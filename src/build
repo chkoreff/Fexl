@@ -1,0 +1,243 @@
+#!/bin/sh
+
+# Usage:
+#   build [quiet] [clean] [install]
+#   build erase
+
+# Build and install the program as required.
+
+build()
+	{
+	compile abstract  value apply C S I L R Y string var
+	compile apply  value
+	compile fexl  value parse trace
+
+	compile parse  value abstract apply I resolve string var Y
+
+	compile resolve  value abstract parse string var \
+		C S I L R Y \
+		char_get char_put \
+		double double_add double_sub double_mul double_div double_from \
+		double_compare \
+		long long_add long_sub long_mul long_div long_from long_compare \
+		string_append string_compare string_from string_from_char string_put \
+		string_at string_len string_slice
+
+	compile C  value
+	compile I  value
+	compile L  value apply
+	compile R  value apply
+	compile S  value apply
+
+	compile compare  value apply C I R
+
+	compile char_get  value apply long
+	compile char_put  value apply I long
+
+	compile double  value
+	compile double_from   value double long string
+	compile double_add  value double
+	compile double_sub  value double
+	compile double_mul  value double
+	compile double_div  value double
+	compile double_compare  value compare double
+
+	compile long  value
+	compile long_add  value long
+	compile long_sub  value long
+	compile long_mul  value long
+	compile long_div  value long
+	compile long_from  value double long string
+	compile long_compare  value compare long
+
+	compile string  value
+	compile string_from  value double long string
+	compile string_append  value string
+	compile string_compare  value compare string
+	compile string_put  value string
+	compile string_from_char  value long string
+	compile string_at  value long string
+	compile string_len  value long string
+	compile string_slice  value long string
+
+	compile trace  value double long string var
+
+	compile value
+	compile var  value string
+	compile Y  value apply
+
+	link fexl
+	install fexl
+	}
+
+### Auxiliary functions below
+
+# Return true if file_1 is newer than file_2.
+newer_than()
+	{
+	file_1=$1
+	file_2=$2
+
+	out_of_date=0
+	if [ -e $file_2 ]
+	then
+		if [ $file_1 -nt $file_2 ]
+		then
+			out_of_date=1
+		fi
+	else
+		out_of_date=1
+	fi
+	echo $out_of_date
+	}
+
+# Compile the .c file if it's newer than the .o file.  Also build up the list
+# of names as we go so we can use them in the link phase.
+compile()
+	{
+	name=$1
+	shift;
+
+	file_c=$name.c
+	file_o=$obj/$name.o
+
+	names="$names $name"
+
+	out_of_date=`newer_than $file_c $file_o`
+
+	if [ $out_of_date -ne 1 ]
+	then
+		for header in $name $@
+		do
+			file_h=$header.h
+			out_of_date=`newer_than $file_h $file_o`
+			if [ $out_of_date -ne 0 ]
+			then
+				break
+			fi
+		done
+	fi
+
+	if [ $out_of_date -ne 0 ]
+	then
+		compile_command="$compile $file_c -o $file_o"
+		if [ $quiet -eq 0 ]; then echo $compile_command ; fi
+		$compile_command
+		code=$?
+		if test $code -ne 0; then exit $code ; fi
+	fi
+	}
+
+# Link all the object files together to produce the target executable.  This
+# only happens if any object file is newer than the target.
+link()
+	{
+	name=$1
+
+	target="$bin/$name"
+
+	out_of_date=0
+	for name in $names
+	do
+		file_o="$obj/$name.o"
+		out_of_date=`newer_than $file_o $target`
+		if [ $out_of_date -ne 0 ]
+		then
+			break
+		fi
+	done
+
+	if [ $out_of_date -ne 0 ]
+	then
+		link_command=$link
+
+		for name in $names
+		do
+			link_command="$link_command $obj/$name.o"
+		done
+
+		link_command="$link_command -o $target"
+
+		if [ $quiet -eq 0 ]; then echo $link_command ; fi
+		$link_command
+		code=$?
+		if test $code -ne 0; then exit $code ; fi
+	fi
+	}
+
+install()
+	{
+	if [ "$verb" = "install" ]
+	then
+		name=$1
+		local_bin=$bin/$name
+		final_bin=$install_location/$name
+
+		if [ `newer_than $local_bin $final_bin` -ne 0 ]
+		then
+			sudo cp -p $local_bin $final_bin
+			sudo chown root $final_bin
+			sudo chgrp root $final_bin
+		fi
+	fi
+	}
+
+# Configure and initialize.
+
+install_location="/usr/bin"
+
+compile="gcc -c -Wall -Werror -ansi -O2"
+link="gcc"
+
+obj=../obj
+bin=../bin
+
+names=""
+
+# Check the command line.
+
+valid=0
+quiet=0
+
+verb=$1
+
+if [ "$verb" = "quiet" ]
+then
+	quiet=1
+	shift
+	verb=$1
+fi
+
+if [ "$verb" = "clean" -o "$verb" = "erase" ]
+then
+	# I don't use $obj and $bin here because that would be dangerous if I made
+	# a mistake setting them above.
+	rm -rf ../obj
+	rm -rf ../bin
+
+	if [ "$verb" = "erase" ]; then exit ; fi
+	shift
+	verb=$1
+fi
+
+if [ "$verb" = "" ]
+then
+	valid=1
+fi
+
+if [ "$verb" = "install" ]
+then
+	valid=1
+fi
+
+if [ $valid -ne 1 ]
+then
+	echo "Unknown verb '$verb'"
+	exit 2
+fi
+
+mkdir -p $obj
+mkdir -p $bin
+
+# Now do the build.
+build

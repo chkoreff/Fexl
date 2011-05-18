@@ -1,0 +1,476 @@
+#!../bin/fexl
+# ^^^ use that line for the locally built version
+
+#!/usr/bin/fexl
+# ^^^ use that line for the installed version
+
+# Useful:
+\print = (\item string_put (string_from item))
+\nl = (print "
+")
+
+\T = (\T\F T)
+\F = (\T\F F)
+
+########
+
+\test_hello_world=
+(
+print "hello world" nl;
+)
+
+########
+
+\test_cat=
+(
+print "=== Enter lines of text and I'll echo them.  Press Ctrl-D to stop";nl;
+
+\long_lt = (\x\y long_compare x y T F F)
+
+# The cat program echoes the input to the output.
+\cat == (char_get \ch long_lt ch 0 I; char_put ch; cat)
+cat
+)
+
+########
+
+\test_string_slice=
+(
+print (string_slice "abcde" 0 1); nl;
+print (string_slice "abcde" 0 2); nl;
+print (string_slice "abcde" 0 3); nl;
+print (string_slice "abcde" 0 4); nl;
+print (string_slice "abcde" 0 5); nl;
+print (string_slice "abcde" 0 6); nl;
+print (string_slice "abcde" 0 700); nl;
+print (string_slice "a" 0 0); nl;
+print (string_slice "a" 0 1); nl;
+print (string_slice "a" 0 2); nl;
+print (string_slice "a" -1 0); nl;
+print "=====";nl;
+print (string_slice "a" 0 1); nl;
+print (string_slice "a" -1 2); nl;
+print (string_slice "a" -2 3); nl;
+print (string_slice "a" -2 4); nl;
+print (string_slice "a" -2 0); nl;
+print (string_slice "abcde" 0 5); nl;
+print (string_slice "abcde" -1 5); nl;
+print (string_slice "abcde" -2 5); nl;
+print (string_slice "abcde" -3 5); nl;
+print (string_slice "abcde" -4 5); nl;
+print (string_slice "abcde" -5 5); nl;
+print (string_slice "abcde" -5 6); nl;
+print (string_slice "abcde" -5 7); nl;
+print (string_slice "abcde" -5 8); nl;
+print (string_slice "abcde" -5 9); nl;
+print (string_slice "abcde" -5 10); nl;
+print (string_slice "abcde" -5 11); nl;
+print "=====";nl;
+print (string_slice "" 0 0); nl;
+print (string_slice "" 0 800); nl;
+print (string_slice "" -30 800); nl;
+#string_put (string_from (string_slice "a" 0 1));nl;
+#string_put (string_from (string_slice "a" 0 1));nl;
+#string_put (string_from (string_slice "a" 0 1));nl;
+#string_put (string_from (string_slice "a" 0 1));nl;
+
+#string_put (string_slice "a" 0 0)
+)
+
+########
+
+\test_write_binary =
+(
+# Writing binary
+
+\string_3014 =
+	(
+	string_append (string_from_char 03);
+	string_append (string_from_char 00);
+	string_append (string_from_char 01);
+	string_append (string_from_char 04);
+	""
+	)
+
+string_put string_3014;
+)
+
+########
+
+\test_string_len=
+(
+print (string_len ""); nl;
+print (string_len "a"); nl;
+print (string_len "ab"); nl;
+print (string_len "12345678901234567890123456789012"); nl;
+)
+
+########
+
+\test_string_at=
+(
+print (string_at "abc" -1); nl;
+print (string_at "abc" 0); nl;
+print (string_at "abc" 1); nl;
+print (string_at "abc" 2); nl;
+print (string_at "abc" 3); nl;
+)
+
+########
+
+\test_string_compare=
+(
+\string_014 =
+	(
+	string_append (string_from_char 00);
+	string_append (string_from_char 01);
+	string_append (string_from_char 04);
+	""
+	)
+
+\string_041 =
+	(
+	string_append (string_from_char 00);
+	string_append (string_from_char 04);
+	string_append (string_from_char 01);
+	""
+	)
+
+\string_eq=(\x\y string_compare x y F T F)
+
+\string_0142 = (string_append string_014; string_from_char 02);
+
+\do_compare=(\x\y\expect
+	\result = (string_compare x y "LT" "EQ" "GT")
+	print result; print " ";
+	print (string_eq result expect "GOOD" "BAD");
+	nl;
+	)
+
+do_compare string_0142 string_014 "GT";
+do_compare string_014 string_0142 "LT";
+do_compare string_014 string_014 "EQ";
+do_compare string_014 string_041 "LT";
+do_compare string_041 string_014 "GT";
+do_compare string_041 string_0142 "GT";
+)
+
+########
+
+\test_long_add=
+(
+\x=(long_add 37 23)
+print "The value of x is "; print x; print "."; nl;
+)
+
+########
+\test_procedural=
+(
+# Make some abbreviations.
+\add=double_add
+\sub=double_sub
+\mul=double_mul
+\div=double_div
+
+
+print ~@
+===
+Here we demonstrate an ordinary "procedural" style of programming.  This works
+because definitions are NOT recursive by default.  If you want a recursive
+definition, you must use "==" instead of just "=".
+
+@;
+
+\show=(\name\value print name; print " = "; print value; nl;)
+
+\x=3.0
+\y=4.0
+
+\x=3.0
+\y=4.0
+\x=(add x x)
+\y=(mul y x)
+show "x" x; show "y" y;
+\x=(div x; mul y 4.0)
+show "x" x; show "y" y;
+
+\z=(mul x; mul y; add 1.0 y)
+show "x" x; show "y" y; show "z" z;
+\z=(div z 5.0)
+show "z" z;
+)
+
+########
+
+# Choose your test(s) to run down here.  Comment the ones don't want to run.
+
+test_hello_world
+test_string_slice
+test_write_binary
+test_string_len
+test_string_at
+test_string_compare
+test_long_add
+test_procedural
+test_cat
+
+\\
+
+# Miscellaneous disorganized stuff down here, mostly syntax tests.
+
+###################################
+
+
+#~END hiEND
+#~@2 lskajfklajsdfklja@;sklfjklas"hhhh" @1 "woo hoo"@2
+#\x x x
+#\\
+
+#long_add 123 456
+#long_add 123.45 456
+#long_add -123.45 456
+#long_add 123 456
+#double_add 123.45 456.0
+#double_from; long_add 123 456
+#double_from; long_add 23987234283793433 0
+
+#long_from 123.45
+
+#long_from "12345.0"
+#long_from; double_from "12345.67"
+
+#string_from 123
+#long_sub 12 -8
+#long_mul 12 -8
+#long_div 25 -8
+#long_div 25 0
+
+#long_compare 23 23
+#long_compare 23 24
+#long_compare 24 23
+#long_compare 24 240
+#long_compare -1 4
+#long_compare 4 -1
+#long_compare -1 -1
+
+#double_compare 23.0 23.0
+#double_compare 23.0 24.0
+#double_compare 23.1 23.2
+#double_compare 24.0 23.0
+#double_compare 24.0 240.0
+double_compare -1.0 4.0
+#double_compare 4.0 -1.0
+#double_compare -1.0 -1.0
+
+#string_compare "x" "y"
+#string_compare "x" "xy"
+#string_compare "y" "y"
+#string_compare "y" "x"
+#string_compare "y" "yx"
+#string_compare "" ""
+
+"LT"
+"EQ"
+"GT"
+
+
+#C S
+
+#Y I
+#Y Y
+
+#\"hi" "hi" ("hi" "hi")
+#\"" "" ""
+#"hi"
+#""
+#string_put "hi"; string_put "world"; string_put "
+#";
+
+#\nl=(string_put "
+#")
+
+#string_put (string_from (double_add 2.345 5.5)); nl
+#string_put (string_from 2.345); nl
+#+2.345e42
+#-3.14159265358979323846
+#0
+
+#\nl=(string_put "
+#")
+
+#"a" "b" \\"c"
+#"a" "b" \\)
+#~@2 lskajfklajsdfklja@;sklfjklas"hhhh" @1 "woo hoo"@2\\hi
+#\\
+
+
+#\ 
+#\a a
+#\\"a"
+#\ a a a
+#\\a a
+#\\
+
+#string_put "hello world"; nl
+#C C
+#\\
+#We can put anything we like down here.  :)
+#\a a a
+#;aklsjfkl;asj
+#akl;sjf
+#;ajksdf
+
+#S C \a a a
+#S C \\
+
+#\\ \
+
+#\
+#\(
+
+
+#a#
+
+#~@@ h@@
+#"hi"
+#~"" hi""
+#~@ hi@
+#~@ i@
+#~@ @
+
+#\~@ES hola mundo@ES
+#\~@EN hello world@EN
+
+#~@EN hello world@EN
+#~@ES hola mundo@ES
+
+#\x x x
+#\"x" "x" "x"
+#\~" x" ~" x" ~" x"
+
+#~ hi
+
+# simple:
+#\x\y y; x x
+# with wild var names:
+#\~@ xx@ \~"" yyy""~"" yyy"" ; ~@ xx@ ~@ xx@
+# all run together:
+#\~@ xx@\~"" yyy""~"" yyy"";~@ xx@~@ xx@
+
+
+
+
+#\abc abc abc
+
+#(S C)C
+#\x=(S C)x
+#\x=(S C)\y=I x y
+#\x=(S C)\y=I y x
+#(\x=C\y\z x (y z)) I S
+#\x=C\y=S y x
+#(\x=C\y=S y x)Y
+
+#\x=(S C) x x
+
+#\x==x x
+
+#\x=C \y y x
+#\x=C\y y x
+#(\x=C\y\z x (y z)) I S
+#(\x=C \y\z x (y z)) I S
+#\x=(C S)x
+
+#\x=C\y=S y x
+
+#(
+#(\x\y y x)
+#S C
+#))
+
+
+#( (\x\y y x) C S ) ( (\x\y y x) C S )
+#((\x\y y x)C S)((\x\y y x)C S)
+
+#; S C ; C S
+
+#S;
+
+
+#(\x=C\y=I\z=S x (y z))
+#(\x=C \y=I \z=S x (y z))
+
+#(\x\y\z x (y z)) C I S
+
+#S C \x   =  S C x
+#S C \x=S C x
+
+#S C \x   =  
+##hi
+#S C x
+
+#S C \x=(I C) S x
+#S C \x=(I C) x
+#\x=(I C) C x
+
+#\x=
+
+#\x=(S (C C)) \y=(C S) x y
+#\x=(S (C C))\y=(C S)x y
+
+
+#I I \x==x x x
+
+#C S
+## comment here
+#I
+
+#=
+
+#\x\y double_add x y
+
+#x
+#\x x
+#\x x x
+#\x y
+#\x\y x y
+#\x\y y x
+
+#C S I L R Y
+
+#\x x
+
+#\x\y y x
+#\x\y z x
+
+
+#() double_add
+#C S x; C; C
+# Defaults to I after trailing semicolon here.
+#C S string_from; C;
+
+#\: :
+#C S I L R Y
+#double_add
+#double_sub
+#double_mul
+#double_div
+#string_append
+#string_from
+#string_put
+
+
+#\x\y\z x (y z)
+#\x\y\z x z y
+#Y Y
+#Y I
+#I
+
+#Y ()
+
+#\x\y x y
+
+#C x y
+#S x y z
+#S C S I
+#S Y C S
+
