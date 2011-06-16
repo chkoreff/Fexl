@@ -93,7 +93,7 @@ void buf_add(int ch)
 		buf_max = new_max;
 		}
 
-	buf[buf_len++] = curr_ch;
+	buf[buf_len++] = ch;
 	}
 
 /*
