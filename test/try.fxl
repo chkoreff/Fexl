@@ -156,6 +156,38 @@ do_compare string_041 string_0142 "GT";
 )
 
 ########
+\test_string_common =
+(
+\string_eq=(\x\y string_compare x y F T F)
+\long_eq=(\x\y long_compare x y F T F)
+
+\check = (\value\expect
+	\halt == (\_ halt)
+	\ok = (long_eq value expect)
+	print " "; print (ok "GOOD" "BAD");nl;
+	ok I halt
+	)
+
+\test_string_common = (\x\y\expect
+	\len = (string_common x y)
+	print "string_common ";print x; print " "; print y; print " = "; print len;
+	check len expect;
+	)
+
+test_string_common "" "" 0;
+test_string_common "" "a" 0;
+test_string_common "a" "a" 1;
+test_string_common "a" "ab" 1;
+test_string_common "ab" "a" 1;
+test_string_common "ab" "ab" 2;
+test_string_common "abc" "abd" 2;
+test_string_common "aac" "abd" 1;
+test_string_common "abd" "abd" 3;
+test_string_common "cbd" "abd" 0;
+test_string_common "x" "" 0;
+)
+
+########
 
 \test_long_add=
 (
@@ -210,6 +242,7 @@ test_write_binary
 test_string_len
 test_string_at
 test_string_compare
+test_string_common
 test_long_add
 test_procedural
 test_cat

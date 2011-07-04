@@ -43,6 +43,7 @@
 #include "string_at.h"
 #include "string_len.h"
 #include "string_slice.h"
+#include "string_common.h"
 
 /*
 LATER do some standard handy definitions such as:
@@ -129,6 +130,7 @@ void start_resolve(void)
 	push_var(new_string("string_at"), &value_string_at);
 	push_var(new_string("string_len"), &value_string_len);
 	push_var(new_string("string_slice"), &value_string_slice);
+	push_var(new_string("string_common"), &value_string_common);
 
 	push_var(new_string("char_get"), &value_char_get);
 	push_var(new_string("char_put"), &value_char_put);

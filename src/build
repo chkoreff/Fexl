@@ -21,7 +21,7 @@ build()
 		double_compare \
 		long long_add long_sub long_mul long_div long_from long_compare \
 		string_append string_compare string_from string_from_char string_put \
-		string_at string_len string_slice
+		string_at string_len string_slice string_common
 
 	compile C  value
 	compile I  value
@@ -59,6 +59,7 @@ build()
 	compile string_at  value long string
 	compile string_len  value long string
 	compile string_slice  value long string
+	compile string_common  value long string
 
 	compile trace  value double long string var
 
