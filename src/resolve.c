@@ -15,6 +15,7 @@
 #include "L.h"
 #include "R.h"
 #include "Y.h"
+#include "Q.h"
 
 #include "char_get.h"
 #include "char_put.h"
@@ -107,6 +108,7 @@ void start_resolve(void)
 	push_var(new_string("L"), &value_L);
 	push_var(new_string("R"), &value_R);
 	push_var(new_string("Y"), &value_Y);
+	push_var(new_string("?"), &value_Q);
 
 	push_var(new_string("long_add"), &value_long_add);
 	push_var(new_string("long_sub"), &value_long_sub);

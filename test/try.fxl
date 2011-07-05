@@ -14,14 +14,14 @@
 
 ########
 
-\test_hello_world=
+\test_hello_world==
 (
 print "hello world" nl;
 )
 
 ########
 
-\test_cat=
+\test_cat==
 (
 print "=== Enter lines of text and I'll echo them.  Press Ctrl-D to stop";nl;
 
@@ -34,7 +34,7 @@ cat
 
 ########
 
-\test_string_slice=
+\test_string_slice==
 (
 print (string_slice "abcde" 0 1); nl;
 print (string_slice "abcde" 0 2); nl;
@@ -79,7 +79,7 @@ print (string_slice "" -30 800); nl;
 
 ########
 
-\test_write_binary =
+\test_write_binary ==
 (
 # Writing binary
 
@@ -97,7 +97,7 @@ string_put string_3014;
 
 ########
 
-\test_string_len=
+\test_string_len==
 (
 print (string_len ""); nl;
 print (string_len "a"); nl;
@@ -107,7 +107,7 @@ print (string_len "12345678901234567890123456789012"); nl;
 
 ########
 
-\test_string_at=
+\test_string_at==
 (
 print (string_at "abc" -1); nl;
 print (string_at "abc" 0); nl;
@@ -118,7 +118,7 @@ print (string_at "abc" 3); nl;
 
 ########
 
-\test_string_compare=
+\test_string_compare==
 (
 \string_014 =
 	(
@@ -156,7 +156,7 @@ do_compare string_041 string_0142 "GT";
 )
 
 ########
-\test_string_common =
+\test_string_common ==
 (
 \string_eq=(\x\y string_compare x y F T F)
 \long_eq=(\x\y long_compare x y F T F)
@@ -189,14 +189,14 @@ test_string_common "x" "" 0;
 
 ########
 
-\test_long_add=
+\test_long_add==
 (
 \x=(long_add 37 23)
 print "The value of x is "; print x; print "."; nl;
 )
 
 ########
-\test_procedural=
+\test_procedural==
 (
 # Make some abbreviations.
 \add=double_add
@@ -217,9 +217,6 @@ definition, you must use "==" instead of just "=".
 
 \x=3.0
 \y=4.0
-
-\x=3.0
-\y=4.0
 \x=(add x x)
 \y=(mul y x)
 show "x" x; show "y" y;
@@ -230,6 +227,27 @@ show "x" x; show "y" y;
 show "x" x; show "y" y; show "z" z;
 \z=(div z 5.0)
 show "z" z;
+)
+
+\test_eager==
+(
+\long_le = (\x\y long_compare x y T T F)
+
+\sum == (\total\count
+	long_le count 0 total;
+
+	# This form evaluates eagerly:
+	\total = (long_add total count)
+
+	# Or if you prefer, you can use "?" to force eager evaluation like this:
+	#? (long_add total count) \total
+
+	sum total (long_sub count 1))
+
+\sum = (sum 0)
+
+\count = 100000
+print "The sum of 1 .. ";print count; print " is "; print (sum count);nl;
 )
 
 ########
@@ -245,6 +263,7 @@ test_string_compare
 test_string_common
 test_long_add
 test_procedural
+test_eager
 test_cat
 
 \\

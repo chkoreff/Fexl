@@ -12,10 +12,10 @@ build()
 	compile apply  value
 	compile fexl  value parse trace
 
-	compile parse  value abstract apply I resolve string var Y
+	compile parse  value abstract apply I resolve string var Y Q
 
 	compile resolve  value abstract parse string var \
-		C S I L R Y \
+		C S I L R Y Q \
 		char_get char_put \
 		double double_add double_sub double_mul double_div double_from \
 		double_compare \
@@ -26,6 +26,7 @@ build()
 	compile C  value
 	compile I  value
 	compile L  value apply
+	compile Q  value apply
 	compile R  value apply
 	compile S  value apply
 

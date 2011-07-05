@@ -12,6 +12,7 @@
 #include "string.h"
 #include "var.h"
 #include "Y.h"
+#include "Q.h"
 
 /*
 Grammar:
@@ -352,7 +353,13 @@ struct value *parse_exp(struct value *exp)
 				hold(body);
 
 				struct value *value = abstract(sym,body);
-				struct value *result = apply(value,def);
+
+				struct value *result;
+				if (is_recursive)
+					result = apply(value,def);
+				else
+					/* The Q forces eager evaluation of def first. */
+					result = apply(apply(&value_Q,def),value);
 
 				exp = exp ? apply(exp,result) : result;
 
