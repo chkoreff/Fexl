@@ -16,6 +16,7 @@ build()
 
 	compile resolve  value abstract parse string var \
 		C S I L R Y Q \
+		item pair \
 		char_get char_put \
 		double double_add double_sub double_mul double_div double_from \
 		double_compare \
@@ -29,6 +30,8 @@ build()
 	compile Q  value apply
 	compile R  value apply
 	compile S  value apply
+	compile item  value apply
+	compile pair  value apply
 
 	compile compare  value apply C I R
 

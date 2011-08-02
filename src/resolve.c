@@ -16,6 +16,8 @@
 #include "R.h"
 #include "Y.h"
 #include "Q.h"
+#include "item.h"
+#include "pair.h"
 
 #include "char_get.h"
 #include "char_put.h"
@@ -110,6 +112,9 @@ void start_resolve(void)
 	push_var(new_string("Y"), &value_Y);
 	push_var(new_string("?"), &value_Q);
 
+	push_var(new_string("item"), &value_item);
+	push_var(new_string("pair"), &value_pair);
+
 	push_var(new_string("long_add"), &value_long_add);
 	push_var(new_string("long_sub"), &value_long_sub);
 	push_var(new_string("long_mul"), &value_long_mul);
@@ -198,5 +203,5 @@ struct value *resolve(struct value *sym)
 	}
 
 	fprintf(stderr, "Undefined variable %s on line %d\n", atom->data, line_no);
-	return new_value(sym->T,sym->L,sym->R);
+	exit(1);
 	}
