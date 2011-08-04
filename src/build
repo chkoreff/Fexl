@@ -6,77 +6,6 @@
 
 # Build and install the program as required.
 
-build()
-	{
-	compile abstract  value apply C S I L R Y string var
-	compile apply  value
-	compile fexl  value parse trace
-
-	compile parse  value abstract apply I resolve string var Y Q
-
-	compile resolve  value abstract parse string var \
-		C S I L R Y Q \
-		item pair \
-		char_get char_put \
-		double double_add double_sub double_mul double_div double_from \
-		double_compare \
-		long long_add long_sub long_mul long_div long_from long_compare \
-		string_append string_compare string_from string_from_char string_put \
-		string_at string_len string_slice string_common
-
-	compile C  value
-	compile I  value
-	compile L  value apply
-	compile Q  value apply
-	compile R  value apply
-	compile S  value apply
-	compile item  value apply
-	compile pair  value apply
-
-	compile compare  value apply C I R
-
-	compile char_get  value apply long
-	compile char_put  value apply I long
-
-	compile double  value
-	compile double_from   value double long string
-	compile double_add  value double
-	compile double_sub  value double
-	compile double_mul  value double
-	compile double_div  value double
-	compile double_compare  value compare double
-
-	compile long  value
-	compile long_add  value long
-	compile long_sub  value long
-	compile long_mul  value long
-	compile long_div  value long
-	compile long_from  value double long string
-	compile long_compare  value compare long
-
-	compile string  value
-	compile string_from  value double long string
-	compile string_append  value string
-	compile string_compare  value compare string
-	compile string_put  value string
-	compile string_from_char  value long string
-	compile string_at  value long string
-	compile string_len  value long string
-	compile string_slice  value long string
-	compile string_common  value long string
-
-	compile trace  value double long string var
-
-	compile value
-	compile var  value string
-	compile Y  value apply
-
-	link fexl
-	install fexl
-	}
-
-### Auxiliary functions below
-
 # Return true if file_1 is newer than file_2.
 newer_than()
 	{
@@ -96,55 +25,38 @@ newer_than()
 	echo $out_of_date
 	}
 
-# Compile the .c file if it's newer than the .o file.  Also build up the list
-# of names as we go so we can use them in the link phase.
+# Compile the .c file if any of the sources are newer than the .o file.
 compile()
 	{
-	name=$1
-	shift;
+	file_o=$1
+	file_c=$2
+	shift
 
-	file_c=$name.c
-	file_o=$obj/$name.o
-
-	names="$names $name"
-
-	out_of_date=`newer_than $file_c $file_o`
-
-	if [ $out_of_date -ne 1 ]
-	then
-		for header in $name $@
-		do
-			file_h=$header.h
-			out_of_date=`newer_than $file_h $file_o`
-			if [ $out_of_date -ne 0 ]
-			then
-				break
-			fi
-		done
-	fi
-
-	if [ $out_of_date -ne 0 ]
-	then
-		compile_command="$compile $file_c -o $file_o"
-		if [ $quiet -eq 0 ]; then echo $compile_command ; fi
-		$compile_command
-		code=$?
-		if test $code -ne 0; then exit $code ; fi
-	fi
+	for source in $@
+	do
+		out_of_date=`newer_than $source $file_o`
+		if [ $out_of_date -eq 1 ]
+		then
+			compile_command="$compile $file_c -o $file_o"
+			if [ $quiet -eq 0 ]; then echo $compile_command ; fi
+			$compile_command
+			code=$?
+			if test $code -ne 0; then exit $code ; fi
+			break
+		fi
+	done
 	}
 
 # Link all the object files together to produce the target executable.  This
 # only happens if any object file is newer than the target.
 link()
 	{
-	name=$1
-
-	target="$bin/$name"
+	target=$1
+	shift
 
 	out_of_date=0
-	for name in $names
+	for file_o in $@
 	do
-		file_o="$obj/$name.o"
 		out_of_date=`newer_than $file_o $target`
 		if [ $out_of_date -ne 0 ]
 		then
@@ -156,9 +68,9 @@ link()
 	then
 		link_command=$link
 
-		for name in $names
+		for file_o in $@
 		do
-			link_command="$link_command $obj/$name.o"
+			link_command="$link_command $file_o"
 		done
 
 		link_command="$link_command -o $target"
@@ -187,62 +99,105 @@ install()
 	fi
 	}
 
-# Configure and initialize.
-
-install_location="/usr/bin"
-
-compile="gcc -c -Wall -Werror -ansi -O2"
-link="gcc"
-
-obj=../obj
-bin=../bin
-
-names=""
-
-# Check the command line.
-
-valid=0
-quiet=0
-
-verb=$1
-
-if [ "$verb" = "quiet" ]
-then
-	quiet=1
-	shift
+handle_options()
+	{
 	verb=$1
-fi
 
-if [ "$verb" = "clean" -o "$verb" = "erase" ]
-then
-	# I don't use $obj and $bin here because that would be dangerous if I made
-	# a mistake setting them above.
-	rm -rf ../obj
-	rm -rf ../bin
+	install_location="/usr/bin"
 
-	if [ "$verb" = "erase" ]; then exit ; fi
-	shift
-	verb=$1
-fi
+	# I use -O3 because that enables -finline-functions.  You can see that by
+	# running "gcc -c -Q -O3 --help=optimizers".
+	compile="gcc -c -Wall -Werror -ansi -O3"
+	link="gcc"
 
-if [ "$verb" = "" ]
-then
-	valid=1
-fi
+	obj=../obj
+	bin=../bin
 
-if [ "$verb" = "install" ]
-then
-	valid=1
-fi
+	# Check the command line.
 
-if [ $valid -ne 1 ]
-then
-	echo "Unknown verb '$verb'"
-	exit 2
-fi
+	valid=0
+	quiet=0
 
-mkdir -p $obj
-mkdir -p $bin
+	if [ "$verb" = "quiet" ]
+	then
+		quiet=1
+		shift
+		verb=$1
+	fi
 
-# Now do the build.
-build
+	if [ "$verb" = "clean" -o "$verb" = "erase" ]
+	then
+		# I don't use $obj and $bin here because that would be dangerous if I
+		# made a mistake setting them above.
+		rm -rf ../obj
+		rm -rf ../bin
+
+		if [ "$verb" = "erase" ]; then exit ; fi
+		shift
+		verb=$1
+	fi
+
+	if [ "$verb" = "" ]
+	then
+		valid=1
+	fi
+
+	if [ "$verb" = "install" ]
+	then
+		valid=1
+	fi
+
+	if [ $valid -ne 1 ]
+	then
+		echo "Unknown verb '$verb'"
+		exit 2
+	fi
+
+	mkdir -p $obj
+	mkdir -p $bin
+	}
+
+build_program()
+	{
+	target=`basename $main_c .c`
+
+	if [ ! -e $obj/build ]
+	then
+		main_c=`grep -l "^int main(" *.c | head -1`
+		if [ "$main_c" = "" ]
+		then
+			echo "I don't see a main program here."
+			exit 2
+		fi
+
+		objects=""
+
+		for file_c in *.c
+		do
+			base=`basename $file_c .c`
+			file_o=$obj/$base.o
+
+			objects="$objects$file_o "
+
+			grep -e "^#include \".*\"$" $file_c |
+			sed "s/^#include \"\(.*\)\"/\1/" |
+			(
+			headers=""
+			while read file_h ; do
+				headers="$headers$file_h "
+			done
+			echo "compile $file_o $file_c $headers" >>$obj/build
+			)
+		done
+
+		echo "link $bin/$target $objects" >>$obj/build
+
+		chmod +x $obj/build
+	fi
+
+	script=`cat $obj/build`
+	eval "$script"
+	}
+
+handle_options $1
+build_program
