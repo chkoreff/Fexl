@@ -159,8 +159,6 @@ handle_options()
 
 build_program()
 	{
-	target=`basename $main_c .c`
-
 	if [ ! -e $obj/build ]
 	then
 		main_c=`grep -l "^int main(" *.c | head -1`
@@ -169,6 +167,8 @@ build_program()
 			echo "I don't see a main program here."
 			exit 2
 		fi
+
+		target=`basename $main_c .c`
 
 		objects=""
 
