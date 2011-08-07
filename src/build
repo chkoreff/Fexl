@@ -1,10 +1,7 @@
 #!/bin/sh
 
-# Usage:
-#   build [quiet] [clean] [install]
-#   build erase
-
-# Build and install the program as required.
+# Build and install the program as required.  To see the usage options, run
+# "./build help".
 
 # Return true if file_1 is newer than file_2.
 newer_than()
@@ -86,9 +83,8 @@ install()
 	{
 	if [ "$verb" = "install" ]
 	then
-		name=$1
-		local_bin=$bin/$name
-		final_bin=$install_location/$name
+		local_bin=$1
+		final_bin=$2
 
 		if [ `newer_than $local_bin $final_bin` -ne 0 ]
 		then
@@ -118,6 +114,48 @@ handle_options()
 	valid=0
 	quiet=0
 
+	if [ "$verb" = "help" ]
+	then
+	progname=./build
+	cat <<EOM
+NAME
+       $progname - build a C program
+
+SYNOPSIS
+       $progname [quiet] [clean] [refresh] [install]
+       $progname erase
+
+DESCRIPTION
+
+       $progname
+              Only compile what actually changed.
+
+       $progname clean
+              Compile everything from scratch.
+
+       $progname install
+              Install the program in the $install_location directory.
+
+       $progname quiet
+              Build quietly, without showing the commands that it runs.
+
+       $progname erase
+              Erase all the output files and don't build anything.
+
+       $progname refresh
+              Refresh the build script, analyzing the program structure again.
+              This is useful when you've changed the program structure by
+              adding or deleting files or creating new header dependencies.
+              You could use the "clean" option instead, but this is faster.
+
+       You may also combine the options in various ways such as this:
+
+       $progname quiet clean install
+
+EOM
+	exit
+	fi
+
 	if [ "$verb" = "quiet" ]
 	then
 		quiet=1
@@ -133,6 +171,13 @@ handle_options()
 		rm -rf ../bin
 
 		if [ "$verb" = "erase" ]; then exit ; fi
+		shift
+		verb=$1
+	fi
+
+	if [ "$verb" = "refresh" ]
+	then
+		rm -f ../obj/build
 		shift
 		verb=$1
 	fi
@@ -191,6 +236,7 @@ build_program()
 		done
 
 		echo "link $bin/$target $objects" >>$obj/build
+		echo "install $bin/$target $install_location/$target" >>$obj/build
 
 		chmod +x $obj/build
 	fi
@@ -199,5 +245,5 @@ build_program()
 	eval "$script"
 	}
 
-handle_options $1
+handle_options $@
 build_program
