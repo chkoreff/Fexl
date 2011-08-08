@@ -27,29 +27,41 @@
 #include "double_sub.h"
 #include "double_mul.h"
 #include "double_div.h"
-#include "double_from.h"
 #include "double_compare.h"
+#include "double_type.h"
+#include "double_string.h"
+#include "double_long.h"
 
 #include "long.h"
 #include "long_add.h"
 #include "long_sub.h"
 #include "long_mul.h"
 #include "long_div.h"
-#include "long_from.h"
 #include "long_compare.h"
+#include "long_type.h"
+#include "long_string.h"
+#include "long_char.h"
+#include "long_double.h"
 
 #include "string_append.h"
 #include "string_compare.h"
-#include "string_from.h"
 #include "string_put.h"
-#include "string_from_char.h"
 #include "string_at.h"
 #include "string_len.h"
 #include "string_slice.h"
 #include "string_common.h"
+#include "string_type.h"
+#include "string_long.h"
+#include "string_double.h"
 
 /*
 LATER do some standard handy definitions such as:
+
+\string_from = (\x
+	string_type x x;
+	long_type x (long_string x);
+	double_type x (double_string x);
+	x)
 
 \print = (\item string_put (string_from item))
 
@@ -119,25 +131,31 @@ void start_resolve(void)
 	push_var(new_string("long_sub"), &value_long_sub);
 	push_var(new_string("long_mul"), &value_long_mul);
 	push_var(new_string("long_div"), &value_long_div);
-	push_var(new_string("long_from"), &value_long_from);
 	push_var(new_string("long_compare"), &value_long_compare);
+	push_var(new_string("long_type"), &value_long_type);
+	push_var(new_string("long_string"), &value_long_string);
+	push_var(new_string("long_char"), &value_long_char);
+	push_var(new_string("long_double"), &value_long_double);
 
 	push_var(new_string("double_add"), &value_double_add);
 	push_var(new_string("double_sub"), &value_double_sub);
 	push_var(new_string("double_mul"), &value_double_mul);
 	push_var(new_string("double_div"), &value_double_div);
-	push_var(new_string("double_from"), &value_double_from);
 	push_var(new_string("double_compare"), &value_double_compare);
+	push_var(new_string("double_type"), &value_double_type);
+	push_var(new_string("double_string"), &value_double_string);
+	push_var(new_string("double_long"), &value_double_long);
 
 	push_var(new_string("string_append"), &value_string_append);
 	push_var(new_string("string_compare"), &value_string_compare);
-	push_var(new_string("string_from"), &value_string_from);
 	push_var(new_string("string_put"), &value_string_put);
-	push_var(new_string("string_from_char"), &value_string_from_char);
 	push_var(new_string("string_at"), &value_string_at);
 	push_var(new_string("string_len"), &value_string_len);
 	push_var(new_string("string_slice"), &value_string_slice);
 	push_var(new_string("string_common"), &value_string_common);
+	push_var(new_string("string_type"), &value_string_type);
+	push_var(new_string("string_long"), &value_string_long);
+	push_var(new_string("string_double"), &value_string_double);
 
 	push_var(new_string("char_get"), &value_char_get);
 	push_var(new_string("char_put"), &value_char_put);

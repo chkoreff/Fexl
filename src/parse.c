@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "memory.h"
 #include "value.h"
 #include "abstract.h"
 #include "apply.h"

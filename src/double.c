@@ -1,5 +1,6 @@
 #include "value.h"
 #include "double.h"
+#include "memory.h"
 
 void hold_double(struct value *value)
 	{

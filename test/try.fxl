@@ -4,7 +4,28 @@
 #!/usr/bin/fexl
 # ^^^ use that line for the installed version
 
+
+# NOTE: If you run ./try.fxl, it will go through a bunch of tests, including
+# one at the end where it asks you to type lines of text and terminate with
+# Ctrl-D.  If you'd like to run the test without having to type anything, and
+# compare it with the reference output, do this:
+#
+#   echo "abc" | ./try.fxl >tmp1
+#   cmp tmp1 out
+#   rm tmp1
+
+#####
+
+# This function halts by simply consuming all arguments given to it.
+\halt == (\_ halt)
+
 # Useful:
+\string_from = (\x
+	string_type x x;
+	long_type x (long_string x);
+	double_type x (double_string x);
+	x)
+
 \print = (\item string_put (string_from item))
 \nl = (print "
 ")
@@ -53,7 +74,7 @@
 \list_print = (\fun list_do \x string_put; fun x)
 
 # We don't use char_put because of buffering problems.
-\chars_print = (list_print string_from_char)
+\chars_print = (list_print long_char)
 
 \bits_print = (list_print \x x "1" "0")
 
@@ -62,9 +83,6 @@
 	\reverse==(\list\result list result \h\t reverse t (item h result))
 	reverse list end
 	)
-
-# This function halts by simply consuming all arguments given to it.
-\halt == (\_ halt)
 
 ########
 
@@ -139,10 +157,10 @@ print (string_slice "" -30 800); nl;
 
 \string_3014 =
 	(
-	string_append (string_from_char 03);
-	string_append (string_from_char 00);
-	string_append (string_from_char 01);
-	string_append (string_from_char 04);
+	string_append (long_char 03);
+	string_append (long_char 00);
+	string_append (long_char 01);
+	string_append (long_char 04);
 	""
 	)
 
@@ -176,21 +194,21 @@ print (string_at "abc" 3); nl;
 (
 \string_014 =
 	(
-	string_append (string_from_char 00);
-	string_append (string_from_char 01);
-	string_append (string_from_char 04);
+	string_append (long_char 00);
+	string_append (long_char 01);
+	string_append (long_char 04);
 	""
 	)
 
 \string_041 =
 	(
-	string_append (string_from_char 00);
-	string_append (string_from_char 04);
-	string_append (string_from_char 01);
+	string_append (long_char 00);
+	string_append (long_char 04);
+	string_append (long_char 01);
 	""
 	)
 
-\string_0142 = (string_append string_014; string_from_char 02);
+\string_0142 = (string_append string_014; long_char 02);
 
 \do_compare=(\x\y\expect
 	\result = (string_compare x y "LT" "EQ" "GT")
@@ -799,12 +817,189 @@ module_test_arithmetic
 
 # Choose your test(s) to run down here.  Comment the ones don't want to run.
 
+\test_string_type==
+(
+\test_case=(\x\expect
+	\result = (string_type x "yes" "no")
+	print "string_type "; print result;
+	print " [";
+	print (string_eq result expect "GOOD" "BAD");
+	print "]";
+	nl;
+	)
 
-test_binary_counter;
-#test_foo;
-test_divide;
-test_sub;
-test_fibonacci
+test_case 4 "no"
+test_case 2.3 "no"
+test_case (\x\y y x) "no"
+test_case C "no"
+test_case (string_append "hello " "world") "yes"
+test_case ((\x\y y x) "hi" I) "yes"
+test_case "hey!" "yes"
+)
+
+\test_double_type==
+(
+\test_case=(\x\expect
+	\result = (double_type x "yes" "no")
+	print "double_type "; print result;
+	print " [";
+	print (string_eq result expect "GOOD" "BAD");
+	print "]";
+	nl;
+	)
+
+test_case 4 "no"
+test_case 2.3 "yes"
+test_case (\x\y y x) "no"
+test_case C "no"
+test_case (string_append "hello " "world") "no"
+test_case ((\x\y y x) (double_add 4.2 2.6) I) "yes"
+test_case "hey!" "no"
+)
+
+\test_long_type==
+(
+\test_case=(\x\expect
+	\result = (long_type x "yes" "no")
+	print "long_type "; print result;
+	print " [";
+	print (string_eq result expect "GOOD" "BAD");
+	print "]";
+	nl;
+	)
+
+test_case 4 "yes"
+test_case 2.3 "no"
+test_case (\x\y y x) "no"
+test_case C "no"
+test_case (string_append "hello " "world") "no"
+test_case ((\x\y y x) (long_add 4 2) I) "yes"
+test_case "hey!" "no"
+)
+
+\test_string_long ==
+(
+\test_case=(\x\expect
+	\quote = ~@ "@
+	\result = (string_long x "no" \n string_append "yes " (long_string n))
+	print "string_long ";
+	string_put quote; string_put x; string_put quote
+	print " : "; print result;
+	print " [";
+	print (string_eq result expect "GOOD" "BAD");
+	print "]";
+	nl;
+	)
+
+test_case "0" "yes 0"
+test_case "1" "yes 1"
+test_case "-1" "yes -1"
+test_case "123" "yes 123"
+test_case "-123" "yes -123"
+test_case "x123" "no"
+test_case "1x23" "no"
+test_case "" "no"
+test_case "   456   " "no"
+test_case "456   " "no"
+test_case "1.6" "no"
+test_case "0." "no"
+)
+
+\test_string_double ==
+(
+\test_case=(\x\expect
+	\quote = ~@ "@
+	\result = (string_double x "no" \n string_append "yes " (double_string n))
+	print "string_double ";
+	string_put quote; string_put x; string_put quote
+	print " : "; print result;
+	print " [";
+	print (string_eq result expect "GOOD" "BAD");
+	print "]";
+	nl;
+	)
+
+test_case "0" "yes 0"
+test_case "1" "yes 1"
+test_case "-1" "yes -1"
+test_case "123" "yes 123"
+test_case "-123" "yes -123"
+test_case "x123" "no"
+test_case "1x23" "no"
+test_case "" "no"
+test_case "   456   " "no"
+test_case "   456.78   " "no"
+test_case "456.78" "yes 456.78"
+test_case "456   " "no"
+test_case "1.6" "yes 1.6"
+test_case "0." "yes 0"
+test_case "-0" "yes -0"
+test_case "-0.0" "yes -0"
+test_case "-0.0123" "yes -0.0123"
+)
+
+\test_long_double ==
+(
+\test_case = (
+\x
+\y = (long_double x)
+
+\x_str = (long_string x)
+\y_str = (double_string y)
+
+print "long x = "; string_put x_str;
+print " double y = "; string_put y_str;nl;
+)
+
+test_case 4
+test_case 0
+test_case -1
+test_case -37
+test_case 126478
+)
+
+\test_double_long ==
+(
+\test_case = (
+\x
+\y = (double_long x)
+
+\x_str = (double_string x)
+\y_str = (long_string y)
+
+print "double x = "; string_put x_str;
+print " long y = "; string_put y_str;nl;
+)
+
+test_case 4.0
+test_case 0.0
+test_case -1.0
+test_case -37.0
+test_case 126478.0
+test_case 4.3
+test_case 0.3
+test_case -1.3
+test_case -37.3
+test_case 126478.3
+test_case 4.9
+test_case 0.9
+test_case -1.9
+test_case -37.9
+test_case 126478.9
+test_case -126478.9
+)
+
+####
+
+test_string_type
+test_double_type
+test_long_type
+
+test_long_double
+test_double_long
+
+test_string_long
+test_string_double
 
 test_hello_world
 test_string_slice
@@ -817,257 +1012,9 @@ test_long_add
 test_double_compare
 test_procedural
 test_eager
+
+test_binary_counter;
+test_divide;
+test_sub;
+test_fibonacci
 test_cat
-
-\\
-
-# Miscellaneous disorganized stuff down here, mostly syntax tests.
-
-###################################
-
-
-#~END hiEND
-#~@2 lskajfklajsdfklja@;sklfjklas"hhhh" @1 "woo hoo"@2
-#\x x x
-#\\
-
-#long_add 123 456
-#long_add 123.45 456
-#long_add -123.45 456
-#long_add 123 456
-#double_add 123.45 456.0
-#double_from; long_add 123 456
-#double_from; long_add 23987234283793433 0
-
-#long_from 123.45
-
-#long_from "12345.0"
-#long_from; double_from "12345.67"
-
-#string_from 123
-#long_sub 12 -8
-#long_mul 12 -8
-#long_div 25 -8
-#long_div 25 0
-
-#long_compare 23 23
-#long_compare 23 24
-#long_compare 24 23
-#long_compare 24 240
-#long_compare -1 4
-#long_compare 4 -1
-#long_compare -1 -1
-
-
-#string_compare "x" "y"
-#string_compare "x" "xy"
-#string_compare "y" "y"
-#string_compare "y" "x"
-#string_compare "y" "yx"
-#string_compare "" ""
-
-"LT"
-"EQ"
-"GT"
-
-
-#C S
-
-#Y I
-#Y Y
-
-#\"hi" "hi" ("hi" "hi")
-#\"" "" ""
-#"hi"
-#""
-#string_put "hi"; string_put "world"; string_put "
-#";
-
-#\nl=(string_put "
-#")
-
-#string_put (string_from (double_add 2.345 5.5)); nl
-#string_put (string_from 2.345); nl
-#+2.345e42
-#-3.14159265358979323846
-#0
-
-#\nl=(string_put "
-#")
-
-#"a" "b" \\"c"
-#"a" "b" \\)
-#~@2 lskajfklajsdfklja@;sklfjklas"hhhh" @1 "woo hoo"@2\\hi
-#\\
-
-
-#\ 
-#\a a
-#\\"a"
-#\ a a a
-#\\a a
-#\\
-
-#string_put "hello world"; nl
-#C C
-#\\
-#We can put anything we like down here.  :)
-#\a a a
-#;aklsjfkl;asj
-#akl;sjf
-#;ajksdf
-
-#S C \a a a
-#S C \\
-
-#\\ \
-
-#\
-#\(
-
-
-#a#
-
-#~@@ h@@
-#"hi"
-#~"" hi""
-#~@ hi@
-#~@ i@
-#~@ @
-
-#\~@ES hola mundo@ES
-#\~@EN hello world@EN
-
-#~@EN hello world@EN
-#~@ES hola mundo@ES
-
-#\x x x
-#\"x" "x" "x"
-#\~" x" ~" x" ~" x"
-
-#~ hi
-
-# simple:
-#\x\y y; x x
-# with wild var names:
-#\~@ xx@ \~"" yyy""~"" yyy"" ; ~@ xx@ ~@ xx@
-# all run together:
-#\~@ xx@\~"" yyy""~"" yyy"";~@ xx@~@ xx@
-
-
-
-
-#\abc abc abc
-
-#(S C)C
-#\x=(S C)x
-#\x=(S C)\y=I x y
-#\x=(S C)\y=I y x
-#(\x=C\y\z x (y z)) I S
-#\x=C\y=S y x
-#(\x=C\y=S y x)Y
-
-#\x=(S C) x x
-
-#\x==x x
-
-#\x=C \y y x
-#\x=C\y y x
-#(\x=C\y\z x (y z)) I S
-#(\x=C \y\z x (y z)) I S
-#\x=(C S)x
-
-#\x=C\y=S y x
-
-#(
-#(\x\y y x)
-#S C
-#))
-
-
-#( (\x\y y x) C S ) ( (\x\y y x) C S )
-#((\x\y y x)C S)((\x\y y x)C S)
-
-#; S C ; C S
-
-#S;
-
-
-#(\x=C\y=I\z=S x (y z))
-#(\x=C \y=I \z=S x (y z))
-
-#(\x\y\z x (y z)) C I S
-
-#S C \x   =  S C x
-#S C \x=S C x
-
-#S C \x   =  
-##hi
-#S C x
-
-#S C \x=(I C) S x
-#S C \x=(I C) x
-#\x=(I C) C x
-
-#\x=
-
-#\x=(S (C C)) \y=(C S) x y
-#\x=(S (C C))\y=(C S)x y
-
-
-#I I \x==x x x
-
-#C S
-## comment here
-#I
-
-#=
-
-#\x\y double_add x y
-
-#x
-#\x x
-#\x x x
-#\x y
-#\x\y x y
-#\x\y y x
-
-#C S I L R Y
-
-#\x x
-
-#\x\y y x
-#\x\y z x
-
-
-#() double_add
-#C S x; C; C
-# Defaults to I after trailing semicolon here.
-#C S string_from; C;
-
-#\: :
-#C S I L R Y
-#double_add
-#double_sub
-#double_mul
-#double_div
-#string_append
-#string_from
-#string_put
-
-
-#\x\y\z x (y z)
-#\x\y\z x z y
-#Y Y
-#Y I
-#I
-
-#Y ()
-
-#\x\y x y
-
-#C x y
-#S x y z
-#S C S I
-#S Y C S
-

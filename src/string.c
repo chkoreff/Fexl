@@ -1,4 +1,5 @@
 #include <string.h>
+#include "memory.h"
 #include "value.h"
 #include "string.h"
 

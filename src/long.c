@@ -1,5 +1,6 @@
 #include "value.h"
 #include "long.h"
+#include "memory.h"
 
 void hold_long(struct value *value)
 	{
