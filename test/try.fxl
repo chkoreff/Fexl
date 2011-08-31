@@ -10,9 +10,10 @@
 # Ctrl-D.  If you'd like to run the test without having to type anything, and
 # compare it with the reference output, do this:
 #
-#   echo "abc" | ./try.fxl >tmp1
-#   cmp tmp1 out
-#   rm tmp1
+#   cat try.fxl | ../bin/fexl | cmp - out
+#
+# That should run quietly with exit code 0.
+
 
 #####
 
@@ -1018,3 +1019,6 @@ test_divide;
 test_sub;
 test_fibonacci
 test_cat
+
+\\Extra stuff down here becomes input
+to the test_cat function.

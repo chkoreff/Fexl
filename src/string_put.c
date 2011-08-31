@@ -1,11 +1,10 @@
-#include <unistd.h>
+#include <stdio.h>
 #include "value.h"
 #include "string.h"
 #include "string_put.h"
 
 /*
-Note that we have to use the raw write here because we may be writing binary
-data.
+Note that we use fwrite here because we may be writing binary data.
 */
 
 int reduce_string_put(struct value *value)
@@ -13,7 +12,7 @@ int reduce_string_put(struct value *value)
 	if (!value->L || !value->L->L) return 0;
 
 	struct atom_string *atom = evaluate_string(value->L->R);
-	if (write(STDOUT_FILENO, atom->data, atom->len)) ;
+	fwrite(atom->data, 1, atom->len, stdout);
 
 	replace(value, value->R);
 	return 1;
