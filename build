@@ -1,0 +1,210 @@
+#!/bin/sh
+
+# Build and install the Fexl program as required.  Run "./build help" to see
+# the usage options.
+
+usage()
+	{
+	progname=$0
+
+	cat <<EOM
+NAME
+       $progname - build the Fexl program
+
+SYNOPSIS
+       $progname [quiet] [clean] [install] [erase]
+
+DESCRIPTION
+
+       $progname
+              Only compile what actually changed.
+
+       $progname clean
+              Compile everything from scratch.
+
+       $progname install
+              Build Fexl and install in $dir_install.
+
+       $progname uninstall
+              Uninstall Fexl from $dir_install.
+
+       $progname quiet
+              Build quietly, without showing the commands that it runs.
+
+       $progname erase
+              Erase all the output files and don't build anything.
+
+       You may also combine the options in various ways such as this:
+
+       $progname quiet clean install
+
+EOM
+	exit 2
+	}
+
+handle_options()
+	{
+	dir_install="/usr"
+
+	# Check the command line.
+
+	valid=1
+	quiet=0
+	clean=0
+	erase=0
+	install=0
+	uninstall=0
+
+	for verb in $@
+	do
+		case $verb in
+			quiet) quiet=1 ;;
+			clean) clean=1 ;;
+			erase) erase=1 ;;
+			install) install=1 ;;
+			uninstall) uninstall=1 ;;
+			*) valid=0 ;;
+		esac
+	done
+
+	if [ $valid -eq 0 ]; then usage; fi
+
+	if [ $uninstall -eq 1 ]; then
+		sudo rm -f /usr/bin/fexl
+		sudo rm -f /usr/lib/libfexl.so
+		exit
+	fi
+
+	if [ $clean -eq 1 -o $erase -eq 1 ]; then
+		rm -rf bin
+		rm -rf lib
+		rm -rf obj
+		if [ $erase -eq 1 ]; then exit; fi
+	fi
+	}
+
+# Return true if file_1 is newer than file_2.
+newer_than()
+	{
+	local file_1="$1"
+	local file_2="$2"
+
+	local result=0
+	if [ -e $file_2 ]; then
+		if [ $file_1 -nt $file_2 ]; then result=1; fi
+	else
+		result=1
+	fi
+	echo $result
+	}
+
+# Run a system command and echo if not quiet.  Halt on any error.
+run()
+	{
+	local command="$1"
+	if [ $quiet -eq 0 ]; then echo $command; fi
+	$command
+	local code=$?
+	if [ $code -ne 0 ]; then exit $code; fi
+	}
+
+handle_options $@
+
+mkdir -p obj
+mkdir -p lib
+mkdir -p bin
+
+# Build any object files which are missing or out of date with respect to their
+# C source files or any included header files.
+#
+# I compile with -O3 because that enables -finline-functions.  You can see that
+# by running "gcc -c -Q -O3 --help=optimizers".
+#
+# I compile with -fPIC to generate Position Independent Code for shared
+# libraries.
+
+for file_c in src/*.c
+do
+	local name=`basename $file_c .c`
+	local file_o=obj/$name.o
+
+	local update=`newer_than $file_c $file_o`
+	if [ $update -eq 0 ]; then
+		grep -e "^#include \".*\"$" $file_c |
+		sed "s/^#include \"\(.*\)\"/\1/" |
+		(
+		while read file; do
+			local file_h=src/$file
+			update=`newer_than $file_h $file_o`
+			if [ $update -eq 1 ]; then exit 1; fi
+		done
+		)
+		update=$?
+	fi
+
+	if [ $update -eq 1 ]; then
+		run "gcc -c -Wall -Werror -ansi -O3 -fPIC $file_c -o $file_o"
+	fi
+done
+
+# Determine where the library should go.
+if [ $install -eq 1 ]; then
+	dir_lib=$dir_install/lib
+else
+	dir_lib=`pwd`/lib
+fi
+
+# Collect objects that are not main programs.  These go into the library.
+objects=
+update=0
+for file_c in `grep -L "^int main(" src/*.c`
+do
+	local name=`basename $file_c .c`
+	local file_o=obj/$name.o
+	objects="$objects $file_o"
+	if [ $update -eq 0 ]; then
+		update=`newer_than $file_o $dir_lib/libfexl.so`
+	fi
+done
+
+# Build the shared library.  We use -ldl (libdl) for dlopen and dlsym.
+if [ $update -eq 1 ]; then
+	local sudo=
+	if [ $install -eq 1 ]; then sudo=sudo; fi
+	run "$sudo gcc -shared -o $dir_lib/libfexl.so $objects -ldl"
+fi
+
+# Build the executables for any main programs.
+#
+# We link with an absolute library path.  That lets you run the executable
+# without having to be in the directory where you did the build.  It also does
+# not rely on the system search paths in /etc/ld.so.conf, which means the
+# program won't break if you change those search paths.  It also allows you to
+# install multiple versions of Fexl in different places if you like.
+
+for file_c in `grep -l "^int main(" src/*.c`
+do
+	local name=`basename $file_c .c`
+	local file_o=obj/$name.o
+
+	local dir_bin=bin
+	local sudo=
+
+	if [ $install -eq 1 ]; then
+		if [ "$name" = "fexl" ]; then
+			dir_bin=$dir_install/bin
+			sudo=sudo
+		fi
+	fi
+
+	local file_x=$dir_bin/$name
+
+	local update=`newer_than $file_o $file_x`
+	if [ $update -eq 0 ]; then
+		update=`newer_than $dir_lib/libfexl.so $file_x`
+	fi
+
+	if [ $update -eq 1 ]; then
+		run "$sudo gcc $file_o -o $file_x $dir_lib/libfexl.so"
+	fi
+done
