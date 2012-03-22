@@ -1,13 +1,19 @@
-struct atom_string
-	{
-	int N;
-	int len;
-	char data[];
-	};
-
-extern void hold_string(struct value *value);
-extern void drop_string(struct value *value);
-extern struct type type_string;
-extern struct value *new_chars(const char *data, int len);
-extern struct value *new_string(const char *data);
-extern struct atom_string *evaluate_string(struct value *value);
+extern struct value *type_string(struct value *);
+extern struct value *Qchars(char *data, long len);
+extern struct value *Qcopy_chars(const char *data, long len);
+extern struct value *Qcopy_string(const char *data);
+extern char *string_data(struct value *);
+extern long string_len(struct value *);
+extern int string_compare(struct value *x, struct value *y);
+extern int string_eq(struct value *x, struct value *y);
+extern int string_long(char *beg, long *num);
+extern int string_double(char *beg, double *num);
+extern struct value *type_string_type(struct value *);
+extern struct value *type_string_compare(struct value *);
+extern struct value *type_string_slice(struct value *);
+extern struct value *type_string_append(struct value *);
+extern struct value *type_string_len(struct value *);
+extern struct value *type_string_long(struct value *);
+extern struct value *type_string_double(struct value *);
+extern struct value *type_string_at(struct value *);
+extern struct value *type_string_common(struct value *);

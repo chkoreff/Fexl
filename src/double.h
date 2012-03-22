@@ -1,9 +1,11 @@
-struct atom_double
-	{
-	int N;
-	double data;
-	};
-
-extern struct type type_double;
-extern struct value *new_double(double x);
-extern double evaluate_double(struct value *value);
+extern struct value *type_double(struct value *);
+extern struct value *Qdouble(double);
+extern double get_double(struct value *);
+extern struct value *type_double_add(struct value *);
+extern struct value *type_double_sub(struct value *);
+extern struct value *type_double_mul(struct value *);
+extern struct value *type_double_div(struct value *);
+extern struct value *type_double_type(struct value *);
+extern struct value *type_double_string(struct value *);
+extern struct value *type_double_compare(struct value *);
+extern struct value *type_double_long(struct value *);

@@ -1,66 +1,70 @@
 /*
-The value is the primary data structure in Fexl, with four fields N, T, L, R.
+In the value structure, the reference count N is a long int, which guarantees
+that it can also be used as a pointer to link unused values on the free list,
+without having to use a cumbersome union type.
 
-N is the reference count.  When the count drops to zero or below, the value is
-recycled (cleared and freed).
+The standard says:
 
-T is the type of the value.
+  long ints are large enough to hold pointers in -n32 and -o32 mode.  Both are
+  32 bits wide.
 
-L is the left child, and R is the right child.  If the value is a function
-application, these will both be non-zero.  If the value is an atom, the left
-child will be zero, and the right child may point to type-specific data of any
-kind.
+  long ints are large enough to hold pointers in -64 mode.  Both are 64 bits
+  wide.
+
+(C Language Reference Manual, document 007-0701-150, Appendix A, Section F.3.7
+"Arrays and Pointers")
+
+Assuming there are no other modes, I conclude that long ints are large enough
+to hold pointers, period.
+
+As further evidence, the section titled "Integer and Floating Point Types" has
+a table of Storage Class Sizes which lists the size in bits for the various
+types in all three modes -o32, -n32, and -64.  In all modes the size of a long
+equals the size of a pointer.
+
+An integer overflow in the reference count is impossible because of memory
+limits.  On a machine with an N-bit word, an overflow is when we increment the
+reference count after it has already reached its maximum value of 2^(N-1)-1.
+This can only happen if we have created 2^(N-1) value records all pointing to a
+single place.  Because each value record is 4 words long, that means we have
+allocated 4*2^(N-1) words, which is 2^(N+1) words.  But that is impossible on
+an N-bit machine, which can only address 2^N words.  Therefore an integer
+overflow is impossible.
+
+If T is zero, the value represents the application of function L to argument R,
+which are both non-zero.
+
+If T is non-zero, the value is a normal form.  T is the redution routine called
+during evaluation.  In this case there are three possibilities, as follows.
+
+If L and R are both zero, the value is a combinator with no arguments.
+
+If L and R are both non-zero, the value is a combinator with arguments, but not
+enough to reduce to anything simpler, for example (C x) or (S x y).
+
+If L is zero and R is non-zero, the value is an atomic data type.  R is the
+value which holds the data.  R->T is the routine which clears the contents of R
+when its reference count drops to zero.  This cleans up the data properly, for
+example freeing a string pointer or closing a file handle.
 */
+
 struct value
 	{
-	int N;
-	struct type *T;
+	long N;
+	struct value *(*T)(struct value *);
 	struct value *L;
 	struct value *R;
 	};
 
-/*
-The type structure defines how a value should behave as a high-order function.
+extern struct value *create(void);
+extern void recycle(struct value *f);
 
-The reduce function transforms the value into something simpler if possible,
-performing any side effects as it goes.  It returns true if it did something,
-or false if there was nothing left to do.
+extern void hold(struct value *f);
+extern void drop(struct value *f);
 
-The hold function holds onto the contents of the value when it is copied.  The
-drop function drops the contents of the value when it is no longer referenced.
+extern struct value *Q(struct value *(*T)(struct value *));
+extern struct value *A(struct value *L, struct value *R);
 
-The name is only used for tracing purposes during development.
-*/
-struct type
-	{
-	int (*reduce)(struct value *);
-	void (*hold)(struct value *);
-	void (*drop)(struct value *);
-	const char *name;
-	};
+extern void replace(struct value *f, struct value *g);
 
-extern struct value *new_value(
-	struct type *type,
-	struct value *left,
-	struct value *right);
-
-extern void hold(struct value *value);
-extern void drop(struct value *value);
-
-extern int reduce_none(struct value *value);
-extern void hold_both(struct value *value);
-extern void drop_both(struct value *value);
-
-extern void replace(struct value *value, struct value *other);
-
-extern long total_steps;
-extern long max_steps;
-
-extern int max_depth;
-extern int total_depth;
-
-extern void evaluate(struct value *value);
-
-extern void evaluate_type(struct value *value, struct type *type);
-
-extern void finish(void);
+extern void end_value(void);

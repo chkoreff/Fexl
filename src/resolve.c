@@ -1,225 +1,136 @@
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stdio.h> /*TODO*/
+#include <string.h>  /* strcmp */
 #include "value.h"
-#include "abstract.h"
-#include "parse.h"
-#include "resolve.h"
-#include "string.h"
-#include "var.h"
-
-#include "C.h"
-#include "S.h"
-#include "I.h"
-#include "L.h"
-#include "R.h"
-#include "Y.h"
-#include "Q.h"
-#include "item.h"
-#include "pair.h"
-
-#include "char_get.h"
-#include "char_put.h"
-
+#include "basic.h"
+#include "die.h"
 #include "double.h"
-#include "double_add.h"
-#include "double_sub.h"
-#include "double_mul.h"
-#include "double_div.h"
-#include "double_compare.h"
-#include "double_type.h"
-#include "double_string.h"
-#include "double_long.h"
-
+#include "io.h"
+#include "list.h"
 #include "long.h"
-#include "long_add.h"
-#include "long_sub.h"
-#include "long_mul.h"
-#include "long_div.h"
-#include "long_compare.h"
-#include "long_type.h"
-#include "long_string.h"
-#include "long_char.h"
-#include "long_double.h"
+#include "meta.h"
+#include "parse_string.h"
+#include "resolve.h"
+#include "show.h" /*TODO*/
+#include "stack.h"
+#include "string.h"
 
-#include "string_append.h"
-#include "string_compare.h"
-#include "string_put.h"
-#include "string_at.h"
-#include "string_len.h"
-#include "string_slice.h"
-#include "string_common.h"
-#include "string_type.h"
-#include "string_long.h"
-#include "string_double.h"
-
-/*
-LATER do some standard handy definitions such as:
-
-\string_from = (\x
-	string_type x x;
-	long_type x (long_string x);
-	double_type x (double_string x);
-	x)
-
-\print = (\item string_put (string_from item))
-
-\nl = (string_put "
-")
-*/
-
-/*
-LATER Template expansion function, e.g.:
-
-\env =
-	(
-	\sym
-	string_eq sym "x" x;
-	string_eq sym "y" y;
-	string_eq sym "product" (long_mul x y);
-	sym
-	)
-
-\template = "
-The sum of ~x and ~y is ~(add x y).
-The product of ~x and ~y is ~(product).
-Thank you.
-"
-print (expand env "~" template); nl;
-*/
-
-/*
-LATER We'll have the power to do embedded environments, that is, we parse the
-user's Fexl program and resolve symbols inside a suitably restricted
-environment.  When Fexl first starts, it has access to all functions, and it
-can tune specific options such as max_steps and max_bytes within Fexl itself.
-Then it can safely turn over control to a sandboxed user function.
-*/
-
-static struct value *var_stack = 0;
-
-void push_var(struct value *var, struct value *def)
-	{
-	var_stack = new_value(&type_var, new_value(&type_var,var,def), var_stack);
-	}
-
-void pop_var(void)
-	{
-	if (!var_stack) return;
-	struct value *tail = var_stack->R;
-	hold(tail);
-	drop(var_stack);
-	tail->N--;
-	var_stack = tail;
-	}
-
-void start_resolve(void)
-	{
-	push_var(new_string("C"), &value_C);
-	push_var(new_string("S"), &value_S);
-	push_var(new_string("I"), &value_I);
-	push_var(new_string("L"), &value_L);
-	push_var(new_string("R"), &value_R);
-	push_var(new_string("Y"), &value_Y);
-	push_var(new_string("?"), &value_Q);
-
-	push_var(new_string("item"), &value_item);
-	push_var(new_string("pair"), &value_pair);
-
-	push_var(new_string("long_add"), &value_long_add);
-	push_var(new_string("long_sub"), &value_long_sub);
-	push_var(new_string("long_mul"), &value_long_mul);
-	push_var(new_string("long_div"), &value_long_div);
-	push_var(new_string("long_compare"), &value_long_compare);
-	push_var(new_string("long_type"), &value_long_type);
-	push_var(new_string("long_string"), &value_long_string);
-	push_var(new_string("long_char"), &value_long_char);
-	push_var(new_string("long_double"), &value_long_double);
-
-	push_var(new_string("double_add"), &value_double_add);
-	push_var(new_string("double_sub"), &value_double_sub);
-	push_var(new_string("double_mul"), &value_double_mul);
-	push_var(new_string("double_div"), &value_double_div);
-	push_var(new_string("double_compare"), &value_double_compare);
-	push_var(new_string("double_type"), &value_double_type);
-	push_var(new_string("double_string"), &value_double_string);
-	push_var(new_string("double_long"), &value_double_long);
-
-	push_var(new_string("string_append"), &value_string_append);
-	push_var(new_string("string_compare"), &value_string_compare);
-	push_var(new_string("string_put"), &value_string_put);
-	push_var(new_string("string_at"), &value_string_at);
-	push_var(new_string("string_len"), &value_string_len);
-	push_var(new_string("string_slice"), &value_string_slice);
-	push_var(new_string("string_common"), &value_string_common);
-	push_var(new_string("string_type"), &value_string_type);
-	push_var(new_string("string_long"), &value_string_long);
-	push_var(new_string("string_double"), &value_string_double);
-
-	push_var(new_string("char_get"), &value_char_get);
-	push_var(new_string("char_put"), &value_char_put);
-	}
-
-void finish_resolve(void)
-	{
-	drop(var_stack);
-	}
+/* The standard context for Fexl. */
 
 struct value *resolve(struct value *sym)
 	{
-	struct value *pos = var_stack;
-	while (pos)
-		{
-		struct value *top = pos->L;
-		if (sym_eq(top->L,sym)) return top->R;
-		pos = pos->R;
-		}
+	char *name = string_data(sym);
 
-	struct atom_string *atom = (struct atom_string *)sym->R;
+	if (sym->T == type_string) return sym;
 
-	/* Simple quoted strings */
-	if (atom->len >= 2
-			&& atom->data[0] == '"'
-			&& atom->data[atom->len-1] == '"')
-		return new_chars(atom->data + 1, atom->len - 2);
+	if (strcmp(name, "C") == 0) return C;
+	if (strcmp(name, "S") == 0) return S;
+	if (strcmp(name, "I") == 0) return I;
+	if (strcmp(name, "R") == 0) return R;
+	if (strcmp(name, "L") == 0) return L;
+	if (strcmp(name, "Y") == 0) return Y;
+	if (strcmp(name, "?") == 0) return query;
+	if (strcmp(name, "T") == 0) return C;
+	if (strcmp(name, "F") == 0) return F;
 
-	/* Complex quoted strings */
-	if (atom->len >= 4
-		&& atom->data[0] == '~')
-		{
-		int term_len = 0;
-		while (1)
-			{
-			if (1 + term_len >= atom->len) break;
-			if (isspace(atom->data[1 + term_len]))
-				{
-				if (memcmp(atom->data + atom->len - term_len, atom->data + 1,
-					term_len) == 0)
-					return new_chars(atom->data + term_len + 2,
-						atom->len - term_len - 2 - term_len);
-				break;
-				}
-			term_len++;
-			}
-		}
+	if (strcmp(name, "item") == 0) return Q(type_item);
+	/* TODO end pair */
+
+	if (strcmp(name, "long_add") == 0) return Q(type_long_add);
+	if (strcmp(name, "long_sub") == 0) return Q(type_long_sub);
+	if (strcmp(name, "long_mul") == 0) return Q(type_long_mul);
+	if (strcmp(name, "long_div") == 0) return Q(type_long_div);
+	if (strcmp(name, "long_double") == 0) return Q(type_long_double);
+	if (strcmp(name, "is_long") == 0) return Q(type_is_long);
+	if (strcmp(name, "long_type") == 0) return Q(type_is_long);
+	if (strcmp(name, "long_string") == 0) return Q(type_long_string);
+	if (strcmp(name, "long_compare") == 0) return Q(type_long_compare);
+	if (strcmp(name, "long_char") == 0) return Q(type_long_char);
+
+	if (strcmp(name, "double_add") == 0) return Q(type_double_add);
+	if (strcmp(name, "double_sub") == 0) return Q(type_double_sub);
+	if (strcmp(name, "double_mul") == 0) return Q(type_double_mul);
+	if (strcmp(name, "double_div") == 0) return Q(type_double_div);
+	if (strcmp(name, "double_type") == 0) return Q(type_double_type);
+	if (strcmp(name, "double_string") == 0) return Q(type_double_string);
+	if (strcmp(name, "double_compare") == 0) return Q(type_double_compare);
+	if (strcmp(name, "double_long") == 0) return Q(type_double_long);
+
+	if (strcmp(name, "nl") == 0) return Q(type_nl);
+	if (strcmp(name, "string_put") == 0) return Q(type_string_put);
+	if (strcmp(name, "string_type") == 0) return Q(type_string_type);
+	if (strcmp(name, "string_compare") == 0) return Q(type_string_compare);
+	if (strcmp(name, "string_slice") == 0) return Q(type_string_slice);
+	if (strcmp(name, "string_append") == 0) return Q(type_string_append);
+	if (strcmp(name, "string_len") == 0) return Q(type_string_len);
+	if (strcmp(name, "string_long") == 0) return Q(type_string_long);
+	if (strcmp(name, "string_double") == 0) return Q(type_string_double);
+	if (strcmp(name, "string_at") == 0) return Q(type_string_at);
+	if (strcmp(name, "string_common") == 0) return Q(type_string_common);
+
+	if (strcmp(name, "char_get") == 0) return Q(type_char_get);
+	if (strcmp(name, "char_put") == 0) return Q(type_char_put);
+
+	if (strcmp(name, "put_max_steps") == 0) return Q(type_put_max_steps);
+	if (strcmp(name, "get_max_steps") == 0) return Q(type_get_max_steps);
+	if (strcmp(name, "put_max_bytes") == 0) return Q(type_put_max_bytes);
+	if (strcmp(name, "get_max_bytes") == 0) return Q(type_get_max_bytes);
+	if (strcmp(name, "show") == 0) return Q(type_show);
+
+	if (strcmp(name, "parse") == 0) return Q(type_parse);
+
+	/*TODO + - * / = < etc.  The "singleton" issue will be handled naturally
+	by abstracting out the free variables one by one after the parse, rather
+	than resolving them inline as I do now. */
 
 	/* Integer number (long) */
 	{
-	char *end;
-	long num = strtol(atom->data, &end, 10);
-	if (end - atom->data == atom->len)
-		return new_long(num);
+	long num;
+	if (string_long(name,&num)) return Qlong(num);
 	}
 
 	/* Floating point number (double) */
 	{
-	char *end;
-	double num = strtod(atom->data, &end);
-	if (end - atom->data == atom->len)
-		return new_double(num);
+	double num;
+	if (string_double(name,&num)) return Qdouble(num);
 	}
 
-	fprintf(stderr, "Undefined variable %s on line %d\n", atom->data, line_no);
-	exit(1);
+	/*TODO report line numbers */
+	/*TODO report all the undefined symbols, not just first.  We'll do that
+	with the chained resolution trick so it all happens inside Fexl. */
+	fputs("Undefined symbol ", stderr);
+	/*TODO unify with show_string */
+	char *quote = sym->T == type_string ? "\"" : "";
+	fputs(quote, stderr);
+	fwrite(string_data(sym), 1, string_len(sym), stderr);
+	fputs(quote, stderr);
+	nl();
+	die("TODO");
+
+	return sym; /*TODO*/
+	}
+
+/*TODO how do we distinguish name vs. string in a resolution function written
+in Fexl? */
+struct value *type_resolve(struct value *f)
+	{
+	if (!f->L->L) return f;
+
+	struct value *sym = f->L->R;
+	struct value *body = f->R;
+
+	if (!sym->T) { push(sym); return f; } /*TODO test*/
+
+	#if 0
+	print("resolve ");show(f);nl();
+	print("  sym  = ");show(sym);nl();
+	print("  body = ");show(body);nl();
+	#endif
+	return A(body,resolve(sym));
+	}
+
+/*TODO static combinator.  Also, we can pass the resolution function into
+parse.c? */
+struct value *Qresolve(struct value *x, struct value *f)
+	{
+	return A(A(Q(type_resolve),x),lambda(x,f));
 	}

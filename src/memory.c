@@ -1,35 +1,41 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "die.h"
 #include "memory.h"
 
-/* Track the amount of memory used and impose an upper limit. */
+/*
+Track the amount of memory used and impose an upper limit.  That way if you run
+a dangerous function like (Y Y), which runs forever and uses unbounded amounts
+of memory, your operating system won't frantically thrash around with virtual
+memory and hang your machine.  I chose a max_bytes value which seems fairly
+safe in practice.  This can be changed at run time.
+*/
+
 long total_blocks = 0;
 long total_bytes = 0;
-long max_bytes = -1;  /* no limit initially */
+long max_bytes = 1000000000;
 
 /*
-Return a new unused span of memory of the given size, or exit if not possible.
+Return a new unused span of memory of the given size, or 0 if not possible.  We
+ensure that the new total byte count is strictly greater than the old total.
+This prevents errors such as allocating zero bytes, negative bytes, or so many
+bytes that it causes an integer overflow.
 */
+
 void *new_memory(long num_bytes)
 	{
-	total_blocks++;
-	total_bytes += num_bytes;
+	long new_total_bytes = total_bytes + num_bytes;
 
-	if (max_bytes >= 0 && total_bytes > max_bytes)
-		{
-		fprintf(stderr,
-			"Your program tried to use more than %ld bytes of memory.\n",
-			max_bytes);
-		exit(1);
-		}
-
-	void *data = malloc(num_bytes);
+	void *data =
+		(new_total_bytes > total_bytes && new_total_bytes <= max_bytes)
+		? malloc(num_bytes)
+		: 0;
 
 	if (data == 0)
-		{
-		fprintf(stderr, "Your program ran out of memory.\n");
-		exit(1);
-		}
+		die("Your program ran out of memory.");
+
+	total_bytes = new_total_bytes;
+	total_blocks++;
 
 	return data;
 	}
@@ -38,10 +44,7 @@ void *new_memory(long num_bytes)
 void free_memory(void *data, long num_bytes)
 	{
 	if (!data)
-		{
-		fprintf(stderr, "The system tried to free a null pointer.\n");
-		exit(1);
-		}
+		die("The system tried to free a null pointer.");
 
 	free(data);
 
@@ -49,22 +52,16 @@ void free_memory(void *data, long num_bytes)
 	total_bytes -= num_bytes;
 
 	if (total_blocks < 0 || total_bytes < 0)
-		{
-		fprintf(stderr,
-			"The system tried to free more memory than it allocated.\n");
-		exit(1);
-		}
+		die("The system tried to free more memory than it allocated.");
 	}
 
-/* Detect any final memory leak when the program ends. */
-void finish_memory(void)
+/* Detect any final memory leak, which should never happen. */
+void end_memory(void)
 	{
 	if (total_blocks || total_bytes)
-		{
-		fprintf(stderr, "Memory leak!  "
-		"The system did not free precisely the memory it allocated.\n");
-		fprintf(stderr, "  total_blocks = %ld\n", total_blocks);
-		fprintf(stderr, "  total_bytes  = %ld\n", total_bytes);
-		exit(1);
-		}
+		die("Memory leak!\n"
+			"The system did not free precisely the memory it allocated.\n"
+			"  total_blocks = %ld\n"
+			"  total_bytes  = %ld",
+			total_blocks, total_bytes);
 	}

@@ -1,0 +1,19 @@
+# You can source these in a new shell with ". alias".  I find them handy.
+
+alias .todo='grep -r TODO build test src'
+
+alias .build='./build quiet'
+
+alias .fexl='.build && bin/fexl'
+
+alias .test_fexl='.build && bin/test_fexl'
+alias .test='.test_fexl | diff -a - test/test_fexl.out'
+
+alias .sample='.fexl test/sample'
+alias .try_sample='.sample | diff -a - test/sample.out'
+alias .try='.fexl test/try.fxl'
+
+alias .bench1='./build quiet && time ( bin/fexl test/sample )'
+alias .bench2='./build quiet && time ( cat test/try.fxl | bin/fexl | diff -a - test/out )'
+
+alias .tmp='.fexl tmp.fxl'

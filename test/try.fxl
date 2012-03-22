@@ -277,13 +277,13 @@ print "The value of x is "; print x; print "."; nl;
 \div=double_div
 
 
-print ~@
+print ~
 ===
 Here we demonstrate an ordinary "procedural" style of programming.  This works
 because definitions are NOT recursive by default.  If you want a recursive
 definition, you must use "==" instead of just "=".
 
-@;
+~;
 
 \show=(\name\value print name; print " = "; print value; nl;)
 
@@ -881,7 +881,7 @@ test_case "hey!" "no"
 \test_string_long ==
 (
 \test_case=(\x\expect
-	\quote = ~@ "@
+	\quote = ~ "~
 	\result = (string_long x "no" \n string_append "yes " (long_string n))
 	print "string_long ";
 	string_put quote; string_put x; string_put quote
@@ -909,7 +909,7 @@ test_case "0." "no"
 \test_string_double ==
 (
 \test_case=(\x\expect
-	\quote = ~@ "@
+	\quote = ~ "~
 	\result = (string_double x "no" \n string_append "yes " (double_string n))
 	print "string_double ";
 	string_put quote; string_put x; string_put quote

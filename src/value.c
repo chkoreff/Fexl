@@ -1,155 +1,109 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include "memory.h"
 #include "value.h"
+#include "memory.h"
 
-/* Using this simple free list makes things about 60% faster. */
+struct value *free_list = 0;
 
-static struct value *free_list = 0;
-
-/* Create a new value with the given type, left, and right data. */
-struct value *new_value(
-	struct type *type,
-	struct value *left,
-	struct value *right)
+/* Create a new uninitialized value. */
+struct value *create(void)
 	{
-	struct value *value;
-	if (free_list)
+	struct value *f = free_list;
+	if (f)
 		{
-		value = free_list;
-		free_list = value->R;
+		free_list = (struct value *)f->N;
+		if (f->L)
+			{
+			drop(f->L);
+			drop(f->R);
+			}
+		else if (f->R && --f->R->N == 0)
+			{
+			f->R->T(f);
+			f->R->L = 0;
+			f->R->R = 0;
+			recycle(f->R);
+			}
 		}
 	else
-		value = (struct value *)new_memory(sizeof (struct value));
+		f = (struct value *)new_memory(sizeof (struct value));
 
+	return f;
+	}
+
+/* Put the value on the free list. */
+void recycle(struct value *f)
+	{
+	f->N = (long)free_list;
+	free_list = f;
+	}
+
+/* Increment the reference count. */
+void hold(struct value *f)
+	{
+	f->N++;
+	}
+
+/*
+Decrement the reference count and put the value on the free list if it drops to
+zero.  We are very strict about this.  It must be exactly zero, not negative.
+A negative reference count indicates an imbalance in hold/drop calls, which is
+sloppy programming, and in that case we want to report a memory leak error when
+the program ends.
+*/
+void drop(struct value *f)
+	{
+	if (--f->N == 0) recycle(f);
+	}
+
+/* Replace the contents of f with the contents of g.  Note that f and g must
+not be equal. */
+void replace(struct value *f, struct value *g)
+	{
+	hold(g);
+
+	drop(f->L);
+	drop(f->R);
+
+	f->T = g->T;
+	f->L = g->L;
+	f->R = g->R;
+
+	if (f->L) hold(f->L);
+	if (f->R) hold(f->R);
+
+	drop(g);
+	}
+
+/* Create a combinator of type T.  Shorthand for "quote". */
+struct value *Q(struct value *(*T)(struct value *))
+	{
+	struct value *value = create();
 	value->N = 0;
-	value->T = type;
-	value->L = left;
-	value->R = right;
-	type->hold(value);
+	value->T = T;
+	value->L = 0;
+	value->R = 0;
+	return value;
+	}
+
+/* Create a function which applies L to R. */
+struct value *A(struct value *L, struct value *R)
+	{
+	hold(L);
+	hold(R);
+
+	struct value *value = create();
+	value->N = 0;
+	value->T = 0;
+	value->L = L;
+	value->R = R;
 
 	return value;
 	}
 
-/* Increment the reference count. */
-void hold(struct value *value)
-	{
-	value->N++;
-	}
-
-/* Decrement the reference count and free the memory if no longer used. */
-void drop(struct value *value)
-	{
-	if (--value->N <= 0)
-		{
-		value->T->drop(value);
-		value->R = free_list;
-		free_list = value;
-		}
-	}
-
-/* Do nothing to the value and return 0. */
-int reduce_none(struct value *value)
-	{
-	return 0;
-	}
-
-/* Hold both sides of a value, either of which can be zero. */
-void hold_both(struct value *value)
-	{
-	if (value->L) hold(value->L);
-	if (value->R) hold(value->R);
-	}
-
-/* Drop both sides of a value, either of which can be zero. */
-void drop_both(struct value *value)
-	{
-	if (value->L) drop(value->L);
-	if (value->R) drop(value->R);
-	}
-
-/* Replace the contents of value with the contents of other. */
-void replace(struct value *value, struct value *other)
-	{
-	if (value == other) return;
-
-	hold(other);
-
-	value->T->drop(value);
-	value->T = other->T;
-	value->L = other->L;
-	value->R = other->R;
-	value->T->hold(value);
-
-	drop(other);
-	}
-
-/* Here is the evaluation system. */
-
-/* Track the number of evaluation steps and impose an upper limit. */
-long total_steps = 0;
-long max_steps = -1;  /* no limit initially */
-
-/*
-Track the depth of evaluation on the left side of a value and impose an upper
-limit.  This prevents a degenerate function like (Y Y) from causing a system
-stack overflow and segmentation fault.  That's usually harmless, but this might
-be a little safer.
-
-On some machines you can use a higher value for max_depth, but it's pointless
-because no reasonable function should ever require such a deep recursion on the
-left side.
-*/
-int max_depth = 100000;
-int total_depth = 0;
-
-/*
-Evaluate a value, reducing it to a final normal form if possible within the
-limits on time and space.
-*/
-void evaluate(struct value *value)
-	{
-	if (++total_depth > max_depth)
-		{
-		fprintf(stderr,
-			"Your program tried to evaluate at a depth greater than %d.\n",
-			max_depth);
-		exit(1);
-		}
-
-	while (1)
-		{
-		if (max_steps >= 0 && ++total_steps > max_steps)
-			{
-			fprintf(stderr,
-				"Your program tried to run more than %ld steps.\n",
-				max_steps);
-			exit(1);
-			}
-
-		if (!value->T->reduce(value)) break;
-		}
-
-	total_depth--;
-	}
-
-/* Evaluate a value and ensure that it has the given type. */
-void evaluate_type(struct value *value, struct type *type)
-	{
-	evaluate(value);
-	if (value->T == type && !value->L) return;
-	fprintf(stderr, "Invalid %s\n", type->name);
-	exit(1);
-	}
-
-void finish(void)
+/* Clear the free list and end the memory arena. */
+void end_value(void)
 	{
 	while (free_list)
-		{
-		struct value *next = free_list->R;
-		free_memory(free_list, sizeof(struct value));
-		free_list = next;
-		}
+		free_memory(create(), sizeof(struct value));
 
-	finish_memory();
+	end_memory();
 	}

@@ -1,433 +1,431 @@
 #include <ctype.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "memory.h"
 #include "value.h"
-#include "abstract.h"
-#include "apply.h"
-#include "I.h"
+#include "basic.h"
+#include "buf.h"
+#include "die.h"
+#include "memory.h"
 #include "parse.h"
 #include "resolve.h"
+#include "run.h"
+#include "stack.h"
 #include "string.h"
-#include "var.h"
-#include "Y.h"
-#include "Q.h"
+#include "sym.h"
 
 /*
 Grammar:
 
-exp  => [empty]
-exp  => term exp
-exp  => \ sym exp
-exp  => \ sym = term exp
-exp  => \ sym == term exp
-exp  => ; exp
+exp  =>  empty
+exp  =>  term exp
+exp  =>  ; exp
+exp  =>  \ sym def exp
 
-term => sym
-term => ( exp )
+term =>  sym
+term =>  ( exp )
+
+def  =>  empty
+def  =>  is term
+
+is   =>  =
+is   =>  ==
+
+sym  => name
+sym  => string
+
+string => simple_string
+string => complex_string
 
 The Fexl parser reads an expression from the input until it reaches EOF (end of
 file) or the special token "\\".  The \\ token stops the parser immediately, as
-if it had reached end of file, allowing the Fexl function to read any remaining
-input after the \\ token.
+if it had reached end of file.
 */
 
-static FILE *curr_source = 0;
-static int curr_ch = 0;
-int line_no = 1;
+int ch = 0;      /* current character */
 
-static void next_char(void)
+/* The read_ch function reads the next character into the ch variable.  It
+can be set to read from any source such as a file or a string. */
+void (*read_ch)(void);
+
+void next_ch(void)
 	{
-	curr_ch = fgetc(curr_source);
-	if (curr_ch == '\n') line_no++;
+	read_ch();
+	if (ch == '\n') line++;
 	}
 
-void skip_space(void)
+void skip_line(void)
 	{
 	while (1)
 		{
-		if (curr_ch == EOF)
-			break;
-		else if (curr_ch == '#')
-			{
-			while (curr_ch != '\n' && curr_ch != EOF)
-				next_char();
-			}
-		else if (isspace(curr_ch))
-			{
-			while (isspace(curr_ch))
-				next_char();
-			}
+		if (ch == '\n' || ch == EOF) break;
+		next_ch();
+		}
+	next_ch();
+	}
+
+int at_white(void)
+	{
+	return isspace(ch) || ch == 0;
+	}
+
+void skip_white(void)
+	{
+	while (1)
+		{
+		if (!at_white() || ch == EOF) break;
+		next_ch();
+		}
+	}
+
+void skip_filler(void)
+	{
+	while (1)
+		{
+		if (ch == '#')
+			skip_line();
+		else if (at_white())
+			skip_white();
 		else
 			break;
 		}
 	}
 
-static int buf_max = 0;
-static int buf_len = 0;
-static char *buf = 0;
-
-void buf_clear(void)
+struct value *collect_string(char *term_string, long term_len, long first_line)
 	{
-	if (buf) free_memory(buf,buf_max);
-	buf_max = 0;
-	buf_len = 0;
-	buf = 0;
-	}
+	struct buf *buf = 0;
+	long match_pos = 0;
 
-void buf_add(int ch)
-	{
-	if (buf_len >= buf_max)
+	while (1)
 		{
-		/* Start at 10 bytes and raise it 20% each time. */
-		int new_max = buf_max == 0 ? 10 : buf_max + buf_max / 5;
-		if (new_max <= buf_len) new_max = buf_len + 10; /* just in case */
-
-		char *new_buf = new_memory(new_max);
-		if (buf)
+		if (ch == term_string[match_pos])
 			{
-			memcpy(new_buf, buf, buf_len);
-			free_memory(buf, buf_max);
+			match_pos++;
+			next_ch();
 			}
-		buf = new_buf;
-		buf_max = new_max;
+		else if (match_pos > 0)
+			{
+			if (match_pos >= term_len)
+				break;
+
+			long i;
+			for (i = 0; i < match_pos; i++)
+				buf_add(&buf, term_string[i]);
+
+			match_pos = 0;
+			}
+		else if (ch == EOF)
+			{
+			line = first_line;
+			die("Unclosed string");
+			}
+		else
+			{
+			buf_add(&buf, ch);
+			next_ch();
+			}
 		}
 
-	buf[buf_len++] = ch;
+	long len;
+	char *string = buf_clear(&buf,&len);
+	return Qchars(string,len);
+	}
+
+struct value *parse_simple_string(void)
+	{
+	long first_line = line;
+	next_ch();
+	return collect_string("\"", 1, first_line);
+	}
+
+struct value *parse_complex_string(void)
+	{
+	long first_line = line;
+	struct buf *term = 0;
+
+	while (1)
+		{
+		if (at_white() || ch == EOF) break;
+		buf_add(&term, ch);
+		next_ch();
+		}
+
+	long term_len;
+	char *term_string = buf_clear(&term,&term_len);
+	next_ch();
+
+	struct value *str = collect_string(term_string, term_len, first_line);
+	free_memory(term_string, term_len+1);
+	return str;
 	}
 
 /*
-Parse a symbol.
-
-IDENTIFIERS
-
-If we're starting with any character other than a quote mark (") or tilde (~),
-then collect the characters up to the next white space character.  White space
-includes space, tab, newline, and anything else which the isspace function
-considers as white space.  Examples:
-
-  a
-  x
-  abc
-  a:b
-  a#b
-
-Note that you can use *any* characters (except white space) in a symbol like
-this, including so-called "binary" characters, even including NUL.  I suppose
-this will come in handy with Unicode characters, though I am only testing the
-system with plain ASCII.
-
-SIMPLE STRINGS
-
-If we're starting with a quote mark ("), then collect the characters up to and
-including the closing quote mark.  Examples:
-
-  "hello"
-  "a"
-  ""
-
-COMPLEX STRINGS
-
-If we're starting with a tilde (~), then skip the tilde and then collect the
-characters up to the next white space character.  Those characters will serve
-as the terminator of the subsequent string.  So we skip that white space
-character, and then keep collecting characters until we see the terminator that
-we read at the beginning.  Examples:
-
-  ~@ This is a "complex" string.@
-  ~"" This too is a "complex" string.""
-  ~@1 Here is a "complex" string with an @ sign inside it.@1
-  ~END Note that we can use anything as a terminator.END
+A name may contain just about anything, except for white space (including NUL)
+and a few other special characters.  This is the simplest possible rule that
+can work.
 */
-
-struct value *parse_sym(void)
+struct value *parse_name(int allow_eq)
 	{
-	buf_clear();
-
-	if (curr_ch == EOF)
+	struct buf *buf = 0;
+	while (1)
 		{
-		fprintf(stderr, "Expected a symbol but reached end of file\n");
-		exit(1);
+		if (
+			at_white()
+			|| ch == '\\'
+			|| ch == '('
+			|| ch == ')'
+			|| ch == ';'
+			|| ch == '"'
+			|| ch == '~'
+			|| ch == '#'
+			|| (ch == '=' && !allow_eq)
+			|| ch == EOF
+			)
+			break;
+
+		buf_add(&buf, ch);
+		next_ch();
 		}
 
-	if (curr_ch == '"')
-		{
-		while (1)
-			{
-			buf_add(curr_ch);
-			next_char();
-			if (curr_ch == EOF)
-				{
-				fprintf(stderr, "Missing closing quote on string.\n");
-				exit(1);
-				}
-			if (curr_ch == '"')
-				{
-				buf_add(curr_ch);
-				next_char();
-				break;
-				}
-			}
-		}
-	else if (curr_ch == '~')
-		{
-		while (1)
-			{
-			buf_add(curr_ch);
-			next_char();
-			if (curr_ch == EOF)
-				{
-				fprintf(stderr,
-				"Opening terminator on string did not end with white space.\n");
-				exit(1);
-				}
+	long len;
+	char *string = buf_clear(&buf,&len);
+	return Qname(Qchars(string,len));
+	}
 
-			if (isspace(curr_ch))
-				{
-				buf_add(curr_ch);
-				break;
-				}
-			}
-
-		int term_len = buf_len - 2;
-
-		if (term_len <= 0)
-			{
-			fprintf(stderr, "Missing opening terminator on string, line %d.\n",
-				line_no);
-			exit(1);
-			}
-
-		while (1)
-			{
-			next_char();
-			if (curr_ch == EOF)
-				{
-				fprintf(stderr, "Missing closing terminator on string.\n");
-				exit(1);
-				}
-
-			buf_add(curr_ch);
-
-			if (memcmp(buf + buf_len - term_len, buf + 1, term_len) == 0)
-				{
-				next_char();
-				break;
-				}
-			}
-		}
+/* Parse a symbol. */
+struct value *parse_sym(int allow_eq)
+	{
+	if (ch == '"')
+		return parse_simple_string();
+	else if (ch == '~')
+		return parse_complex_string();
 	else
-		{
-		while (1)
-			{
-			if (curr_ch == EOF || isspace(curr_ch)
-				|| curr_ch == '\\'
-				|| curr_ch == '('
-				|| curr_ch == ')'
-				|| curr_ch == ';'
-				|| curr_ch == '='
-				|| curr_ch == '"'
-				|| curr_ch == '~'
-				)
-				break;
-
-			buf_add(curr_ch);
-			next_char();
-			}
-		}
-
-	if (buf_len == 0)
-		{
-		fprintf(stderr, "Missing symbol on line %d\n", line_no);
-		exit(1);
-		}
-
-	struct value *sym = new_chars(buf,buf_len);
-	sym->T = &type_var;
-	buf_clear();
-	return sym;
+		return parse_name(allow_eq);
 	}
 
-/*
-LATER also once we start calling this parser from within fexl itself for
-embedded environments, we'll increment total_steps and compare with max_steps
-as we go.
-*/
+/* stack of symbols defined outside the source text */
+struct value *outside = 0;
 
-int paren_count = 0;
+struct value *find_sym(struct value *name)
+	{
+	struct value *pos = stack;
+	while (1)
+		{
+		if (pos == 0) return 0;
+		if (sym_eq(name,pos->L)) return pos->L;
+		pos = pos->R;
+		}
+	}
 
-extern struct value *parse_exp(struct value *exp);
+extern struct value *parse_exp(void);
 
 struct value *parse_term(void)
 	{
-	struct value *term;
-
-	if (curr_ch == '(')
+	long first_line = line;
+	if (ch == '(')
 		{
-		paren_count++;
-		next_char();
-		term = parse_exp(0);
+		next_ch();
+		struct value *exp = parse_exp();
+
+		if (ch == ')')
+			next_ch();
+		else
+			{
+			line = first_line;
+			die("Unclosed parenthesis");
+			}
+
+		return exp;
 		}
 	else
 		{
-		struct value *sym = parse_sym();
-		term = resolve(sym);
-		drop(sym);
-		}
+		struct value *sym = parse_sym(1);
 
-	return term;
+		if (sym->T == type_name && string_len(sym) == 0)
+			{
+			line = first_line;
+			die("Missing definition");
+			}
+
+		struct value *def = find_sym(sym);
+
+		if (!def)
+			{
+			/*TODO clean up (make a routine) */
+			struct value *save = stack;
+			stack = outside;
+
+			def = find_sym(sym);
+			if (!def)
+				{
+				def = sym;
+				hold(def);
+				push(def);
+				}
+
+			outside = stack;
+			stack = save;
+			}
+
+		if (def != sym)
+			{
+			hold(sym);
+			drop(sym);
+			}
+
+		return def;
+		}
 	}
 
 /*
-Parse an expression.  If an exp value is given, apply that to the left side of
-the parsed expression.  This gives us the left-associative chaining that we
-need.
+Parse a lambda form following the initial '\' character.
 
-Note that we check max_depth here to avoid a stack overflow and segmentation
-fault which could happen from strange inputs like an infinite series of left
-parentheses.
+An ordinary lambda symbol is terminated by white space or '=', for example:
+
+  \x=4
+  \y = 5
+
+If you want a lambda symbol to contain '=', you must use white space after the
+initial '\'.  This tells the parser that the lambda symbol is terminated by
+white space only, and not '='.  For example:
+
+  \ =   = num_eq
+  \ ==  = num_eq
+  \ !=  = num_ne
+  \ <   = num_lt
+  \ <=  = num_le
+  \ >   = num_gt
+  \ >=  = num_ge
 */
-
-struct value *parse_exp(struct value *exp)
+struct value *parse_lambda(void)
 	{
-	if (++total_depth > max_depth)
+	int allow_eq = at_white();
+	skip_white();
+
+	struct value *sym = parse_sym(allow_eq);
+	if (sym->T == type_name && string_len(sym) == 0)
+		die("Missing lambda symbol");
+
+	hold(sym);
+
+	skip_filler();
+	int has_def = (ch == '=');
+
+	struct value *val;
+
+	if (has_def)
 		{
-		fprintf(stderr,
-			"Your program tried to evaluate at a depth greater than %d.\n",
-			max_depth);
-		exit(1);
-		}
-
-	while (1)
-		{
-		skip_space();
-
-		if (curr_ch == EOF)
-			break;
-		else if (curr_ch == '\\')
+		next_ch();
+		if (ch == '=')
 			{
-			next_char();
+			/* Recursive definition */
+			next_ch();
+			skip_filler();
 
-			if (curr_ch == '\\')
-				{
-				/* Stop reading the input. */
-				curr_ch = EOF;
-				break;
-				}
-
-			skip_space();
-
-			struct value *sym = parse_sym();
-
-			skip_space();
-
-			if (curr_ch == '=')
-				{
-				next_char();
-
-				int is_recursive = 0;
-				if (curr_ch == '=')
-					{
-					is_recursive = 1;
-					next_char();
-					}
-
-				skip_space();
-
-				if (is_recursive) push_var(sym, sym);
-				struct value *term = parse_term();
-				hold(term);
-				if (!is_recursive) push_var(sym, sym);
-
-				struct value *def;
-				if (is_recursive)
-					{
-					def = apply(&value_Y,abstract(sym,term));
-					optimize(def);
-					}
-				else
-					def = term;
-
-				struct value *body = parse_exp(0);
-				hold(body);
-
-				struct value *value = abstract(sym,body);
-
-				struct value *result;
-				if (is_recursive)
-					result = apply(value,def);
-				else
-					/* The Q forces eager evaluation of def first. */
-					result = apply(apply(&value_Q,def),value);
-
-				exp = exp ? apply(exp,result) : result;
-
-				drop(term);
-				drop(body);
-				}
-			else
-				{
-				push_var(sym, sym);
-				struct value *body = parse_exp(0);
-				hold(body);
-
-				struct value *value = abstract(sym,body);
-				exp = exp ? apply(exp,value) : value;
-
-				drop(body);
-				}
-
-			pop_var();
-			break;
-			}
-		else if (curr_ch == ')')
-			{
-			paren_count--;
-			if (paren_count < 0)
-				{
-				fprintf(stderr,
-					"Extra right parentheses on line %d\n", line_no);
-				exit(1);
-				}
-			next_char();
-			break;
-			}
-		else if (curr_ch == ';')
-			{
-			next_char();
-			struct value *value = parse_exp(0);
-			exp = exp ? apply(exp,value) : value;
-			break;
+			push(sym);
+			struct value *def = parse_term();
+			def = A(Y,lambda(sym,def));
+			val = lambda(sym,parse_exp());
+			val = A(val,def);
+			pop();
 			}
 		else
 			{
-			struct value *term = parse_term();
-			exp = exp ? apply(exp,term) : term;
+			/* Non-recursive definition, forces eager evaluation */
+			skip_filler();
+			struct value *def = parse_term();
+
+			push(sym);
+			val = lambda(sym,parse_exp());
+			val = A(A(query,def),val);
+			pop();
 			}
 		}
-
-	total_depth--;
-	return exp ? exp : &value_I;
-	}
-
-struct value *parse(FILE *source)
-	{
-	start_resolve();
-
-	curr_source = source;
-	next_char();
-
-	struct value *value = parse_exp(0);
-
-	if (paren_count > 0)
+	else
 		{
-		fprintf(stderr, "Missing right parentheses\n");
-		exit(1);
+		/* Normal parameter (symbol without definition) */
+		push(sym);
+		val = lambda(sym,parse_exp());
+		pop();
 		}
 
-	finish_resolve();
+	drop(sym);
+	return val;
+	}
 
-	return value;
+/*
+Parse an expression.
+
+We limit the depth here to avoid a stack overflow resulting from strange inputs
+like an infinite series of left parentheses.
+*/
+struct value *parse_exp(void)
+	{
+	struct value *exp = I;
+
+	if (++cur_depth > max_depth)
+		die("Your program is too deeply nested.");
+
+	while (1)
+		{
+		skip_filler();
+		if (ch == EOF || ch == ')') break;
+
+		struct value *val;
+
+		if (ch == '\\')
+			{
+			next_ch();
+			if (ch == '\\')
+				{
+				ch = EOF; /* Two backslashes simulates end of file. */
+				break;
+				}
+
+			val = parse_lambda();
+			}
+		else if (ch == ';')
+			{
+			next_ch();
+			val = parse_exp();
+			}
+		else
+			val = parse_term();
+
+		exp = exp->T == type_I ? val : A(exp,val);
+		}
+
+	cur_depth--;
+	return exp;
+	}
+
+struct value *parse_source(void)
+	{
+	line = 1;
+	next_ch();
+
+	struct value *save_stack = stack;
+	stack = 0;
+
+	struct value *exp = parse_exp();
+
+	if (ch != EOF)
+		die("Extraneous input");
+
+	int ok = 1;
+	stack = outside;
+	while (stack)
+		{
+		struct value *x = stack->L;
+		exp = Qresolve(x,exp); /*TODO*/
+		drop(x);
+		pop();
+		}
+
+	outside = 0;
+
+	if (!ok)
+		die("Your program has undefined symbols."); /*TODO*/
+
+	stack = save_stack;
+
+	return exp;
 	}
