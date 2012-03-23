@@ -48,15 +48,15 @@ file) or the special token "\\".  The \\ token stops the parser immediately, as
 if it had reached end of file.
 */
 
-int ch = 0;      /* current character */
+/* The read_ch function reads the next character.  It can be set to read from
+any source such as a file or a string. */
+int (*read_ch)(void);
 
-/* The read_ch function reads the next character into the ch variable.  It
-can be set to read from any source such as a file or a string. */
-void (*read_ch)(void);
+static int ch = 0;      /* current character */
 
 void next_ch(void)
 	{
-	read_ch();
+	ch = read_ch();
 	if (ch == '\n') line++;
 	}
 

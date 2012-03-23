@@ -10,9 +10,9 @@ static char *source_string = 0;  /* source of characters */
 static long source_len = 0;      /* total length */
 static long source_pos = 0;      /* current pos */
 
-void string_read_ch(void)
+int string_read_ch(void)
 	{
-	ch = source_pos < source_len ? source_string[source_pos++] : EOF;
+	return source_pos < source_len ? source_string[source_pos++] : EOF;
 	}
 
 struct value *parse_chars(char *string, long len)

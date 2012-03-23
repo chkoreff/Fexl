@@ -6,9 +6,9 @@
 /* Parse directly from a FILE. */
 static FILE *source_file = 0;  /* source of characters */
 
-void file_read_ch(void)
+int file_read_ch(void)
 	{
-	ch = fgetc(source_file);
+	return fgetc(source_file);
 	}
 
 struct value *parse_file(FILE *file)
