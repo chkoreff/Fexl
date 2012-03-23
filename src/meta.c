@@ -5,8 +5,6 @@
 #include "run.h"
 #include "stack.h"
 
-/*TODO test these */
-
 struct value *type_put_max_steps(struct value *f)
 	{
 	if (!f->L->L) return f;

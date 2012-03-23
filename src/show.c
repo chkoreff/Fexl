@@ -12,19 +12,8 @@
 #include "string.h"
 #include "sym.h"
 
-void print(const char *s)
-	{
-	fputs(s, stdout);
-	}
-
-/*TODO full string quoting */
-void show_string(struct value *f)
-	{
-	char *quote = "\"";
-	print(quote);
-	string_put(f);
-	print(quote);
-	}
+extern struct value *type_lambda(struct value *); /*TODO*/
+extern struct value *type_show(struct value *);
 
 void show(struct value *f)
 	{
@@ -48,7 +37,7 @@ void show(struct value *f)
 	else if (f->T == type_double)
 		printf("%.16g", get_double(f));
 	else if (f->T == type_string)
-		show_string(f);
+		quote_string_put(f);
 	else if (f->T == type_name)
 		string_put(f);
 	else

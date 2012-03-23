@@ -1,5 +1,4 @@
 #include "value.h"
-#include "basic.h"
 #include "stack.h"
 
 struct value *stack = 0;
@@ -28,18 +27,8 @@ int arg(struct value *(*T)(struct value *), struct value *f)
 	return 0;
 	}
 
-struct value *arg_is_type(
-	struct value *(*T)(struct value *),
-	struct value *f)
-	{
-	struct value *x = f->R;
-	if (arg(T,x)) return C;
-	if (x->T == 0) return f;
-	return F;
-	}
-
-#if 0
-/* TODO .bench2 is slower, 44s vs 42.5s -- test again tho */
+/* Used for functions of the form (is_T x yes no), which checks the type of x
+and returns yes if it's type T or no otherwise. */
 struct value *arg_is_type(
 	struct value *(*T)(struct value *),
 	struct value *f)
@@ -50,4 +39,3 @@ struct value *arg_is_type(
 	if (x->T == 0) return f;
 	return f->R;
 	}
-#endif

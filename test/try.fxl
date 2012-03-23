@@ -31,8 +31,10 @@
 \nl = (print "
 ")
 
-\T = (\T\F T)
-\F = (\T\F F)
+# T and F are the predefined symbols for True and False.  They are equivalent
+# to:
+# \T = (\T\F T)
+# \F = (\T\F F)
 
 \string_eq=(\x\y string_compare x y F T F)
 
@@ -45,11 +47,14 @@
 
 ### List functions
 
-# "end" is the empty list.
-\end = (\end\item end)
-
-# The "item" (cons) list constructor is built-in, but could be defined thus:
+# Predefined:
+# end is the empty list.
+# (item head tail) is the list consisting of head followed by tail.
+#
+# They are equivalent to:
+# \end  = (           \end\item end)
 # \item = (\head\tail \end\item item head tail)
+
 
 # Return the first N items of the list.
 \list_prefix == (\list\N

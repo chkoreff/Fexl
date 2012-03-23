@@ -1,6 +1,5 @@
 #include <stdio.h> /* sprintf */
 #include "value.h"
-#include "basic.h"
 #include "double.h"
 #include "long.h"
 #include "stack.h"

@@ -2,6 +2,7 @@
 #include "memory.h"
 #include <string.h>  /* memcpy */
 
+/* Add a single character. */
 void buf_add(struct buf **top, char ch)
 	{
 	struct buf *buf = *top;
@@ -41,6 +42,13 @@ void buf_add(struct buf **top, char ch)
 		}
 
 	buf->data[buf->len++] = ch;
+	}
+
+/* Add a NUL-terminated string. */
+void buf_add_string(struct buf **top, char *str)
+	{
+	while (*str)
+		buf_add(top, *str++);
 	}
 
 char *buf_clear(struct buf **top, long *final_len)

@@ -65,6 +65,15 @@ struct value *type_Y(struct value *f)
 	}
 
 /*
+The F function follows the rule ((F x) y) = y.  It represents False, which
+always returns its second argument. */
+struct value *type_F(struct value *f)
+	{
+	if (!f->L->L) return f;
+	return f->R;
+	}
+
+/*
 The query function is used for eager evaluation.  It follows this rule:
   (query x y) = (y x)
 
@@ -77,81 +86,4 @@ struct value *type_query(struct value *f)
 	if (!f->L->L) return f;
 	if (!f->L->R->T) push(f->L->R);
 	return A(f->R,f->L->R);
-	}
-
-/* Return a copy of fun with val substituted according to pattern p. */
-struct value *subst(struct value *p, struct value *fun, struct value *val)
-	{
-	if (p->T == type_I) return val;
-	if (p->T == type_C) return fun;
-	return A(subst(p->L,fun->L,val),subst(p->R,fun->R,val));
-	}
-
-struct value *type_lambda(struct value *f)
-	{
-	if (!f->L->L || !f->L->L->L) return f;
-	return subst(f->L->L->R,f->L->R,f->R);
-	}
-
-struct value *C;
-struct value *S;
-struct value *I;
-struct value *R;
-struct value *L;
-struct value *Y;
-struct value *F;
-struct value *query;
-struct value *lam;
-
-struct value *get_pattern(struct value *sym, struct value *fun)
-	{
-	if (fun == sym) return I;
-	if (!fun->L) return C;
-
-	struct value *fl = get_pattern(sym,fun->L);
-	struct value *fr = get_pattern(sym,fun->R);
-	if (fl->T == type_C && fr->T == type_C) return C;
-
-	return A(fl,fr);
-	}
-
-struct value *lambda(struct value *x, struct value *f)
-	{
-	return A(A(lam,get_pattern(x,f)),f);
-	}
-
-void beg_basic(void)
-	{
-	C = Q(type_C);
-	S = Q(type_S);
-	I = Q(type_I);
-	R = Q(type_R);
-	L = Q(type_L);
-	Y = Q(type_Y);
-	query = Q(type_query);
-	F = A(C,I);
-	lam = Q(type_lambda);
-
-	hold(C);
-	hold(S);
-	hold(I);
-	hold(R);
-	hold(L);
-	hold(Y);
-	hold(query);
-	hold(F);
-	hold(lam);
-	}
-
-void end_basic(void)
-	{
-	drop(C);
-	drop(S);
-	drop(I);
-	drop(R);
-	drop(L);
-	drop(Y);
-	drop(query);
-	drop(F);
-	drop(lam);
 	}

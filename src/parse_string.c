@@ -25,7 +25,7 @@ struct value *parse_chars(char *string, long len)
 	}
 
 /* Combinator to call parse_chars from within Fexl.
-parse string next TODO
+Called as (parse string next)  -- TODO resolution function, yes/no result
 */
 struct value *type_parse(struct value *f)
 	{

@@ -11,6 +11,11 @@ void nl(void)
 	putchar('\n');
 	}
 
+void print(const char *s)
+	{
+	fputs(s, stdout);
+	}
+
 struct value *type_nl(struct value *f)
 	{
 	nl();
@@ -21,6 +26,15 @@ struct value *type_nl(struct value *f)
 void string_put(struct value *x)
 	{
 	fwrite(string_data(x), 1, string_len(x), stdout);
+	}
+
+/*TODO full string quoting */
+void quote_string_put(struct value *f)
+	{
+	char *quote = "\"";
+	print(quote);
+	string_put(f);
+	print(quote);
 	}
 
 struct value *type_string_put(struct value *f)

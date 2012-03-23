@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "value.h"
-#include "basic.h"
 #include "die.h"
 #include "eval.h"
 #include "parse_file.h"
@@ -17,8 +16,6 @@ int main(int argc, char *argv[], char *envp[])
 	FILE *source = argc > 1 ? fopen(argv[1],"r") : stdin;
 	if (!source) die("Can't open script");
 
-	beg_basic();
-
 	struct value *f = parse_file(source);
 	if (source != stdin) fclose(source);
 
@@ -26,7 +23,6 @@ int main(int argc, char *argv[], char *envp[])
 	eval(f);
 	drop(f);
 
-	end_basic();
 	end_value();
 	return 0;
 	}

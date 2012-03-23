@@ -5,12 +5,21 @@
 #include "double.h"
 #include "dynamic.h"
 #include "eval.h"
+#include "io.h"
 #include "long.h"
 #include "memory.h"
 #include "run.h"
 #include "show.h"
 #include "string.h"
 #include "sym.h"
+
+struct value *C;
+struct value *S;
+struct value *I;
+struct value *Y;
+struct value *R;
+struct value *L;
+struct value *query;
 
 struct value *long_add;
 struct value *long_sub;
@@ -383,7 +392,13 @@ void test_fexl(void)
 
 void beg_test(void)
 	{
-	beg_basic();
+	C = Q(type_C);
+	S = Q(type_S);
+	I = Q(type_I);
+	R = Q(type_R);
+	L = Q(type_L);
+	Y = Q(type_Y);
+	query = Q(type_query);
 
 	long_add = Q(type_long_add);
 	long_sub = Q(type_long_sub);
@@ -394,6 +409,14 @@ void beg_test(void)
 	double_sub = Q(type_double_sub);
 	double_mul = Q(type_double_mul);
 	double_div = Q(type_double_div);
+
+	hold(C);
+	hold(S);
+	hold(I);
+	hold(R);
+	hold(L);
+	hold(Y);
+	hold(query);
 
 	hold(long_add);
 	hold(long_sub);
@@ -408,7 +431,13 @@ void beg_test(void)
 
 void end_test(void)
 	{
-	end_basic();
+	drop(C);
+	drop(S);
+	drop(I);
+	drop(R);
+	drop(L);
+	drop(Y);
+	drop(query);
 	drop(long_add);
 	drop(long_sub);
 	drop(long_mul);

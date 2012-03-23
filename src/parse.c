@@ -12,6 +12,14 @@
 #include "string.h"
 #include "sym.h"
 
+static struct value *C;
+static struct value *I;
+static struct value *Y;
+static struct value *query;
+
+extern struct value *parse_exp(void);
+extern struct value *lambda(struct value *x, struct value *f);
+
 /*
 Grammar:
 
@@ -202,7 +210,7 @@ struct value *parse_sym(int allow_eq)
 	}
 
 /* stack of symbols defined outside the source text */
-struct value *outside = 0;
+static struct value *outside = 0;
 
 struct value *find_sym(struct value *name)
 	{
@@ -214,8 +222,6 @@ struct value *find_sym(struct value *name)
 		pos = pos->R;
 		}
 	}
-
-extern struct value *parse_exp(void);
 
 struct value *parse_term(void)
 	{
@@ -397,8 +403,78 @@ struct value *parse_exp(void)
 	return exp;
 	}
 
+struct value *get_pattern(struct value *sym, struct value *fun)
+	{
+	if (fun == sym) return I;
+	if (!fun->L) return C;
+
+	struct value *fl = get_pattern(sym,fun->L);
+	struct value *fr = get_pattern(sym,fun->R);
+	if (fl->T == type_C && fr->T == type_C) return C;
+
+	return A(fl,fr);
+	}
+
+/* Return a copy of fun with val substituted according to pattern p. */
+struct value *subst(struct value *p, struct value *fun, struct value *val)
+	{
+	if (p->T == type_I) return val;
+	if (p->T == type_C) return fun;
+	return A(subst(p->L,fun->L,val),subst(p->R,fun->R,val));
+	}
+
+struct value *type_lambda(struct value *f)
+	{
+	if (!f->L->L || !f->L->L->L) return f;
+	return subst(f->L->L->R,f->L->R,f->R);
+	}
+
+static struct value *lam;
+
+struct value *lambda(struct value *x, struct value *f)
+	{
+	return A(A(lam,get_pattern(x,f)),f);
+	}
+
+/*TODO pass resolution function into parse instead of always using built-in */
+static struct value *resolve;
+
+struct value *Qresolve(struct value *x, struct value *f)
+	{
+	return A(A(resolve,x),lambda(x,f));
+	}
+
+void beg_parse(void)
+	{
+	C = Q(type_C);
+	I = Q(type_I);
+	Y = Q(type_Y);
+	query = Q(type_query);
+	lam = Q(type_lambda);
+	resolve = Q(type_resolve);
+
+	hold(C);
+	hold(I);
+	hold(Y);
+	hold(query);
+	hold(lam);
+	hold(resolve);
+	}
+
+void end_parse(void)
+	{
+	drop(C);
+	drop(I);
+	drop(Y);
+	drop(query);
+	drop(lam);
+	drop(resolve);
+	}
+
 struct value *parse_source(void)
 	{
+	beg_parse();
+
 	line = 1;
 	next_ch();
 
@@ -427,5 +503,6 @@ struct value *parse_source(void)
 
 	stack = save_stack;
 
+	end_parse();
 	return exp;
 	}
