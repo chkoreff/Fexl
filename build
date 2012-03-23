@@ -12,7 +12,7 @@ NAME
        $progname - build the Fexl program
 
 SYNOPSIS
-       $progname [quiet] [clean] [install] [erase]
+       $progname [quiet] [clean] [install] [uninstall] [erase]
 
 DESCRIPTION
 
