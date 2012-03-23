@@ -5,7 +5,7 @@ extern struct value *type_double_add(struct value *);
 extern struct value *type_double_sub(struct value *);
 extern struct value *type_double_mul(struct value *);
 extern struct value *type_double_div(struct value *);
-extern struct value *type_double_type(struct value *);
+extern struct value *type_is_double(struct value *);
 extern struct value *type_double_string(struct value *);
 extern struct value *type_double_compare(struct value *);
 extern struct value *type_double_long(struct value *);

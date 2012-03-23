@@ -16,6 +16,8 @@
 
 /* The standard context for Fexl. */
 
+/*TODO perhaps also a same_type function for checking types at run-time */
+
 struct value *resolve(struct value *sym)
 	{
 	char *name = string_data(sym);
@@ -50,14 +52,16 @@ struct value *resolve(struct value *sym)
 	if (strcmp(name, "double_sub") == 0) return Q(type_double_sub);
 	if (strcmp(name, "double_mul") == 0) return Q(type_double_mul);
 	if (strcmp(name, "double_div") == 0) return Q(type_double_div);
-	if (strcmp(name, "double_type") == 0) return Q(type_double_type);
+	if (strcmp(name, "is_double") == 0) return Q(type_is_double);
+	if (strcmp(name, "double_type") == 0) return Q(type_is_double);
 	if (strcmp(name, "double_string") == 0) return Q(type_double_string);
 	if (strcmp(name, "double_compare") == 0) return Q(type_double_compare);
 	if (strcmp(name, "double_long") == 0) return Q(type_double_long);
 
 	if (strcmp(name, "nl") == 0) return Q(type_nl);
 	if (strcmp(name, "string_put") == 0) return Q(type_string_put);
-	if (strcmp(name, "string_type") == 0) return Q(type_string_type);
+	if (strcmp(name, "is_string") == 0) return Q(type_is_string);
+	if (strcmp(name, "string_type") == 0) return Q(type_is_string);
 	if (strcmp(name, "string_compare") == 0) return Q(type_string_compare);
 	if (strcmp(name, "string_slice") == 0) return Q(type_string_slice);
 	if (strcmp(name, "string_append") == 0) return Q(type_string_append);

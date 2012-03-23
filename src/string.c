@@ -168,17 +168,10 @@ int string_eq(struct value *x, struct value *y)
 	return memcmp(string_data(x), string_data(y), x_len) == 0;
 	}
 
-/*TODO don't refer to C and F -- just use extra args */
-/* Return T if the argument has the given type, otherwise F.  */
-
-/* TODO string_type x yes no */
-
-struct value *type_string_type(struct value *f)
+/* Determine if the value has type string. */
+struct value *type_is_string(struct value *f)
 	{
-	struct value *x = f->R;
-	if (arg(type_string,x)) return C;
-	if (x->T == 0) return f;
-	return F;
+	return arg_is_type(type_string,f);
 	}
 
 /* Append two strings. */
@@ -256,6 +249,7 @@ int string_long(char *beg, long *num)
 	return *beg != '\0' && *end == '\0';
 	}
 
+/* string_long x no yes */
 struct value *type_string_long(struct value *f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
@@ -284,6 +278,7 @@ int string_double(char *beg, double *num)
 	return *beg != '\0' && *end == '\0';
 	}
 
+/* string_double x no yes */
 struct value *type_string_double(struct value *f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;

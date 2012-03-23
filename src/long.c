@@ -86,18 +86,10 @@ struct value *type_long_div(struct value *f)
 	return Qlong(vy ? vx / vy : 0);
 	}
 
-/*TODO perhaps also a same_type function for checking types at run-time */
-
-/* Determine if the value has type long.
-TODO perhaps don't refer to C and F.
-TODO perhaps rename type_long_type
-*/
+/* Determine if the value has type long. */
 struct value *type_is_long(struct value *f)
 	{
-	struct value *x = f->R;
-	if (arg(type_long,x)) return C;
-	if (x->T == 0) return f;
-	return F;
+	return arg_is_type(type_long,f);
 	}
 
 /* Convert long to double. */

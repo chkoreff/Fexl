@@ -8,7 +8,7 @@ extern int string_compare(struct value *x, struct value *y);
 extern int string_eq(struct value *x, struct value *y);
 extern int string_long(char *beg, long *num);
 extern int string_double(char *beg, double *num);
-extern struct value *type_string_type(struct value *);
+extern struct value *type_is_string(struct value *);
 extern struct value *type_string_compare(struct value *);
 extern struct value *type_string_slice(struct value *);
 extern struct value *type_string_append(struct value *);

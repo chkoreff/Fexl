@@ -113,14 +113,9 @@ struct value *type_double_div(struct value *f)
 	}
 
 /* Determine if the value has type double. */
-/*TODO also allow is_double */
-/*TODO unify with type_is_long? */
-struct value *type_double_type(struct value *f)
+struct value *type_is_double(struct value *f)
 	{
-	struct value *x = f->R;
-	if (arg(type_double,x)) return C;
-	if (x->T == 0) return f;
-	return F;
+	return arg_is_type(type_double,f);
 	}
 
 struct value *type_double_string(struct value *f)
