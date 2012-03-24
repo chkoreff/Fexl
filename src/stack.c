@@ -1,8 +1,10 @@
 #include "value.h"
 #include "stack.h"
 
+/* The global stack used for tracking recursive goals during evaluation. */
 struct value *stack = 0;
 
+/* Push a value on the global stack. */
 void push(struct value *f)
 	{
 	struct value *next = create();
@@ -11,6 +13,7 @@ void push(struct value *f)
 	stack = next;
 	}
 
+/* Pop a value from the global stack. */
 void pop(void)
 	{
 	struct value *next = stack->R;
@@ -18,6 +21,26 @@ void pop(void)
 	stack->R = 0;
 	recycle(stack);
 	stack = next;
+	}
+
+/* Push a value on the designated list. */
+void push_list(struct value **list, struct value *f)
+	{
+	struct value *save = stack;
+	stack = *list;
+	push(f);
+	*list = stack;
+	stack = save;
+	}
+
+/* Pop a value from the designated list. */
+void pop_list(struct value **list)
+	{
+	struct value *save = stack;
+	stack = *list;
+	pop();
+	*list = stack;
+	stack = save;
 	}
 
 int arg(struct value *(*T)(struct value *), struct value *f)

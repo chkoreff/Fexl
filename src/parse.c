@@ -4,6 +4,7 @@
 #include "basic.h"
 #include "buf.h"
 #include "die.h"
+#include "long.h"
 #include "memory.h"
 #include "parse.h"
 #include "resolve.h"
@@ -209,18 +210,53 @@ struct value *parse_sym(int allow_eq)
 		return parse_name(allow_eq);
 	}
 
-/* stack of symbols defined outside the source text */
-static struct value *outside = 0;
-
-struct value *find_sym(struct value *name)
+struct value *find_sym(struct value *list, struct value *name)
 	{
-	struct value *pos = stack;
+	struct value *pos = list;
 	while (1)
 		{
 		if (pos == 0) return 0;
 		if (sym_eq(name,pos->L)) return pos->L;
 		pos = pos->R;
 		}
+	}
+
+/* Symbols declared with lambda forms inside the source text */
+static struct value *inside_syms = 0;
+/* Symbols referenced outside the source text */
+static struct value *outside_syms = 0;
+/* Line numbers of outside symbols */
+static struct value *outside_places = 0;
+
+/* Return the originally encountered occurrence of a symbol.  This unifies
+multiple occurrences into a single one. */
+struct value *orig_sym(struct value *sym, long first_line)
+	{
+	struct value *orig = find_sym(inside_syms,sym);
+
+	if (!orig)
+		{
+		orig = find_sym(outside_syms,sym);
+
+		if (!orig)
+			{
+			orig = sym;
+			hold(orig);
+			push_list(&outside_syms,orig); /* new outside sym encountered */
+
+			struct value *place = Qlong(first_line);
+			hold(place);
+			push_list(&outside_places,place);
+			}
+		}
+
+	if (orig != sym)
+		{
+		hold(sym);
+		drop(sym);
+		}
+
+	return orig;
 	}
 
 struct value *parse_term(void)
@@ -251,33 +287,7 @@ struct value *parse_term(void)
 			die("Missing definition");
 			}
 
-		struct value *def = find_sym(sym);
-
-		if (!def)
-			{
-			/*TODO clean up (make a routine) */
-			struct value *save = stack;
-			stack = outside;
-
-			def = find_sym(sym);
-			if (!def)
-				{
-				def = sym;
-				hold(def);
-				push(def);
-				}
-
-			outside = stack;
-			stack = save;
-			}
-
-		if (def != sym)
-			{
-			hold(sym);
-			drop(sym);
-			}
-
-		return def;
+		return orig_sym(sym,first_line);
 		}
 	}
 
@@ -326,12 +336,12 @@ struct value *parse_lambda(void)
 			next_ch();
 			skip_filler();
 
-			push(sym);
+			push_list(&inside_syms,sym);
 			struct value *def = parse_term();
 			def = A(Y,lambda(sym,def));
 			val = lambda(sym,parse_exp());
 			val = A(val,def);
-			pop();
+			pop_list(&inside_syms);
 			}
 		else
 			{
@@ -339,18 +349,18 @@ struct value *parse_lambda(void)
 			skip_filler();
 			struct value *def = parse_term();
 
-			push(sym);
+			push_list(&inside_syms,sym);
 			val = lambda(sym,parse_exp());
 			val = A(A(query,def),val);
-			pop();
+			pop_list(&inside_syms);
 			}
 		}
 	else
 		{
 		/* Normal parameter (symbol without definition) */
-		push(sym);
+		push_list(&inside_syms,sym);
 		val = lambda(sym,parse_exp());
-		pop();
+		pop_list(&inside_syms);
 		}
 
 	drop(sym);
@@ -437,11 +447,14 @@ struct value *lambda(struct value *x, struct value *f)
 	}
 
 /*TODO pass resolution function into parse instead of always using built-in */
+/* TODO use the version that chains */
 static struct value *resolve;
 
-struct value *Qresolve(struct value *x, struct value *f)
+struct value *Qresolve(
+	struct value *sym, struct value *place,
+	struct value *exp)
 	{
-	return A(A(resolve,x),lambda(x,f));
+	return A(A(A(resolve,sym),place),lambda(sym,exp));
 	}
 
 void beg_parse(void)
@@ -478,30 +491,24 @@ struct value *parse_source(void)
 	line = 1;
 	next_ch();
 
-	struct value *save_stack = stack;
-	stack = 0;
-
 	struct value *exp = parse_exp();
 
 	if (ch != EOF)
 		die("Extraneous input");
 
-	int ok = 1;
-	stack = outside;
-	while (stack)
+	while (outside_syms)
 		{
-		struct value *x = stack->L;
-		exp = Qresolve(x,exp); /*TODO*/
-		drop(x);
-		pop();
+		struct value *sym = outside_syms->L;
+		struct value *place = outside_places->L;
+
+		exp = Qresolve(sym,place,exp);
+
+		drop(sym);
+		pop_list(&outside_syms);
+
+		drop(place);
+		pop_list(&outside_places);
 		}
-
-	outside = 0;
-
-	if (!ok)
-		die("Your program has undefined symbols."); /*TODO*/
-
-	stack = save_stack;
 
 	end_parse();
 	return exp;

@@ -1,24 +1,21 @@
 #include <dlfcn.h> /*TODO*/
-#include <stdio.h> /*TODO*/
 #include <string.h>  /* strcmp */
 #include "buf.h"
 #include "die.h"
 #include "value.h"
 #include "double.h"
-#include "io.h" /*TODO*/
 #include "long.h"
 #include "memory.h"
 #include "resolve.h"
+#include "run.h"
 #include "stack.h"
 #include "string.h"
 
 /* The standard context for Fexl. */
 
-/*TODO perhaps also a same_type function for checking types at run-time */
-/*TODO pair */
+/*TODO perhaps a "same_type" function for checking types at run-time */
 /*TODO append */
 /*TODO + - * / = < etc. */
-
 /*TODO use lib_sym(0,name) -- except that has a built-in die */
 
 /* Look up type_[name] in the Fexl library linked with the executable. */
@@ -50,7 +47,7 @@ char *canonical_name(char *name)
 	return name;
 	}
 
-struct value *resolve(struct value *sym)
+struct value *resolve(struct value *sym, long line_no)
 	{
 	if (sym->T == type_string) return sym;
 
@@ -72,34 +69,25 @@ struct value *resolve(struct value *sym)
 	struct value *f = resolve_name(canonical_name(name));
 	if (f) return f;
 
-	/*TODO report line numbers */
 	/*TODO report all the undefined symbols, not just first.  We'll do that
 	with the chained resolution trick so it all happens inside Fexl. */
-	fputs("Undefined symbol ", stderr);
-	/*TODO unify with quote_string_put */
-	char *quote = sym->T == type_string ? "\"" : "";
-	fputs(quote, stderr);
-	fwrite(string_data(sym), 1, string_len(sym), stderr);
-	fputs(quote, stderr);
-	nl();
-	die("TODO");
+	line = line_no;
+	die("Undefined symbol %s",string_data(sym));
 
-	return sym; /*TODO*/
+	return sym;
 	}
 
-/*TODO how do we distinguish name vs. string in a resolution function written
-in Fexl? */
+/* resolve sym place exp */
 struct value *type_resolve(struct value *f)
 	{
-	if (!f->L->L) return f;
+	if (!f->L->L || !f->L->L->L) return f;
 
-	struct value *sym = f->L->R;
-	struct value *body = f->R;
+	struct value *sym = f->L->L->R;
+	struct value *place = f->L->R;
+	struct value *exp = f->R;
 
 	if (!sym->T) { push(sym); return f; } /*TODO test*/
+	if (!arg(type_long,place)) return f; /*TODO test */
 
-	#if 0
-	print("resolve sym  = ");show(sym);nl();
-	#endif
-	return A(body,resolve(sym));
+	return A(exp,resolve(sym,get_long(place)));
 	}

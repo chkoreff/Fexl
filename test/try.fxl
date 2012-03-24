@@ -28,8 +28,6 @@
 	x)
 
 \print = (\item string_put (string_from item))
-\nl = (print "
-")
 
 # T and F are the predefined symbols for True and False.  They are equivalent
 # to:

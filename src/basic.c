@@ -87,3 +87,24 @@ struct value *type_query(struct value *f)
 	if (!f->L->R->T) push(f->L->R);
 	return A(f->R,f->L->R);
 	}
+
+/*
+(item head tail) is the list with first element head followed by the list tail.
+It follows the rule (item h t f g) = (g h t), and can be defined as
+	\item = (\head\tail \end\item item head tail)
+*/
+struct value *type_item(struct value *f)
+	{
+	if (!f->L->L || !f->L->L->L || !f->L->L->L->L) return f;
+	return A(A(f->R,f->L->L->L->R),f->L->L->R);
+	}
+
+/* The pair function makes a pair of two things.  It follows the rule
+(pair x y p) = (p x y), and can be defined as
+	\pair = (\x\y\p p x y)
+*/
+struct value *type_pair(struct value *f)
+	{
+	if (!f->L->L || !f->L->L->L) return f;
+	return A(A(f->R,f->L->L->R),f->L->R);
+	}
