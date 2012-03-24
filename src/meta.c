@@ -1,7 +1,6 @@
 #include "memory.h"
 #include "value.h"
 #include "long.h"
-#include "meta.h"
 #include "run.h"
 #include "stack.h"
 

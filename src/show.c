@@ -11,6 +11,7 @@
 #include "show.h"
 #include "string.h"
 #include "sym.h"
+/*TODO won't need most of these header files when you do "show" in Fexl */
 
 extern struct value *type_lambda(struct value *); /*TODO*/
 extern struct value *type_show(struct value *);
