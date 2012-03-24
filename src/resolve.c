@@ -1,4 +1,4 @@
-#include <dlfcn.h> /*TODO*/
+#include <dlfcn.h>
 #include <string.h>  /* strcmp */
 #include "buf.h"
 #include "die.h"
@@ -13,10 +13,8 @@
 
 /* The standard context for Fexl. */
 
-/*TODO perhaps a "same_type" function for checking types at run-time */
 /*TODO append */
 /*TODO + - * / = < etc. */
-/*TODO use lib_sym(0,name) -- except that has a built-in die */
 
 /* Look up type_[name] in the Fexl library linked with the executable. */
 struct value *resolve_name(char *name)

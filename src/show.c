@@ -79,7 +79,10 @@ void show(struct value *f)
 	cur_depth--;
 	}
 
-/*TODO perhaps do this in Fexl itself */
+/*TODO Do the show routine in Fexl itself.  I'll implement a data type "type"
+(type_type) to represent handles to built-in type routines, and you can
+compare types that way.
+*/
 struct value *type_show(struct value *f)
 	{
 	if (!f->L->L) return f;

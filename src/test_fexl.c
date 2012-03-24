@@ -3,7 +3,6 @@
 #include "value.h"
 #include "basic.h"
 #include "double.h"
-#include "dynamic.h"
 #include "eval.h"
 #include "io.h"
 #include "long.h"
@@ -129,31 +128,6 @@ void test_overflow(long x, long y)
 
 	printf("check %ld + %ld = %ld : %s\n", x, y, z,
 		(ok ? "OK" : "OVERFLOW"));
-	}
-
-/* LATER unused */
-void test_dl_math(void)
-	{
-	void *lib = open_lib("libm.so");
-
-	double (*cosine)(double) = lib_sym(lib,"cos");
-
-	double x = 3.14159265358;
-	double y = (*cosine)(x);
-	printf("cosine(%f) = %f\n", x, y);
-
-	close_lib(lib);
-	}
-
-/* LATER unused */
-void test_dl_print(struct value *f)
-	{
-	void *lib = open_lib("libfexl.so");
-	void (*show)(struct value *f) = lib_sym(lib, "show");
-
-	(*show)(f);
-
-	close_lib(lib);
 	}
 
 void test_fexl(void)
