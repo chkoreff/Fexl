@@ -16,12 +16,11 @@ long total_bytes = 0;
 long max_bytes = 1000000000;
 
 /*
-Return a new unused span of memory of the given size, or 0 if not possible.  We
-ensure that the new total byte count is strictly greater than the old total.
+Return a new unused span of memory of the given size, or die if not possible.
+We ensure that the new total byte count is strictly greater than the old total.
 This prevents errors such as allocating zero bytes, negative bytes, or so many
 bytes that it causes an integer overflow.
 */
-
 void *new_memory(long num_bytes)
 	{
 	long new_total_bytes = total_bytes + num_bytes;
