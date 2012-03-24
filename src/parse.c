@@ -221,32 +221,32 @@ struct value *find_sym(struct value *list, struct value *name)
 		}
 	}
 
-/* Symbols declared with lambda forms inside the source text */
-static struct value *inside_syms = 0;
-/* Symbols referenced outside the source text */
-static struct value *outside_syms = 0;
-/* Line numbers of outside symbols */
-static struct value *outside_places = 0;
+/* Symbols defined with lambda forms inside the source text */
+static struct value *inner_syms = 0;
+/* Symbols defined outside the source text */
+static struct value *outer_syms = 0;
+/* Line numbers of outer symbols */
+static struct value *outer_places = 0;
 
 /* Return the originally encountered occurrence of a symbol.  This unifies
 multiple occurrences into a single one. */
 struct value *orig_sym(struct value *sym, long first_line)
 	{
-	struct value *orig = find_sym(inside_syms,sym);
+	struct value *orig = find_sym(inner_syms,sym);
 
 	if (!orig)
 		{
-		orig = find_sym(outside_syms,sym);
+		orig = find_sym(outer_syms,sym);
 
 		if (!orig)
 			{
 			orig = sym;
 			hold(orig);
-			push_list(&outside_syms,orig); /* new outside sym encountered */
+			push_list(&outer_syms,orig); /* new outer sym encountered */
 
 			struct value *place = Qlong(first_line);
 			hold(place);
-			push_list(&outside_places,place);
+			push_list(&outer_places,place);
 			}
 		}
 
@@ -336,12 +336,12 @@ struct value *parse_lambda(void)
 			next_ch();
 			skip_filler();
 
-			push_list(&inside_syms,sym);
+			push_list(&inner_syms,sym);
 			struct value *def = parse_term();
 			def = A(Y,lambda(sym,def));
 			val = lambda(sym,parse_exp());
 			val = A(val,def);
-			pop_list(&inside_syms);
+			pop_list(&inner_syms);
 			}
 		else
 			{
@@ -349,18 +349,18 @@ struct value *parse_lambda(void)
 			skip_filler();
 			struct value *def = parse_term();
 
-			push_list(&inside_syms,sym);
+			push_list(&inner_syms,sym);
 			val = lambda(sym,parse_exp());
 			val = A(A(query,def),val);
-			pop_list(&inside_syms);
+			pop_list(&inner_syms);
 			}
 		}
 	else
 		{
 		/* Normal parameter (symbol without definition) */
-		push_list(&inside_syms,sym);
+		push_list(&inner_syms,sym);
 		val = lambda(sym,parse_exp());
-		pop_list(&inside_syms);
+		pop_list(&inner_syms);
 		}
 
 	drop(sym);
@@ -496,18 +496,18 @@ struct value *parse_source(void)
 	if (ch != EOF)
 		die("Extraneous input");
 
-	while (outside_syms)
+	while (outer_syms)
 		{
-		struct value *sym = outside_syms->L;
-		struct value *place = outside_places->L;
+		struct value *sym = outer_syms->L;
+		struct value *place = outer_places->L;
 
 		exp = Qresolve(sym,place,exp);
 
 		drop(sym);
-		pop_list(&outside_syms);
+		pop_list(&outer_syms);
 
 		drop(place);
-		pop_list(&outside_places);
+		pop_list(&outer_places);
 		}
 
 	end_parse();
