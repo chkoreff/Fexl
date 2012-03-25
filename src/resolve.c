@@ -84,6 +84,7 @@ value type_resolve(value f)
 	value place = f->L->R;
 	value exp = f->R;
 
+	/*TODO can't use arg here yet because the type is either name or string */
 	if (!sym->T) { push(sym); return f; } /*TODO test*/
 	if (!arg(type_long,place)) return f; /*TODO test */
 

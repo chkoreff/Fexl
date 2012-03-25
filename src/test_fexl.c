@@ -329,6 +329,32 @@ void test_fexl(void)
 	test_eval(A(A(double_sub,Qdouble(4.5)),Qdouble(3.0)));
 	test_eval(A(double_mul,A(A(double_mul,Qdouble(4.5)),Qdouble(3.0))));
 
+	{
+	value x = A(A(double_add,Qdouble(4.2)),Qdouble(2.4));
+	value y = Qdouble(5.2);
+	test_eval(A(A(double_mul,x),y));
+	}
+
+	/* Test some type errors */
+	{
+	test_eval(A(double_mul,A(A(double_mul,Qlong(4)),Qdouble(3.0))));
+	test_eval(A(A(double_mul,Qdouble(3.2)),Qlong(4)));
+
+	{
+	value x = A(A(double_add,Qdouble(4.2)),Qlong(4));
+	value y = A(A(double_mul,Qdouble(3.7)),Qdouble(5.2));
+	test_eval(A(A(double_mul,x),y));
+	}
+
+	test_eval(
+		A(
+		A(double_mul,
+			A(A(double_mul,Qdouble(4.5)),Qdouble(3.0))),
+			A(A(double_mul,Qlong(7)),Qdouble(3.0))
+		)
+		);
+	}
+
 	if (0)
 	{
 	/* Test too much memory */

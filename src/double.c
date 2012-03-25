@@ -117,6 +117,7 @@ value type_is_double(value f)
 	return arg_is_type(type_double,f);
 	}
 
+/* double_string num */
 value type_double_string(value f)
 	{
 	value x = f->R;

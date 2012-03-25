@@ -125,16 +125,16 @@ value type_string_slice(value f)
 	long pos = get_long(y);
 	long len = get_long(z);
 
-	long xlen = string_len(x);
-
 	if (pos < 0)
 		{
 		len += pos;
 		pos = 0;
 		}
 
-	if (len > xlen - pos)
-		len = xlen - pos;
+	long max = string_len(x) - pos;
+
+	if (len > max)
+		len = max;
 
 	return Qcopy_chars(string_data(x) + pos, len);
 	}
@@ -150,12 +150,12 @@ value type_string_at(value f)
 	if (!arg(type_string,x)) return f;
 	if (!arg(type_long,y)) return f;
 
+	long len = string_len(x);
+	char *data = string_data(x);
+
 	long pos = get_long(y);
 
-	long xlen = string_len(x);
-	char *xdata = string_data(x);
-
-	long ch = pos >= 0 && pos < xlen ? xdata[pos] : 0;
+	long ch = pos >= 0 && pos < len ? data[pos] : 0;
 	return Qlong(ch);
 	}
 

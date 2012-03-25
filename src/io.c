@@ -37,10 +37,10 @@ void quote_string_put(value f)
 	print(quote);
 	}
 
+/* string_put str next */
 value type_string_put(value f)
 	{
 	if (!f->L->L) return f;
-
 	value x = f->L->R;
 	if (!arg(type_string,x)) return f;
 
@@ -53,11 +53,10 @@ value type_char_get(value f)
 	return A(f->R,Qlong(getchar()));
 	}
 
-/* char_put x next */
+/* char_put ch next */
 value type_char_put(value f)
 	{
 	if (!f->L->L) return f;
-
 	value x = f->L->R;
 	if (!arg(type_long,x)) return f;
 
