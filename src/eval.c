@@ -13,7 +13,7 @@ itself recursively using the system stack.  Instead, it uses its own stack in
 the form of a linked list of values.  This allows it to reduce values with very
 deep left sides without causing a segmentation fault.
 */
-void eval(struct value *f)
+void eval(value f)
 	{
 	push(f);
 
@@ -28,7 +28,7 @@ void eval(struct value *f)
 			pop();
 		else if (f->L->T)
 			{
-			struct value *g = f->L->T(f);
+			value g = f->L->T(f);
 			if (g && g != f)
 				replace(f,g);
 			else if (f == stack->L)

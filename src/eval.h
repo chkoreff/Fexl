@@ -1,1 +1,1 @@
-extern void eval(struct value *f);
+extern void eval(value);

@@ -1,9 +1,7 @@
-extern struct value *stack;
-extern void push(struct value *);
+extern value stack;
+extern void push(value);
 extern void pop(void);
-extern void push_list(struct value **list, struct value *f);
-extern void pop_list(struct value **list);
-extern int arg(struct value *(*T)(struct value *), struct value *f);
-extern struct value *arg_is_type(
-	struct value *(*T)(struct value *),
-	struct value *f);
+extern void push_list(value *, value);
+extern void pop_list(value *);
+extern int arg(type, value);
+extern value arg_is_type(type, value);

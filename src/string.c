@@ -11,19 +11,19 @@
 /*TODO wrap a combinator around the buf.c module, which will allow very fast
 large-scale buffering */
 
-char *string_data(struct value *f)
+char *string_data(value f)
 	{
 	return (char *)f->R->R;
 	}
 
-long string_len(struct value *f)
+long string_len(value f)
 	{
 	return (long)f->R->L;
 	}
 
-struct value *type_string(struct value *f) { return f; }
+value type_string(value f) { return f; }
 
-struct value *clear_string(struct value *f)
+value clear_string(value f)
 	{
 	free_memory(string_data(f), string_len(f) + 1);
 	return f;
@@ -35,28 +35,28 @@ consisting of len bytes of real data, followed by a NUL byte.  The real data
 itself may contain anything, including NUL bytes.  We put a NUL byte after the
 real data so we can easily call system functions which expect a NUL terminator.
 */
-struct value *Qchars(char *data, long len)
+value Qchars(char *data, long len)
 	{
 	if (data == 0 || len < 0) die("Qchars");
 
-	struct value *atom = create();
+	value atom = create();
 	atom->N = 1;
 	atom->T = clear_string;
-	atom->L = (struct value *)len;
-	atom->R = (struct value *)data;
+	atom->L = (value)len;
+	atom->R = (value)data;
 
-	struct value *value = create();
-	value->N = 0;
-	value->T = type_string;
-	value->L = 0;
-	value->R = atom;
-	return value;
+	value f = create();
+	f->N = 0;
+	f->T = type_string;
+	f->L = 0;
+	f->R = atom;
+	return f;
 	}
 
 /* Make a string by copying len bytes of data and adding a NUL byte.  If data
 is null then make an uninitialized string which can hold len bytes but don't
 copy anything. */
-struct value *Qcopy_chars(const char *data, long len)
+value Qcopy_chars(const char *data, long len)
 	{
 	if (len < 0) len = 0;
 
@@ -68,7 +68,7 @@ struct value *Qcopy_chars(const char *data, long len)
 	}
 
 /* Make a string by copying null-terminated data. */
-struct value *Qcopy_string(const char *data)
+value Qcopy_string(const char *data)
 	{
 	if (data == 0) die("Qcopy_string");
 	return Qcopy_chars(data, strlen(data));
@@ -76,7 +76,7 @@ struct value *Qcopy_string(const char *data)
 
 /* Compare strings x and y, returning negative if x < y, zero if x == y, or
 positive if x > y. */
-int string_compare(struct value *x, struct value *y)
+int string_compare(value x, value y)
 	{
 	long x_len = string_len(x);
 	long y_len = string_len(y);
@@ -92,13 +92,13 @@ int string_compare(struct value *x, struct value *y)
 	}
 
 /* string_compare x y lt eq gt */
-struct value *type_string_compare(struct value *f)
+value type_string_compare(value f)
 	{
 	if (!f->L->L || !f->L->L->L || !f->L->L->L->L || !f->L->L->L->L->L)
 		return f;
 
-	struct value *x = f->L->L->L->L->R;
-	struct value *y = f->L->L->L->R;
+	value x = f->L->L->L->L->R;
+	value y = f->L->L->L->R;
 
 	if (!arg(type_string,x)) return f;
 	if (!arg(type_string,y)) return f;
@@ -110,13 +110,13 @@ struct value *type_string_compare(struct value *f)
 	}
 
 /* string_slice str pos len */
-struct value *type_string_slice(struct value *f)
+value type_string_slice(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
 
-	struct value *x = f->L->L->R;
-	struct value *y = f->L->R;
-	struct value *z = f->R;
+	value x = f->L->L->R;
+	value y = f->L->R;
+	value z = f->R;
 
 	if (!arg(type_string,x)) return f;
 	if (!arg(type_long,y)) return f;
@@ -140,12 +140,12 @@ struct value *type_string_slice(struct value *f)
 	}
 
 /* string_at str pos - return the character at the position */
-struct value *type_string_at(struct value *f)
+value type_string_at(value f)
 	{
 	if (!f->L->L) return f;
 
-	struct value *x = f->L->R;
-	struct value *y = f->R;
+	value x = f->L->R;
+	value y = f->R;
 
 	if (!arg(type_string,x)) return f;
 	if (!arg(type_long,y)) return f;
@@ -160,7 +160,7 @@ struct value *type_string_at(struct value *f)
 	}
 
 /* Compare strings x and y, returning true if x == y. */
-int string_eq(struct value *x, struct value *y)
+int string_eq(value x, value y)
 	{
 	long x_len = string_len(x);
 	if (x_len != string_len(y)) return 0;
@@ -168,18 +168,18 @@ int string_eq(struct value *x, struct value *y)
 	}
 
 /* Determine if the value has type string. */
-struct value *type_is_string(struct value *f)
+value type_is_string(value f)
 	{
 	return arg_is_type(type_string,f);
 	}
 
 /* Append two strings. */
-struct value *type_string_append(struct value *f)
+value type_string_append(value f)
 	{
 	if (!f->L->L) return f;
 
-	struct value *x = f->L->R;
-	struct value *y = f->R;
+	value x = f->L->R;
+	value y = f->R;
 
 	if (!arg(type_string,x)) return f;
 	if (!arg(type_string,y)) return f;
@@ -188,7 +188,7 @@ struct value *type_string_append(struct value *f)
 	long ylen = string_len(y);
 
 	int len = xlen + ylen;
-	struct value *result = Qcopy_chars(0, len);
+	value result = Qcopy_chars(0, len);
 
 	char *dest = string_data(result);
 	memcpy(dest, string_data(x), xlen);
@@ -197,12 +197,12 @@ struct value *type_string_append(struct value *f)
 	}
 
 /* Compute the length of the longest common prefix of two strings. */
-struct value *type_string_common(struct value *f)
+value type_string_common(value f)
 	{
 	if (!f->L->L) return f;
 
-	struct value *x = f->L->R;
-	struct value *y = f->R;
+	value x = f->L->R;
+	value y = f->R;
 
 	if (!arg(type_string,x)) return f;
 	if (!arg(type_string,y)) return f;
@@ -226,9 +226,9 @@ struct value *type_string_common(struct value *f)
 	}
 
 /* Return the length of the string. */
-struct value *type_string_len(struct value *f)
+value type_string_len(value f)
 	{
-	struct value *x = f->R;
+	value x = f->R;
 	if (!arg(type_string,x)) return f;
 	return Qlong(string_len(x));
 	}
@@ -249,11 +249,11 @@ int string_long(char *beg, long *num)
 	}
 
 /* string_long x no yes */
-struct value *type_string_long(struct value *f)
+value type_string_long(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
 
-	struct value *x = f->L->L->R;
+	value x = f->L->L->R;
 	if (!arg(type_string,x)) return f;
 
 	long num;
@@ -278,11 +278,11 @@ int string_double(char *beg, double *num)
 	}
 
 /* string_double x no yes */
-struct value *type_string_double(struct value *f)
+value type_string_double(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
 
-	struct value *x = f->L->L->R;
+	value x = f->L->L->R;
 	if (!arg(type_string,x)) return f;
 
 	double num;

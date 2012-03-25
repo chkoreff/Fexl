@@ -5,18 +5,20 @@
 #include "double.h"
 #include "io.h"
 #include "long.h"
-#include "parse_string.h"
 #include "resolve.h"
 #include "run.h"
 #include "show.h"
 #include "string.h"
 #include "sym.h"
+
 /*TODO won't need most of these header files when you do "show" in Fexl */
 
-extern struct value *type_lambda(struct value *); /*TODO*/
-extern struct value *type_show(struct value *);
+/*TODO won't need these externs either */
+extern value type_lambda(value);
+extern value type_show(value);
+extern value type_parse(value);
 
-void show(struct value *f)
+void show(value f)
 	{
 	if (cur_depth > max_depth)
 		{
@@ -80,11 +82,8 @@ void show(struct value *f)
 	cur_depth--;
 	}
 
-/*TODO Do the show routine in Fexl itself.  I'll implement a data type "type"
-(type_type) to represent handles to built-in type routines, and you can
-compare types that way.
-*/
-struct value *type_show(struct value *f)
+/*TODO Do the show routine in Fexl itself. (see type.c) */
+value type_show(value f)
 	{
 	if (!f->L->L) return f;
 	show(f->L->R);

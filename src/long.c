@@ -5,36 +5,36 @@
 #include "stack.h"
 #include "string.h"
 
-struct value *type_long(struct value *f) { return f; }
+value type_long(value f) { return f; }
 
 /* Make a new value of type long.  */
-struct value *Qlong(long number)
+value Qlong(long number)
 	{
-	struct value *atom = create();
+	value atom = create();
 	atom->N = 1;
 	atom->T = type_long;
-	atom->L = (struct value *)number;
+	atom->L = (value)number;
 
-	struct value *value = create();
-	value->N = 0;
-	value->T = type_long;
-	value->L = 0;
-	value->R = atom;
+	value f = create();
+	f->N = 0;
+	f->T = type_long;
+	f->L = 0;
+	f->R = atom;
 
-	return value;
+	return f;
 	}
 
-long get_long(struct value *f)
+long get_long(value f)
 	{
 	return (long)f->R->L;
 	}
 
-struct value *type_long_add(struct value *f)
+value type_long_add(value f)
 	{
 	if (!f->L->L) return f;
 
-	struct value *x = f->L->R;
-	struct value *y = f->R;
+	value x = f->L->R;
+	value y = f->R;
 
 	if (!arg(type_long,x)) return f;
 	if (!arg(type_long,y)) return f;
@@ -42,12 +42,12 @@ struct value *type_long_add(struct value *f)
 	return Qlong(get_long(x) + get_long(y));
 	}
 
-struct value *type_long_sub(struct value *f)
+value type_long_sub(value f)
 	{
 	if (!f->L->L) return f;
 
-	struct value *x = f->L->R;
-	struct value *y = f->R;
+	value x = f->L->R;
+	value y = f->R;
 
 	if (!arg(type_long,x)) return f;
 	if (!arg(type_long,y)) return f;
@@ -55,12 +55,12 @@ struct value *type_long_sub(struct value *f)
 	return Qlong(get_long(x) - get_long(y));
 	}
 
-struct value *type_long_mul(struct value *f)
+value type_long_mul(value f)
 	{
 	if (!f->L->L) return f;
 
-	struct value *x = f->L->R;
-	struct value *y = f->R;
+	value x = f->L->R;
+	value y = f->R;
 
 	if (!arg(type_long,x)) return f;
 	if (!arg(type_long,y)) return f;
@@ -69,12 +69,12 @@ struct value *type_long_mul(struct value *f)
 	}
 
 /* long_div returns 0 if you try to divide by 0. */
-struct value *type_long_div(struct value *f)
+value type_long_div(value f)
 	{
 	if (!f->L->L) return f;
 
-	struct value *x = f->L->R;
-	struct value *y = f->R;
+	value x = f->L->R;
+	value y = f->R;
 
 	if (!arg(type_long,x)) return f;
 	if (!arg(type_long,y)) return f;
@@ -86,23 +86,23 @@ struct value *type_long_div(struct value *f)
 	}
 
 /* Determine if the value has type long. */
-struct value *type_is_long(struct value *f)
+value type_is_long(value f)
 	{
 	return arg_is_type(type_long,f);
 	}
 
 /* Convert long to double. */
-struct value *type_long_double(struct value *f)
+value type_long_double(value f)
 	{
-	struct value *x = f->R;
+	value x = f->R;
 	if (!arg(type_long,x)) return f;
 
 	return Qdouble(get_long(x));
 	}
 
-struct value *type_long_string(struct value *f)
+value type_long_string(value f)
 	{
-	struct value *x = f->R;
+	value x = f->R;
 	if (!arg(type_long,x)) return f;
 
 	char buf[100]; /* being careful here */
@@ -111,9 +111,9 @@ struct value *type_long_string(struct value *f)
 	}
 
 /* Convert long to char (string of length 1). */
-struct value *type_long_char(struct value *f)
+value type_long_char(value f)
 	{
-	struct value *x = f->R;
+	value x = f->R;
 	if (!arg(type_long,x)) return f;
 
 	char buf[1];
@@ -122,13 +122,13 @@ struct value *type_long_char(struct value *f)
 	}
 
 /* long_compare x y lt eq gt */
-struct value *type_long_compare(struct value *f)
+value type_long_compare(value f)
 	{
 	if (!f->L->L || !f->L->L->L || !f->L->L->L->L || !f->L->L->L->L->L)
 		return f;
 
-	struct value *x = f->L->L->L->L->R;
-	struct value *y = f->L->L->L->R;
+	value x = f->L->L->L->L->R;
+	value y = f->L->L->L->R;
 
 	if (!arg(type_long,x)) return f;
 	if (!arg(type_long,y)) return f;

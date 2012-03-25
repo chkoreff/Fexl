@@ -17,7 +17,7 @@
 /*TODO + - * / = < etc. */
 
 /* Look up type_[name] in the Fexl library linked with the executable. */
-struct value *resolve_name(char *name)
+value resolve_name(char *name)
 	{
 	struct buf *buf = 0;
 	buf_add_string(&buf, "type_");
@@ -45,7 +45,7 @@ char *canonical_name(char *name)
 	return name;
 	}
 
-struct value *resolve(struct value *sym, long line_no)
+value resolve(value sym, long line_no)
 	{
 	if (sym->T == type_string) return sym;
 
@@ -64,7 +64,7 @@ struct value *resolve(struct value *sym, long line_no)
 	}
 
 	/* Resolve the canonical name. */
-	struct value *f = resolve_name(canonical_name(name));
+	value f = resolve_name(canonical_name(name));
 	if (f) return f;
 
 	/*TODO report all the undefined symbols, not just first.  We'll do that
@@ -76,13 +76,13 @@ struct value *resolve(struct value *sym, long line_no)
 	}
 
 /* resolve sym place exp */
-struct value *type_resolve(struct value *f)
+value type_resolve(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
 
-	struct value *sym = f->L->L->R;
-	struct value *place = f->L->R;
-	struct value *exp = f->R;
+	value sym = f->L->L->R;
+	value place = f->L->R;
+	value exp = f->R;
 
 	if (!sym->T) { push(sym); return f; } /*TODO test*/
 	if (!arg(type_long,place)) return f; /*TODO test */

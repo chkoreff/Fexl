@@ -48,23 +48,26 @@ when its reference count drops to zero.  This cleans up the data properly, for
 example freeing a string pointer or closing a file handle.
 */
 
+typedef struct value *value;
+typedef value (*type)(value);
+
 struct value
 	{
 	long N;
-	struct value *(*T)(struct value *);
-	struct value *L;
-	struct value *R;
+	type T;
+	value L;
+	value R;
 	};
 
-extern struct value *create(void);
-extern void recycle(struct value *f);
+extern value create(void);
+extern void recycle(value);
 
-extern void hold(struct value *f);
-extern void drop(struct value *f);
+extern void hold(value);
+extern void drop(value);
 
-extern struct value *Q(struct value *(*T)(struct value *));
-extern struct value *A(struct value *L, struct value *R);
+extern value Q(type);
+extern value A(value, value);
 
-extern void replace(struct value *f, struct value *g);
+extern void replace(value, value);
 
 extern void end_value(void);

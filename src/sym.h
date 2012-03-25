@@ -1,3 +1,3 @@
-extern struct value *type_name(struct value *);
-extern struct value *Qname(struct value *);
-extern int sym_eq(struct value *x, struct value *y);
+extern value type_name(value);
+extern value Qname(value);
+extern int sym_eq(value, value);

@@ -13,13 +13,13 @@
 #include "string.h"
 #include "sym.h"
 
-static struct value *C;
-static struct value *I;
-static struct value *Y;
-static struct value *query;
+static value C;
+static value I;
+static value Y;
+static value query;
 
-extern struct value *parse_exp(void);
-extern struct value *lambda(struct value *x, struct value *f);
+extern value parse_exp(void);
+extern value lambda(value, value);
 
 /*
 Grammar:
@@ -98,7 +98,7 @@ void skip_filler(void)
 		}
 	}
 
-struct value *collect_string(char *term_string, long term_len, long first_line)
+value collect_string(char *term_string, long term_len, long first_line)
 	{
 	struct buf *buf = 0;
 	long match_pos = 0;
@@ -138,14 +138,14 @@ struct value *collect_string(char *term_string, long term_len, long first_line)
 	return Qchars(string,len);
 	}
 
-struct value *parse_simple_string(void)
+value parse_simple_string(void)
 	{
 	long first_line = line;
 	next_ch();
 	return collect_string("\"", 1, first_line);
 	}
 
-struct value *parse_complex_string(void)
+value parse_complex_string(void)
 	{
 	long first_line = line;
 	struct buf *term = 0;
@@ -161,7 +161,7 @@ struct value *parse_complex_string(void)
 	char *term_string = buf_clear(&term,&term_len);
 	next_ch();
 
-	struct value *str = collect_string(term_string, term_len, first_line);
+	value str = collect_string(term_string, term_len, first_line);
 	free_memory(term_string, term_len+1);
 	return str;
 	}
@@ -171,7 +171,7 @@ A name may contain just about anything, except for white space (including NUL)
 and a few other special characters.  This is the simplest possible rule that
 can work.
 */
-struct value *parse_name(int allow_eq)
+value parse_name(int allow_eq)
 	{
 	struct buf *buf = 0;
 	while (1)
@@ -200,7 +200,7 @@ struct value *parse_name(int allow_eq)
 	}
 
 /* Parse a symbol. */
-struct value *parse_sym(int allow_eq)
+value parse_sym(int allow_eq)
 	{
 	if (ch == '"')
 		return parse_simple_string();
@@ -210,9 +210,9 @@ struct value *parse_sym(int allow_eq)
 		return parse_name(allow_eq);
 	}
 
-struct value *find_sym(struct value *list, struct value *name)
+value find_sym(value list, value name)
 	{
-	struct value *pos = list;
+	value pos = list;
 	while (1)
 		{
 		if (pos == 0) return 0;
@@ -222,17 +222,17 @@ struct value *find_sym(struct value *list, struct value *name)
 	}
 
 /* Symbols defined with lambda forms inside the source text */
-static struct value *inner_syms = 0;
+static value inner_syms = 0;
 /* Symbols defined outside the source text */
-static struct value *outer_syms = 0;
+static value outer_syms = 0;
 /* Line numbers of outer symbols */
-static struct value *outer_places = 0;
+static value outer_places = 0;
 
 /* Return the originally encountered occurrence of a symbol.  This unifies
 multiple occurrences into a single one. */
-struct value *orig_sym(struct value *sym, long first_line)
+value orig_sym(value sym, long first_line)
 	{
-	struct value *orig = find_sym(inner_syms,sym);
+	value orig = find_sym(inner_syms,sym);
 
 	if (!orig)
 		{
@@ -244,7 +244,7 @@ struct value *orig_sym(struct value *sym, long first_line)
 			hold(orig);
 			push_list(&outer_syms,orig); /* new outer sym encountered */
 
-			struct value *place = Qlong(first_line);
+			value place = Qlong(first_line);
 			hold(place);
 			push_list(&outer_places,place);
 			}
@@ -259,13 +259,13 @@ struct value *orig_sym(struct value *sym, long first_line)
 	return orig;
 	}
 
-struct value *parse_term(void)
+value parse_term(void)
 	{
 	long first_line = line;
 	if (ch == '(')
 		{
 		next_ch();
-		struct value *exp = parse_exp();
+		value exp = parse_exp();
 
 		if (ch == ')')
 			next_ch();
@@ -279,7 +279,7 @@ struct value *parse_term(void)
 		}
 	else
 		{
-		struct value *sym = parse_sym(1);
+		value sym = parse_sym(1);
 
 		if (sym->T == type_name && string_len(sym) == 0)
 			{
@@ -311,12 +311,12 @@ white space only, and not '='.  For example:
   \ >   = num_gt
   \ >=  = num_ge
 */
-struct value *parse_lambda(void)
+value parse_lambda(void)
 	{
 	int allow_eq = at_white();
 	skip_white();
 
-	struct value *sym = parse_sym(allow_eq);
+	value sym = parse_sym(allow_eq);
 	if (sym->T == type_name && string_len(sym) == 0)
 		die("Missing lambda symbol");
 
@@ -325,7 +325,7 @@ struct value *parse_lambda(void)
 	skip_filler();
 	int has_def = (ch == '=');
 
-	struct value *val;
+	value val;
 
 	if (has_def)
 		{
@@ -337,7 +337,7 @@ struct value *parse_lambda(void)
 			skip_filler();
 
 			push_list(&inner_syms,sym);
-			struct value *def = parse_term();
+			value def = parse_term();
 			def = A(Y,lambda(sym,def));
 			val = lambda(sym,parse_exp());
 			val = A(val,def);
@@ -347,7 +347,7 @@ struct value *parse_lambda(void)
 			{
 			/* Non-recursive definition, forces eager evaluation */
 			skip_filler();
-			struct value *def = parse_term();
+			value def = parse_term();
 
 			push_list(&inner_syms,sym);
 			val = lambda(sym,parse_exp());
@@ -373,9 +373,9 @@ Parse an expression.
 We limit the depth here to avoid a stack overflow resulting from strange inputs
 like an infinite series of left parentheses.
 */
-struct value *parse_exp(void)
+value parse_exp(void)
 	{
-	struct value *exp = I;
+	value exp = I;
 
 	if (++cur_depth > max_depth)
 		die("Your program is too deeply nested.");
@@ -385,7 +385,7 @@ struct value *parse_exp(void)
 		skip_filler();
 		if (ch == EOF || ch == ')') break;
 
-		struct value *val;
+		value val;
 
 		if (ch == '\\')
 			{
@@ -413,46 +413,44 @@ struct value *parse_exp(void)
 	return exp;
 	}
 
-struct value *get_pattern(struct value *sym, struct value *fun)
+value get_pattern(value sym, value fun)
 	{
 	if (fun == sym) return I;
 	if (!fun->L) return C;
 
-	struct value *fl = get_pattern(sym,fun->L);
-	struct value *fr = get_pattern(sym,fun->R);
+	value fl = get_pattern(sym,fun->L);
+	value fr = get_pattern(sym,fun->R);
 	if (fl->T == type_C && fr->T == type_C) return C;
 
 	return A(fl,fr);
 	}
 
 /* Return a copy of fun with val substituted according to pattern p. */
-struct value *subst(struct value *p, struct value *fun, struct value *val)
+value subst(value p, value fun, value val)
 	{
 	if (p->T == type_I) return val;
 	if (p->T == type_C) return fun;
 	return A(subst(p->L,fun->L,val),subst(p->R,fun->R,val));
 	}
 
-struct value *type_lambda(struct value *f)
+value type_lambda(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
 	return subst(f->L->L->R,f->L->R,f->R);
 	}
 
-static struct value *lam;
+static value lam;
 
-struct value *lambda(struct value *x, struct value *f)
+value lambda(value x, value f)
 	{
 	return A(A(lam,get_pattern(x,f)),f);
 	}
 
 /*TODO pass resolution function into parse instead of always using built-in */
 /* TODO use the version that chains */
-static struct value *resolve;
+static value resolve;
 
-struct value *Qresolve(
-	struct value *sym, struct value *place,
-	struct value *exp)
+value Qresolve(value sym, value place, value exp)
 	{
 	return A(A(A(resolve,sym),place),lambda(sym,exp));
 	}
@@ -484,22 +482,22 @@ void end_parse(void)
 	drop(resolve);
 	}
 
-struct value *parse_source(void)
+value parse_source(void)
 	{
 	beg_parse();
 
 	line = 1;
 	next_ch();
 
-	struct value *exp = parse_exp();
+	value exp = parse_exp();
 
 	if (ch != EOF)
 		die("Extraneous input");
 
 	while (outer_syms)
 		{
-		struct value *sym = outer_syms->L;
-		struct value *place = outer_places->L;
+		value sym = outer_syms->L;
+		value place = outer_places->L;
 
 		exp = Qresolve(sym,place,exp);
 

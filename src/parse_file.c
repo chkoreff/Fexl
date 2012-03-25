@@ -11,7 +11,7 @@ int file_read_ch(void)
 	return fgetc(source_file);
 	}
 
-struct value *parse_file(FILE *file)
+value parse_file(FILE *file)
 	{
 	read_ch = file_read_ch;
 	source_file = file;

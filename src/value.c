@@ -1,15 +1,15 @@
 #include "value.h"
 #include "memory.h"
 
-struct value *free_list = 0;
+value free_list = 0;
 
 /* Create a new uninitialized value. */
-struct value *create(void)
+value create(void)
 	{
-	struct value *f = free_list;
+	value f = free_list;
 	if (f)
 		{
-		free_list = (struct value *)f->N;
+		free_list = (value)f->N;
 		if (f->L)
 			{
 			drop(f->L);
@@ -24,20 +24,20 @@ struct value *create(void)
 			}
 		}
 	else
-		f = (struct value *)new_memory(sizeof (struct value));
+		f = (value)new_memory(sizeof (struct value));
 
 	return f;
 	}
 
 /* Put the value on the free list. */
-void recycle(struct value *f)
+void recycle(value f)
 	{
 	f->N = (long)free_list;
 	free_list = f;
 	}
 
 /* Increment the reference count. */
-void hold(struct value *f)
+void hold(value f)
 	{
 	f->N++;
 	}
@@ -49,14 +49,14 @@ A negative reference count indicates an imbalance in hold/drop calls, which is
 sloppy programming, and in that case we want to report a memory leak error when
 the program ends.
 */
-void drop(struct value *f)
+void drop(value f)
 	{
 	if (--f->N == 0) recycle(f);
 	}
 
 /* Replace the contents of f with the contents of g.  Note that f and g must
 not be equal. */
-void replace(struct value *f, struct value *g)
+void replace(value f, value g)
 	{
 	hold(g);
 
@@ -74,29 +74,29 @@ void replace(struct value *f, struct value *g)
 	}
 
 /* Create a combinator of type T.  Shorthand for "quote". */
-struct value *Q(struct value *(*T)(struct value *))
+value Q(type T)
 	{
-	struct value *value = create();
-	value->N = 0;
-	value->T = T;
-	value->L = 0;
-	value->R = 0;
-	return value;
+	value f = create();
+	f->N = 0;
+	f->T = T;
+	f->L = 0;
+	f->R = 0;
+	return f;
 	}
 
 /* Create a function which applies L to R. */
-struct value *A(struct value *L, struct value *R)
+value A(value L, value R)
 	{
 	hold(L);
 	hold(R);
 
-	struct value *value = create();
-	value->N = 0;
-	value->T = 0;
-	value->L = L;
-	value->R = R;
+	value f = create();
+	f->N = 0;
+	f->T = 0;
+	f->L = L;
+	f->R = R;
 
-	return value;
+	return f;
 	}
 
 /* Clear the free list and end the memory arena. */

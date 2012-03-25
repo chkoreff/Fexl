@@ -16,7 +16,7 @@ int main(int argc, char *argv[], char *envp[])
 	FILE *source = argc > 1 ? fopen(argv[1],"r") : stdin;
 	if (!source) die("Can't open script");
 
-	struct value *f = parse_file(source);
+	value f = parse_file(source);
 	if (source != stdin) fclose(source);
 
 	hold(f);

@@ -4,34 +4,34 @@
 #include "run.h"
 #include "stack.h"
 
-struct value *type_put_max_steps(struct value *f)
+value type_put_max_steps(value f)
 	{
 	if (!f->L->L) return f;
 
-	struct value *x = f->L->R;
+	value x = f->L->R;
 	if (!arg(type_long,x)) return f;
 
 	max_steps = get_long(x);
 	return f->R;
 	}
 
-struct value *type_put_max_bytes(struct value *f)
+value type_put_max_bytes(value f)
 	{
 	if (!f->L->L) return f;
 
-	struct value *x = f->L->R;
+	value x = f->L->R;
 	if (!arg(type_long,x)) return f;
 
 	max_bytes = get_long(x);
 	return f->R;
 	}
 
-struct value *type_get_max_steps(struct value *f)
+value type_get_max_steps(value f)
 	{
 	return A(f->R,Qlong(max_steps));
 	}
 
-struct value *type_get_max_bytes(struct value *f)
+value type_get_max_bytes(value f)
 	{
 	return A(f->R,Qlong(max_bytes));
 	}

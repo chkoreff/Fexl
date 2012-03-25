@@ -5,7 +5,7 @@
 #include "stack.h"
 #include "string.h"
 
-struct value *type_double(struct value *f) { return f; }
+value type_double(value f) { return f; }
 
 /*
 Make a new value of type double.
@@ -21,21 +21,21 @@ A double is guaranteed to fit in 64 bits.  The standard says:
 We know that the L and R pointers are either 32 or 64 bits each, depending on
 the machine, so together they can definitely hold the 64 bits of a double.
 */
-struct value *Qdouble(double number)
+value Qdouble(double number)
 	{
-	struct value *atom = create();
+	value atom = create();
 	atom->N = 1;
 	atom->T = type_double;
 	double *p = (double *)(&atom->L);
 	*p = number;
 
-	struct value *value = create();
-	value->N = 0;
-	value->T = type_double;
-	value->L = 0;
-	value->R = atom;
+	value f = create();
+	f->N = 0;
+	f->T = type_double;
+	f->L = 0;
+	f->R = atom;
 
-	return value;
+	return f;
 	}
 
 /*
@@ -48,18 +48,18 @@ That yields an error:
 
 Instead, we must first get a pointer to double, then dereference the pointer.
 */
-double get_double(struct value *f)
+double get_double(value f)
 	{
 	double *x = (double *)&f->R->L;
 	return *x;
 	}
 
-struct value *type_double_add(struct value *f)
+value type_double_add(value f)
 	{
 	if (!f->L->L) return f;
 
-	struct value *x = f->L->R;
-	struct value *y = f->R;
+	value x = f->L->R;
+	value y = f->R;
 
 	if (!arg(type_double,x)) return f;
 	if (!arg(type_double,y)) return f;
@@ -67,12 +67,12 @@ struct value *type_double_add(struct value *f)
 	return Qdouble(get_double(x) + get_double(y));
 	}
 
-struct value *type_double_sub(struct value *f)
+value type_double_sub(value f)
 	{
 	if (!f->L->L) return f;
 
-	struct value *x = f->L->R;
-	struct value *y = f->R;
+	value x = f->L->R;
+	value y = f->R;
 
 	if (!arg(type_double,x)) return f;
 	if (!arg(type_double,y)) return f;
@@ -80,12 +80,12 @@ struct value *type_double_sub(struct value *f)
 	return Qdouble(get_double(x) - get_double(y));
 	}
 
-struct value *type_double_mul(struct value *f)
+value type_double_mul(value f)
 	{
 	if (!f->L->L) return f;
 
-	struct value *x = f->L->R;
-	struct value *y = f->R;
+	value x = f->L->R;
+	value y = f->R;
 
 	if (!arg(type_double,x)) return f;
 	if (!arg(type_double,y)) return f;
@@ -98,12 +98,12 @@ Note that dividing by zero is no problem here.  If you divide a non-zero by
 zero, it yields inf (infinity).  If you divide zero by zero, it yields -nan
 (not a number).
 */
-struct value *type_double_div(struct value *f)
+value type_double_div(value f)
 	{
 	if (!f->L->L) return f;
 
-	struct value *x = f->L->R;
-	struct value *y = f->R;
+	value x = f->L->R;
+	value y = f->R;
 
 	if (!arg(type_double,x)) return f;
 	if (!arg(type_double,y)) return f;
@@ -112,14 +112,14 @@ struct value *type_double_div(struct value *f)
 	}
 
 /* Determine if the value has type double. */
-struct value *type_is_double(struct value *f)
+value type_is_double(value f)
 	{
 	return arg_is_type(type_double,f);
 	}
 
-struct value *type_double_string(struct value *f)
+value type_double_string(value f)
 	{
-	struct value *x = f->R;
+	value x = f->R;
 	if (!arg(type_double,x)) return f;
 
 	char buf[100]; /* being careful here */
@@ -127,22 +127,22 @@ struct value *type_double_string(struct value *f)
 	return Qcopy_string(buf);
 	}
 
-struct value *type_double_long(struct value *f)
+value type_double_long(value f)
 	{
-	struct value *x = f->R;
+	value x = f->R;
 	if (!arg(type_double,x)) return f;
 
 	return Qlong(get_double(x));
 	}
 
 /* double_compare x y lt eq gt */
-struct value *type_double_compare(struct value *f)
+value type_double_compare(value f)
 	{
 	if (!f->L->L || !f->L->L->L || !f->L->L->L->L || !f->L->L->L->L->L)
 		return f;
 
-	struct value *x = f->L->L->L->L->R;
-	struct value *y = f->L->L->L->R;
+	value x = f->L->L->L->L->R;
+	value y = f->L->L->L->R;
 
 	if (!arg(type_double,x)) return f;
 	if (!arg(type_double,y)) return f;

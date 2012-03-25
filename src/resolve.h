@@ -1,1 +1,1 @@
-extern struct value *type_resolve(struct value *);
+extern value type_resolve(value);

@@ -12,25 +12,25 @@
 #include "string.h"
 #include "sym.h"
 
-struct value *C;
-struct value *S;
-struct value *I;
-struct value *Y;
-struct value *R;
-struct value *L;
-struct value *query;
+value C;
+value S;
+value I;
+value Y;
+value R;
+value L;
+value query;
 
-struct value *long_add;
-struct value *long_sub;
-struct value *long_mul;
-struct value *long_div;
+value long_add;
+value long_sub;
+value long_mul;
+value long_div;
 
-struct value *double_add;
-struct value *double_sub;
-struct value *double_mul;
-struct value *double_div;
+value double_add;
+value double_sub;
+value double_mul;
+value double_div;
 
-struct value *tower(int height, struct value *f)
+value tower(int height, value f)
 	{
 	int i;
 	for (i = 0; i < height; i++)
@@ -39,7 +39,7 @@ struct value *tower(int height, struct value *f)
 	return f;
 	}
 
-long depth(struct value *f)
+long depth(value f)
 	{
 	if (f && f->L)
 		return 1 + depth(f->L);
@@ -61,7 +61,7 @@ void test_stack_depth(void)
 	long test_depth = 10000000; /* 469m */
 
 	printf("using test_depth = %ld\n", test_depth);
-	struct value *f = tower(test_depth,I);
+	value f = tower(test_depth,I);
 
 	hold(f);
 	long n = depth(f);
@@ -79,7 +79,7 @@ void test_stack_depth(void)
 	}
 
 /*LATER use fork for tests that use too much memory or run too long */
-void test_eval_plain(struct value *f)
+void test_eval_plain(value f)
 	{
 	cur_steps = 0;
 
@@ -93,14 +93,14 @@ void test_eval_plain(struct value *f)
 	nl();
 	}
 
-void test_eval(struct value *f)
+void test_eval(value f)
 	{
 	print(": ");show(f);nl();
 	test_eval_plain(f);
 	}
 
 #if 0
-void test_eval_max_steps(struct value *f, long new_max_steps)
+void test_eval_max_steps(value f, long new_max_steps)
 	{
 	long save = max_steps;
 	max_steps = new_max_steps;
@@ -110,7 +110,7 @@ void test_eval_max_steps(struct value *f, long new_max_steps)
 	}
 #endif
 
-void test_eval_tower(int height, struct value *f)
+void test_eval_tower(int height, value f)
 	{
 	printf(": (tower %d ", height); show(f); print(")\n");
 	f = tower(height,f);
@@ -170,9 +170,9 @@ void test_fexl(void)
 		))); /* Y */
 
 	{
-	struct value *x = Qname(Qcopy_string("x"));
-	struct value *y = Qname(Qcopy_string("y"));
-	struct value *z = Qname(Qcopy_string("z"));
+	value x = Qname(Qcopy_string("x"));
+	value y = Qname(Qcopy_string("y"));
+	value z = Qname(Qcopy_string("z"));
 
 	hold(x);
 	hold(y);
@@ -226,7 +226,7 @@ void test_fexl(void)
 	test_eval(query);
 
 	{
-	struct value *outer_long_sub =
+	value outer_long_sub =
 		A(A(L,query),A(A(R,A(L,query)),long_sub));
 
 	test_eval(A(A(outer_long_sub,
@@ -301,7 +301,7 @@ void test_fexl(void)
 	/* This evaluates instantly (0.065s) in spite of its enormous exponential
 	complexity.  That's because the evaluator replaces values inline.
 	*/
-	struct value *f = tower(65536,tower(65536,tower(65536,tower(65536,I))));
+	value f = tower(65536,tower(65536,tower(65536,tower(65536,I))));
 	print(": (tower 65536; tower 65536; tower 65536; tower 65536; I)\n");
 	test_eval_plain(f);
 	}
@@ -338,7 +338,7 @@ void test_fexl(void)
 	long save = max_bytes;
 	max_bytes = 400;
 	printf("Evaluate (tower 8 I) with %ld bytes of memory.\n", max_bytes);
-	struct value *f = tower(8,I);
+	value f = tower(8,I);
 	test_eval(f);
 	max_bytes = save;
 	}
@@ -356,7 +356,7 @@ void test_fexl(void)
 	/* Test too much memory */
 	long save = max_bytes;
 	max_bytes = 400000000;
-	struct value *f = A(Y,Y);
+	value f = A(Y,Y);
 	printf("Evaluate with %ld bytes of memory ...\n", max_bytes);
 	test_eval_plain(f);
 	max_bytes = save;
