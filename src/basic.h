@@ -1,8 +1,8 @@
-extern value type_C(value);
-extern value type_S(value);
-extern value type_I(value);
-extern value type_R(value);
-extern value type_L(value);
-extern value type_Y(value);
-extern value type_F(value);
-extern value type_query(value);
+extern value fexl_C(value);
+extern value fexl_S(value);
+extern value fexl_I(value);
+extern value fexl_R(value);
+extern value fexl_L(value);
+extern value fexl_Y(value);
+extern value fexl_F(value);
+extern value fexl_query(value);

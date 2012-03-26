@@ -54,7 +54,7 @@ double get_double(value f)
 	return *x;
 	}
 
-value type_double_add(value f)
+value fexl_double_add(value f)
 	{
 	if (!f->L->L) return f;
 
@@ -67,7 +67,7 @@ value type_double_add(value f)
 	return Qdouble(get_double(x) + get_double(y));
 	}
 
-value type_double_sub(value f)
+value fexl_double_sub(value f)
 	{
 	if (!f->L->L) return f;
 
@@ -80,7 +80,7 @@ value type_double_sub(value f)
 	return Qdouble(get_double(x) - get_double(y));
 	}
 
-value type_double_mul(value f)
+value fexl_double_mul(value f)
 	{
 	if (!f->L->L) return f;
 
@@ -98,7 +98,7 @@ Note that dividing by zero is no problem here.  If you divide a non-zero by
 zero, it yields inf (infinity).  If you divide zero by zero, it yields -nan
 (not a number).
 */
-value type_double_div(value f)
+value fexl_double_div(value f)
 	{
 	if (!f->L->L) return f;
 
@@ -112,13 +112,13 @@ value type_double_div(value f)
 	}
 
 /* Determine if the value has type double. */
-value type_is_double(value f)
+value fexl_is_double(value f)
 	{
 	return arg_is_type(type_double,f);
 	}
 
 /* double_string num */
-value type_double_string(value f)
+value fexl_double_string(value f)
 	{
 	value x = f->R;
 	if (!arg(type_double,x)) return f;
@@ -128,7 +128,7 @@ value type_double_string(value f)
 	return Qcopy_string(buf);
 	}
 
-value type_double_long(value f)
+value fexl_double_long(value f)
 	{
 	value x = f->R;
 	if (!arg(type_double,x)) return f;
@@ -137,7 +137,7 @@ value type_double_long(value f)
 	}
 
 /* double_compare x y lt eq gt */
-value type_double_compare(value f)
+value fexl_double_compare(value f)
 	{
 	if (!f->L->L || !f->L->L->L || !f->L->L->L->L || !f->L->L->L->L->L)
 		return f;

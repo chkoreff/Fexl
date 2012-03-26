@@ -13,14 +13,14 @@
 
 /* The standard context for Fexl. */
 
-/*TODO append */
-/*TODO + - * / = < etc. */
+/* TODO append */
+/* TODO + - * / = < etc. */
 
-/* Look up type_[name] in the Fexl library linked with the executable. */
+/* Look up fexl_[name] in the Fexl library linked with the executable. */
 value resolve_name(char *name)
 	{
 	struct buf *buf = 0;
-	buf_add_string(&buf, "type_");
+	buf_add_string(&buf, "fexl_");
 	buf_add_string(&buf, name);
 	long len;
 	char *string = buf_clear(&buf,&len);
@@ -76,7 +76,7 @@ value resolve(value sym, long line_no)
 	}
 
 /* resolve sym place exp */
-value type_resolve(value f)
+value fexl_resolve(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
 

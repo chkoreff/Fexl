@@ -26,7 +26,7 @@ value parse_chars(char *string, long len)
 /* Combinator to call parse_chars from within Fexl.
 Called as (parse string next)  -- TODO resolution function, yes/no result
 */
-value type_parse(value f)
+value fexl_parse(value f)
 	{
 	if (!f->L->L) return f;
 

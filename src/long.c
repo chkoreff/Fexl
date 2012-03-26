@@ -29,7 +29,7 @@ long get_long(value f)
 	return (long)f->R->L;
 	}
 
-value type_long_add(value f)
+value fexl_long_add(value f)
 	{
 	if (!f->L->L) return f;
 
@@ -42,7 +42,7 @@ value type_long_add(value f)
 	return Qlong(get_long(x) + get_long(y));
 	}
 
-value type_long_sub(value f)
+value fexl_long_sub(value f)
 	{
 	if (!f->L->L) return f;
 
@@ -55,7 +55,7 @@ value type_long_sub(value f)
 	return Qlong(get_long(x) - get_long(y));
 	}
 
-value type_long_mul(value f)
+value fexl_long_mul(value f)
 	{
 	if (!f->L->L) return f;
 
@@ -69,7 +69,7 @@ value type_long_mul(value f)
 	}
 
 /* long_div returns 0 if you try to divide by 0. */
-value type_long_div(value f)
+value fexl_long_div(value f)
 	{
 	if (!f->L->L) return f;
 
@@ -86,13 +86,13 @@ value type_long_div(value f)
 	}
 
 /* Determine if the value has type long. */
-value type_is_long(value f)
+value fexl_is_long(value f)
 	{
 	return arg_is_type(type_long,f);
 	}
 
 /* Convert long to double. */
-value type_long_double(value f)
+value fexl_long_double(value f)
 	{
 	value x = f->R;
 	if (!arg(type_long,x)) return f;
@@ -100,7 +100,7 @@ value type_long_double(value f)
 	return Qdouble(get_long(x));
 	}
 
-value type_long_string(value f)
+value fexl_long_string(value f)
 	{
 	value x = f->R;
 	if (!arg(type_long,x)) return f;
@@ -111,7 +111,7 @@ value type_long_string(value f)
 	}
 
 /* Convert long to char (string of length 1). */
-value type_long_char(value f)
+value fexl_long_char(value f)
 	{
 	value x = f->R;
 	if (!arg(type_long,x)) return f;
@@ -122,7 +122,7 @@ value type_long_char(value f)
 	}
 
 /* long_compare x y lt eq gt */
-value type_long_compare(value f)
+value fexl_long_compare(value f)
 	{
 	if (!f->L->L || !f->L->L->L || !f->L->L->L->L || !f->L->L->L->L->L)
 		return f;

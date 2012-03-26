@@ -16,7 +16,7 @@ void print(const char *s)
 	fputs(s, stdout);
 	}
 
-value type_nl(value f)
+value fexl_nl(value f)
 	{
 	nl();
 	return f->R;
@@ -38,7 +38,7 @@ void quote_string_put(value f)
 	}
 
 /* string_put str next */
-value type_string_put(value f)
+value fexl_string_put(value f)
 	{
 	if (!f->L->L) return f;
 	value x = f->L->R;
@@ -48,13 +48,13 @@ value type_string_put(value f)
 	return f->R;
 	}
 
-value type_char_get(value f)
+value fexl_char_get(value f)
 	{
 	return A(f->R,Qlong(getchar()));
 	}
 
 /* char_put ch next */
-value type_char_put(value f)
+value fexl_char_put(value f)
 	{
 	if (!f->L->L) return f;
 	value x = f->L->R;

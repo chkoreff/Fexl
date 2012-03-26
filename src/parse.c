@@ -406,7 +406,7 @@ value parse_exp(void)
 		else
 			val = parse_term();
 
-		exp = exp->T == type_I ? val : A(exp,val);
+		exp = exp->T == fexl_I ? val : A(exp,val);
 		}
 
 	cur_depth--;
@@ -420,7 +420,7 @@ value get_pattern(value sym, value fun)
 
 	value fl = get_pattern(sym,fun->L);
 	value fr = get_pattern(sym,fun->R);
-	if (fl->T == type_C && fr->T == type_C) return C;
+	if (fl->T == fexl_C && fr->T == fexl_C) return C;
 
 	return A(fl,fr);
 	}
@@ -428,12 +428,12 @@ value get_pattern(value sym, value fun)
 /* Return a copy of fun with val substituted according to pattern p. */
 value subst(value p, value fun, value val)
 	{
-	if (p->T == type_I) return val;
-	if (p->T == type_C) return fun;
+	if (p->T == fexl_I) return val;
+	if (p->T == fexl_C) return fun;
 	return A(subst(p->L,fun->L,val),subst(p->R,fun->R,val));
 	}
 
-value type_lambda(value f)
+value fexl_lambda(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
 	return subst(f->L->L->R,f->L->R,f->R);
@@ -457,12 +457,12 @@ value Qresolve(value sym, value place, value exp)
 
 void beg_parse(void)
 	{
-	C = Q(type_C);
-	I = Q(type_I);
-	Y = Q(type_Y);
-	query = Q(type_query);
-	lam = Q(type_lambda);
-	resolve = Q(type_resolve);
+	C = Q(fexl_C);
+	I = Q(fexl_I);
+	Y = Q(fexl_Y);
+	query = Q(fexl_query);
+	lam = Q(fexl_lambda);
+	resolve = Q(fexl_resolve);
 
 	hold(C);
 	hold(I);

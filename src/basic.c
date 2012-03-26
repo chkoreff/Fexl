@@ -6,7 +6,7 @@
 The C function follows the rule ((C x) y) = x.  This is known as the "constancy
 function", or "Konstanzfunktion" in the original German.
 */
-value type_C(value f)
+value fexl_C(value f)
 	{
 	if (!f->L->L) return f;
 	return f->L->R;
@@ -16,7 +16,7 @@ value type_C(value f)
 The S function follows the rule (((S x) y) z) = ((x z) (y z)).  This is known
 as the "fusion function", or "Verschmelzungfunktion" in the original German.
 */
-value type_S(value f)
+value fexl_S(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
 	return A( A(f->L->L->R, f->R), A(f->L->R, f->R) );
@@ -26,7 +26,7 @@ value type_S(value f)
 The I function follows the rule (I x) = x.  This is known as the "identity
 function."
 */
-value type_I(value f)
+value fexl_I(value f)
 	{
 	return f->R;
 	}
@@ -37,7 +37,7 @@ passes z to the right side only.  It can be defined as
 	S (C S) C
 but it's such a common pattern that I make a special combinator for it.
 */
-value type_R(value f)
+value fexl_R(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
 	return A( f->L->L->R, A(f->L->R, f->R) );
@@ -49,7 +49,7 @@ passes z to the left side only.  It can be defined as
 	S (S (C S) (S (C C) S)) (C C)
 but it's such a common pattern that I make a special combinator for it.
 */
-value type_L(value f)
+value fexl_L(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
 	return A( A(f->L->L->R, f->R), f->L->R);
@@ -59,7 +59,7 @@ value type_L(value f)
 The Y function follows the rule (Y f) = (f (Y f)).  This is known as the
 "fixpoint function."
 */
-value type_Y(value f)
+value fexl_Y(value f)
 	{
 	return A(f->R, A(f->L,f->R));
 	}
@@ -67,7 +67,7 @@ value type_Y(value f)
 /*
 The F function follows the rule ((F x) y) = y.  It represents False, which
 always returns its second argument. */
-value type_F(value f)
+value fexl_F(value f)
 	{
 	if (!f->L->L) return f;
 	return f->R;
@@ -81,7 +81,7 @@ However, it evaluates x first before passing it to y.
 
 This function is called "?" in the standard context.
 */
-value type_query(value f)
+value fexl_query(value f)
 	{
 	if (!f->L->L) return f;
 	if (!f->L->R->T) push(f->L->R);
@@ -93,7 +93,7 @@ value type_query(value f)
 It follows the rule (item h t f g) = (g h t), and can be defined as
 	\item = (\head\tail \end\item item head tail)
 */
-value type_item(value f)
+value fexl_item(value f)
 	{
 	if (!f->L->L || !f->L->L->L || !f->L->L->L->L) return f;
 	return A(A(f->R,f->L->L->L->R),f->L->L->R);
@@ -103,7 +103,7 @@ value type_item(value f)
 (pair x y p) = (p x y), and can be defined as
 	\pair = (\x\y\p p x y)
 */
-value type_pair(value f)
+value fexl_pair(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
 	return A(A(f->R,f->L->L->R),f->L->R);

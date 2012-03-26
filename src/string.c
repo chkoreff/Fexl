@@ -92,7 +92,7 @@ int string_compare(value x, value y)
 	}
 
 /* string_compare x y lt eq gt */
-value type_string_compare(value f)
+value fexl_string_compare(value f)
 	{
 	if (!f->L->L || !f->L->L->L || !f->L->L->L->L || !f->L->L->L->L->L)
 		return f;
@@ -110,7 +110,7 @@ value type_string_compare(value f)
 	}
 
 /* string_slice str pos len */
-value type_string_slice(value f)
+value fexl_string_slice(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
 
@@ -140,7 +140,7 @@ value type_string_slice(value f)
 	}
 
 /* string_at str pos - return the character at the position */
-value type_string_at(value f)
+value fexl_string_at(value f)
 	{
 	if (!f->L->L) return f;
 
@@ -168,13 +168,13 @@ int string_eq(value x, value y)
 	}
 
 /* Determine if the value has type string. */
-value type_is_string(value f)
+value fexl_is_string(value f)
 	{
 	return arg_is_type(type_string,f);
 	}
 
 /* Append two strings. */
-value type_string_append(value f)
+value fexl_string_append(value f)
 	{
 	if (!f->L->L) return f;
 
@@ -197,7 +197,7 @@ value type_string_append(value f)
 	}
 
 /* Compute the length of the longest common prefix of two strings. */
-value type_string_common(value f)
+value fexl_string_common(value f)
 	{
 	if (!f->L->L) return f;
 
@@ -226,7 +226,7 @@ value type_string_common(value f)
 	}
 
 /* Return the length of the string. */
-value type_string_len(value f)
+value fexl_string_len(value f)
 	{
 	value x = f->R;
 	if (!arg(type_string,x)) return f;
@@ -249,7 +249,7 @@ int string_long(char *beg, long *num)
 	}
 
 /* string_long x no yes */
-value type_string_long(value f)
+value fexl_string_long(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
 
@@ -278,7 +278,7 @@ int string_double(char *beg, double *num)
 	}
 
 /* string_double x no yes */
-value type_string_double(value f)
+value fexl_string_double(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
 

@@ -4,7 +4,7 @@
 #include "run.h"
 #include "stack.h"
 
-value type_put_max_steps(value f)
+value fexl_put_max_steps(value f)
 	{
 	if (!f->L->L) return f;
 
@@ -15,7 +15,7 @@ value type_put_max_steps(value f)
 	return f->R;
 	}
 
-value type_put_max_bytes(value f)
+value fexl_put_max_bytes(value f)
 	{
 	if (!f->L->L) return f;
 
@@ -26,12 +26,12 @@ value type_put_max_bytes(value f)
 	return f->R;
 	}
 
-value type_get_max_steps(value f)
+value fexl_get_max_steps(value f)
 	{
 	return A(f->R,Qlong(max_steps));
 	}
 
-value type_get_max_bytes(value f)
+value fexl_get_max_bytes(value f)
 	{
 	return A(f->R,Qlong(max_bytes));
 	}

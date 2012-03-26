@@ -1,1 +1,1 @@
-extern value type_resolve(value);
+extern value fexl_resolve(value);

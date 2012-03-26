@@ -392,23 +392,23 @@ void test_fexl(void)
 
 void beg_test(void)
 	{
-	C = Q(type_C);
-	S = Q(type_S);
-	I = Q(type_I);
-	R = Q(type_R);
-	L = Q(type_L);
-	Y = Q(type_Y);
-	query = Q(type_query);
+	C = Q(fexl_C);
+	S = Q(fexl_S);
+	I = Q(fexl_I);
+	R = Q(fexl_R);
+	L = Q(fexl_L);
+	Y = Q(fexl_Y);
+	query = Q(fexl_query);
 
-	long_add = Q(type_long_add);
-	long_sub = Q(type_long_sub);
-	long_mul = Q(type_long_mul);
-	long_div = Q(type_long_div);
+	long_add = Q(fexl_long_add);
+	long_sub = Q(fexl_long_sub);
+	long_mul = Q(fexl_long_mul);
+	long_div = Q(fexl_long_div);
 
-	double_add = Q(type_double_add);
-	double_sub = Q(type_double_sub);
-	double_mul = Q(type_double_mul);
-	double_div = Q(type_double_div);
+	double_add = Q(fexl_double_add);
+	double_sub = Q(fexl_double_sub);
+	double_mul = Q(fexl_double_mul);
+	double_div = Q(fexl_double_div);
 
 	hold(C);
 	hold(S);
