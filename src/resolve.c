@@ -1,13 +1,15 @@
-#include <dlfcn.h>
 #include <string.h>  /* strcmp */
+
 #include "buf.h"
 #include "die.h"
+#include "dynamic.h"
+#include "memory.h"
+#include "run.h"
+
 #include "value.h"
 #include "double.h"
 #include "long.h"
-#include "memory.h"
 #include "resolve.h"
-#include "run.h"
 #include "stack.h"
 #include "string.h"
 
@@ -15,23 +17,6 @@
 
 /* TODO append */
 /* TODO + - * / = < etc. */
-
-/* Look up fexl_[name] in the Fexl library linked with the executable. */
-value resolve_name(char *name)
-	{
-	struct buf *buf = 0;
-	buf_add_string(&buf, "fexl_");
-	buf_add_string(&buf, name);
-	long len;
-	char *string = buf_clear(&buf,&len);
-
-	void *def = dlsym(0, string);
-	char *err = dlerror();
-
-	free_memory(string, len+1);
-	if (err) return 0;
-	return Q(def);
-	}
 
 /* Map synonyms to canonical names. */
 char *canonical_name(char *name)
@@ -64,8 +49,8 @@ value resolve(value sym, long line_no)
 	}
 
 	/* Resolve the canonical name. */
-	value f = resolve_name(canonical_name(name));
-	if (f) return f;
+	void *def = lib_sym("fexl_",canonical_name(name));
+	if (def) return Q(def);
 
 	/*TODO report all the undefined symbols, not just first.  We'll do that
 	with the chained resolution trick so it all happens inside Fexl. */
