@@ -375,7 +375,7 @@ like an infinite series of left parentheses.
 */
 value parse_exp(void)
 	{
-	value exp = I;
+	value exp = 0;
 
 	if (++cur_depth > max_depth)
 		die("Your program is too deeply nested.");
@@ -406,11 +406,11 @@ value parse_exp(void)
 		else
 			val = parse_term();
 
-		exp = exp->T == fexl_I ? val : A(exp,val);
+		exp = exp == 0 ? val : A(exp,val);
 		}
 
 	cur_depth--;
-	return exp;
+	return exp ? exp : Q(fexl_I);
 	}
 
 value get_pattern(value sym, value fun)
