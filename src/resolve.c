@@ -17,6 +17,7 @@
 
 /* TODO append */
 /* TODO + - * / = < etc. */
+/* TODO file operations */
 
 /* Map synonyms to canonical names. */
 char *canonical_name(char *name)

@@ -1,6 +1,6 @@
 # You can source these in a new shell with ". alias".  I find them handy.
 
-alias .todo='grep -r TODO build test src'
+alias .todo='grep -ra TODO build test src'
 
 alias .build='./build quiet'
 
