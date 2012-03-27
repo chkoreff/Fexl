@@ -1,5 +1,6 @@
-#include "value.h"
 #include "die.h"
+#include "value.h"
+#include "stack.h"
 #include "string.h"
 #include "sym.h"
 
@@ -18,4 +19,11 @@ int sym_eq(value form, value sym)
 	return (form->T == type_name || form->T == type_string)
 		&& sym->T == form->T
 		&& string_eq(sym,form);
+	}
+
+value fexl_name_string(value f)
+	{
+	value x = f->R;
+	if (!arg(type_name,x)) return f;
+	return Qcopy_chars(string_data(x), string_len(x));
 	}

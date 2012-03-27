@@ -16,4 +16,4 @@ alias .try='.fexl test/try.fxl'
 alias .bench1='./build quiet && time ( bin/fexl test/sample )'
 alias .bench2='./build quiet && time ( cat test/try.fxl | bin/fexl | diff -a - test/out )'
 
-alias .tmp='.fexl tmp.fxl'
+alias .tmp='.fexl test/tmp.fxl'

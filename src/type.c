@@ -50,6 +50,21 @@ value fexl_atomic(value f)
 	return f->R;
 	}
 
+/*
+is_apply x yes no
+	= (yes L R)  # if x is the function application (L R)
+	= no         # if x is atomic
+*/
+value fexl_is_apply(value f)
+	{
+	if (!f->L->L || !f->L->L->L) return f;
+
+	value x = f->L->L->R;
+
+	if (x->L) return A(A(f->L->R,x->L),x->R);
+	return f->R;
+	}
+
 /* (type_named name) returns the type with the given name, or type 0 if there
 is no such type. */
 void *fexl_type_named(value f)
