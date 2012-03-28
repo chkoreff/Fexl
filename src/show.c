@@ -11,11 +11,11 @@
 #include "sym.h"
 
 /*TODO won't need most of these header files when you do "show" in Fexl */
-
 /*TODO won't need these externs either */
 extern value fexl_lambda(value);
-extern value fexl_show(value);
 extern value fexl_parse(value);
+
+/*TODO we still have a "show" routine in C for tracing during development. */
 
 void show(value f)
 	{
@@ -37,7 +37,7 @@ void show(value f)
 	else if (f->T == type_long)
 		printf("%ld", get_long(f));
 	else if (f->T == type_double)
-		printf("%.16g", get_double(f));
+		printf("%.15g", get_double(f));
 	else if (f->T == type_string)
 		quote_string_put(f);
 	else if (f->T == type_name)
@@ -67,7 +67,6 @@ void show(value f)
 
 		f->T == fexl_string_append ? "string_append" :
 
-		f->T == fexl_show ? "show" :
 		f->T == fexl_parse ? "parse" :
 		f->T == fexl_nl ? "nl" :
 		f->T == fexl_string_put ? "string_put" :
@@ -79,12 +78,4 @@ void show(value f)
 		}
 
 	cur_depth--;
-	}
-
-/*TODO Do the show routine in Fexl itself. (see type.c) */
-value fexl_show(value f)
-	{
-	if (!f->L->L) return f;
-	show(f->L->R);
-	return f->R;
 	}

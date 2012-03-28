@@ -1,6 +1,6 @@
 # You can source these in a new shell with ". alias".  I find them handy.
 
-alias .todo='grep -ra TODO build test src'
+alias .todo='grep -ra TODO build test src --exclude=".*.swp"'
 
 alias .build='./build quiet'
 
@@ -16,4 +16,6 @@ alias .try='.fexl test/try.fxl'
 alias .bench1='./build quiet && time ( bin/fexl test/sample )'
 alias .bench2='./build quiet && time ( cat test/try.fxl | bin/fexl | diff -a - test/out )'
 
-alias .tmp='.fexl test/tmp.fxl'
+###
+alias .t='.fexl test/tmp.fxl'
+alias .td='.fexl test/tmp.fxl | diff -a - test/tmp.out'

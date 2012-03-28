@@ -124,6 +124,7 @@ value fexl_double_string(value f)
 	if (!arg(type_double,x)) return f;
 
 	char buf[100]; /* being careful here */
+	/* We show 15 digits because that's what Perl does. */
 	sprintf(buf, "%.15g", get_double(x));
 	return Qcopy_string(buf);
 	}
