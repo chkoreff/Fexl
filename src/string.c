@@ -335,7 +335,10 @@ value fexl_string_index(value f)
 		if (xs[xi] == ys[yi])
 			yi++;
 		else
+			{
+			xi -= yi;
 			yi = 0;
+			}
 
 		xi++;
 		}
