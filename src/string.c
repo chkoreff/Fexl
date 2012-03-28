@@ -290,3 +290,53 @@ value fexl_string_double(value f)
 		return A(f->R,Qdouble(num));
 	return f->L->R;
 	}
+
+/*
+string_index haystack needle offset
+NOTE: I have an extensive test suite verifying compatibility with the Perl
+"index" function.
+*/
+value fexl_string_index(value f)
+	{
+	if (!f->L->L || !f->L->L->L) return f;
+
+	value x = f->L->L->R;
+	value y = f->L->R;
+	value z = f->R;
+
+	if (!arg(type_string,x)) return f;
+	if (!arg(type_string,y)) return f;
+	if (!arg(type_long,z)) return f;
+
+	char *xs = string_data(x);
+	long xn = string_len(x);
+
+	char *ys = string_data(y);
+	long yn = string_len(y);
+
+	long zn = get_long(z);
+	if (zn < 0) zn = 0;
+	if (zn > xn) zn = xn;
+
+	/* Always consider null string to be found at adjusted zn. */
+	if (yn == 0) return Qlong(zn);
+
+	/* Avoid unnecessary work if match is impossible based on length. */
+	if (zn + yn > xn) return Qlong(-1);
+
+	long xi = zn;
+	long yi = 0;
+
+	while (1)
+		{
+		if (yi >= yn) return Qlong(xi - yi);
+		if (xi >= xn) return Qlong(-1);
+
+		if (xs[xi] == ys[yi])
+			yi++;
+		else
+			yi = 0;
+
+		xi++;
+		}
+	}
