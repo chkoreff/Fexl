@@ -28,15 +28,6 @@ void string_put(value x)
 	fwrite(string_data(x), 1, string_len(x), stdout);
 	}
 
-/*TODO full string quoting */
-void quote_string_put(value f)
-	{
-	char *quote = "\"";
-	print(quote);
-	string_put(f);
-	print(quote);
-	}
-
 /* string_put str next */
 value fexl_string_put(value f)
 	{

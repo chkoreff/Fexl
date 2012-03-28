@@ -1,4 +1,8 @@
 #if 0
+/*
+NOTE we only keep this code around for tracing during development.  It's
+normally disabled with "if 0" at the top.  To enable it, change it to "if 1".
+*/
 #include <stdio.h>
 #include "value.h"
 #include "basic.h"
@@ -14,7 +18,14 @@
 extern value fexl_lambda(value);
 extern value fexl_parse(value);
 
-/*TODO we still keep this "show" routine for tracing during development. */
+void quote_string_put(value f)
+	{
+	char *quote = "\"";
+	print(quote);
+	string_put(f);
+	print(quote);
+	}
+
 void show(value f)
 	{
 	if (cur_depth > max_depth)
