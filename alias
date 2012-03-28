@@ -1,3 +1,4 @@
+#!/bin/sh    # for syntax highlighting only
 # Handy shell functions for development and testing.  You can source these in a
 # new shell with ". alias".
 
@@ -14,7 +15,7 @@
 # Run a test script.
 .run()
 	{
-	.build
+	.build &&
 	bin/fexl "test/$1.fxl"
 	}
 
@@ -22,14 +23,14 @@
 # the "cat" form here in case the script uses interactive input like char_get.
 .check()
 	{
-	.build
+	.build &&
 	cat "test/$1.fxl" | bin/fexl | diff -a - "test/$1.out"
 	}
 
 # Time a test script, also checking its output.
 .time()
 	{
-	.build
+	.build &&
 	time (cat "test/$1.fxl" | bin/fexl | diff -a - "test/$1.out")
 	}
 
