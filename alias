@@ -32,3 +32,15 @@
 	.build
 	time (cat "test/$1.fxl" | bin/fexl | diff -a - "test/$1.out")
 	}
+
+# git status
+.gs()
+	{
+	git status
+	}
+
+# git diff (-a treats binary files as text)
+.gd()
+	{
+	git diff -a $1
+	}
