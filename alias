@@ -1,21 +1,26 @@
-# You can source these in a new shell with ". alias".  I find them handy.
+# Handy aliases for development and testing.  You can source these in a new
+# shell with ". alias".
 
 alias .todo='grep -ra TODO build test src --exclude=".*.swp"'
 
 alias .build='./build quiet'
 
+# Use this if you're modifying C code a lot and want to build automatically.
 alias .fexl='.build && bin/fexl'
+# Use this if you're just working with Fexl code while the C code is stable.
+alias .fexl='bin/fexl'
 
-alias .test_fexl='.build && bin/test_fexl'
-alias .test='.test_fexl | diff -a - test/test_fexl.out'
+# I use the "cat" form when diffing output in case the program uses interactive
+# input functions like char_get.
 
-alias .sample='.fexl test/sample'
-alias .try_sample='.sample | diff -a - test/sample.out'
-alias .try='.fexl test/try.fxl'
+alias .a0='.fexl test/a0.fxl'
+alias .a0d='cat test/a0.fxl | .fexl | diff -a - test/a0.out'
+alias .a0t='time .a0d'
 
-alias .bench1='./build quiet && time ( bin/fexl test/sample )'
-alias .bench2='./build quiet && time ( cat test/try.fxl | bin/fexl | diff -a - test/out )'
+alias .a1='.fexl test/a1.fxl'
+alias .a1d='cat test/a1.fxl | .fexl | diff -a - test/a1.out'
+alias .a1t='time .a1d'
 
-###
-alias .t='.fexl test/tmp.fxl'
-alias .td='.fexl test/tmp.fxl | diff -a - test/tmp.out'
+alias .a2='.fexl test/a2.fxl'
+alias .a2d='cat test/a2.fxl | .fexl | diff -a - test/a2.out'
+alias .a2t='time .a2d'

@@ -1,9 +1,4 @@
-#!../bin/fexl
-# ^^^ use that line for the locally built version
-
 #!/usr/bin/fexl
-# ^^^ use that line for the installed version
-
 
 # NOTE: If you run ./try.fxl, it will go through a bunch of tests, including
 # one at the end where it asks you to type lines of text and terminate with
