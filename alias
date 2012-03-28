@@ -1,26 +1,34 @@
-# Handy aliases for development and testing.  You can source these in a new
-# shell with ". alias".
+# Handy shell functions for development and testing.  You can source these in a
+# new shell with ". alias".
 
-alias .todo='grep -ra TODO build test src --exclude=".*.swp"'
+.todo()
+	{
+	grep -ra TODO build test src --exclude=".*.swp"
+	}
 
-alias .build='./build quiet'
+.build()
+	{
+	./build quiet
+	}
 
-# Use this if you're modifying C code a lot and want to build automatically.
-alias .fexl='(.build && bin/fexl)'
-# Use this if you're just working with Fexl code while the C code is stable.
-alias .fexl='bin/fexl'
+# Run a test script.
+.run()
+	{
+	.build
+	bin/fexl "test/$1.fxl"
+	}
 
-# I use the "cat" form when diffing output in case the program uses interactive
-# input functions like char_get.
+# Check that the output of a test script equals its reference output.  I use
+# the "cat" form here in case the script uses interactive input like char_get.
+.check()
+	{
+	.build
+	cat "test/$1.fxl" | bin/fexl | diff -a - "test/$1.out"
+	}
 
-alias .a0='.fexl test/a0.fxl'
-alias .a0d='cat test/a0.fxl | .fexl | diff -a - test/a0.out'
-alias .a0t='time .a0d'
-
-alias .a1='.fexl test/a1.fxl'
-alias .a1d='cat test/a1.fxl | .fexl | diff -a - test/a1.out'
-alias .a1t='time .a1d'
-
-alias .a2='.fexl test/a2.fxl'
-alias .a2d='cat test/a2.fxl | .fexl | diff -a - test/a2.out'
-alias .a2t='time .a2d'
+# Time a test script, also checking its output.
+.time()
+	{
+	.build
+	time (cat "test/$1.fxl" | bin/fexl | diff -a - "test/$1.out")
+	}
