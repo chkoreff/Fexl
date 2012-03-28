@@ -441,6 +441,14 @@ value fexl_lambda(value f)
 
 static value lam;
 
+/* LATER: It seems quite plausible to generate C code to implement these lambda
+substitution patterns extremely fast so we don't have to call "subst" at run-
+time.  I'm sure it's trivial to generate the C code, but I'll have to research
+how to compile and link that code into the running executable on the fly.
+
+Alternatively, I might just precompile some very common patterns and recognize
+them here.
+*/
 value lambda(value x, value f)
 	{
 	return A(A(lam,get_pattern(x,f)),f);

@@ -6,7 +6,7 @@ alias .todo='grep -ra TODO build test src --exclude=".*.swp"'
 alias .build='./build quiet'
 
 # Use this if you're modifying C code a lot and want to build automatically.
-alias .fexl='.build && bin/fexl'
+alias .fexl='(.build && bin/fexl)'
 # Use this if you're just working with Fexl code while the C code is stable.
 alias .fexl='bin/fexl'
 
