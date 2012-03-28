@@ -1,3 +1,4 @@
+#if 0
 #include <stdio.h>
 #include "value.h"
 #include "basic.h"
@@ -10,13 +11,10 @@
 #include "string.h"
 #include "sym.h"
 
-/*TODO won't need most of these header files when you do "show" in Fexl */
-/*TODO won't need these externs either */
 extern value fexl_lambda(value);
 extern value fexl_parse(value);
 
-/*TODO we still have a "show" routine in C for tracing during development. */
-
+/*TODO we still keep this "show" routine for tracing during development. */
 void show(value f)
 	{
 	if (cur_depth > max_depth)
@@ -79,3 +77,4 @@ void show(value f)
 
 	cur_depth--;
 	}
+#endif
