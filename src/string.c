@@ -4,8 +4,8 @@
 #include "memory.h"
 #include "value.h"
 #include "double.h"
+#include "eval.h"
 #include "long.h"
-#include "stack.h"
 #include "string.h"
 
 /*TODO wrap a combinator around the buf.c module, which will allow very fast
@@ -39,17 +39,10 @@ value Qchars(char *data, long len)
 	{
 	if (data == 0 || len < 0) die("Qchars");
 
-	value atom = create();
-	atom->N = 1;
-	atom->T = clear_string;
-	atom->L = (value)len;
-	atom->R = (value)data;
-
-	value f = create();
-	f->N = 0;
-	f->T = type_string;
-	f->L = 0;
-	f->R = atom;
+	value f = D(type_string);
+	f->R->T = clear_string;
+	f->R->L = (value)len;
+	f->R->R = (value)data;
 	return f;
 	}
 

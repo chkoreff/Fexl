@@ -1,8 +1,8 @@
 #include "value.h"
 #include "double.h"
+#include "eval.h"
 #include "io.h"
 #include "long.h"
-#include "stack.h"
 #include "string.h"
 
 value type_long(value f) { return f; }
@@ -10,17 +10,8 @@ value type_long(value f) { return f; }
 /* Make a new value of type long.  */
 value Qlong(long number)
 	{
-	value atom = create();
-	atom->N = 1;
-	atom->T = type_long;
-	atom->L = (value)number;
-
-	value f = create();
-	f->N = 0;
-	f->T = type_long;
-	f->L = 0;
-	f->R = atom;
-
+	value f = D(type_long);
+	f->R->L = (value)number;
 	return f;
 	}
 

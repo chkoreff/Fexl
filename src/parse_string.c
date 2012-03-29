@@ -1,6 +1,7 @@
+#include <string.h> /* strlen */
 #include "value.h"
+#include "eval.h"
 #include "parse.h"
-#include "stack.h"
 #include "string.h"
 
 /* Parse directly from a string. */
@@ -20,6 +21,12 @@ value parse_chars(char *string, long len)
 	source_len = len;
 	source_pos = 0;
 	return parse_source();
+	}
+
+/* Parse a NUL-terminated string. */
+value parse_string(char *string)
+	{
+	return parse_chars(string, strlen(string));
 	}
 
 /* Combinator to call parse_chars from within Fexl.

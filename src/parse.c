@@ -8,7 +8,6 @@
 #include "parse.h"
 #include "resolve.h"
 #include "run.h"
-#include "stack.h"
 #include "string.h"
 #include "sym.h"
 
@@ -239,13 +238,10 @@ value orig_sym(value sym, long first_line)
 
 		if (!orig)
 			{
+			/* new outer sym encountered */
 			orig = sym;
-			hold(orig);
-			push_list(&outer_syms,orig); /* new outer sym encountered */
-
-			value place = Qlong(first_line);
-			hold(place);
-			push_list(&outer_places,place);
+			push(&outer_syms, orig);
+			push(&outer_places, Qlong(first_line));
 			}
 		}
 
@@ -335,12 +331,12 @@ value parse_lambda(void)
 			next_ch();
 			skip_filler();
 
-			push_list(&inner_syms,sym);
+			push(&inner_syms,sym);
 			value def = parse_term();
 			def = A(Y,lambda(sym,def));
 			val = lambda(sym,parse_exp());
 			val = A(val,def);
-			pop_list(&inner_syms);
+			pop(&inner_syms);
 			}
 		else
 			{
@@ -348,18 +344,18 @@ value parse_lambda(void)
 			skip_filler();
 			value def = parse_term();
 
-			push_list(&inner_syms,sym);
+			push(&inner_syms,sym);
 			val = lambda(sym,parse_exp());
 			val = A(A(query,def),val);
-			pop_list(&inner_syms);
+			pop(&inner_syms);
 			}
 		}
 	else
 		{
 		/* Normal parameter (symbol without definition) */
-		push_list(&inner_syms,sym);
+		push(&inner_syms,sym);
 		val = lambda(sym,parse_exp());
-		pop_list(&inner_syms);
+		pop(&inner_syms);
 		}
 
 	drop(sym);
@@ -508,11 +504,8 @@ value parse_source(void)
 
 		exp = Qresolve(sym,place,exp);
 
-		drop(sym);
-		pop_list(&outer_syms);
-
-		drop(place);
-		pop_list(&outer_places);
+		pop(&outer_syms);
+		pop(&outer_places);
 		}
 
 	end_parse();

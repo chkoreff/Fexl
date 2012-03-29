@@ -1,8 +1,8 @@
 #include "value.h"
 #include "double.h"
+#include "eval.h"
 #include "io.h"
 #include "long.h"
-#include "stack.h"
 #include "string.h"
 
 value type_double(value f) { return f; }
@@ -23,18 +23,9 @@ the machine, so together they can definitely hold the 64 bits of a double.
 */
 value Qdouble(double number)
 	{
-	value atom = create();
-	atom->N = 1;
-	atom->T = type_double;
-	double *p = (double *)(&atom->L);
+	value f = D(type_double);
+	double *p = (double *)(&f->R->L);
 	*p = number;
-
-	value f = create();
-	f->N = 0;
-	f->T = type_double;
-	f->L = 0;
-	f->R = atom;
-
 	return f;
 	}
 

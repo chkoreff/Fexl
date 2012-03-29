@@ -1,8 +1,8 @@
 #include "memory.h"
 #include "value.h"
+#include "eval.h"
 #include "long.h"
 #include "run.h"
-#include "stack.h"
 
 value fexl_put_max_steps(value f)
 	{

@@ -1,6 +1,6 @@
 #include "die.h"
 #include "value.h"
-#include "stack.h"
+#include "eval.h"
 #include "string.h"
 #include "sym.h"
 

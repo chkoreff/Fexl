@@ -22,7 +22,7 @@
 	double_type x (double_string x);
 	x)
 
-\print = (\item string_put (string_from item))
+\print = (\data string_put (string_from data))
 
 # T and F are the predefined symbols for True and False.  They are equivalent
 # to:

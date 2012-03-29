@@ -8,14 +8,13 @@
 
 #include "value.h"
 #include "double.h"
+#include "eval.h"
 #include "long.h"
 #include "resolve.h"
-#include "stack.h"
 #include "string.h"
 
 /* The standard context for Fexl. */
 
-/* TODO append */
 /* TODO + - * / = < etc. */
 /* TODO file operations */
 
@@ -70,8 +69,7 @@ value fexl_resolve(value f)
 	value place = f->L->R;
 	value exp = f->R;
 
-	/*TODO can't use arg here yet because the type is either name or string */
-	if (!sym->T) { push(sym); return f; } /*TODO test*/
+	if (sym->T == 0) { arg(0,sym); return f; } /*TODO test*/
 	if (!arg(type_long,place)) return f; /*TODO test */
 
 	return A(exp,resolve(sym,get_long(place)));

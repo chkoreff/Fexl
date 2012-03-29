@@ -1,7 +1,7 @@
 #include "dynamic.h"
 #include "value.h"
+#include "eval.h"
 #include "long.h"
-#include "stack.h"
 #include "string.h"
 
 value type_type(value f) { return f; }

@@ -2,6 +2,8 @@ extern void nl(void);
 extern void print(const char *);
 extern void string_put(value);
 extern void quote_string_put(value);
+
+extern int printf(const char *format, ...);
 extern int sprintf(char *str, const char *format, ...);
 
 extern value fexl_nl(value);

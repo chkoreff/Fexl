@@ -2,7 +2,31 @@
 #include "die.h"
 #include "eval.h"
 #include "run.h"
-#include "stack.h"
+
+/* The stack used for tracking recursive goals during evaluation. */
+static value stack = 0;
+
+int arg(type T, value x)
+	{
+	if (x->T == 0)
+		{
+		push(&stack, x);
+		return 0;
+		}
+
+	return x->T == T && !x->L;
+	}
+
+/* Used for functions of the form (is_T x yes no), which checks the type of x
+and returns yes if it's type T or no otherwise. */
+value arg_is_type(type T, value f)
+	{
+	if (!f->L->L || !f->L->L->L) return f;
+	value x = f->L->L->R;
+	if (arg(T,x)) return f->L->R;
+	if (x->T == 0) return f;
+	return f->R;
+	}
 
 /*
 Evaluate a value, reducing it to a final normal form if possible within any
@@ -16,7 +40,7 @@ deep left sides without causing a segmentation fault.
 void eval(value f)
 	{
 	hold(f);
-	push(f);
+	push(&stack, f);
 
 	while (stack)
 		{
@@ -26,7 +50,7 @@ void eval(value f)
 		f = stack->L;
 
 		if (f->T)
-			pop();
+			pop(&stack);
 		else if (f->L->T)
 			{
 			value g = f->L->T(f);
@@ -36,7 +60,7 @@ void eval(value f)
 				f->T = f->L->T;
 			}
 		else
-			push(f->L);
+			push(&stack, f->L);
 		}
 
 	drop(f);

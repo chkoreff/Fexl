@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include "value.h"
 #include "die.h"
+#include "eval.h"
 #include "io.h"
 #include "long.h"
-#include "stack.h"
 #include "string.h"
 
 void nl(void)

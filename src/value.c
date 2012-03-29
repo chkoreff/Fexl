@@ -3,34 +3,8 @@
 
 value free_list = 0;
 
-/* Create a new uninitialized value. */
-value create(void)
-	{
-	value f = free_list;
-	if (f)
-		{
-		free_list = (value)f->N;
-		if (f->L)
-			{
-			drop(f->L);
-			drop(f->R);
-			}
-		else if (f->R && --f->R->N == 0)
-			{
-			f->R->T(f);
-			f->R->L = 0;
-			f->R->R = 0;
-			recycle(f->R);
-			}
-		}
-	else
-		f = (value)new_memory(sizeof (struct value));
-
-	return f;
-	}
-
 /* Put the value on the free list. */
-void recycle(value f)
+static void recycle(value f)
 	{
 	f->N = (long)free_list;
 	free_list = f;
@@ -39,7 +13,7 @@ void recycle(value f)
 /* Increment the reference count. */
 void hold(value f)
 	{
-	f->N++;
+	if (f) f->N++;
 	}
 
 /*
@@ -51,59 +25,119 @@ the program ends.
 */
 void drop(value f)
 	{
-	if (--f->N == 0) recycle(f);
+	if (f && --f->N == 0) recycle(f);
 	}
 
-/* Replace the contents of f with the contents of g.  Note that f and g must
-not be equal. */
-void replace(value f, value g)
+static void clear(value f)
 	{
-	hold(g);
+	if (f->L)
+		{
+		/* Clear a pair. */
+		if (--f->L->N == 0)
+			recycle(f->L);
+		if (f->R && --f->R->N == 0)
+			recycle(f->R);
+		}
+	else
+		{
+		/* Clear an atom. */
+		if (f->R && --f->R->N == 0)
+			{
+			if (f->R->T)
+				f->R->T(f); /* Call the clear routine for the data. */
+			f->R->L = 0;
+			f->R->R = 0;
+			recycle(f->R);
+			}
+		}
+	}
 
-	drop(f->L);
-	drop(f->R);
+/* Create a new value. */
+static value create(type T, value L, value R)
+	{
+	value f = free_list;
+	if (f)
+		{
+		free_list = (value)f->N;
+		clear(f);
+		}
+	else
+		f = (value)new_memory(sizeof (struct value));
 
-	f->T = g->T;
-	f->L = g->L;
-	f->R = g->R;
+	f->N = 0;
+	f->T = T;
+	f->L = L;
+	f->R = R;
 
-	if (f->L) hold(f->L);
-	if (f->R) hold(f->R);
+	if (L) L->N++;
+	if (R) R->N++;
 
-	drop(g);
+	return f;
+	}
+
+/* Create a data object of type T. */
+value D(type T)
+	{
+	return create(T,0,create(0,0,0));
 	}
 
 /* Create a combinator of type T.  Shorthand for "quote". */
 value Q(type T)
 	{
-	value f = create();
-	f->N = 0;
-	f->T = T;
-	f->L = 0;
-	f->R = 0;
-	return f;
+	return create(T,0,0);
 	}
 
 /* Create a function which applies L to R. */
 value A(value L, value R)
 	{
-	hold(L);
-	hold(R);
+	return create(0,L,R);
+	}
 
-	value f = create();
-	f->N = 0;
-	f->T = 0;
-	f->L = L;
-	f->R = R;
+/* Replace the contents of f with the contents of g.  Assumes g && f != g. */
+void replace(value f, value g)
+	{
+	g->N++;
 
-	return f;
+	clear(f);
+
+	f->T = g->T;
+	f->L = g->L;
+	f->R = g->R;
+
+	if (f->L) f->L->N++;
+	if (f->R) f->R->N++;
+
+	if (--g->N == 0)
+		recycle(g);
+	}
+
+/* Set a value reference to a new value. */
+static void set(value *pos, value val)
+	{
+	if (val) val->N++;
+	value old = *pos;
+	if (old && --old->N == 0)
+		recycle(old);
+	*pos = val;
+	}
+
+/* Push a value on the stack. */
+void push(value *stack, value f)
+	{
+	set(stack, A(f,*stack));
+	}
+
+/* Pop a value from the stack. */
+void pop(value *stack)
+	{
+	set(stack, (*stack)->R);
 	}
 
 /* Clear the free list and end the memory arena. */
 void end_value(void)
 	{
 	while (free_list)
-		free_memory(create(), sizeof(struct value));
+		free_memory(Q(0), sizeof(struct value));
 
 	end_memory();
 	}
