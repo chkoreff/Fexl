@@ -15,6 +15,7 @@ deep left sides without causing a segmentation fault.
 */
 void eval(value f)
 	{
+	hold(f);
 	push(f);
 
 	while (stack)
@@ -37,4 +38,6 @@ void eval(value f)
 		else
 			push(f->L);
 		}
+
+	drop(f);
 	}

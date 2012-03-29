@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "die.h"
 #include "value.h"
 #include "parse.h"
 #include "parse_file.h"
@@ -11,9 +12,16 @@ int file_read_ch(void)
 	return fgetc(source_file);
 	}
 
-value parse_file(FILE *file)
+value parse_file(char *name)
 	{
+	source_file = name ? fopen(name,"r") : stdin;
+	if (!source_file) die("Can't open script");
+
 	read_ch = file_read_ch;
-	source_file = file;
-	return parse_source();
+	value f = parse_source();
+
+	if (name) fclose(source_file);
+	source_file = 0;
+
+	return f;
 	}

@@ -1,1 +1,1 @@
-extern value parse_file(FILE *file);
+extern value parse_file(char *name);
