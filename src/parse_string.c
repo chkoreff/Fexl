@@ -1,4 +1,3 @@
-#include <stdio.h> /* EOF */
 #include "value.h"
 #include "parse.h"
 #include "stack.h"
@@ -11,7 +10,7 @@ static long source_pos = 0;      /* current pos */
 
 int string_read_ch(void)
 	{
-	return source_pos < source_len ? source_string[source_pos++] : EOF;
+	return source_pos < source_len ? source_string[source_pos++] : -1;
 	}
 
 value parse_chars(char *string, long len)

@@ -1,5 +1,4 @@
 #include <ctype.h>
-#include <stdio.h> /* EOF (TODO) */
 #include "value.h"
 #include "basic.h"
 #include "buf.h"
@@ -44,7 +43,7 @@ sym  => string
 string => simple_string
 string => complex_string
 
-The Fexl parser reads an expression from the input until it reaches EOF (end of
+The Fexl parser reads an expression from the input until it reaches -1 (end of
 file) or the special token "\\".  The \\ token stops the parser immediately, as
 if it had reached end of file.
 */
@@ -65,7 +64,7 @@ void skip_line(void)
 	{
 	while (1)
 		{
-		if (ch == '\n' || ch == EOF) break;
+		if (ch == '\n' || ch == -1) break;
 		next_ch();
 		}
 	next_ch();
@@ -80,7 +79,7 @@ void skip_white(void)
 	{
 	while (1)
 		{
-		if (!at_white() || ch == EOF) break;
+		if (!at_white() || ch == -1) break;
 		next_ch();
 		}
 	}
@@ -121,7 +120,7 @@ value collect_string(char *term_string, long term_len, long first_line)
 
 			match_pos = 0;
 			}
-		else if (ch == EOF)
+		else if (ch == -1)
 			{
 			line = first_line;
 			die("Unclosed string");
@@ -152,7 +151,7 @@ value parse_complex_string(void)
 
 	while (1)
 		{
-		if (at_white() || ch == EOF) break;
+		if (at_white() || ch == -1) break;
 		buf_add(&term, ch);
 		next_ch();
 		}
@@ -186,7 +185,7 @@ value parse_name(int allow_eq)
 			|| ch == '~'
 			|| ch == '#'
 			|| (ch == '=' && !allow_eq)
-			|| ch == EOF
+			|| ch == -1
 			)
 			break;
 
@@ -383,7 +382,7 @@ value parse_exp(void)
 	while (1)
 		{
 		skip_filler();
-		if (ch == EOF || ch == ')') break;
+		if (ch == -1 || ch == ')') break;
 
 		value val;
 
@@ -392,7 +391,7 @@ value parse_exp(void)
 			next_ch();
 			if (ch == '\\')
 				{
-				ch = EOF; /* Two backslashes simulates end of file. */
+				ch = -1; /* Two backslashes simulates end of file. */
 				break;
 				}
 
@@ -499,7 +498,7 @@ value parse_source(void)
 
 	value exp = parse_exp();
 
-	if (ch != EOF)
+	if (ch != -1)
 		die("Extraneous input");
 
 	while (outer_syms)

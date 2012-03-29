@@ -1,6 +1,6 @@
-#include <stdio.h> /* sprintf */
 #include "value.h"
 #include "double.h"
+#include "io.h"
 #include "long.h"
 #include "stack.h"
 #include "string.h"
