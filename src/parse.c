@@ -423,7 +423,6 @@ value get_pattern(value sym, value fun)
 	}
 
 /* Return a copy of fun with val substituted according to pattern p. */
-/*TODO p == I or p == C ?  would have to keep them around tho */
 value subst(value p, value fun, value val)
 	{
 	if (p->T == fexl_I) return val;
