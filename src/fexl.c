@@ -13,7 +13,10 @@ evaluates that function.
 int main(int argc, char *argv[], char *envp[])
 	{
 	beg_run(argc, argv, envp);
-	eval(parse_file(argc > 1 ? argv[1] : 0));
+	value f = parse_file(argc > 1 ? argv[1] : 0);
+	hold(f);
+	eval(f);
+	drop(f);
 	end_value();
 	return 0;
 	}
