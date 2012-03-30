@@ -37,7 +37,7 @@ void eval(value f)
 			die("Your program ran too long");
 
 		value x = f->L;
-		eval(x);
+		if (x->T == 0) eval(x);
 
 		value g = x->T(f);
 		if (g && g != f)
