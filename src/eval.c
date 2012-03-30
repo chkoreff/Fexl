@@ -3,17 +3,9 @@
 #include "eval.h"
 #include "run.h"
 
-/* The stack used for tracking recursive goals during evaluation. */
-static value stack = 0;
-
 int arg(type T, value x)
 	{
-	if (x->T == 0)
-		{
-		push(&stack, x);
-		return 0;
-		}
-
+	if (x->T == 0) eval(x);
 	return x->T == T && !x->L;
 	}
 
@@ -31,38 +23,28 @@ value arg_is_type(type T, value f)
 /*
 Evaluate a value, reducing it to a final normal form if possible within any
 limits on time and space.
-
-When eval reduces the left side of a function application, it does not call
-itself recursively using the system stack.  Instead, it uses its own stack in
-the form of a linked list of values.  This allows it to reduce values with very
-deep left sides without causing a segmentation fault.
 */
 void eval(value f)
 	{
-	hold(f);
-	push(&stack, f);
+	if (++cur_depth > max_depth)
+		die("Your program is too deeply nested.");
 
-	while (stack)
+	while (1)
 		{
+		if (f->T) break;
+
 		if (max_steps >= 0 && ++cur_steps > max_steps)
 			die("Your program ran too long");
 
-		f = stack->L;
 		value x = f->L;
+		eval(x);
 
-		if (f->T)
-			pop(&stack);
-		else if (x->T)
-			{
-			value g = x->T(f);
-			if (g && g != f)
-				replace(f,g);
-			else if (f == stack->L)
-				f->T = x->T;
-			}
+		value g = x->T(f);
+		if (g && g != f)
+			replace(f,g);
 		else
-			push(&stack, x);
+			f->T = x->T;
 		}
 
-	drop(f);
+	cur_depth--;
 	}
