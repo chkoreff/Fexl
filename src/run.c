@@ -4,6 +4,7 @@
 int main_argc;
 char **main_argv;
 char **main_envp;
+int main_exit;
 
 long line = 1; /* line number */
 

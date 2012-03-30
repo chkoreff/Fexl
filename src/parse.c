@@ -14,6 +14,8 @@
 static value C;
 static value I;
 static value Y;
+static value L;
+static value R;
 static value query;
 
 extern value parse_exp(void);
@@ -405,7 +407,7 @@ value parse_exp(void)
 		}
 
 	cur_depth--;
-	return exp ? exp : Q(fexl_I);
+	return exp ? exp : I;
 	}
 
 value get_pattern(value sym, value fun)
@@ -421,6 +423,7 @@ value get_pattern(value sym, value fun)
 	}
 
 /* Return a copy of fun with val substituted according to pattern p. */
+/*TODO p == I or p == C ?  would have to keep them around tho */
 value subst(value p, value fun, value val)
 	{
 	if (p->T == fexl_I) return val;
@@ -450,7 +453,6 @@ value lambda(value x, value f)
 	}
 
 /*TODO pass resolution function into parse instead of always using built-in */
-/* TODO use the version that chains */
 static value resolve;
 
 value Qresolve(value sym, value place, value exp)
@@ -463,6 +465,8 @@ void beg_parse(void)
 	C = Q(fexl_C);
 	I = Q(fexl_I);
 	Y = Q(fexl_Y);
+	L = Q(fexl_L);
+	R = Q(fexl_R);
 	query = Q(fexl_query);
 	lam = Q(fexl_lambda);
 	resolve = Q(fexl_resolve);
@@ -470,6 +474,8 @@ void beg_parse(void)
 	hold(C);
 	hold(I);
 	hold(Y);
+	hold(L);
+	hold(R);
 	hold(query);
 	hold(lam);
 	hold(resolve);
@@ -480,6 +486,8 @@ void end_parse(void)
 	drop(C);
 	drop(I);
 	drop(Y);
+	drop(L);
+	drop(R);
 	drop(query);
 	drop(lam);
 	drop(resolve);
@@ -497,6 +505,9 @@ value parse_source(void)
 	if (ch != -1)
 		die("Extraneous input");
 
+	/* Start with (\yes\no exp yes exp). */
+	exp = A(A(R,C),A(A(L,I),exp));
+
 	while (outer_syms)
 		{
 		value sym = outer_syms->L;
@@ -507,6 +518,9 @@ value parse_source(void)
 		pop(&outer_syms);
 		pop(&outer_places);
 		}
+
+	/* Finish with (exp I F).  The F quits if there are undefined symbols. */
+	exp = A(A(exp,I),A(C,I));
 
 	end_parse();
 	return exp;

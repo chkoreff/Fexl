@@ -7,6 +7,7 @@
 #include "run.h"
 
 #include "value.h"
+#include "basic.h"
 #include "double.h"
 #include "eval.h"
 #include "long.h"
@@ -30,7 +31,7 @@ char *canonical_name(char *name)
 	return name;
 	}
 
-value resolve(value sym, long line_no)
+value resolve(value sym)
 	{
 	if (sym->T == type_string) return sym;
 
@@ -52,16 +53,10 @@ value resolve(value sym, long line_no)
 	void *def = lib_sym("fexl_",canonical_name(name));
 	if (def) return Q(def);
 
-	/*TODO report all the undefined symbols, not just first.  We'll do that
-	with the chained resolution trick so it all happens inside Fexl. */
-	line = line_no;
-	die("Undefined symbol %s",string_data(sym));
-
-	return sym;
+	return 0;
 	}
 
 /* resolve sym place exp */
-/*TODO try the chained technique */
 value fexl_resolve(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
@@ -73,5 +68,18 @@ value fexl_resolve(value f)
 	if (sym->T == 0) { arg(0,sym); return f; } /*TODO test*/
 	if (!arg(type_long,place)) return f; /*TODO test */
 
-	return A(exp,resolve(sym,get_long(place)));
+
+	void *def = resolve(sym);
+	if (def) return A(exp,def);
+
+	/* Undefined symbol:  warn and return (\yes\no exp sym no no). */
+
+	line = get_long(place);
+	warn("Undefined symbol %s",string_data(sym));
+	main_exit = 1;
+
+	value C = Q(fexl_C);
+	value S = Q(fexl_S);
+	value I = Q(fexl_I);
+	return A(C,A(A(S,A(exp,sym)),I));
 	}

@@ -18,5 +18,5 @@ int main(int argc, char *argv[], char *envp[])
 	eval(f);
 	drop(f);
 	end_value();
-	return 0;
+	return main_exit;
 	}

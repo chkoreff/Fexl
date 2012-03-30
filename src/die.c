@@ -6,7 +6,7 @@
 #include "die.h"
 #include "run.h"
 
-void die(const char *format, ...)
+void warn(const char *format, ...)
 	{
 	fflush(stdout);
 
@@ -23,6 +23,14 @@ void die(const char *format, ...)
 
 	if (errno) fprintf(stderr, ": %s", strerror(errno));
 	fputc('\n', stderr);
+	}
+
+void die(const char *format, ...)
+	{
+	va_list ap;
+	va_start(ap, format);
+	warn(format, ap);
+	va_end(ap);
 
 	exit(1);
 	}
