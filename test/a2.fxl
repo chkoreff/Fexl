@@ -16,13 +16,13 @@
 \halt == (\_ halt)
 
 # Useful:
-\string_from = (\x
+\to_string = (\x
 	string_type x x;
 	long_type x (long_string x);
 	double_type x (double_string x);
 	x)
 
-\print = (\data string_put (string_from data))
+\print = (\data string_put (to_string data))
 
 # T and F are the predefined symbols for True and False.  They are equivalent
 # to:
@@ -140,10 +140,10 @@ print "=====";nl;
 print (string_slice "" 0 0); nl;
 print (string_slice "" 0 800); nl;
 print (string_slice "" -30 800); nl;
-#string_put (string_from (string_slice "a" 0 1));nl;
-#string_put (string_from (string_slice "a" 0 1));nl;
-#string_put (string_from (string_slice "a" 0 1));nl;
-#string_put (string_from (string_slice "a" 0 1));nl;
+#string_put (to_string (string_slice "a" 0 1));nl;
+#string_put (to_string (string_slice "a" 0 1));nl;
+#string_put (to_string (string_slice "a" 0 1));nl;
+#string_put (to_string (string_slice "a" 0 1));nl;
 
 #string_put (string_slice "a" 0 0)
 )

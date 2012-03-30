@@ -117,6 +117,8 @@ value fexl_pair(value f)
 /*
 \append == (\x\y x y \h\t item h; append t y)
 This appends two lists.
+TODO We'll have a way to read built-in definitions from a config file, but for
+now I'm just parsing static text in C.
 */
 value fexl_append(value f)
 	{
