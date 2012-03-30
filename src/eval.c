@@ -48,19 +48,20 @@ void eval(value f)
 			die("Your program ran too long");
 
 		f = stack->L;
+		value x = f->L;
 
 		if (f->T)
 			pop(&stack);
-		else if (f->L->T)
+		else if (x->T)
 			{
-			value g = f->L->T(f);
+			value g = x->T(f);
 			if (g && g != f)
 				replace(f,g);
 			else if (f == stack->L)
-				f->T = f->L->T;
+				f->T = x->T;
 			}
 		else
-			push(&stack, f->L);
+			push(&stack, x);
 		}
 
 	drop(f);
