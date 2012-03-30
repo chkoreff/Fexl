@@ -61,6 +61,7 @@ value resolve(value sym, long line_no)
 	}
 
 /* resolve sym place exp */
+/*TODO try the chained technique */
 value fexl_resolve(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
