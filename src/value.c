@@ -28,6 +28,7 @@ void drop(value f)
 	if (f && --f->N == 0) recycle(f);
 	}
 
+/* Clear a value prior to reuse. */
 static void clear(value f)
 	{
 	if (f->L)
