@@ -27,10 +27,6 @@ void warn(const char *format, ...)
 
 void die(const char *format, ...)
 	{
-	va_list ap;
-	va_start(ap, format);
-	warn(format, ap);
-	va_end(ap);
-
+	warn(format);
 	exit(1);
 	}
