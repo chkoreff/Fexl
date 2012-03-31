@@ -220,13 +220,6 @@ value find_sym(value list, value name)
 		}
 	}
 
-/*TODO I suppose instead of using static stacks here I could pass this stuff
-around through all the parse routines, building it up cleanly as normal values.
-I guess it would just be a single extra parameter to the various routines,
-called "context", which would be (pair inner_syms (pair outer_syms outer_places)).
-Then I won't need "push" and "pop" (and "set") in value.c.
-I could also then rely on the assumption that f->R != 0 whenever f->L != 0.
-*/
 /* Symbols defined with lambda forms inside the source text */
 static value inner_syms = 0;
 /* Symbols defined outside the source text */
