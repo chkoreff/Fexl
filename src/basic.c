@@ -2,6 +2,7 @@
 #include "basic.h"
 #include "eval.h"
 #include "parse_string.h"
+#include "resolve.h"
 
 /*
 \C = (\x\y x)
@@ -126,6 +127,6 @@ value fexl_append(value f)
 "\\append == (\\x\\y x y \\h\\t item h; append t y)"
 "append"
 ;
-	replace(f->L, parse_string(text));
+	replace(f->L, parse_string(text, Q(fexl_resolve)));
 	return f;
 	}

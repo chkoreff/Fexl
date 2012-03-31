@@ -68,7 +68,6 @@ value fexl_resolve(value f)
 	if (sym->T == 0) { arg(0,sym); return f; } /*TODO test*/
 	if (!arg(type_long,place)) return f; /*TODO test */
 
-
 	void *def = resolve(sym);
 	if (def) return A(exp,def);
 

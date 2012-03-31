@@ -14,30 +14,33 @@ int string_read_ch(void)
 	return source_pos < source_len ? source_string[source_pos++] : -1;
 	}
 
-value parse_chars(char *string, long len)
+value parse_chars(char *string, long len, value resolve)
 	{
 	read_ch = string_read_ch;
 	source_string = string;
 	source_len = len;
 	source_pos = 0;
-	return parse_source();
+	return parse_source(resolve);
 	}
 
 /* Parse a NUL-terminated string. */
-value parse_string(char *string)
+value parse_string(char *string, value resolve)
 	{
-	return parse_chars(string, strlen(string));
+	return parse_chars(string, strlen(string), resolve);
 	}
 
 /* Combinator to call parse_chars from within Fexl.
-Called as (parse string next)  -- TODO resolution function, yes/no result
+Called as (parse string resolve next), where the resolve function supplies
+definitions for outer symbols used in the string.
 */
 value fexl_parse(value f)
 	{
-	if (!f->L->L) return f;
+	if (!f->L->L || !f->L->L->L) return f;
 
-	value x = f->L->R;
+	value x = f->L->L->R;
 	if (!arg(type_string,x)) return f;
 
-	return A(f->R,parse_chars(string_data(x), string_len(x)));
+	value resolve = f->L->R;
+
+	return A(f->R,parse_chars(string_data(x), string_len(x), resolve));
 	}

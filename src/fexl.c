@@ -1,6 +1,7 @@
 #include "value.h"
 #include "eval.h"
 #include "parse_file.h"
+#include "resolve.h"
 #include "run.h"
 
 /*
@@ -13,7 +14,7 @@ evaluates that function.
 int main(int argc, char *argv[], char *envp[])
 	{
 	beg_run(argc, argv, envp);
-	value f = parse_file(argc > 1 ? argv[1] : 0);
+	value f = parse_file(argc > 1 ? argv[1] : 0, Q(fexl_resolve));
 	hold(f);
 	eval(f);
 	drop(f);

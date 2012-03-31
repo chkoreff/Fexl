@@ -6,7 +6,6 @@
 #include "long.h"
 #include "memory.h"
 #include "parse.h"
-#include "resolve.h"
 #include "run.h"
 #include "string.h"
 #include "sym.h"
@@ -451,14 +450,6 @@ value lambda(value x, value f)
 	return A(A(lam,get_pattern(x,f)),f);
 	}
 
-/*TODO pass resolution function into parse instead of always using built-in */
-static value resolve;
-
-value Qresolve(value sym, value place, value exp)
-	{
-	return A(A(A(resolve,sym),place),lambda(sym,exp));
-	}
-
 void beg_parse(void)
 	{
 	C = Q(fexl_C);
@@ -468,7 +459,6 @@ void beg_parse(void)
 	R = Q(fexl_R);
 	query = Q(fexl_query);
 	lam = Q(fexl_lambda);
-	resolve = Q(fexl_resolve);
 
 	hold(C);
 	hold(I);
@@ -477,7 +467,6 @@ void beg_parse(void)
 	hold(R);
 	hold(query);
 	hold(lam);
-	hold(resolve);
 	}
 
 void end_parse(void)
@@ -489,11 +478,11 @@ void end_parse(void)
 	drop(R);
 	drop(query);
 	drop(lam);
-	drop(resolve);
 	}
 
-value parse_source(void)
+value parse_source(value resolve)
 	{
+	hold(resolve);
 	beg_parse();
 
 	line = 1;
@@ -512,7 +501,7 @@ value parse_source(void)
 		value sym = outer_syms->L;
 		value place = outer_places->L;
 
-		exp = Qresolve(sym,place,exp);
+		exp = A(A(A(resolve,sym),place),lambda(sym,exp));
 
 		pop(&outer_syms);
 		pop(&outer_places);
@@ -521,6 +510,9 @@ value parse_source(void)
 	/* Finish with (exp I F).  The F quits if there are undefined symbols. */
 	exp = A(A(exp,I),A(C,I));
 
+	/*TODO simplify the resolution chaining */
+
 	end_parse();
+	drop(resolve);
 	return exp;
 	}

@@ -12,13 +12,13 @@ int file_read_ch(void)
 	return fgetc(source_file);
 	}
 
-value parse_file(char *name)
+value parse_file(char *name, value resolve)
 	{
 	source_file = name ? fopen(name,"r") : stdin;
 	if (!source_file) die("Can't open script");
 
 	read_ch = file_read_ch;
-	value f = parse_source();
+	value f = parse_source(resolve);
 
 	if (name) fclose(source_file);
 	source_file = 0;
