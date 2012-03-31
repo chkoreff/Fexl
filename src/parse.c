@@ -1,8 +1,8 @@
 #include <ctype.h>
+#include "die.h"
 #include "value.h"
 #include "basic.h"
 #include "buf.h"
-#include "die.h"
 #include "long.h"
 #include "memory.h"
 #include "parse.h"
@@ -17,8 +17,8 @@ static value L;
 static value R;
 static value query;
 
-extern value parse_exp(void);
-extern value lambda(value, value);
+static value parse_exp(void);
+static value lambda(value, value);
 
 /*
 Grammar:
@@ -54,13 +54,17 @@ int (*read_ch)(void);
 
 static int ch = 0;      /* current character */
 
-void next_ch(void)
+static void next_ch(void)
 	{
+	/* Pay attention to max_steps while parsing. */
+	if (max_steps >= 0 && ++cur_steps > max_steps)
+		die("Your program ran too long");
+
 	ch = read_ch();
 	if (ch == '\n') line++;
 	}
 
-void skip_line(void)
+static void skip_line(void)
 	{
 	while (1)
 		{
@@ -70,12 +74,12 @@ void skip_line(void)
 	next_ch();
 	}
 
-int at_white(void)
+static int at_white(void)
 	{
 	return isspace(ch) || ch == 0;
 	}
 
-void skip_white(void)
+static void skip_white(void)
 	{
 	while (1)
 		{
@@ -84,7 +88,7 @@ void skip_white(void)
 		}
 	}
 
-void skip_filler(void)
+static void skip_filler(void)
 	{
 	while (1)
 		{
@@ -97,7 +101,7 @@ void skip_filler(void)
 		}
 	}
 
-value collect_string(char *term_string, long term_len, long first_line)
+static value collect_string(char *term_string, long term_len, long first_line)
 	{
 	struct buf *buf = 0;
 	long match_pos = 0;
@@ -123,7 +127,8 @@ value collect_string(char *term_string, long term_len, long first_line)
 		else if (ch == -1)
 			{
 			line = first_line;
-			die("Unclosed string");
+			error = "Unclosed string";
+			break;
 			}
 		else
 			{
@@ -132,19 +137,25 @@ value collect_string(char *term_string, long term_len, long first_line)
 			}
 		}
 
+	if (error)
+		{
+		buf_discard(&buf);
+		return 0;
+		}
+
 	long len;
 	char *string = buf_clear(&buf,&len);
 	return Qchars(string,len);
 	}
 
-value parse_simple_string(void)
+static value parse_simple_string(void)
 	{
 	long first_line = line;
 	next_ch();
 	return collect_string("\"", 1, first_line);
 	}
 
-value parse_complex_string(void)
+static value parse_complex_string(void)
 	{
 	long first_line = line;
 	struct buf *term = 0;
@@ -154,6 +165,18 @@ value parse_complex_string(void)
 		if (at_white() || ch == -1) break;
 		buf_add(&term, ch);
 		next_ch();
+		}
+
+	if (ch == -1)
+		{
+		line = first_line;
+		error = "Unclosed string terminator";
+		}
+
+	if (error)
+		{
+		buf_discard(&term);
+		return 0;
 		}
 
 	long term_len;
@@ -170,7 +193,7 @@ A name may contain just about anything, except for white space (including NUL)
 and a few other special characters.  This is the simplest possible rule that
 can work.
 */
-value parse_name(int allow_eq)
+static value parse_name(int allow_eq)
 	{
 	struct buf *buf = 0;
 	while (1)
@@ -199,7 +222,7 @@ value parse_name(int allow_eq)
 	}
 
 /* Parse a symbol. */
-value parse_sym(int allow_eq)
+static value parse_sym(int allow_eq)
 	{
 	if (ch == '"')
 		return parse_simple_string();
@@ -209,7 +232,7 @@ value parse_sym(int allow_eq)
 		return parse_name(allow_eq);
 	}
 
-value find_sym(value list, value name)
+static value find_sym(value list, value name)
 	{
 	value pos = list;
 	while (1)
@@ -250,7 +273,7 @@ static void pop(value *stack)
 
 /* Return the originally encountered occurrence of a symbol.  This unifies
 multiple occurrences into a single one. */
-value orig_sym(value sym, long first_line)
+static value orig_sym(value sym, long first_line)
 	{
 	value orig = find_sym(inner_syms,sym);
 
@@ -276,36 +299,50 @@ value orig_sym(value sym, long first_line)
 	return orig;
 	}
 
-value parse_term(void)
+static value parse_term(void)
 	{
 	long first_line = line;
+
+	value exp;
+
 	if (ch == '(')
 		{
 		next_ch();
-		value exp = parse_exp();
-
-		if (ch == ')')
-			next_ch();
-		else
+		exp = parse_exp();
+		if (exp)
 			{
-			line = first_line;
-			die("Unclosed parenthesis");
+			if (ch == ')')
+				next_ch();
+			else
+				{
+				line = first_line;
+				error = "Unclosed parenthesis";
+				}
 			}
-
-		return exp;
 		}
 	else
 		{
-		value sym = parse_sym(1);
-
-		if (sym->T == type_name && string_len(sym) == 0)
+		exp = parse_sym(1);
+		if (exp)
 			{
-			line = first_line;
-			die("Missing definition");
+			if (exp->T == type_name && string_len(exp) == 0)
+				{
+				line = first_line;
+				error = "Missing definition";
+				}
+			else
+				exp = orig_sym(exp,first_line);
 			}
-
-		return orig_sym(sym,first_line);
 		}
+
+	if (error)
+		{
+		hold(exp);
+		drop(exp);
+		exp = 0;
+		}
+
+	return exp;
 	}
 
 /*
@@ -328,21 +365,28 @@ white space only, and not '='.  For example:
   \ >   = num_gt
   \ >=  = num_ge
 */
-value parse_lambda(void)
+static value parse_lambda(void)
 	{
 	int allow_eq = at_white();
 	skip_white();
 
 	value sym = parse_sym(allow_eq);
+	if (sym == 0) return 0;
+
 	if (sym->T == type_name && string_len(sym) == 0)
-		die("Missing lambda symbol");
+		{
+		error = "Missing lambda symbol";
+		hold(sym);
+		drop(sym);
+		return 0;
+		}
 
 	hold(sym);
 
 	skip_filler();
 	int has_def = (ch == '=');
 
-	value val;
+	value val = 0;
 
 	if (has_def)
 		{
@@ -355,28 +399,42 @@ value parse_lambda(void)
 
 			push(&inner_syms,sym);
 			value def = parse_term();
-			def = A(Y,lambda(sym,def));
-			val = lambda(sym,parse_exp());
-			val = A(val,def);
+			if (def)
+				{
+				value body = parse_exp();
+				if (body)
+					{
+					val = lambda(sym,body);
+					val = A(val,A(Y,lambda(sym,def)));
+					}
+				}
 			pop(&inner_syms);
 			}
 		else
 			{
 			/* Non-recursive definition, forces eager evaluation */
 			skip_filler();
-			value def = parse_term();
 
-			push(&inner_syms,sym);
-			val = lambda(sym,parse_exp());
-			val = A(A(query,def),val);
-			pop(&inner_syms);
+			value def = parse_term();
+			if (def)
+				{
+				push(&inner_syms,sym);
+				value body = parse_exp();
+				if (body)
+					{
+					val = lambda(sym,body);
+					val = A(A(query,def),val);
+					}
+				pop(&inner_syms);
+				}
 			}
 		}
 	else
 		{
 		/* Normal parameter (symbol without definition) */
 		push(&inner_syms,sym);
-		val = lambda(sym,parse_exp());
+		value body = parse_exp();
+		if (body) val = lambda(sym,body);
 		pop(&inner_syms);
 		}
 
@@ -390,12 +448,15 @@ Parse an expression.
 We limit the depth here to avoid a stack overflow resulting from strange inputs
 like an infinite series of left parentheses.
 */
-value parse_exp(void)
+static value parse_exp(void)
 	{
-	value exp = 0;
-
 	if (++cur_depth > max_depth)
-		die("Your program is too deeply nested.");
+		{
+		error = "Your program is too deeply nested.";
+		return 0;
+		}
+
+	value exp = I;
 
 	while (1)
 		{
@@ -423,14 +484,22 @@ value parse_exp(void)
 		else
 			val = parse_term();
 
-		exp = exp == 0 ? val : A(exp,val);
+		if (val == 0)
+			{
+			hold(exp);
+			drop(exp);
+			exp = 0;
+			break;
+			}
+
+		exp = exp == I ? val : A(exp,val);
 		}
 
 	cur_depth--;
-	return exp ? exp : I;
+	return exp;
 	}
 
-value get_pattern(value sym, value fun)
+static value get_pattern(value sym, value fun)
 	{
 	if (fun == sym) return I;
 	if (!fun->L) return C;
@@ -443,7 +512,7 @@ value get_pattern(value sym, value fun)
 	}
 
 /* Return a copy of fun with val substituted according to pattern p. */
-value subst(value p, value fun, value val)
+static value subst(value p, value fun, value val)
 	{
 	if (p->T == fexl_I) return val;
 	if (p->T == fexl_C) return fun;
@@ -466,12 +535,12 @@ how to compile and link that code into the running executable on the fly.
 Alternatively, I might just precompile some very common patterns and recognize
 them here.
 */
-value lambda(value x, value f)
+static value lambda(value x, value f)
 	{
 	return A(A(lam,get_pattern(x,f)),f);
 	}
 
-void beg_parse(void)
+static void beg_parse(void)
 	{
 	C = Q(fexl_C);
 	I = Q(fexl_I);
@@ -490,7 +559,7 @@ void beg_parse(void)
 	hold(lam);
 	}
 
-void end_parse(void)
+static void end_parse(void)
 	{
 	drop(C);
 	drop(I);
@@ -501,8 +570,6 @@ void end_parse(void)
 	drop(lam);
 	}
 
-#include "io.h" /*TODO*/
-#include "show.h" /*TODO*/
 value parse_source(value resolve)
 	{
 	hold(resolve);
@@ -512,9 +579,19 @@ value parse_source(value resolve)
 	next_ch();
 
 	value exp = parse_exp();
+	if (exp)
+		{
+		if (ch != -1)
+			{
+			error = "Extraneous input";
+			hold(exp);
+			drop(exp);
+			exp = 0;
+			}
+		}
 
-	if (ch != -1)
-		die("Extraneous input");
+	/* Use a dummy expression if there was an error. */
+	if (exp == 0) exp = I;
 
 	value new_exp = exp; /*TODO*/
 	value new_list = C;
@@ -548,7 +625,10 @@ value parse_source(value resolve)
 	/* Finish with (exp I F).  The F quits if there are undefined symbols. */
 	exp = A(A(exp,I),A(C,I));
 
-	/*TODO LATER can make syntax errors non-fatal and return empty list here */
+	/*TODO LATER return (pair ok; pair exp; outer)
+	where exp is the expression if ok, or the string error otherwise
+	where outer is a list of (pair sym place)
+	*/
 	value new_result = A(A(item,new_exp),new_list);
 
 	#if 0
@@ -561,5 +641,13 @@ value parse_source(value resolve)
 
 	end_parse();
 	drop(resolve);
+
+	if (error)
+		{
+		hold(exp);
+		drop(exp);
+		exp = 0;
+		}
+
 	return exp;
 	}

@@ -12,6 +12,11 @@
 	./build quiet
 	}
 
+.fexl()
+	{
+	.build && bin/fexl $1
+	}
+
 # Run a test script.
 .run()
 	{

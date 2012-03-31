@@ -28,5 +28,6 @@ void warn(const char *format, ...)
 void die(const char *format, ...)
 	{
 	warn(format);
-	exit(1);
+	main_exit = 1;
+	exit(main_exit);
 	}

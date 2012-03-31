@@ -2,6 +2,7 @@ extern int main_argc;
 extern char **main_argv;
 extern char **main_envp;
 extern int main_exit;
+extern char *error;
 extern long line;
 extern long max_depth;
 extern long cur_depth;

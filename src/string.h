@@ -4,7 +4,6 @@ extern value Qcopy_chars(const char *data, long len);
 extern value Qcopy_string(const char *data);
 extern char *string_data(value);
 extern long string_len(value);
-extern int string_compare(value, value);
 extern int string_eq(value, value);
 extern int string_long(char *beg, long *num);
 extern int string_double(char *beg, double *num);

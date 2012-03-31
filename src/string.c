@@ -23,7 +23,7 @@ long string_len(value f)
 
 value type_string(value f) { return f; }
 
-value clear_string(value f)
+static value clear_string(value f)
 	{
 	free_memory(string_data(f), string_len(f) + 1);
 	return f;
@@ -69,7 +69,7 @@ value Qcopy_string(const char *data)
 
 /* Compare strings x and y, returning negative if x < y, zero if x == y, or
 positive if x > y. */
-int string_compare(value x, value y)
+static int string_compare(value x, value y)
 	{
 	if (x == y) return 0;
 	long x_len = string_len(x);

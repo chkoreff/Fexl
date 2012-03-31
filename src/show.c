@@ -1,4 +1,4 @@
-#if 1 /*TODO NOW */
+#if 0
 /*
 NOTE we only keep this code around for tracing during development.  It's
 normally disabled with "if 0" at the top.  To enable it, change it to "if 1".
