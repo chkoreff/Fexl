@@ -71,6 +71,7 @@ value Qcopy_string(const char *data)
 positive if x > y. */
 int string_compare(value x, value y)
 	{
+	if (x == y) return 0;
 	long x_len = string_len(x);
 	long y_len = string_len(y);
 
@@ -129,6 +130,9 @@ value fexl_string_slice(value f)
 	if (len > max)
 		len = max;
 
+	if (pos == 0 && len == max)
+		return x;
+
 	return Qcopy_chars(string_data(x) + pos, len);
 	}
 
@@ -155,6 +159,7 @@ value fexl_string_at(value f)
 /* Compare strings x and y, returning true if x == y. */
 int string_eq(value x, value y)
 	{
+	if (x == y) return 1;
 	long x_len = string_len(x);
 	if (x_len != string_len(y)) return 0;
 	return memcmp(string_data(x), string_data(y), x_len) == 0;
@@ -179,6 +184,9 @@ value fexl_string_append(value f)
 
 	long xlen = string_len(x);
 	long ylen = string_len(y);
+
+	if (xlen == 0) return y;
+	if (ylen == 0) return x;
 
 	int len = xlen + ylen;
 	value result = Qcopy_chars(0, len);
