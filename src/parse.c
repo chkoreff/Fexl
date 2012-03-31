@@ -220,6 +220,13 @@ value find_sym(value list, value name)
 		}
 	}
 
+/*TODO I suppose instead of using static stacks here I could pass this stuff
+around through all the parse routines, building it up cleanly as normal values.
+I guess it would just be a single extra parameter to the various routines,
+called "context", which would be (pair inner_syms (pair outer_syms outer_places)).
+Then I won't need "push" and "pop" (and "set") in value.c.
+I could also then rely on the assumption that f->R != 0 whenever f->L != 0.
+*/
 /* Symbols defined with lambda forms inside the source text */
 static value inner_syms = 0;
 /* Symbols defined outside the source text */
@@ -480,6 +487,8 @@ void end_parse(void)
 	drop(lam);
 	}
 
+#include "io.h" /*TODO*/
+#include "show.h" /*TODO*/
 value parse_source(value resolve)
 	{
 	hold(resolve);
@@ -493,6 +502,12 @@ value parse_source(value resolve)
 	if (ch != -1)
 		die("Extraneous input");
 
+	value new_exp = exp; /*TODO*/
+	value new_list = C;
+	value item = Q(fexl_item);
+	value pair = Q(fexl_pair);
+	hold(pair);
+
 	/* Start with (\yes\no exp yes exp). */
 	exp = A(A(R,C),A(A(L,I),exp));
 
@@ -501,14 +516,32 @@ value parse_source(value resolve)
 		value sym = outer_syms->L;
 		value place = outer_places->L;
 
+		#if 0
+		printf("outer sym %s on line %ld\n", string_data(sym), get_long(place));
+		#endif
+
 		exp = A(A(A(resolve,sym),place),lambda(sym,exp));
+
+		new_exp = lambda(sym,new_exp);
+		new_list = A(A(item,A(A(pair,sym),place)),new_list);
 
 		pop(&outer_syms);
 		pop(&outer_places);
 		}
 
+	drop(pair);
+
 	/* Finish with (exp I F).  The F quits if there are undefined symbols. */
 	exp = A(A(exp,I),A(C,I));
+
+	/*TODO LATER can make syntax errors non-fatal and return empty list here */
+	value new_result = A(A(item,new_exp),new_list);
+
+	#if 0
+	print("new_result = ");show(new_result);nl();
+	#endif
+	hold(new_result);
+	drop(new_result);
 
 	/*TODO simplify the resolution chaining */
 

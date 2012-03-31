@@ -1,4 +1,4 @@
-#if 0
+#if 1 /*TODO NOW */
 /*
 NOTE we only keep this code around for tracing during development.  It's
 normally disabled with "if 0" at the top.  To enable it, change it to "if 1".
@@ -61,6 +61,8 @@ void show(value f)
 		f->T == fexl_L ? "L" :
 		f->T == fexl_Y ? "Y" :
 		f->T == fexl_query ? "?" :
+		f->T == fexl_item ? "item" :
+		f->T == fexl_pair ? "pair" :
 
 		f->T == fexl_long_add ? "long_add" :
 		f->T == fexl_long_sub ? "long_sub" :

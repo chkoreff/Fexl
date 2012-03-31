@@ -1,12 +1,60 @@
 #!/usr/bin/fexl
 # Scratch-pad for developing new Fexl code.
 
-# Testing undefined symbols.
-
-string_put "Hello world!";nl;
 a;
-b
-;
+b; c;
+I
+a;
+string_put "hello";
+\\
 
-c; a; a;
-b
+# TODO why does total_blocks reach such a high number?
+# 140,736,229,942,136
+
+a;
+b; c;
+string_put "Hello"
+
+\\
+
+\to_string = (\x
+	is_string x x;
+	is_long x (long_string x);
+	is_double x (double_string x);
+	type_eq (type_of x) (type_named "name") (name_string x);
+	x)
+
+\print = (\data string_put (to_string data))
+
+\string_eq=(\x\y string_compare x y F T F)
+
+\inner_resolve=resolve
+
+\outer_resolve =
+	(\sym\line\exp
+	type_eq (type_of sym) (type_named "name")
+		(
+		# name
+		\name = (name_string sym)
+		string_eq name "print" (exp print);
+		#string_eq name "nl" (exp nl);
+		#print "Undefined symbol ";print name;nl;
+		#\yes\no exp sym no no
+		inner_resolve sym line exp
+		)
+		(
+		# not a name -- return literal string
+		exp sym
+		)
+	)
+
+\text=
+~~
+# embedded test program
+print "Hello world!";nl;
+#foo;
+~~
+
+parse text outer_resolve \f
+print "Now let's run the program:";nl;
+f;
