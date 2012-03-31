@@ -86,3 +86,20 @@ char *buf_clear(struct buf **top, long *final_len)
 	*final_len = len;
 	return string;
 	}
+
+void buf_discard(struct buf **top)
+	{
+	struct buf *buf = *top;
+	struct buf *curr = buf;
+
+	while (1)
+		{
+		if (curr == 0) break;
+
+		free_memory(curr->data, curr->size);
+
+		struct buf *prev = curr->prev;
+		free_memory(curr, sizeof(struct buf));
+		curr = prev;
+		}
+	}

@@ -1,13 +1,13 @@
 #include <stdio.h>
-#include "die.h"
 #include "value.h"
 #include "parse.h"
 #include "parse_file.h"
+#include "run.h"
 
 /* Parse directly from a FILE. */
 static FILE *source_file = 0;  /* source of characters */
 
-int file_read_ch(void)
+static int file_read_ch(void)
 	{
 	return fgetc(source_file);
 	}
@@ -15,7 +15,11 @@ int file_read_ch(void)
 value parse_file(char *name, value resolve)
 	{
 	source_file = name ? fopen(name,"r") : stdin;
-	if (!source_file) die("Can't open script");
+	if (!source_file)
+		{
+		error = "Can't open script";
+		return 0;
+		}
 
 	read_ch = file_read_ch;
 	value f = parse_source(resolve);

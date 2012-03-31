@@ -1,7 +1,9 @@
 #include <string.h> /* strlen */
+#include "die.h"
 #include "value.h"
 #include "eval.h"
 #include "parse.h"
+#include "run.h"
 #include "string.h"
 
 /* Parse directly from a string. */
@@ -9,12 +11,12 @@ static char *source_string = 0;  /* source of characters */
 static long source_len = 0;      /* total length */
 static long source_pos = 0;      /* current pos */
 
-int string_read_ch(void)
+static int string_read_ch(void)
 	{
 	return source_pos < source_len ? source_string[source_pos++] : -1;
 	}
 
-value parse_chars(char *string, long len, value resolve)
+static value parse_chars(char *string, long len, value resolve)
 	{
 	read_ch = string_read_ch;
 	source_string = string;
@@ -42,5 +44,9 @@ value fexl_parse(value f)
 
 	value resolve = f->L->R;
 
-	return A(f->R,parse_chars(string_data(x), string_len(x), resolve));
+	value exp = parse_chars(string_data(x), string_len(x), resolve);
+	if (exp == 0)
+		die(error); /*TODO*/
+
+	return A(f->R,exp);
 	}

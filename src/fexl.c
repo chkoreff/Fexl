@@ -1,3 +1,4 @@
+#include "die.h"
 #include "value.h"
 #include "eval.h"
 #include "parse_file.h"
@@ -14,10 +15,24 @@ evaluates that function.
 int main(int argc, char *argv[], char *envp[])
 	{
 	beg_run(argc, argv, envp);
-	value f = parse_file(argc > 1 ? argv[1] : 0, Q(fexl_resolve));
-	hold(f);
-	eval(f);
-	drop(f);
+
+	value resolve = Q(fexl_resolve);
+	hold(resolve);
+	value f = parse_file(argc > 1 ? argv[1] : 0, resolve);
+	drop(resolve);
+
+	if (f)
+		{
+		hold(f);
+		eval(f);
+		drop(f);
+		}
+	else
+		{
+		warn(error);
+		main_exit = 1;
+		}
+
 	end_value();
 	return main_exit;
 	}

@@ -1,0 +1,8 @@
+# Test extraneous input.
+
+I C )
+
+\\
+
+# Unclosed string:
+\"

@@ -1,12 +1,8 @@
 #!/usr/bin/fexl
 # Scratch-pad for developing new Fexl code.
 
-# Testing undefined symbols.
-
-string_put "Hello world!";nl;
 a;
-b
-;
-
-c; a; a;
-b
+b; c;
+I
+a;
+string_put "hello";
