@@ -65,6 +65,4 @@ extern value D(type);
 extern value Q(type);
 extern value A(value, value);
 extern void replace(value, value);
-extern void push(value *, value);
-extern void pop(value *);
 extern void end_value(void);

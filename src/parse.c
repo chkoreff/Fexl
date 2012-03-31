@@ -220,12 +220,40 @@ value find_sym(value list, value name)
 		}
 	}
 
+/*TODO I suppose instead of using static stacks here I could pass this stuff
+around through all the parse routines, building it up cleanly as normal values.
+I guess it would just be a single extra parameter to the various routines,
+called "context", which would be (pair inner_syms (pair outer_syms outer_places)).
+Then I won't need "push" and "pop" (and "set") in value.c.
+I could also then rely on the assumption that f->R != 0 whenever f->L != 0.
+*/
 /* Symbols defined with lambda forms inside the source text */
 static value inner_syms = 0;
 /* Symbols defined outside the source text */
 static value outer_syms = 0;
 /* Line numbers of outer symbols */
 static value outer_places = 0;
+
+/* Set a value reference to a new value. */
+static void set(value *pos, value val)
+	{
+	if (val) val->N++;
+	value old = *pos;
+	if (old) drop(old);
+	*pos = val;
+	}
+
+/* Push a value on the stack. */
+static void push(value *stack, value f)
+	{
+	set(stack, A(f,*stack));
+	}
+
+/* Pop a value from the stack. */
+static void pop(value *stack)
+	{
+	set(stack, (*stack)->R);
+	}
 
 /* Return the originally encountered occurrence of a symbol.  This unifies
 multiple occurrences into a single one. */
