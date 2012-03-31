@@ -234,6 +234,27 @@ static value outer_syms = 0;
 /* Line numbers of outer symbols */
 static value outer_places = 0;
 
+/* Set a value reference to a new value. */
+static void set(value *pos, value val)
+	{
+	if (val) val->N++;
+	value old = *pos;
+	if (old) drop(old);
+	*pos = val;
+	}
+
+/* Push a value on the stack. */
+static void push(value *stack, value f)
+	{
+	set(stack, A(f,*stack));
+	}
+
+/* Pop a value from the stack. */
+static void pop(value *stack)
+	{
+	set(stack, (*stack)->R);
+	}
+
 /* Return the originally encountered occurrence of a symbol.  This unifies
 multiple occurrences into a single one. */
 value orig_sym(value sym, long first_line)

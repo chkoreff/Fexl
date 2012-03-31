@@ -111,28 +111,6 @@ void replace(value f, value g)
 		recycle(g);
 	}
 
-/* Set a value reference to a new value. */
-static void set(value *pos, value val)
-	{
-	if (val) val->N++;
-	value old = *pos;
-	if (old && --old->N == 0)
-		recycle(old);
-	*pos = val;
-	}
-
-/* Push a value on the stack. */
-void push(value *stack, value f)
-	{
-	set(stack, A(f,*stack));
-	}
-
-/* Pop a value from the stack. */
-void pop(value *stack)
-	{
-	set(stack, (*stack)->R);
-	}
-
 /* Clear the free list and end the memory arena. */
 void end_value(void)
 	{
