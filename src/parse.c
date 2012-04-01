@@ -537,7 +537,12 @@ them here.
 */
 static value lambda(value x, value f)
 	{
-	return A(A(lam,get_pattern(x,f)),f);
+	value p = get_pattern(x,f);
+
+	if (p->T == fexl_C) return A(C,f);
+	if (p->T == fexl_I) return I;
+
+	return A(A(lam,p),f);
 	}
 
 static void beg_parse(void)
