@@ -499,24 +499,24 @@ static value parse_exp(void)
 	return exp;
 	}
 
-static value get_pattern(value sym, value fun)
+static value get_pattern(value x, value f)
 	{
-	if (fun == sym) return I;
-	if (!fun->L) return C;
+	if (f == x) return I;
+	if (!f->L) return C;
 
-	value fl = get_pattern(sym,fun->L);
-	value fr = get_pattern(sym,fun->R);
-	if (fl->T == fexl_C && fr->T == fexl_C) return C;
+	value pl = get_pattern(x,f->L);
+	value pr = get_pattern(x,f->R);
+	if (pl->T == fexl_C && pr->T == fexl_C) return C;
 
-	return A(fl,fr);
+	return A(pl,pr);
 	}
 
-/* Return a copy of fun with val substituted according to pattern p. */
-static value subst(value p, value fun, value val)
+/* Return a copy of f with x substituted according to pattern p. */
+static value subst(value p, value f, value x)
 	{
-	if (p->T == fexl_I) return val;
-	if (p->T == fexl_C) return fun;
-	return A(subst(p->L,fun->L,val),subst(p->R,fun->R,val));
+	if (p->T == fexl_C) return f;
+	if (p->T == fexl_I) return x;
+	return A(subst(p->L,f->L,x),subst(p->R,f->R,x));
 	}
 
 value fexl_lambda(value f)
