@@ -502,13 +502,16 @@ static value parse_exp(void)
 static value get_pattern(value x, value f)
 	{
 	if (f == x) return I;
-	if (!f->L) return C;
+	if (f->T) return C;
 
 	value pl = get_pattern(x,f->L);
 	value pr = get_pattern(x,f->R);
+
 	if (pl->T == fexl_C && pr->T == fexl_C) return C;
 
-	return A(pl,pr);
+	value p = A(pl,pr);
+	p->T = fexl_S;
+	return p;
 	}
 
 /* Return a copy of f with x substituted according to pattern p. */
