@@ -8,7 +8,7 @@
 #include "long.h"
 #include "string.h"
 
-/*TODO wrap a combinator around the buf.c module, which will allow very fast
+/*LATER wrap a combinator around the buf.c module, which will allow very fast
 large-scale buffering */
 
 char *string_data(value f)

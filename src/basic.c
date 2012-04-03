@@ -91,7 +91,7 @@ value fexl_query(value f)
 	{
 	if (!f->L->L) return f;
 	value x = f->L->R;
-	arg(0,x);
+	eval(x);
 	return A(f->R,x);
 	}
 
@@ -118,7 +118,7 @@ value fexl_pair(value f)
 /*
 \append == (\x\y x y \h\t item h; append t y)
 This appends two lists.
-TODO We'll have a way to read built-in definitions from a config file, but for
+LATER We'll have a way to read built-in definitions from a config file, but for
 now I'm just parsing static text in C.
 */
 value fexl_append(value f)

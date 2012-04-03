@@ -15,11 +15,6 @@ success, or 1 for failure.
 It parses the file named on the command line, or stdin if no name is given, and
 evaluates that function.
 */
-
-/*TODO NOW update fexl_resolve to return just the resolution function so
-we can chain it.  Also update a1.fxl to demonstrate the new technique instead
-of the old crap. */
-
 int main(int argc, char *argv[], char *envp[])
 	{
 	beg_run(argc, argv, envp);

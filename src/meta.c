@@ -37,7 +37,7 @@ value fexl_get_max_bytes(value f)
 	}
 
 #if 0
-/* TODO a combinator to access envp */
+/* LATER a combinator to access envp */
 int i = 0;
 while (1)
 	{
@@ -46,11 +46,11 @@ while (1)
 	i++;
 	}
 
-/* TODO a combinator to access argv */
+/* LATER a combinator to access argv */
 #endif
 
 /*
-TODO a combinator to fork another Fexl and read stdout and stderr so you can
+LATER a combinator to fork another Fexl and read stdout and stderr so you can
 run other functions safely without affecting the parent, and gather stdout and
 stderr too.
 */

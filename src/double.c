@@ -109,7 +109,7 @@ value fexl_is_double(value f)
 	}
 
 /* double_string num */
-/*TODO note that sprintf "%.15g" shows 0.0 as "0", which looks like a long if
+/*LATER note that sprintf "%.15g" shows 0.0 as "0", which looks like a long if
 we try to read it back in.  Perhaps force a ".0" suffix, not sure. */
 value fexl_double_string(value f)
 	{

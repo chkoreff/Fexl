@@ -54,4 +54,4 @@ value fexl_char_put(value f)
 	return f->R;
 	}
 
-/* TODO A "print" routine which detects type of arg */
+/* LATER A "print" routine which detects type of arg */

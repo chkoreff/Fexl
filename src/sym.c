@@ -21,9 +21,20 @@ int sym_eq(value form, value sym)
 		&& string_eq(sym,form);
 	}
 
+/* Convert name to string. */
 value fexl_name_string(value f)
 	{
 	value x = f->R;
 	if (!arg(type_name,x)) return f;
 	return Qcopy_chars(string_data(x), string_len(x));
+	}
+
+/* Convert string to name. */
+value fexl_string_name(value f)
+	{
+	value x = f->R;
+	if (!arg(type_string,x)) return f;
+	value name = Qcopy_chars(string_data(x), string_len(x));
+	name->T = type_name;
+	return name;
 	}

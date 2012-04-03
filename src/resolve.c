@@ -16,8 +16,8 @@
 
 /* The standard context for Fexl. */
 
-/* TODO + - * / = < etc. */
-/* TODO file operations */
+/* LATER + - * / = < etc. */
+/* LATER file operations */
 
 /* Map synonyms to canonical names. */
 char *canonical_name(char *name)
@@ -56,30 +56,20 @@ value resolve(value sym)
 	return 0;
 	}
 
-/* resolve sym place exp */
-/*TODO NOW  change this */
+/*
+Resolve a symbol in the standard Fexl context.
+The value of (resolve sym no yes) is
+  no           # if the symbol is not defined
+  yes def      # if the symbol is defined as def
+*/
 value fexl_resolve(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
 
 	value sym = f->L->L->R;
-	value place = f->L->R;
-	value exp = f->R;
-
-	if (sym->T == 0) { arg(0,sym); return f; } /*TODO test*/
-	if (!arg(type_long,place)) return f; /*TODO test */
+	if (sym->T == 0) eval(sym);
 
 	void *def = resolve(sym);
-	if (def) return A(exp,def);
-
-	/* Undefined symbol:  warn and return (\yes\no exp sym no no). */
-
-	line = get_long(place);
-	warn("Undefined symbol %s",string_data(sym));
-	main_exit = 1;
-
-	value C = Q(fexl_C);
-	value S = Q(fexl_S);
-	value I = Q(fexl_I);
-	return A(C,A(A(S,A(exp,sym)),I));
+	if (!def) return f->L->R;
+	return A(f->R,def);
 	}
