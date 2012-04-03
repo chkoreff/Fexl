@@ -127,6 +127,11 @@ value fexl_append(value f)
 "\\append == (\\x\\y x y \\h\\t item h; append t y)"
 "append"
 ;
-	replace(f->L, parse_string(text, Q(fexl_resolve)));
+	value result = parse_string(text);
+	hold(result);
+	value exp = A(result->R->L->R, Q(fexl_item));
+	replace(f->L, exp);
+	drop(result);
+
 	return f;
 	}

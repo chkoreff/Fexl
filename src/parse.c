@@ -579,66 +579,6 @@ static void end_parse(void)
 	drop(lam);
 	}
 
-value parse_source(value resolve)
-	{
-	hold(resolve);
-	beg_parse();
-
-	line = 1;
-	next_ch();
-
-	value exp = parse_exp();
-	if (exp)
-		{
-		if (ch != -1)
-			{
-			error = "Extraneous input";
-			hold(exp);
-			drop(exp);
-			exp = 0;
-			}
-		}
-
-	/* Use a dummy expression if there was an error. */
-	if (exp == 0) exp = I;
-
-	/* Start with (\yes\no exp yes exp). */
-	exp = A(A(R,C),A(A(L,I),exp));
-
-	while (outer_syms)
-		{
-		value sym = outer_syms->L;
-		value place = outer_places->L;
-
-		exp = A(A(A(resolve,sym),place),lambda(sym,exp));
-
-		pop(&outer_syms);
-		pop(&outer_places);
-		}
-
-	/* Finish with (exp I F).  The F quits if there are undefined symbols. */
-	exp = A(A(exp,I),A(C,I));
-
-	/*TODO LATER return (pair ok; pair exp; outer)
-	where exp is the expression if ok, or the string error otherwise
-	where outer is a list of (pair sym place)
-	*/
-
-	/*TODO simplify the resolution chaining */
-
-	end_parse();
-	drop(resolve);
-
-	if (error)
-		{
-		hold(exp);
-		drop(exp);
-		exp = 0;
-		}
-
-	return exp;
-	}
-
 /*
 Parse the source text, returning (pair ok; pair exp; symbols).
 
@@ -655,7 +595,7 @@ If ok is true, then the caller can take the exp and successively apply the
 definitions of each symbol in the symbols list.  The result will be the actual
 executable function which can then be run with "eval" in the Fexl intepreter.
 */
-value Parse_source(void)
+value parse_source(void)
 	{
 	beg_parse();
 

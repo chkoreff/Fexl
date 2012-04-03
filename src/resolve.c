@@ -57,6 +57,7 @@ value resolve(value sym)
 	}
 
 /* resolve sym place exp */
+/*TODO NOW  change this */
 value fexl_resolve(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;

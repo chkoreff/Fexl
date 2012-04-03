@@ -19,7 +19,7 @@
 
 .s()
 	{
-	grep -r $1 src/*
+	grep -r "$1" src/*
 	}
 
 # Run a test script.

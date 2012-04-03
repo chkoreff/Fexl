@@ -1,1 +1,1 @@
-extern value fexl_resolve(value);
+extern value resolve(value sym);

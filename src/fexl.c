@@ -1,9 +1,12 @@
 #include "die.h"
 #include "value.h"
+#include "basic.h"
 #include "eval.h"
+#include "long.h"
 #include "parse_file.h"
 #include "resolve.h"
 #include "run.h"
+#include "string.h"
 
 /*
 This is the main routine of the Fexl interpreter.  The exit status is 0 for
@@ -12,17 +15,16 @@ success, or 1 for failure.
 It parses the file named on the command line, or stdin if no name is given, and
 evaluates that function.
 */
-#include "basic.h" /*TODO*/
-#include "long.h"
-#include "string.h"
-#include "string.h"
-extern value resolve(value sym); /*TODO*/
+
+/*TODO NOW update fexl_resolve to return just the resolution function so
+we can chain it.  Also update a1.fxl to demonstrate the new technique instead
+of the old crap. */
 
 int main(int argc, char *argv[], char *envp[])
 	{
 	beg_run(argc, argv, envp);
 
-	value result = Parse_file(argc > 1 ? argv[1] : 0);
+	value result = parse_file(argc > 1 ? argv[1] : 0);
 	int ok = result->L->R->T == fexl_C;
 	value f = result->R->L->R;
 
