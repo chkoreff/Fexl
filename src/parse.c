@@ -275,6 +275,7 @@ static void pop(value *stack)
 multiple occurrences into a single one. */
 static value orig_sym(value sym, long first_line)
 	{
+	hold(sym);
 	value orig = find_sym(inner_syms,sym);
 
 	if (!orig)
@@ -290,12 +291,7 @@ static value orig_sym(value sym, long first_line)
 			}
 		}
 
-	if (orig != sym)
-		{
-		hold(sym);
-		drop(sym);
-		}
-
+	drop(sym);
 	return orig;
 	}
 
@@ -399,6 +395,7 @@ static value parse_lambda(void)
 
 			push(&inner_syms,sym);
 			value def = parse_term();
+			hold(def);
 			if (def)
 				{
 				value body = parse_exp();
@@ -407,12 +404,8 @@ static value parse_lambda(void)
 					val = lambda(sym,body);
 					val = A(val,A(Y,lambda(sym,def)));
 					}
-				else
-					{
-					hold(def);
-					drop(def);
-					}
 				}
+			drop(def);
 			pop(&inner_syms);
 			}
 		else
@@ -421,6 +414,7 @@ static value parse_lambda(void)
 			skip_filler();
 
 			value def = parse_term();
+			hold(def);
 			if (def)
 				{
 				push(&inner_syms,sym);
@@ -430,13 +424,9 @@ static value parse_lambda(void)
 					val = lambda(sym,body);
 					val = A(A(query,def),val);
 					}
-				else
-					{
-					hold(def);
-					drop(def);
-					}
 				pop(&inner_syms);
 				}
+			drop(def);
 			}
 		}
 	else
