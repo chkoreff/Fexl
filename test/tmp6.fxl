@@ -1,5 +1,0 @@
-# Test the Missing definition error.
-
-\foo=
-\print=string_put
-print "Hello world";nl;

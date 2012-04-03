@@ -1,3 +1,0 @@
-# Here's a string which starts with a terminator that does not end
-# with a white space, but ends with -1 (EOF) instead.
-~EOM

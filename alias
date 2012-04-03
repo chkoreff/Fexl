@@ -17,6 +17,11 @@
 	.build && bin/fexl $1
 	}
 
+.s()
+	{
+	grep -r $1 src/*
+	}
+
 # Run a test script.
 .run()
 	{

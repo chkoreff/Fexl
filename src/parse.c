@@ -499,24 +499,25 @@ static value parse_exp(void)
 	return exp;
 	}
 
-static value get_pattern(value sym, value fun)
+static value get_pattern(value x, value f)
 	{
-	if (fun == sym) return I;
-	if (!fun->L) return C;
+	if (f == x) return I;
+	if (f->T) return C;
 
-	value fl = get_pattern(sym,fun->L);
-	value fr = get_pattern(sym,fun->R);
-	if (fl->T == fexl_C && fr->T == fexl_C) return C;
+	value pl = get_pattern(x,f->L);
+	value pr = get_pattern(x,f->R);
 
-	return A(fl,fr);
+	if (pl->T == fexl_C && pr->T == fexl_C) return C;
+
+	return A(pl,pr);
 	}
 
-/* Return a copy of fun with val substituted according to pattern p. */
-static value subst(value p, value fun, value val)
+/* Return a copy of f with x substituted according to pattern p. */
+static value subst(value p, value f, value x)
 	{
-	if (p->T == fexl_I) return val;
-	if (p->T == fexl_C) return fun;
-	return A(subst(p->L,fun->L,val),subst(p->R,fun->R,val));
+	if (p->T == fexl_C) return f;
+	if (p->T == fexl_I) return x;
+	return A(subst(p->L,f->L,x),subst(p->R,f->R,x));
 	}
 
 value fexl_lambda(value f)
@@ -537,7 +538,15 @@ them here.
 */
 static value lambda(value x, value f)
 	{
-	return A(A(lam,get_pattern(x,f)),f);
+	value p = get_pattern(x,f);
+
+	if (p->T == fexl_C) return A(C,f);
+	if (p->T == fexl_I) return I;
+
+	value e = A(A(lam,p),f);
+	/* Set left type so the next get_pattern doesn't have to look there.*/
+	e->L->T = fexl_lambda;
+	return e;
 	}
 
 static void beg_parse(void)
@@ -593,12 +602,6 @@ value parse_source(value resolve)
 	/* Use a dummy expression if there was an error. */
 	if (exp == 0) exp = I;
 
-	value new_exp = exp; /*TODO*/
-	value new_list = C;
-	value item = Q(fexl_item);
-	value pair = Q(fexl_pair);
-	hold(pair);
-
 	/* Start with (\yes\no exp yes exp). */
 	exp = A(A(R,C),A(A(L,I),exp));
 
@@ -607,20 +610,11 @@ value parse_source(value resolve)
 		value sym = outer_syms->L;
 		value place = outer_places->L;
 
-		#if 0
-		printf("outer sym %s on line %ld\n", string_data(sym), get_long(place));
-		#endif
-
 		exp = A(A(A(resolve,sym),place),lambda(sym,exp));
-
-		new_exp = lambda(sym,new_exp);
-		new_list = A(A(item,A(A(pair,sym),place)),new_list);
 
 		pop(&outer_syms);
 		pop(&outer_places);
 		}
-
-	drop(pair);
 
 	/* Finish with (exp I F).  The F quits if there are undefined symbols. */
 	exp = A(A(exp,I),A(C,I));
@@ -629,13 +623,6 @@ value parse_source(value resolve)
 	where exp is the expression if ok, or the string error otherwise
 	where outer is a list of (pair sym place)
 	*/
-	value new_result = A(A(item,new_exp),new_list);
-
-	#if 0
-	print("new_result = ");show(new_result);nl();
-	#endif
-	hold(new_result);
-	drop(new_result);
 
 	/*TODO simplify the resolution chaining */
 
@@ -650,4 +637,74 @@ value parse_source(value resolve)
 		}
 
 	return exp;
+	}
+
+/*
+Parse the source text, returning (pair ok; pair exp; symbols).
+
+ok is true if the source is well-formed, i.e. no syntax errors.
+
+If ok is true, exp is the parsed expression.
+If ok is false, exp is the string error message.
+
+symbols is the list of all symbols used but not defined within the source text.
+It is a list of entries (pair sym line_no), where line_no is the line number on
+which the symbol first occurred.
+
+If ok is true, then the caller can take the exp and successively apply the
+definitions of each symbol in the symbols list.  The result will be the actual
+executable function which can then be run with "eval" in the Fexl intepreter.
+*/
+value Parse_source(void)
+	{
+	beg_parse();
+
+	line = 1;
+	next_ch();
+
+	value exp = parse_exp();
+	if (exp)
+		{
+		if (ch != -1)
+			{
+			error = "Extraneous input";
+			hold(exp);
+			drop(exp);
+			exp = 0;
+			}
+		}
+
+	value item = Q(fexl_item);
+	value pair = Q(fexl_pair);
+
+	hold(item);
+	hold(pair);
+
+	value symbols = C;
+
+	while (outer_syms)
+		{
+		value sym = outer_syms->L;
+		value place = outer_places->L;
+
+		if (exp) exp = lambda(sym,exp);
+		symbols = A(A(item,A(A(pair,sym),place)),symbols);
+
+		pop(&outer_syms);
+		pop(&outer_places);
+		}
+
+	/* If there was an error, use the error string as the expression. */
+	if (exp == 0) exp = Qcopy_string(error);
+
+	value ok = Q(error ? fexl_F : fexl_C);
+	value result = A(A(pair,ok),A(A(pair,exp),symbols));
+
+	drop(item);
+	drop(pair);
+
+	error = 0;
+
+	end_parse();
+	return result;
 	}

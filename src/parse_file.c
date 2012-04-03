@@ -29,3 +29,21 @@ value parse_file(char *name, value resolve)
 
 	return f;
 	}
+
+value Parse_file(char *name)
+	{
+	source_file = name ? fopen(name,"r") : stdin;
+	if (!source_file)
+		{
+		error = "Can't open script";
+		return 0;
+		}
+
+	read_ch = file_read_ch;
+	value result = Parse_source();
+
+	if (name) fclose(source_file);
+	source_file = 0;
+
+	return result;
+	}
