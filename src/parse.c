@@ -407,6 +407,11 @@ static value parse_lambda(void)
 					val = lambda(sym,body);
 					val = A(val,A(Y,lambda(sym,def)));
 					}
+				else
+					{
+					hold(def);
+					drop(def);
+					}
 				}
 			pop(&inner_syms);
 			}
@@ -424,6 +429,11 @@ static value parse_lambda(void)
 					{
 					val = lambda(sym,body);
 					val = A(A(query,def),val);
+					}
+				else
+					{
+					hold(def);
+					drop(def);
 					}
 				pop(&inner_syms);
 				}
