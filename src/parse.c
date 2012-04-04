@@ -585,7 +585,8 @@ Parse the source text, returning (pair ok; pair exp; symbols).
 ok is true if the source is well-formed, i.e. no syntax errors.
 
 If ok is true, exp is the parsed expression.
-If ok is false, exp is the string error message.
+If ok is false, exp is (pair error line), where error is the string describing
+the syntax error, and line is the line number on which it occurred.
 
 symbols is the list of all symbols used but not defined within the source text.
 It is a list of entries (pair sym line_no), where line_no is the line number on
@@ -634,8 +635,9 @@ value parse_source(void)
 		pop(&outer_places);
 		}
 
-	/* If there was an error, use the error string as the expression. */
-	if (exp == 0) exp = Qcopy_string(error);
+	/* If there was an error, use (pair error line) as the expression. */
+	if (exp == 0)
+		exp = A(A(pair,Qcopy_string(error)),Qlong(line));
 
 	value ok = Q(error ? fexl_F : fexl_C);
 	value result = A(A(pair,ok),A(A(pair,exp),symbols));

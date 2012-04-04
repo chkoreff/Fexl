@@ -24,7 +24,10 @@ int main(int argc, char *argv[], char *envp[])
 	value f = result->R->L->R;
 
 	if (!ok)
-		warn(string_data(f));
+		{
+		line = get_long(f->R);
+		warn(string_data(f->L->R));
+		}
 
 	value symbols = result->R->R;
 
@@ -38,8 +41,7 @@ int main(int argc, char *argv[], char *envp[])
 			f = A(f,def);
 		else
 			{
-			value place = entry->R;
-			line = get_long(place);
+			line = get_long(entry->R);
 			warn("Undefined symbol %s",string_data(sym));
 			ok = 0;
 			}
