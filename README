@@ -261,7 +261,8 @@ this:
 	\fibonacci =
 		(\1\add
 
-		\fibonacci == (\x\y
+		\fibonacci ==
+			(\x\y
 			item x;
 			\z = (add x y)
 			fibonacci y z
