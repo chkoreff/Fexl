@@ -81,3 +81,212 @@ Then make your script executable with:
 Now you can run your script directly this way:
 
   ./script
+
+
+HELPFUL INFORMATION
+
+On 2012-04-03 a colleague asked:  "Is there a collection of short Fexl programs
+that can be used as a guide of sorts of learning the language?"  Here's my
+reply.
+
+Thanks for asking -- actually there's a collection of not-so-short programs
+which I use as regression tests:
+
+	test/a1.fxl
+	test/a2.fxl
+
+In the shell, I do a ". alias" to read in some handy shell functions, and then
+I can run my tests like this:
+
+	.run a1    # to run a1.fxl and see the output
+	.check a1  # to diff the output against a1.out
+	.time a1   # to diff the output *and* time the run
+
+(Those are nice because they automatically run "build" on fexl itself so I can
+hack the C code and immediately check my test cases without thinking about re-
+building.)
+
+
+However, the problem with those programs as a tutorial is that I'm deliberately
+testing all sorts of intricate stuff, so it's very programmer-geeky.
+
+I suppose one could start with this:
+
+	string_put "Hello world."; nl;
+	\x = (long_add 4 3)
+	\x = (long_mul x 5)
+	string_put "x = "; string_put (long_string x); nl;
+
+
+Keep in mind at this point you're working in a raw environment where even a
+helpful function like "print" is not yet defined.  I plan soon to provide a
+whole host of handy functions such as print, map, fold, etc.
+
+I'll be able to do this without altering the C code, because eventually the
+top-level fexl executable will always read a file called "fexl.fxl" to start
+everything, so you can add installation- and site-specific definitions there.
+So fexl.fxl will provide a full bootstrap capability, where you can even
+program it to fetch certain definitions off the net, run apt-get, install gpg,
+etc. etc. automatically.  It could even generate and compile C code if you want
+it to.
+
+In summary, the way I'll do "modules" is through meta-parsing a piece of text
+inside an arbitrary environment which provides definitions for all the
+undefined symbols referenced in the text.  This is also how you provide "safe"
+or "restricted" environments -- for example in a web context you might want
+"print" not to go to stdout, but into a string instead, and you wouldn't want
+"delete_file" to be defined (at least not in its normal sense).
+
+In the meantime, I just have to copy all my handy function definitions at the
+top of each Fexl program.  So for example, I can start with this:
+
+	\to_string =
+		(\x
+		string_type x x;
+		long_type x (long_string x);
+		double_type x (double_string x);
+		x
+		)
+
+	\print = (\data string_put (to_string data))
+
+
+And now I can simply use print on strings, longs, and doubles easily:
+
+	print "Hello world."; nl;
+	\x = (long_add 4 3)
+	\x = (long_mul x 5)
+	print "x = "; print x; nl;
+
+
+Maybe you'll find that "multiplying by 5" is something you do a lot, so you can
+define a function like this:
+
+	\quintuple = (\x long_mul x 5)
+
+Or, if you cleverly fancy the "point free" style:
+
+	\quintuple = (long_mul 5)
+
+
+And then you can say:
+
+	print "Hello world."; nl;
+	\x = (long_add 4 3)
+	\x = (quintuple x)
+	print "x = "; print x; nl;
+
+
+Or even:
+
+	print "Hello world."; nl;
+	print "x = "; print (quintuple (long_add 4 3)); nl;
+
+Note by the way that ';' is just the "right-pivot" operator which allows you to
+avoid many parentheses when grouping things on the right.  For example, instead
+of this:
+
+	(+ 2 (+ 3 (+ 5 (+ 7 (+ 11 13)))))
+
+You can say this:
+
+	(+ 2; + 3; + 5; + 7; + 11 13)
+
+It's mostly a matter of style, though in same cases it's obvious you should use
+';' and in other cases it's obvious you shouldn't because you've pushed it too
+far.
+
+
+Now since you're a highly experienced programmer with a strong intuition
+about things, let me fast-forward to a few functions which deal with lists:
+
+	\append == (\xs\ys xs ys \x\xs item x; append xs ys)
+
+	\map == (\f\xs xs end \x\xs item (f x) (map f xs))
+
+	\fold == (\f\z\xs xs z \x\xs \z=(f z x) fold f z xs)
+
+Note the use of "==" because those are recursive definitions.  When you define
+a function that refers to itself, you must use "==".  If you mistakenly use "="
+like this:
+
+	\my_append = (\xs\ys xs ys \x\xs item x; my_append xs ys)
+
+You'll get an error message "Undefined symbol my_append" because Fexl thinks
+you're trying to redefine my_append in terms of the *previous* definition of
+my_append, which of course does not exist.
+
+
+Now consider some Boolean operators:
+
+	\and=(\x\y x y F)
+	\or=(\x\y x T y)
+	\not=(\x x F T)
+
+	\xor  = (\x\y x (not y) y)
+	\xnor = (\x\y x y (not y))
+
+
+Now what if you need functions that operate on a list of booleans, reducing
+the list with either "and" or "or":
+
+	\list_and = (fold and T)
+	\list_or  = (fold or F)
+
+
+It's also handy to have functions like this:
+
+	\all = (\f\xs list_and (map f xs))
+	\some = (\f\xs list_or (map f xs))
+
+
+So you can say:
+
+	all good list (print "all good!") (print "some bad!")
+
+or equivalently:
+
+	some bad list (print "some bad!") (print "all good!")
+
+
+I'm finding that Fexl is an open-ended scratch-pad for computation which allows
+me to refactor and compress code down to its incompressible essence.  The
+process is challenging, but also rewarding because the result can be like a
+diamond of conceptual thought.
+
+For example, I can capture the "ultimate essence" of the Fibonacci series like
+this:
+
+	# This is the infinite list of all Fibonacci numbers.
+	\fibonacci =
+		(
+		\1
+		\add
+
+		\fibonacci == (\x\y
+			item x;
+			\z = (add x y)
+			fibonacci y z
+			)
+
+		fibonacci 1 1
+		)
+
+Note that you *pass in* the definitions of "1" and "add" there.  That allows
+you to define fibonacci either in terms of built-in long numbers like this:
+
+	\fibonacci = (fibonacci 1 long_add)
+
+Or in terms of unlimited precision natural numbers like this:
+
+	\fibonacci = (fibonacci nat_1 nat_add)
+
+In fact, when you do this:
+
+	.run a2
+
+You will see a long series of high-precision Fibonacci numbers produced.
+
+
+I trust that this will serve as a decent top-level introduction and survey of
+the possibilities.
