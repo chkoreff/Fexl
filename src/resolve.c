@@ -58,9 +58,9 @@ value resolve(value sym)
 
 /*
 Resolve a symbol in the standard Fexl context.
-The value of (resolve sym no yes) is
-  no           # if the symbol is not defined
+The value of (resolve sym yes no) is
   yes def      # if the symbol is defined as def
+  no           # if the symbol is not defined
 */
 value fexl_resolve(value f)
 	{
@@ -70,6 +70,6 @@ value fexl_resolve(value f)
 	if (sym->T == 0) eval(sym);
 
 	void *def = resolve(sym);
-	if (!def) return f->L->R;
-	return A(f->R,def);
+	if (def) return A(f->L->R,def);
+	return f->R;
 	}

@@ -24,7 +24,7 @@
 
 .s()
 	{
-	grep -r "$1" src/*
+	grep -r "$1" src/* --exclude "*.swp"
 	}
 
 # Run a test script.

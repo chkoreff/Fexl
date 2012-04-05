@@ -91,6 +91,7 @@ value fexl_long_double(value f)
 	return Qdouble(get_long(x));
 	}
 
+/* Convert long to string. */
 value fexl_long_string(value f)
 	{
 	value x = f->R;

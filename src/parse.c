@@ -520,6 +520,7 @@ static value subst(value p, value f, value x)
 	return A(subst(p->L,f->L,x),subst(p->R,f->R,x));
 	}
 
+/* lambda pattern form value = subst(pattern,form,value) */
 value fexl_lambda(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
@@ -528,14 +529,7 @@ value fexl_lambda(value f)
 
 static value lam;
 
-/* LATER: It seems quite plausible to generate C code to implement these lambda
-substitution patterns extremely fast so we don't have to call "subst" at run-
-time.  I'm sure it's trivial to generate the C code, but I'll have to research
-how to compile and link that code into the running executable on the fly.
-
-Alternatively, I might just precompile some very common patterns and recognize
-them here.
-*/
+/* Make a lambda form using the substitution pattern for symbol x in form f. */
 static value lambda(value x, value f)
 	{
 	value p = get_pattern(x,f);
@@ -544,7 +538,7 @@ static value lambda(value x, value f)
 	if (p->T == fexl_I) return I;
 
 	value e = A(A(lam,p),f);
-	/* Set left type so the next get_pattern doesn't have to look there.*/
+	/* Set left type so the next get_pattern doesn't have to look there. */
 	e->L->T = fexl_lambda;
 	return e;
 	}

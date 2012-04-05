@@ -38,6 +38,7 @@ value fexl_string_put(value f)
 	return f->R;
 	}
 
+/* (char_get next) = (next ch), where ch is the next character from stdin. */
 value fexl_char_get(value f)
 	{
 	return A(f->R,Qlong(getchar()));
