@@ -259,9 +259,7 @@ this:
 
 	# This is the infinite list of all Fibonacci numbers.
 	\fibonacci =
-		(
-		\1
-		\add
+		(\1\add
 
 		\fibonacci == (\x\y
 			item x;
