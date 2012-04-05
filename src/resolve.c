@@ -13,6 +13,7 @@
 #include "long.h"
 #include "resolve.h"
 #include "string.h"
+#include "sym.h"
 
 /* The standard context for Fexl. */
 
@@ -20,7 +21,8 @@
 /* LATER file operations */
 
 /* Map synonyms to canonical names. */
-char *canonical_name(char *name)
+/* LATER move out to fexl.fxl */
+static char *canonical_name(char *name)
 	{
 	if (strcmp(name,"?") == 0) return "query";
 	if (strcmp(name,"T") == 0) return "C";
@@ -34,6 +36,7 @@ char *canonical_name(char *name)
 value resolve(value sym)
 	{
 	if (sym->T == type_string) return sym;
+	if (sym->T != type_name) return 0;
 
 	char *name = string_data(sym);
 

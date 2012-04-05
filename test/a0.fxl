@@ -1,8 +1,0 @@
-#!/usr/bin/fexl
-# Scratch-pad for developing new Fexl code.
-
-a;
-b; c;
-I
-a;
-string_put "hello";

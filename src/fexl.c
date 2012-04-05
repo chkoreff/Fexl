@@ -8,18 +8,20 @@
 #include "run.h"
 #include "string.h"
 
-/*
-This is the main routine of the Fexl interpreter.  The exit status is 0 for
-success, or 1 for failure.
-
-It parses the file named on the command line, or stdin if no name is given, and
-evaluates that function.
-*/
-int main(int argc, char *argv[], char *envp[])
+/* Parse the given file name, or 0 for stdin, and resolve all symbols therein,
+returning an evaluable function if all went well, or 0 otherwise.  Report any
+errors along the way, including syntax errors and undefined symbols. */
+value parse_main(char *name)
 	{
-	beg_run(argc, argv, envp);
+	value result = parse_file(name);
+	if (result == 0)
+		{
+		warn("Can't open script");
+		return 0;
+		}
 
-	value result = parse_file(argc > 1 ? argv[1] : 0);
+	hold(result);
+
 	int ok = result->L->R->T == fexl_C;
 	value f = result->R->L->R;
 
@@ -49,11 +51,34 @@ int main(int argc, char *argv[], char *envp[])
 		symbols = symbols->R;
 		}
 
-	hold(result);
 	drop(result);
+
+	if (!ok)
+		{
+		hold(f);
+		drop(f);
+		f = 0;
+		}
+
+	return f;
+	}
+
+/*
+This is the main routine of the Fexl interpreter.  The exit status is 0 for
+success, or 1 for failure.
+
+It parses the file named on the command line, or stdin if no name is given, and
+evaluates that function.
+*/
+int main(int argc, char *argv[], char *envp[])
+	{
+	beg_run(argc, argv, envp);
+
+	value f = parse_main(argc > 1 ? argv[1] : 0);
+
 	hold(f);
 
-	if (ok)
+	if (f)
 		eval(f);
 	else
 		main_exit = 1;
