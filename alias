@@ -22,9 +22,16 @@
 	.build && bin/fexl $1
 	}
 
+# Search source.
 .s()
 	{
 	grep -r "$1" src/* --exclude "*.swp"
+	}
+
+# Search source for whole word.
+.sw()
+	{
+	grep -r "\<$1\>" src/* --exclude "*.swp"
 	}
 
 # Run a test script.

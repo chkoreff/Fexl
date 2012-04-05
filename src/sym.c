@@ -7,6 +7,9 @@
 value type_name(value f) { return f; }
 
 /* Convert a string to a name. */
+/* LATER I may wrap a name functor around the string instead of changing its
+type here, so when I convert between names and strings I don't have to make a
+copy */
 value Qname(value f)
 	{
 	if (f->T != type_string) die("Qname");

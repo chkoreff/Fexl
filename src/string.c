@@ -234,14 +234,7 @@ value fexl_string_len(value f)
 	return Qlong(string_len(x));
 	}
 
-/*
-Convert string to long.  The value of (string_long string no yes) is:
-
-  no           # if string has incorrect format
-  yes long     # if string has correct format
-
-LATER: strtod does not allow numeric separators like ',' and '_'.
-*/
+/* Convert string to long and return true if successful. */
 int string_long(char *beg, long *num)
 	{
 	char *end;
@@ -249,7 +242,13 @@ int string_long(char *beg, long *num)
 	return *beg != '\0' && *end == '\0';
 	}
 
-/* string_long x no yes */
+/* (string_long x yes no) converts string x to a possible long value:
+
+  yes long     # if string has correct format
+  no           # if string has incorrect format
+
+LATER: strtol does not allow numeric separators like ',' and '_'.
+*/
 value fexl_string_long(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
@@ -259,18 +258,11 @@ value fexl_string_long(value f)
 
 	long num;
 	if (string_long(string_data(x),&num))
-		return A(f->R,Qlong(num));
-	return f->L->R;
+		return A(f->L->R,Qlong(num));
+	return f->R;
 	}
 
-/*
-Convert string to double.  The value of (string_double string no yes) is:
-
-  no           # if string has incorrect format
-  yes double   # if string has correct format
-
-LATER: strtod does not allow numeric separators like ',' and '_'.
-*/
+/* Convert string to double and return true if successful. */
 int string_double(char *beg, double *num)
 	{
 	char *end;
@@ -278,7 +270,13 @@ int string_double(char *beg, double *num)
 	return *beg != '\0' && *end == '\0';
 	}
 
-/* string_double x no yes */
+/* (string_double x yes no) converts string x to a possible double value:
+
+  yes double   # if string has correct format
+  no           # if string has incorrect format
+
+LATER: strtod does not allow numeric separators like ',' and '_'.
+*/
 value fexl_string_double(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
@@ -288,8 +286,8 @@ value fexl_string_double(value f)
 
 	double num;
 	if (string_double(string_data(x),&num))
-		return A(f->R,Qdouble(num));
-	return f->L->R;
+		return A(f->L->R,Qdouble(num));
+	return f->R;
 	}
 
 /*

@@ -880,7 +880,7 @@ test_case "hey!" "no"
 (
 \test_case=(\x\expect
 	\quote = ~ "~
-	\result = (string_long x "no" \n string_append "yes " (long_string n))
+	\result = (string_long x (\n string_append "yes " (long_string n)) "no")
 	print "string_long ";
 	string_put quote; string_put x; string_put quote
 	print " : "; print result;
@@ -908,7 +908,7 @@ test_case "0." "no"
 (
 \test_case=(\x\expect
 	\quote = ~ "~
-	\result = (string_double x "no" \n string_append "yes " (double_string n))
+	\result = (string_double x (\n string_append "yes " (double_string n)) "no")
 	print "string_double ";
 	string_put quote; string_put x; string_put quote
 	print " : "; print result;
