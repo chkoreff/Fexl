@@ -219,9 +219,9 @@ my_append, which of course does not exist.
 
 Now consider some Boolean operators:
 
-	\and=(\x\y x y F)
-	\or=(\x\y x T y)
-	\not=(\x x F T)
+	\and  = (\x\y x y F)
+	\or   = (\x\y x T y)
+	\not  = (\x x F T)
 
 	\xor  = (\x\y x (not y) y)
 	\xnor = (\x\y x y (not y))
