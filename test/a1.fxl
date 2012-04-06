@@ -4,21 +4,60 @@
 ##### Handy
 # LATER A lot of these will be built into the standard context.
 
+\and=(\x\y x y F)
+\or=(\x\y x T y)
+\not=(\x x F T)
+
 # These functions represent a "possible" value, either (yes val) if you have a
 # value or no if you don't.
 \yes = (\val \yes\no yes val)
 \no  = (     \yes\no no)
+
+# (defined x) is true if x is (yes val).
+\defined = (\x x (\_ T) F)
+
+# (undefined x) is true if x is no.
+\undefined = (\x not (defined x))
+
+# (default v x) =
+#    v   if x is no
+#    val if x is (yes val)
+\default = (\v\x x I v)
+
+# LATER doc
+
+\map == (\f\xs xs end \x\xs item (f x) (map f xs))
+
+\fold == (\f\z\xs xs z \x\xs \z=(f z x) fold f z xs)
+
+\do == (\xs\f\end xs end \x\xs f x; do xs f end)
+
+\list_and = (fold and T)
+\list_or = (fold or F)
+
+\all = (\f\xs list_and (map f xs))
+\some = (\f\xs list_or (map f xs))
+
+\choose ==
+	(\xs\ys
+	xs end \x\xs
+	ys end \y\ys
+	x (item y) I (choose xs ys)
+	)
+
 
 # Halt the current expression by consuming all arguments which follow.
 \halt == (\_ halt)
 
 \string_eq=(\x\y string_compare x y F T F)
 
-\and=(\x\y x y F)
-
 \long_lt=(\x\y long_compare x y T F F)
 \long_eq=(\x\y long_compare x y F T F)
 \long_gt=(\x\y long_compare x y F F T)
+
+\double_lt=(\x\y double_compare x y T F F)
+\double_eq=(\x\y double_compare x y F T F)
+\double_gt=(\x\y double_compare x y F F T)
 
 \ < = long_lt
 \ = = long_eq
@@ -691,106 +730,89 @@ print ":: test_resolve";nl;
 print "Try resolving some things that are not names or strings ...";nl;
 resolve C I I;
 resolve (C C) I I;
-print "... we survived that.";nl;
+print "... we survived that.";nl;nl;
 
 ## Now try a full-fledged parse and resolve.
-\try =
-(
-\undef =
-	(\sym\line\next
-	\prog="fexl" # we'd use argv[0]
-	\script="sample" # we'd use argv[1]
 
-	print prog;print ":";print script;print ":";print line;print " ";
-	print " Undefined symbol "; print sym;print " ";nl;
+# Run a program text in the normal way, parsing it in the given context and
+# reporting any errors, running the program only if there were no errors.
+# LATER errors to stderr instead of stdout.
+\run_program =
+	(\text\context\next
+
+	parse text \syntax_ok\result result \exp\symbols
+
+	\defs = (map (\entry entry \sym\line context sym) symbols)
+	\symbols_ok = (all defined defs)
+	\ok = (and syntax_ok symbols_ok)
+	\undef_symbols = (choose (map undefined defs) symbols)
+	\program == (ok (fold I exp (map (default 0) defs)) exp)
+
+	\print_error =
+		(\line\next
+
+		\prog="fexl" # we'd use argv[0]
+		\script="sample" # we'd use argv[1]
+
+		print prog;print ":";print script;print ":";print line;print " ";
+		next
+		)
+
+	syntax_ok ()
+		(
+		exp \error\line
+		print_error line; print error;nl;
+		);
+
+	do undef_symbols
+		(\sym
+		sym \sym\line
+		print_error line; print " Undefined symbol ";
+			print (is_name sym I quote_string sym);
+			nl;
+		);
+
+	ok program I;
 	next
-	)
-
-# Redefined resolve in terms of the built-in resolve, adding a couple new
-# functions.
-
-\resolve =
-	(\sym
-	is_name sym
-		(
-		# Resolve a name
-		\if = (\name\def string_eq (name_string sym) name (yes def))
-		if "print" print;
-		if "bye" (print "bye";nl;);
-		#if "this" (print "this";nl;);
-		#if "that" (print "that";nl;);
-		resolve sym
-		)
-		(
-		# Resolve a string
-		resolve sym
-		)
-	)
-
-\resolve_symbols ==
-	(\exp\symbols\ok\next
-
-	symbols (next ok exp) \entry\symbols
-	entry \sym\line
-
-	resolve sym
-		(\def
-		resolve_symbols (exp def) symbols ok next
-		)
-		(
-		undef sym line;
-		\def = sym  # dummy definition
-		resolve_symbols (exp def) symbols F next
-		)
-	)
-
-# LATER I think I can make it more clear.
-\resolve_symbols ==
-	(\exp\symbols\ok\next
-
-	symbols (next ok exp) \entry\symbols
-	entry \sym\line
-
-	(\return
-	resolve sym
-		(return ok)
-		(undef sym line; return F sym)
-	)
-
-	\ok\def
-	resolve_symbols (exp def) symbols ok next
 	)
 
 \try =
 	(\text\next
 
-	\result = (parse text)
-	result \ok\result
-	result \exp\symbols
-
-	nl;
 	print "::: program:";nl;
 	print (quote_string text);nl;
+	print "::: result:";nl;
 
-	print "::: parse and resolve:";nl;
-	resolve_symbols exp symbols T \ok\f
-	print "::: program is "; print (ok "good" "bad");nl;
-	ok
-		(
-		print "::: running";nl;
-		f
+	# Here is a highly restricted context:
+	\context =
+		(\sym
+		string_long sym yes;
+		string_double sym yes;
+		\if=(\name\def string_eq sym name (yes def))
+		if "print" print;
+		if "string_eq" string_eq;
+		if "long_lt" long_lt;
+		if "double_lt" double_lt;
+		if "nl" nl;
+		if "bye" (print "bye";nl;);
+		#if "this" (print "this";nl;);
+		#if "that" (print "that";nl;);
+		no
 		)
-		(
-		# Not doing this because it halts when encountering the undef symbol.
-		#print "::: running even though it's bad";nl;
-		#f
-		);
-	print "::: done";nl;
+
+	# Now wrap that in a context which treats strings literally.
+	\context =
+		(\sym
+		is_name sym
+			(context (name_string sym))
+			(yes sym)
+		)
+
+	run_program text context;
+
+	print "::: done";nl;nl;
 	next
 	)
-
-try
-)
 
 ### A couple of test cases
 try ~
