@@ -516,19 +516,6 @@ static value parse_exp(void)
 	return exp;
 	}
 
-static value get_pattern(value x, value f)
-	{
-	if (f == x) return I;
-	if (f->T && f->T != type_open) return C;
-
-	value pl = get_pattern(x,f->L);
-	value pr = get_pattern(x,f->R);
-
-	if (pl->T == fexl_C && pr->T == fexl_C) return C;
-
-	return A(pl,pr);
-	}
-
 /* Return a copy of f with x substituted according to pattern p. */
 static value subst(value p, value f, value x)
 	{
@@ -542,6 +529,20 @@ value fexl_lambda(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
 	return subst(f->L->L->R,f->L->R,f->R);
+	}
+
+/* Get the pattern of occurrences of symbol x in form f. */
+static value get_pattern(value x, value f)
+	{
+	if (f == x) return I;
+	if (f->T && f->T != type_open) return C;
+
+	value pl = get_pattern(x,f->L);
+	value pr = get_pattern(x,f->R);
+
+	if (pl->T == fexl_C && pr->T == fexl_C) return C;
+
+	return A(pl,pr);
 	}
 
 static value lam;
