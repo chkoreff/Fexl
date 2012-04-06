@@ -341,28 +341,20 @@ static value parse_term(void)
 	return exp;
 	}
 
-/*TODO*/
-#define use_new 1
+static value type_open(value f) { return f; }
 
-#if use_new
-
-/*TODO more work */
-value type_open(value f) { return f; }
 int is_open(value f)
 	{
 	return f->T == type_open || f->T == type_name || f->T == type_string;
 	}
-#endif
 
 static value apply(value f, value x)
 	{
 	if (f == I) return x;
 
 	value result = A(f,x);
-	#if use_new
 	if (is_open(f) && is_open(x))
 		result->T = type_open;
-	#endif
 	return result;
 	}
 
@@ -526,14 +518,8 @@ static value parse_exp(void)
 
 static value get_pattern(value x, value f)
 	{
-	/*TODO*/
-	#if use_new
 	if (f == x) return I;
 	if (f->T && f->T != type_open) return C;
-	#else
-	if (f == x) return I;
-	if (f->T) return C;
-	#endif
 
 	value pl = get_pattern(x,f->L);
 	value pr = get_pattern(x,f->R);
@@ -568,15 +554,7 @@ static value lambda(value x, value f)
 	if (p->T == fexl_C) return A(C,f);
 	if (p->T == fexl_I) return I;
 
-	#if use_new
 	return apply(A(lam,p),f);
-	#else
-	value e = A(A(lam,p),f);
-	/*TODO use apply I think */
-	/* Set left type so the next get_pattern doesn't have to look there. */
-	e->L->T = fexl_lambda;
-	return e;
-	#endif
 	}
 
 static void beg_parse(void)
