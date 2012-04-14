@@ -21,6 +21,7 @@ value parse_main(char *name)
 		}
 
 	hold(result);
+	/*LATER push this into fexl itself */
 
 	int ok = result->L->R->T == fexl_C;
 	value f = result->R->L->R;

@@ -58,6 +58,7 @@
 	)
 
 # Return the item at position N in the list, or default if no such item.
+# LATER use undefined vs (defined val)
 \list_at == (\list\N\default
 	list default \head\tail
 	long_compare N 0 default head
@@ -72,6 +73,9 @@
 
 \list_print = (\fun list_do \x string_put; fun x)
 
+# LATER perhaps implement fold in C to accelerate it.
+\fold == (\f\z\xs xs z \x\xs \z=(f z x) fold f z xs)
+
 # We don't use char_put because of buffering problems.
 \chars_print = (list_print long_char)
 
@@ -81,6 +85,41 @@
 \reverse=(\list
 	\reverse==(\list\result list result \h\t reverse t (item h result))
 	reverse list end
+	)
+
+\ru_utime_string =
+	(\time
+	time \sec\usec
+	string_append (long_string sec);
+	string_append ".";
+	string_slice (long_string (long_add 1000000 usec)) 1 6
+	)
+
+\ru_utime_double =
+	(\time
+	time \sec\usec
+	double_add
+		(long_double sec)
+		(double_div (long_double usec) (long_double 1000000))
+	)
+
+\ru_utime_sub =
+	(\x\y
+	x \x_sec\x_usec
+	y \y_sec\y_usec
+	\z_sec = (long_sub x_sec y_sec)
+	\z_usec = (long_sub x_usec y_usec)
+	long_lt z_usec 0
+		(pair (long_sub z_sec 1) (long_add z_usec 1000000))
+		(pair z_sec z_usec)
+	)
+
+\elapsed =
+	(\prev\next
+	ru_utime \curr
+	\elapse = (ru_utime_sub curr prev)
+	print "That took ";print (ru_utime_string elapse);print " seconds.";nl;
+	next curr
 	)
 
 ########
@@ -300,24 +339,42 @@ show "z" z;
 )
 
 \test_eager==
-(
+(\next
+ru_utime \time
+
 \long_le = (\x\y long_compare x y T T F)
 
 \sum == (\total\count
 	long_le count 0 total;
-
-	# This form evaluates eagerly:
 	\total = (long_add total count)
-
-	# Or if you prefer, you can use "?" to force eager evaluation like this:
-	#? (long_add total count) \total
-
 	sum total (long_sub count 1))
 
 \sum = (sum 0)
 
 \count = 100000
 print "The sum of 1 .. ";print count; print " is "; print (sum count);nl;
+elapsed time \time
+next
+)
+
+\test_eager_2 ==
+(\next
+ru_utime \time
+# (list_long x) is the list of all long values starting with x.
+\list_long == (\x item x; \x=(long_add x 1) list_long x)
+
+# (list_sum xs) is the sum of the long values xs.
+\list_sum = (fold long_add 0)
+
+\count = 100000
+\list = (list_prefix (list_long 1) count)
+
+# Now we've built the list of all numbers 1 .. count.  Print the sum.
+
+\sum = (list_sum list)
+print "The sum of 1 .. ";print count; print " is "; print sum;nl;
+elapsed time \time
+next
 )
 
 \test_double_compare ==
@@ -539,17 +596,18 @@ do_compare -1.0 -1.0 "EQ"
 
 ####
 
-\test_fibonacci ==
-(
+\test_fibonacci =
+(\next
 
 # This lets you use either built-in arithmetic or arbitrary-precision
 # arithmetic.
 
-\test_case ==
+\test_case =
 (
 \if_show_all
 \number_type
 \num_rounds
+\next
 
 if_show_all
 (
@@ -595,6 +653,7 @@ if_show_all
 (nums_print; list_prefix fibonacci num_rounds)
 (num_print; list_at fibonacci (long_sub num_rounds 1) num_1)
 nl;
+next
 )
 
 #test_case T "nat" 200;
@@ -618,8 +677,12 @@ nl;
 #test_case F "nat" 200;
 #test_case F "nat" 2000;
 
+ru_utime \time
 test_case T "nat" 300;
-test_case F "nat" 1600;   # 10.208s
+elapsed time \time
+test_case F "nat" 1600;   # 5.69s
+elapsed time \time
+next
 )
 
 ####
@@ -643,7 +706,7 @@ loop 50 nat_0
 )
 
 \test_divide==
-(
+(\next
 # LATER automatically check the constraints
 \test_div = (\x\y
 	nat_div x y \q\r
@@ -732,20 +795,24 @@ test_div nat_19 nat_5;
 \y =nat_10
 \y=(nat_mul y y)
 
+ru_utime \time
 test_div x y;
+elapsed time \time
 test_div (churn x) (churn; churn; churn; churn; churn; churn y);
+elapsed time \time
 next
 )
 
-big_test
+big_test;
 #big_test;
 #big_test;
 #big_test;
 #big_test;
+next
 )
 
 \test_sub ==
-(
+(\next
 \test_sub = (\x\y
 	\z = (nat_sub x y)
 	print "== test_sub: ";
@@ -803,6 +870,7 @@ test_sub nat_3 nat_19
 test_sub nat_19 nat_19
 test_sub nat_49 nat_19
 test_sub nat_48 nat_19
+next
 )
 
 \return return test_fibonacci test_binary_counter test_divide
@@ -990,33 +1058,37 @@ test_case -126478.9
 
 ####
 
-test_string_type
-test_double_type
-test_long_type
+ru_utime \time
+test_string_type;
+test_double_type;
+test_long_type;
 
-test_long_double
-test_double_long
+test_long_double;
+test_double_long;
 
-test_string_long
-test_string_double
+test_string_long;
+test_string_double;
 
-test_hello_world
-test_string_slice
-test_write_binary
-test_string_len
-test_string_at
-test_string_compare
-test_string_common
-test_long_add
-test_double_compare
-test_procedural
-test_eager
+test_hello_world;
+test_string_slice;
+test_write_binary;
+test_string_len;
+test_string_at;
+test_string_compare;
+test_string_common;
+test_long_add;
+test_double_compare;
+test_procedural;
+test_eager;
+test_eager_2;
 
 test_binary_counter;
 test_divide;
 test_sub;
-test_fibonacci
-test_cat
+test_fibonacci;
+nl; print "Done with all that.";nl;
+elapsed time \time
+test_cat;
 
 \\Extra stuff down here becomes input
 to the test_cat function.
