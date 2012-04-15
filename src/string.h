@@ -1,7 +1,8 @@
 extern value type_string(value);
-extern value Qchars(char *data, long len);
+extern value Qchars(const char *data, long len);
 extern value Qcopy_chars(const char *data, long len);
 extern value Qcopy_string(const char *data);
+extern value Qstring(const char *data);
 extern char *string_data(value);
 extern long string_len(value);
 extern int string_eq(value, value);

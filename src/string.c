@@ -35,7 +35,7 @@ consisting of len bytes of real data, followed by a NUL byte.  The real data
 itself may contain anything, including NUL bytes.  We put a NUL byte after the
 real data so we can easily call system functions which expect a NUL terminator.
 */
-value Qchars(char *data, long len)
+value Qchars(const char *data, long len)
 	{
 	if (data == 0 || len < 0) die("Qchars");
 
@@ -65,6 +65,15 @@ value Qcopy_string(const char *data)
 	{
 	if (data == 0) die("Qcopy_string");
 	return Qcopy_chars(data, strlen(data));
+	}
+
+/* Make a string from static null-terminated data, without copying. */
+value Qstring(const char *data)
+	{
+	if (data == 0) die("Qstring");
+	value str = Qchars(data, strlen(data));
+	str->R->T = 0;  /* Don't clear static string. */
+	return str;
 	}
 
 /* Compare strings x and y, returning negative if x < y, zero if x == y, or

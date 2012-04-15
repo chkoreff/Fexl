@@ -38,19 +38,6 @@ value fexl_get_max_bytes(value f)
 	return A(f->R,Qlong(max_bytes));
 	}
 
-static value op_access_string_array(value f, long len, char *array[])
-	{
-	if (!f->L->L) return f;
-	value x = f->L->R;
-	if (!arg(type_long,x)) return f;
-
-	long i = get_long(x);
-	char *str = i < len ? array[i] : "";
-	value val = Qchars(str,strlen(str));
-	val->R->T = 0;  /* Don't clear static string. */
-	return A(f->R,val);
-	}
-
 /* (argc next) = next val */
 value fexl_argc(value f)
 	{
@@ -60,7 +47,12 @@ value fexl_argc(value f)
 /* (argv i next) = next val */
 value fexl_argv(value f)
 	{
-	return op_access_string_array(f, main_argc, main_argv);
+	if (!f->L->L) return f;
+	value x = f->L->R;
+	if (!arg(type_long,x)) return f;
+
+	long i = get_long(x);
+	return A(f->R,Qstring(i < main_argc ? main_argv[i] : ""));
 	}
 
 /* (envc next) = next val */
@@ -72,7 +64,12 @@ value fexl_envc(value f)
 /* (envp i next) = next val */
 value fexl_envp(value f)
 	{
-	return op_access_string_array(f, main_envc(), main_envp);
+	if (!f->L->L) return f;
+	value x = f->L->R;
+	if (!arg(type_long,x)) return f;
+
+	long i = get_long(x);
+	return A(f->R,Qstring(i < main_envc() ? main_envp[i] : ""));
 	}
 
 /*

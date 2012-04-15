@@ -218,7 +218,7 @@ static value parse_name(int allow_eq)
 
 	long len;
 	char *string = buf_clear(&buf,&len);
-	return Qname(Qchars(string,len));
+	return Qname(string,len);
 	}
 
 /* Parse a symbol. */
@@ -253,7 +253,7 @@ static value outer_places = 0;
 /* Set a value reference to a new value. */
 static void set(value *pos, value val)
 	{
-	if (val) val->N++;
+	hold(val);
 	value old = *pos;
 	if (old) drop(old);
 	*pos = val;
@@ -646,7 +646,7 @@ value parse_source(void)
 
 	/* If there was an error, use (pair error line) as the expression. */
 	if (exp == 0)
-		exp = A(A(pair,Qcopy_string(error)),Qlong(line));
+		exp = A(A(pair,Qstring(error)),Qlong(line));
 
 	value ok = Q(error ? fexl_F : fexl_C);
 	value result = A(A(pair,ok),A(A(pair,exp),symbols));
