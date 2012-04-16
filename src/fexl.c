@@ -14,11 +14,6 @@ errors along the way, including syntax errors and undefined symbols. */
 value parse_main(char *name)
 	{
 	value result = parse_file(name);
-	if (result == 0)
-		{
-		warn("Can't open script");
-		return 0;
-		}
 
 	hold(result);
 

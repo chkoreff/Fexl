@@ -610,17 +610,25 @@ value parse_source(void)
 	beg_parse();
 
 	line = 1;
-	next_ch();
 
-	value exp = parse_exp();
-	if (exp)
+	value exp;
+
+	if (error)
+		exp = 0;
+	else
 		{
-		if (ch != -1)
+		next_ch();
+
+		exp = parse_exp();
+		if (exp)
 			{
-			error = "Extraneous input";
-			hold(exp);
-			drop(exp);
-			exp = 0;
+			if (ch != -1)
+				{
+				error = "Extraneous input";
+				hold(exp);
+				drop(exp);
+				exp = 0;
+				}
 			}
 		}
 
