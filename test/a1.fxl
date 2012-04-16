@@ -738,32 +738,49 @@ print "... we survived that.";nl;nl;
 # reporting any errors, running the program only if there were no errors.
 # LATER errors to stderr instead of stdout.
 \run_program =
-	(\text\context\next
-
-	parse text \syntax_ok\result result \exp\symbols
+	(
+	\result\context\next
+	result \syntax_ok\result result \exp\symbols
 
 	\defs = (map (\entry entry \sym\line context sym) symbols)
 	\symbols_ok = (all defined defs)
 	\ok = (and syntax_ok symbols_ok)
 	\undef_symbols = (choose (map undefined defs) symbols)
-	\program == (ok (fold I exp (map (default 0) defs)) exp)
+
+	# Now we flatten all the yes/no entries into pure values, using a dummy
+	# value of 0 for all no entries.  If we have any no entries we won't run
+	# the program anyway, so these dummy values are never encountered anyway.
+	\defs = (map (default 0) defs)
+
+	# Now we rip through the list of defs and force an evaluation on each one.
+	# This isn't strictly necessary on a functional basis, but it's useful when
+	# you use reflective features like type_of, for example in a function such
+	# as "show".  By forcing evaluation, a symbol like "C" is evaluated all the
+	# way to its ultimate value, instead of lazily remaining as an unevaluated
+	# function application.
+
+	do defs (\val \val=val)
+
+	# Now create the program, which is the result of applying exp to each of
+	# the definitions in turn.
+	\program == (ok (fold I exp defs) exp)
 
 	\print_error =
 		(\line\next
-
-		\prog="fexl" # we'd use argv[0]
-		\script="sample" # we'd use argv[1]
-
+		argv 0 \prog
+		argv 1 \script
 		print prog;print ":";print script;print ":";print line;print " ";
 		next
 		)
 
+	# Report any syntax error.
 	syntax_ok ()
 		(
 		exp \error\line
 		print_error line; print error;nl;
 		);
 
+	# Report any undefined symbols.
 	do undef_symbols
 		(\sym
 		sym \sym\line
@@ -772,6 +789,7 @@ print "... we survived that.";nl;nl;
 			nl;
 		);
 
+	# Run the program if there were no errors.
 	ok program I;
 	next
 	)
@@ -794,9 +812,11 @@ print "... we survived that.";nl;nl;
 		if "long_lt" long_lt;
 		if "double_lt" double_lt;
 		if "nl" nl;
-		if "bye" (print "bye";nl;);
-		#if "this" (print "this";nl;);
-		#if "that" (print "that";nl;);
+		if "bye" (\next print "bye";nl; next);
+		if "is_apply" is_apply;
+		if "C" C;
+		#if "this" (\next print "this";nl;next);
+		#if "that" (\next print "that";nl;next);
 		no
 		)
 
@@ -808,7 +828,7 @@ print "... we survived that.";nl;nl;
 			(yes sym)
 		)
 
-	run_program text context;
+	run_program (parse text) context;
 
 	print "::: done";nl;nl;
 	next
@@ -825,6 +845,14 @@ print "end program";nl;
 try ~
 print "Hello world.";nl;
 bye;
+~
+
+# Test a simple reflective feature to ensure that we've forced evaluation on
+# all the resolved symbols.
+try ~
+print "verify that C is an atom  : ";
+print (is_apply C (\_\_ "NO") "YES");
+nl;
 ~
 
 # LATER test under fork
