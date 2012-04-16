@@ -14,16 +14,17 @@ static int file_read_ch(void)
 	return fgetc(source_file);
 	}
 
+/* Parse the file with the given name.  If name is 0 or empty, use stdin. */
 value parse_file(char *name)
 	{
-	source_file = name ? fopen(name,"r") : stdin;
+	source_file = name && name[0] ? fopen(name,"r") : stdin;
 	if (!source_file)
 		error = "Can't open script";
 
 	read_ch = file_read_ch;
 	value result = parse_source();
 
-	if (name && source_file)
+	if (source_file && source_file != stdin)
 		fclose(source_file);
 	source_file = 0;
 
