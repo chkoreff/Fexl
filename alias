@@ -2,40 +2,40 @@
 # Handy shell functions for development and testing.  You can source these in a
 # new shell with ". alias".
 
-.todo()
+function .todo()
 	{
 	grep -ra TODO build test src --exclude=".*.swp"
 	}
 
-.later()
+function .later()
 	{
 	grep -ra "LATER" build test src --exclude=".*.swp"
 	}
 
-.build()
+function .build()
 	{
 	./build quiet
 	}
 
-.fexl()
+function .fexl()
 	{
 	.build && bin/fexl $1
 	}
 
 # Search source.
-.s()
+function .s()
 	{
 	grep -r "$1" src/* --exclude "*.swp"
 	}
 
 # Search source for whole word.
-.sw()
+function .sw()
 	{
 	grep -r "\<$1\>" src/* --exclude "*.swp"
 	}
 
 # Run a test script.
-.run()
+function .run()
 	{
 	.build &&
 	bin/fexl "test/$1.fxl"
@@ -43,27 +43,27 @@
 
 # Check that the output of a test script equals its reference output.  I use
 # the "cat" form here in case the script uses interactive input like char_get.
-.check()
+function .check()
 	{
 	.build &&
 	cat "test/$1.fxl" | bin/fexl | diff -a - "test/$1.out"
 	}
 
 # Time a test script, also checking its output.
-.time()
+function .time()
 	{
 	.build &&
 	time (cat "test/$1.fxl" | bin/fexl | diff -a - "test/$1.out")
 	}
 
 # git status
-.gs()
+function .gs()
 	{
 	git status
 	}
 
 # git diff (-a treats binary files as text)
-.gd()
+function .gd()
 	{
 	git diff -a $1
 	}
