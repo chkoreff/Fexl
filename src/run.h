@@ -1,8 +1,8 @@
 extern int main_argc;
 extern char **main_argv;
+extern long argi;
 extern int main_envc();
 extern char **main_envp;
-extern int main_exit;
 extern char *error;
 extern long line;
 extern long max_depth;

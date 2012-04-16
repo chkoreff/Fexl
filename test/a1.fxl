@@ -738,8 +738,7 @@ print "... we survived that.";nl;nl;
 # reporting any errors, running the program only if there were no errors.
 # LATER errors to stderr instead of stdout.
 \run_program =
-	(
-	\result\context\next
+	(\prog\script\result\context\next
 	result \syntax_ok\result result \exp\symbols
 
 	\defs = (map (\entry entry \sym\line context sym) symbols)
@@ -767,8 +766,6 @@ print "... we survived that.";nl;nl;
 
 	\print_error =
 		(\line\next
-		argv 0 \prog
-		argv 1 \script
 		print prog;print ":";print script;print ":";print line;print " ";
 		next
 		)
@@ -828,7 +825,9 @@ print "... we survived that.";nl;nl;
 			(yes sym)
 		)
 
-	run_program (parse text) context;
+	argv 0 \prog
+	\script = ""
+	run_program prog script (parse text) context;
 
 	print "::: done";nl;nl;
 	next

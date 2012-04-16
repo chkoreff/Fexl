@@ -1,0 +1,351 @@
+# This script provides an enhanced context wrapped around another script.
+
+#### [ auxiliary definitions
+
+# These functions represent a "possible" value, either (yes val) if you have a
+# value or no if you don't.
+\yes = (\val \yes\no yes val)
+\no  = (     \yes\no no)
+
+\halt==(\_ halt)
+\and=(\x\y x y F)
+\or=(\x\y x T y)
+\not=(\x x F T)
+
+\defined = (\x x (\_ T) F)
+\undefined = (\x not (defined x))
+\default = (\v\x x I v)
+
+####
+
+\map == (\f\xs xs end \x\xs item (f x) (map f xs))
+
+\fold == (\f\z\xs xs z \x\xs \z=(f z x) fold f z xs)
+
+\do == (\xs\f\end xs end \x\xs f x; do xs f end)
+
+\list_and = (fold and T)
+\list_or = (fold or F)
+
+\all = (\f\xs list_and (map f xs))
+\some = (\f\xs list_or (map f xs))
+
+\choose ==
+	(\xs\ys
+	xs end \x\xs
+	ys end \y\ys
+	x (item y) I (choose xs ys)
+	)
+
+\string_eq=(\x\y string_compare x y F T F)
+
+\long_lt=(\x\y long_compare x y T F F)
+\long_le=(\x\y long_compare x y T T F)
+\long_eq=(\x\y long_compare x y F T F)
+\long_ge=(\x\y long_compare x y F T T)
+\long_gt=(\x\y long_compare x y F F T)
+\long_ne=(\x\y long_compare x y T F T)
+
+\double_lt=(\x\y double_compare x y T F F)
+\double_le=(\x\y double_compare x y T T F)
+\double_eq=(\x\y double_compare x y F T F)
+\double_ge=(\x\y double_compare x y F T T)
+\double_gt=(\x\y double_compare x y F F T)
+\double_ne=(\x\y double_compare x y T F T)
+
+\string_lt=(\x\y string_compare x y T F F)
+\string_le=(\x\y string_compare x y T T F)
+\string_eq=(\x\y string_compare x y F T F)
+\string_ge=(\x\y string_compare x y F T T)
+\string_gt=(\x\y string_compare x y F F T)
+\string_ne=(\x\y string_compare x y T F T)
+
+
+# LATER not sure about this stuff -- perhaps auto-promote long to double?
+\ < = long_lt
+\ = = long_eq
+\ + = long_add
+\ - = long_sub
+
+\is_name = (\x type_eq (type_of x) (type_named "name"))
+
+\to_string = (\x
+	is_string x x;
+	is_long x (long_string x);
+	is_double x (double_string x);
+	is_name x (name_string x);
+	x)
+
+\print = (\data string_put (to_string data))
+
+# Quote a string.
+#
+# If the string does not contain quotes, then wrap quotes around it.
+#
+# If the string does contain quotes, then wrap tilde terminators around it,
+# including a space after the first one.  In choosing the terminator, the
+# function tries the values "~", "~1", "~2" etc. until it finds one that is not
+# contained within the string.
+
+\quote_string =
+	(
+	\try_quote_level==
+		(\level\str
+
+		# Choose the terminator string for this level.
+		\term =
+			(
+			(= level 0) ~ "~;  # Try quote first.
+			(= level 1) "~";   # Try tilde next.
+			# Beyond that, try appending tilde to level minus one.
+			string_append "~" (long_string (- level 1))
+			)
+
+		# See if the terminator appears inside the string.
+		\pos=(string_index str term 0)
+
+		< pos 0
+			# It does not appear, so enclose string in pair of terminators.
+			(
+			# Start with the first terminator.
+			string_append term;
+
+			(= level 0
+				# Using a quote, so don't use a space.
+				()
+				# Using a tilde, so use a space.
+				(string_append " ")
+			);
+
+			# Then follow with the string itself and the terminator again.
+			string_append str; term
+			)
+
+			# It does appear, so try again with the next level.
+			(try_quote_level (+ level 1) str)
+		)
+
+	try_quote_level 0
+	)
+
+# Convert the value to a tree with the given leaf and branch functions.
+\value_tree =
+	(\value\leaf\branch
+
+	is_apply value branch;
+
+	\if_type=(type_eq (type_of value))
+
+	\if_basic=(\val\type_name
+		if_type (type_of val) (leaf type_name))
+
+	\if_data=(\type_name\to_string
+		if_type (type_named type_name) (leaf (to_string value)))
+
+	if_data "long" long_string;
+	if_data "double" double_string;
+	if_data "string" quote_string;
+	if_data "name" name_string;
+	if_basic C "C";
+	if_basic S "S";
+	if_basic I "I";
+	if_basic Y "Y";
+	if_basic L "L";
+	if_basic R "R";
+	if_basic F "F";
+	if_basic query "?";
+	if_basic parse "parse";
+	if_basic lambda "lam";
+	if_basic resolve "resolve";
+	if_basic long_add "long_add";
+	if_basic double_add "double_add";
+	if_basic string_append "string_append";
+	if_basic is_long "is_long";
+	if_basic long_double "long_double";
+	if_basic end "end";
+	if_basic item "item";
+	if_basic pair "pair";
+	if_basic append "append";
+	if_basic nl "nl";
+
+	leaf "_" # unknown
+	)
+
+# Print a value.
+\value_put ==
+	(\value\next
+	value_tree value (\x string_put x next)
+	\L\R
+	string_put "(";
+	value_put L;
+	string_put " ";
+	value_put R;
+	string_put ")";
+	next
+	)
+
+# Convert value to a string representation.
+\value_string ==
+	(\value
+	value_tree value I
+	\L\R
+	string_append "(";
+	string_append (value_string L);
+	string_append " ";
+	string_append (value_string R);
+	string_append ")";
+	""
+	)
+
+# Show a value (shorthand for value_put).
+\show = value_put
+
+#### ] auxiliary definitions
+
+###########################
+
+# Run a program in the normal way, resolving it in the given context and
+# reporting any errors, running the program only if there were no errors.
+\run_program =
+	(\prog\script\result\context\next
+	result \syntax_ok\result result \exp\symbols
+
+	\defs = (map (\entry entry \sym\line context sym) symbols)
+	\symbols_ok = (all defined defs)
+	\ok = (and syntax_ok symbols_ok)
+	\undef_symbols = (choose (map undefined defs) symbols)
+
+	# Now we flatten all the yes/no entries into pure values, using a dummy
+	# value of 0 for all no entries.  If we have any no entries we won't run
+	# the program anyway, so these dummy values are never encountered anyway.
+	\defs = (map (default 0) defs)
+
+	# Now we rip through the list of defs and force an evaluation on each one.
+	# This isn't strictly necessary on a functional basis, but it's useful when
+	# you use reflective features like type_of, for example in a function such
+	# as "show".  By forcing evaluation, a symbol like "C" is evaluated all the
+	# way to its ultimate value, instead of lazily remaining as an unevaluated
+	# function application.
+
+	do defs (\val \val=val)
+
+	# Now create the program, which is the result of applying exp to each of
+	# the definitions in turn.
+	\program == (ok (fold I exp defs) exp)
+
+	# Here's the routine which prints an error, with line number.
+	# LATER print to stderr instead of stdout
+
+	\print_error =
+		(\line\next
+		print prog;print ":";print script;print ":";print line;print " ";
+		next
+		)
+
+	# Report any syntax error.
+	syntax_ok ()
+		(
+		exp \error\line
+		print_error line; print error;nl;
+		);
+
+	# Report any undefined symbols.
+	do undef_symbols
+		(\sym
+		sym \sym\line
+		print_error line; print " Undefined symbol ";
+			print (is_name sym I quote_string sym);
+			nl;
+		);
+	
+	# Run the program if it's ok, otherwise exit.
+	ok program (exit 1);
+	next
+	)
+
+# An enhanced context.
+\context =
+	(\sym
+	string_long sym yes;
+	string_double sym yes;
+	\if=(\name\def string_eq sym name (yes def))
+
+	# Try the built-in resolve function first before checking enhancements.
+	resolve (string_name sym) yes;
+
+	# LATER read enhancements on-demand from separate files.
+
+	if "print" print;
+	if "to_string" to_string;
+
+	if "show" show;
+	if "quote_string" quote_string;
+	if "value_string" value_string;
+
+	if "fold" fold;
+	if "do" do;
+	if "map" map;
+	if "yes" yes;
+	if "no" no;
+	if "and" and;
+	if "or" or;
+	if "not" not;
+	if "defined" defined;
+	if "undefined" undefined;
+	if "default" default;
+	if "all" all;
+	if "some" some;
+	if "choose" choose;
+	if "list_and" list_and;
+	if "list_or" list_or;
+
+	if "long_lt" long_lt;
+	if "long_le" long_le;
+	if "long_eq" long_eq;
+	if "long_ge" long_ge;
+	if "long_gt" long_gt;
+	if "long_ne" long_ne;
+
+	if "double_lt" double_lt;
+	if "double_le" double_le;
+	if "double_eq" double_eq;
+	if "double_ge" double_ge;
+	if "double_gt" double_gt;
+	if "double_ne" double_ne;
+
+	if "string_lt" string_lt;
+	if "string_le" string_le;
+	if "string_eq" string_eq;
+	if "string_ge" string_ge;
+	if "string_gt" string_gt;
+	if "string_ne" string_ne;
+
+	# Oh well, the symbol is not defined.
+	no
+	)
+
+# Now wrap that in a context which treats strings literally.
+\context =
+	(\sym
+	is_name sym
+		(context (name_string sym))
+		(yes sym)
+	)
+
+# Now let's put it all together and run the user's script in the enhanced
+# context.
+
+argv 0 \prog
+argv 1 \boot
+argv 2 \script
+
+# You can do this to impose limits on the script.
+#put_max_steps 1000000;
+#put_max_bytes 1000000;
+
+# Change current argument position to 2 so it reports the correct script name
+# in case the script dies.
+put_argi 2;
+
+parse_file script \result
+run_program prog script result context;

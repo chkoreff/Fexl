@@ -12,7 +12,7 @@ void warn(const char *format, ...)
 
 	if (main_argv)
 		{
-		const char *script_name = main_argc > 1 ? main_argv[1] : "";
+		const char *script_name = (argi < main_argc) ? main_argv[argi] : "";
 		fprintf(stderr, "%s:%s:%ld: ", main_argv[0], script_name, line);
 		}
 
@@ -28,6 +28,5 @@ void warn(const char *format, ...)
 void die(const char *format, ...)
 	{
 	warn(format);
-	main_exit = 1;
-	exit(main_exit);
+	exit(1);
 	}

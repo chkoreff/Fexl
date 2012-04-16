@@ -1,0 +1,50 @@
+#!/usr/bin/fexl test/fexl.fxl
+
+print "This is a4.fxl running in an enhanced context.";nl;
+show (C (S S));nl;
+#foo;
+#Y I;
+#Y Y;
+
+# Just mentioning a bunch of symbols here to make sure they're defined.
+F  # This prevents trying to execute the stuff in parentheses.
+(
+yes no
+and or not
+defined undefined
+default
+fold map
+show
+do
+list_and list_or
+all some
+choose
+
+long_lt
+long_le
+long_eq
+long_ge
+long_gt
+long_ne
+
+double_lt
+double_le
+double_eq
+double_ge
+double_gt
+double_ne
+
+string_lt
+string_le
+string_eq
+string_ge
+string_gt
+string_ne
+
+to_string
+quote_string
+
+value_string
+);
+
+print "That's all folks!";nl;

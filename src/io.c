@@ -54,5 +54,3 @@ value fexl_char_put(value f)
 	putchar(get_long(x));
 	return f->R;
 	}
-
-/* LATER A "print" routine which detects type of arg */

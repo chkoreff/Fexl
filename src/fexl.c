@@ -72,14 +72,9 @@ int main(int argc, char *argv[], char *envp[])
 	value f = parse_main(argc > 1 ? argv[1] : 0);
 
 	hold(f);
-
-	if (f)
-		eval(f);
-	else
-		main_exit = 1;
-
+	if (f) eval(f);
 	drop(f);
 
 	end_value();
-	return main_exit;
+	return f ? 0 : 1;
 	}
