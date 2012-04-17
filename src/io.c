@@ -22,20 +22,36 @@ value fexl_nl(value f)
 	}
 
 /* Note that we use fwrite here because we may be writing binary data.  */
-void string_put(value x)
+void string_write(value x, FILE *stream)
 	{
-	fwrite(string_data(x), 1, string_len(x), stdout);
+	fwrite(string_data(x), 1, string_len(x), stream);
 	}
 
-/* string_put str next */
-value fexl_string_put(value f)
+void string_put(value x)
+	{
+	string_write(x, stdout);
+	}
+
+static value op_string_write(value f, FILE *stream)
 	{
 	if (!f->L->L) return f;
 	value x = f->L->R;
 	if (!arg(type_string,x)) return f;
 
-	string_put(x);
+	string_write(x, stream);
 	return f->R;
+	}
+
+/* string_put str next */
+value fexl_string_put(value f)
+	{
+	return op_string_write(f, stdout);
+	}
+
+/* string_stderr str next */
+value fexl_string_stderr(value f)
+	{
+	return op_string_write(f, stderr);
 	}
 
 /* (char_get next) = (next ch), where ch is the next character from stdin. */

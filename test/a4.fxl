@@ -9,6 +9,7 @@ show (C (S S));nl;
 # Just mentioning a bunch of symbols here to make sure they're defined.
 F  # This prevents trying to execute the stuff in parentheses.
 (
+print warn
 yes no
 and or not
 defined undefined
@@ -19,6 +20,8 @@ do
 list_and list_or
 all some
 choose
+
+args envs
 
 long_lt
 long_le

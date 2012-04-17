@@ -77,6 +77,7 @@
 	x)
 
 \print = (\data string_put (to_string data))
+\warn = (\data string_stderr (to_string data))
 
 # Quote a string.
 #
@@ -86,6 +87,12 @@
 # including a space after the first one.  In choosing the terminator, the
 # function tries the values "~", "~1", "~2" etc. until it finds one that is not
 # contained within the string.
+
+# LATER I could rewrite this far more simply by generating the infinite list of
+# all possible terminators and choosing the first one that doesn't appear in
+# the string.  No need to convolve the production of terminator candidates with
+# the testing and application like this.  The procedural style used here just
+# muddies the waters.
 
 \quote_string =
 	(
@@ -200,6 +207,38 @@
 # Show a value (shorthand for value_put).
 \show = value_put
 
+# Collect an array into a list.
+\array_list =
+	(\f_count\f_get
+	f_count \n
+
+	\collect ==
+		(\i
+		long_lt i n
+			(
+			f_get i \val
+			\i = (long_add i 1)
+			item val; collect i
+			)
+			end
+		)
+	
+	collect 0
+	)
+
+# The list of command-line arguments.
+\args = (array_list argc argv)
+# The list of shell environment bindings (name=value strings).
+\envs = (array_list envc envp)
+
+# Here's an example of how you could print those two lists:
+F
+(
+\print_entry = (\val print "  ";print val;nl;)
+print "args:";nl; do args print_entry;
+print "envs:";nl; do envs print_entry;
+);
+
 #### ] auxiliary definitions
 
 ###########################
@@ -233,10 +272,13 @@
 	# the definitions in turn.
 	\program == (ok (fold I exp defs) exp)
 
-	# Here's the routine which prints an error, with line number.
-	# LATER print to stderr instead of stdout
+	# Override so we print to stderr instead of stdout.
+	\print = warn
+	\nl = (warn "
+")
 
-	\print_error =
+	# Report an error, with program and script names, and line number.
+	\error_at =
 		(\line\next
 		print prog;print ":";print script;print ":";print line;print " ";
 		next
@@ -246,14 +288,14 @@
 	syntax_ok ()
 		(
 		exp \error\line
-		print_error line; print error;nl;
+		error_at line; print error;nl;
 		);
 
 	# Report any undefined symbols.
 	do undef_symbols
 		(\sym
 		sym \sym\line
-		print_error line; print " Undefined symbol ";
+		error_at line; print " Undefined symbol ";
 			print (is_name sym I quote_string sym);
 			nl;
 		);
@@ -276,6 +318,7 @@
 	# LATER read enhancements on-demand from separate files.
 
 	if "print" print;
+	if "warn" warn;
 	if "to_string" to_string;
 
 	if "show" show;
@@ -319,6 +362,9 @@
 	if "string_ge" string_ge;
 	if "string_gt" string_gt;
 	if "string_ne" string_ne;
+
+	if "args" args;
+	if "envs" envs;
 
 	# Oh well, the symbol is not defined.
 	no

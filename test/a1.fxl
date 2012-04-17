@@ -809,7 +809,8 @@ print "... we survived that.";nl;nl;
 		if "long_lt" long_lt;
 		if "double_lt" double_lt;
 		if "nl" nl;
-		if "bye" (\next print "bye";nl; next);
+		if "hello" (\next print "Hello.";nl; next);
+		if "bye" (\next print "Bye.";nl; next);
 		if "is_apply" is_apply;
 		if "C" C;
 		#if "this" (\next print "this";nl;next);
@@ -833,7 +834,7 @@ print "... we survived that.";nl;nl;
 	next
 	)
 
-### A couple of test cases
+### A few test cases
 try ~
 print "begin program";nl;
 this;
@@ -845,6 +846,14 @@ try ~
 print "Hello world.";nl;
 bye;
 ~
+
+try ~|
+hello;
+print "test: ";print (string_eq "a" "b" "eq" "ne");nl;
+print "test: ";print (long_lt 3 4 "lt" "ge");nl;
+print "test: ";print (double_lt 4.5 2.0 "lt" "ge");nl;
+bye;
+~|;
 
 # Test a simple reflective feature to ensure that we've forced evaluation on
 # all the resolved symbols.
