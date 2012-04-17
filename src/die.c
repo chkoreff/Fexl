@@ -12,7 +12,8 @@ void warn(const char *format, ...)
 
 	if (main_argv)
 		{
-		const char *script_name = (argi < main_argc) ? main_argv[argi] : "";
+		const char *script_name = (0 < argi && argi < main_argc)
+			? main_argv[argi] : "";
 		fprintf(stderr, "%s:%s:%ld: ", main_argv[0], script_name, line);
 		}
 
