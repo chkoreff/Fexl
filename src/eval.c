@@ -34,7 +34,7 @@ void eval(value f)
 		if (f->T) break;
 
 		if (max_steps >= 0 && ++cur_steps > max_steps)
-			die("Your program ran too long");
+			die("Your program ran too long.");
 
 		value x = f->L;
 		if (x->T == 0) eval(x);

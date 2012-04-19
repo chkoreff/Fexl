@@ -2,24 +2,83 @@
 
 #### [ auxiliary definitions
 
+### Boolean functions.
+
+# Define T as a synonym for C.  F is already built-in.
+\T=C
+
+\and=(\x\y x y F)
+\or=(\x\y x T y)
+\not=(\x x F T)
+
 # These functions represent a "possible" value, either (yes val) if you have a
 # value or no if you don't.
 \yes = (\val \yes\no yes val)
 \no  = (     \yes\no no)
 
-\halt==(\_ halt)
-\and=(\x\y x y F)
-\or=(\x\y x T y)
-\not=(\x x F T)
-
+# (defined x) is true if x is (yes val).
 \defined = (\x x (\_ T) F)
+# (undefined x) is true if x is no.
 \undefined = (\x not (defined x))
+
+# (default v x) =
+#    v   if x is no
+#    val if x is (yes val)
 \default = (\v\x x I v)
 
-####
+# The halt function ends the evaluation of the current expression by consuming
+# all arguments given to it.  It does not halt the entire program.
+\halt==(\_ halt)
+
+### Comparison functions
+
+\long_lt=(\x\y long_compare x y T F F)
+\long_le=(\x\y long_compare x y T T F)
+\long_eq=(\x\y long_compare x y F T F)
+\long_ge=(\x\y long_compare x y F T T)
+\long_gt=(\x\y long_compare x y F F T)
+\long_ne=(\x\y long_compare x y T F T)
+
+\long_min = (\x\y long_compare x y  x x y)
+\long_max = (\x\y long_compare x y  y x x)
+
+\double_lt=(\x\y double_compare x y T F F)
+\double_le=(\x\y double_compare x y T T F)
+\double_eq=(\x\y double_compare x y F T F)
+\double_ge=(\x\y double_compare x y F T T)
+\double_gt=(\x\y double_compare x y F F T)
+\double_ne=(\x\y double_compare x y T F T)
+
+\double_min = (\x\y double_compare x y  x x y)
+\double_max = (\x\y double_compare x y  y x x)
+
+\string_lt=(\x\y string_compare x y T F F)
+\string_le=(\x\y string_compare x y T T F)
+\string_eq=(\x\y string_compare x y F T F)
+\string_ge=(\x\y string_compare x y F T T)
+\string_gt=(\x\y string_compare x y F F T)
+\string_ne=(\x\y string_compare x y T F T)
+
+\string_min = (\x\y string_compare x y  x x y)
+\string_max = (\x\y string_compare x y  y x x)
+
+### List functions
+# Define end as a synonym for C.  The item function is already built-in.
+\end=C
+
+\append == (\xs\ys xs ys \x\xs item x; append xs ys)
+
+# Push all entries in list xs onto list ys.
+\push_all==(\xs\ys xs ys \x\xs push_all xs (item x ys))
+
+# Reverse list xs.
+\reverse=(\xs push_all xs end)
+
+# LATER more doc
 
 \map == (\f\xs xs end \x\xs item (f x) (map f xs))
 
+# LATER perhaps implement fold in C to accelerate it.
 \fold == (\f\z\xs xs z \x\xs \z=(f z x) fold f z xs)
 
 \do == (\xs\f\end xs end \x\xs f x; do xs f end)
@@ -30,6 +89,8 @@
 \all = (\f\xs list_and (map f xs))
 \some = (\f\xs list_or (map f xs))
 
+# (choose xs ys) returns the list of all y in ys where the corresponding x in
+# xs is true.  The xs is a list of bits which serves as a "mask".
 \choose ==
 	(\xs\ys
 	xs end \x\xs
@@ -37,29 +98,26 @@
 	x (item y) I (choose xs ys)
 	)
 
-\string_eq=(\x\y string_compare x y F T F)
+# Return the first N items of the list.
+\list_prefix == (\list\N
+	long_le N 0 end;
+	list end \head\tail
+	\N = (long_sub N 1)
+	item head; list_prefix tail N
+	)
 
-\long_lt=(\x\y long_compare x y T F F)
-\long_le=(\x\y long_compare x y T T F)
-\long_eq=(\x\y long_compare x y F T F)
-\long_ge=(\x\y long_compare x y F T T)
-\long_gt=(\x\y long_compare x y F F T)
-\long_ne=(\x\y long_compare x y T F T)
+# Return the possible entry at position n in list xs.
+\list_entry == (\xs\n
+	xs no \x\xs
+	long_compare n 0 no (yes x)
+	\n = (long_sub n 1)
+	list_entry xs n
+	)
 
-\double_lt=(\x\y double_compare x y T F F)
-\double_le=(\x\y double_compare x y T T F)
-\double_eq=(\x\y double_compare x y F T F)
-\double_ge=(\x\y double_compare x y F T T)
-\double_gt=(\x\y double_compare x y F F T)
-\double_ne=(\x\y double_compare x y T F T)
+# Return the entry at position n in list xs, or v if no such position.
+\list_at = (\xs\n\v list_entry xs n I v)
 
-\string_lt=(\x\y string_compare x y T F F)
-\string_le=(\x\y string_compare x y T T F)
-\string_eq=(\x\y string_compare x y F T F)
-\string_ge=(\x\y string_compare x y F T T)
-\string_gt=(\x\y string_compare x y F F T)
-\string_ne=(\x\y string_compare x y T F T)
-
+# LATER + - * / = < etc.
 
 # LATER not sure about this stuff -- perhaps auto-promote long to double?
 \ < = long_lt
@@ -172,7 +230,6 @@
 	if_basic end "end";
 	if_basic item "item";
 	if_basic pair "pair";
-	if_basic append "append";
 	if_basic nl "nl";
 
 	leaf "_" # unknown
@@ -246,7 +303,7 @@ print "envs:";nl; do envs print_entry;
 # Run a program in the normal way, resolving it in the given context and
 # reporting any errors, running the program only if there were no errors.
 \run_program =
-	(\prog\script\result\context\next
+	(\script\result\context\next
 	result \syntax_ok\result result \exp\symbols
 
 	\defs = (map (\entry entry \sym\line context sym) symbols)
@@ -277,10 +334,10 @@ print "envs:";nl; do envs print_entry;
 	\nl = (warn "
 ")
 
-	# Report an error, with program and script names, and line number.
+	# Report the error location.
 	\error_at =
 		(\line\next
-		print prog;print ":";print script;print ":";print line;print " ";
+		print " on line ";print line;print " of ";print script;nl;
 		next
 		)
 
@@ -288,16 +345,15 @@ print "envs:";nl; do envs print_entry;
 	syntax_ok ()
 		(
 		exp \error\line
-		error_at line; print error;nl;
+		print error; error_at line;
 		);
 
 	# Report any undefined symbols.
 	do undef_symbols
 		(\sym
 		sym \sym\line
-		error_at line; print " Undefined symbol ";
-			print (is_name sym I quote_string sym);
-			nl;
+		print "Undefined symbol "; print (is_name sym I quote_string sym);
+		error_at line;
 		);
 	
 	# Run the program if it's ok, otherwise exit.
@@ -305,7 +361,7 @@ print "envs:";nl; do envs print_entry;
 	next
 	)
 
-# An enhanced context.
+# The enhanced context for Fexl programs.
 \context =
 	(\sym
 	string_long sym yes;
@@ -323,13 +379,33 @@ print "envs:";nl; do envs print_entry;
 
 	if "show" show;
 	if "quote_string" quote_string;
+	if "value_put" value_put;
 	if "value_string" value_string;
 
+	if "T" T;
+	if "is_name" is_name;
+	if "halt" halt;
+
+	# a few synonyms
+	if "?" query;
+	if "long_type" is_long;
+	if "double_type" is_double;
+	if "string_type" is_string;
+
+	if "end" end;
+	if "append" append;
+	if "reverse" reverse;
 	if "fold" fold;
 	if "do" do;
 	if "map" map;
+
+	if "list_prefix" list_prefix;
+	if "list_at" list_at;
+	if "list_entry" list_entry;
+
 	if "yes" yes;
 	if "no" no;
+
 	if "and" and;
 	if "or" or;
 	if "not" not;
@@ -348,6 +424,8 @@ print "envs:";nl; do envs print_entry;
 	if "long_ge" long_ge;
 	if "long_gt" long_gt;
 	if "long_ne" long_ne;
+	if "long_min" long_min;
+	if "long_max" long_max;
 
 	if "double_lt" double_lt;
 	if "double_le" double_le;
@@ -355,6 +433,8 @@ print "envs:";nl; do envs print_entry;
 	if "double_ge" double_ge;
 	if "double_gt" double_gt;
 	if "double_ne" double_ne;
+	if "double_min" double_min;
+	if "double_max" double_max;
 
 	if "string_lt" string_lt;
 	if "string_le" string_le;
@@ -362,6 +442,8 @@ print "envs:";nl; do envs print_entry;
 	if "string_ge" string_ge;
 	if "string_gt" string_gt;
 	if "string_ne" string_ne;
+	if "string_min" string_min;
+	if "string_max" string_max;
 
 	if "args" args;
 	if "envs" envs;
@@ -378,20 +460,13 @@ print "envs:";nl; do envs print_entry;
 		(yes sym)
 	)
 
-# Now let's put it all together and run the user's script in the enhanced
-# context.
-
-argv 0 \prog
-argv 1 \boot
-argv 2 \script
-
-# You can do this to impose limits on the script.
+# NOTE: You can do this sort of thing to impose limits on the script.
 #put_max_steps 1000000;
 #put_max_bytes 1000000;
 
-# Change current argument position to 2 so it reports the correct script name
-# in case the script dies.
-put_argi 2;
+# Now let's put it all together and run the user's script in the enhanced
+# context.
 
+argv 1 \script
 parse_file script \result
-run_program prog script result context;
+run_program script result context;

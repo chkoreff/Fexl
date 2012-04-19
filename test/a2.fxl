@@ -9,83 +9,14 @@
 #
 # That should run quietly with exit code 0.
 
-
-#####
-
-# This function halts by simply consuming all arguments given to it.
-\halt == (\_ halt)
-
-# Useful:
-\to_string = (\x
-	string_type x x;
-	long_type x (long_string x);
-	double_type x (double_string x);
-	x)
-
-\print = (\data string_put (to_string data))
-
-# T and F are the predefined symbols for True and False.  They are equivalent
-# to:
-# \T = (\T\F T)
-# \F = (\T\F F)
-
-\string_eq=(\x\y string_compare x y F T F)
-
-\long_le = (\x\y long_compare x y T T F)
-\long_lt = (\x\y long_compare x y T F F)
-\long_ge = (\x\y long_compare x y F T T)
-\long_gt = (\x\y long_compare x y F F T)
-\long_ne = (\x\y long_compare x y T F T)
-\long_min = (\x\y long_compare x y  x x y)
-
-### List functions
-
-# Predefined:
-# end is the empty list.
-# (item head tail) is the list consisting of head followed by tail.
-#
-# They are equivalent to:
-# \end  = (           \end\item end)
-# \item = (\head\tail \end\item item head tail)
-
-
-# Return the first N items of the list.
-\list_prefix == (\list\N
-	long_le N 0 end;
-	list end \head\tail
-	\N = (long_sub N 1)
-	item head; list_prefix tail N
-	)
-
-# Return the item at position N in the list, or default if no such item.
-# LATER use undefined vs (defined val)
-\list_at == (\list\N\default
-	list default \head\tail
-	long_compare N 0 default head
-	\N = (long_sub N 1)
-	list_at tail N default
-	)
-
-\list_map == (\next\fun\list
-	list next \head\tail fun head; list_map next fun tail)
-
-\list_do = (list_map I)
-
-\list_print = (\fun list_do \x string_put; fun x)
-
-# LATER perhaps implement fold in C to accelerate it.
-\fold == (\f\z\xs xs z \x\xs \z=(f z x) fold f z xs)
+\list_print = (\f\xs do (map f xs) string_put)
 
 # We don't use char_put because of buffering problems.
 \chars_print = (list_print long_char)
 
 \bits_print = (list_print \x x "1" "0")
 
-# Reverse a list.
-\reverse=(\list
-	\reverse==(\list\result list result \h\t reverse t (item h result))
-	reverse list end
-	)
+# LATER generalize some of these and make them available in top.fxl.
 
 \ru_utime_string =
 	(\time
@@ -628,9 +559,12 @@ case "nat" (return nat_print nat_add nat_1);
 halt
 )
 
+# LATER export num_string and define num_print in terms of that.  Then define
+# nums_print in terms of list_print.
+
 choose \num_print \num_add \num_1
 
-\nums_print = (list_do \x num_print x; nl)
+\nums_print = (\xs do xs (\x num_print x; nl))
 
 # Produces the infinite list of all Fibonacci numbers.
 \fibonacci =

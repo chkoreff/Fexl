@@ -3,13 +3,9 @@
 /* Command line arguments */
 int main_argc;
 char **main_argv;
-long argi = 1; /* current position in argument list */
 
 static int cache_envc = -1; /* auto-initialized count of envp entries */
 char **main_envp;
-
-char *error;  /* set on syntax error in parse */
-long line = 1; /* line number */
 
 /*
 Limit the depth of recursive routines to avoid segmentation fault caused by

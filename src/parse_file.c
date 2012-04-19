@@ -18,16 +18,14 @@ static int file_read_ch(void)
 value parse_file(char *name)
 	{
 	source_file = name && name[0] ? fopen(name,"r") : stdin;
-	if (!source_file)
-		error = "Can't open script";
+	read_ch = source_file ? file_read_ch : 0;
 
-	read_ch = file_read_ch;
 	value result = parse_source();
 
 	if (source_file && source_file != stdin)
 		fclose(source_file);
-	source_file = 0;
 
+	source_file = 0;
 	return result;
 	}
 

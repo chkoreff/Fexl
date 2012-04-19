@@ -10,6 +10,9 @@
 #include "string.h"
 #include "sym.h"
 
+static long line;     /* current line number */
+static char *error;   /* syntax error if any */
+
 static value C;
 static value I;
 static value Y;
@@ -609,14 +612,16 @@ value parse_source(void)
 	{
 	beg_parse();
 
-	line = 1;
-
 	value exp;
 
-	if (error)
+	if (read_ch == 0)
+		{
+		error = "Can't open script";
 		exp = 0;
+		}
 	else
 		{
+		line = 1;
 		next_ch();
 
 		exp = parse_exp();
@@ -662,6 +667,7 @@ value parse_source(void)
 	drop(item);
 	drop(pair);
 
+	line = 0;
 	error = 0;
 
 	end_parse();

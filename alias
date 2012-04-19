@@ -4,12 +4,12 @@
 
 function .todo()
 	{
-	grep -ra TODO build test src --exclude=".*.swp"
+	grep -ra TODO build test src share --exclude=".*.swp"
 	}
 
 function .later()
 	{
-	grep -ra "LATER" build test src --exclude=".*.swp"
+	grep -ra "LATER" build test src share --exclude=".*.swp"
 	}
 
 function .build()

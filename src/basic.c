@@ -1,7 +1,6 @@
 #include "value.h"
 #include "basic.h"
 #include "eval.h"
-#include "parse_string.h"
 #include "resolve.h"
 
 /*
@@ -113,25 +112,4 @@ value fexl_pair(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
 	return A(A(f->R,f->L->L->R),f->L->R);
-	}
-
-/*
-\append == (\x\y x y \h\t item h; append t y)
-This appends two lists.
-LATER We'll have a way to read built-in definitions from a config file, but for
-now I'm just parsing static text in C.
-*/
-value fexl_append(value f)
-	{
-	char *text =
-"\\append == (\\x\\y x y \\h\\t item h; append t y)"
-"append"
-;
-	value result = parse_string(text);
-	hold(result);
-	value exp = A(result->R->L->R, Q(fexl_item));
-	replace(f->L, exp);
-	drop(result);
-
-	return f;
 	}

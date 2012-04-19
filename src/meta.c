@@ -33,11 +33,6 @@ value fexl_put_max_bytes(value f)
 	return op_put_long(f,&max_bytes);
 	}
 
-value fexl_put_argi(value f)
-	{
-	return op_put_long(f,&argi);
-	}
-
 value fexl_get_max_steps(value f)
 	{
 	return op_get_long(f,&max_steps);
@@ -46,11 +41,6 @@ value fexl_get_max_steps(value f)
 value fexl_get_max_bytes(value f)
 	{
 	return op_get_long(f,&max_bytes);
-	}
-
-value fexl_get_argi(value f)
-	{
-	return op_get_long(f,&argi);
 	}
 
 /* (argc next) = next val */

@@ -40,8 +40,8 @@ Run this command:
 
   ./build install
 
-That builds the /usr/bin/fexl program and the /usr/lib/libfexl.so library.  You
-may be prompted for your sudo (superuser) password during this process.
+That creates /usr/bin/fexl, /usr/lib/fexl, and /usr/share/fexl.  You may be
+prompted for your sudo (superuser) password during this process.
 
 Note that you should NOT preface the command with "sudo", because you don't
 want to create the local build objects with root permissions.
@@ -106,58 +106,15 @@ I can run my tests like this:
 hack the C code and immediately check my test cases without thinking about re-
 building.)
 
-
 However, the problem with those programs as a tutorial is that I'm deliberately
 testing all sorts of intricate stuff, so it's very programmer-geeky.
 
 I suppose one could start with this:
 
-	string_put "Hello world."; nl;
-	\x = (long_add 4 3)
-	\x = (long_mul x 5)
-	string_put "x = "; string_put (long_string x); nl;
-
-
-Keep in mind at this point you're working in a raw environment where even a
-helpful function like "print" is not yet defined.  I plan soon to provide a
-whole host of handy functions such as print, map, fold, etc.
-
-I'll be able to do this without altering the C code, because eventually the
-top-level fexl executable will always read a file called "fexl.fxl" to start
-everything, so you can add installation- and site-specific definitions there.
-So fexl.fxl will provide a full bootstrap capability, where you can even
-program it to fetch certain definitions off the net, run apt-get, install gpg,
-etc. etc. automatically.  It could even generate and compile C code if you want
-it to.
-
-In summary, the way I'll do "modules" is through meta-parsing a piece of text
-inside an arbitrary environment which provides definitions for all the
-undefined symbols referenced in the text.  This is also how you provide "safe"
-or "restricted" environments -- for example in a web context you might want
-"print" not to go to stdout, but into a string instead, and you wouldn't want
-"delete_file" to be defined (at least not in its normal sense).
-
-In the meantime, I just have to copy all my handy function definitions at the
-top of each Fexl program.  So for example, I can start with this:
-
-	\to_string =
-		(\x
-		string_type x x;
-		long_type x (long_string x);
-		double_type x (double_string x);
-		x
-		)
-
-	\print = (\data string_put (to_string data))
-
-
-And now I can simply use print on strings, longs, and doubles easily:
-
 	print "Hello world."; nl;
 	\x = (long_add 4 3)
 	\x = (long_mul x 5)
 	print "x = "; print x; nl;
-
 
 Maybe you'll find that "multiplying by 5" is something you do a lot, so you can
 define a function like this:
@@ -247,6 +204,9 @@ So you can say:
 or equivalently:
 
 	some bad list (print "some bad!") (print "all good!")
+
+Note that these are all built into the standard share/fexl/top.fxl which comes
+with the distribution.
 
 
 I'm finding that Fexl is an open-ended scratch-pad for computation which allows
