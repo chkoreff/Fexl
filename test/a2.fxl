@@ -45,7 +45,12 @@
 		(pair z_sec z_usec)
 	)
 
-\elapsed =
+# Begin a test interval by checkpointing the current usage time.
+\test_begin = ru_utime
+
+# Report on how much time has elapsed since the prev time, and return the new
+# curr time.
+\test_elapsed =
 	(\prev\next
 	ru_utime \curr
 	\elapse = (ru_utime_sub curr prev)
@@ -271,7 +276,7 @@ show "z" z;
 
 \test_eager==
 (\next
-ru_utime \time
+test_begin \time
 
 \long_le = (\x\y long_compare x y T T F)
 
@@ -284,13 +289,13 @@ ru_utime \time
 
 \count = 100000
 print "The sum of 1 .. ";print count; print " is "; print (sum count);nl;
-elapsed time \time
+test_elapsed time \time
 next
 )
 
 \test_eager_2 ==
 (\next
-ru_utime \time
+test_begin \time
 # (list_long x) is the list of all long values starting with x.
 \list_long == (\x item x; \x=(long_add x 1) list_long x)
 
@@ -304,7 +309,7 @@ ru_utime \time
 
 \sum = (list_sum list)
 print "The sum of 1 .. ";print count; print " is "; print sum;nl;
-elapsed time \time
+test_elapsed time \time
 next
 )
 
@@ -611,11 +616,11 @@ next
 #test_case F "nat" 200;
 #test_case F "nat" 2000;
 
-ru_utime \time
+test_begin \time
 test_case T "nat" 300;
-elapsed time \time
+test_elapsed time \time
 test_case F "nat" 1600;   # 5.69s
-elapsed time \time
+test_elapsed time \time
 next
 )
 
@@ -729,11 +734,11 @@ test_div nat_19 nat_5;
 \y =nat_10
 \y=(nat_mul y y)
 
-ru_utime \time
+test_begin \time
 test_div x y;
-elapsed time \time
+test_elapsed time \time
 test_div (churn x) (churn; churn; churn; churn; churn; churn y);
-elapsed time \time
+test_elapsed time \time
 next
 )
 
@@ -990,9 +995,83 @@ test_case 126478.9
 test_case -126478.9
 )
 
+\test_sort =
+(\next
+print ":: test_sort";nl;
+
+# Print a list of strings, each on a separate line.
+\print_list = (\xs do xs \x print x; nl)
+
+test_begin \time
+
+# Here are 30 random words generated with the diceware.com technique.
+\list =
+	(
+	item "when";
+	item "scud";
+	item "gibby";
+	item "babel";
+	item "skip";
+	item "sham";
+	item "rug";
+	item "expel";
+	item "grout";
+	item "perky";
+	item "jo";
+	item "piece";
+	item "ro";
+	item "haw";
+	item "revel";
+	item "qqqq";
+	item "bow";
+	item "blotch";
+	item "flam";
+	item "than";
+	item "subtly";
+	item "jess";
+	item "angie";
+	item "dewar";
+	item "polka";
+	item "ur";
+	item "eb";
+	item "am";
+	item "amra";
+	item "crown";
+	end
+	)
+
+# Now make the list bigger by doubling it a few times.
+\list = (append list list) # 60
+\list = (append list list) # 120
+\list = (append list list) # 240
+\list = (append list list) # 480
+\list = (append list list) # 960
+\list = (append list list) # 1920
+\list = (append list list) # 3840
+
+# Just for the fun of it let's reverse the list now.  It makes no significant
+# difference in running time.
+\list = (reverse list)
+
+# Sort the list without duplicates.
+\list = (sort F string_compare list)
+
+# Print the list.
+print_list list;nl;
+
+# Report the elapsed time.
+test_elapsed time \time
+
+# Here's another interesting test:
+# \list = (list_prefix (rand 0) 20000)
+# \list = (sort T long_compare list)
+
+next
+)
+
 ####
 
-ru_utime \time
+test_begin \time
 test_string_type;
 test_double_type;
 test_long_type;
@@ -1019,9 +1098,10 @@ test_eager_2;
 test_binary_counter;
 test_divide;
 test_sub;
+test_sort;
 test_fibonacci;
 nl; print "Done with all that.";nl;
-elapsed time \time
+test_elapsed time \time
 test_cat;
 
 \\Extra stuff down here becomes input
