@@ -573,13 +573,11 @@ choose \num_print \num_add \num_1
 
 # Produces the infinite list of all Fibonacci numbers.
 \fibonacci =
-	(
-	\1
-	\add
+	(\1\+
 
 	\fibonacci == (\x\y
 		item x;
-		\z = (add x y)
+		\z = (+ x y)
 		fibonacci y z
 		)
 
