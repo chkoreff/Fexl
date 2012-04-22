@@ -62,6 +62,43 @@
 \string_min = (\x\y string_compare x y  x x y)
 \string_max = (\x\y string_compare x y  y x x)
 
+### [ Comparison functions capable of handling long, double, and string.
+
+\compare =
+	(\x\y
+	is_long x
+		(
+		is_long y (long_compare x y);
+		is_double y (double_compare (long_double x) y);
+		halt
+		);
+	is_double x
+		(
+		is_double y (double_compare x y);
+		is_long y (double_compare x (long_double y));
+		halt
+		);
+	is_string x
+		(
+		is_string y (string_compare x y);
+		halt
+		);
+	halt
+	)
+
+\ <   =(\x\y compare x y  T F F)
+\ <=  =(\x\y compare x y  T T F)
+\ =   =(\x\y compare x y  F T F)
+\ ==  =(\x\y compare x y  F T F)
+\ >=  =(\x\y compare x y  F T T)
+\ >   =(\x\y compare x y  F F T)
+\ !=  =(\x\y compare x y  T F T)
+
+\min  =(\x\y compare x y  x x y)
+\max  =(\x\y compare x y  y x x)
+
+### ]
+
 ### List functions
 # Define end as a synonym for C.  The item function is already built-in.
 \end=C
@@ -136,13 +173,26 @@
 # Return the entry at position n in list xs, or v if no such position.
 \list_at = (\xs\n\v list_entry xs n I v)
 
-# LATER + - * / = < etc.
+# The math_op function is internal only to help us build the operators below.
+\math_op = (\f\g
+	\x\y
+	is_long x
+		(
+		is_long y
+			(f x y)
+			(\x = (long_double x) g x y)
+		)
+		(
+		is_long y
+			(\y = (long_double y) g x y)
+			(g x y)
+		)
+	)
 
-# LATER not sure about this stuff -- perhaps auto-promote long to double?
-\ < = long_lt
-\ = = long_eq
-\ + = long_add
-\ - = long_sub
+\+ = (math_op long_add double_add)
+\- = (math_op long_sub double_sub)
+\* = (math_op long_mul double_mul)
+\/ = (math_op long_div double_div)
 
 \is_name = (\x type_eq (type_of x) (type_named "name"))
 
@@ -450,6 +500,22 @@
 
 	if "yes" yes;
 	if "no" no;
+
+	if "+" +;
+	if "-" -;
+	if "*" *;
+	if "/" /;
+
+	if "compare" compare;
+	if "<" <;
+	if "<=" <=;
+	if "=" =;
+	if "==" ==;
+	if ">=" >=;
+	if ">" >;
+	if "!=" !=;
+	if "min" min;
+	if "max" max;
 
 	if "and" and;
 	if "or" or;

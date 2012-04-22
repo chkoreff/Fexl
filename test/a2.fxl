@@ -71,10 +71,8 @@ print "hello world" nl;
 (
 print "=== Enter lines of text and I'll echo them.  Press Ctrl-D to stop";nl;
 
-\long_lt = (\x\y long_compare x y T F F)
-
 # The cat program echoes the input to the output.
-\cat == (char_get \ch long_lt ch 0 I; char_put ch; cat)
+\cat == (char_get \ch < ch 0 I; char_put ch; cat)
 cat
 )
 
@@ -278,12 +276,13 @@ show "z" z;
 (\next
 test_begin \time
 
-\long_le = (\x\y long_compare x y T T F)
+# NOTE: I deliberately use the slightly less efficient <= + and - here, instead
+# of long_le long_add and long_sub, just for testing.
 
 \sum == (\total\count
-	long_le count 0 total;
-	\total = (long_add total count)
-	sum total (long_sub count 1))
+	<= count 0 total;
+	\total = (+ total count)
+	sum total (- count 1))
 
 \sum = (sum 0)
 
