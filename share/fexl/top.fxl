@@ -457,16 +457,11 @@
 	)
 
 # The enhanced context for Fexl programs.
-\context =
+\enhanced_context =
 	(\sym
-	string_long sym yes;
-	string_double sym yes;
-	\if=(\name\def string_eq sym name (yes def))
-
-	# Try the built-in resolve function first before checking enhancements.
-	resolve (string_name sym) yes;
 
 	# LATER read enhancements on-demand from separate files.
+	\if=(\name\def string_eq sym name (yes def))
 
 	if "print" print;
 	if "warn" warn;
@@ -562,17 +557,21 @@
 	if "envs" envs;
 
 	if "rand" rand;
-
-	# Oh well, the symbol is not defined.
 	no
 	)
 
-# Now wrap that in a context which treats strings literally.
+# Here's the context we actually use.  It resolves a name by first looking for
+# a definition using the built-in "resolve" function.  If it doesn't find one
+# there, it looks for a definition using the enhanced context.
 \context =
 	(\sym
 	is_name sym
-		(context (name_string sym))
-		(yes sym)
+		(
+		resolve sym yes;  # First look for a built-in definition.
+		enhanced_context (name_string sym) yes;  # Now try the enhanced.
+		no  # Oh well, the symbol is not defined.
+		)
+		(yes sym)  # Treat strings literally.
 	)
 
 # NOTE: You can do this sort of thing to impose limits on the script.
