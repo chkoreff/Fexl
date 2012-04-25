@@ -25,13 +25,13 @@ function .fexl()
 # Search source.
 function .s()
 	{
-	grep -r "$1" src/* --exclude "*.swp"
+	grep -r "$1" src/* share/* --exclude "*.swp"
 	}
 
 # Search source for whole word.
 function .sw()
 	{
-	grep -r "\<$1\>" src/* --exclude "*.swp"
+	grep -r "\<$1\>" src/* share/* --exclude "*.swp"
 	}
 
 # Run a test script.

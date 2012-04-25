@@ -130,6 +130,10 @@
 # for which (f x) is true.
 \filter == (\f\xs xs end \x\xs f x (item x) I; filter f xs)
 
+# (find f xs) finds the first x in the list xs for which (f x) is true.
+# It returns (yes x) if such an x was found, otherwise no.
+\find == (\f\xs xs no \x\xs f x (yes x); find f xs)
+
 # (choose xs ys) returns the list of all y in ys where the corresponding x in
 # xs is true.  The xs is a list of bits which serves as a "mask".
 \choose ==
@@ -173,6 +177,9 @@
 # Return the entry at position n in list xs, or v if no such position.
 \list_at = (\xs\n\v list_entry xs n I v)
 
+# (list_long x) is the list of all long values starting with x.
+\list_long == (\x item x; \x=(long_add x 1) list_long x)
+
 # The math_op function is internal only to help us build the operators below.
 \math_op = (\f\g
 	\x\y
@@ -206,6 +213,15 @@
 \print = (\data string_put (to_string data))
 \warn = (\data string_stderr (to_string data))
 
+# This is the infinite list of terminators that we try when quoting a string.
+\terminators ==
+	(
+	item ~ "~;  # quote mark
+	item "~";   # tilde
+	# Then the values "~1", "~2", etc.
+	map (\n string_append "~" (long_string n)) (list_long 1)
+	)
+
 # Quote a string.
 #
 # If the string does not contain quotes, then wrap quotes around it.
@@ -214,52 +230,20 @@
 # including a space after the first one.  In choosing the terminator, the
 # function tries the values "~", "~1", "~2" etc. until it finds one that is not
 # contained within the string.
-
-# LATER I could rewrite this far more simply by generating the infinite list of
-# all possible terminators and choosing the first one that doesn't appear in
-# the string.  No need to convolve the production of terminator candidates with
-# the testing and application like this.  The procedural style used here just
-# muddies the waters.
-
 \quote_string =
-	(
-	\try_quote_level==
-		(\level\str
-
-		# Choose the terminator string for this level.
-		\term =
-			(
-			(= level 0) ~ "~;  # Try quote first.
-			(= level 1) "~";   # Try tilde next.
-			# Beyond that, try appending tilde to level minus one.
-			string_append "~" (long_string (- level 1))
-			)
-
-		# See if the terminator appears inside the string.
-		\pos=(string_index str term 0)
-
-		< pos 0
-			# It does not appear, so enclose string in pair of terminators.
-			(
-			# Start with the first terminator.
-			string_append term;
-
-			(= level 0
-				# Using a quote, so don't use a space.
-				()
-				# Using a tilde, so use a space.
-				(string_append " ")
-			);
-
-			# Then follow with the string itself and the terminator again.
-			string_append str; term
-			)
-
-			# It does appear, so try again with the next level.
-			(try_quote_level (+ level 1) str)
+	(\str
+	find (\term < (string_index str term 0) 0) terminators
+		(\term
+		# Start with the terminator we found.
+		string_append term;
+		# Append a space unless we're using " itself.
+		(== term ~ "~ () (string_append " "));
+		# Append the string.
+		string_append str;
+		# Append the terminator again.
+		term
 		)
-
-	try_quote_level 0
+		halt  # Can't happen.
 	)
 
 # Convert the value to a tree with the given leaf and branch functions.
@@ -492,6 +476,7 @@
 	if "list_prefix" list_prefix;
 	if "list_at" list_at;
 	if "list_entry" list_entry;
+	if "list_long" list_long;
 
 	if "yes" yes;
 	if "no" no;
@@ -521,6 +506,7 @@
 	if "all" all;
 	if "some" some;
 	if "filter" filter;
+	if "find" find;
 	if "choose" choose;
 	if "sort" sort;
 	if "list_and" list_and;
