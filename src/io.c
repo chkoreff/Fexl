@@ -5,8 +5,6 @@
 #include "long.h"
 #include "string.h"
 
-/* LATER general-purpose file operations */
-
 void nl(void)
 	{
 	putchar('\n');

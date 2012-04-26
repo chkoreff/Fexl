@@ -11,7 +11,7 @@
 
 \list_print = (\f\xs do (map f xs) string_put)
 
-# We don't use char_put because of buffering problems.
+# We don't use char_put because of buffering problems. LATER are you sure?
 \chars_print = (list_print long_char)
 
 \bits_print = (list_print \x x "1" "0")
