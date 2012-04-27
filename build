@@ -91,10 +91,10 @@ handle_options()
 # Return true if file_1 is newer than file_2.
 newer_than()
 	{
-	local file_1="$1"
-	local file_2="$2"
+	file_1="$1"
+	file_2="$2"
 
-	local result=0
+	result=0
 	if [ -e $file_2 ]; then
 		if [ $file_1 -nt $file_2 ]; then result=1; fi
 	else
@@ -106,10 +106,10 @@ newer_than()
 # Run a system command and echo if not quiet.  Halt on any error.
 run()
 	{
-	local command="$1"
+	command="$1"
 	if [ $quiet -eq 0 ]; then echo $command; fi
 	$command
-	local code=$?
+	code=$?
 	if [ $code -ne 0 ]; then exit $code; fi
 	}
 
@@ -129,16 +129,16 @@ mkdir -p bin
 
 for file_c in src/*.c
 do
-	local name=`basename $file_c .c`
-	local file_o=obj/$name.o
+	name=`basename $file_c .c`
+	file_o=obj/$name.o
 
-	local update=`newer_than $file_c $file_o`
+	update=`newer_than $file_c $file_o`
 	if [ $update -eq 0 ]; then
 		grep -e "^#include \".*\"$" $file_c |
 		sed "s/^#include \"\(.*\)\"/\1/" |
 		(
 		while read file; do
-			local file_h=src/$file
+			file_h=src/$file
 			update=`newer_than $file_h $file_o`
 			if [ $update -eq 1 ]; then exit 1; fi
 		done
@@ -168,8 +168,8 @@ objects=
 update=0
 for file_c in `grep -L "^int main(" src/*.c`
 do
-	local name=`basename $file_c .c`
-	local file_o=obj/$name.o
+	name=`basename $file_c .c`
+	file_o=obj/$name.o
 	objects="$objects $file_o"
 	if [ $update -eq 0 ]; then
 		update=`newer_than $file_o $dir_lib/libfexl.so`
@@ -182,15 +182,15 @@ done
 
 for version in local install
 do
-	local base_dir=
+	base_dir=
 	if [ "$version" = "install" ]; then
 		base_dir=$dir_install
 	else
 		base_dir=$pwd
 	fi
 
-	local file_c=obj/base_$version.c
-	local file_o=obj/base_$version.o
+	file_c=obj/base_$version.c
+	file_o=obj/base_$version.o
 
 	if [ ! -e $file_c ]; then
 		echo "char *base = \"$base_dir\";" >$file_c
@@ -213,7 +213,7 @@ fi
 
 # Build the shared library.  We use -ldl (libdl) for dlopen and dlsym.
 if [ $update -eq 1 ]; then
-	local sudo=
+	sudo=
 	if [ $install -eq 1 ]; then sudo=sudo; fi
 	$sudo mkdir -p $dir_lib
 	run "$sudo gcc -shared -o $dir_lib/libfexl.so $objects -ldl"
@@ -221,7 +221,7 @@ fi
 
 if [ $install -eq 1 ]; then
 	# Copy the "share/fexl" directory to "$dir_install/share/fexl".
-	local sudo=sudo
+	sudo=sudo
 	$sudo rm -rf $dir_install/share/fexl
 	$sudo cp -pr share/fexl $dir_install/share/
 	$sudo sudo chown -R root:root $dir_install/share/fexl
@@ -237,11 +237,11 @@ fi
 
 for file_c in `grep -l "^int main(" src/*.c`
 do
-	local name=`basename $file_c .c`
-	local file_o=obj/$name.o
+	name=`basename $file_c .c`
+	file_o=obj/$name.o
 
-	local dir_bin=bin
-	local sudo=
+	dir_bin=bin
+	sudo=
 
 	if [ $install -eq 1 ]; then
 		if [ "$name" = "fexl" ]; then
@@ -250,9 +250,9 @@ do
 		fi
 	fi
 
-	local file_x=$dir_bin/$name
+	file_x=$dir_bin/$name
 
-	local update=`newer_than $file_o $file_x`
+	update=`newer_than $file_o $file_x`
 	if [ $update -eq 0 ]; then
 		update=`newer_than $dir_lib/libfexl.so $file_x`
 	fi

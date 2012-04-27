@@ -24,7 +24,7 @@ the machine, so together they can definitely hold the 64 bits of a double.
 value Qdouble(double number)
 	{
 	value f = D(type_double);
-	double *p = (double *)(&f->R->L);
+	double *p = (double *)(void *)(&f->R->L);
 	*p = number;
 	return f;
 	}
@@ -41,7 +41,7 @@ Instead, we must first get a pointer to double, then dereference the pointer.
 */
 double get_double(value f)
 	{
-	double *x = (double *)&f->R->L;
+	double *x = (double *)(void *)&f->R->L;
 	return *x;
 	}
 
