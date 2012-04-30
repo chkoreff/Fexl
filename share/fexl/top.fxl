@@ -28,12 +28,12 @@
 # all arguments given to it.  It does not halt the entire program.
 \halt==(\_ halt)
 
+# (eval f) forces an evaluation of f and returns its value.
+\eval = (\f \f=f f)
+
 ### Comparison functions
 
-\long_lt=(\x\y long_compare x y T F F)
-\long_le=(\x\y long_compare x y T T F)
 \long_eq=(\x\y long_compare x y F T F)
-
 \string_eq=(\x\y string_compare x y F T F)
 
 ### List functions
@@ -48,7 +48,9 @@
 # LATER perhaps implement fold in C to accelerate it.
 \fold == (\f\z\xs xs z \x\xs \z=(f z x) fold f z xs)
 
-\do == (\xs\f\end xs end \x\xs f x; do xs f end)
+# Apply function f to each entry in xs, returning next as the final value.
+# This is used to produce a side-effect for each entry in a list.
+\do == (\xs\f\next xs next \x\xs \x=(f x) do xs f next)
 
 # (choose xs ys) returns the list of all y in ys where the corresponding x in
 # xs is true.  The xs is a list of bits which serves as a "mask".
@@ -163,6 +165,21 @@
 	resolve_parse script result
 	)
 
+# This wrapper caches the known module names so it never has to parse a file
+# more than once.
+\module =
+	(
+	\str
+	string_eq str "compare" (eval; module "compare");
+	string_eq str "double" (eval; module "double");
+	string_eq str "list" (eval; module "list");
+	string_eq str "long" (eval; module "long");
+	string_eq str "math" (eval; module "math");
+	string_eq str "meta" (eval; module "meta");
+	string_eq str "string" (eval; module "string");
+	module str
+	)
+
 # This is the context which resolve symbols in Fexl programs.  If the symbol is
 # a string, we treat that literally.  If the symbol is a name, we first look
 # for a definition with the built-in "resolve" function.  If we don't find one
@@ -188,17 +205,7 @@
 		long_eq (string_common sym prefix) (string_len prefix)
 		)
 
-	# We create handles to all potential modules here, which prevents parsing
-	# any module file more than once.
-	\module_string == (module "string" context)
-	\module_list == (module "list" context)
-	\module_long == (module "long" context)
-	\module_double == (module "double" context)
-	\module_meta == (module "meta" context)
-	\module_rand == (module "rand" context)
-	\module_run == (module "run" context)
-	\module_compare == (module "compare" context)
-	\module_math == (module "math" context)
+	\see = (\name module name context sym)
 
 	# Now start looking.
 
@@ -215,6 +222,8 @@
 	if "long_type" (yes is_long);
 	if "double_type" (yes is_double);
 	if "string_type" (yes is_string);
+
+	if "eval" (yes eval);
 
 	if "end" (yes end);
 	if "fold" (yes fold);
@@ -237,43 +246,43 @@
 	if "list_and" (yes list_and);
 	if "list_or" (yes list_or);
 
-	if "find" (module_list sym);
-	if "append" (module_list sym);
-	if "reverse" (module_list sym);
-	if "list_prefix" (module_list sym);
-	if "list_at" (module_list sym);
-	if "list_entry" (module_list sym);
-	if "filter" (module_list sym);
-	if "sort" (module_list sym);
+	if "find" (see "list");
+	if "append" (see "list");
+	if "reverse" (see "list");
+	if "list_prefix" (see "list");
+	if "list_at" (see "list");
+	if "list_entry" (see "list");
+	if "filter" (see "list");
+	if "sort" (see "list");
 
-	starts_with "long_" (module_long sym);
-	starts_with "double_" (module_double sym);
-	starts_with "string_" (module_string sym);
+	starts_with "long_" (see "long");
+	starts_with "double_" (see "double");
+	starts_with "string_" (see "string");
 
-	if "quote_string" (module_meta sym);
+	if "quote_string" (see "meta");
+	if "show" (see "meta");
+	if "value_put" (see "meta");
+	if "value_string" (see "meta");
 
-	if "show" (module_meta sym);
-	if "value_put" (module_meta sym);
-	if "value_string" (module_meta sym);
-	if "rand" (module_rand sym);
-	if "args" (module_run sym);
-	if "envs" (module_run sym);
+	if "rand" (see "rand");
+	if "args" (see "run");
+	if "envs" (see "run");
 
-	if "compare" (module_compare sym);
-	if "<" (module_compare sym);
-	if "<=" (module_compare sym);
-	if "=" (module_compare sym);
-	if "==" (module_compare sym);
-	if ">=" (module_compare sym);
-	if ">" (module_compare sym);
-	if "!=" (module_compare sym);
-	if "min" (module_compare sym);
-	if "max" (module_compare sym);
+	if "compare" (see "compare");
+	if "<" (see "compare");
+	if "<=" (see "compare");
+	if "=" (see "compare");
+	if "==" (see "compare");
+	if ">=" (see "compare");
+	if ">" (see "compare");
+	if "!=" (see "compare");
+	if "min" (see "compare");
+	if "max" (see "compare");
 
-	if "+" (module_math sym);
-	if "-" (module_math sym);
-	if "*" (module_math sym);
-	if "/" (module_math sym);
+	if "+" (see "math");
+	if "-" (see "math");
+	if "*" (see "math");
+	if "/" (see "math");
 
 	no  # The symbol is not defined.
 	)
