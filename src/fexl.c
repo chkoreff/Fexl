@@ -13,7 +13,7 @@
 #include "string.h"
 
 /*
-Parse the top Fexl configuration file "base/share/fexl/top.fxl", where "base"
+Parse the top Fexl configuration file "base/share/fexl/main.fxl", where "base"
 is the base directory set by the build script:  either `pwd` when building
 locally, or "/usr" when doing a final install.
 
@@ -23,7 +23,7 @@ symbols.  Return an evaluable function if all went well, or 0 otherwise.
 */
 static value parse_top(void)
 	{
-	char *top = "share/fexl/top.fxl";
+	char *top = "share/fexl/main.fxl";
 
 	struct buf *buf = 0;
 	buf_add_string(&buf, base);

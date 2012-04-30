@@ -16,7 +16,7 @@
 
 \bits_print = (list_print \x x "1" "0")
 
-# LATER generalize some of these and make them available in top.fxl.
+# LATER generalize some of these and make them available in main.fxl.
 
 \ru_utime_string =
 	(\time
