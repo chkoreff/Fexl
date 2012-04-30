@@ -273,7 +273,6 @@
 	if_basic F "F";
 	if_basic query "?";
 	if_basic parse "parse";
-	if_basic lambda "lam";
 	if_basic resolve "resolve";
 	if_basic long_add "long_add";
 	if_basic double_add "double_add";
