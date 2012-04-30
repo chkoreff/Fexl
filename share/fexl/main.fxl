@@ -48,9 +48,7 @@
 # LATER perhaps implement fold in C to accelerate it.
 \fold == (\f\z\xs xs z \x\xs \z=(f z x) fold f z xs)
 
-# Apply function f to each entry in xs, returning next as the final value.
-# This is used to produce a side-effect for each entry in a list.
-\do == (\xs\f\next xs next \x\xs \x=(f x) do xs f next)
+\do == (\xs\f\next xs next \x\xs f x; do xs f next)
 
 # (choose xs ys) returns the list of all y in ys where the corresponding x in
 # xs is true.  The xs is a list of bits which serves as a "mask".
@@ -188,26 +186,34 @@
 
 \context ==
 	(\sym
+	\sym=sym  # Force evaluation in case it's a computed symbol.
 
+	# See if the symbol is a name.
 	is_name sym
 	(
-	resolve sym yes;  # First look for a built-in definition.
+	\str = (name_string sym)  # Convert name to string.
 
-	# We didn't find one there, so convert the name to a string and let's
-	# look among the enhancements.
-	\sym = (name_string sym)
-
-	# Make some helper functions.
-	\if = (string_eq sym)
+	# Make some helper functions with str embedded.
+	\if = (string_eq str)
 
 	\starts_with =
 		(\prefix
-		long_eq (string_common sym prefix) (string_len prefix)
+		long_eq (string_common str prefix) (string_len prefix)
 		)
 
-	\see = (\name module name context sym)
+	\see = (\file module file context str)
 
-	# Now start looking.
+	# Now start looking for the symbol definition.
+
+	# First, we define "resolve" to refer to *this* context itself, instead of
+	# the resolve function built into resolve.c.  That way any Fexl programs
+	# which call "resolve" directly will pick up all the enhancements here.
+	if "resolve" (yes context);
+
+	# Now look for a definition built into resolve.c.
+	resolve sym yes;
+
+	# We didn't find one there, so now we look through the enhancements.
 
 	if "print" (yes print);
 	if "warn" (yes warn);
@@ -285,8 +291,11 @@
 	if "/" (see "math");
 
 	no  # The symbol is not defined.
-	)
-	(yes sym)  # Treat strings literally.
+	);
+	# It's not a name, now see if it's a string.
+	is_string sym (yes sym);  # Treat strings literally.
+	# It's not a name or a string, so it's undefined.
+	no
 	)
 
 # Run the user's script in the standard context.
