@@ -1,0 +1,62 @@
+# List functions
+
+\append == (\xs\ys xs ys \x\xs item x; append xs ys)
+
+# Push all entries in list xs onto list ys.
+\push_all==(\xs\ys xs ys \x\xs push_all xs (item x ys))
+
+# Reverse list xs.
+\reverse=(\xs push_all xs end)
+
+# (filter f xs) filters the list xs with function f, only returning the entries
+# for which (f x) is true.
+\filter == (\f\xs xs end \x\xs f x (item x) I; filter f xs)
+
+# (find f xs) finds the first x in the list xs for which (f x) is true.
+# It returns (yes x) if such an x was found, otherwise no.
+\find == (\f\xs xs no \x\xs f x (yes x); find f xs)
+
+# (sort keep compare xs) sorts the list xs using the three-way comparison
+# function.  It keeps duplicates if the keep flag is true, otherwise it
+# discards them and returns only the unique entries.
+\sort ==
+	(\keep\compare\xs
+	xs end \x\xs
+
+	\lo = (filter (\y compare y x T F F) xs)
+	\hi = (filter (\y compare y x F keep T) xs)
+
+	append (sort keep compare lo);
+	item x;
+	sort keep compare hi
+	)
+
+# Return the first N items of the list.
+\list_prefix == (\list\N
+	long_le N 0 end;
+	list end \head\tail
+	\N = (long_sub N 1)
+	item head; list_prefix tail N
+	)
+
+# Return the possible entry at position n in list xs.
+\list_entry == (\xs\n
+	xs no \x\xs
+	long_compare n 0 no (yes x)
+	\n = (long_sub n 1)
+	list_entry xs n
+	)
+
+# Return the entry at position n in list xs, or v if no such position.
+\list_at = (\xs\n\v list_entry xs n I v)
+
+\sym
+string_eq sym "append" (yes append);
+string_eq sym "reverse" (yes reverse);
+string_eq sym "list_prefix" (yes list_prefix);
+string_eq sym "list_at" (yes list_at);
+string_eq sym "list_entry" (yes list_entry);
+string_eq sym "filter" (yes filter);
+string_eq sym "find" (yes find);
+string_eq sym "sort" (yes sort);
+no

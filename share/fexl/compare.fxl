@@ -1,0 +1,47 @@
+# Comparison functions capable of handling long, double, and string.
+
+\compare =
+	(\x\y
+	is_long x
+		(
+		is_long y (long_compare x y);
+		is_double y (double_compare (long_double x) y);
+		halt
+		);
+	is_double x
+		(
+		is_double y (double_compare x y);
+		is_long y (double_compare x (long_double y));
+		halt
+		);
+	is_string x
+		(
+		is_string y (string_compare x y);
+		halt
+		);
+	halt
+	)
+
+\ <   =(\x\y compare x y  T F F)
+\ <=  =(\x\y compare x y  T T F)
+\ =   =(\x\y compare x y  F T F)
+\ ==  =(\x\y compare x y  F T F)
+\ >=  =(\x\y compare x y  F T T)
+\ >   =(\x\y compare x y  F F T)
+\ !=  =(\x\y compare x y  T F T)
+
+\min  =(\x\y compare x y  x x y)
+\max  =(\x\y compare x y  y x x)
+
+\sym
+string_eq sym "compare" (yes compare);
+string_eq sym "<" (yes <);
+string_eq sym "<=" (yes <=);
+string_eq sym "=" (yes =);
+string_eq sym "==" (yes ==);
+string_eq sym ">=" (yes >=);
+string_eq sym ">" (yes >);
+string_eq sym "!=" (yes !=);
+string_eq sym "min" (yes min);
+string_eq sym "max" (yes max);
+no

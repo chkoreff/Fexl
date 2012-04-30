@@ -1,0 +1,22 @@
+#
+
+\double_lt=(\x\y double_compare x y T F F)
+\double_le=(\x\y double_compare x y T T F)
+\double_eq=(\x\y double_compare x y F T F)
+\double_ge=(\x\y double_compare x y F T T)
+\double_gt=(\x\y double_compare x y F F T)
+\double_ne=(\x\y double_compare x y T F T)
+
+\double_min = (\x\y double_compare x y  x x y)
+\double_max = (\x\y double_compare x y  y x x)
+
+\sym
+string_eq sym "double_lt" (yes double_lt);
+string_eq sym "double_le" (yes double_le);
+string_eq sym "double_eq" (yes double_eq);
+string_eq sym "double_ge" (yes double_ge);
+string_eq sym "double_gt" (yes double_gt);
+string_eq sym "double_ne" (yes double_ne);
+string_eq sym "double_min" (yes double_min);
+string_eq sym "double_max" (yes double_max);
+no

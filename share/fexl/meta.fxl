@@ -1,0 +1,119 @@
+# Some introspection functions for examining core data structures and quoting
+# strings.
+
+# This is the infinite list of terminators that we try when quoting a string.
+\terminators ==
+	(
+	item ~ "~;  # quote mark
+	item "~";   # tilde
+	# Then the values "~1", "~2", etc.
+	map (\n string_append "~" (long_string n)) (list_long 1)
+	)
+
+# Quote a string.
+#
+# If the string does not contain quotes, then wrap quotes around it.
+#
+# If the string does contain quotes, then wrap tilde terminators around it,
+# including a space after the first one.  In choosing the terminator, the
+# function tries the values "~", "~1", "~2" etc. until it finds one that is not
+# contained within the string.
+\quote_string =
+	(\str
+	find (\term long_lt (string_index str term 0) 0) terminators
+		(\term
+		# Start with the terminator we found.
+		string_append term;
+		# Append a space unless we're using " itself.
+		(string_eq term ~ "~ () (string_append " "));
+		# Append the string.
+		string_append str;
+		# Append the terminator again.
+		term
+		)
+		halt  # Can't happen.
+	)
+
+# LATER: unquote_string
+
+# Convert the value to a tree with the given leaf and branch functions.
+\value_tree =
+	(\value\leaf\branch
+
+	is_apply value branch;
+
+	\if_type=(type_eq (type_of value))
+
+	\if_basic=(\val\type_name
+		if_type (type_of val) (leaf type_name))
+
+	\if_data=(\type_name\to_string
+		if_type (type_named type_name) (leaf (to_string value)))
+
+	if_data "long" long_string;
+	if_data "double" double_string;
+	if_data "string" quote_string;
+	if_data "name" name_string;
+	if_basic C "C";
+	if_basic S "S";
+	if_basic I "I";
+	if_basic Y "Y";
+	if_basic L "L";
+	if_basic R "R";
+	if_basic F "F";
+	if_basic query "?";
+	if_basic parse "parse";
+
+	# Special case because lambda is in a grey area:  it's not a predefined
+	# function you can call directly, and it's not a data object either.
+	if_type (type_named "lambda") (leaf "lam");
+
+	if_basic resolve "resolve";
+	if_basic long_add "long_add";
+	if_basic double_add "double_add";
+	if_basic string_append "string_append";
+	if_basic is_long "is_long";
+	if_basic long_double "long_double";
+	if_basic end "end";
+	if_basic item "item";
+	if_basic pair "pair";
+	if_basic nl "nl";
+
+	leaf "_" # unknown
+	)
+
+# Convert value to a string representation.
+\value_string ==
+	(\value
+	value_tree value I
+	\L\R
+	string_append "(";
+	string_append (value_string L);
+	string_append " ";
+	string_append (value_string R);
+	string_append ")";
+	""
+	)
+
+# Print a value.
+\value_put ==
+	(\value\next
+	value_tree value (\x string_put x next)
+	\L\R
+	string_put "(";
+	value_put L;
+	string_put " ";
+	value_put R;
+	string_put ")";
+	next
+	)
+
+# Show a value (shorthand for value_put).
+\show = value_put
+
+\sym
+string_eq sym "quote_string" (yes quote_string);
+string_eq sym "show" (yes show);
+string_eq sym "value_put" (yes value_put);
+string_eq sym "value_string" (yes value_string);
+no

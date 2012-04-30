@@ -1,0 +1,29 @@
+#
+
+# The math_op function helps us build the generic operators below.
+\math_op = (\f\g
+	\x\y
+	is_long x
+		(
+		is_long y
+			(f x y)
+			(\x = (long_double x) g x y)
+		)
+		(
+		is_long y
+			(\y = (long_double y) g x y)
+			(g x y)
+		)
+	)
+
+\+ = (math_op long_add double_add)
+\- = (math_op long_sub double_sub)
+\* = (math_op long_mul double_mul)
+\/ = (math_op long_div double_div)
+
+\sym
+string_eq sym "+" (yes +);
+string_eq sym "-" (yes -);
+string_eq sym "*" (yes *);
+string_eq sym "/" (yes /);
+no

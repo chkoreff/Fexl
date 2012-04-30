@@ -1,7 +1,5 @@
 # This script provides an enhanced context wrapped around another script.
 
-#### [ auxiliary definitions
-
 ### Boolean functions.
 
 # Define T as a synonym for C.  F is already built-in.
@@ -35,104 +33,22 @@
 \long_lt=(\x\y long_compare x y T F F)
 \long_le=(\x\y long_compare x y T T F)
 \long_eq=(\x\y long_compare x y F T F)
-\long_ge=(\x\y long_compare x y F T T)
-\long_gt=(\x\y long_compare x y F F T)
-\long_ne=(\x\y long_compare x y T F T)
 
-\long_min = (\x\y long_compare x y  x x y)
-\long_max = (\x\y long_compare x y  y x x)
-
-\double_lt=(\x\y double_compare x y T F F)
-\double_le=(\x\y double_compare x y T T F)
-\double_eq=(\x\y double_compare x y F T F)
-\double_ge=(\x\y double_compare x y F T T)
-\double_gt=(\x\y double_compare x y F F T)
-\double_ne=(\x\y double_compare x y T F T)
-
-\double_min = (\x\y double_compare x y  x x y)
-\double_max = (\x\y double_compare x y  y x x)
-
-\string_lt=(\x\y string_compare x y T F F)
-\string_le=(\x\y string_compare x y T T F)
 \string_eq=(\x\y string_compare x y F T F)
-\string_ge=(\x\y string_compare x y F T T)
-\string_gt=(\x\y string_compare x y F F T)
-\string_ne=(\x\y string_compare x y T F T)
-
-\string_min = (\x\y string_compare x y  x x y)
-\string_max = (\x\y string_compare x y  y x x)
-
-### [ Comparison functions capable of handling long, double, and string.
-
-\compare =
-	(\x\y
-	is_long x
-		(
-		is_long y (long_compare x y);
-		is_double y (double_compare (long_double x) y);
-		halt
-		);
-	is_double x
-		(
-		is_double y (double_compare x y);
-		is_long y (double_compare x (long_double y));
-		halt
-		);
-	is_string x
-		(
-		is_string y (string_compare x y);
-		halt
-		);
-	halt
-	)
-
-\ <   =(\x\y compare x y  T F F)
-\ <=  =(\x\y compare x y  T T F)
-\ =   =(\x\y compare x y  F T F)
-\ ==  =(\x\y compare x y  F T F)
-\ >=  =(\x\y compare x y  F T T)
-\ >   =(\x\y compare x y  F F T)
-\ !=  =(\x\y compare x y  T F T)
-
-\min  =(\x\y compare x y  x x y)
-\max  =(\x\y compare x y  y x x)
-
-### ]
 
 ### List functions
+
 # Define end as a synonym for C.  The item function is already built-in.
 \end=C
 
-\append == (\xs\ys xs ys \x\xs item x; append xs ys)
-
-# Push all entries in list xs onto list ys.
-\push_all==(\xs\ys xs ys \x\xs push_all xs (item x ys))
-
-# Reverse list xs.
-\reverse=(\xs push_all xs end)
+\map == (\f\xs xs end \x\xs item (f x) (map f xs))
 
 # LATER more doc
-
-\map == (\f\xs xs end \x\xs item (f x) (map f xs))
 
 # LATER perhaps implement fold in C to accelerate it.
 \fold == (\f\z\xs xs z \x\xs \z=(f z x) fold f z xs)
 
 \do == (\xs\f\end xs end \x\xs f x; do xs f end)
-
-\list_and = (fold and T)
-\list_or = (fold or F)
-
-\all = (\f\xs list_and (map f xs))
-\some = (\f\xs list_or (map f xs))
-
-# (filter f xs) filters the list xs with function f, only returning the entries
-# for which (f x) is true.
-\filter == (\f\xs xs end \x\xs f x (item x) I; filter f xs)
-
-# (find f xs) finds the first x in the list xs for which (f x) is true.
-# It returns (yes x) if such an x was found, otherwise no.
-\find == (\f\xs xs no \x\xs f x (yes x); find f xs)
 
 # (choose xs ys) returns the list of all y in ys where the corresponding x in
 # xs is true.  The xs is a list of bits which serves as a "mask".
@@ -143,63 +59,16 @@
 	x (item y) I (choose xs ys)
 	)
 
-# (sort keep compare xs) sorts the list xs using the three-way comparison
-# function.  It keeps duplicates if the keep flag is true, otherwise it
-# discards them and returns only the unique entries.
-\sort ==
-	(\keep\compare\xs
-	xs end \x\xs
+\list_and = (fold and T)
+\list_or = (fold or F)
 
-	\lo = (filter (\y compare y x T F F) xs)
-	\hi = (filter (\y compare y x F keep T) xs)
-
-	append (sort keep compare lo);
-	item x;
-	sort keep compare hi
-	)
-
-# Return the first N items of the list.
-\list_prefix == (\list\N
-	long_le N 0 end;
-	list end \head\tail
-	\N = (long_sub N 1)
-	item head; list_prefix tail N
-	)
-
-# Return the possible entry at position n in list xs.
-\list_entry == (\xs\n
-	xs no \x\xs
-	long_compare n 0 no (yes x)
-	\n = (long_sub n 1)
-	list_entry xs n
-	)
-
-# Return the entry at position n in list xs, or v if no such position.
-\list_at = (\xs\n\v list_entry xs n I v)
+\all = (\f\xs list_and (map f xs))
+\some = (\f\xs list_or (map f xs))
 
 # (list_long x) is the list of all long values starting with x.
 \list_long == (\x item x; \x=(long_add x 1) list_long x)
 
-# The math_op function is internal only to help us build the operators below.
-\math_op = (\f\g
-	\x\y
-	is_long x
-		(
-		is_long y
-			(f x y)
-			(\x = (long_double x) g x y)
-		)
-		(
-		is_long y
-			(\y = (long_double y) g x y)
-			(g x y)
-		)
-	)
-
-\+ = (math_op long_add double_add)
-\- = (math_op long_sub double_sub)
-\* = (math_op long_mul double_mul)
-\/ = (math_op long_div double_div)
+###
 
 \is_name = (\x type_eq (type_of x) (type_named "name"))
 
@@ -213,179 +82,13 @@
 \print = (\data string_put (to_string data))
 \warn = (\data string_stderr (to_string data))
 
-# This is the infinite list of terminators that we try when quoting a string.
-\terminators ==
-	(
-	item ~ "~;  # quote mark
-	item "~";   # tilde
-	# Then the values "~1", "~2", etc.
-	map (\n string_append "~" (long_string n)) (list_long 1)
-	)
-
-# Quote a string.
+# Resolve the result of parsing a file, where script is the name of the file,
+# result is the return value from parse_file, context is the context for
+# resolving undefined symbols, and next is what to do next.
 #
-# If the string does not contain quotes, then wrap quotes around it.
-#
-# If the string does contain quotes, then wrap tilde terminators around it,
-# including a space after the first one.  In choosing the terminator, the
-# function tries the values "~", "~1", "~2" etc. until it finds one that is not
-# contained within the string.
-\quote_string =
-	(\str
-	find (\term < (string_index str term 0) 0) terminators
-		(\term
-		# Start with the terminator we found.
-		string_append term;
-		# Append a space unless we're using " itself.
-		(== term ~ "~ () (string_append " "));
-		# Append the string.
-		string_append str;
-		# Append the terminator again.
-		term
-		)
-		halt  # Can't happen.
-	)
-
-# Convert the value to a tree with the given leaf and branch functions.
-\value_tree =
-	(\value\leaf\branch
-
-	is_apply value branch;
-
-	\if_type=(type_eq (type_of value))
-
-	\if_basic=(\val\type_name
-		if_type (type_of val) (leaf type_name))
-
-	\if_data=(\type_name\to_string
-		if_type (type_named type_name) (leaf (to_string value)))
-
-	if_data "long" long_string;
-	if_data "double" double_string;
-	if_data "string" quote_string;
-	if_data "name" name_string;
-	if_basic C "C";
-	if_basic S "S";
-	if_basic I "I";
-	if_basic Y "Y";
-	if_basic L "L";
-	if_basic R "R";
-	if_basic F "F";
-	if_basic query "?";
-	if_basic parse "parse";
-
-	# Special case because lambda is in a grey area:  it's not a predefined
-	# function you can call directly, and it's not a data object either.
-	if_type (type_named "lambda") (leaf "lam");
-
-	if_basic resolve "resolve";
-	if_basic long_add "long_add";
-	if_basic double_add "double_add";
-	if_basic string_append "string_append";
-	if_basic is_long "is_long";
-	if_basic long_double "long_double";
-	if_basic end "end";
-	if_basic item "item";
-	if_basic pair "pair";
-	if_basic nl "nl";
-
-	leaf "_" # unknown
-	)
-
-# Print a value.
-\value_put ==
-	(\value\next
-	value_tree value (\x string_put x next)
-	\L\R
-	string_put "(";
-	value_put L;
-	string_put " ";
-	value_put R;
-	string_put ")";
-	next
-	)
-
-# Convert value to a string representation.
-\value_string ==
-	(\value
-	value_tree value I
-	\L\R
-	string_append "(";
-	string_append (value_string L);
-	string_append " ";
-	string_append (value_string R);
-	string_append ")";
-	""
-	)
-
-# Show a value (shorthand for value_put).
-\show = value_put
-
-# Collect an array into a list.
-\array_list =
-	(\f_count\f_get
-	f_count \n
-
-	\collect ==
-		(\i
-		long_lt i n
-			(
-			f_get i \val
-			\i = (long_add i 1)
-			item val; collect i
-			)
-			end
-		)
-	
-	collect 0
-	)
-
-# The list of command-line arguments.
-\args = (array_list argc argv)
-# The list of shell environment bindings (name=value strings).
-\envs = (array_list envc envp)
-
-# Here's an example of how you could print those two lists:
-# \print_entry = (\val print "  ";print val;nl;)
-# print "args:";nl; do args print_entry;
-# print "envs:";nl; do envs print_entry;
-
-
-# (rand x) is the infinite list of pseudo-random long numbers, starting with
-# seed x, generated by the linear congruential generator with the constants
-# chosen by Donald Knuth.  See:
-#     https://en.wikipedia.org/wiki/Linear_congruential_generator
-#
-# This one however uses signed 64-bit long values, not unsigned values as
-# suggested by that Wiki page.  I suppose this is OK, and we can just let it
-# roll with signed numbers, letting them underflow and overflow at will,
-# because 64 bits are 64 bits and it doesn't really matter if one of them is a
-# sign bit.  I need to analyze it a bit further to make sure this is true.
-#
-# Just for reference, here are a few relevant constants:
-#
-#   m = 2^64 = 18446744073709551616
-#       2^63 =  9223372036854775808
-#          a =  6364136223846793005
-#          c =  1442695040888963407
-#
-# Signed longs are in the range -2^63 .. 2^63-1.
-
-\rand ==
-	(\x
-	\a = 6364136223846793005
-	\c = 1442695040888963407
-	\x = (long_add c; long_mul a x)
-	item x; rand x
-	)
-
-#### ] auxiliary definitions
-
-###########################
-
-# Run a program in the normal way, resolving it in the given context and
-# reporting any errors, running the program only if there were no errors.
-\run_program =
+# If there are any syntax or undefined symbol errors, it reports them to stderr
+# and calls (exit 1).
+\resolve_parse =
 	(\script\result\context\next
 	result \syntax_ok\result result \exp\symbols
 
@@ -435,142 +138,149 @@
 	do undef_symbols
 		(\sym
 		sym \sym\line
-		print "Undefined symbol "; print (is_name sym I quote_string sym);
-		error_at line;
+		print "Undefined symbol "; print sym; error_at line;
 		);
-	
+
 	# Run the program if it's ok, otherwise exit.
 	ok program (exit 1);
 	next
 	)
 
-# The enhanced context for Fexl programs.
-\enhanced_context =
+# Parse the module file with the given logical name.  This returns a value
+# which, when applied to a context, returns the actual fully resolved function 
+# described in that file.
+\module =
+	(\name
+	base_path \path
+	\script =
+		(
+		string_append path;
+		string_append "/share/fexl/";
+		string_append name;
+		".fxl"
+		)
+	parse_file script \result
+	resolve_parse script result
+	)
+
+# This is the context which resolve symbols in Fexl programs.  If the symbol is
+# a string, we treat that literally.  If the symbol is a name, we first look
+# for a definition with the built-in "resolve" function.  If we don't find one
+# there, we look for a definition among a large set of enhancements, which we
+# can extend at will and partition across several files in the share directory.
+
+\context ==
 	(\sym
 
-	# LATER read enhancements on-demand from separate files.
-	\if=(\name\def string_eq sym name (yes def))
+	is_name sym
+	(
+	resolve sym yes;  # First look for a built-in definition.
 
-	if "print" print;
-	if "warn" warn;
-	if "to_string" to_string;
+	# We didn't find one there, so convert the name to a string and let's
+	# look among the enhancements.
+	\sym = (name_string sym)
 
-	if "show" show;
-	if "quote_string" quote_string;
-	if "value_put" value_put;
-	if "value_string" value_string;
+	# Make some helper functions.
+	\if = (string_eq sym)
 
-	if "T" T;
-	if "is_name" is_name;
-	if "halt" halt;
+	\starts_with =
+		(\prefix
+		long_eq (string_common sym prefix) (string_len prefix)
+		)
+
+	# We create handles to all potential modules here, which prevents parsing
+	# any module file more than once.
+	\module_string == (module "string" context)
+	\module_list == (module "list" context)
+	\module_long == (module "long" context)
+	\module_double == (module "double" context)
+	\module_meta == (module "meta" context)
+	\module_rand == (module "rand" context)
+	\module_run == (module "run" context)
+	\module_compare == (module "compare" context)
+	\module_math == (module "math" context)
+
+	# Now start looking.
+
+	if "print" (yes print);
+	if "warn" (yes warn);
+	if "to_string" (yes to_string);
+
+	if "T" (yes T);
+	if "is_name" (yes is_name);
+	if "halt" (yes halt);
 
 	# a few synonyms
-	if "?" query;
-	if "long_type" is_long;
-	if "double_type" is_double;
-	if "string_type" is_string;
+	if "?" (yes query);
+	if "long_type" (yes is_long);
+	if "double_type" (yes is_double);
+	if "string_type" (yes is_string);
 
-	if "end" end;
-	if "append" append;
-	if "reverse" reverse;
-	if "fold" fold;
-	if "do" do;
-	if "map" map;
+	if "end" (yes end);
+	if "fold" (yes fold);
+	if "do" (yes do);
+	if "map" (yes map);
+	if "list_long" (yes list_long);
 
-	if "list_prefix" list_prefix;
-	if "list_at" list_at;
-	if "list_entry" list_entry;
-	if "list_long" list_long;
+	if "yes" (yes yes);
+	if "no" (yes no);
 
-	if "yes" yes;
-	if "no" no;
+	if "and" (yes and);
+	if "or" (yes or);
+	if "not" (yes not);
+	if "defined" (yes defined);
+	if "undefined" (yes undefined);
+	if "default" (yes default);
+	if "all" (yes all);
+	if "some" (yes some);
+	if "choose" (yes choose);
+	if "list_and" (yes list_and);
+	if "list_or" (yes list_or);
 
-	if "+" +;
-	if "-" -;
-	if "*" *;
-	if "/" /;
+	if "find" (module_list sym);
+	if "append" (module_list sym);
+	if "reverse" (module_list sym);
+	if "list_prefix" (module_list sym);
+	if "list_at" (module_list sym);
+	if "list_entry" (module_list sym);
+	if "filter" (module_list sym);
+	if "sort" (module_list sym);
 
-	if "compare" compare;
-	if "<" <;
-	if "<=" <=;
-	if "=" =;
-	if "==" ==;
-	if ">=" >=;
-	if ">" >;
-	if "!=" !=;
-	if "min" min;
-	if "max" max;
+	starts_with "long_" (module_long sym);
+	starts_with "double_" (module_double sym);
+	starts_with "string_" (module_string sym);
 
-	if "and" and;
-	if "or" or;
-	if "not" not;
-	if "defined" defined;
-	if "undefined" undefined;
-	if "default" default;
-	if "all" all;
-	if "some" some;
-	if "filter" filter;
-	if "find" find;
-	if "choose" choose;
-	if "sort" sort;
-	if "list_and" list_and;
-	if "list_or" list_or;
+	if "quote_string" (module_meta sym);
 
-	if "long_lt" long_lt;
-	if "long_le" long_le;
-	if "long_eq" long_eq;
-	if "long_ge" long_ge;
-	if "long_gt" long_gt;
-	if "long_ne" long_ne;
-	if "long_min" long_min;
-	if "long_max" long_max;
+	if "show" (module_meta sym);
+	if "value_put" (module_meta sym);
+	if "value_string" (module_meta sym);
+	if "rand" (module_rand sym);
+	if "args" (module_run sym);
+	if "envs" (module_run sym);
 
-	if "double_lt" double_lt;
-	if "double_le" double_le;
-	if "double_eq" double_eq;
-	if "double_ge" double_ge;
-	if "double_gt" double_gt;
-	if "double_ne" double_ne;
-	if "double_min" double_min;
-	if "double_max" double_max;
+	if "compare" (module_compare sym);
+	if "<" (module_compare sym);
+	if "<=" (module_compare sym);
+	if "=" (module_compare sym);
+	if "==" (module_compare sym);
+	if ">=" (module_compare sym);
+	if ">" (module_compare sym);
+	if "!=" (module_compare sym);
+	if "min" (module_compare sym);
+	if "max" (module_compare sym);
 
-	if "string_lt" string_lt;
-	if "string_le" string_le;
-	if "string_eq" string_eq;
-	if "string_ge" string_ge;
-	if "string_gt" string_gt;
-	if "string_ne" string_ne;
-	if "string_min" string_min;
-	if "string_max" string_max;
+	if "+" (module_math sym);
+	if "-" (module_math sym);
+	if "*" (module_math sym);
+	if "/" (module_math sym);
 
-	if "args" args;
-	if "envs" envs;
-
-	if "rand" rand;
-	no
+	no  # The symbol is not defined.
+	)
+	(yes sym)  # Treat strings literally.
 	)
 
-# Here's the context we actually use.  It resolves a name by first looking for
-# a definition using the built-in "resolve" function.  If it doesn't find one
-# there, it looks for a definition using the enhanced context.
-\context =
-	(\sym
-	is_name sym
-		(
-		resolve sym yes;  # First look for a built-in definition.
-		enhanced_context (name_string sym) yes;  # Now try the enhanced.
-		no  # Oh well, the symbol is not defined.
-		)
-		(yes sym)  # Treat strings literally.
-	)
-
-# NOTE: You can do this sort of thing to impose limits on the script.
-#put_max_steps 1000000;
-#put_max_bytes 1000000;
-
-# Now let's put it all together and run the user's script in the enhanced
-# context.
-
+# Run the user's script in the standard context.
 argv 1 \script
 parse_file script \result
-run_program script result context;
+resolve_parse script result context;

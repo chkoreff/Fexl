@@ -1,0 +1,22 @@
+#
+
+\long_lt=(\x\y long_compare x y T F F)
+\long_le=(\x\y long_compare x y T T F)
+\long_eq=(\x\y long_compare x y F T F)
+\long_ge=(\x\y long_compare x y F T T)
+\long_gt=(\x\y long_compare x y F F T)
+\long_ne=(\x\y long_compare x y T F T)
+
+\long_min = (\x\y long_compare x y  x x y)
+\long_max = (\x\y long_compare x y  y x x)
+
+\sym
+string_eq sym "long_lt" (yes long_lt);
+string_eq sym "long_le" (yes long_le);
+string_eq sym "long_eq" (yes long_eq);
+string_eq sym "long_ge" (yes long_ge);
+string_eq sym "long_gt" (yes long_gt);
+string_eq sym "long_ne" (yes long_ne);
+string_eq sym "long_min" (yes long_min);
+string_eq sym "long_max" (yes long_max);
+no
