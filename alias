@@ -1,41 +1,43 @@
-#!/bin/sh    # for syntax highlighting only
+#!/bin/sh
+# The bang line is for syntax highlighting only.
+
 # Handy shell functions for development and testing.  You can source these in a
 # new shell with ". alias".
 
-function .todo()
+.todo()
 	{
 	grep -ra TODO build test src share --exclude=".*.swp"
 	}
 
-function .later()
+.later()
 	{
 	grep -ra "LATER" build test src share --exclude=".*.swp"
 	}
 
-function .build()
+.build()
 	{
 	./build quiet
 	}
 
-function .fexl()
+.fexl()
 	{
 	.build && bin/fexl $1
 	}
 
 # Search source.
-function .s()
+.s()
 	{
 	grep -r "$1" src/* share/* --exclude "*.swp"
 	}
 
 # Search source for whole word.
-function .sw()
+.sw()
 	{
 	grep -r "\<$1\>" src/* share/* --exclude "*.swp"
 	}
 
 # Run a test script.
-function .run()
+.run()
 	{
 	.build &&
 	bin/fexl "test/$1.fxl"
@@ -43,27 +45,27 @@ function .run()
 
 # Check that the output of a test script equals its reference output.  I use
 # the "cat" form here in case the script uses interactive input like char_get.
-function .check()
+.check()
 	{
 	.build &&
 	cat "test/$1.fxl" | bin/fexl | diff -a - "test/$1.out"
 	}
 
 # Time a test script, also checking its output.
-function .time()
+.time()
 	{
 	.build &&
 	time (cat "test/$1.fxl" | bin/fexl | diff -a - "test/$1.out")
 	}
 
 # git status
-function .gs()
+.gs()
 	{
 	git status
 	}
 
 # git diff (-a treats binary files as text)
-function .gd()
+.gd()
 	{
 	git diff -a $1
 	}

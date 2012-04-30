@@ -528,7 +528,7 @@ static value subst(value p, value f, value x)
 	}
 
 /* lambda pattern form value = subst(pattern,form,value) */
-value fexl_lambda(value f)
+value type_lambda(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
 	return subst(f->L->L->R,f->L->R,f->R);
@@ -569,7 +569,7 @@ static void beg_parse(void)
 	L = Q(fexl_L);
 	R = Q(fexl_R);
 	query = Q(fexl_query);
-	lam = Q(fexl_lambda);
+	lam = Q(type_lambda);
 
 	hold(C);
 	hold(I);

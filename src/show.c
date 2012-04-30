@@ -15,7 +15,7 @@ normally disabled with "if 0" at the top.  To enable it, change it to "if 1".
 #include "string.h"
 #include "sym.h"
 
-extern value fexl_lambda(value);
+extern value type_lambda(value);
 extern value fexl_parse(value);
 extern value fexl_resolve(value);
 
@@ -58,7 +58,7 @@ void show_type(type T)
 	T == fexl_nl ? "nl" :
 	T == fexl_string_put ? "string_put" :
 	T == fexl_resolve ? "resolve" :
-	T == fexl_lambda ? "lam" :
+	T == type_lambda ? "lam" :
 	"_";
 
 	print(name);

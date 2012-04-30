@@ -112,24 +112,24 @@ testing all sorts of intricate stuff, so it's very programmer-geeky.
 I suppose one could start with this:
 
 	print "Hello world."; nl;
-	\x = (long_add 4 3)
-	\x = (long_mul x 5)
+	\x = (+ 4 3)
+	\x = (* x 5)
 	print "x = "; print x; nl;
 
 Maybe you'll find that "multiplying by 5" is something you do a lot, so you can
 define a function like this:
 
-	\quintuple = (\x long_mul x 5)
+	\quintuple = (\x * x 5)
 
 Or, if you cleverly fancy the "point free" style:
 
-	\quintuple = (long_mul 5)
+	\quintuple = (* 5)
 
 
 And then you can say:
 
 	print "Hello world."; nl;
-	\x = (long_add 4 3)
+	\x = (+ 4 3)
 	\x = (quintuple x)
 	print "x = "; print x; nl;
 
@@ -137,7 +137,7 @@ And then you can say:
 Or even:
 
 	print "Hello world."; nl;
-	print "x = "; print (quintuple (long_add 4 3)); nl;
+	print "x = "; print (quintuple (+ 4 3)); nl;
 
 Note by the way that ';' is just the "right-pivot" operator which allows you to
 avoid many parentheses when grouping things on the right.  For example, instead

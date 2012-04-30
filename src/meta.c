@@ -1,5 +1,6 @@
 #include <string.h> /* strlen */
 #include <stdlib.h> /* exit */
+#include "base.h"
 #include "memory.h"
 #include "value.h"
 #include "eval.h"
@@ -87,6 +88,13 @@ value fexl_exit(value f)
 	long status = get_long(x);
 	exit(status);
 	return f->R; /* never reached */
+	}
+
+/* (base_path next) = (next path) where path is the base path of the current
+Fexl executable. */
+value fexl_base_path(value f)
+	{
+	return A(f->R,Qstring(base));
 	}
 
 /*

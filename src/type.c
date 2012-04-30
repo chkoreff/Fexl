@@ -67,7 +67,7 @@ value fexl_is_apply(value f)
 
 /* (type_named name) returns the type with the given name, or type 0 if there
 is no such type. */
-void *fexl_type_named(value f)
+value fexl_type_named(value f)
 	{
 	value x = f->R;
 	if (!arg(type_string,x)) return f;

@@ -91,10 +91,10 @@ handle_options()
 # Return true if file_1 is newer than file_2.
 newer_than()
 	{
-	file_1="$1"
-	file_2="$2"
+	local file_1="$1"
+	local file_2="$2"
 
-	result=0
+	local result=0
 	if [ -e $file_2 ]; then
 		if [ $file_1 -nt $file_2 ]; then result=1; fi
 	else
@@ -106,10 +106,10 @@ newer_than()
 # Run a system command and echo if not quiet.  Halt on any error.
 run()
 	{
-	command="$1"
+	local command="$1"
 	if [ $quiet -eq 0 ]; then echo $command; fi
 	$command
-	code=$?
+	local code=$?
 	if [ $code -ne 0 ]; then exit $code; fi
 	}
 
