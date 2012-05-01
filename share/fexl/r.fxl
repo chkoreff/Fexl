@@ -1,0 +1,4 @@
+#
+starts "rand" (see "rand");
+starts "reverse" (see "list");
+void

@@ -149,7 +149,7 @@
 	)
 
 # Parse the module file with the given logical name.  This returns a value
-# which, when applied to a context, returns the actual fully resolved function 
+# which, when applied to a context, returns the fully resolved function
 # described in that file.
 \module =
 	(\name
@@ -170,13 +170,20 @@
 \module =
 	(
 	\str
+	string_eq str "a" (eval; module "a");
 	string_eq str "compare" (eval; module "compare");
 	string_eq str "double" (eval; module "double");
 	string_eq str "list" (eval; module "list");
 	string_eq str "long" (eval; module "long");
 	string_eq str "math" (eval; module "math");
 	string_eq str "meta" (eval; module "meta");
+	string_eq str "m" (eval; module "m");
+	string_eq str "rand" (eval; module "rand");
+	string_eq str "r" (eval; module "r");
+	string_eq str "run" (eval; module "run");
+	string_eq str "s" (eval; module "s");
 	string_eq str "string" (eval; module "string");
+	string_eq str "v" (eval; module "v");
 	module str
 	)
 
@@ -209,9 +216,7 @@
 		(
 		define "all" all;
 		define "and" and;
-		starts "append" (see "list");
-		starts "args" (see "run");
-		void
+		see "a"
 		);
 	starts "c"
 		(
@@ -259,9 +264,7 @@
 	starts "m"
 		(
 		define "map" map;
-		starts "max" (see "compare");
-		starts "min" (see "compare");
-		void
+		see "m"
 		);
 	starts "n"
 		(
@@ -272,32 +275,22 @@
 	define "or" or;
 	define "print" print;
 	starts "quote_string" (see "meta");
-	starts "r"
-		(
-		starts "rand" (see "rand");
-		starts "reverse" (see "list");
-		void
-		);
+	starts "r" (see "r");
 	starts "s"
 		(
 		define "see" see;
-		starts "show" (see "meta");
-		define "some" some;
-		starts "sort" (see "list");
 		define "standard" standard;
 		define "starts" starts;
-		starts "string_" (see "string");
-		void
+		define "some" some;
+		see "s"
 		);
 	define "T" T;
 	define "to_string" to_string;
 	define "undefined" undefined;
 	starts "v"
 		(
-		starts "value_put" (see "meta");
-		starts "value_string" (see "meta");
 		define "void" void;
-		void
+		see "v"
 		);
 	define "warn" warn;
 	define "yes" yes;
