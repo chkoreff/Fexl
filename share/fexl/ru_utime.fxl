@@ -1,0 +1,51 @@
+# Functions for manipulating high-resolution timer values.
+
+# Convert time to string.
+\ru_utime_string =
+	(\time
+	time \sec\usec
+	string_append (long_string sec);
+	string_append ".";
+	string_slice (long_string (long_add 1000000 usec)) 1 6
+	)
+
+# Convert time to double.
+\ru_utime_double =
+	(\time
+	time \sec\usec
+	double_add
+		(long_double sec)
+		(double_div (long_double usec) (long_double 1000000))
+	)
+
+# Subtract time x minus time y.
+\ru_utime_sub =
+	(\x\y
+	x \x_sec\x_usec
+	y \y_sec\y_usec
+	\z_sec = (long_sub x_sec y_sec)
+	\z_usec = (long_sub x_usec y_usec)
+	long_lt z_usec 0
+		(pair (long_sub z_sec 1) (long_add z_usec 1000000))
+		(pair z_sec z_usec)
+	)
+
+# Begin an interval by checkpointing the current usage time.
+\timer_begin = ru_utime
+
+# Report on how much time has elapsed since the prev time, and return the new
+# curr time.
+\timer_elapsed =
+	(\prev\next
+	ru_utime \curr
+	\elapse = (ru_utime_sub curr prev)
+	print "That took ";print (ru_utime_string elapse);print " seconds.";nl;
+	next curr
+	)
+
+define "ru_utime_string" ru_utime_string;
+define "ru_utime_double" ru_utime_double;
+define "ru_utime_sub" ru_utime_sub;
+define "timer_begin" timer_begin;
+define "timer_elapsed" timer_elapsed;
+void

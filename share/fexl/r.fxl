@@ -1,4 +1,5 @@
 #
 starts "rand" (see "rand");
 starts "reverse" (see "list");
+starts "ru_utime" (see "ru_utime");
 void

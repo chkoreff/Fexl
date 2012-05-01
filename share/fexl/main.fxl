@@ -180,6 +180,7 @@
 	string_eq str "m" (eval; module "m");
 	string_eq str "rand" (eval; module "rand");
 	string_eq str "r" (eval; module "r");
+	string_eq str "ru_utime" (eval; module "ru_utime");
 	string_eq str "run" (eval; module "run");
 	string_eq str "s" (eval; module "s");
 	string_eq str "string" (eval; module "string");
@@ -285,6 +286,7 @@
 		see "s"
 		);
 	define "T" T;
+	starts "timer_" (see "ru_utime");
 	define "to_string" to_string;
 	define "undefined" undefined;
 	starts "v"

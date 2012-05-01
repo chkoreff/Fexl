@@ -120,6 +120,9 @@ rand
 resolve
 reverse
 ru_utime
+ru_utime_double
+ru_utime_string
+ru_utime_sub
 S
 see
 show
@@ -149,6 +152,8 @@ string_slice
 string_stderr
 string_type
 T
+timer_begin
+timer_elapsed
 to_string
 type_eq
 type_named
