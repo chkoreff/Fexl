@@ -280,6 +280,7 @@
 		);
 	starts "s"
 		(
+		define "see" see;
 		starts "show" (see "meta");
 		define "some" some;
 		starts "sort" (see "list");
