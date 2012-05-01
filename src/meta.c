@@ -1,5 +1,6 @@
 #include <string.h> /* strlen */
 #include <stdlib.h> /* exit */
+#include <unistd.h> /* fork */
 #include "base.h"
 #include "memory.h"
 #include "value.h"
@@ -98,7 +99,11 @@ value fexl_base_path(value f)
 	}
 
 /*
-LATER a combinator to fork another Fexl and read stdout and stderr so you can
-run other functions safely without affecting the parent, and gather stdout and
-stderr too.
+LATER wrap a function around fork which reads stdout and stderr of the child.
 */
+
+/* (fork next) = (next pid), where pid is the result of calling fork(2). */
+value fexl_fork(value f)
+	{
+	return A(f->R,Qlong(fork()));
+	}

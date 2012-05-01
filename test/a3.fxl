@@ -63,6 +63,7 @@ filter
 find
 fold
 fopen
+fork
 fputc
 fwrite
 get_max_bytes

@@ -73,7 +73,7 @@ value fexl_fputc(value f)
 	}
 
 /* (fwrite file str next) */
-extern void string_write(value x, FILE *stream); /* LATER clean up */
+extern void string_write(value x, FILE *stream);
 value fexl_fwrite(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return f;
