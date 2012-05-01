@@ -111,9 +111,8 @@
 # Show a value (shorthand for value_put).
 \show = value_put
 
-\sym
-string_eq sym "quote_string" (yes quote_string);
-string_eq sym "show" (yes show);
-string_eq sym "value_put" (yes value_put);
-string_eq sym "value_string" (yes value_string);
-no
+define "quote_string" quote_string;
+define "show" show;
+define "value_put" value_put;
+define "value_string" value_string;
+void

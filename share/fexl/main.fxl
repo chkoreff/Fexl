@@ -48,6 +48,8 @@
 # LATER perhaps implement fold in C to accelerate it.
 \fold == (\f\z\xs xs z \x\xs \z=(f z x) fold f z xs)
 
+# Apply function f to each entry in xs, ending with next.  This is useful for
+# producing a side-effect for each entry in a list.
 \do == (\xs\f\next xs next \x\xs f x; do xs f next)
 
 # (choose xs ys) returns the list of all y in ys where the corresponding x in
@@ -178,127 +180,145 @@
 	module str
 	)
 
-# This is the context which resolve symbols in Fexl programs.  If the symbol is
-# a string, we treat that literally.  If the symbol is a name, we first look
-# for a definition with the built-in "resolve" function.  If we don't find one
-# there, we look for a definition among a large set of enhancements, which we
-# can extend at will and partition across several files in the share directory.
+# Context combinators
 
-\context ==
+\void = (\key no)
+\define = (\key\val\next \sym string_eq sym key (yes val) (next sym))
+\starts = (\key\inner\next
+	\sym
+	long_eq (string_common sym key) (string_len key) inner next
+	sym
+	)
+
+# Define an enhanced context in terms of the given standard context.
+\enhance =
+	(\standard
+	# Parse the module file in the standard context.
+	\see = (\file module file standard)
+
+	starts "<" (see "compare");
+	starts "=" (see "compare");
+	starts ">" (see "compare");
+	starts "-" (see "math");
+	starts "!=" (see "compare");
+	define "?" query;
+	starts "/" (see "math");
+	starts "*" (see "math");
+	starts "+" (see "math");
+	starts "a"
+		(
+		define "all" all;
+		define "and" and;
+		starts "append" (see "list");
+		starts "args" (see "run");
+		void
+		);
+	starts "c"
+		(
+		define "choose" choose;
+		starts "compare" (see "compare");
+		void
+		);
+	starts "d"
+		(
+		define "default" default;
+		define "define" define;
+		define "defined" defined;
+		define "do" do;
+		starts "double_" (see "double");
+		void
+		);
+	starts "e"
+		(
+		define "end" end;
+		starts "envs" (see "run");
+		define "eval" eval;
+		void
+		);
+	starts "f"
+		(
+		starts "filter" (see "list");
+		starts "find" (see "list");
+		define "fold" fold;
+		void
+		);
+	define "halt" halt;
+	define "is_name" is_name;
+	starts "l"
+		(
+		starts "list"
+			(
+			define "list_and" list_and;
+			define "list_long" list_long;
+			define "list_or" list_or;
+			see "list"
+			);
+		starts "long_" (see "long");
+		void
+		);
+	starts "m"
+		(
+		define "map" map;
+		starts "max" (see "compare");
+		starts "min" (see "compare");
+		void
+		);
+	starts "n"
+		(
+		define "no" no;
+		define "not" not;
+		void
+		);
+	define "or" or;
+	define "print" print;
+	starts "quote_string" (see "meta");
+	starts "r"
+		(
+		starts "rand" (see "rand");
+		starts "reverse" (see "list");
+		void
+		);
+	starts "s"
+		(
+		starts "show" (see "meta");
+		define "some" some;
+		starts "sort" (see "list");
+		define "standard" standard;
+		define "starts" starts;
+		starts "string_" (see "string");
+		void
+		);
+	define "T" T;
+	define "to_string" to_string;
+	define "undefined" undefined;
+	starts "v"
+		(
+		starts "value_put" (see "meta");
+		starts "value_string" (see "meta");
+		define "void" void;
+		void
+		);
+	define "warn" warn;
+	define "yes" yes;
+	void
+	)
+
+# This is the standard context which resolve symbols in Fexl programs.
+\standard ==
 	(\sym
 	\sym=sym  # Force evaluation in case it's a computed symbol.
-
-	# See if the symbol is a name.
 	is_name sym
-	(
-	\str = (name_string sym)  # Convert name to string.
-
-	# Make some helper functions with str embedded.
-	\if = (string_eq str)
-
-	\starts_with =
-		(\prefix
-		long_eq (string_common str prefix) (string_len prefix)
-		)
-
-	\see = (\file module file context str)
-
-	# Now start looking for the symbol definition.
-
-	# First, we define "resolve" to refer to *this* context itself, instead of
-	# the resolve function built into resolve.c.  That way any Fexl programs
-	# which call "resolve" directly will pick up all the enhancements here.
-	if "resolve" (yes context);
-
-	# Now look for a definition built into resolve.c.
-	resolve sym yes;
-
-	# We didn't find one there, so now we look through the enhancements.
-
-	if "print" (yes print);
-	if "warn" (yes warn);
-	if "to_string" (yes to_string);
-
-	if "T" (yes T);
-	if "is_name" (yes is_name);
-	if "halt" (yes halt);
-
-	# a few synonyms
-	if "?" (yes query);
-	if "long_type" (yes is_long);
-	if "double_type" (yes is_double);
-	if "string_type" (yes is_string);
-
-	if "eval" (yes eval);
-
-	if "end" (yes end);
-	if "fold" (yes fold);
-	if "do" (yes do);
-	if "map" (yes map);
-	if "list_long" (yes list_long);
-
-	if "yes" (yes yes);
-	if "no" (yes no);
-
-	if "and" (yes and);
-	if "or" (yes or);
-	if "not" (yes not);
-	if "defined" (yes defined);
-	if "undefined" (yes undefined);
-	if "default" (yes default);
-	if "all" (yes all);
-	if "some" (yes some);
-	if "choose" (yes choose);
-	if "list_and" (yes list_and);
-	if "list_or" (yes list_or);
-
-	if "find" (see "list");
-	if "append" (see "list");
-	if "reverse" (see "list");
-	if "list_prefix" (see "list");
-	if "list_at" (see "list");
-	if "list_entry" (see "list");
-	if "filter" (see "list");
-	if "sort" (see "list");
-
-	starts_with "long_" (see "long");
-	starts_with "double_" (see "double");
-	starts_with "string_" (see "string");
-
-	if "quote_string" (see "meta");
-	if "show" (see "meta");
-	if "value_put" (see "meta");
-	if "value_string" (see "meta");
-
-	if "rand" (see "rand");
-	if "args" (see "run");
-	if "envs" (see "run");
-
-	if "compare" (see "compare");
-	if "<" (see "compare");
-	if "<=" (see "compare");
-	if "=" (see "compare");
-	if "==" (see "compare");
-	if ">=" (see "compare");
-	if ">" (see "compare");
-	if "!=" (see "compare");
-	if "min" (see "compare");
-	if "max" (see "compare");
-
-	if "+" (see "math");
-	if "-" (see "math");
-	if "*" (see "math");
-	if "/" (see "math");
-
-	no  # The symbol is not defined.
-	);
-	# It's not a name, now see if it's a string.
+		(
+		# Look for a definition built into resolve.c.
+		resolve sym yes;
+		# We didn't find one there, so look through the enhancements.
+		enhance standard (name_string sym)
+		);
 	is_string sym (yes sym);  # Treat strings literally.
-	# It's not a name or a string, so it's undefined.
-	no
+	no  # It's not a name or a string, so it's undefined.
 	)
 
 # Run the user's script in the standard context.
 argv 1 \script
 parse_file script \result
-resolve_parse script result context;
+resolve_parse script result standard;

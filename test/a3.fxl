@@ -31,6 +31,7 @@ char_put
 choose
 compare
 default
+define
 defined
 do
 double_add
@@ -53,6 +54,7 @@ end
 envc
 envp
 envs
+eval
 exit
 F
 fgetc
@@ -122,6 +124,8 @@ S
 show
 some
 sort
+standard
+starts
 string_append
 string_at
 string_common
@@ -151,6 +155,7 @@ type_of
 undefined
 value_put
 value_string
+void
 warn
 Y
 yes

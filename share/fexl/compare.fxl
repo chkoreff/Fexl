@@ -33,15 +33,14 @@
 \min  =(\x\y compare x y  x x y)
 \max  =(\x\y compare x y  y x x)
 
-\sym
-string_eq sym "compare" (yes compare);
-string_eq sym "<" (yes <);
-string_eq sym "<=" (yes <=);
-string_eq sym "=" (yes =);
-string_eq sym "==" (yes ==);
-string_eq sym ">=" (yes >=);
-string_eq sym ">" (yes >);
-string_eq sym "!=" (yes !=);
-string_eq sym "min" (yes min);
-string_eq sym "max" (yes max);
-no
+define "compare" compare;
+define "<" <;
+define "<=" <=;
+define "=" =;
+define "==" ==;
+define ">=" >=;
+define ">" >;
+define "!=" !=;
+define "min" min;
+define "max" max;
+void

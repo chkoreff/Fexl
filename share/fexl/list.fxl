@@ -50,13 +50,12 @@
 # Return the entry at position n in list xs, or v if no such position.
 \list_at = (\xs\n\v list_entry xs n I v)
 
-\sym
-string_eq sym "append" (yes append);
-string_eq sym "reverse" (yes reverse);
-string_eq sym "list_prefix" (yes list_prefix);
-string_eq sym "list_at" (yes list_at);
-string_eq sym "list_entry" (yes list_entry);
-string_eq sym "filter" (yes filter);
-string_eq sym "find" (yes find);
-string_eq sym "sort" (yes sort);
-no
+define "append" append;
+define "reverse" reverse;
+define "list_prefix" list_prefix;
+define "list_at" list_at;
+define "list_entry" list_entry;
+define "filter" filter;
+define "find" find;
+define "sort" sort;
+void

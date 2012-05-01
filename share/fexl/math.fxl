@@ -21,9 +21,8 @@
 \* = (math_op long_mul double_mul)
 \/ = (math_op long_div double_div)
 
-\sym
-string_eq sym "+" (yes +);
-string_eq sym "-" (yes -);
-string_eq sym "*" (yes *);
-string_eq sym "/" (yes /);
-no
+define "+" +;
+define "-" -;
+define "*" *;
+define "/" /;
+void

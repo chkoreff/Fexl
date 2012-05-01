@@ -10,13 +10,13 @@
 \string_min = (\x\y string_compare x y  x x y)
 \string_max = (\x\y string_compare x y  y x x)
 
-\sym
-string_eq sym "string_lt" (yes string_lt);
-string_eq sym "string_le" (yes string_le);
-string_eq sym "string_eq" (yes string_eq);
-string_eq sym "string_ge" (yes string_ge);
-string_eq sym "string_gt" (yes string_gt);
-string_eq sym "string_ne" (yes string_ne);
-string_eq sym "string_min" (yes string_min);
-string_eq sym "string_max" (yes string_max);
-no
+define "string_lt" string_lt;
+define "string_le" string_le;
+define "string_eq" string_eq;
+define "string_ge" string_ge;
+define "string_gt" string_gt;
+define "string_ne" string_ne;
+define "string_min" string_min;
+define "string_max" string_max;
+define "string_type" is_string;
+void

@@ -28,6 +28,5 @@
 	item x; rand x
 	)
 
-\sym
-string_eq sym "rand" (yes rand);
-no
+define "rand" rand;
+void

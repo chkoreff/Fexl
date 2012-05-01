@@ -27,7 +27,6 @@
 # print "args:";nl; do args print_entry;
 # print "envs:";nl; do envs print_entry;
 
-\sym
-string_eq sym "args" (yes args);
-string_eq sym "envs" (yes envs);
-no
+define "args" args;
+define "envs" envs;
+void

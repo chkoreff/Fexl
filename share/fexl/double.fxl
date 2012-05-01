@@ -10,13 +10,13 @@
 \double_min = (\x\y double_compare x y  x x y)
 \double_max = (\x\y double_compare x y  y x x)
 
-\sym
-string_eq sym "double_lt" (yes double_lt);
-string_eq sym "double_le" (yes double_le);
-string_eq sym "double_eq" (yes double_eq);
-string_eq sym "double_ge" (yes double_ge);
-string_eq sym "double_gt" (yes double_gt);
-string_eq sym "double_ne" (yes double_ne);
-string_eq sym "double_min" (yes double_min);
-string_eq sym "double_max" (yes double_max);
-no
+define "double_lt" double_lt;
+define "double_le" double_le;
+define "double_eq" double_eq;
+define "double_ge" double_ge;
+define "double_gt" double_gt;
+define "double_ne" double_ne;
+define "double_min" double_min;
+define "double_max" double_max;
+define "double_type" is_double;
+void

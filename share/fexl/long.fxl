@@ -10,13 +10,13 @@
 \long_min = (\x\y long_compare x y  x x y)
 \long_max = (\x\y long_compare x y  y x x)
 
-\sym
-string_eq sym "long_lt" (yes long_lt);
-string_eq sym "long_le" (yes long_le);
-string_eq sym "long_eq" (yes long_eq);
-string_eq sym "long_ge" (yes long_ge);
-string_eq sym "long_gt" (yes long_gt);
-string_eq sym "long_ne" (yes long_ne);
-string_eq sym "long_min" (yes long_min);
-string_eq sym "long_max" (yes long_max);
-no
+define "long_lt" long_lt;
+define "long_le" long_le;
+define "long_eq" long_eq;
+define "long_ge" long_ge;
+define "long_gt" long_gt;
+define "long_ne" long_ne;
+define "long_min" long_min;
+define "long_max" long_max;
+define "long_type" is_long;
+void
