@@ -1,3 +1,4 @@
+#!/usr/bin/fexl
 # This script ensures that all the expected functions are defined, simply by
 # mentioning all of them.
 
@@ -29,10 +30,12 @@ C
 char_get
 char_put
 choose
+close
 compare
 default
 define
 defined
+die
 do
 double_add
 double_compare
@@ -50,6 +53,7 @@ double_ne
 double_string
 double_sub
 double_type
+dup2
 end
 envc
 envp
@@ -57,6 +61,8 @@ envs
 eval
 exit
 F
+fdopen
+fflush
 fgetc
 file_string
 filter
@@ -68,6 +74,9 @@ fputc
 fwrite
 get_max_bytes
 get_max_steps
+get_stderr
+get_stdin
+get_stdout
 halt
 I
 is_apply
@@ -103,6 +112,7 @@ long_type
 map
 max
 min
+NL
 name_string
 nl
 no
@@ -111,9 +121,11 @@ or
 pair
 parse
 parse_file
+pipe
 print
 put_max_bytes
 put_max_steps
+putchar
 query
 quote_string
 R
@@ -129,6 +141,7 @@ see
 show
 some
 sort
+spawn
 standard
 starts
 string_append
@@ -163,6 +176,7 @@ undefined
 value_put
 value_string
 void
+wait
 warn
 Y
 yes

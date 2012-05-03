@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <unistd.h>
 #include "value.h"
 #include "eval.h"
 #include "io.h"
@@ -69,4 +70,44 @@ value fexl_char_put(value f)
 
 	putchar(get_long(x));
 	return f->R;
+	}
+
+/*
+(pipe next) = (next status read write), where read and write are the two ends
+of the pipe, expressed as numeric file descriptors.  The status is the return
+value of pipe, 0 if success, or -1 otherwise.
+*/
+value fexl_pipe(value f)
+	{
+	int fd[2];
+	int status = pipe(fd);
+	return A(A(A(f->R,Qlong(status)),Qlong(fd[0])),Qlong(fd[1]));
+	}
+
+/* (dup2 oldfd newfd next) = (next status) */
+value fexl_dup2(value f)
+	{
+	if (!f->L->L || !f->L->L->L) return f;
+	value x = f->L->L->R;
+	value y = f->L->R;
+	if (!arg(type_long,x)) return f;
+	if (!arg(type_long,y)) return f;
+
+	long oldfd = get_long(x);
+	long newfd = get_long(y);
+
+	int status = dup2(oldfd, newfd);
+	return A(f->R,Qlong(status));
+	}
+
+/* (close fd next) = (next status) */
+value fexl_close(value f)
+	{
+	if (!f->L->L) return f;
+	value x = f->L->R;
+	if (!arg(type_long,x)) return f;
+
+	long fd = get_long(x);
+	long status = close(fd);
+	return A(f->R,Qlong(status));
 	}

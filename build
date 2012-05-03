@@ -126,6 +126,11 @@ mkdir -p bin
 #
 # I compile with -fPIC to generate Position Independent Code for shared
 # libraries.
+#
+# NOTE: I no longer use the -ansi flag because that makes the fdopen function
+# inaccessible in stdio.h for some strange reason.
+
+cflags="-c -Wall -Werror -O3 -fPIC"
 
 for file_c in src/*.c
 do
@@ -147,7 +152,7 @@ do
 	fi
 
 	if [ $update -eq 1 ]; then
-		run "gcc -c -Wall -Werror -ansi -O3 -fPIC $file_c -o $file_o"
+		run "gcc $cflags $file_c -o $file_o"
 	fi
 done
 
@@ -194,7 +199,7 @@ do
 
 	if [ ! -e $file_c ]; then
 		echo "char *base = \"$base_dir\";" >$file_c
-		run "gcc -c -Wall -Werror -ansi -O3 -fPIC $file_c -o $file_o"
+		run "gcc $cflags $file_c -o $file_o"
 	fi
 done
 
@@ -212,6 +217,8 @@ if [ $update -eq 0 ]; then
 fi
 
 # Build the shared library.  We use -ldl (libdl) for dlopen and dlsym.
+# LATER jturner says he had to remove -ldl when building on OpenBSD.
+# I should auto-detect that.
 if [ $update -eq 1 ]; then
 	sudo=
 	if [ $install -eq 1 ]; then sudo=sudo; fi

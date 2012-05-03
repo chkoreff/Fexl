@@ -84,6 +84,20 @@
 \print = (\data string_put (to_string data))
 \warn = (\data string_stderr (to_string data))
 
+# LATER move putchar, NL, and die to separate modules.
+
+# Define putchar as synonym for char_put.
+\putchar = char_put
+
+\NL="
+"
+
+\die =
+	(\msg
+	warn msg; warn NL;
+	exit 1
+	)
+
 # Resolve the result of parsing a file, where script is the name of the file,
 # result is the return value from parse_file, context is the context for
 # resolving undefined symbols, and next is what to do next.
@@ -173,6 +187,7 @@
 	string_eq str "a" (eval; module "a");
 	string_eq str "compare" (eval; module "compare");
 	string_eq str "double" (eval; module "double");
+	string_eq str "ipc" (eval; module "ipc");
 	string_eq str "list" (eval; module "list");
 	string_eq str "long" (eval; module "long");
 	string_eq str "math" (eval; module "math");
@@ -230,6 +245,7 @@
 		define "default" default;
 		define "define" define;
 		define "defined" defined;
+		define "die" die;
 		define "do" do;
 		starts "double_" (see "double");
 		void
@@ -267,6 +283,7 @@
 		define "map" map;
 		see "m"
 		);
+	define "NL" NL;
 	starts "n"
 		(
 		define "no" no;
@@ -275,6 +292,7 @@
 		);
 	define "or" or;
 	define "print" print;
+	define "putchar" putchar;
 	starts "quote_string" (see "meta");
 	starts "r" (see "r");
 	starts "s"

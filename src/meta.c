@@ -1,5 +1,7 @@
 #include <string.h> /* strlen */
 #include <stdlib.h> /* exit */
+#include <sys/types.h> /* pid_t */
+#include <sys/wait.h> /* wait */
 #include <unistd.h> /* fork */
 #include "base.h"
 #include "memory.h"
@@ -106,4 +108,12 @@ LATER wrap a function around fork which reads stdout and stderr of the child.
 value fexl_fork(value f)
 	{
 	return A(f->R,Qlong(fork()));
+	}
+
+/* (wait next) = (next pid status) */
+value fexl_wait(value f)
+	{
+	int status;
+	pid_t pid = wait(&status);
+	return A(A(f->R,Qlong(pid)),Qlong(status));
 	}
