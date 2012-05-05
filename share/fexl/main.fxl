@@ -72,7 +72,7 @@
 
 ###
 
-\is_name = (\x type_eq (type_of x) (type_named "name"))
+\is_name = (\x type_named "name" (type_eq (type_of x)) F)
 
 \to_string = (\x
 	is_string x x;
@@ -84,7 +84,7 @@
 \print = (\data string_put (to_string data))
 \warn = (\data string_stderr (to_string data))
 
-# LATER move putchar, NL, and die to separate modules.
+# LATER move putchar, NL, and die to separate files.
 
 # Define putchar as synonym for char_put.
 \putchar = char_put

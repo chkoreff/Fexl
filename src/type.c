@@ -65,11 +65,20 @@ value fexl_is_apply(value f)
 	return f->R;
 	}
 
-/* (type_named name) returns the type with the given name, or type 0 if there
-is no such type. */
+/*
+Find the type with the given name.
+The value of (type_named name yes no) is
+  yes type     # if the type exists
+  no           # if not
+*/
 value fexl_type_named(value f)
 	{
-	value x = f->R;
+	if (!f->L->L || !f->L->L->L) return f;
+
+	value x = f->L->L->R;
 	if (!arg(type_string,x)) return f;
-	return Qtype(lib_sym("type_",string_data(x)));
+
+	void *def = lib_sym("type_",string_data(x));
+	if (def) return A(f->L->R,Qtype(def));
+	return f->R;
 	}

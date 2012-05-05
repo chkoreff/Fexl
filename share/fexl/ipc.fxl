@@ -1,5 +1,6 @@
 # (spawn child_fn next)
-# Fork the child function as a process and is pid, stdin, stdout, and stderr.
+# Fork the child function as a process and return its pid, stdin, stdout, and
+# stderr.
 \spawn =
 	(
 	### Use error-checking versions of system routines
@@ -58,8 +59,8 @@
 		dup2 w_err 2;
 
 		# Close unused file handles.  They're all unused because we duped the
-		# ones we need.  Also, we must close w_in or the child hangs waiting
-		# for stdin to close.
+		# ones we need.  In any case we must close w_in or the child hangs
+		# waiting for stdin to close.
 		close r_in; close w_in;
 		close r_out; close w_out;
 		close r_err; close w_err;

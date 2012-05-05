@@ -3,6 +3,10 @@
 #include "eval.h"
 #include "run.h"
 
+/* LATER use rlimit, see:
+http://linux.about.com/library/cmd/blcmdl2_getrlimit.htm
+*/
+
 int arg(type T, value x)
 	{
 	if (x->T == 0) eval(x);

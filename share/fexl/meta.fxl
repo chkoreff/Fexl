@@ -48,12 +48,14 @@
 		if_type (type_of val) (leaf type_name))
 
 	\if_data=(\type_name\to_string
-		if_type (type_named type_name) (leaf (to_string value)))
+		type_named type_name if_type F (leaf (to_string value)))
 
 	if_data "long" long_string;
 	if_data "double" double_string;
 	if_data "string" quote_string;
 	if_data "name" name_string;
+	if_data "lambda" (\_ "lam");
+
 	if_basic C "C";
 	if_basic S "S";
 	if_basic I "I";
@@ -63,11 +65,6 @@
 	if_basic F "F";
 	if_basic query "?";
 	if_basic parse "parse";
-
-	# Special case because lambda is in a grey area:  it's not a predefined
-	# function you can call directly, and it's not a data object either.
-	if_type (type_named "lambda") (leaf "lam");
-
 	if_basic resolve "resolve";
 	if_basic long_add "long_add";
 	if_basic double_add "double_add";

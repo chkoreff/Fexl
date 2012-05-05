@@ -3,6 +3,9 @@
 # Build and install the Fexl program as required.  Run "./build help" to see
 # the usage options.
 
+# LATER http://stackoverflow.com/questions/394230/detect-the-os-from-a-bash-script
+# Don't use backticks, use the newer clearer syntax: "unamestr = $(uname)".
+
 usage()
 	{
 	progname=$0
