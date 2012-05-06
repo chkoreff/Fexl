@@ -64,5 +64,7 @@ extern void drop(value);
 extern value D(type);
 extern value Q(type);
 extern value A(value, value);
-extern void replace(value, value);
+extern void eval(value);
+extern int arg(type, value);
+extern value arg_is_type(type, value);
 extern void end_value(void);

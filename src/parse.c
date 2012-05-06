@@ -59,10 +59,6 @@ static int ch = 0;      /* current character */
 
 static void next_ch(void)
 	{
-	/* Pay attention to max_steps while parsing. */
-	if (max_steps >= 0 && ++cur_steps > max_steps)
-		die("Your program ran too long");
-
 	ch = read_ch();
 	if (ch == '\n') line++;
 	}
@@ -344,7 +340,7 @@ static value parse_term(void)
 	return exp;
 	}
 
-static value type_open(value f) { return f; }
+static value type_open(value f) { return 0; }
 
 int is_open(value f)
 	{
@@ -463,19 +459,24 @@ static value parse_lambda(void)
 	}
 
 /*
-Parse an expression.
+If you're parsing a possibly malicious script, you should use setrlimit to
+impose limits not only on stack depth, but also on total memory usage and
+CPU time.
 
-We limit the depth here to avoid a stack overflow resulting from strange inputs
-like an infinite series of left parentheses.
+For example, if you parse an infinite stream of '(' characters, you'll see a
+segmentation fault due to stack overflow.  That happens due to the default
+limits on stack size, without any intervention.  But if you parse an infinite
+stream of ' ' characters, it will run forever unless you impose limits on CPU
+time with RLIMIT_CPU.  If you parse an infinite stream of 'a' characters, it
+will use an unbounded amount of memory which could slow your machine to a crawl
+until it finally reaches the very large default limits.  So you should set
+RLIMIT_AS, and also RLIMIT_DATA for good measure, to limit the total amount of
+memory.
 */
+
+/* Parse an expression. */
 static value parse_exp(void)
 	{
-	if (++cur_depth > max_depth)
-		{
-		error = "Your program is too deeply nested.";
-		return 0;
-		}
-
 	value exp = I;
 
 	while (1)
@@ -515,7 +516,6 @@ static value parse_exp(void)
 		exp = apply(exp,val);
 		}
 
-	cur_depth--;
 	return exp;
 	}
 
@@ -530,7 +530,7 @@ static value subst(value p, value f, value x)
 /* lambda pattern form value = subst(pattern,form,value) */
 value type_lambda(value f)
 	{
-	if (!f->L->L || !f->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 	return subst(f->L->L->R,f->L->R,f->R);
 	}
 

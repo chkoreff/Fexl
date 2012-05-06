@@ -1,6 +1,5 @@
 #include "value.h"
 #include "basic.h"
-#include "eval.h"
 #include "resolve.h"
 
 /*
@@ -15,7 +14,7 @@ context.
 */
 value fexl_C(value f)
 	{
-	if (!f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 	return f->L->R;
 	}
 
@@ -25,7 +24,7 @@ This represents "false", which always returns its second argument.
 */
 value fexl_F(value f)
 	{
-	if (!f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 	return f->R;
 	}
 
@@ -36,7 +35,7 @@ German.
 */
 value fexl_S(value f)
 	{
-	if (!f->L->L || !f->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 	return A( A(f->L->L->R, f->R), A(f->L->R, f->R) );
 	}
 
@@ -46,6 +45,7 @@ This is the "identity function."
 */
 value fexl_I(value f)
 	{
+	if (!f->L) return 0;
 	return f->R;
 	}
 
@@ -56,7 +56,7 @@ I call it R because it passes z to the right side only.
 */
 value fexl_R(value f)
 	{
-	if (!f->L->L || !f->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 	return A( f->L->L->R, A(f->L->R, f->R) );
 	}
 
@@ -67,7 +67,7 @@ I call it L because it passes z to the left side only.
 */
 value fexl_L(value f)
 	{
-	if (!f->L->L || !f->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 	return A( A(f->L->L->R, f->R), f->L->R);
 	}
 
@@ -78,6 +78,7 @@ in a fully closed form with no need for circular references or symbol tables.
 */
 value fexl_Y(value f)
 	{
+	if (!f->L) return 0;
 	return A(f->R, A(f->L,f->R));
 	}
 
@@ -88,7 +89,7 @@ standard environment.
 */
 value fexl_query(value f)
 	{
-	if (!f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 	value x = f->L->R;
 	eval(x);
 	return A(f->R,x);
@@ -100,7 +101,7 @@ This creates a list with the first element head, followed by the list tail.
 */
 value fexl_item(value f)
 	{
-	if (!f->L->L || !f->L->L->L || !f->L->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
 	return A(A(f->R,f->L->L->L->R),f->L->L->R);
 	}
 
@@ -110,6 +111,6 @@ This creates a pair of two things.
 */
 value fexl_pair(value f)
 	{
-	if (!f->L->L || !f->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 	return A(A(f->R,f->L->L->R),f->L->R);
 	}

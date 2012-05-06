@@ -1,11 +1,10 @@
 #include "value.h"
 #include "double.h"
-#include "eval.h"
 #include "io.h"
 #include "long.h"
 #include "string.h"
 
-value type_double(value f) { return f; }
+value type_double(value f) { return 0; }
 
 /*
 Make a new value of type double.
@@ -47,39 +46,39 @@ double get_double(value f)
 
 value fexl_double_add(value f)
 	{
-	if (!f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 
 	value x = f->L->R;
 	value y = f->R;
 
-	if (!arg(type_double,x)) return f;
-	if (!arg(type_double,y)) return f;
+	if (!arg(type_double,x)) return 0;
+	if (!arg(type_double,y)) return 0;
 
 	return Qdouble(get_double(x) + get_double(y));
 	}
 
 value fexl_double_sub(value f)
 	{
-	if (!f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 
 	value x = f->L->R;
 	value y = f->R;
 
-	if (!arg(type_double,x)) return f;
-	if (!arg(type_double,y)) return f;
+	if (!arg(type_double,x)) return 0;
+	if (!arg(type_double,y)) return 0;
 
 	return Qdouble(get_double(x) - get_double(y));
 	}
 
 value fexl_double_mul(value f)
 	{
-	if (!f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 
 	value x = f->L->R;
 	value y = f->R;
 
-	if (!arg(type_double,x)) return f;
-	if (!arg(type_double,y)) return f;
+	if (!arg(type_double,x)) return 0;
+	if (!arg(type_double,y)) return 0;
 
 	return Qdouble(get_double(x) * get_double(y));
 	}
@@ -91,13 +90,13 @@ zero, it yields inf (infinity).  If you divide zero by zero, it yields -nan
 */
 value fexl_double_div(value f)
 	{
-	if (!f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 
 	value x = f->L->R;
 	value y = f->R;
 
-	if (!arg(type_double,x)) return f;
-	if (!arg(type_double,y)) return f;
+	if (!arg(type_double,x)) return 0;
+	if (!arg(type_double,y)) return 0;
 
 	return Qdouble(get_double(x) / get_double(y));
 	}
@@ -113,8 +112,10 @@ value fexl_is_double(value f)
 we try to read it back in.  Perhaps force a ".0" suffix, not sure. */
 value fexl_double_string(value f)
 	{
+	if (!f->L) return 0;
+
 	value x = f->R;
-	if (!arg(type_double,x)) return f;
+	if (!arg(type_double,x)) return 0;
 
 	char buf[100]; /* being careful here */
 	/* We show 15 digits because that's what Perl does. */
@@ -124,8 +125,10 @@ value fexl_double_string(value f)
 
 value fexl_double_long(value f)
 	{
+	if (!f->L) return 0;
+
 	value x = f->R;
-	if (!arg(type_double,x)) return f;
+	if (!arg(type_double,x)) return 0;
 
 	return Qlong(get_double(x));
 	}
@@ -133,14 +136,15 @@ value fexl_double_long(value f)
 /* double_compare x y lt eq gt */
 value fexl_double_compare(value f)
 	{
-	if (!f->L->L || !f->L->L->L || !f->L->L->L->L || !f->L->L->L->L->L)
-		return f;
+	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L
+		|| !f->L->L->L->L->L)
+		return 0;
 
 	value x = f->L->L->L->L->R;
 	value y = f->L->L->L->R;
 
-	if (!arg(type_double,x)) return f;
-	if (!arg(type_double,y)) return f;
+	if (!arg(type_double,x)) return 0;
+	if (!arg(type_double,y)) return 0;
 
 	double vx = get_double(x);
 	double vy = get_double(y);

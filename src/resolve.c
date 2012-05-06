@@ -1,7 +1,6 @@
 #include "dynamic.h"
 #include "value.h"
 #include "double.h"
-#include "eval.h"
 #include "long.h"
 #include "resolve.h"
 #include "string.h"
@@ -42,10 +41,10 @@ The value of (resolve sym yes no) is
 */
 value fexl_resolve(value f)
 	{
-	if (!f->L->L || !f->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 
 	value sym = f->L->L->R;
-	if (sym->T == 0) eval(sym);
+	eval(sym);
 
 	void *def = resolve(sym);
 	if (def) return A(f->L->R,def);

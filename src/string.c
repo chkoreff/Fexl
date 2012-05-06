@@ -4,7 +4,6 @@
 #include "memory.h"
 #include "value.h"
 #include "double.h"
-#include "eval.h"
 #include "long.h"
 #include "string.h"
 
@@ -21,12 +20,12 @@ long string_len(value f)
 	return (long)f->R->L;
 	}
 
-value type_string(value f) { return f; }
+value type_string(value f) { return 0; }
 
 static value clear_string(value f)
 	{
 	free_memory(string_data(f), string_len(f) + 1);
-	return f;
+	return 0;
 	}
 
 /*
@@ -97,14 +96,15 @@ static int string_compare(value x, value y)
 /* string_compare x y lt eq gt */
 value fexl_string_compare(value f)
 	{
-	if (!f->L->L || !f->L->L->L || !f->L->L->L->L || !f->L->L->L->L->L)
-		return f;
+	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L
+		|| !f->L->L->L->L->L)
+		return 0;
 
 	value x = f->L->L->L->L->R;
 	value y = f->L->L->L->R;
 
-	if (!arg(type_string,x)) return f;
-	if (!arg(type_string,y)) return f;
+	if (!arg(type_string,x)) return 0;
+	if (!arg(type_string,y)) return 0;
 
 	int cmp = string_compare(x,y);
 	if (cmp < 0) return f->L->L->R;
@@ -115,15 +115,15 @@ value fexl_string_compare(value f)
 /* string_slice str pos len */
 value fexl_string_slice(value f)
 	{
-	if (!f->L->L || !f->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 
 	value x = f->L->L->R;
 	value y = f->L->R;
 	value z = f->R;
 
-	if (!arg(type_string,x)) return f;
-	if (!arg(type_long,y)) return f;
-	if (!arg(type_long,z)) return f;
+	if (!arg(type_string,x)) return 0;
+	if (!arg(type_long,y)) return 0;
+	if (!arg(type_long,z)) return 0;
 
 	long pos = get_long(y);
 	long len = get_long(z);
@@ -148,13 +148,13 @@ value fexl_string_slice(value f)
 /* string_at str pos - return the character at the position */
 value fexl_string_at(value f)
 	{
-	if (!f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 
 	value x = f->L->R;
 	value y = f->R;
 
-	if (!arg(type_string,x)) return f;
-	if (!arg(type_long,y)) return f;
+	if (!arg(type_string,x)) return 0;
+	if (!arg(type_long,y)) return 0;
 
 	long len = string_len(x);
 	char *data = string_data(x);
@@ -183,13 +183,13 @@ value fexl_is_string(value f)
 /* Append two strings. */
 value fexl_string_append(value f)
 	{
-	if (!f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 
 	value x = f->L->R;
 	value y = f->R;
 
-	if (!arg(type_string,x)) return f;
-	if (!arg(type_string,y)) return f;
+	if (!arg(type_string,x)) return 0;
+	if (!arg(type_string,y)) return 0;
 
 	long xlen = string_len(x);
 	long ylen = string_len(y);
@@ -209,13 +209,13 @@ value fexl_string_append(value f)
 /* Compute the length of the longest common prefix of two strings. */
 value fexl_string_common(value f)
 	{
-	if (!f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 
 	value x = f->L->R;
 	value y = f->R;
 
-	if (!arg(type_string,x)) return f;
-	if (!arg(type_string,y)) return f;
+	if (!arg(type_string,x)) return 0;
+	if (!arg(type_string,y)) return 0;
 
 	long xlen = string_len(x);
 	long ylen = string_len(y);
@@ -238,8 +238,9 @@ value fexl_string_common(value f)
 /* Return the length of the string. */
 value fexl_string_len(value f)
 	{
+	if (!f->L) return 0;
 	value x = f->R;
-	if (!arg(type_string,x)) return f;
+	if (!arg(type_string,x)) return 0;
 	return Qlong(string_len(x));
 	}
 
@@ -260,10 +261,10 @@ LATER: strtol does not allow numeric separators like ',' and '_'.
 */
 value fexl_string_long(value f)
 	{
-	if (!f->L->L || !f->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 
 	value x = f->L->L->R;
-	if (!arg(type_string,x)) return f;
+	if (!arg(type_string,x)) return 0;
 
 	long num;
 	if (string_long(string_data(x),&num))
@@ -288,10 +289,10 @@ LATER: strtod does not allow numeric separators like ',' and '_'.
 */
 value fexl_string_double(value f)
 	{
-	if (!f->L->L || !f->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 
 	value x = f->L->L->R;
-	if (!arg(type_string,x)) return f;
+	if (!arg(type_string,x)) return 0;
 
 	double num;
 	if (string_double(string_data(x),&num))
@@ -306,15 +307,15 @@ NOTE: I have an extensive test suite verifying compatibility with the Perl
 */
 value fexl_string_index(value f)
 	{
-	if (!f->L->L || !f->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 
 	value x = f->L->L->R;
 	value y = f->L->R;
 	value z = f->R;
 
-	if (!arg(type_string,x)) return f;
-	if (!arg(type_string,y)) return f;
-	if (!arg(type_long,z)) return f;
+	if (!arg(type_string,x)) return 0;
+	if (!arg(type_string,y)) return 0;
+	if (!arg(type_long,z)) return 0;
 
 	char *xs = string_data(x);
 	long xn = string_len(x);

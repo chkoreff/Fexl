@@ -1,19 +1,18 @@
 #include <stdio.h>
 #include "buf.h"
 #include "value.h"
-#include "eval.h"
 #include "io.h"
 #include "long.h"
 #include "string.h"
 
-value type_file(value f) { return f; }
+value type_file(value f) { return 0; }
 
 /* Close the file when it's no longer used. */
 static value clear_file(value f)
 	{
 	FILE *fh = (FILE *)f->R->L;
 	if (fh) fclose(fh);
-	return f;
+	return 0;
 	}
 
 /* Make a file value from the given file handle. */
@@ -41,12 +40,12 @@ value Qfile_const(FILE *fh)
 */
 value fexl_fopen(value f)
 	{
-	if (!f->L->L || !f->L->L->L || !f->L->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
 
 	value x = f->L->L->L->R;
 	value y = f->L->L->R;
-	if (!arg(type_string,x)) return f;
-	if (!arg(type_string,y)) return f;
+	if (!arg(type_string,x)) return 0;
+	if (!arg(type_string,y)) return 0;
 
 	char *path = string_data(x);
 	char *mode = string_data(y);
@@ -61,11 +60,11 @@ value fexl_fopen(value f)
 */
 value fexl_fdopen(value f)
 	{
-	if (!f->L->L || !f->L->L->L || !f->L->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
 	value x = f->L->L->L->R;
 	value y = f->L->L->R;
-	if (!arg(type_long,x)) return f;
-	if (!arg(type_string,y)) return f;
+	if (!arg(type_long,x)) return 0;
+	if (!arg(type_string,y)) return 0;
 
 	long fd = get_long(x);
 	char *mode = string_data(y);
@@ -78,10 +77,10 @@ value fexl_fdopen(value f)
 /* (fgetc file next) = (next ch), where ch is the next character from file. */
 value fexl_fgetc(value f)
 	{
-	if (!f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 
 	value x = f->L->R;
-	if (!arg(type_file,x)) return f;
+	if (!arg(type_file,x)) return 0;
 
 	FILE *fh = (FILE *)x->R->L;
 
@@ -91,12 +90,12 @@ value fexl_fgetc(value f)
 /* (fputc file ch next) */
 value fexl_fputc(value f)
 	{
-	if (!f->L->L || !f->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 
 	value x = f->L->L->R;
 	value y = f->L->R;
-	if (!arg(type_file,x)) return f;
-	if (!arg(type_long,y)) return f;
+	if (!arg(type_file,x)) return 0;
+	if (!arg(type_long,y)) return 0;
 
 	FILE *fh = (FILE *)x->R->L;
 	fputc(get_long(y), fh);
@@ -107,12 +106,12 @@ value fexl_fputc(value f)
 extern void string_write(value x, FILE *stream);
 value fexl_fwrite(value f)
 	{
-	if (!f->L->L || !f->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 
 	value x = f->L->L->R;
 	value y = f->L->R;
-	if (!arg(type_file,x)) return f;
-	if (!arg(type_string,y)) return f;
+	if (!arg(type_file,x)) return 0;
+	if (!arg(type_string,y)) return 0;
 
 	FILE *fh = (FILE *)x->R->L;
 	string_write(y, fh);
@@ -122,9 +121,9 @@ value fexl_fwrite(value f)
 /* (fflush file next) = (next status) */
 value fexl_fflush(value f)
 	{
-	if (!f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 	value x = f->L->R;
-	if (!arg(type_file,x)) return f;
+	if (!arg(type_file,x)) return 0;
 	FILE *fh = (FILE *)x->R->L;
 	return A(f->R,Qlong(fflush(fh)));
 	}
@@ -133,10 +132,10 @@ value fexl_fflush(value f)
 of file in a single string. */
 value fexl_file_string(value f)
 	{
-	if (!f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 
 	value x = f->L->R;
-	if (!arg(type_file,x)) return f;
+	if (!arg(type_file,x)) return 0;
 
 	FILE *fh = (FILE *)x->R->L;
 	struct buf *buf = 0;
@@ -153,17 +152,17 @@ value fexl_file_string(value f)
 	return A(f->R,Qchars(data,len));
 	}
 
-value fexl_get_stdin(value f)
+value fexl_stdin(value f)
 	{
-	return A(f->R,Qfile_const(stdin));
+	return Qfile_const(stdin);
 	}
 
-value fexl_get_stdout(value f)
+value fexl_stdout(value f)
 	{
-	return A(f->R,Qfile_const(stdout));
+	return Qfile_const(stdout);
 	}
 
-value fexl_get_stderr(value f)
+value fexl_stderr(value f)
 	{
-	return A(f->R,Qfile_const(stderr));
+	return Qfile_const(stderr);
 	}

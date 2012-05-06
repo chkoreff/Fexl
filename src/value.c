@@ -1,5 +1,5 @@
-#include "value.h"
 #include "memory.h"
+#include "value.h"
 
 value free_list = 0;
 
@@ -95,7 +95,7 @@ value A(value L, value R)
 	}
 
 /* Replace the contents of f with the contents of g.  Assumes g && f != g. */
-void replace(value f, value g)
+static void replace(value f, value g)
 	{
 	g->N++;
 
@@ -110,6 +110,45 @@ void replace(value f, value g)
 
 	if (--g->N == 0)
 		recycle(g);
+	}
+
+/*
+Evaluate a value, reducing it to a final normal form if possible within any
+limits on time and space.
+*/
+void eval(value f)
+	{
+	while (1)
+		{
+		if (f->T)
+			{
+			value g = f->T(f);
+			if (g == 0) break;
+			if (g != f) replace(f,g);
+			}
+		else
+			{
+			eval(f->L);
+			f->T = f->L->T;
+			}
+		}
+	}
+
+/* Determine if a function argument has the correct type. */
+int arg(type T, value x)
+	{
+	eval(x);
+	return x->T == T && !x->L;
+	}
+
+/* Used for functions of the form (is_T x yes no), which checks the type of x
+and returns yes if it's type T or no otherwise. */
+value arg_is_type(type T, value f)
+	{
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	value x = f->L->L->R;
+	if (arg(T,x)) return f->L->R;
+	return f->R;
 	}
 
 /* Clear the free list and end the memory arena. */

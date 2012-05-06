@@ -1,7 +1,6 @@
 #include <string.h> /* strlen */
 #include "die.h"
 #include "value.h"
-#include "eval.h"
 #include "parse.h"
 #include "parse_string.h"
 #include "run.h"
@@ -36,7 +35,8 @@ value parse_string(char *string)
 (pair ok; pair exp; symbols). */
 value fexl_parse(value f)
 	{
+	if (!f->L) return 0;
 	value source = f->R;
-	if (!arg(type_string,source)) return f;
+	if (!arg(type_string,source)) return 0;
 	return parse_chars(string_data(source), string_len(source));
 	}

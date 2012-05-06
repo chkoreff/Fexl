@@ -39,8 +39,8 @@
 	# accidentally getting pushed into the child's input.  I've noticed this
 	# can happen when your script output is sent to a file or pipe instead of
 	# a console.
-	get_stdout \fh fflush fh \_
-	get_stderr \fh fflush fh \_
+	fflush stdout \_
+	fflush stderr \_
 
 	# Now create a series of pipes, each with a read and write side.
 	pipe \r_in\w_in

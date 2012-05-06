@@ -1,11 +1,10 @@
 #include "value.h"
 #include "double.h"
-#include "eval.h"
 #include "io.h"
 #include "long.h"
 #include "string.h"
 
-value type_long(value f) { return f; }
+value type_long(value f) { return 0; }
 
 /* Make a new value of type long.  */
 value Qlong(long number)
@@ -22,39 +21,39 @@ long get_long(value f)
 
 value fexl_long_add(value f)
 	{
-	if (!f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 
 	value x = f->L->R;
 	value y = f->R;
 
-	if (!arg(type_long,x)) return f;
-	if (!arg(type_long,y)) return f;
+	if (!arg(type_long,x)) return 0;
+	if (!arg(type_long,y)) return 0;
 
 	return Qlong(get_long(x) + get_long(y));
 	}
 
 value fexl_long_sub(value f)
 	{
-	if (!f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 
 	value x = f->L->R;
 	value y = f->R;
 
-	if (!arg(type_long,x)) return f;
-	if (!arg(type_long,y)) return f;
+	if (!arg(type_long,x)) return 0;
+	if (!arg(type_long,y)) return 0;
 
 	return Qlong(get_long(x) - get_long(y));
 	}
 
 value fexl_long_mul(value f)
 	{
-	if (!f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 
 	value x = f->L->R;
 	value y = f->R;
 
-	if (!arg(type_long,x)) return f;
-	if (!arg(type_long,y)) return f;
+	if (!arg(type_long,x)) return 0;
+	if (!arg(type_long,y)) return 0;
 
 	return Qlong(get_long(x) * get_long(y));
 	}
@@ -62,13 +61,13 @@ value fexl_long_mul(value f)
 /* long_div returns 0 if you try to divide by 0. */
 value fexl_long_div(value f)
 	{
-	if (!f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 
 	value x = f->L->R;
 	value y = f->R;
 
-	if (!arg(type_long,x)) return f;
-	if (!arg(type_long,y)) return f;
+	if (!arg(type_long,x)) return 0;
+	if (!arg(type_long,y)) return 0;
 
 	long vx = get_long(x);
 	long vy = get_long(y);
@@ -85,8 +84,10 @@ value fexl_is_long(value f)
 /* Convert long to double. */
 value fexl_long_double(value f)
 	{
+	if (!f->L) return 0;
+
 	value x = f->R;
-	if (!arg(type_long,x)) return f;
+	if (!arg(type_long,x)) return 0;
 
 	return Qdouble(get_long(x));
 	}
@@ -94,8 +95,10 @@ value fexl_long_double(value f)
 /* Convert long to string. */
 value fexl_long_string(value f)
 	{
+	if (!f->L) return 0;
+
 	value x = f->R;
-	if (!arg(type_long,x)) return f;
+	if (!arg(type_long,x)) return 0;
 
 	char buf[100]; /* being careful here */
 	sprintf(buf, "%ld", get_long(x));
@@ -105,8 +108,10 @@ value fexl_long_string(value f)
 /* Convert long to char (string of length 1). */
 value fexl_long_char(value f)
 	{
+	if (!f->L) return 0;
+
 	value x = f->R;
-	if (!arg(type_long,x)) return f;
+	if (!arg(type_long,x)) return 0;
 
 	char buf[1];
 	buf[0] = get_long(x);
@@ -116,14 +121,15 @@ value fexl_long_char(value f)
 /* long_compare x y lt eq gt */
 value fexl_long_compare(value f)
 	{
-	if (!f->L->L || !f->L->L->L || !f->L->L->L->L || !f->L->L->L->L->L)
-		return f;
+	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L
+		|| !f->L->L->L->L->L)
+		return 0;
 
 	value x = f->L->L->L->L->R;
 	value y = f->L->L->L->R;
 
-	if (!arg(type_long,x)) return f;
-	if (!arg(type_long,y)) return f;
+	if (!arg(type_long,x)) return 0;
+	if (!arg(type_long,y)) return 0;
 
 	long vx = get_long(x);
 	long vy = get_long(y);

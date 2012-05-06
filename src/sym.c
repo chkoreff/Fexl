@@ -1,10 +1,9 @@
 #include "die.h"
 #include "value.h"
-#include "eval.h"
 #include "string.h"
 #include "sym.h"
 
-value type_name(value f) { return f; }
+value type_name(value f) { return 0; }
 
 /* Make a name from the given data. */
 value Qname(char *data, long len)
@@ -24,8 +23,9 @@ int sym_eq(value form, value sym)
 /* Convert name to string. */
 value fexl_name_string(value f)
 	{
+	if (!f->L) return 0;
 	value x = f->R;
-	if (!arg(type_name,x)) return f;
+	if (!arg(type_name,x)) return 0;
 
 	value v = Q(type_string);
 	v->R = x->R;
@@ -36,8 +36,9 @@ value fexl_name_string(value f)
 /* Convert string to name. */
 value fexl_string_name(value f)
 	{
+	if (!f->L) return 0;
 	value x = f->R;
-	if (!arg(type_string,x)) return f;
+	if (!arg(type_string,x)) return 0;
 
 	value v = Q(type_name);
 	v->R = x->R;

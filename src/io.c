@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
 #include "value.h"
-#include "eval.h"
 #include "io.h"
 #include "long.h"
 #include "string.h"
@@ -18,6 +17,7 @@ void print(const char *s)
 
 value fexl_nl(value f)
 	{
+	if (!f->L) return 0;
 	nl();
 	return f->R;
 	}
@@ -35,9 +35,9 @@ void string_put(value x)
 
 static value op_string_write(value f, FILE *stream)
 	{
-	if (!f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 	value x = f->L->R;
-	if (!arg(type_string,x)) return f;
+	if (!arg(type_string,x)) return 0;
 
 	string_write(x, stream);
 	return f->R;
@@ -58,15 +58,16 @@ value fexl_string_stderr(value f)
 /* (char_get next) = (next ch), where ch is the next character from stdin. */
 value fexl_char_get(value f)
 	{
+	if (!f->L) return 0;
 	return A(f->R,Qlong(getchar()));
 	}
 
 /* char_put ch next */
 value fexl_char_put(value f)
 	{
-	if (!f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 	value x = f->L->R;
-	if (!arg(type_long,x)) return f;
+	if (!arg(type_long,x)) return 0;
 
 	putchar(get_long(x));
 	return f->R;
@@ -79,6 +80,7 @@ value of pipe, 0 if success, or -1 otherwise.
 */
 value fexl_pipe(value f)
 	{
+	if (!f->L) return 0;
 	int fd[2];
 	int status = pipe(fd);
 	return A(A(A(f->R,Qlong(status)),Qlong(fd[0])),Qlong(fd[1]));
@@ -87,11 +89,11 @@ value fexl_pipe(value f)
 /* (dup2 oldfd newfd next) = (next status) */
 value fexl_dup2(value f)
 	{
-	if (!f->L->L || !f->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 	value x = f->L->L->R;
 	value y = f->L->R;
-	if (!arg(type_long,x)) return f;
-	if (!arg(type_long,y)) return f;
+	if (!arg(type_long,x)) return 0;
+	if (!arg(type_long,y)) return 0;
 
 	long oldfd = get_long(x);
 	long newfd = get_long(y);
@@ -103,9 +105,9 @@ value fexl_dup2(value f)
 /* (close fd next) = (next status) */
 value fexl_close(value f)
 	{
-	if (!f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 	value x = f->L->R;
-	if (!arg(type_long,x)) return f;
+	if (!arg(type_long,x)) return 0;
 
 	long fd = get_long(x);
 	long status = close(fd);

@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "value.h"
-#include "eval.h"
 #include "parse.h"
 #include "parse_file.h"
 #include "run.h"
@@ -32,10 +31,10 @@ value parse_file(char *name)
 /* parse_file name next = (next result) */
 value fexl_parse_file(value f)
 	{
-	if (!f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 
 	value x = f->L->R;
-	if (!arg(type_string,x)) return f;
+	if (!arg(type_string,x)) return 0;
 
 	return A(f->R, parse_file(string_data(x)));
 	}

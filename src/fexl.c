@@ -5,7 +5,6 @@
 
 #include "value.h"
 #include "basic.h"
-#include "eval.h"
 #include "long.h"
 #include "parse_file.h"
 #include "resolve.h"
@@ -84,7 +83,7 @@ static value parse_top(void)
 
 /*
 This is the main routine of the Fexl interpreter.  The exit status is 0 for
-success, or 1 for failure.
+success or non-zero for failure.
 
 It parses the top Fexl configuration script and evaluates that function.  That
 function defines the standard context of predefined function definitions, then

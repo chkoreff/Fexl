@@ -1,10 +1,9 @@
 #include "dynamic.h"
 #include "value.h"
-#include "eval.h"
 #include "long.h"
 #include "string.h"
 
-value type_type(value f) { return f; }
+value type_type(value f) { return 0; }
 
 /* Make a new value of type "type".  */
 value Qtype(type T)
@@ -21,19 +20,20 @@ type get_type(value f)
 
 value fexl_type_of(value f)
 	{
+	if (!f->L) return 0;
 	return Qtype(f->R->T);
 	}
 
 /* type_eq x y yes no */
 value fexl_type_eq(value f)
 	{
-	if (!f->L->L || !f->L->L->L || !f->L->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
 
 	value x = f->L->L->L->R;
 	value y = f->L->L->R;
 
-	if (!arg(type_type,x)) return f;
-	if (!arg(type_type,y)) return f;
+	if (!arg(type_type,x)) return 0;
+	if (!arg(type_type,y)) return 0;
 
 	if (get_type(x) == get_type(y)) return f->L->R;
 	return f->R;
@@ -42,7 +42,7 @@ value fexl_type_eq(value f)
 /* atomic x yes no */
 value fexl_atomic(value f)
 	{
-	if (!f->L->L || !f->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 
 	value x = f->L->L->R;
 
@@ -57,7 +57,7 @@ is_apply x yes no
 */
 value fexl_is_apply(value f)
 	{
-	if (!f->L->L || !f->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 
 	value x = f->L->L->R;
 
@@ -73,10 +73,10 @@ The value of (type_named name yes no) is
 */
 value fexl_type_named(value f)
 	{
-	if (!f->L->L || !f->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 
 	value x = f->L->L->R;
-	if (!arg(type_string,x)) return f;
+	if (!arg(type_string,x)) return 0;
 
 	void *def = lib_sym("type_",string_data(x));
 	if (def) return A(f->L->R,Qtype(def));

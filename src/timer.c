@@ -6,6 +6,7 @@
 /* ru_time next = (next (pair sec usec)) */
 value fexl_ru_utime(value f)
 	{
+	if (!f->L) return 0;
 	struct rusage ru;
 	getrusage(RUSAGE_SELF, &ru);
 	return A(f->R,

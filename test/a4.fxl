@@ -1,0 +1,114 @@
+#!/usr/bin/fexl
+
+# Override setrlimit with a version that dies on failure.  For example, if you
+# set the soft limit higher than the hard limit, setrlimit returns -1 and has
+# no effect.  In that case we want it to die because we don't want to continue
+# the program mistakenly thinking we've actually set a limit.
+\setrlimit =
+	(\resource\soft\hard\next
+	setrlimit resource soft hard \status
+	long_eq status -1 (die "setrlimit failed");
+	next
+	)
+
+# This one specifies a single limit used for both soft and hard limits.
+\setrlimit =
+	(\resource\limit
+	setrlimit resource limit limit
+	)
+
+# This imposes reasonably safe limits on a child process, which could possibly
+# be malicious.  We could also set limits on the number of processes, in case
+# the child does a fork, but in practice we're unlikely to define "fork" in
+# user-submitted scripts anyway.
+\impose_safe_limits =
+	(\next
+
+	\max_time   = 1
+	\max_memory = 8000000
+	\max_stack  = 1000000
+
+	setrlimit RLIMIT_CPU max_time;
+	setrlimit RLIMIT_DATA max_memory;
+	setrlimit RLIMIT_AS max_memory;
+	setrlimit RLIMIT_STACK max_stack;
+	next
+	)
+
+### Handy
+
+# Copy the source stream to the target stream.
+\cat ==
+	(\source\target\next
+	fgetc source \ch
+	long_lt ch 0 next;
+	fputc target ch;
+	cat source target next
+	)
+
+# Build a tower of function applications, allowing us to use lots of memory
+# very easily.
+\tower ==
+	(\f\x\count
+	long_le count 1 x;
+	\x = (f x x)
+	tower f x (long_sub count 1)
+	)
+
+
+# The test_limits function tests setting CPU and memory limits on arbitrary
+# child processes.
+\test_limits ==
+(\next
+print "== test_limits";nl;
+
+# The try function tests a single case, spawning the child function and sending
+# the input string to it.
+\try =
+	(\input\child_fn\next
+
+	print "== test case";nl;
+
+	\child_fn =
+		(
+		\next
+		impose_safe_limits;
+		child_fn
+		next
+		)
+
+	# Spawn the child.
+	spawn child_fn \pid\child_in\child_out\child_err
+
+	# Now we can communicate with the child through its three file handles.
+	#print "Hello from parent, child pid = ";print pid;print ".";nl;
+
+	(fwrite child_in input);  # Send input to child.
+
+	print ":: child stdout is:";nl; cat child_out stdout;
+	print ":: child stderr is:";nl; cat child_err stdout;
+
+	wait \pid\status
+	print ":: child status = ";print status;print ".";nl;nl;
+	next
+	)
+
+# Now run all the test cases.
+try "" (print "Hello world.";nl;);  # status 0
+try "" (print "Hello world.";nl; die "dummy error");  # status 256
+
+# Now send a message to a child process.
+try 
+	(string_append "Message from parent." NL)
+	(cat stdin stdout; print "Bye from child.";nl; die "dummy error");
+
+# Now try pushing some memory and CPU limits.
+try "" (tower string_append "x" 10);  # status 0 (this one's ok)
+try "" (tower string_append "x" 20);  # status 256
+try "" (tower I 1 100000000);  # status 256
+try "" (Y Y);  # status 11 but no stderr.
+try "" (Y I);  # status 9 but no stderr.  Times out after 1 second.
+next
+)
+
+test_limits;
