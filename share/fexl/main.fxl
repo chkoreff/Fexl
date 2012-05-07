@@ -41,12 +41,8 @@
 # Define end as a synonym for C.  The item function is already built-in.
 \end=C
 
+# (map f xs) is the list of (f x) values for each x in xs.
 \map == (\f\xs xs end \x\xs item (f x) (map f xs))
-
-# LATER more doc
-
-# LATER perhaps implement fold in C to accelerate it.
-\fold == (\f\z\xs xs z \x\xs \z=(f z x) fold f z xs)
 
 # Apply function f to each entry in xs, ending with next.  This is useful for
 # producing a side-effect for each entry in a list.
@@ -262,7 +258,6 @@
 		(
 		starts "filter" (see "list");
 		starts "find" (see "list");
-		define "fold" fold;
 		void
 		);
 	define "getchar" getchar;

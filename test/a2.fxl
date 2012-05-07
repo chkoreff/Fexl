@@ -233,13 +233,10 @@ show "z" z;
 (\next
 timer_begin \time
 
-# NOTE: I deliberately use the slightly less efficient <= + and - here, instead
-# of long_le long_add and long_sub, just for testing.
-
 \sum == (\total\count
-	<= count 0 total;
-	\total = (+ total count)
-	sum total (- count 1))
+	long_le count 0 total;
+	\total = (long_add total count)
+	sum total (long_sub count 1))
 
 \sum = (sum 0)
 

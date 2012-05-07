@@ -114,3 +114,35 @@ value fexl_pair(value f)
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 	return A(A(f->R,f->L->L->R),f->L->R);
 	}
+
+/*
+\fold == (\fn\z\xs xs z \x\xs \z=(fn z x) fold fn z xs)
+It's about 35% faster implemented in C.
+*/
+value fexl_fold(value f)
+	{
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+
+	value fn = f->L->L->R;
+	value z = f->L->R;
+	value xs = f->R;
+
+	xs = A(A(xs,Q(fexl_C)),Q(fexl_item));
+	eval(xs);
+
+	value result = 0;
+
+	if (xs->T == fexl_C)
+		result = z;
+	else if (xs->T == fexl_item && xs->L && xs->L->L && !xs->L->L->L)
+		{
+		value x = xs->L->R;
+		value tail = xs->R;
+		value fold = f->L->L->L;
+		result = A(A(Q(fexl_query),A(A(fn,z),x)),
+			A(A(Q(fexl_L),A(fold,fn)),tail));
+		}
+
+	hold(xs); drop(xs);
+	return result;
+	}
