@@ -86,8 +86,9 @@
 
 # LATER move putchar, NL, and die to separate files.
 
-# Define putchar as synonym for char_put.
+# Synonyms
 \putchar = char_put
+\getchar = char_get
 
 \NL="
 "
@@ -264,6 +265,7 @@
 		define "fold" fold;
 		void
 		);
+	define "getchar" getchar;
 	define "halt" halt;
 	define "is_name" is_name;
 	starts "l"
