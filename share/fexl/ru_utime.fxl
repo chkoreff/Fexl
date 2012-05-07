@@ -39,7 +39,7 @@
 	(\prev\next
 	ru_utime \curr
 	\elapse = (ru_utime_sub curr prev)
-	print "That took ";print (ru_utime_string elapse);print " seconds.";nl;
+	print "# That took ";print (ru_utime_string elapse);print " seconds.";nl;
 	next curr
 	)
 

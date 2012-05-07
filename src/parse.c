@@ -556,6 +556,18 @@ static value lambda(value x, value f)
 	if (p->T == fexl_C) return A(C,f);
 	if (p->T == fexl_I) return I;
 
+	/* This special case speeds things up a little. */
+	value faster = 0;
+	if (p->L->T == fexl_C && p->R->T == fexl_I)
+		faster = A(I,f->L);  /* lam (C I) (f g) = f */
+
+	if (faster)
+		{
+		hold(p); drop(p);
+		hold(f); drop(f);
+		return faster;
+		}
+
 	return apply(A(lam,p),f);
 	}
 
