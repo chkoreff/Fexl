@@ -1,24 +1,13 @@
 #include <stdio.h>
 #include <unistd.h>
 #include "value.h"
-#include "io.h"
 #include "long.h"
 #include "string.h"
-
-void nl(void)
-	{
-	putchar('\n');
-	}
-
-void print(const char *s)
-	{
-	fputs(s, stdout);
-	}
 
 value fexl_nl(value f)
 	{
 	if (!f->L) return 0;
-	nl();
+	putchar('\n');
 	return f->R;
 	}
 
@@ -26,11 +15,6 @@ value fexl_nl(value f)
 void string_write(value x, FILE *stream)
 	{
 	fwrite(string_data(x), 1, string_len(x), stream);
-	}
-
-void string_put(value x)
-	{
-	string_write(x, stdout);
 	}
 
 static value op_string_write(value f, FILE *stream)

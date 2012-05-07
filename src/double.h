@@ -1,11 +1,1 @@
-extern value type_double(value);
 extern value Qdouble(double);
-extern double get_double(value);
-extern value fexl_double_add(value);
-extern value fexl_double_sub(value);
-extern value fexl_double_mul(value);
-extern value fexl_double_div(value);
-extern value fexl_is_double(value);
-extern value fexl_double_string(value);
-extern value fexl_double_compare(value);
-extern value fexl_double_long(value);

@@ -1,6 +1,5 @@
 #include "value.h"
 #include "double.h"
-#include "io.h"
 #include "long.h"
 #include "string.h"
 
@@ -93,6 +92,7 @@ value fexl_long_double(value f)
 	}
 
 /* Convert long to string. */
+extern int sprintf(char *str, const char *format, ...);
 value fexl_long_string(value f)
 	{
 	if (!f->L) return 0;

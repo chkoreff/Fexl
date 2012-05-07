@@ -1,6 +1,5 @@
 #include "value.h"
 #include "double.h"
-#include "io.h"
 #include "long.h"
 #include "string.h"
 
@@ -110,6 +109,7 @@ value fexl_is_double(value f)
 /* double_string num */
 /*LATER note that sprintf "%.15g" shows 0.0 as "0", which looks like a long if
 we try to read it back in.  Perhaps force a ".0" suffix, not sure. */
+extern int sprintf(char *str, const char *format, ...);
 value fexl_double_string(value f)
 	{
 	if (!f->L) return 0;

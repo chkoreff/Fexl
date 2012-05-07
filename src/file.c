@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include "buf.h"
 #include "value.h"
-#include "io.h"
 #include "long.h"
 #include "string.h"
 

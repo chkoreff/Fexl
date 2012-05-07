@@ -1,12 +1,3 @@
 extern value type_long(value);
 extern value Qlong(long);
 extern long get_long(value);
-extern value fexl_long_add(value);
-extern value fexl_long_sub(value);
-extern value fexl_long_mul(value);
-extern value fexl_long_div(value);
-extern value fexl_is_long(value);
-extern value fexl_long_double(value);
-extern value fexl_long_string(value);
-extern value fexl_long_compare(value);
-extern value fexl_long_char(value);

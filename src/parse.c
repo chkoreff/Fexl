@@ -16,8 +16,6 @@ static char *error;   /* syntax error if any */
 static value C;
 static value I;
 static value Y;
-static value L;
-static value R;
 static value query;
 
 static value parse_exp(void);
@@ -566,16 +564,12 @@ static void beg_parse(void)
 	C = Q(fexl_C);
 	I = Q(fexl_I);
 	Y = Q(fexl_Y);
-	L = Q(fexl_L);
-	R = Q(fexl_R);
 	query = Q(fexl_query);
 	lam = Q(type_lambda);
 
 	hold(C);
 	hold(I);
 	hold(Y);
-	hold(L);
-	hold(R);
 	hold(query);
 	hold(lam);
 	}
@@ -585,8 +579,6 @@ static void end_parse(void)
 	drop(C);
 	drop(I);
 	drop(Y);
-	drop(L);
-	drop(R);
 	drop(query);
 	drop(lam);
 	}
