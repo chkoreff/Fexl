@@ -298,11 +298,14 @@ do_compare -1.0 -1.0 "EQ"
 \nat_0 = end
 \nat_1 = (d1 nat_0)
 
-# (nat_2x x) is twice x.
-\nat_2x=(\x x nat_0 \_\_ d0 x)
-
-# (nat_2x1 x) is twice x plus 1.
-\nat_2x1=d1
+# (nat b n) is the natural number b + 2*n, where b is a bit and n is a natural
+# number.
+\nat =
+	(\b\n
+	b
+		(item T n)
+		(n nat_0 \_\_ item F n)
+	)
 
 # (nat_eq0 x) is true iff x = 0
 \nat_eq0=(\x x T \_\_ F)
@@ -331,6 +334,72 @@ do_compare -1.0 -1.0 "EQ"
 		(by (d1; nat_add nx (nat_mul ny x)) (d0; nat_mul ny x))
 		(by (d0; nat_mul nx y) (d0; d0; nat_mul nx ny))
 	)
+
+# Decrement x, returning:
+#   yes d     # if x > 0 and d = x - 1
+#   no        # if x = 0
+\nat_dec_clip ==
+	(\x
+	x no \bx\nx
+	bx
+		(yes (nat F nx))
+		(nat_dec_clip nx (\d yes (nat T d)) no)
+	)
+
+# Subtract x minus y, returning:
+#   yes d     # if x >= y and d = x - y
+#   no        # if x < y
+\nat_sub_clip ==
+	(\x\y
+	x (y (yes nat_0) \_\_ no) \bx\nx
+	y (yes x) \by\ny
+
+	nat_sub_clip nx ny
+		(\d
+		bx
+			(yes (nat (by F T) d))
+			(by
+				(nat_dec_clip (nat F d) yes no)
+				(yes (nat F d))
+			)
+		)
+		no
+	)
+
+# (div x y) divides x by y, returning the quotient q and remainder r which
+# satisfy: x = q*y + r and 0 <= r < y.  Or if y=0, the function returns q=0 and
+# r=0.
+\nat_div==(\x\y
+	x (pair nat_0 nat_0) \bx\nx
+	y (pair nat_0 nat_0) \by\ny
+	by
+		(
+		# divide by odd
+		nat_div nx y \q\r
+		\r=(nat bx r)
+		nat_sub_clip r y
+			(pair (nat T q))
+			(pair (nat F q) r)
+		)
+		(
+		# divide by even
+		nat_div nx ny \q\r
+		pair q (nat bx r)
+		)
+	)
+
+# Compare x and y, returning lt, eq, or gt.
+\nat_compare == (\x\y \lt\eq\gt
+	x (y eq \_\_ lt) \bx\nx
+	y gt \by\ny
+	nat_compare nx ny
+		lt
+		(bx (by eq gt) (by lt eq))
+		gt
+	)
+
+\nat_le = (\x\y nat_compare x y T T F)
+\nat_ge = (\x\y nat_compare x y F T T)
 
 # (int_ge0 x) is true if int x >= 0.
 \int_ge0=(\x x T \s\_ s)
@@ -361,45 +430,6 @@ do_compare -1.0 -1.0 "EQ"
 	\z = (int_2x (nat_sub nx ny))
 	bx (by I int_inc) (by int_dec I) z
 	)
-
-# (nat_div x y) divides x by y.  It yields a pair <q,r>, where q is the
-# quotient and r is the remainder.
-#
-# The result satisfies the equation x = q*y + r,  0 <= r < y.
-#
-# NOTE:  If you divide by zero, the function yields the pair <0,0>.
-
-\nat_div==(\x\y\return
-	x (return nat_0 nat_0) \bx\nx
-	y (return nat_0 nat_0) \by\ny
-	by
-		(
-		# divide by odd
-		nat_div nx y \q\r
-		\r=(bx nat_2x1 nat_2x r)
-		\d=(nat_sub r y)
-		int_ge0 d
-			(return (nat_2x1 q) (int_abs d))
-			(return (nat_2x q) r)
-		)
-		(
-		# divide by even
-		nat_div nx ny \q\r
-		return q (bx nat_2x1 nat_2x r)
-		)
-	)
-
-\nat_compare == (\x\y \lt\eq\gt
-	x (y eq \_\_ lt) \bx\nx
-	y gt \by\ny
-	nat_compare nx ny
-		lt
-		(bx (by eq gt) (by lt eq))
-		gt
-	)
-
-\nat_le = (\x\y nat_compare x y T T F)
-\nat_ge = (\x\y nat_compare x y F T T)
 
 \nat_2 = (d0 nat_1)
 \nat_5 = (d1 nat_2)
@@ -1041,7 +1071,6 @@ test_double_compare;
 test_procedural;
 test_eager;
 test_eager_2;
-
 test_binary_counter;
 test_divide;
 test_sub;
