@@ -63,9 +63,6 @@
 \all = (\f\xs list_and (map f xs))
 \some = (\f\xs list_or (map f xs))
 
-# (list_long x) is the list of all long values starting with x.
-\list_long == (\x item x; \x=(long_add x 1) list_long x)
-
 ###
 
 \is_name = (\x type_named "name" (type_eq (type_of x)) F)
@@ -268,7 +265,6 @@
 		starts "list"
 			(
 			define "list_and" list_and;
-			define "list_long" list_long;
 			define "list_or" list_or;
 			see "list"
 			);

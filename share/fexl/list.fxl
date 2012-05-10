@@ -31,6 +31,20 @@
 	sort keep compare hi
 	)
 
+# Return the list of long values in the range x through y.  It works forwards
+# or backwards.
+\range ==
+	(\x\y
+	item x;
+	long_compare x y
+		(range (long_add x 1) y)
+		end
+		(range (long_sub x 1) y)
+	)
+
+# (list_long x) is the list of all long values starting with x.
+\list_long == (\x item x; \x=(long_add x 1) list_long x)
+
 # Return the first N items of the list.
 \list_prefix == (\list\N
 	long_le N 0 end;
@@ -55,7 +69,9 @@ define "reverse" reverse;
 define "list_prefix" list_prefix;
 define "list_at" list_at;
 define "list_entry" list_entry;
+define "list_long" list_long;
 define "filter" filter;
 define "find" find;
+define "range" range;
 define "sort" sort;
 void

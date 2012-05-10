@@ -141,6 +141,7 @@ RLIMIT_RTTIME
 RLIMIT_SIGPENDING
 RLIMIT_STACK
 rand
+range
 resolve
 reverse
 ru_utime
