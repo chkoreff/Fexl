@@ -70,6 +70,7 @@ find
 fold
 fopen
 fork
+fprint
 fputc
 fwrite
 getchar

@@ -74,8 +74,23 @@
 	is_name x (name_string x);
 	x)
 
-\print = (\data string_put (to_string data))
-\warn = (\data string_stderr (to_string data))
+# (fprint fh x next) prints value x to file fh and continues with next.
+#
+# In addition to printing atomic values like strings and numbers, it can also
+# print whole application trees at once, for example:
+#   (("Hello " "world." NL) ("Good " "bye." NL));
+
+\fprint ==
+	(\fh\x\next
+	\x=x  # Force evaluation.
+	is_apply x (\a\b fprint fh a; fprint fh b; next);
+	\x = (to_string x)
+	is_string x (fwrite fh x; next);
+	next
+	)
+
+\print = (fprint stdout)
+\warn = (fprint stderr)
 
 # LATER move putchar, NL, and die to separate files.
 
@@ -89,7 +104,7 @@
 \die =
 	(\msg
 	warn msg; warn NL;
-	exit 1
+	exit 1;
 	)
 
 # Resolve the result of parsing a file, where script is the name of the file,
@@ -255,6 +270,7 @@
 		(
 		starts "filter" (see "list");
 		starts "find" (see "list");
+		define "fprint" fprint;
 		void
 		);
 	define "getchar" getchar;

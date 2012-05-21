@@ -153,3 +153,5 @@ value fexl_double_compare(value f)
 	if (vx > vy) return f->R;
 	return f->L->R;
 	}
+
+/*LATER ordinary built-in srand and rand routines */
