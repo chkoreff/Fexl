@@ -96,14 +96,21 @@
 	exit 1;
 	)
 
-# Resolve the result of parsing a file, where script is the name of the file,
-# result is the return value from parse_file, context is the context for
-# resolving undefined symbols, and next is what to do next.
+# Resolve the result of parsing a file, where:
+#   script is the name of the file or other program source.
+#   result is the return value from the parse function.
+#   context is the context for resolving undefined symbols.
+#   print is the function to use for reporting any error messages.
+#   bad is the function to call if there were any errors.
+#   next is what to do next
 #
-# If there are any syntax or undefined symbol errors, it reports them to stderr
-# and calls (exit 1).
+# If there were errors, it calls bad, otherwise it calls the fully resolved
+# program.  Then it calls next.
+
 \resolve_parse =
-	(\script\result\context\next
+	(\script\result\context\print\bad\next
+	\nl = (print NL)
+
 	result \syntax_ok\result result \exp\symbols
 
 	\defs = (map (\entry entry \sym\line context sym) symbols)
@@ -129,27 +136,22 @@
 	# the definitions in turn.
 	\program == (ok (fold I exp defs) exp)
 
-	# Override so we print to stderr instead of stdout.
-	\print = warn
-	\nl = (print NL)
-
 	# Report the error location.
 	\error_at =
-		(\line\next
+		(\line
 		print " on line ";print line;
-			(string_eq script "" () (print " of ";print script));
-			nl;
-		next
+		(\next string_eq script "" next;
+			print " of ";print script; next);
+		nl
 		)
 
 	# Report any syntax error.
 	syntax_ok ()
 		(
 		exp \error\line
-		# LATER 20120826 fexl.c says if line == 0
-		### warn("Can't open configuration script %s", name);
-
-		print error; error_at line;
+		long_eq line 0
+			(print "Can't open configuration script ";print script;nl;)
+			(print error; error_at line;)
 		);
 
 	# Report any undefined symbols.
@@ -159,8 +161,8 @@
 		print "Undefined symbol "; print sym; error_at line;
 		);
 
-	# Run the program if it's ok, otherwise exit.
-	ok program (exit 1);
+	# Run the program if it's ok, otherwise run bad.
+	ok program bad;
 	next
 	)
 
@@ -178,9 +180,11 @@
 		".fxl"
 		)
 	parse_file script \result
-	resolve_parse script result
+	\context resolve_parse script result context warn (exit 1)
 	)
 
+# TODO simplify the module stuff.  I think I can do one-shot parsing without
+# having to enumerate the available modules here.
 # This wrapper caches the known module names so it never has to parse a file
 # more than once.
 \module =
@@ -315,7 +319,7 @@
 	starts "quote_string" (see "meta");
 	starts "r"
 		(
-		##define "resolve_parse" resolve_parse; # LATER 20120826 almost
+		define "resolve_parse" resolve_parse; # TODO don't like
 		see "r"
 		);
 	starts "s"
@@ -359,4 +363,4 @@
 # Run the user's script in the standard context.
 argv 1 \script
 parse_file script \result
-resolve_parse script result standard;
+resolve_parse script result standard warn (exit 1);
