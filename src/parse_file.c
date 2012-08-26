@@ -29,12 +29,13 @@ value parse_file(char *name)
 	}
 
 /* parse_file name next = (next result) */
-value fexl_parse_file(value f)
+static void reduce2_parse_file(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
+	value x = arg(type_string,f->L->R);
+	replace_apply(f, f->R, parse_file(string_data(x)));
+	}
 
-	value x = f->L->R;
-	if (!arg(type_string,x)) return 0;
-
-	return A(f->R, parse_file(string_data(x)));
+void reduce_parse_file(value f)
+	{
+	f->T = reduce2_parse_file;
 	}

@@ -1,9 +1,10 @@
 #include "dynamic.h"
 #include "value.h"
+#include "basic.h"
 #include "long.h"
 #include "string.h"
 
-value type_type(value f) { return 0; }
+void type_type(value f) { type_error(); }
 
 /* Make a new value of type "type".  */
 value Qtype(type T)
@@ -18,36 +19,28 @@ type get_type(value f)
 	return (type)f->R->L;
 	}
 
-value fexl_type_of(value f)
+void reduce_type_of(value f)
 	{
-	if (!f->L) return 0;
-	return Qtype(f->R->T);
+	replace(f, Qtype((type)f->R->T));
 	}
 
-/* type_eq x y yes no */
-value fexl_type_eq(value f)
+/* (type_eq x y) is true if types x and y are equal. */
+static void reduce2_type_eq(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
-
-	value x = f->L->L->L->R;
-	value y = f->L->L->R;
-
-	if (!arg(type_type,x)) return 0;
-	if (!arg(type_type,y)) return 0;
-
-	if (get_type(x) == get_type(y)) return f->L->R;
-	return f->R;
+	type x = get_type(arg(type_type,f->L->R));
+	type y = get_type(arg(type_type,f->R));
+	replace_boolean(f, x == y);
 	}
 
-/* atomic x yes no */
-value fexl_atomic(value f)
+void reduce_type_eq(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	f->T = reduce2_type_eq;
+	}
 
-	value x = f->L->L->R;
-
-	if (!x->L) return f->L->R;
-	return f->R;
+/* (atomic x) is true if x is an atomic form. */
+void reduce_atomic(value f)
+	{
+	replace_boolean(f, !f->R->L);
 	}
 
 /*
@@ -55,30 +48,39 @@ is_apply x yes no
 	= (yes L R)  # if x is the function application (L R)
 	= no         # if x is atomic
 */
-value fexl_is_apply(value f)
+static void reduce3_is_apply(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
-
 	value x = f->L->L->R;
 
-	if (x->L) return A(A(f->L->R,x->L),x->R);
-	return f->R;
+	if (x->L)
+		replace_apply(f, A(f->L->R,x->L), x->R);
+	else
+		replace(f, f->R);
+	}
+
+static void reduce2_is_apply(value f)
+	{
+	f->T = reduce3_is_apply;
+	}
+
+void reduce_is_apply(value f)
+	{
+	f->T = reduce2_is_apply;
 	}
 
 /*
 Find the type with the given name.
-The value of (type_named name yes no) is
+The value of (type_named name) is:
   yes type     # if the type exists
   no           # if not
 */
-value fexl_type_named(value f)
+void reduce_type_named(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
-
-	value x = f->L->L->R;
-	if (!arg(type_string,x)) return 0;
+	value x = arg(type_string,f->R);
 
 	void *def = lib_sym("type_",string_data(x));
-	if (def) return A(f->L->R,Qtype(def));
-	return f->R;
+	if (def)
+		replace_apply(f, Q(reduce_yes), Qtype(def));
+	else
+		replace(f, Q(reduce_F));
 	}

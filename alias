@@ -27,13 +27,13 @@
 # Search source.
 .s()
 	{
-	grep -r "$1" src/* share/* --exclude "*.swp"
+	grep -ra "$1" src share test --exclude "*.swp"
 	}
 
 # Search source for whole word.
 .sw()
 	{
-	grep -r "\<$1\>" src/* share/* --exclude "*.swp"
+	grep -ra "\<$1\>" src share test --exclude "*.swp"
 	}
 
 # Run a test script.

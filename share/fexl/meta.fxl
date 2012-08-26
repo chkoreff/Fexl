@@ -57,11 +57,8 @@
 	if_data "lambda" (\_ "lam");
 
 	if_basic C "C";
-	if_basic S "S";
 	if_basic I "I";
 	if_basic Y "Y";
-	if_basic L "L";
-	if_basic R "R";
 	if_basic F "F";
 	if_basic query "?";
 	if_basic parse "parse";
@@ -71,7 +68,6 @@
 	if_basic string_append "string_append";
 	if_basic is_long "is_long";
 	if_basic long_double "long_double";
-	if_basic end "end";
 	if_basic item "item";
 	if_basic pair "pair";
 	if_basic nl "nl";

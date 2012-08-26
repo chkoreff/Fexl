@@ -1,21 +1,26 @@
 #
 
-\string_lt=(\x\y string_compare x y T F F)
-\string_le=(\x\y string_compare x y T T F)
-\string_eq=(\x\y string_compare x y F T F)
-\string_ge=(\x\y string_compare x y F T T)
-\string_gt=(\x\y string_compare x y F F T)
-\string_ne=(\x\y string_compare x y T F T)
+\string_compare = (\x\y order (string_cmp x y))
 
-\string_min = (\x\y string_compare x y  x x y)
-\string_max = (\x\y string_compare x y  y x x)
+\string_gt = (\x\y order (string_cmp x y) F F T)
+\string_eq = (\x\y order (string_cmp x y) F T F)
+\string_ge = (\x\y order (string_cmp x y) F T T)
 
-define "string_lt" string_lt;
-define "string_le" string_le;
+\string_lt = (\x\y order (string_cmp x y) T F F)
+\string_ne = (\x\y order (string_cmp x y) T F T)
+\string_le = (\x\y order (string_cmp x y) T T F)
+
+\string_min = (\x\y order (string_cmp x y) x x y)
+\string_max = (\x\y order (string_cmp x y) y y x)
+
+
+define "string_compare" string_compare;
+define "string_gt" string_gt;
 define "string_eq" string_eq;
 define "string_ge" string_ge;
-define "string_gt" string_gt;
+define "string_lt" string_lt;
 define "string_ne" string_ne;
+define "string_le" string_le;
 define "string_min" string_min;
 define "string_max" string_max;
 define "string_type" is_string;

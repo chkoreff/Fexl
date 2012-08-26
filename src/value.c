@@ -1,3 +1,4 @@
+#include "die.h"
 #include "memory.h"
 #include "value.h"
 
@@ -88,28 +89,42 @@ value Q(type T)
 	return create(T,0,0);
 	}
 
-/* Create a function which applies L to R. */
+/* Create a function that applies L to R. */
 value A(value L, value R)
 	{
 	return create(0,L,R);
 	}
 
 /* Replace the contents of f with the contents of g.  Assumes g && f != g. */
-static void replace(value f, value g)
+void replace(value f, value g)
 	{
 	g->N++;
+
+	value g0 = g->L;
+	value g1 = g->R;
+
+	if (g0) g0->N++;
+	if (g1) g1->N++;
 
 	clear(f);
 
 	f->T = g->T;
-	f->L = g->L;
-	f->R = g->R;
+	f->L = g0;
+	f->R = g1;
 
-	if (f->L) f->L->N++;
-	if (f->R) f->R->N++;
+	if (--g->N == 0) recycle(g);
+	}
 
-	if (--g->N == 0)
-		recycle(g);
+/* Equivalent to replace(f,A(g0,G1)). */
+void replace_apply(value f, value g0, value g1)
+	{
+	g0->N++;
+	g1->N++;
+
+	clear(f);
+
+	f->L = g0;
+	f->R = g1;
 	}
 
 /*
@@ -118,37 +133,30 @@ limits on time and space.
 */
 void eval(value f)
 	{
-	while (1)
+	while (f->T == 0)
 		{
-		if (f->T)
-			{
-			value g = f->T(f);
-			if (g == 0) break;
-			if (g != f) replace(f,g);
-			}
-		else
-			{
-			eval(f->L);
-			f->T = f->L->T;
-			}
+		eval(f->L);
+		f->L->T(f);
 		}
 	}
 
 /* Determine if a function argument has the correct type. */
-int arg(type T, value x)
+int if_type(type T, value x)
 	{
 	eval(x);
-	return x->T == T && !x->L;
+	return x->T == T;
 	}
 
-/* Used for functions of the form (is_T x yes no), which checks the type of x
-and returns yes if it's type T or no otherwise. */
-value arg_is_type(type T, value f)
+void type_error(void)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
-	value x = f->L->L->R;
-	if (arg(T,x)) return f->L->R;
-	return f->R;
+	die("You used a data type incorrectly.");
+	}
+
+value arg(type T, value x)
+	{
+	eval(x);
+	if (x->T != T) type_error();
+	return x;
 	}
 
 /* Clear the free list and end the memory arena. */

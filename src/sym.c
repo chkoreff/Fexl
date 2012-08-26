@@ -3,7 +3,7 @@
 #include "string.h"
 #include "sym.h"
 
-value type_name(value f) { return 0; }
+void type_name(value f) { type_error(); }
 
 /* Make a name from the given data. */
 value Qname(char *data, long len)
@@ -21,27 +21,15 @@ int sym_eq(value form, value sym)
 	}
 
 /* Convert name to string. */
-value fexl_name_string(value f)
+void reduce_name_string(value f)
 	{
-	if (!f->L) return 0;
-	value x = f->R;
-	if (!arg(type_name,x)) return 0;
-
-	value v = Q(type_string);
-	v->R = x->R;
-	hold(v->R);
-	return v;
+	replace(f,arg(type_name,f->R));
+	f->T = type_string;
 	}
 
 /* Convert string to name. */
-value fexl_string_name(value f)
+void reduce_string_name(value f)
 	{
-	if (!f->L) return 0;
-	value x = f->R;
-	if (!arg(type_string,x)) return 0;
-
-	value v = Q(type_name);
-	v->R = x->R;
-	hold(v->R);
-	return v;
+	replace(f,arg(type_string,f->R));
+	f->T = type_name;
 	}

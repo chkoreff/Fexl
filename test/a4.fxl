@@ -103,9 +103,8 @@ try
 	(cat stdin stdout; print "Bye from child.";nl; die "dummy error");
 
 # Now try pushing some memory and CPU limits.
-try "" (tower string_append "x" 10);  # status 0 (this one's ok)
-try "" (tower string_append "x" 20);  # status 256
-try "" (tower I 1 100000000);  # status 256
+try "" (? (tower string_append "x" 10)); # status 0 (this one's ok)
+try "" (? (tower string_append "x" 20)); # status 256 (out of memory)
 try "" (Y Y);  # status 11 but no stderr.
 try "" (Y I);  # status 9 but no stderr.  Times out after 1 second.
 next

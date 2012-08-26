@@ -34,8 +34,11 @@ static value parse_top(void)
 	value result = parse_file(name);
 
 	hold(result);
+	/*LATER 20120826 I bet we could make a Fexl function do this, so we don't have to
+	traverse the structure here in C.  Then we could unify back in and call
+	it from main.fxl, as a special case of a parameterized resolve_parse. */
 
-	int ok = result->L->R->T == fexl_C;
+	int ok = result->L->R->T == reduce_C;
 	value f = result->R->L->R;
 
 	if (!ok)

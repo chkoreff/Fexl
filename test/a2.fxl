@@ -158,9 +158,6 @@ do_compare string_041 string_0142 "GT";
 ########
 \test_string_common ==
 (
-\string_eq=(\x\y string_compare x y F T F)
-\long_eq=(\x\y long_compare x y F T F)
-
 \check = (\value\expect
 	\halt == (\_ halt)
 	\ok = (long_eq value expect)

@@ -1,46 +1,70 @@
 # Comparison functions capable of handling long, double, and string.
 
-\compare =
+# LATER 20120826 instead of -9, how about calling type_error directly?
+\cmp =
 	(\x\y
 	is_long x
 		(
-		is_long y (long_compare x y);
-		is_double y (double_compare (long_double x) y);
-		halt
+		is_long y (long_cmp x y);
+		is_double y (double_cmp (long_double x) y);
+		-9
 		);
 	is_double x
 		(
-		is_double y (double_compare x y);
-		is_long y (double_compare x (long_double y));
-		halt
+		is_double y (double_cmp x y);
+		is_long y (double_cmp x (long_double y));
+		-9
 		);
 	is_string x
 		(
-		is_string y (string_compare x y);
-		halt
+		is_string y (string_cmp x y);
+		-9
 		);
-	halt
+	-9
 	)
 
-\ <   =(\x\y compare x y  T F F)
-\ <=  =(\x\y compare x y  T T F)
-\ =   =(\x\y compare x y  F T F)
-\ ==  =(\x\y compare x y  F T F)
-\ >=  =(\x\y compare x y  F T T)
-\ >   =(\x\y compare x y  F F T)
-\ !=  =(\x\y compare x y  T F T)
+\compare = (\x\y order (cmp x y))
 
-\min  =(\x\y compare x y  x x y)
-\max  =(\x\y compare x y  y x x)
+\gt = (\x\y order (cmp x y) F F T)
+\eq = (\x\y order (cmp x y) F T F)
+\ge = (\x\y order (cmp x y) F T T)
 
+\lt = (\x\y order (cmp x y) T F F)
+\ne = (\x\y order (cmp x y) T F T)
+\le = (\x\y order (cmp x y) T T F)
+
+\min = (\x\y order (cmp x y) x x y)
+\max = (\x\y order (cmp x y) y y x)
+
+\ >   = gt
+\ =   = eq
+\ ==  = eq
+\ >=  = ge
+
+\ <   = lt
+\ !=  = ne
+\ <=  = le
+
+define "cmp" cmp;
 define "compare" compare;
-define "<" <;
-define "<=" <=;
+
+define "gt" gt;
+define "eq" eq;
+define "ge" ge;
+
+define "lt" lt;
+define "ne" ne;
+define "le" le;
+
+define "min" min;
+define "max" max;
+
+define ">" >;
 define "=" =;
 define "==" ==;
 define ">=" >=;
-define ">" >;
+
+define "<" <;
 define "!=" !=;
-define "min" min;
-define "max" max;
+define "<=" <=;
 void

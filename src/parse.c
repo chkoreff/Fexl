@@ -338,7 +338,7 @@ static value parse_term(void)
 	return exp;
 	}
 
-static value type_open(value f) { return 0; }
+static void type_open(value f) { type_error(); }
 
 int is_open(value f)
 	{
@@ -520,16 +520,25 @@ static value parse_exp(void)
 /* Return a copy of f with x substituted according to pattern p. */
 static value subst(value p, value f, value x)
 	{
-	if (p->T == fexl_C) return f;
-	if (p->T == fexl_I) return x;
+	if (p->T == reduce_C) return f;
+	if (p->T == reduce_I) return x;
 	return A(subst(p->L,f->L,x),subst(p->R,f->R,x));
 	}
 
 /* lambda pattern form value = subst(pattern,form,value) */
-value type_lambda(value f)
+static void reduce3_lambda(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
-	return subst(f->L->L->R,f->L->R,f->R);
+	replace(f, subst(f->L->L->R,f->L->R,f->R));
+	}
+
+static void reduce2_lambda(value f)
+	{
+	f->T = reduce3_lambda;
+	}
+
+void type_lambda(value f)
+	{
+	f->T = reduce2_lambda;
 	}
 
 /* Get the pattern of occurrences of symbol x in form f. */
@@ -541,7 +550,7 @@ static value get_pattern(value x, value f)
 	value pl = get_pattern(x,f->L);
 	value pr = get_pattern(x,f->R);
 
-	if (pl->T == fexl_C && pr->T == fexl_C) return C;
+	if (pl->T == reduce_C && pr->T == reduce_C) return C;
 
 	return A(pl,pr);
 	}
@@ -553,19 +562,16 @@ static value lambda(value x, value f)
 	{
 	value p = get_pattern(x,f);
 
-	if (p->T == fexl_C) return A(C,f);
-	if (p->T == fexl_I) return I;
+	if (p->T == reduce_C) return A(C,f);
+	if (p->T == reduce_I) return I;
 
-	/* This special case speeds things up a little. */
-	value faster = 0;
-	if (p->L->T == fexl_C && p->R->T == fexl_I)
-		faster = A(I,f->L);  /* lam (C I) (f g) = f */
-
-	if (faster)
+	/* This special case uses a little less time and memory. */
+	if (p->L->T == reduce_C && p->R->T == reduce_I)
 		{
+		value result = A(I,f->L);  /* lam (C I) (f g) = f */
 		hold(p); drop(p);
 		hold(f); drop(f);
-		return faster;
+		return result;
 		}
 
 	return apply(A(lam,p),f);
@@ -573,10 +579,10 @@ static value lambda(value x, value f)
 
 static void beg_parse(void)
 	{
-	C = Q(fexl_C);
-	I = Q(fexl_I);
-	Y = Q(fexl_Y);
-	query = Q(fexl_query);
+	C = Q(reduce_C);
+	I = Q(reduce_I);
+	Y = Q(reduce_Y);
+	query = Q(reduce_query);
 	lam = Q(type_lambda);
 
 	hold(C);
@@ -641,8 +647,8 @@ value parse_source(void)
 			}
 		}
 
-	value item = Q(fexl_item);
-	value pair = Q(fexl_pair);
+	value item = Q(reduce_item);
+	value pair = Q(reduce_pair);
 
 	hold(item);
 	hold(pair);
@@ -665,7 +671,7 @@ value parse_source(void)
 	if (exp == 0)
 		exp = A(A(pair,Qstring(error)),Qlong(line));
 
-	value ok = Q(error ? fexl_F : fexl_C);
+	value ok = Q(error ? reduce_F : reduce_C);
 	value result = A(A(pair,ok),A(A(pair,exp),symbols));
 
 	drop(item);

@@ -3,6 +3,7 @@
 #include "die.h"
 #include "memory.h"
 #include "value.h"
+#include "basic.h"
 #include "double.h"
 #include "long.h"
 #include "string.h"
@@ -20,19 +21,18 @@ long string_len(value f)
 	return (long)f->R->L;
 	}
 
-value type_string(value f) { return 0; }
+void type_string(value f) { type_error(); }
 
-static value clear_string(value f)
+static void clear_string(value f)
 	{
 	free_memory(string_data(f), string_len(f) + 1);
-	return 0;
 	}
 
 /*
-Make a string from the given data.  The data must by an array of len+1 bytes,
+Make a string from the given data.  The data must be an array of len+1 bytes,
 consisting of len bytes of real data, followed by a NUL byte.  The real data
 itself may contain anything, including NUL bytes.  We put a NUL byte after the
-real data so we can easily call system functions which expect a NUL terminator.
+real data so we can easily call system functions that expect a NUL terminator.
 */
 value Qchars(const char *data, long len)
 	{
@@ -46,7 +46,7 @@ value Qchars(const char *data, long len)
 	}
 
 /* Make a string by copying len bytes of data and adding a NUL byte.  If data
-is null then make an uninitialized string which can hold len bytes but don't
+is null then make an uninitialized string that can hold len bytes but don't
 copy anything. */
 value Qcopy_chars(const char *data, long len)
 	{
@@ -77,7 +77,7 @@ value Qstring(const char *data)
 
 /* Compare strings x and y, returning negative if x < y, zero if x == y, or
 positive if x > y. */
-static int string_compare(value x, value y)
+static int string_cmp(value x, value y)
 	{
 	if (x == y) return 0;
 	long x_len = string_len(x);
@@ -93,40 +93,26 @@ static int string_compare(value x, value y)
 	return cmp;
 	}
 
-/* string_compare x y lt eq gt */
-value fexl_string_compare(value f)
+/* (string_cmp x y) compares x and y and returns <0, 0, or >0. */
+static void reduce2_string_cmp(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L
-		|| !f->L->L->L->L->L)
-		return 0;
+	value x = arg(type_string,f->L->R);
+	value y = arg(type_string,f->R);
 
-	value x = f->L->L->L->L->R;
-	value y = f->L->L->L->R;
+	replace(f, Qlong(string_cmp(x,y)));
+	}
 
-	if (!arg(type_string,x)) return 0;
-	if (!arg(type_string,y)) return 0;
-
-	int cmp = string_compare(x,y);
-	if (cmp < 0) return f->L->L->R;
-	if (cmp > 0) return f->R;
-	return f->L->R;
+void reduce_string_cmp(value f)
+	{
+	f->T = reduce2_string_cmp;
 	}
 
 /* string_slice str pos len */
-value fexl_string_slice(value f)
+static void reduce3_string_slice(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
-
-	value x = f->L->L->R;
-	value y = f->L->R;
-	value z = f->R;
-
-	if (!arg(type_string,x)) return 0;
-	if (!arg(type_long,y)) return 0;
-	if (!arg(type_long,z)) return 0;
-
-	long pos = get_long(y);
-	long len = get_long(z);
+	value str = arg(type_string,f->L->L->R);
+	long pos = get_long(arg(type_long,f->L->R));
+	long len = get_long(arg(type_long,f->R));
 
 	if (pos < 0)
 		{
@@ -134,35 +120,43 @@ value fexl_string_slice(value f)
 		pos = 0;
 		}
 
-	long max = string_len(x) - pos;
-
+	long max = string_len(str) - pos;
 	if (len > max)
 		len = max;
 
 	if (pos == 0 && len == max)
-		return x;
+		replace(f,str);
+	else
+		replace(f,Qcopy_chars(string_data(str) + pos, len));
+	}
 
-	return Qcopy_chars(string_data(x) + pos, len);
+static void reduce2_string_slice(value f)
+	{
+	f->T = reduce3_string_slice;
+	}
+
+void reduce_string_slice(value f)
+	{
+	f->T = reduce2_string_slice;
 	}
 
 /* string_at str pos - return the character at the position */
-value fexl_string_at(value f)
+
+static void reduce2_string_at(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
+	value str = arg(type_string,f->L->R);
+	long pos = get_long(arg(type_long,f->R));
 
-	value x = f->L->R;
-	value y = f->R;
-
-	if (!arg(type_string,x)) return 0;
-	if (!arg(type_long,y)) return 0;
-
-	long len = string_len(x);
-	char *data = string_data(x);
-
-	long pos = get_long(y);
+	long len = string_len(str);
+	char *data = string_data(str);
 
 	long ch = pos >= 0 && pos < len ? data[pos] : 0;
-	return Qlong(ch);
+	replace(f, Qlong(ch));
+	}
+
+void reduce_string_at(value f)
+	{
+	f->T = reduce2_string_at;
 	}
 
 /* Compare strings x and y, returning true if x == y. */
@@ -175,47 +169,46 @@ int string_eq(value x, value y)
 	}
 
 /* Determine if the value has type string. */
-value fexl_is_string(value f)
+void reduce_is_string(value f)
 	{
-	return arg_is_type(type_string,f);
+	replace_boolean(f, if_type(type_string,f->R));
 	}
 
 /* Append two strings. */
-value fexl_string_append(value f)
+static void reduce2_string_append(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
-
-	value x = f->L->R;
-	value y = f->R;
-
-	if (!arg(type_string,x)) return 0;
-	if (!arg(type_string,y)) return 0;
+	value x = arg(type_string,f->L->R);
+	value y = arg(type_string,f->R);
 
 	long xlen = string_len(x);
 	long ylen = string_len(y);
 
-	if (xlen == 0) return y;
-	if (ylen == 0) return x;
+	if (xlen == 0)
+		replace(f,y);
+	else if (ylen == 0)
+		replace(f,x);
+	else
+		{
+		int len = xlen + ylen;
+		value result = Qcopy_chars(0, len);
 
-	int len = xlen + ylen;
-	value result = Qcopy_chars(0, len);
+		char *dest = string_data(result);
+		memcpy(dest, string_data(x), xlen);
+		memcpy(dest + xlen, string_data(y), ylen);
+		replace(f,result);
+		}
+	}
 
-	char *dest = string_data(result);
-	memcpy(dest, string_data(x), xlen);
-	memcpy(dest + xlen, string_data(y), ylen);
-	return result;
+void reduce_string_append(value f)
+	{
+	f->T = reduce2_string_append;
 	}
 
 /* Compute the length of the longest common prefix of two strings. */
-value fexl_string_common(value f)
+static void reduce2_string_common(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
-
-	value x = f->L->R;
-	value y = f->R;
-
-	if (!arg(type_string,x)) return 0;
-	if (!arg(type_string,y)) return 0;
+	value x = arg(type_string,f->L->R);
+	value y = arg(type_string,f->R);
 
 	long xlen = string_len(x);
 	long ylen = string_len(y);
@@ -232,16 +225,19 @@ value fexl_string_common(value f)
 		len++;
 		}
 
-	return Qlong(len);
+	replace(f, Qlong(len));
+	}
+
+void reduce_string_common(value f)
+	{
+	f->T = reduce2_string_common;
 	}
 
 /* Return the length of the string. */
-value fexl_string_len(value f)
+void reduce_string_len(value f)
 	{
-	if (!f->L) return 0;
-	value x = f->R;
-	if (!arg(type_string,x)) return 0;
-	return Qlong(string_len(x));
+	value x = arg(type_string,f->R);
+	replace(f, Qlong(string_len(x)));
 	}
 
 /* Convert string to long and return true if successful. */
@@ -252,24 +248,21 @@ int string_long(char *beg, long *num)
 	return *beg != '\0' && *end == '\0';
 	}
 
-/* (string_long x yes no) converts string x to a possible long value:
-
+/* (string_long x) converts string x to a possible long value:
   yes long     # if string has correct format
   no           # if string has incorrect format
 
 LATER: strtol does not allow numeric separators like ',' and '_'.
 */
-value fexl_string_long(value f)
+void reduce_string_long(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
-
-	value x = f->L->L->R;
-	if (!arg(type_string,x)) return 0;
+	value x = arg(type_string,f->R);
 
 	long num;
 	if (string_long(string_data(x),&num))
-		return A(f->L->R,Qlong(num));
-	return f->R;
+		replace_apply(f, Q(reduce_yes), Qlong(num));
+	else
+		replace(f, Q(reduce_F));
 	}
 
 /* Convert string to double and return true if successful. */
@@ -281,23 +274,31 @@ int string_double(char *beg, double *num)
 	}
 
 /* (string_double x yes no) converts string x to a possible double value:
-
   yes double   # if string has correct format
   no           # if string has incorrect format
 
 LATER: strtod does not allow numeric separators like ',' and '_'.
 */
-value fexl_string_double(value f)
-	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 
-	value x = f->L->L->R;
-	if (!arg(type_string,x)) return 0;
+static void reduce3_string_double(value f)
+	{
+	value x = arg(type_string,f->L->L->R);
 
 	double num;
 	if (string_double(string_data(x),&num))
-		return A(f->L->R,Qdouble(num));
-	return f->R;
+		replace_apply(f, f->L->R, Qdouble(num));
+	else
+		replace(f, f->R);
+	}
+
+static void reduce2_string_double(value f)
+	{
+	f->T = reduce3_string_double;
+	}
+
+void reduce_string_double(value f)
+	{
+	f->T = reduce2_string_double;
 	}
 
 /*
@@ -305,17 +306,11 @@ string_index haystack needle offset
 NOTE: I have an extensive test suite verifying compatibility with the Perl
 "index" function.
 */
-value fexl_string_index(value f)
+static void reduce3_string_index(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
-
-	value x = f->L->L->R;
-	value y = f->L->R;
-	value z = f->R;
-
-	if (!arg(type_string,x)) return 0;
-	if (!arg(type_string,y)) return 0;
-	if (!arg(type_long,z)) return 0;
+	value x = arg(type_string,f->L->L->R);
+	value y = arg(type_string,f->L->R);
+	long offset = get_long(arg(type_long,f->R));
 
 	char *xs = string_data(x);
 	long xn = string_len(x);
@@ -323,23 +318,22 @@ value fexl_string_index(value f)
 	char *ys = string_data(y);
 	long yn = string_len(y);
 
-	long zn = get_long(z);
-	if (zn < 0) zn = 0;
-	if (zn > xn) zn = xn;
+	if (offset < 0) offset = 0;
+	if (offset > xn) offset = xn;
 
-	/* Always consider null string to be found at adjusted zn. */
-	if (yn == 0) return Qlong(zn);
+	/* Always consider null string to be found at adjusted offset. */
+	if (yn == 0) { replace(f,Qlong(offset)); return; }
 
 	/* Avoid unnecessary work if match is impossible based on length. */
-	if (zn + yn > xn) return Qlong(-1);
+	if (offset + yn > xn) { replace(f,Qlong(-1)); return; }
 
-	long xi = zn;
+	long xi = offset;
 	long yi = 0;
 
 	while (1)
 		{
-		if (yi >= yn) return Qlong(xi - yi);
-		if (xi >= xn) return Qlong(-1);
+		if (yi >= yn) { replace(f,Qlong(xi - yi)); return; }
+		if (xi >= xn) { replace(f,Qlong(-1)); return; }
 
 		if (xs[xi] == ys[yi])
 			yi++;
@@ -351,4 +345,14 @@ value fexl_string_index(value f)
 
 		xi++;
 		}
+	}
+
+static void reduce2_string_index(value f)
+	{
+	f->T = reduce3_string_index;
+	}
+
+void reduce_string_index(value f)
+	{
+	f->T = reduce2_string_index;
 	}

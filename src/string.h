@@ -1,4 +1,4 @@
-extern value type_string(value);
+extern void type_string(value);
 extern value Qchars(const char *data, long len);
 extern value Qcopy_chars(const char *data, long len);
 extern value Qcopy_string(const char *data);

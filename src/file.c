@@ -1,17 +1,22 @@
 #include <stdio.h>
 #include "buf.h"
 #include "value.h"
+#include "basic.h"
 #include "long.h"
 #include "string.h"
 
-value type_file(value f) { return 0; }
+void type_file(value f) { type_error(); }
+
+FILE *get_file(value f)
+	{
+	return (FILE *)f->R->L;
+	}
 
 /* Close the file when it's no longer used. */
-static value clear_file(value f)
+static void clear_file(value f)
 	{
-	FILE *fh = (FILE *)f->R->L;
+	FILE *fh = get_file(f);
 	if (fh) fclose(fh);
-	return 0;
 	}
 
 /* Make a file value from the given file handle. */
@@ -28,115 +33,120 @@ automatically closed, such as stdout. */
 value Qfile_const(FILE *fh)
 	{
 	value f = Qfile(fh);
-	f->R->T = 0;
+	f->R->T = 0; /* Do not close. */
 	return f;
 	}
 
-/* (file_open path mode yes no) opens the file with the given path and returns:
-
-  yes fh       # if successful, where fh is the open file handle
-  no           # if not successful
+/* (fopen path mode) opens the file with the given path and returns:
+  yes fh   # if successful, where fh is the open file handle
+  no       # if not successful
 */
-value fexl_fopen(value f)
+static void reduce2_fopen(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
-
-	value x = f->L->L->L->R;
-	value y = f->L->L->R;
-	if (!arg(type_string,x)) return 0;
-	if (!arg(type_string,y)) return 0;
-
-	char *path = string_data(x);
-	char *mode = string_data(y);
+	char *path = string_data(arg(type_string,f->L->R));
+	char *mode = string_data(arg(type_string,f->R));
 
 	FILE *fh = fopen(path,mode);
-	if (fh == 0) return f->R;
-	return A(f->L->R,Qfile(fh));
+	if (fh)
+		replace_apply(f, Q(reduce_yes), Qfile(fh));
+	else
+		replace(f, Q(reduce_F));
 	}
 
-/* (fdopen fd mode yes no) calls fdopen on fd and mode and returns either
-(yes fh) or no.
-*/
-value fexl_fdopen(value f)
+void reduce_fopen(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
-	value x = f->L->L->L->R;
-	value y = f->L->L->R;
-	if (!arg(type_long,x)) return 0;
-	if (!arg(type_string,y)) return 0;
+	f->T = reduce2_fopen;
+	}
 
-	long fd = get_long(x);
-	char *mode = string_data(y);
+/* (fdopen fd mode) calls fdopen and returns either (yes fh) or no. */
+static void reduce2_fdopen(value f)
+	{
+	long fd = get_long(arg(type_long,f->L->R));
+	char *mode = string_data(arg(type_string,f->R));
 
 	FILE *fh = fdopen(fd,mode);
-	if (fh == 0) return f->R;
-	return A(f->L->R,Qfile(fh));
+	if (fh)
+		replace_apply(f, Q(reduce_yes), Qfile(fh));
+	else
+		replace(f, Q(reduce_F));
+	}
+
+void reduce_fdopen(value f)
+	{
+	f->T = reduce2_fdopen;
 	}
 
 /* (fgetc file next) = (next ch), where ch is the next character from file. */
-value fexl_fgetc(value f)
+static void reduce2_fgetc(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
+	FILE *fh = get_file(arg(type_file,f->L->R));
+	replace_apply(f, f->R, Qlong(fgetc(fh)));
+	}
 
-	value x = f->L->R;
-	if (!arg(type_file,x)) return 0;
-
-	FILE *fh = (FILE *)x->R->L;
-
-	return A(f->R,Qlong(fgetc(fh)));
+void reduce_fgetc(value f)
+	{
+	f->T = reduce2_fgetc;
 	}
 
 /* (fputc file ch next) */
-value fexl_fputc(value f)
+static void reduce3_fputc(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	FILE *fh = get_file(arg(type_file,f->L->L->R));
+	long ch = get_long(arg(type_long,f->L->R));
 
-	value x = f->L->L->R;
-	value y = f->L->R;
-	if (!arg(type_file,x)) return 0;
-	if (!arg(type_long,y)) return 0;
-
-	FILE *fh = (FILE *)x->R->L;
-	fputc(get_long(y), fh);
-	return f->R;
+	fputc(ch, fh);
+	replace(f,f->R);
 	}
 
-/* (fwrite file str next) */
-extern void string_write(value x, FILE *stream);
-value fexl_fwrite(value f)
+static void reduce2_fputc(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	f->T = reduce3_fputc;
+	}
 
-	value x = f->L->L->R;
-	value y = f->L->R;
-	if (!arg(type_file,x)) return 0;
-	if (!arg(type_string,y)) return 0;
+void reduce_fputc(value f)
+	{
+	f->T = reduce2_fputc;
+	}
 
-	FILE *fh = (FILE *)x->R->L;
-	string_write(y, fh);
-	return f->R;
+/* (fwrite file str next)
+Note that we use fwrite because we may be writing binary data.
+*/
+static void reduce3_fwrite(value f)
+	{
+	FILE *fh = get_file(arg(type_file,f->L->L->R));
+	value y = arg(type_string,f->L->R);
+
+	fwrite(string_data(y), 1, string_len(y), fh);
+	replace(f,f->R);
+	}
+
+static void reduce2_fwrite(value f)
+	{
+	f->T = reduce3_fwrite;
+	}
+
+void reduce_fwrite(value f)
+	{
+	f->T = reduce2_fwrite;
 	}
 
 /* (fflush file next) = (next status) */
-value fexl_fflush(value f)
+static void reduce2_fflush(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
-	value x = f->L->R;
-	if (!arg(type_file,x)) return 0;
-	FILE *fh = (FILE *)x->R->L;
-	return A(f->R,Qlong(fflush(fh)));
+	FILE *fh = get_file(arg(type_file,f->L->R));
+	replace_apply(f, f->R, Qlong(fflush(fh)));
+	}
+
+void reduce_fflush(value f)
+	{
+	f->T = reduce2_fflush;
 	}
 
 /* (file_string file next) = (next string) where string is the entire content
 of file in a single string. */
-value fexl_file_string(value f)
+static void reduce2_file_string(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
-
-	value x = f->L->R;
-	if (!arg(type_file,x)) return 0;
-
-	FILE *fh = (FILE *)x->R->L;
+	FILE *fh = get_file(arg(type_file,f->L->R));
 	struct buf *buf = 0;
 
 	while (1)
@@ -148,20 +158,14 @@ value fexl_file_string(value f)
 
 	long len;
 	char *data = buf_clear(&buf,&len);
-	return A(f->R,Qchars(data,len));
+	replace_apply(f, f->R, Qchars(data,len));
 	}
 
-value fexl_stdin(value f)
+void reduce_file_string(value f)
 	{
-	return Qfile_const(stdin);
+	f->T = reduce2_file_string;
 	}
 
-value fexl_stdout(value f)
-	{
-	return Qfile_const(stdout);
-	}
-
-value fexl_stderr(value f)
-	{
-	return Qfile_const(stderr);
-	}
+value const_stdin(void)  { return Qfile_const(stdin); }
+value const_stdout(void) { return Qfile_const(stdout); }
+value const_stderr(void) { return Qfile_const(stderr); }

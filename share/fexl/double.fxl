@@ -1,21 +1,26 @@
 #
 
-\double_lt=(\x\y double_compare x y T F F)
-\double_le=(\x\y double_compare x y T T F)
-\double_eq=(\x\y double_compare x y F T F)
-\double_ge=(\x\y double_compare x y F T T)
-\double_gt=(\x\y double_compare x y F F T)
-\double_ne=(\x\y double_compare x y T F T)
+\double_compare = (\x\y order (double_cmp x y))
 
-\double_min = (\x\y double_compare x y  x x y)
-\double_max = (\x\y double_compare x y  y x x)
+\double_gt = (\x\y order (double_cmp x y) F F T)
+\double_eq = (\x\y order (double_cmp x y) F T F)
+\double_ge = (\x\y order (double_cmp x y) F T T)
 
-define "double_lt" double_lt;
-define "double_le" double_le;
+\double_lt = (\x\y order (double_cmp x y) T F F)
+\double_ne = (\x\y order (double_cmp x y) T F T)
+\double_le = (\x\y order (double_cmp x y) T T F)
+
+\double_min = (\x\y order (double_cmp x y) x x y)
+\double_max = (\x\y order (double_cmp x y) y y x)
+
+
+define "double_compare" double_compare;
+define "double_gt" double_gt;
 define "double_eq" double_eq;
 define "double_ge" double_ge;
-define "double_gt" double_gt;
+define "double_lt" double_lt;
 define "double_ne" double_ne;
+define "double_le" double_le;
 define "double_min" double_min;
 define "double_max" double_max;
 define "double_type" is_double;

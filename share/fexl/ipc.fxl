@@ -31,6 +31,13 @@
 		next pid
 		)
 
+	\close =
+		(\fd\next
+		close fd \status
+		long_lt status 0 (die "close failed");
+		next
+		)
+
 	# Now here's the spawn function itself.
 
 	\child_fn\next

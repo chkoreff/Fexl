@@ -2,17 +2,14 @@
 
 ### Boolean functions.
 
-# Define T as a synonym for C.  F is already built-in.
+# Synonyms
 \T=C
+\no=F
 
+# Logic functions
 \and=(\x\y x y F)
 \or=(\x\y x T y)
 \not=(\x x F T)
-
-# These functions represent a "possible" value, either (yes val) if you have a
-# value or no if you don't.
-\yes = (\val \yes\no yes val)
-\no  = (     \yes\no no)
 
 # (defined x) is true if x is (yes val).
 \defined = (\x x (\_ T) F)
@@ -32,9 +29,8 @@
 \eval = (\f \f=f f)
 
 ### Comparison functions
-
-\long_eq=(\x\y long_compare x y F T F)
-\string_eq=(\x\y string_compare x y F T F)
+\long_eq = (\x\y order (long_cmp x y) F T F)
+\string_eq = (\x\y order (string_cmp x y) F T F)
 
 ### List functions
 
@@ -57,6 +53,10 @@
 	x (item y) I (choose xs ys)
 	)
 
+# LATER It's about 35% faster implemented in C, but let's revisit that after
+# the rewrite.
+\fold == (\fn\z\xs xs z \x\xs \z=(fn z x) fold fn z xs)
+
 \list_and = (fold and T)
 \list_or = (fold or F)
 
@@ -72,22 +72,11 @@
 	is_long x (long_string x);
 	is_double x (double_string x);
 	is_name x (name_string x);
-	x)
-
-# (fprint fh x next) prints value x to file fh and continues with next.
-#
-# In addition to printing atomic values like strings and numbers, it can also
-# print whole application trees at once, for example:
-#   (("Hello " "world." NL) ("Good " "bye." NL));
-
-\fprint ==
-	(\fh\x\next
-	\x=x  # Force evaluation.
-	is_apply x (\a\b fprint fh a; fprint fh b; next);
-	\x = (to_string x)
-	is_string x (fwrite fh x; next);
-	next
+	x
 	)
+
+# (fprint fh x) prints value x to file fh.
+\fprint == (\fh\x fwrite fh; to_string x)
 
 \print = (fprint stdout)
 \warn = (fprint stderr)
@@ -142,13 +131,14 @@
 
 	# Override so we print to stderr instead of stdout.
 	\print = warn
-	\nl = (warn "
-")
+	\nl = (print NL)
 
 	# Report the error location.
 	\error_at =
 		(\line\next
-		print " on line ";print line;print " of ";print script;nl;
+		print " on line ";print line;
+			(string_eq script "" () (print " of ";print script));
+			nl;
 		next
 		)
 
@@ -156,6 +146,9 @@
 	syntax_ok ()
 		(
 		exp \error\line
+		# LATER 20120826 fexl.c says if line == 0
+		### warn("Can't open configuration script %s", name);
+
 		print error; error_at line;
 		);
 
@@ -228,15 +221,18 @@
 	# Parse the module file in the standard context.
 	\see = (\file module file standard)
 
-	starts "<" (see "compare");
-	starts "=" (see "compare");
-	starts ">" (see "compare");
-	starts "-" (see "math");
-	starts "!=" (see "compare");
-	define "?" query;
-	starts "/" (see "math");
-	starts "*" (see "math");
 	starts "+" (see "math");
+	starts "-" (see "math");
+	starts "*" (see "math");
+	starts "/" (see "math");
+
+	define "?" query;
+
+	starts ">" (see "compare");
+	starts "=" (see "compare");
+	starts "<" (see "compare");
+	starts "!=" (see "compare");
+
 	starts "a"
 		(
 		define "all" all;
@@ -246,6 +242,7 @@
 	starts "c"
 		(
 		define "choose" choose;
+		starts "cmp" (see "compare");
 		starts "compare" (see "compare");
 		void
 		);
@@ -263,6 +260,7 @@
 		(
 		define "end" end;
 		starts "envs" (see "run");
+		starts "eq" (see "compare");
 		define "eval" eval;
 		void
 		);
@@ -270,10 +268,17 @@
 		(
 		starts "filter" (see "list");
 		starts "find" (see "list");
+		define "fold" fold;
 		define "fprint" fprint;
 		void
 		);
-	define "getchar" getchar;
+	starts "g"
+		(
+		define "getchar" getchar;
+		starts "gt" (see "compare");
+		starts "ge" (see "compare");
+		void
+		);
 	define "halt" halt;
 	define "is_name" is_name;
 	starts "l"
@@ -285,11 +290,15 @@
 			see "list"
 			);
 		starts "long_" (see "long");
+		starts "le" (see "compare");
+		starts "lt" (see "compare");
 		void
 		);
 	starts "m"
 		(
 		define "map" map;
+		starts "min" (see "compare");
+		starts "max" (see "compare");
 		see "m"
 		);
 	define "NL" NL;
@@ -297,19 +306,26 @@
 		(
 		define "no" no;
 		define "not" not;
+		starts "ne" (see "compare");
 		void
 		);
 	define "or" or;
 	define "print" print;
 	define "putchar" putchar;
 	starts "quote_string" (see "meta");
-	starts "r" (see "r");
+	starts "r"
+		(
+		##define "resolve_parse" resolve_parse; # LATER 20120826 almost
+		see "r"
+		);
 	starts "s"
 		(
 		define "see" see;
 		define "standard" standard;
 		define "starts" starts;
 		define "some" some;
+		define "string_put" (fwrite stdout);
+		define "string_stderr" (fwrite stderr);
 		see "s"
 		);
 	define "T" T;
@@ -322,11 +338,10 @@
 		see "v"
 		);
 	define "warn" warn;
-	define "yes" yes;
 	void
 	)
 
-# This is the standard context which resolve symbols in Fexl programs.
+# This is the standard context that resolves symbols in Fexl programs.
 \standard ==
 	(\sym
 	\sym=sym  # Force evaluation in case it's a computed symbol.

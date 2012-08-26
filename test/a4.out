@@ -34,12 +34,6 @@ Your program ran out of memory.
 == test case
 :: child stdout is:
 :: child stderr is:
-Your program ran out of memory.
-:: child status = 256.
-
-== test case
-:: child stdout is:
-:: child stderr is:
 :: child status = 11.
 
 == test case

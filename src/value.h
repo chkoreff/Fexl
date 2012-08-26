@@ -18,7 +18,7 @@ Assuming there are no other modes, I conclude that long ints are large enough
 to hold pointers, period.
 
 As further evidence, the section titled "Integer and Floating Point Types" has
-a table of Storage Class Sizes which lists the size in bits for the various
+a table of Storage Class Sizes that lists the size in bits for the various
 types in all three modes -o32, -n32, and -64.  In all modes the size of a long
 equals the size of a pointer.
 
@@ -34,8 +34,9 @@ overflow is impossible.
 If T is zero, the value represents the application of function L to argument R,
 which are both non-zero.
 
-If T is non-zero, the value is a normal form.  T is the redution routine called
-during evaluation.  In this case there are three possibilities, as follows.
+If T is non-zero, the value is a normal form.  T is the reduction routine
+called during evaluation.  In this case there are three possibilities, as
+follows.
 
 If L and R are both zero, the value is a combinator with no arguments.
 
@@ -43,13 +44,13 @@ If L and R are both non-zero, the value is a combinator with arguments, but not
 enough to reduce to anything simpler, for example (C x) or (S x y).
 
 If L is zero and R is non-zero, the value is an atomic data type.  R is the
-value which holds the data.  R->T is the routine which clears the contents of R
+value that holds the data.  R->T is the routine that clears the contents of R
 when its reference count drops to zero.  This cleans up the data properly, for
 example freeing a string pointer or closing a file handle.
 */
 
 typedef struct value *value;
-typedef value (*type)(value);
+typedef void (*type)(value);
 
 struct value
 	{
@@ -64,7 +65,10 @@ extern void drop(value);
 extern value D(type);
 extern value Q(type);
 extern value A(value, value);
+extern void replace(value, value);
+extern void replace_apply(value, value, value);
 extern void eval(value);
-extern int arg(type, value);
-extern value arg_is_type(type, value);
+extern value arg(type, value);
+extern int if_type(type, value);
+extern void type_error(void);
 extern void end_value(void);

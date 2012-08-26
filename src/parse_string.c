@@ -33,10 +33,8 @@ value parse_string(char *string)
 
 /* (parse source) parses the source string as a Fexl function and returns
 (pair ok; pair exp; symbols). */
-value fexl_parse(value f)
+void reduce_parse(value f)
 	{
-	if (!f->L) return 0;
-	value source = f->R;
-	if (!arg(type_string,source)) return 0;
-	return parse_chars(string_data(source), string_len(source));
+	value source = arg(type_string,f->R);
+	replace(f, parse_chars(string_data(source), string_len(source)));
 	}

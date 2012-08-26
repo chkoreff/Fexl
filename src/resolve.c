@@ -1,5 +1,6 @@
 #include "dynamic.h"
 #include "value.h"
+#include "basic.h"
 #include "double.h"
 #include "long.h"
 #include "resolve.h"
@@ -26,27 +27,41 @@ value resolve(value sym)
 	if (string_double(name,&num)) return Qdouble(num);
 	}
 
-	/* Resolve name "X" by looking up "fexl_X" in the library. */
-	void *def = lib_sym("fexl_",name);
-	if (def) return Q(def);
+	/* Resolve name "X" by looking up "reduce_X" in the library. */
+	{
+	void *def = lib_sym("reduce_",name);
+	if (def)
+		return Q(def);
+	}
+
+	/* Resolve name "X" by looking up "const_X" in the library and evaluating
+	that function to get the constant value. */
+	{
+	void *def = lib_sym("const_",name);
+	if (def)
+		{
+		value (*f)(void) = def;
+		return f();
+		}
+	}
 
 	return 0;
 	}
 
 /*
 Resolve a symbol in the standard Fexl context.
-The value of (resolve sym yes no) is
+The value of (resolve sym) is
   yes def      # if the symbol is defined as def
   no           # if the symbol is not defined
 */
-value fexl_resolve(value f)
+void reduce_resolve(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
-
-	value sym = f->L->L->R;
+	value sym = f->R;
 	eval(sym);
 
 	void *def = resolve(sym);
-	if (def) return A(f->L->R,def);
-	return f->R;
+	if (def)
+		replace_apply(f, Q(reduce_yes), def);
+	else
+		replace(f, Q(reduce_F));
 	}
