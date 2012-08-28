@@ -45,7 +45,7 @@ static value parse_top(void)
 		{
 		long line = get_long(f->R);
 		if (line == 0)
-			warn("Can't open configuration script %s", name);
+			warn("Can't open file %s", name);
 		else
 			warn("%s on line %ld of %s", string_data(f->L->R), line, name);
 		}

@@ -126,8 +126,8 @@ not
 or
 order
 pair
-parse
 parse_file
+parse_string
 pipe
 print
 putchar

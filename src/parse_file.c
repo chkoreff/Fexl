@@ -28,16 +28,9 @@ value parse_file(char *name)
 	return result;
 	}
 
-/* parse_file name next = (next result)
-TODO perhaps simply return the value like "parse" (a string)
-*/
-static void reduce2_parse_file(value f)
-	{
-	value x = arg(type_string,f->L->R);
-	replace_apply(f, f->R, parse_file(string_data(x)));
-	}
-
+/* (parse_file name) parses the contents of the named file. */
 void reduce_parse_file(value f)
 	{
-	f->T = reduce2_parse_file;
+	value x = arg(type_string,f->R);
+	replace(f, parse_file(string_data(x)));
 	}

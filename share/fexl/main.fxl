@@ -97,7 +97,7 @@
 	)
 
 # Resolve the result of parsing a file, where:
-#   script is the name of the file or other program source.
+#   label is the name of the file or other program source.
 #   result is the return value from the parse function.
 #   context is the context for resolving undefined symbols.
 #   print is the function to use for reporting any error messages.
@@ -108,7 +108,7 @@
 # program.  Then it calls next.
 
 \resolve_parse =
-	(\script\result\context\print\bad\next
+	(\label\result\context\print\bad\next
 	\nl = (print NL)
 
 	result \syntax_ok\result result \exp\symbols
@@ -140,9 +140,9 @@
 	\error_at =
 		(\line
 		print " on line ";print line;
-		(\next string_eq script "" next;
-			print " of ";print script; next);
-		nl
+		(\next string_eq label "" next;
+			print " of ";print label; next);
+		nl;
 		)
 
 	# Report any syntax error.
@@ -150,7 +150,7 @@
 		(
 		exp \error\line
 		long_eq line 0
-			(print "Can't open configuration script ";print script;nl;)
+			(print "Can't open file ";print label;nl;)
 			(print error; error_at line;)
 		);
 
@@ -166,21 +166,27 @@
 	next
 	)
 
+\normal_parse_file =
+	(\name\context
+	\result = (parse_file name)
+	resolve_parse name result context warn (exit 1)
+	)
+
 # Parse the module file with the given logical name.  This returns a value
 # which, when applied to a context, returns the fully resolved function
 # described in that file.
 \module =
 	(\name
 	base_path \path
-	\script =
+	\name =
 		(
 		string_append path;
 		string_append "/share/fexl/";
 		string_append name;
 		".fxl"
 		)
-	parse_file script \result
-	\context resolve_parse script result context warn (exit 1)
+
+	normal_parse_file name
 	)
 
 # TODO simplify the module stuff.  I think I can do one-shot parsing without
@@ -362,5 +368,4 @@
 
 # Run the user's script in the standard context.
 argv 1 \script
-parse_file script \result
-resolve_parse script result standard warn (exit 1);
+normal_parse_file script standard;

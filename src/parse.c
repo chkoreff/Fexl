@@ -626,7 +626,7 @@ value parse_source(void)
 
 	if (read_ch == 0)
 		{
-		error = "Can't open script";
+		error = "Can't open file";
 		exp = 0;
 		}
 	else
