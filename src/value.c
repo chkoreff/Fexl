@@ -95,7 +95,7 @@ value A(value L, value R)
 	return create(0,L,R);
 	}
 
-/* Replace the contents of f with the contents of g.  Assumes g && f != g. */
+/* Replace the contents of f with the contents of g. */
 void replace(value f, value g)
 	{
 	g->N++;
