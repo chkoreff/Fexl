@@ -96,45 +96,52 @@
 	exit 1;
 	)
 
-# Resolve the result of parsing a file, where:
-#   label is the name of the file or other program source.
-#   result is the return value from the parse function.
-#   context is the context for resolving undefined symbols.
-#   print is the function to use for reporting any error messages.
-#   bad is the function to call if there were any errors.
-#   next is what to do next
+# (resolve_symbols syms context exp final error bad)
 #
-# If there were errors, it calls bad, otherwise it calls the fully resolved
-# program.  Then it calls next.
+# This looks up the definitions of all the symbols using the given context,
+# applying each one in turn to the given expression.  For each symbol that is
+# not defined, it calls (error name place) to indicate the name and line number
+# of the missing symbol, and uses the name itself as the dummy definition.
+#
+# After applying all the definitions to the original expression exp, we end up
+# with a new expression exp.  If all the symbols were properly defined, we
+# return (final exp).  If any symbols were undefined, we return (bad exp).
 
-\resolve_parse =
-	(\label\result\context\print\bad\next
+\resolve_symbols ==
+	(\syms\context\exp\final\error\bad
+	syms (final exp) \sym\syms
+	sym \name\place
+
+	\continue = (\val\final
+		resolve_symbols syms context (exp val) final error bad)
+
+	context name
+		(\val
+		# The name is defined as val.  We force an evaluation of the value,
+		# which isn't strictly necessary on a functional basis, but useful when
+		# using reflective features.  By forcing evaluation, the value is
+		# reduced to its normal form, instead of lazily remaining as an
+		# unevaluated form.
+		\val=val
+		continue val final
+		)
+		(
+		error name place;
+		continue name bad
+		)
+	)
+
+# (check_parse parse source context label good bad print)
+#
+# Call the parse function on the source and resolve it in the given context,
+# returning (good program) if there were no errors.  If there were errors,
+# report them in English using the given print function, and return bad.  The
+# label is the logical name used to identify the source in error messages.
+
+\check_parse =
+	(\parse\source\context\label\good\bad\print
+
 	\nl = (print NL)
-
-	result \syntax_ok\result result \exp\symbols
-
-	\defs = (map (\entry entry \sym\line context sym) symbols)
-	\symbols_ok = (all defined defs)
-	\ok = (and syntax_ok symbols_ok)
-	\undef_symbols = (choose (map undefined defs) symbols)
-
-	# Now we flatten all the yes/no entries into pure values, using a dummy
-	# value of 0 for all no entries.  If we have any no entries we won't run
-	# the program anyway, so these dummy values are never encountered anyway.
-	\defs = (map (default 0) defs)
-
-	# Now we rip through the list of defs and force an evaluation on each one.
-	# This isn't strictly necessary on a functional basis, but it's useful when
-	# you use reflective features like type_of, for example in a function such
-	# as "show".  By forcing evaluation, a symbol like "C" is evaluated all the
-	# way to its ultimate value, instead of lazily remaining as an unevaluated
-	# function application.
-
-	do defs (\val \val=val)
-
-	# Now create the program, which is the result of applying exp to each of
-	# the definitions in turn.
-	\program == (ok (fold I exp defs) exp)
 
 	# Report the error location.
 	\error_at =
@@ -145,31 +152,49 @@
 		nl;
 		)
 
+	\error_file ==
+		(
+		print "Can't open file ";print label;nl;
+		)
+
+	\error_syntax =
+		(\error\line
+		print error; error_at line;
+		)
+
+	\error_symbol =
+		(\sym\line
+		print "Undefined symbol "; print sym; error_at line;
+		)
+
+	parse source \ok\result result \exp\symbols
+
 	# Report any syntax error.
-	syntax_ok ()
+	ok ()
 		(
 		exp \error\line
 		long_eq line 0
-			(print "Can't open file ";print label;nl;)
-			(print error; error_at line;)
+			(error_file)
+			(error_syntax error line)
 		);
 
-	# Report any undefined symbols.
-	do undef_symbols
-		(\sym
-		sym \sym\line
-		print "Undefined symbol "; print sym; error_at line;
-		);
-
-	# Run the program if it's ok, otherwise run bad.
-	ok program bad;
-	next
+	# Resolve open symbols.
+	resolve_symbols symbols context exp
+		(
+		\exp
+		# All symbols were defined.
+		ok exp bad
+		)
+		error_symbol
+		(\exp
+		# Some symbols were undefined.
+		bad
+		)
 	)
 
 \normal_parse_file =
 	(\name\context
-	\result = (parse_file name)
-	resolve_parse name result context warn (exit 1)
+	check_parse parse_file name context name I (exit 1) warn
 	)
 
 # Parse the module file with the given logical name.  This returns a value
@@ -189,8 +214,8 @@
 	normal_parse_file name
 	)
 
-# TODO simplify the module stuff.  I think I can do one-shot parsing without
-# having to enumerate the available modules here.
+# LATER 20120828 simplify the module stuff.  I think I can do one-shot parsing
+# without having to enumerate the available modules here.
 # This wrapper caches the known module names so it never has to parse a file
 # more than once.
 \module =
@@ -254,6 +279,7 @@
 		define "choose" choose;
 		starts "cmp" (see "compare");
 		starts "compare" (see "compare");
+		define "check_parse" check_parse;
 		void
 		);
 	starts "d"
@@ -325,7 +351,6 @@
 	starts "quote_string" (see "meta");
 	starts "r"
 		(
-		define "resolve_parse" resolve_parse; # TODO don't like
 		see "r"
 		);
 	starts "s"
