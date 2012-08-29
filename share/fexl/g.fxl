@@ -1,0 +1,4 @@
+#
+starts "gt" (see "compare");
+starts "ge" (see "compare");
+void

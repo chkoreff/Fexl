@@ -185,14 +185,21 @@
 	\str
 	\case=(string_eq str)
 	case "a" (eval; module "a");
+	case "c" (eval; module "c");
 	case "compare" (eval; module "compare");
+	case "d" (eval; module "d");
 	case "double" (eval; module "double");
+	case "e" (eval; module "e");
+	case "f" (eval; module "f");
+	case "g" (eval; module "g");
 	case "ipc" (eval; module "ipc");
+	case "l" (eval; module "l");
 	case "list" (eval; module "list");
 	case "long" (eval; module "long");
 	case "math" (eval; module "math");
 	case "meta" (eval; module "meta");
 	case "m" (eval; module "m");
+	case "n" (eval; module "n");
 	case "rand" (eval; module "rand");
 	case "r" (eval; module "r");
 	case "ru_utime" (eval; module "ru_utime");
@@ -224,70 +231,41 @@
 	starts "<" (see "compare");
 	starts "!=" (see "compare");
 
-	starts "a"
-		(
-		starts "all" (see "list");
-		starts "and" (see "list");
-		see "a"
-		);
+	starts "a" (see "a");
 	starts "c"
 		(
-		starts "cmp" (see "compare");
-		starts "compare" (see "compare");
-		starts "choose" (see "list");
 		define "check_parse" check_parse;
-		void
+		see "c"
 		);
 	starts "d"
 		(
-		starts "default" (see "list");
 		define "define" define;
-		starts "defined" (see "list");
-		starts "die" (see "list");
-		starts "double_" (see "double");
-		starts "do" (see "list");
-		void
+		see "d"
 		);
 	starts "e"
 		(
-		starts "end" (see "list");
-		starts "envs" (see "run");
-		starts "eq" (see "compare");
 		define "eval" eval;
-		void
+		see "e"
 		);
 	starts "f"
 		(
-		starts "filter" (see "list");
-		starts "find" (see "list");
 		define "fprint" fprint;
-		void
+		see "f"
 		);
 	starts "g"
 		(
 		define "getchar" getchar;
-		starts "gt" (see "compare");
-		starts "ge" (see "compare");
-		void
+		see "g"
 		);
 	starts "halt" (see "list");
 	define "is_name" is_name;
-	starts "l"
-		(
-		starts "long_" (see "long");
-		starts "le" (see "compare");
-		starts "lt" (see "compare");
-		starts "list" (see "list");
-		void
-		);
+	starts "l" (see "l");
 	starts "m" (see "m");
 	define "NL" NL;
 	starts "n"
 		(
 		define "no" no;
-		starts "not" (see "list");
-		starts "ne" (see "compare");
-		void
+		see "n"
 		);
 	starts "or" (see "list");
 	starts "p"

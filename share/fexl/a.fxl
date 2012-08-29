@@ -1,4 +1,6 @@
 #
 starts "append" (see "list");
+starts "and" (see "list");
+starts "all" (see "list");
 starts "args" (see "run");
 void

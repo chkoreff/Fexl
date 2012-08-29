@@ -1,0 +1,5 @@
+#
+starts "cmp" (see "compare");
+starts "compare" (see "compare");
+starts "choose" (see "list");
+void
