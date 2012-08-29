@@ -65,8 +65,6 @@ void reduce_query(value f)
 /*
 \pair = (\x\y\p p x y)
 This creates a pair of two things.
-
-LATER use pair2 constructor
 */
 static void reduce3_pair(value f)
 	{
@@ -87,8 +85,6 @@ void reduce_pair(value f)
 /*
 \item = (\head\tail \end\item item head tail)
 This creates a list with the first element head, followed by the list tail.
-
-LATER use item2 constructor (cons)
 */
 
 static void reduce3_item(value f)
@@ -128,4 +124,50 @@ void reduce_yes(value f)
 void replace_boolean(value f, int flag)
 	{
 	replace(f, Q(flag ? reduce_C : reduce_F));
+	}
+
+/* \fold == (\fn\z\xs xs z \x\xs \z=(fn z x) fold fn z xs)
+It's about 75% faster implemented in C.
+*/
+static void reduce3_fold(value f)
+	{
+	value z = f->L->R;
+	value xs = f->R;
+
+	xs = A(A(xs,Q(reduce_C)),Q(reduce_pair));
+	hold(xs);
+	eval(xs);
+
+	if (xs->T == reduce_C)
+		replace(f, z);
+	else if (xs->T == reduce3_pair)
+		{
+		hold(z);
+
+		drop(f->R);
+		f->R = xs->R;
+		hold(f->R);
+
+		drop(f->L->R);
+		f->L->R = A(A(f->L->L->R,z),xs->L);
+		hold(f->L->R);
+
+		eval(f->L->R);
+
+		drop(z);
+		}
+	else
+		type_error();
+
+	drop(xs);
+	}
+
+static void reduce2_fold(value f)
+	{
+	f->T = reduce3_fold;
+	}
+
+void reduce_fold(value f)
+	{
+	f->T = reduce2_fold;
 	}

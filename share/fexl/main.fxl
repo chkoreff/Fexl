@@ -53,10 +53,6 @@
 	x (item y) I (choose xs ys)
 	)
 
-# LATER It's about 35% faster implemented in C, but let's revisit that after
-# the rewrite.
-\fold == (\fn\z\xs xs z \x\xs \z=(fn z x) fold fn z xs)
-
 \list_and = (fold and T)
 \list_or = (fold or F)
 
@@ -155,8 +151,8 @@
 # LATER 20120829 Fold the do_parse adaptor back into the C code.  This will
 # require doing some tagged evaluation to simulate the operation of do_parse
 # (and therefore resolve_symbols) within the C code itself, but that's no big
-# deal.  I can use that same technique to provide built-in versions of "fold",
-# "map", etc.
+# deal.  I use that same technique for the built-in version of "fold".
+#
 # Here I override the built in C versions with the new versions.
 \parse_string = (do_parse parse_string)
 \parse_file = (do_parse parse_file)
@@ -323,7 +319,6 @@
 		(
 		starts "filter" (see "list");
 		starts "find" (see "list");
-		define "fold" fold;
 		define "fprint" fprint;
 		void
 		);
