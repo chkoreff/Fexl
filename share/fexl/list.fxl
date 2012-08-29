@@ -1,4 +1,38 @@
-# List functions
+# Functions for boolean, optional, and list values.
+
+### Boolean
+\and=(\x\y x y F)
+\or=(\x\y x T y)
+\not=(\x x F T)
+
+### Optional
+
+# (defined x) is true if x is (yes val).
+\defined = (\x x (\_ T) F)
+# (undefined x) is true if x is no.
+\undefined = (\x not (defined x))
+
+# (default v x) =
+#    v   if x is no
+#    val if x is (yes val)
+\default = (\v\x x I v)
+
+### Control
+
+\die =
+	(\msg
+	warn msg; warn NL;
+	exit 1;
+	)
+
+# The halt function ends the evaluation of the current expression by consuming
+# all arguments given to it.  It does not halt the entire program.
+\halt==(\_ halt)
+
+### List
+
+# Define end as a synonym for C.  The item function is already built-in.
+\end=C
 
 \append == (\xs\ys xs ys \x\xs item x; append xs ys)
 
@@ -64,8 +98,35 @@
 # Return the entry at position n in list xs, or v if no such position.
 \list_at = (\xs\n\v list_entry xs n I v)
 
+\list_and = (fold and T)
+\list_or = (fold or F)
+
+# (map f xs) is the list of (f x) values for each x in xs.
+\map == (\f\xs xs end \x\xs item (f x) (map f xs))
+
+\all = (\f\xs list_and (map f xs))
+\some = (\f\xs list_or (map f xs))
+
+# Apply function f to each entry in xs, ending with next.  This is useful for
+# producing a side-effect for each entry in a list.
+\do == (\xs\f\next xs next \x\xs f x; do xs f next)
+
+# (choose xs ys) returns the list of all y in ys where the corresponding x in
+# xs is true.  The xs is a list of bits which serves as a "mask".
+\choose ==
+	(\xs\ys
+	xs end \x\xs
+	ys end \y\ys
+	x (item y) I (choose xs ys)
+	)
+
+define "end" end;
 define "append" append;
 define "reverse" reverse;
+define "sort" sort;
+define "and" and;
+define "or" or;
+define "not" not;
 define "list_prefix" list_prefix;
 define "list_at" list_at;
 define "list_entry" list_entry;
@@ -73,5 +134,16 @@ define "list_long" list_long;
 define "filter" filter;
 define "find" find;
 define "range" range;
-define "sort" sort;
+define "list_and" list_and;
+define "list_or" list_or;
+define "all" all;
+define "some" some;
+define "map" map;
+define "do" do;
+define "choose" choose;
+define "defined" defined;
+define "undefined" undefined;
+define "default" default;
+define "die" die;
+define "halt" halt;
 void

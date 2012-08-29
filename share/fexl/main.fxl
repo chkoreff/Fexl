@@ -1,65 +1,20 @@
-# This script provides an enhanced context wrapped around another script.
-
-### Boolean functions.
+# This parses the script specified on the command line and runs it in the
+# standard context.  The standard context includes the functions built into C
+# (names starting with "reduce_"), along with more functions written in Fexl
+# (see "enhance" below).
 
 # Synonyms
 \T=C
 \no=F
 
-# Logic functions
-\and=(\x\y x y F)
-\or=(\x\y x T y)
-\not=(\x x F T)
-
-# (defined x) is true if x is (yes val).
-\defined = (\x x (\_ T) F)
-# (undefined x) is true if x is no.
-\undefined = (\x not (defined x))
-
-# (default v x) =
-#    v   if x is no
-#    val if x is (yes val)
-\default = (\v\x x I v)
-
-# The halt function ends the evaluation of the current expression by consuming
-# all arguments given to it.  It does not halt the entire program.
-\halt==(\_ halt)
-
 # (eval f) forces an evaluation of f and returns its value.
 \eval = (\f \f=f f)
 
-### Comparison functions
+# Comparison
 \long_eq = (\x\y order (long_cmp x y) F T F)
 \string_eq = (\x\y order (string_cmp x y) F T F)
 
-### List functions
-
-# Define end as a synonym for C.  The item function is already built-in.
-\end=C
-
-# (map f xs) is the list of (f x) values for each x in xs.
-\map == (\f\xs xs end \x\xs item (f x) (map f xs))
-
-# Apply function f to each entry in xs, ending with next.  This is useful for
-# producing a side-effect for each entry in a list.
-\do == (\xs\f\next xs next \x\xs f x; do xs f next)
-
-# (choose xs ys) returns the list of all y in ys where the corresponding x in
-# xs is true.  The xs is a list of bits which serves as a "mask".
-\choose ==
-	(\xs\ys
-	xs end \x\xs
-	ys end \y\ys
-	x (item y) I (choose xs ys)
-	)
-
-\list_and = (fold and T)
-\list_or = (fold or F)
-
-\all = (\f\xs list_and (map f xs))
-\some = (\f\xs list_or (map f xs))
-
-###
+# I/O
 
 \is_name = (\x type_named "name" (type_eq (type_of x)) F)
 
@@ -77,20 +32,12 @@
 \print = (fprint stdout)
 \warn = (fprint stderr)
 
-# LATER move putchar, NL, and die to separate files.
-
-# Synonyms
+\NL="
+"
+# LATER move to separate file
 \putchar = char_put
 \getchar = char_get
 
-\NL="
-"
-
-\die =
-	(\msg
-	warn msg; warn NL;
-	exit 1;
-	)
 
 # (resolve_symbols symbols context exp error final)
 #
@@ -236,22 +183,23 @@
 \module =
 	(
 	\str
-	string_eq str "a" (eval; module "a");
-	string_eq str "compare" (eval; module "compare");
-	string_eq str "double" (eval; module "double");
-	string_eq str "ipc" (eval; module "ipc");
-	string_eq str "list" (eval; module "list");
-	string_eq str "long" (eval; module "long");
-	string_eq str "math" (eval; module "math");
-	string_eq str "meta" (eval; module "meta");
-	string_eq str "m" (eval; module "m");
-	string_eq str "rand" (eval; module "rand");
-	string_eq str "r" (eval; module "r");
-	string_eq str "ru_utime" (eval; module "ru_utime");
-	string_eq str "run" (eval; module "run");
-	string_eq str "s" (eval; module "s");
-	string_eq str "string" (eval; module "string");
-	string_eq str "v" (eval; module "v");
+	\case=(string_eq str)
+	case "a" (eval; module "a");
+	case "compare" (eval; module "compare");
+	case "double" (eval; module "double");
+	case "ipc" (eval; module "ipc");
+	case "list" (eval; module "list");
+	case "long" (eval; module "long");
+	case "math" (eval; module "math");
+	case "meta" (eval; module "meta");
+	case "m" (eval; module "m");
+	case "rand" (eval; module "rand");
+	case "r" (eval; module "r");
+	case "ru_utime" (eval; module "ru_utime");
+	case "run" (eval; module "run");
+	case "s" (eval; module "s");
+	case "string" (eval; module "string");
+	case "v" (eval; module "v");
 	module str
 	)
 
@@ -285,31 +233,31 @@
 
 	starts "a"
 		(
-		define "all" all;
-		define "and" and;
+		starts "all" (see "list");
+		starts "and" (see "list");
 		see "a"
 		);
 	starts "c"
 		(
-		define "choose" choose;
 		starts "cmp" (see "compare");
 		starts "compare" (see "compare");
+		starts "choose" (see "list");
 		define "check_parse" check_parse;
 		void
 		);
 	starts "d"
 		(
-		define "default" default;
+		starts "default" (see "list");
 		define "define" define;
-		define "defined" defined;
-		define "die" die;
-		define "do" do;
+		starts "defined" (see "list");
+		starts "die" (see "list");
 		starts "double_" (see "double");
+		starts "do" (see "list");
 		void
 		);
 	starts "e"
 		(
-		define "end" end;
+		starts "end" (see "list");
 		starts "envs" (see "run");
 		starts "eq" (see "compare");
 		define "eval" eval;
@@ -329,37 +277,32 @@
 		starts "ge" (see "compare");
 		void
 		);
-	define "halt" halt;
+	starts "halt" (see "list");
 	define "is_name" is_name;
 	starts "l"
 		(
-		starts "list"
-			(
-			define "list_and" list_and;
-			define "list_or" list_or;
-			see "list"
-			);
 		starts "long_" (see "long");
 		starts "le" (see "compare");
 		starts "lt" (see "compare");
+		starts "list" (see "list");
 		void
 		);
 	starts "m"
 		(
-		define "map" map;
 		starts "min" (see "compare");
 		starts "max" (see "compare");
+		starts "map" (see "list");
 		see "m"
 		);
 	define "NL" NL;
 	starts "n"
 		(
 		define "no" no;
-		define "not" not;
+		starts "not" (see "list");
 		starts "ne" (see "compare");
 		void
 		);
-	define "or" or;
+	starts "or" (see "list");
 	define "print" print;
 	define "putchar" putchar;
 	starts "quote_string" (see "meta");
@@ -372,15 +315,15 @@
 		define "see" see;
 		define "standard" standard;
 		define "starts" starts;
-		define "some" some;
 		define "string_put" (fwrite stdout);
 		define "string_stderr" (fwrite stderr);
+		starts "some" (see "list");
 		see "s"
 		);
 	define "T" T;
 	starts "timer_" (see "ru_utime");
 	define "to_string" to_string;
-	define "undefined" undefined;
+	starts "undefined" (see "list");
 	starts "v"
 		(
 		define "void" void;
