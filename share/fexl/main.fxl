@@ -7,9 +7,6 @@
 \T=C
 \no=F
 
-# (eval f) forces an evaluation of f and returns its value.
-\eval = (\f \f=f f)
-
 # Comparison
 \long_eq = (\x\y order (long_cmp x y) F T F)
 \string_eq = (\x\y order (string_cmp x y) F T F)
@@ -176,6 +173,9 @@
 	parse_script name
 	)
 
+# (eval f) forces an evaluation of f and returns its value.
+\eval = (\f \f=f f)
+
 # LATER 20120828 simplify the module stuff.  I think I can do one-shot parsing
 # without having to enumerate the available modules here.
 # This wrapper caches the known module names so it never has to parse a file
@@ -203,21 +203,14 @@
 	module str
 	)
 
-# Context combinators
+# LATER 20120829 abstract the other modules so they don't use define, starts,
+# sees, and void directly.
 
-\void = (\key no)
-\define = (\key\val\next \sym string_eq sym key (yes val) (next sym))
-\starts = (\key\inner\next
-	\sym
-	long_eq (string_common sym key) (string_len key) inner next
-	sym
-	)
-
-# Define an enhanced context in terms of the given standard context.
-\enhance =
-	(\standard
-	# Parse the module file in the standard context.
-	\see = (\file module file standard)
+# This is the abstract description of the enhanced standard context.  Using an
+# abstract description enables nice features in the future, such as automatic
+# production of documentation.
+\enhanced =
+	(\standard\define\starts\see\void
 
 	starts "+" (see "math");
 	starts "-" (see "math");
@@ -287,13 +280,7 @@
 		starts "list" (see "list");
 		void
 		);
-	starts "m"
-		(
-		starts "min" (see "compare");
-		starts "max" (see "compare");
-		starts "map" (see "list");
-		see "m"
-		);
+	starts "m" (see "m");
 	define "NL" NL;
 	starts "n"
 		(
@@ -303,13 +290,14 @@
 		void
 		);
 	starts "or" (see "list");
-	define "print" print;
-	define "putchar" putchar;
-	starts "quote_string" (see "meta");
-	starts "r"
+	starts "p"
 		(
-		see "r"
+		define "print" print;
+		define "putchar" putchar;
+		void
 		);
+	starts "quote_string" (see "meta");
+	starts "r" (see "r");
 	starts "s"
 		(
 		define "see" see;
@@ -317,7 +305,6 @@
 		define "starts" starts;
 		define "string_put" (fwrite stdout);
 		define "string_stderr" (fwrite stderr);
-		starts "some" (see "list");
 		see "s"
 		);
 	define "T" T;
@@ -335,7 +322,30 @@
 
 # This is the standard context that resolves symbols in Fexl programs.
 \standard ==
-	(\sym
+	(
+	# Enhance the standard context.  We use the "enhanced" description above,
+	# passing in values for its five parameters to create a fully functional
+	# context.
+	\standard =
+		(
+		\define = (\key\val\next \sym string_eq sym key (yes val) (next sym))
+
+		\starts = (\key\inner\next
+			\sym
+			long_eq (string_common sym key) (string_len key) inner next
+			sym
+			)
+
+		# The "see" function parses the file in the standard context.
+		\see = (\file module file standard)
+
+		\void = (\key no)
+
+		enhanced standard define starts see void
+		)
+
+	# Here's the function which looks up the definition of a symbol.
+	\sym
 	\sym=sym  # Force evaluation in case it's a computed symbol.
 	is_name sym
 		(
@@ -349,7 +359,7 @@
 		# Look for a definition built into resolve.c.
 		resolve sym yes;
 		# We didn't find one there, so look through the enhancements.
-		enhance standard (name_string sym)
+		standard (name_string sym)
 		);
 	is_string sym (yes sym);  # Treat strings literally.
 	no  # It's not a name or a string, so it's undefined.
