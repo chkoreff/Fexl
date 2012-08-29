@@ -61,7 +61,6 @@
 	if_basic Y "Y";
 	if_basic F "F";
 	if_basic query "?";
-	if_basic parse_string "parse_string";
 	if_basic resolve "resolve";
 	if_basic long_add "long_add";
 	if_basic double_add "double_add";

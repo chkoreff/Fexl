@@ -96,24 +96,23 @@
 	exit 1;
 	)
 
-# (resolve_symbols syms context exp final error bad)
+# (resolve_symbols symbols context exp error final)
 #
 # This looks up the definitions of all the symbols using the given context,
 # applying each one in turn to the given expression.  For each symbol that is
-# not defined, it calls (error name place) to indicate the name and line number
-# of the missing symbol, and uses the name itself as the dummy definition.
+# not defined, it calls (error name line) to indicate the name and line number
+# of the missing symbol, and does not apply any definition to the expression.
 #
 # After applying all the definitions to the original expression exp, we end up
-# with a new expression exp.  If all the symbols were properly defined, we
-# return (final exp).  If any symbols were undefined, we return (bad exp).
+# with a new expression exp, and we return (final exp).
 
 \resolve_symbols ==
-	(\syms\context\exp\final\error\bad
-	syms (final exp) \sym\syms
-	sym \name\place
+	(\symbols\context\exp\error\final
 
-	\continue = (\val\final
-		resolve_symbols syms context (exp val) final error bad)
+	symbols (final exp) \sym\symbols
+	sym \name\line
+
+	\continue = (\exp resolve_symbols symbols context exp error final)
 
 	context name
 		(\val
@@ -123,23 +122,49 @@
 		# reduced to its normal form, instead of lazily remaining as an
 		# unevaluated form.
 		\val=val
-		continue val final
+		continue (exp val)
 		)
 		(
-		error name place;
-		continue name bad
+		# The name is not defined.
+		error name line;
+		continue exp
 		)
 	)
 
-# (check_parse parse source context label good bad print)
-#
-# Call the parse function on the source and resolve it in the given context,
-# returning (good program) if there were no errors.  If there were errors,
-# report them in English using the given print function, and return bad.  The
-# label is the logical name used to identify the source in error messages.
+# LATER 20120829
+# The do_parse function is a temporary adaptor which maps the old result form
+# returned from the built-in parse_string and parse_file routines, into a new
+# cleaner mechanism where you just pass in handlers for various things.
+\do_parse =
+	(\parse\source\context\error_source\error_syntax\error_symbol\final
 
-\check_parse =
-	(\parse\source\context\label\good\bad\print
+	parse source \ok\result result \exp\symbols
+
+	ok ()
+		(
+		exp \error\line
+		long_eq line 0
+			(error_source)  # Could not open source
+			(error_syntax error line)  # Syntax error
+		);
+
+	# Now resolve all the symbols with the given context.
+	resolve_symbols symbols context exp error_symbol final
+	)
+
+# LATER 20120829 Fold the do_parse adaptor back into the C code.  This will
+# require doing some tagged evaluation to simulate the operation of do_parse
+# (and therefore resolve_symbols) within the C code itself, but that's no big
+# deal.  I can use that same technique to provide built-in versions of "fold",
+# "map", etc.
+# Here I override the built in C versions with the new versions.
+\parse_string = (do_parse parse_string)
+\parse_file = (do_parse parse_file)
+
+
+# Print any errors in a parse result.
+\print_parse_errors =
+	(\result\label\print
 
 	\nl = (print NL)
 
@@ -147,8 +172,7 @@
 	\error_at =
 		(\line
 		print " on line ";print line;
-		(\next string_eq label "" next;
-			print " of ";print label; next);
+		print (string_eq label "" "" (string_append " of " label));
 		nl;
 		)
 
@@ -167,34 +191,29 @@
 		print "Undefined symbol "; print sym; error_at line;
 		)
 
-	parse source \ok\result result \exp\symbols
-
-	# Report any syntax error.
-	ok ()
-		(
-		exp \error\line
-		long_eq line 0
-			(error_file)
-			(error_syntax error line)
-		);
-
-	# Resolve open symbols.
-	resolve_symbols symbols context exp
-		(
-		\exp
-		# All symbols were defined.
-		ok exp bad
-		)
-		error_symbol
-		(\exp
-		# Some symbols were undefined.
-		bad
-		)
+	result error_file error_syntax error_symbol (\_)
 	)
 
-\normal_parse_file =
+# Get the expression from a parse result, returning (yes exp) if the result is
+# good, or no if the result has errors.
+\get_parsed_expression =
+	(\result result (\_ no) (\_\_\_ no) (\_\_\_ no) yes)
+
+# (check_parse result label good bad print)
+#
+# Check the result of a (parse source context) call, returning (good program)
+# if there were no errors.  If there were errors, report them in English using
+# the given print function, and return bad.
+
+\check_parse =
+	(\result\label\good\bad\print
+	print_parse_errors result label print;
+	get_parsed_expression result good bad
+	)
+
+\parse_script =
 	(\name\context
-	check_parse parse_file name context name I (exit 1) warn
+	check_parse (parse_file name context) name I (exit 1) warn
 	)
 
 # Parse the module file with the given logical name.  This returns a value
@@ -211,7 +230,7 @@
 		".fxl"
 		)
 
-	normal_parse_file name
+	parse_script name
 	)
 
 # LATER 20120828 simplify the module stuff.  I think I can do one-shot parsing
@@ -382,6 +401,13 @@
 	\sym=sym  # Force evaluation in case it's a computed symbol.
 	is_name sym
 		(
+		# LATER 20120829 This is a temporary hack to make the new parse
+		# functions defined in this module override the core routines built
+		# into C.
+		\str=(name_string sym)
+		string_eq str "parse_string" (yes parse_string);
+		string_eq str "parse_file" (yes parse_file);
+
 		# Look for a definition built into resolve.c.
 		resolve sym yes;
 		# We didn't find one there, so look through the enhancements.
@@ -393,4 +419,4 @@
 
 # Run the user's script in the standard context.
 argv 1 \script
-normal_parse_file script standard;
+parse_script script standard;
