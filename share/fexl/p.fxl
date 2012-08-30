@@ -1,0 +1,3 @@
+#
+define "putchar" char_put;
+void

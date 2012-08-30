@@ -1,4 +1,5 @@
 #
+define "getchar" char_get;
 starts "gt" (see "compare");
 starts "ge" (see "compare");
 void

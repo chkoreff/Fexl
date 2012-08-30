@@ -31,10 +31,6 @@
 
 \NL="
 "
-# LATER move to separate file
-\putchar = char_put
-\getchar = char_get
-
 
 # (resolve_symbols symbols context exp error final)
 #
@@ -200,6 +196,7 @@
 	case "meta" (eval; module "meta");
 	case "m" (eval; module "m");
 	case "n" (eval; module "n");
+	case "p" (eval; module "p");
 	case "rand" (eval; module "rand");
 	case "r" (eval; module "r");
 	case "ru_utime" (eval; module "ru_utime");
@@ -252,11 +249,7 @@
 		define "fprint" fprint;
 		see "f"
 		);
-	starts "g"
-		(
-		define "getchar" getchar;
-		see "g"
-		);
+	starts "g" (see "g");
 	starts "halt" (see "list");
 	define "is_name" is_name;
 	starts "l" (see "l");
@@ -271,8 +264,7 @@
 	starts "p"
 		(
 		define "print" print;
-		define "putchar" putchar;
-		void
+		see "p"
 		);
 	starts "quote_string" (see "meta");
 	starts "r" (see "r");
