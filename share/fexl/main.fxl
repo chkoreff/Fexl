@@ -93,9 +93,14 @@
 \parse_file = (do_parse parse_file)
 
 
-# Print any errors in a parse result.
-\print_parse_errors =
-	(\result\label\print
+# (check_parse result label good bad print)
+#
+# Check the result of a (parse source context) call, returning (good program)
+# if there were no errors.  If there were errors, report them in English using
+# the given print function, and return bad.
+
+\check_parse =
+	(\result\label\good\bad\print
 
 	\nl = (print NL)
 
@@ -122,24 +127,20 @@
 		print "Undefined symbol "; print sym; error_at line;
 		)
 
-	result error_file error_syntax error_symbol (\_)
-	)
-
-# Get the expression from a parse result, returning (yes exp) if the result is
-# good, or no if the result has errors.
-\get_parsed_expression =
-	(\result result (\_ no) (\_\_\_ no) (\_\_\_ no) yes)
-
-# (check_parse result label good bad print)
-#
-# Check the result of a (parse source context) call, returning (good program)
-# if there were no errors.  If there were errors, report them in English using
-# the given print function, and return bad.
-
-\check_parse =
-	(\result\label\good\bad\print
-	print_parse_errors result label print;
-	get_parsed_expression result good bad
+	result
+		(
+		error_file
+		\_ bad
+		)
+		(\error\line
+		error_syntax error line
+		\_ bad
+		)
+		(\name\line
+		error_symbol name line
+		\_ bad
+		)
+		good
 	)
 
 \parse_script =
@@ -259,6 +260,7 @@
 	starts "p"
 		(
 		define "print" print;
+		define "parse_script" parse_script;
 		see "p"
 		);
 	starts "quote_string" (see "meta");
@@ -324,7 +326,7 @@
 		# Look for a definition built into resolve.c.
 		resolve sym yes;
 		# We didn't find one there, so look through the enhancements.
-		standard (name_string sym)
+		standard str
 		);
 	is_string sym (yes sym);  # Treat strings literally.
 	no  # It's not a name or a string, so it's undefined.
