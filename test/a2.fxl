@@ -24,13 +24,13 @@ print "hello world" nl;
 
 ########
 
-\test_cat==
-(
+\test_cat =
+(\next
 print "=== Enter lines of text and I'll echo them.  Press Ctrl-D to stop";nl;
 
 # The cat program echoes the input to the output.
-\cat == (char_get \ch < ch 0 I; char_put ch; cat)
-cat
+\cat == (\next char_get \ch < ch 0 next; char_put ch; cat next)
+cat next
 )
 
 ########
