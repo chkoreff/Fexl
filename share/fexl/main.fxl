@@ -52,12 +52,7 @@
 
 	context name
 		(\val
-		# The name is defined as val.  We force an evaluation of the value,
-		# which isn't strictly necessary on a functional basis, but useful when
-		# using reflective features.  By forcing evaluation, the value is
-		# reduced to its normal form, instead of lazily remaining as an
-		# unevaluated form.
-		\val=val
+		# The name is defined as val.
 		continue (exp val)
 		)
 		(

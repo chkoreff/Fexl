@@ -25,7 +25,8 @@
 		# Start with the terminator we found.
 		string_append term;
 		# Append a space unless we're using " itself.
-		(string_eq term ~ "~ () (string_append " "));
+		\is_quote=(string_eq term ~ "~)
+		(is_quote () (string_append " "));
 		# Append the string.
 		string_append str;
 		# Append the terminator again.

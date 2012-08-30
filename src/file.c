@@ -108,9 +108,7 @@ void reduce_fputc(value f)
 	f->T = reduce2_fputc;
 	}
 
-/* (fwrite file str next)
-Note that we use fwrite because we may be writing binary data.
-*/
+/* (fwrite file str next) */
 static void reduce3_fwrite(value f)
 	{
 	FILE *fh = get_file(arg(type_file,f->L->L->R));

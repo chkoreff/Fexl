@@ -25,9 +25,9 @@
 	exit 1;
 	)
 
-# The halt function ends the evaluation of the current expression by consuming
-# all arguments given to it.  It does not halt the entire program.
-\halt==(\_ halt)
+# The halt function dies with a simple error message, and is useful in corner
+# cases that are impossible to handle and should never be reached.
+\halt==(die "Halted!")
 
 ### List
 

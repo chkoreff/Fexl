@@ -1,26 +1,25 @@
 # Comparison functions capable of handling long, double, and string.
 
-# LATER 20120826 instead of -9, how about calling type_error directly?
 \cmp =
 	(\x\y
 	is_long x
 		(
 		is_long y (long_cmp x y);
 		is_double y (double_cmp (long_double x) y);
-		-9
+		halt
 		);
 	is_double x
 		(
 		is_double y (double_cmp x y);
 		is_long y (double_cmp x (long_double y));
-		-9
+		halt
 		);
 	is_string x
 		(
 		is_string y (string_cmp x y);
-		-9
+		halt
 		);
-	-9
+	halt
 	)
 
 \compare = (\x\y order (cmp x y))

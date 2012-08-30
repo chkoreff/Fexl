@@ -159,7 +159,6 @@ do_compare string_041 string_0142 "GT";
 \test_string_common ==
 (
 \check = (\value\expect
-	\halt == (\_ halt)
 	\ok = (long_eq value expect)
 	print " "; print (ok "GOOD" "BAD");nl;
 	ok I halt
