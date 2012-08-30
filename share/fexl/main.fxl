@@ -127,20 +127,28 @@
 		print "Undefined symbol "; print sym; error_at line;
 		)
 
-	result
+	# Report any errors and set def to the expression if no errors.
+	\def =
 		(
-		error_file
-		\_ bad
+		\fail = (\final final (\_ no) no)
+		result
+			(
+			error_file;
+			fail
+			)
+			(\error\line
+			error_syntax error line;
+			fail
+			)
+			(\name\line
+			error_symbol name line;
+			fail
+			)
+			yes
 		)
-		(\error\line
-		error_syntax error line
-		\_ bad
-		)
-		(\name\line
-		error_symbol name line
-		\_ bad
-		)
-		good
+
+	# Apply the handlers.
+	def good bad
 	)
 
 \parse_script =
