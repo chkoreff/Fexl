@@ -64,6 +64,7 @@
 	if_basic query "?";
 	if_basic resolve "resolve";
 	if_basic long_add "long_add";
+	if_basic long_mul "long_mul";
 	if_basic double_add "double_add";
 	if_basic string_append "string_append";
 	if_basic is_long "is_long";

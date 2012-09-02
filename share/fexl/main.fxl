@@ -32,128 +32,188 @@
 \NL="
 "
 
-# (resolve_symbols symbols context exp error final)
+# (resolve_symbols symbols context)
+# Resolve the symbols in the context.
 #
-# This looks up the definitions of all the symbols using the given context,
-# applying each one in turn to the given expression.  For each symbol that is
-# not defined, it calls (error name line) to indicate the name and line number
-# of the missing symbol, and does not apply any definition to the expression.
+# The symbols are a data structure like this:
 #
-# After applying all the definitions to the original expression exp, we end up
-# with a new expression exp, and we return (final exp).
+#    (\:\.
+#    : "a" 5;   # symbol "a" on line 5
+#    : "b" 7;   # symbol "b" on line 7
+#    : "c" 9;   # symbol "c" on line 9
+#    .
+#    )
+#
+# The context is a function mapping a symbol to its optional definition.
+#
+# The result is a data structure like this:
+#
+#    (\good\bad\end
+#    good "a" 5 10;  # symbol "a" on line 5 defined with value 10
+#    bad "b" 7;      # symbol "b" on line 7 not defined
+#    good "c" 9 30;  # symbol "c" on line 9 defined with value 30
+#    end
+#    )
+#
+# This function forces evaluation all the way down the first time you use it,
+# so subsequent uses do not evaluate the context again.
 
-\resolve_symbols ==
-	(\symbols\context\exp\error\final
-
-	symbols (final exp) \sym\symbols
-	sym \name\line
-
-	\continue = (\exp resolve_symbols symbols context exp error final)
-
-	context name
-		(\val
-		# The name is defined as val.
-		continue (exp val)
+\resolve_symbols =
+	(\symbols\context
+	symbols
+		(\name\line\next
+		\good\bad\end
+		context name
+			(\val good name line val)
+			(bad name line);
+		next good bad end
 		)
-		(
-		# The name is not defined.
-		error name line;
-		continue exp
-		)
+		(\good\bad\end end)
 	)
 
-# LATER 20120829
-# The do_parse function is a temporary adaptor which maps the old result form
-# returned from the built-in parse_string and parse_file routines, into a new
-# cleaner mechanism where you just pass in handlers for various things.
-\do_parse =
-	(\parse\source\context\error_source\error_syntax\error_symbol\final
+# Get the optional final value from the resolved definitions.  This applies the
+# original expression to each defined value in order, returning (yes value) if
+# all the symbols were defined, or no otherwise.
+#
+# For example, if defs has three symbols defined as 10, 20, and 30, the value
+# of (get_final_value defs exp) is (yes (exp 10 20 30)).  If defs has any
+# undefined symbols, the value is no.
+\get_final_value =
+	(\defs\exp
+	defs
+		(\name\line\val\next\exp next (exp val) yes no)
+		(\name\line\next\exp no)
+		yes
+		exp
+	)
 
-	parse source \ok\result result \exp\symbols
+# These routines convert the old parse result from the inner C functions into a
+# new parse result, which uses a more "functional data" technique to make it
+# easier to use.  Eventually I'll fold these back into the C code to produce
+# the new result directly.
 
-	ok ()
+\convert_parse_symbols ==
+	(\symbols
+	symbols (\:\. .) \entry\symbols
+	entry \name\line
+	\:\.
+	: name line;
+	convert_parse_symbols symbols : .
+	)
+
+\convert_parse_result =
+	(\result
+	result \ok\result result \exp\symbols
+	\symbols = (convert_parse_symbols symbols)
+
+	ok
+		# Parse succeeded.
 		(
-		exp \error\line
+		\form = (\ok\error ok exp)
+		yes \: : form symbols
+		)
+
+		# Parse failed.
+		(exp \error\line
 		long_eq line 0
-			(error_source)  # Could not open source
-			(error_syntax error line)  # Syntax error
-		);
+			# Source file is missing.
+			no
+			# Syntax is bad.
+			(
+			\form =
+				(
+				exp \msg\line
+				\ok\error error msg line
+				)
 
-	# Now resolve all the symbols with the given context.
-	resolve_symbols symbols context exp error_symbol final
+			yes \: : form symbols
+			)
+		)
 	)
 
-# LATER 20120829 Fold the do_parse adaptor back into the C code.  This will
-# require doing some tagged evaluation to simulate the operation of do_parse
-# (and therefore resolve_symbols) within the C code itself, but that's no big
-# deal.  I use that same technique for the built-in version of "fold".
-#
 # Here I override the built in C versions with the new versions.
-\parse_string = (do_parse parse_string)
-\parse_file = (do_parse parse_file)
+# LATER 20120902 Fold convert_parse_result back into the C code.
+
+\parse_string = (\source convert_parse_result; parse_string source)
+\parse_file = (\source convert_parse_result; parse_file source)
 
 
-# (check_parse result label good bad print)
+# (check_parse result context label good bad print)
 #
-# Check the result of a (parse source context) call, returning (good program)
-# if there were no errors.  If there were errors, report them in English using
-# the given print function, and return bad.
-
+# Check the result of a parse and resolve it in the context.  If there are no
+# errors, return (good program).  If there are errors, report them in English
+# using the given print function and return bad.  The label is used to identify
+# the source of the parse in error messages, but it's omitted if null.
 \check_parse =
-	(\result\label\good\bad\print
+	(\result\context\label\good\bad\print
 
 	\nl = (print NL)
 
 	# Report the error location.
 	\error_at =
-		(\line
+		(\line\next
 		print " on line ";print line;
 		print (string_eq label "" "" (string_append " of " label));
 		nl;
+		next
 		)
 
 	\error_file ==
-		(
+		(\next
 		print "Can't open file ";print label;nl;
+		next
 		)
 
 	\error_syntax =
-		(\error\line
+		(\error\line\next
 		print error; error_at line;
+		next
 		)
 
 	\error_symbol =
-		(\sym\line
-		print "Undefined symbol "; print sym; error_at line;
+		(\name\line\next
+		print "Undefined symbol ";print name;error_at line;
+		next
 		)
 
-	# Report any errors and set def to the expression if no errors.
-	\def =
-		(
-		\fail = (\final final (\_ no) no)
-		result
+	\show_undefined_symbols =
+		(\defs\next
+		defs
+			(\name\line\val\next next)
+			error_symbol
+			next
+		)
+
+	result
+		(\result
+		result \form\symbols
+		\defs = (resolve_symbols symbols context)
+
+		\final =
 			(
-			error_file;
-			fail
+			form
+				(get_final_value defs)
+				(\msg\line
+				error_syntax msg line;
+				no
+				)
 			)
-			(\error\line
-			error_syntax error line;
-			fail
-			)
-			(\name\line
-			error_symbol name line;
-			fail
-			)
-			yes
-		)
 
-	# Apply the handlers.
-	def good bad
+		show_undefined_symbols defs;
+		final good bad
+		)
+		( # Source file is missing.
+		error_file;
+		bad
+		)
 	)
 
-\parse_script =
+# Parse the named script file and resolve it in the context.  If there are no
+# errors, return the evaluable function denoted by that script in that context.
+# If there are errors, report them to stderr and exit with status 1.
+\eval_script =
 	(\name\context
-	check_parse (parse_file name context) name I (exit 1) warn
+	check_parse (parse_file name) context name I (exit 1) warn
 	)
 
 # Parse the module file with the given logical name.  This returns a value
@@ -170,7 +230,7 @@
 		".fxl"
 		)
 
-	parse_script name
+	eval_script name
 	)
 
 # (eval f) forces an evaluation of f and returns its value.
@@ -246,6 +306,7 @@
 	starts "e"
 		(
 		define "eval" eval;
+		define "eval_script" eval_script;
 		see "e"
 		);
 	starts "f"
@@ -268,7 +329,6 @@
 	starts "p"
 		(
 		define "print" print;
-		define "parse_script" parse_script;
 		see "p"
 		);
 	starts "quote_string" (see "meta");
@@ -296,6 +356,7 @@
 	)
 
 # This is the standard context that resolves symbols in Fexl programs.
+# LATER 20120902 I'm going to simplify this greatly.
 \standard ==
 	(
 	# Enhance the standard context.  We use the "enhanced" description above,
@@ -340,6 +401,6 @@
 	no  # It's not a name or a string, so it's undefined.
 	)
 
-# Run the user's script in the standard context.
+# Evaluate the user's script in the standard context.
 argv 1 \script
-parse_script script standard;
+eval_script script standard;

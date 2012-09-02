@@ -62,6 +62,7 @@ envp
 envs
 eq
 eval
+eval_script
 exit
 F
 fdopen
