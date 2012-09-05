@@ -216,69 +216,82 @@
 	check_parse (parse_file name) context name I (exit 1) warn
 	)
 
-# Parse the module file with the given logical name.  This returns a value
-# which, when applied to a context, returns the fully resolved function
-# described in that file.
-\module =
-	(\name
-	base_path \path
-	\name =
-		(
-		string_append path;
-		string_append "/share/fexl/";
-		string_append name;
-		".fxl"
-		)
-
-	eval_script name
-	)
-
 # (eval f) forces an evaluation of f and returns its value.
 \eval = (\f \f=f f)
 
-# LATER 20120828 simplify the module stuff.  I think I can do one-shot parsing
-# without having to enumerate the available modules here.
-# This wrapper caches the known module names so it never has to parse a file
-# more than once.
-\module =
-	(
-	\str
-	\case=(string_eq str)
-	case "a" (eval; module "a");
-	case "c" (eval; module "c");
-	case "compare" (eval; module "compare");
-	case "d" (eval; module "d");
-	case "double" (eval; module "double");
-	case "e" (eval; module "e");
-	case "f" (eval; module "f");
-	case "g" (eval; module "g");
-	case "ipc" (eval; module "ipc");
-	case "l" (eval; module "l");
-	case "list" (eval; module "list");
-	case "long" (eval; module "long");
-	case "math" (eval; module "math");
-	case "meta" (eval; module "meta");
-	case "m" (eval; module "m");
-	case "n" (eval; module "n");
-	case "p" (eval; module "p");
-	case "rand" (eval; module "rand");
-	case "r" (eval; module "r");
-	case "ru_utime" (eval; module "ru_utime");
-	case "run" (eval; module "run");
-	case "s" (eval; module "s");
-	case "string" (eval; module "string");
-	case "v" (eval; module "v");
-	module str
+# Context constructors.  A context is a function which maps a name (string) to
+# an optional value, either (yes val) if defined or no if not defined.
+
+# (define key val next name) is (yes val) if name equals key, or (next name)
+# otherwise.
+\define = (\key\val\next \sym string_eq sym key (yes val) (next sym))
+
+# (starts key inner next name) is (inner name) if the name starts with key, or
+# (next name) otherwise.
+\starts = (\key\inner\next
+	\sym
+	long_eq (string_common sym key) (string_len key) inner next
+	sym
 	)
 
-# LATER 20120829 abstract the other modules so they don't use define, starts,
-# sees, and void directly.
+# (void name) is always no.
+\void = (\name no)
 
-# This is the abstract description of the enhanced standard context.  Using an
-# abstract description enables nice features in the future, such as automatic
-# production of documentation.
-\enhanced =
-	(\standard\define\starts\see\void
+
+# This function enhances the standard context with extra functions defined in
+# the Fexl "share" directory.
+\enhance =
+	(
+	# Parse the module file with the given logical name.  This returns a value
+	# which, when applied to a context, returns the fully resolved function
+	# described in that file.
+	\module =
+		(
+		\full_path =
+			(\name
+			base_path \path
+			string_append path;
+			string_append "/share/fexl/";
+			string_append name;
+			".fxl"
+			)
+
+		\name
+		eval_script (full_path name)
+		)
+
+	\standard
+
+	# The "see" function parses the file in the standard context.
+	\see =
+		(\str
+		\case=(string_eq str)
+		case "a" (module "a" standard);
+		case "c" (module "c" standard);
+		case "compare" (module "compare" standard);
+		case "d" (module "d" standard);
+		case "double" (module "double" standard);
+		case "e" (module "e" standard);
+		case "f" (module "f" standard);
+		case "g" (module "g" standard);
+		case "ipc" (module "ipc" standard);
+		case "l" (module "l" standard);
+		case "list" (module "list" standard);
+		case "long" (module "long" standard);
+		case "math" (module "math" standard);
+		case "meta" (module "meta" standard);
+		case "m" (module "m" standard);
+		case "n" (module "n" standard);
+		case "p" (module "p" standard);
+		case "rand" (module "rand" standard);
+		case "r" (module "r" standard);
+		case "ru_utime" (module "ru_utime" standard);
+		case "run" (module "run" standard);
+		case "s" (module "s" standard);
+		case "string" (module "string" standard);
+		case "v" (module "v" standard);
+		void
+		)
 
 	starts "+" (see "math");
 	starts "-" (see "math");
@@ -356,31 +369,8 @@
 	)
 
 # This is the standard context that resolves symbols in Fexl programs.
-# LATER 20120902 I'm going to simplify this greatly.
 \standard ==
 	(
-	# Enhance the standard context.  We use the "enhanced" description above,
-	# passing in values for its five parameters to create a fully functional
-	# context.
-	\standard =
-		(
-		\define = (\key\val\next \sym string_eq sym key (yes val) (next sym))
-
-		\starts = (\key\inner\next
-			\sym
-			long_eq (string_common sym key) (string_len key) inner next
-			sym
-			)
-
-		# The "see" function parses the file in the standard context.
-		\see = (\file module file standard)
-
-		\void = (\key no)
-
-		enhanced standard define starts see void
-		)
-
-	# Here's the function which looks up the definition of a symbol.
 	\sym
 	\sym=sym  # Force evaluation in case it's a computed symbol.
 	is_name sym
@@ -388,6 +378,10 @@
 		# LATER 20120829 This is a temporary hack to make the new parse
 		# functions defined in this module override the core routines built
 		# into C.
+
+		# LATER 20120905 any way to make enhanced functions override core
+		# routines by default, instead of by exception?
+
 		\str=(name_string sym)
 		string_eq str "parse_string" (yes parse_string);
 		string_eq str "parse_file" (yes parse_file);
@@ -395,7 +389,7 @@
 		# Look for a definition built into resolve.c.
 		resolve sym yes;
 		# We didn't find one there, so look through the enhancements.
-		standard str
+		enhance standard str
 		);
 	is_string sym (yes sym);  # Treat strings literally.
 	no  # It's not a name or a string, so it's undefined.
