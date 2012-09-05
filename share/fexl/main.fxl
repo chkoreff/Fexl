@@ -222,12 +222,12 @@
 # Context constructors.  A context is a function which maps a name (string) to
 # an optional value, either (yes val) if defined or no if not defined.
 
-# (define key val next name) is (yes val) if name equals key, or (next name)
+# ((define key val next) name) is (yes val) if name equals key, or (next name)
 # otherwise.
 \define = (\key\val\next \sym string_eq sym key (yes val) (next sym))
 
-# (starts key inner next name) is (inner name) if the name starts with key, or
-# (next name) otherwise.
+# ((starts key inner next) name) is (inner name) if the name starts with key,
+# or (next name) otherwise.
 \starts = (\key\inner\next
 	\sym
 	long_eq (string_common sym key) (string_len key) inner next
