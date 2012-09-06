@@ -29,6 +29,7 @@ base_path
 C
 char_get
 char_put
+check_parse
 choose
 close
 cmp
