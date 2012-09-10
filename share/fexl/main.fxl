@@ -1,7 +1,7 @@
 # This parses the script specified on the command line and runs it in the
 # standard context.  The standard context includes the functions built into C
 # (names starting with "reduce_"), along with more functions written in Fexl
-# (see "enhance" below).
+# (see "standard" below).
 
 # Synonyms
 \T=C
@@ -31,6 +31,18 @@
 
 \NL="
 "
+
+### Control
+
+\die =
+	(\msg
+	warn msg; warn NL;
+	exit 1;
+	)
+
+# The halt function dies with a simple error message, and is useful in corner
+# cases that are impossible to handle and should never be reached.
+\halt==(die "Halted!")
 
 # (resolve_symbols symbols context)
 # Resolve the symbols in the context.
@@ -237,162 +249,263 @@
 # (void name) is always no.
 \void = (\name no)
 
+# (chain f g) chains two contexts f and g together.
+\chain =
+	(\f\g
+	\str
+	f str yes;
+	g str
+	)
 
-# This function enhances the standard context with extra functions defined in
-# the Fexl "share" directory.
-\enhance =
+# This returns a context which includes all the definitions in the given
+# context, but also the core definitions built into C.
+\wrap_context =
+	(\context
+
+	\sym
+	\sym=sym  # Force evaluation in case it's a computed symbol.
+
+	# Look in the given context first (if the symbol is a name).
+	\def = (is_name sym (context (name_string sym)) no)
+	def yes;
+
+	# Otherwise look for a definition built into resolve.c.  This includes
+	# built in functions and string, long, and double constants.
+	resolve sym
+	)
+
+# Given a logical module name, return the full path to its source code.
+\full_path =
+	(\name
+	base_path \path
+	string_append path;
+	string_append "/share/fexl/";
+	string_append name;
+	".fxl"
+	)
+
+# Read a named module, resolving it in the given context, wrapped to include
+# all the built-in definitions.
+\module = (\name\context eval_script (full_path name) (wrap_context context))
+
+# Define some stubs which read specific named modules on demand.  This ensures
+# that the modules are parsed and resolved only once, even if they are used in
+# multiple places.
+#[
+
+# This module is a basic context for parsing other modules.
+\module_basic =
 	(
-	# Parse the module file with the given logical name.  This returns a value
-	# which, when applied to a context, returns the fully resolved function
-	# described in that file.
-	\module =
-		(
-		\full_path =
-			(\name
-			base_path \path
-			string_append path;
-			string_append "/share/fexl/";
-			string_append name;
-			".fxl"
-			)
+	define "define" define;
+	define "die" die;
+	define "halt" halt;
+	define "T" T;
+	define "no" no;
+	define "NL" NL;
+	define "print" print;
+	define "string_eq" string_eq;
+	define "string_put" (fwrite stdout);
+	define "warn" warn;
+	define "void" void;
+	void
+	)
 
-		\name
-		eval_script (full_path name)
-		)
+# Set the current context to basic.
+\context = module_basic
 
-	\standard
-
-	# The "see" function parses the file in the standard context.
-	\see =
-		(\str
-		\case=(string_eq str)
-		case "a" (module "a" standard);
-		case "c" (module "c" standard);
-		case "compare" (module "compare" standard);
-		case "d" (module "d" standard);
-		case "double" (module "double" standard);
-		case "e" (module "e" standard);
-		case "f" (module "f" standard);
-		case "g" (module "g" standard);
-		case "ipc" (module "ipc" standard);
-		case "l" (module "l" standard);
-		case "list" (module "list" standard);
-		case "long" (module "long" standard);
-		case "math" (module "math" standard);
-		case "meta" (module "meta" standard);
-		case "m" (module "m" standard);
-		case "n" (module "n" standard);
-		case "p" (module "p" standard);
-		case "rand" (module "rand" standard);
-		case "r" (module "r" standard);
-		case "ru_utime" (module "ru_utime" standard);
-		case "run" (module "run" standard);
-		case "s" (module "s" standard);
-		case "string" (module "string" standard);
-		case "v" (module "v" standard);
-		void
-		)
-
-	starts "+" (see "math");
-	starts "-" (see "math");
-	starts "*" (see "math");
-	starts "/" (see "math");
-
+# The main module provides definitions defined locally, not in separate files.
+\module_main =
+	(
+	chain context;
 	define "?" query;
+	define "chain" chain;
+	define "check_parse" check_parse;
+	define "eval" eval;
+	define "eval_script" eval_script;
+	define "fprint" fprint;
+	define "getchar" char_get;
+	define "is_name" is_name;
+	define "parse_file" parse_file;
+	define "parse_string" parse_string;
+	define "putchar" char_put;
+	define "starts" starts;
+	define "string_stderr" (fwrite stderr);
+	define "to_string" to_string;
+	void
+	)
 
-	starts ">" (see "compare");
-	starts "=" (see "compare");
-	starts "<" (see "compare");
-	starts "!=" (see "compare");
+# Define some modules which can be loaded on demand.
+\module_string == (module "string" context)
+\module_double == (module "double" context)
+\module_math == (module "math" context)
+\module_rand == (module "rand" context)
+\module_compare == (module "compare" context)
+\module_long == (module "long" context)
 
-	starts "a" (see "a");
+# Extend the current context.
+\context = (chain context module_long)
+
+# Define some modules which can be loaded on demand.
+\module_ru_utime == (module "ru_utime" context)
+\module_ipc == (module "ipc" context)
+\module_list == (module "list" context)
+
+# Extend the current context.
+\context = (chain context module_list)
+
+# Define some modules which can be loaded on demand.
+\module_run == (module "run" context)
+\module_meta == (module "meta" context)
+#]
+
+# This function maps a symbol to the module where it is expected to be defined.
+# I use "starts" to dispatch on prefixes, enhancing efficiency and conciseness.
+\find_module =
+	(
+	define "+" module_math;
+	define "-" module_math;
+	define "*" module_math;
+	define "/" module_math;
+	starts "<" (\_ yes module_compare);
+	starts ">" (\_ yes module_compare);
+	starts "=" (\_ yes module_compare);
+	define "!=" module_compare;
+	define "?" module_main;
+	starts "a"
+		(
+		define "all" module_list;
+		define "and" module_list;
+		define "append" module_list;
+		define "args" module_run;
+		void
+		);
 	starts "c"
 		(
-		define "check_parse" check_parse;
-		see "c"
+		define "cmp" module_compare;
+		define "compare" module_compare;
+		define "check_parse" module_main;
+		define "choose" module_list;
+		define "chain" module_main;
+		void
 		);
 	starts "d"
 		(
-		define "define" define;
-		see "d"
+		define "default" module_list;
+		define "define" module_main;
+		define "defined" module_list;
+		define "die" module_main;
+		define "do" module_list;
+		starts "double" (\_ yes module_double);
+		void
 		);
 	starts "e"
 		(
-		define "eval" eval;
-		define "eval_script" eval_script;
-		see "e"
+		define "end" module_list;
+		define "envs" module_run;
+		define "eq" module_compare;
+		define "eval" module_main;
+		define "eval_script" module_main;
+		void
 		);
 	starts "f"
 		(
-		define "fprint" fprint;
-		see "f"
+		define "filter" module_list;
+		define "find" module_list;
+		define "fprint" module_main;
+		void
 		);
-	starts "g" (see "g");
-	starts "halt" (see "list");
-	define "is_name" is_name;
-	starts "l" (see "l");
-	starts "m" (see "m");
-	define "NL" NL;
+	starts "g"
+		(
+		define "ge" module_compare;
+		define "getchar" module_main;
+		define "gt" module_compare;
+		void
+		);
+	define "halt" module_main;
+	define "is_name" module_main;
+	starts "l"
+		(
+		define "le" module_compare;
+		define "lt" module_compare;
+		starts "list" (\_ yes module_list);
+		starts "long_" (\_ yes module_long);
+		void
+		);
+	starts "m"
+		(
+		define "map" module_list;
+		define "max" module_compare;
+		define "min" module_compare;
+		void
+		);
+	define "NL" module_main;
 	starts "n"
 		(
-		define "no" no;
-		see "n"
+		define "ne" module_compare;
+		define "no" module_main;
+		define "not" module_list;
+		void
 		);
-	starts "or" (see "list");
+	define "or" module_list;
 	starts "p"
 		(
-		define "print" print;
-		see "p"
+		define "parse_file" module_main;
+		define "parse_string" module_main;
+		define "print" module_main;
+		define "putchar" module_main;
+		void
 		);
-	starts "quote_string" (see "meta");
-	starts "r" (see "r");
+	define "quote_string" module_meta;
+	starts "r"
+		(
+		define "rand" module_rand;
+		define "range" module_list;
+		define "reverse" module_list;
+		starts "ru_utime" (\_ yes module_ru_utime);
+		void
+		);
 	starts "s"
 		(
-		define "see" see;
-		define "standard" standard;
-		define "starts" starts;
-		define "string_put" (fwrite stdout);
-		define "string_stderr" (fwrite stderr);
-		see "s"
+		define "show" module_meta;
+		define "some" module_list;
+		define "sort" module_list;
+		define "spawn" module_ipc;
+		define "starts" module_main;
+		starts "string_"
+			(
+			define "string_put" module_main;
+			define "string_stderr" module_main;
+			\_ yes module_string
+			);
+		void
 		);
-	define "T" T;
-	starts "timer_" (see "ru_utime");
-	define "to_string" to_string;
-	starts "undefined" (see "list");
+	define "T" module_main;
+	starts "t"
+		(
+		define "to_string" module_main;
+		starts "timer" (\_ yes module_ru_utime);
+		void
+		);
+	define "undefined" module_list;
 	starts "v"
 		(
-		define "void" void;
-		see "v"
+		define "value_put" module_meta;
+		define "value_string" module_meta;
+		define "void" module_main;
+		void
 		);
-	define "warn" warn;
+	define "warn" module_main;
 	void
 	)
 
 # This is the standard context that resolves symbols in Fexl programs.
 \standard ==
 	(
-	\sym
-	\sym=sym  # Force evaluation in case it's a computed symbol.
-	is_name sym
-		(
-		# LATER 20120829 This is a temporary hack to make the new parse
-		# functions defined in this module override the core routines built
-		# into C.
-
-		# LATER 20120905 any way to make enhanced functions override core
-		# routines by default, instead of by exception?
-
-		\str=(name_string sym)
-		string_eq str "parse_string" (yes parse_string);
-		string_eq str "parse_file" (yes parse_file);
-
-		# Look for a definition built into resolve.c.
-		resolve sym yes;
-		# We didn't find one there, so look through the enhancements.
-		enhance standard str
-		);
-	is_string sym (yes sym);  # Treat strings literally.
-	no  # It's not a name or a string, so it's undefined.
+	wrap_context
+	\str
+	find_module str (\module module str);  # Look in module if there is one.
+	string_eq str "standard" (yes standard);  # Define standard itself.
+	no
 	)
 
 # Evaluate the user's script in the standard context.

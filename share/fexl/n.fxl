@@ -1,4 +1,0 @@
-#
-starts "not" (see "list");
-starts "ne" (see "compare");
-void

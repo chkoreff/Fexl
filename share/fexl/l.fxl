@@ -1,6 +1,0 @@
-#
-starts "long_" (see "long");
-starts "le" (see "compare");
-starts "lt" (see "compare");
-starts "list" (see "list");
-void

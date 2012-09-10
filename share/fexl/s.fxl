@@ -1,8 +1,0 @@
-#
-
-starts "string_" (see "string");
-starts "sort" (see "list");
-starts "show" (see "meta");
-starts "some" (see "list");
-starts "spawn" (see "ipc");
-void

@@ -1,7 +1,0 @@
-#
-starts "default" (see "list");
-starts "defined" (see "list");
-starts "die" (see "list");
-starts "double_" (see "double");
-starts "do" (see "list");
-void

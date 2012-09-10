@@ -1,5 +1,0 @@
-#
-starts "max" (see "compare");
-starts "min" (see "compare");
-starts "map" (see "list");
-void

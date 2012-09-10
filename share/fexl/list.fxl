@@ -17,18 +17,6 @@
 #    val if x is (yes val)
 \default = (\v\x x I v)
 
-### Control
-
-\die =
-	(\msg
-	warn msg; warn NL;
-	exit 1;
-	)
-
-# The halt function dies with a simple error message, and is useful in corner
-# cases that are impossible to handle and should never be reached.
-\halt==(die "Halted!")
-
 ### List
 
 # Define end as a synonym for C.  The item function is already built-in.
@@ -144,6 +132,4 @@ define "choose" choose;
 define "defined" defined;
 define "undefined" undefined;
 define "default" default;
-define "die" die;
-define "halt" halt;
 void
