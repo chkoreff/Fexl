@@ -131,30 +131,17 @@ It's about 75% faster implemented in C.
 */
 static void reduce3_fold(value f)
 	{
-	value z = f->L->R;
 	value xs = f->R;
-
 	xs = A(A(xs,Q(reduce_C)),Q(reduce_pair));
 	hold(xs);
 	eval(xs);
 
 	if (xs->T == reduce_C)
-		replace(f, z);
+		replace(f, f->L->R);
 	else if (xs->T == reduce3_pair)
 		{
-		hold(z);
-
-		drop(f->R);
-		f->R = xs->R;
-		hold(f->R);
-
-		drop(f->L->R);
-		f->L->R = A(A(f->L->L->R,z),xs->L);
-		hold(f->L->R);
-
+		replace_apply(f, A(f->L->L,A(A(f->L->L->R,f->L->R),xs->L)), xs->R);
 		eval(f->L->R);
-
-		drop(z);
 		}
 	else
 		type_error();
