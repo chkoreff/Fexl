@@ -44,192 +44,73 @@
 # cases that are impossible to handle and should never be reached.
 \halt==(die "Halted!")
 
-# (resolve_symbols symbols context)
-# Resolve the symbols in the context.
-#
-# The symbols are a data structure like this:
-#
-#    (\:\.
-#    : "a" 5;   # symbol "a" on line 5
-#    : "b" 7;   # symbol "b" on line 7
-#    : "c" 9;   # symbol "c" on line 9
-#    .
-#    )
-#
-# The context is a function mapping a symbol to its optional definition.
-#
-# The result is a data structure like this:
-#
-#    (\good\bad\end
-#    good "a" 5 10;  # symbol "a" on line 5 defined with value 10
-#    bad "b" 7;      # symbol "b" on line 7 not defined
-#    good "c" 9 30;  # symbol "c" on line 9 defined with value 30
-#    end
-#    )
-#
-# This function forces evaluation all the way down the first time you use it,
-# so subsequent uses do not evaluate the context again.
+# (eval f) forces an evaluation of f and returns its value.
+\eval = (\f \f=f f)
 
-\resolve_symbols =
-	(\symbols\context
-	symbols
-		(\name\line\next
-		\good\bad\end
-		context name
-			(\val good name line val)
-			(bad name line);
-		next good bad end
-		)
-		(\good\bad\end end)
-	)
+# Parsing
 
-# Get the optional final value from the resolved definitions.  This applies the
-# original expression to each defined value in order, returning (yes value) if
-# all the symbols were defined, or no otherwise.
-#
-# For example, if defs has three symbols defined as 10, 20, and 30, the value
-# of (get_final_value defs exp) is (yes (exp 10 20 30)).  If defs has any
-# undefined symbols, the value is no.
-\get_final_value =
-	(\defs\exp
-	defs
-		(\name\line\val\next\exp next (exp val) yes no)
-		(\name\line\next\exp no)
-		yes
-		exp
-	)
-
-# These routines convert the old parse result from the inner C functions into a
-# new parse result, which uses a more "functional data" technique to make it
-# easier to use.  Eventually I'll fold these back into the C code to produce
-# the new result directly.
-
-\convert_parse_symbols ==
-	(\symbols
-	symbols (\:\. .) \entry\symbols
-	entry \name\line
-	\:\.
-	: name line;
-	convert_parse_symbols symbols : .
-	)
-
-\convert_parse_result =
-	(\result
-	result \ok\result result \exp\symbols
-	\symbols = (convert_parse_symbols symbols)
-
-	ok
-		# Parse succeeded.
-		(
-		\form = (\ok\error ok exp)
-		yes \: : form symbols
-		)
-
-		# Parse failed.
-		(exp \error\line
-		long_eq line 0
-			# Source file is missing.
-			no
-			# Syntax is bad.
-			(
-			\form =
-				(
-				exp \msg\line
-				\ok\error error msg line
-				)
-
-			yes \: : form symbols
-			)
-		)
-	)
-
-# Here I override the built in C versions with the new versions.
-# LATER 20120902 Fold convert_parse_result back into the C code.
-
-\parse_string = (\source convert_parse_result; parse_string source)
-\parse_file = (\source convert_parse_result; parse_file source)
-
-
-# (check_parse result context label good bad print)
+# (check_parse result context label print good bad)
 #
 # Check the result of a parse and resolve it in the context.  If there are no
-# errors, return (good program).  If there are errors, report them in English
-# using the given print function and return bad.  The label is used to identify
-# the source of the parse in error messages, but it's omitted if null.
+# errors, return (good value), where value is the fully specified value.  If
+# there are errors, report them in English using the given print function and
+# return bad.  The label is used to identify the source of the parse in error
+# messages, but it's omitted if null.
+
 \check_parse =
-	(\result\context\label\good\bad\print
+	(\result\context\label\print\good\bad
 
 	\nl = (print NL)
 
-	# Report the error location.
+	# Report an error location.
 	\error_at =
 		(\line\next
 		print " on line ";print line;
-		print (string_eq label "" "" (string_append " of " label));
+		(\next
+			string_eq label "" next;
+			print " of ";print label;next);
 		nl;
 		next
 		)
 
-	\error_file ==
-		(\next
-		print "Can't open file ";print label;nl;
-		next
-		)
+	\resolve_symbols ==
+		(\ok\exp\symbols\next
+		symbols (next ok exp) \entry\symbols
+		entry \name\line
 
-	\error_syntax =
-		(\error\line\next
-		print error; error_at line;
-		next
-		)
-
-	\error_symbol =
-		(\name\line\next
-		print "Undefined symbol ";print name;error_at line;
-		next
-		)
-
-	\show_undefined_symbols =
-		(\defs\next
-		defs
-			(\name\line\val\next next)
-			error_symbol
-			next
-		)
-
-	result
-		(\result
-		result \form\symbols
-		\defs = (resolve_symbols symbols context)
-
-		\final =
+		context name
+			(\val resolve_symbols ok (exp val) symbols next)
 			(
-			form
-				(get_final_value defs)
-				(\msg\line
-				error_syntax msg line;
-				no
-				)
+			print "Undefined symbol "; print name; error_at line;
+			resolve_symbols F I symbols next
 			)
+		)
 
-		show_undefined_symbols defs;
-		final good bad
-		)
-		( # Source file is missing.
-		error_file;
-		bad
-		)
+	result \ok\result
+	result \exp\symbols
+
+	# Report any syntax error.
+	ok ()
+		(
+		exp \error\line
+		long_eq line 0
+			(print "Can't open file ";print label;nl;)
+			(print error; error_at line;)
+		);
+
+	# Resolve any open symbols, applying the expression to their values.
+	resolve_symbols ok exp symbols \ok\value
+	ok (good value) bad
 	)
 
 # Parse the named script file and resolve it in the context.  If there are no
 # errors, return the evaluable function denoted by that script in that context.
 # If there are errors, report them to stderr and exit with status 1.
+
 \eval_script =
 	(\name\context
-	check_parse (parse_file name) context name I (exit 1) warn
+	check_parse (parse_file name) context name warn I (exit 1)
 	)
-
-# (eval f) forces an evaluation of f and returns its value.
-\eval = (\f \f=f f)
 
 # Context constructors.  A context is a function which maps a name (string) to
 # an optional value, either (yes val) if defined or no if not defined.
@@ -325,8 +206,6 @@
 	define "fprint" fprint;
 	define "getchar" char_get;
 	define "is_name" is_name;
-	define "parse_file" parse_file;
-	define "parse_string" parse_string;
 	define "putchar" char_put;
 	define "starts" starts;
 	define "string_stderr" (fwrite stderr);
@@ -449,8 +328,6 @@
 	define "or" module_list;
 	starts "p"
 		(
-		define "parse_file" module_main;
-		define "parse_string" module_main;
 		define "print" module_main;
 		define "putchar" module_main;
 		void
