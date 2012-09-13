@@ -76,10 +76,6 @@ handle_options()
 		sudo rm -f $dir_install/bin/fexl
 		sudo rm -rf $dir_install/lib/fexl
 		sudo rm -rf $dir_install/share/fexl
-
-		# LATER 20120419 I'm keeping this for a while to clean up older
-		# installations which put the library in lib instead of lib/fexl.
-		sudo rm -f $dir_install/lib/libfexl.so
 		exit
 	fi
 
