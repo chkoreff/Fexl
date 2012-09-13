@@ -17,6 +17,7 @@ static value C;
 static value I;
 static value Y;
 static value query;
+static value lam;
 
 static value parse_exp(void);
 static value lambda(value, value);
@@ -555,8 +556,6 @@ static value get_pattern(value x, value f)
 	return A(pl,pr);
 	}
 
-static value lam;
-
 /* Make a lambda form using the substitution pattern for symbol x in form f. */
 static value lambda(value x, value f)
 	{
@@ -647,12 +646,6 @@ value parse_source(void)
 			}
 		}
 
-	value item = Q(reduce_item);
-	value pair = Q(reduce_pair);
-
-	hold(item);
-	hold(pair);
-
 	value symbols = C;
 
 	while (outer_syms)
@@ -661,7 +654,7 @@ value parse_source(void)
 		value place = outer_places->L;
 
 		if (exp) exp = lambda(sym,exp);
-		symbols = A(A(item,A(A(pair,sym),place)),symbols);
+		symbols = item(pair(sym,place),symbols);
 
 		pop(&outer_syms);
 		pop(&outer_places);
@@ -669,13 +662,10 @@ value parse_source(void)
 
 	/* If there was an error, use (pair error line) as the expression. */
 	if (exp == 0)
-		exp = A(A(pair,Qstring(error)),Qlong(line));
+		exp = pair(Qstring(error),Qlong(line));
 
 	value ok = Q(error ? reduce_F : reduce_C);
-	value result = A(A(pair,ok),A(A(pair,exp),symbols));
-
-	drop(item);
-	drop(pair);
+	value result = pair(ok,pair(exp,symbols));
 
 	line = 0;
 	error = 0;

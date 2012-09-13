@@ -158,3 +158,17 @@ void reduce_fold(value f)
 	{
 	f->T = reduce2_fold;
 	}
+
+value pair(value x, value y)
+	{
+	value f = A(x,y);
+	f->T = reduce3_pair;
+	return f;
+	}
+
+value item(value x, value y)
+	{
+	value f = A(x,y);
+	f->T = reduce3_item;
+	return f;
+	}

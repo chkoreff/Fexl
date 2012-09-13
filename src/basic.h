@@ -7,3 +7,5 @@ extern void reduce_pair(value);
 extern void reduce_item(value);
 extern void reduce_yes(value);
 extern void replace_boolean(value f, int flag);
+extern value pair(value, value);
+extern value item(value, value);

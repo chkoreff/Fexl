@@ -32,36 +32,30 @@ static value parse_top(void)
 	char *name = buf_clear(&buf,&len);
 
 	value result = parse_file(name);
-
 	hold(result);
 
-	/*LATER 20120826 I bet we could make a Fexl function do this, so we don't
-	have to traverse the structure here in C.  Then we could unify back in and
-	call it from main.fxl, as a special case of a parameterized check_parse.
-	*/
-
-	int ok = result->L->R->T == reduce_C;
-	value f = result->R->L->R;
+	int ok = result->L->T == reduce_C;
+	value exp = result->R->L;
 
 	if (!ok)
 		{
-		long line = get_long(f->R);
+		long line = get_long(exp->R);
 		if (line == 0)
 			warn("Can't open file %s", name);
 		else
-			warn("%s on line %ld of %s", string_data(f->L->R), line, name);
+			warn("%s on line %ld of %s", string_data(exp->L), line, name);
 		}
 
 	value symbols = result->R->R;
 
-	while (symbols->L)
+	while (symbols->T != reduce_C)
 		{
-		value entry = symbols->L->R;
-		value sym = entry->L->R;
+		value entry = symbols->L;
+		value sym = entry->L;
 		value def = resolve(sym);
 
 		if (def)
-			f = A(f,def);
+			exp = A(exp,def);
 		else
 			{
 			long line = get_long(entry->R);
@@ -78,12 +72,12 @@ static value parse_top(void)
 
 	if (!ok)
 		{
-		hold(f);
-		drop(f);
-		f = 0;
+		hold(exp);
+		drop(exp);
+		exp = 0;
 		}
 
-	return f;
+	return exp;
 	}
 
 /*
@@ -99,12 +93,12 @@ int main(int argc, char *argv[], char *envp[])
 	{
 	beg_run(argc, argv, envp);
 
-	value f = parse_top();
+	value exp = parse_top();
 
-	hold(f);
-	if (f) eval(f);
-	drop(f);
+	hold(exp);
+	if (exp) eval(exp);
+	drop(exp);
 
 	end_value();
-	return f ? 0 : 1;
+	return exp ? 0 : 1;
 	}
