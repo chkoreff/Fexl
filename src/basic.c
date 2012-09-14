@@ -126,7 +126,7 @@ void replace_boolean(value f, int flag)
 	replace(f, Q(flag ? reduce_C : reduce_F));
 	}
 
-/* \fold == (\fn\z\xs xs z \x\xs \z=(fn z x) fold fn z xs)
+/* \fold == (\fn\z\xs xs z \x\xs \z=(fn z x) eval z; fold fn z xs)
 It's about 75% faster implemented in C.
 */
 static void reduce3_fold(value f)

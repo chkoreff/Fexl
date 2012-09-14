@@ -17,7 +17,7 @@
 
 ########
 
-\test_hello_world==
+\test_hello_world =
 (
 print "hello world" nl;
 )
@@ -35,7 +35,7 @@ cat next
 
 ########
 
-\test_string_slice==
+\test_string_slice =
 (
 print (string_slice "abcde" 0 1); nl;
 print (string_slice "abcde" 0 2); nl;
@@ -80,7 +80,7 @@ print (string_slice "" -30 800); nl;
 
 ########
 
-\test_write_binary ==
+\test_write_binary =
 (
 # Writing binary
 
@@ -98,7 +98,7 @@ string_put string_3014;
 
 ########
 
-\test_string_len==
+\test_string_len =
 (
 print (string_len ""); nl;
 print (string_len "a"); nl;
@@ -108,7 +108,7 @@ print (string_len "12345678901234567890123456789012"); nl;
 
 ########
 
-\test_string_at==
+\test_string_at =
 (
 print (string_at "abc" -1); nl;
 print (string_at "abc" 0); nl;
@@ -119,7 +119,7 @@ print (string_at "abc" 3); nl;
 
 ########
 
-\test_string_compare==
+\test_string_compare =
 (
 \string_014 =
 	(
@@ -156,7 +156,7 @@ do_compare string_041 string_0142 "GT";
 )
 
 ########
-\test_string_common ==
+\test_string_common =
 (
 \check = (\value\expect
 	\ok = (long_eq value expect)
@@ -185,14 +185,14 @@ test_string_common "x" "" 0;
 
 ########
 
-\test_long_add==
+\test_long_add =
 (
 \x=(long_add 37 23)
 print "The value of x is "; print x; print "."; nl;
 )
 
 ########
-\test_procedural==
+\test_procedural =
 (
 # Make some abbreviations.
 \add=double_add
@@ -225,13 +225,14 @@ show "x" x; show "y" y; show "z" z;
 show "z" z;
 )
 
-\test_eager==
+\test_eager =
 (\next
 timer_begin \time
 
 \sum == (\total\count
 	long_le count 0 total;
 	\total = (long_add total count)
+	eval total;
 	sum total (long_sub count 1))
 
 \sum = (sum 0)
@@ -242,11 +243,12 @@ timer_elapsed time \time
 next
 )
 
-\test_eager_2 ==
+\test_eager_2 =
 (\next
 timer_begin \time
 # (list_long x) is the list of all long values starting with x.
-\list_long == (\x item x; \x=(long_add x 1) list_long x)
+# Instead of defining it here, I'm testing the version built into list.fxl.
+#\list_long == (\x item x; ? (long_add x 1) list_long)
 
 # (list_sum xs) is the sum of the long values xs.
 \list_sum = (fold long_add 0)
@@ -262,7 +264,7 @@ timer_elapsed time \time
 next
 )
 
-\test_double_compare ==
+\test_double_compare =
 (
 \do_compare=(\x\y\expect
 	\result = (double_compare x y "LT" "EQ" "GT")
@@ -283,7 +285,7 @@ do_compare -1.0 -1.0 "EQ"
 
 ####### Some tests with arbitrary precision arithmetic.
 
-\module_test_arithmetic ==
+\module_test_arithmetic =
 (
 
 # These put a binary digit 0 or 1 on the front of a list.
@@ -450,7 +452,8 @@ do_compare -1.0 -1.0 "EQ"
 # with the least significant digit.
 \nat_base_10_lo == (\x
 	nat_div10 x \q\r
-	\ch = (long_add 48; nat_long r);
+	\ch = (long_add 48; nat_long r)
+	eval ch;
 	item ch;
 	nat_eq0 q end;
 	nat_base_10_lo q
@@ -599,7 +602,7 @@ next
 )
 
 ####
-\test_binary_counter ==
+\test_binary_counter =
 (
 
 \loop ==
@@ -618,7 +621,7 @@ loop count num
 loop 50 nat_0
 )
 
-\test_divide==
+\test_divide=
 (\next
 \test_div = (\x\y
 	nat_div x y \q\r
@@ -723,7 +726,7 @@ big_test;
 next
 )
 
-\test_sub ==
+\test_sub =
 (\next
 \test_sub = (\x\y
 	\z = (nat_sub x y)
@@ -796,7 +799,7 @@ module_test_arithmetic
 
 # Choose your test(s) to run down here.  Comment the ones don't want to run.
 
-\test_string_type==
+\test_string_type=
 (
 \test_case=(\x\expect
 	\result = (string_type x "yes" "no")
@@ -816,7 +819,7 @@ test_case ((\x\y y x) "hi" I) "yes"
 test_case "hey!" "yes"
 )
 
-\test_double_type==
+\test_double_type=
 (
 \test_case=(\x\expect
 	\result = (double_type x "yes" "no")
@@ -836,7 +839,7 @@ test_case ((\x\y y x) (double_add 4.2 2.6) I) "yes"
 test_case "hey!" "no"
 )
 
-\test_long_type==
+\test_long_type=
 (
 \test_case=(\x\expect
 	\result = (long_type x "yes" "no")
@@ -856,7 +859,7 @@ test_case ((\x\y y x) (long_add 4 2) I) "yes"
 test_case "hey!" "no"
 )
 
-\test_string_long ==
+\test_string_long =
 (
 \test_case=(\x\expect
 	\quote = ~ "~
@@ -884,7 +887,7 @@ test_case "1.6" "no"
 test_case "0." "no"
 )
 
-\test_string_double ==
+\test_string_double =
 (
 \test_case=(\x\expect
 	\quote = ~ "~
@@ -917,7 +920,7 @@ test_case "-0.0" "yes -0"
 test_case "-0.0123" "yes -0.0123"
 )
 
-\test_long_double ==
+\test_long_double =
 (
 \test_case = (
 \x
@@ -937,7 +940,7 @@ test_case -37
 test_case 126478
 )
 
-\test_double_long ==
+\test_double_long =
 (
 \test_case = (
 \x

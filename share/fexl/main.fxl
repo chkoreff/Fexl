@@ -24,7 +24,7 @@
 	)
 
 # (fprint fh x) prints value x to file fh.
-\fprint == (\fh\x fwrite fh; to_string x)
+\fprint = (\fh\x fwrite fh; to_string x)
 
 \print = (fprint stdout)
 \warn = (fprint stderr)
@@ -42,10 +42,10 @@
 
 # The halt function dies with a simple error message, and is useful in corner
 # cases that are impossible to handle and should never be reached.
-\halt==(die "Halted!")
+\halt = (die "Halted!")
 
-# (eval f) forces an evaluation of f and returns its value.
-\eval = (\f \f=f f)
+# (eval f) forces an evaluation of f and returns I.
+\eval = (\f query f \_ I)
 
 # Parsing
 
@@ -144,7 +144,7 @@
 	(\context
 
 	\sym
-	\sym=sym  # Force evaluation in case it's a computed symbol.
+	query sym \sym  # Force evaluation in case it's a computed symbol.
 
 	# Look in the given context first (if the symbol is a name).
 	\def = (is_name sym (context (name_string sym)) no)
@@ -188,6 +188,7 @@
 	define "string_put" (fwrite stdout);
 	define "warn" warn;
 	define "void" void;
+	define "?" query;
 	void
 	)
 
@@ -198,7 +199,6 @@
 \module_main =
 	(
 	chain context;
-	define "?" query;
 	define "chain" chain;
 	define "check_parse" check_parse;
 	define "eval" eval;
@@ -214,27 +214,27 @@
 	)
 
 # Define some modules which can be loaded on demand.
-\module_string == (module "string" context)
-\module_double == (module "double" context)
-\module_math == (module "math" context)
-\module_rand == (module "rand" context)
-\module_compare == (module "compare" context)
-\module_long == (module "long" context)
+\module_string = (module "string" context)
+\module_double = (module "double" context)
+\module_math = (module "math" context)
+\module_rand = (module "rand" context)
+\module_compare = (module "compare" context)
+\module_long = (module "long" context)
 
 # Extend the current context.
 \context = (chain context module_long)
 
 # Define some modules which can be loaded on demand.
-\module_ru_utime == (module "ru_utime" context)
-\module_ipc == (module "ipc" context)
-\module_list == (module "list" context)
+\module_ru_utime = (module "ru_utime" context)
+\module_ipc = (module "ipc" context)
+\module_list = (module "list" context)
 
 # Extend the current context.
 \context = (chain context module_list)
 
 # Define some modules which can be loaded on demand.
-\module_run == (module "run" context)
-\module_meta == (module "meta" context)
+\module_run = (module "run" context)
+\module_meta = (module "meta" context)
 #]
 
 # This function maps a symbol to the module where it is expected to be defined.

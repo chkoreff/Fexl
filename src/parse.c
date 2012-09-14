@@ -16,7 +16,6 @@ static char *error;   /* syntax error if any */
 static value C;
 static value I;
 static value Y;
-static value query;
 static value lam;
 
 static value parse_exp(void);
@@ -437,7 +436,7 @@ static value parse_lambda(void)
 				if (body)
 					{
 					val = lambda(sym,body);
-					val = apply(apply(query,def),val);
+					val = apply(val,def);
 					}
 				pop(&inner_syms);
 				}
@@ -581,13 +580,11 @@ static void beg_parse(void)
 	C = Q(reduce_C);
 	I = Q(reduce_I);
 	Y = Q(reduce_Y);
-	query = Q(reduce_query);
 	lam = Q(type_lambda);
 
 	hold(C);
 	hold(I);
 	hold(Y);
-	hold(query);
 	hold(lam);
 	}
 
@@ -596,7 +593,6 @@ static void end_parse(void)
 	drop(C);
 	drop(I);
 	drop(Y);
-	drop(query);
 	drop(lam);
 	}
 

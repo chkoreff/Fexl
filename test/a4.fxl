@@ -58,7 +58,7 @@
 
 # The test_limits function tests setting CPU and memory limits on arbitrary
 # child processes.
-\test_limits ==
+\test_limits =
 (\next
 print "== test_limits";nl;
 

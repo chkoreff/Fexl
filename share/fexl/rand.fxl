@@ -24,7 +24,7 @@
 	(\x
 	\a = 6364136223846793005
 	\c = 1442695040888963407
-	\x = (long_add c; long_mul a x)
+	? (long_add c; long_mul a x) \x
 	item x; rand x
 	)
 

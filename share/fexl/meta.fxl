@@ -2,7 +2,7 @@
 # strings.
 
 # This is the infinite list of terminators that we try when quoting a string.
-\terminators ==
+\terminators =
 	(
 	item ~ "~;  # quote mark
 	item "~";   # tilde

@@ -65,7 +65,7 @@
 	)
 
 # (list_long x) is the list of all long values starting with x.
-\list_long == (\x item x; \x=(long_add x 1) list_long x)
+\list_long == (\x item x; ? (long_add x 1) list_long)
 
 # Return the first N items of the list.
 \list_prefix == (\list\N
