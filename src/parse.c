@@ -428,9 +428,9 @@ static value parse_lambda(void)
 			skip_filler();
 
 			value def = parse_term();
-			hold(def);
 			if (def)
 				{
+				hold(def);
 				push(&inner_syms,sym);
 				value body = parse_exp();
 				if (body)
@@ -439,8 +439,11 @@ static value parse_lambda(void)
 					val = apply(val,def);
 					}
 				pop(&inner_syms);
+				if (def == val)
+					def->N--;
+				else
+					drop(def);
 				}
-			drop(def);
 			}
 		}
 	else
