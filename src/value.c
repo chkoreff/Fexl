@@ -54,8 +54,8 @@ static void clear(value f)
 		}
 	}
 
-/* Create a new value. */
-static value create(type T, value L, value R)
+/* Create a function that applies L to R. */
+value A(value L, value R)
 	{
 	value f = free_list;
 	if (f)
@@ -67,7 +67,7 @@ static value create(type T, value L, value R)
 		f = (value)new_memory(sizeof (struct value));
 
 	f->N = 0;
-	f->T = T;
+	f->T = 0;
 	f->L = L;
 	f->R = R;
 
@@ -80,19 +80,25 @@ static value create(type T, value L, value R)
 /* Create a data object of type T. */
 value D(type T)
 	{
-	return create(T,0,create(0,0,0));
+	value f = A(0,A(0,0));
+	f->T = T;
+	return f;
 	}
 
 /* Create a combinator of type T.  Shorthand for "quote". */
 value Q(type T)
 	{
-	return create(T,0,0);
+	value f = A(0,0);
+	f->T = T;
+	return f;
 	}
 
-/* Create a function that applies L to R. */
-value A(value L, value R)
+/* Return a copy of value f. */
+value copy(value f)
 	{
-	return create(0,L,R);
+	value g = A(f->L,f->R);
+	g->T = f->T;
+	return g;
 	}
 
 /* Replace the contents of f with the contents of g. */

@@ -62,9 +62,10 @@ struct value
 
 extern void hold(value);
 extern void drop(value);
+extern value A(value, value);
 extern value D(type);
 extern value Q(type);
-extern value A(value, value);
+extern value copy(value);
 extern void replace(value, value);
 extern void replace_apply(value, value, value);
 extern void eval(value);

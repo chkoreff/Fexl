@@ -345,14 +345,54 @@ int is_open(value f)
 	return f->T == type_open || f->T == type_name || f->T == type_string;
 	}
 
+/* This is a wrapper around the copy routine which prevents us from copying
+symbols, because we still rely on pointer comparison in get_pattern.  That will
+soon change, because in a new version of the code we won't even have symbols in
+expressions, and we'll compute lambda patterns in a bottom-up fashion. */
+
+static value copy_exp(value f)
+	{
+	if (f->T == type_name || f->T == type_string)
+		return f;
+
+	return copy(f);
+	}
+
 static value apply(value f, value x)
 	{
+	if (f == 0)
+		{
+		hold(x); drop(x);
+		return 0;
+		}
+
+	if (x == 0) return 0;
 	if (f == I) return x;
 
 	value result = A(f,x);
 	if (is_open(f) && is_open(x))
 		result->T = type_open;
 	return result;
+	}
+
+/* In the new version we won't need these "scope_" routines because we'll
+compute lambda patterns in a bottom-up fashion and won't need any symbol
+stacks. */
+
+static value scope_parse_term(value sym)
+	{
+	push(&inner_syms,sym);
+	value val = parse_term();
+	pop(&inner_syms);
+	return val;
+	}
+
+static value scope_parse_exp(value sym)
+	{
+	push(&inner_syms,sym);
+	value val = parse_exp();
+	pop(&inner_syms);
+	return val;
 	}
 
 /*
@@ -401,59 +441,27 @@ static value parse_lambda(void)
 	if (has_def)
 		{
 		next_ch();
+		value def;
 		if (ch == '=')
 			{
 			/* Recursive definition */
 			next_ch();
 			skip_filler();
-
-			push(&inner_syms,sym);
-			value def = parse_term();
-			hold(def);
-			if (def)
-				{
-				value body = parse_exp();
-				if (body)
-					{
-					val = lambda(sym,body);
-					val = apply(val,apply(Y,lambda(sym,def)));
-					}
-				}
-			drop(def);
-			pop(&inner_syms);
+			def = apply(Y,lambda(sym, scope_parse_term(sym)));
 			}
 		else
 			{
-			/* Non-recursive definition, forces eager evaluation */
+			/* Non-recursive definition */
 			skip_filler();
-
-			value def = parse_term();
-			if (def)
-				{
-				hold(def);
-				push(&inner_syms,sym);
-				value body = parse_exp();
-				if (body)
-					{
-					val = lambda(sym,body);
-					val = apply(val,def);
-					}
-				pop(&inner_syms);
-				if (def == val)
-					def->N--;
-				else
-					drop(def);
-				}
+			def = parse_term();
 			}
+
+		val = def ? lambda(sym, scope_parse_exp(sym)) : 0;
+		val = apply(val,def);
 		}
 	else
-		{
 		/* Normal parameter (symbol without definition) */
-		push(&inner_syms,sym);
-		value body = parse_exp();
-		if (body) val = lambda(sym,body);
-		pop(&inner_syms);
-		}
+		val = lambda(sym, scope_parse_exp(sym));
 
 	drop(sym);
 	return val;
@@ -561,15 +569,25 @@ static value get_pattern(value x, value f)
 /* Make a lambda form using the substitution pattern for symbol x in form f. */
 static value lambda(value x, value f)
 	{
+	if (f == 0) return 0;
+
 	value p = get_pattern(x,f);
 
 	if (p->T == reduce_C) return A(C,f);
-	if (p->T == reduce_I) return I;
+	if (p->T == reduce_I)
+		{
+		hold(f); drop(f);
+		return I;
+		}
 
-	/* This special case uses a little less time and memory. */
 	if (p->L->T == reduce_C && p->R->T == reduce_I)
 		{
-		value result = A(I,f->L);  /* lam (C I) (f g) = f */
+		/* Special case for the rule:  lam (C I) (L R) = L.  This optimization
+		greatly compresses many parsed forms, saving memory and time. */
+
+		value result = copy_exp(f->L);
+		/* Copy result because f->L is a part of f, and we're dropping f. */
+
 		hold(p); drop(p);
 		hold(f); drop(f);
 		return result;
@@ -652,7 +670,7 @@ value parse_source(void)
 		value sym = outer_syms->L;
 		value place = outer_places->L;
 
-		if (exp) exp = lambda(sym,exp);
+		exp = lambda(sym,exp);
 		symbols = item(pair(sym,place),symbols);
 
 		pop(&outer_syms);
