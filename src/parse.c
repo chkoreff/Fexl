@@ -10,6 +10,11 @@
 #include "string.h"
 #include "sym.h"
 
+/* LATER 20120920 get rid of the symbols stacks.  */
+
+/* LATER 20120920 instead of returning 0 on syntax error, return
+syntax_error(msg,line) */
+
 static long line;     /* current line number */
 static char *error;   /* syntax error if any */
 
@@ -65,10 +70,14 @@ static void skip_line(void)
 	{
 	while (1)
 		{
-		if (ch == '\n' || ch == -1) break;
-		next_ch();
+		if (ch == '\n' || ch == -1)
+			{
+			next_ch();
+			return;
+			}
+		else
+			next_ch();
 		}
-	next_ch();
 	}
 
 static int at_white(void)
@@ -80,8 +89,10 @@ static void skip_white(void)
 	{
 	while (1)
 		{
-		if (!at_white() || ch == -1) break;
-		next_ch();
+		if (!at_white() || ch == -1)
+			return;
+		else
+			next_ch();
 		}
 	}
 
@@ -94,7 +105,7 @@ static void skip_filler(void)
 		else if (at_white())
 			skip_white();
 		else
-			break;
+			return;
 		}
 	}
 
@@ -113,19 +124,26 @@ static value collect_string(char *term_string, long term_len, long first_line)
 		else if (match_pos > 0)
 			{
 			if (match_pos >= term_len)
-				break;
+				{
+				long len;
+				char *string = buf_clear(&buf,&len);
+				return Qchars(string,len);
+				}
+			else
+				{
+				long i;
+				for (i = 0; i < match_pos; i++)
+					buf_add(&buf, term_string[i]);
 
-			long i;
-			for (i = 0; i < match_pos; i++)
-				buf_add(&buf, term_string[i]);
-
-			match_pos = 0;
+				match_pos = 0;
+				}
 			}
 		else if (ch == -1)
 			{
+			buf_discard(&buf);
 			line = first_line;
 			error = "Unclosed string";
-			break;
+			return 0;
 			}
 		else
 			{
@@ -133,16 +151,6 @@ static value collect_string(char *term_string, long term_len, long first_line)
 			next_ch();
 			}
 		}
-
-	if (error)
-		{
-		buf_discard(&buf);
-		return 0;
-		}
-
-	long len;
-	char *string = buf_clear(&buf,&len);
-	return Qchars(string,len);
 	}
 
 static value parse_simple_string(void)
@@ -159,30 +167,29 @@ static value parse_complex_string(void)
 
 	while (1)
 		{
-		if (at_white() || ch == -1) break;
-		buf_add(&term, ch);
-		next_ch();
+		if (at_white())
+			{
+			long term_len;
+			char *term_string = buf_clear(&term,&term_len);
+			next_ch();
+
+			value str = collect_string(term_string, term_len, first_line);
+			free_memory(term_string, term_len+1);
+			return str;
+			}
+		else if (ch == -1)
+			{
+			line = first_line;
+			error = "Unclosed string terminator";
+			buf_discard(&term);
+			return 0;
+			}
+		else
+			{
+			buf_add(&term, ch);
+			next_ch();
+			}
 		}
-
-	if (ch == -1)
-		{
-		line = first_line;
-		error = "Unclosed string terminator";
-		}
-
-	if (error)
-		{
-		buf_discard(&term);
-		return 0;
-		}
-
-	long term_len;
-	char *term_string = buf_clear(&term,&term_len);
-	next_ch();
-
-	value str = collect_string(term_string, term_len, first_line);
-	free_memory(term_string, term_len+1);
-	return str;
 	}
 
 /*
@@ -207,15 +214,17 @@ static value parse_name(int allow_eq)
 			|| (ch == '=' && !allow_eq)
 			|| ch == -1
 			)
-			break;
-
-		buf_add(&buf, ch);
-		next_ch();
+			{
+			long len;
+			char *string = buf_clear(&buf,&len);
+			return Qname(string,len);
+			}
+		else
+			{
+			buf_add(&buf, ch);
+			next_ch();
+			}
 		}
-
-	long len;
-	char *string = buf_clear(&buf,&len);
-	return Qname(string,len);
 	}
 
 /* Parse a symbol. */
@@ -234,9 +243,12 @@ static value find_sym(value list, value name)
 	value pos = list;
 	while (1)
 		{
-		if (pos == 0) return 0;
-		if (sym_eq(name,pos->L)) return pos->L;
-		pos = pos->R;
+		if (pos == 0)
+			return 0;
+		else if (sym_eq(name,pos->L))
+			return pos->L;
+		else
+			pos = pos->R;
 		}
 	}
 
@@ -296,46 +308,42 @@ static value parse_term(void)
 	{
 	long first_line = line;
 
-	value exp;
-
 	if (ch == '(')
 		{
 		next_ch();
-		exp = parse_exp();
-		if (exp)
+		value exp = parse_exp();
+		if (exp == 0)
+			return exp;
+		else if (ch == ')')
 			{
-			if (ch == ')')
-				next_ch();
-			else
-				{
-				line = first_line;
-				error = "Unclosed parenthesis";
-				}
+			next_ch();
+			return exp;
+			}
+		else
+			{
+			hold(exp);
+			line = first_line;
+			error = "Unclosed parenthesis";
+			drop(exp);
+			return 0;
 			}
 		}
 	else
 		{
-		exp = parse_sym(1);
-		if (exp)
+		value exp = parse_sym(1);
+		if (exp == 0)
+			return exp;
+		else if (exp->T == type_name && string_len(exp) == 0)
 			{
-			if (exp->T == type_name && string_len(exp) == 0)
-				{
-				line = first_line;
-				error = "Missing definition";
-				}
-			else
-				exp = orig_sym(exp,first_line);
+			hold(exp);
+			line = first_line;
+			error = "Missing definition";
+			drop(exp);
+			return 0;
 			}
+		else
+			return orig_sym(exp,first_line);
 		}
-
-	if (error)
-		{
-		hold(exp);
-		drop(exp);
-		exp = 0;
-		}
-
-	return exp;
 	}
 
 static void type_open(value f) { type_error(); }
@@ -354,25 +362,32 @@ static value copy_exp(value f)
 	{
 	if (f->T == type_name || f->T == type_string)
 		return f;
-
-	return copy(f);
+	else
+		return copy(f);
 	}
 
 static value apply(value f, value x)
 	{
 	if (f == 0)
 		{
-		hold(x); drop(x);
+		hold(x);
+		drop(x);
 		return 0;
 		}
-
-	if (x == 0) return 0;
-	if (f == I) return x;
-
-	value result = A(f,x);
-	if (is_open(f) && is_open(x))
-		result->T = type_open;
-	return result;
+	else if (x == 0)
+		{
+		hold(f);
+		drop(f);
+		return 0;
+		}
+	else if (f == I)
+		return x;
+	else
+		{
+		value result = A(f,x);
+		if (is_open(f) && is_open(x)) result->T = type_open;
+		return result;
+		}
 	}
 
 /* In the new version we won't need these "scope_" routines because we'll
@@ -421,47 +436,46 @@ static value parse_lambda(void)
 	skip_white();
 
 	value sym = parse_sym(allow_eq);
-	if (sym == 0) return 0;
-
-	if (sym->T == type_name && string_len(sym) == 0)
-		{
-		error = "Missing lambda symbol";
-		hold(sym);
-		drop(sym);
-		return 0;
-		}
-
 	hold(sym);
 
-	skip_filler();
-	int has_def = (ch == '=');
+	value val;
 
-	value val = 0;
-
-	if (has_def)
+	if (sym == 0)
+		val = 0;
+	else if (sym->T == type_name && string_len(sym) == 0)
 		{
-		next_ch();
-		value def;
-		if (ch == '=')
-			{
-			/* Recursive definition */
-			next_ch();
-			skip_filler();
-			def = apply(Y,lambda(sym, scope_parse_term(sym)));
-			}
-		else
-			{
-			/* Non-recursive definition */
-			skip_filler();
-			def = parse_term();
-			}
-
-		val = def ? lambda(sym, scope_parse_exp(sym)) : 0;
-		val = apply(val,def);
+		error = "Missing lambda symbol";
+		val = 0;
 		}
 	else
-		/* Normal parameter (symbol without definition) */
-		val = lambda(sym, scope_parse_exp(sym));
+		{
+		skip_filler();
+
+		if (ch == '=')
+			{
+			next_ch();
+			value def;
+			if (ch == '=')
+				{
+				/* Recursive definition */
+				next_ch();
+				skip_filler();
+				def = apply(Y,lambda(sym, scope_parse_term(sym)));
+				}
+			else
+				{
+				/* Non-recursive definition */
+				skip_filler();
+				def = parse_term();
+				}
+
+			val = def ? lambda(sym, scope_parse_exp(sym)) : 0;
+			val = apply(val,def);
+			}
+		else
+			/* Normal parameter (symbol without definition) */
+			val = lambda(sym, scope_parse_exp(sym));
+		}
 
 	drop(sym);
 	return val;
@@ -491,49 +505,49 @@ static value parse_exp(void)
 	while (1)
 		{
 		skip_filler();
-		if (ch == -1 || ch == ')') break;
 
-		value val;
-
-		if (ch == '\\')
+		if (ch == -1 || ch == ')')
+			return exp;
+		else
 			{
-			next_ch();
+			value val;
+
 			if (ch == '\\')
 				{
-				ch = -1; /* Two backslashes simulates end of file. */
-				break;
+				next_ch();
+				if (ch == '\\')
+					{
+					ch = -1; /* Two backslashes simulates end of file. */
+					return exp;
+					}
+				else
+					val = parse_lambda();
 				}
+			else if (ch == ';')
+				{
+				next_ch();
+				val = parse_exp();
+				}
+			else
+				val = parse_term();
 
-			val = parse_lambda();
-			}
-		else if (ch == ';')
-			{
-			next_ch();
-			val = parse_exp();
-			}
-		else
-			val = parse_term();
+			exp = apply(exp,val);
 
-		if (val == 0)
-			{
-			hold(exp);
-			drop(exp);
-			exp = 0;
-			break;
+			if (exp == 0)
+				return exp;
 			}
-
-		exp = apply(exp,val);
 		}
-
-	return exp;
 	}
 
 /* Return a copy of f with x substituted according to pattern p. */
 static value subst(value p, value f, value x)
 	{
-	if (p->T == reduce_C) return f;
-	if (p->T == reduce_I) return x;
-	return A(subst(p->L,f->L,x),subst(p->R,f->R,x));
+	if (p->T == reduce_C)
+		return f;
+	else if (p->T == reduce_I)
+		return x;
+	else
+		return A(subst(p->L,f->L,x),subst(p->R,f->R,x));
 	}
 
 /* lambda pattern form value = subst(pattern,form,value) */
@@ -555,45 +569,53 @@ void type_lambda(value f)
 /* Get the pattern of occurrences of symbol x in form f. */
 static value get_pattern(value x, value f)
 	{
-	if (f == x) return I;
-	if (f->T && f->T != type_open) return C;
+	if (f == x)
+		return I;
+	else if (f->T && f->T != type_open)
+		return C;
+	else
+		{
+		value pl = get_pattern(x,f->L);
+		value pr = get_pattern(x,f->R);
 
-	value pl = get_pattern(x,f->L);
-	value pr = get_pattern(x,f->R);
-
-	if (pl->T == reduce_C && pr->T == reduce_C) return C;
-
-	return A(pl,pr);
+		if (pl->T == reduce_C && pr->T == reduce_C)
+			return C;
+		else
+			return A(pl,pr);
+		}
 	}
 
 /* Make a lambda form using the substitution pattern for symbol x in form f. */
 static value lambda(value x, value f)
 	{
-	if (f == 0) return 0;
+	hold(f);
 
-	value p = get_pattern(x,f);
+	value val;
 
-	if (p->T == reduce_C) return A(C,f);
-	if (p->T == reduce_I)
+	if (f == 0)
+		val = 0;
+	else
 		{
-		hold(f); drop(f);
-		return I;
+		value p = get_pattern(x,f);
+		hold(p);
+
+		if (p->T == reduce_C)
+			val = A(C,f);
+		else if (p->T == reduce_I)
+			val = I;
+		else if (p->L->T == reduce_C && p->R->T == reduce_I)
+			/* Special case for the rule:  lam (C I) (L R) = L.  This greatly
+			compresses many parsed forms, saving memory and time.  We copy f->L
+			because it's a part of f and we'll be dropping f.  */
+			val = copy_exp(f->L);
+		else
+			val = apply(A(lam,p),f);
+
+		drop(p);
 		}
 
-	if (p->L->T == reduce_C && p->R->T == reduce_I)
-		{
-		/* Special case for the rule:  lam (C I) (L R) = L.  This optimization
-		greatly compresses many parsed forms, saving memory and time. */
-
-		value result = copy_exp(f->L);
-		/* Copy result because f->L is a part of f, and we're dropping f. */
-
-		hold(p); drop(p);
-		hold(f); drop(f);
-		return result;
-		}
-
-	return apply(A(lam,p),f);
+	drop(f);
+	return val;
 	}
 
 static void beg_parse(void)
@@ -655,8 +677,8 @@ value parse_source(void)
 			{
 			if (ch != -1)
 				{
-				error = "Extraneous input";
 				hold(exp);
+				error = "Extraneous input";
 				drop(exp);
 				exp = 0;
 				}
