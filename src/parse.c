@@ -385,7 +385,8 @@ static value apply(value f, value x)
 	else
 		{
 		value result = A(f,x);
-		if (is_open(f) && is_open(x)) result->T = type_open;
+		if (is_open(f) || is_open(x))
+			result->T = type_open;
 		return result;
 		}
 	}
@@ -571,7 +572,7 @@ static value get_pattern(value x, value f)
 	{
 	if (f == x)
 		return I;
-	else if (f->T && f->T != type_open)
+	else if (f->T != type_open)
 		return C;
 	else
 		{
@@ -582,6 +583,31 @@ static value get_pattern(value x, value f)
 			return C;
 		else
 			return A(pl,pr);
+		}
+	}
+
+/* LATER 20120921 unify with get_pattern into one lambda routine.  This is good
+preparation for when we go back to using combinators instead of pattern
+substitution.  Note that when we do use combinators again, they'll be of a very
+eager or "aggressive" variety, so they should be as fast as substitution, or
+even faster because I think they'll avoid extra work in cases where a value is
+not used during computation. */
+
+value remove_sym(value x, value f)
+	{
+	if (f == x)
+		return I;
+	else if (f->T != type_open)
+		return f;
+	else
+		{
+		value fl = remove_sym(x,f->L);
+		value fr = remove_sym(x,f->R);
+
+		value g = A(fl,fr);
+		if (is_open(g->L) || is_open(g->R))
+			g->T = type_open;
+		return g;
 		}
 	}
 
@@ -600,7 +626,7 @@ static value lambda(value x, value f)
 		hold(p);
 
 		if (p->T == reduce_C)
-			val = A(C,f);
+			val = apply(C,f);
 		else if (p->T == reduce_I)
 			val = I;
 		else if (p->L->T == reduce_C && p->R->T == reduce_I)
@@ -609,7 +635,7 @@ static value lambda(value x, value f)
 			because it's a part of f and we'll be dropping f.  */
 			val = copy_exp(f->L);
 		else
-			val = apply(A(lam,p),f);
+			val = apply(A(lam,p),remove_sym(x,f));
 
 		drop(p);
 		}
