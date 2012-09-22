@@ -94,6 +94,8 @@ which I use as regression tests:
 
 	test/a1.fxl
 	test/a2.fxl
+	test/a3.fxl
+	test/a4.fxl
 
 In the shell, I do a ". alias" to read in some handy shell functions, and then
 I can run my tests like this:
@@ -205,7 +207,7 @@ or equivalently:
 
 	some bad list (print "some bad!") (print "all good!")
 
-Note that these are all built into the standard share/fexl/top.fxl which comes
+Note that these are all built into the standard share/fexl/main.fxl which comes
 with the distribution.
 
 
