@@ -299,13 +299,12 @@ do
 	fi
 done
 
-# Now, in case you're running under sudo, change the permissions on the local
-# bin and obj directories back to the underlying user.  Otherwise you'd have
-# files owned by root in your local directory, which is annoying.
+# Now, in case you're running under sudo, change the permissions on the locally
+# created directories back to the underlying user.  Otherwise you'd have files
+# owned by root in your local directory, which is annoying.
 
 if [ "$SUDO_USER" != "" ]; then
-	if [ $install -eq 1 ]; then
-		chown -R $SUDO_USER:$SUDO_USER bin
-		chown -R $SUDO_USER:$SUDO_USER obj
-	fi
+	chown -R $SUDO_USER:$SUDO_USER bin
+	chown -R $SUDO_USER:$SUDO_USER lib
+	chown -R $SUDO_USER:$SUDO_USER obj
 fi
