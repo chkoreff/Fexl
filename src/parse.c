@@ -1,5 +1,4 @@
 #include <ctype.h>
-#include "die.h"
 #include "value.h"
 #include "basic.h"
 #include "buf.h"
@@ -9,8 +8,6 @@
 #include "run.h"
 #include "string.h"
 #include "sym.h"
-
-/* LATER 20120920 get rid of the symbols stacks.  */
 
 /* LATER 20120920 instead of returning 0 on syntax error, return
 syntax_error(msg,line) */
@@ -22,9 +19,6 @@ static value C;
 static value I;
 static value Y;
 static value lam;
-
-static value parse_exp(void);
-static value lambda(value, value);
 
 /*
 Grammar:
@@ -109,6 +103,21 @@ static void skip_filler(void)
 		}
 	}
 
+static void type_open(value f) { type_error(); }
+
+static value make_sym(type t, struct buf **buf, long first_line)
+	{
+	long len;
+	char *string = buf_clear(buf,&len);
+
+	value data = Qchars(string,len);
+	data->T = t;
+
+	value sym = A(Q(t),pair(data,Qlong(first_line)));
+	sym->T = type_open;
+	return sym;
+	}
+
 static value collect_string(char *term_string, long term_len, long first_line)
 	{
 	struct buf *buf = 0;
@@ -124,11 +133,7 @@ static value collect_string(char *term_string, long term_len, long first_line)
 		else if (match_pos > 0)
 			{
 			if (match_pos >= term_len)
-				{
-				long len;
-				char *string = buf_clear(&buf,&len);
-				return Qchars(string,len);
-				}
+				return make_sym(type_string,&buf,first_line);
 			else
 				{
 				long i;
@@ -171,11 +176,11 @@ static value parse_complex_string(void)
 			{
 			long term_len;
 			char *term_string = buf_clear(&term,&term_len);
-			next_ch();
 
-			value str = collect_string(term_string, term_len, first_line);
+			next_ch();
+			value sym = collect_string(term_string, term_len, first_line);
 			free_memory(term_string, term_len+1);
-			return str;
+			return sym;
 			}
 		else if (ch == -1)
 			{
@@ -197,8 +202,10 @@ A name may contain just about anything, except for white space (including NUL)
 and a few other special characters.  This is the simplest possible rule that
 can work.
 */
+
 static value parse_name(int allow_eq)
 	{
+	long first_line = line;
 	struct buf *buf = 0;
 	while (1)
 		{
@@ -214,11 +221,7 @@ static value parse_name(int allow_eq)
 			|| (ch == '=' && !allow_eq)
 			|| ch == -1
 			)
-			{
-			long len;
-			char *string = buf_clear(&buf,&len);
-			return Qname(string,len);
-			}
+			return make_sym(type_name,&buf,first_line);
 		else
 			{
 			buf_add(&buf, ch);
@@ -227,8 +230,15 @@ static value parse_name(int allow_eq)
 		}
 	}
 
+static int is_null_name(value exp)
+	{
+	return exp->T == type_open
+		&& exp->L->T == type_name
+		&& string_len(exp->R->L) == 0;
+	}
+
 /* Parse a symbol. */
-static value parse_sym(int allow_eq)
+static value new_parse_sym(int allow_eq)
 	{
 	if (ch == '"')
 		return parse_simple_string();
@@ -238,78 +248,13 @@ static value parse_sym(int allow_eq)
 		return parse_name(allow_eq);
 	}
 
-static value find_sym(value list, value name)
-	{
-	value pos = list;
-	while (1)
-		{
-		if (pos == 0)
-			return 0;
-		else if (sym_eq(name,pos->L))
-			return pos->L;
-		else
-			pos = pos->R;
-		}
-	}
-
-/* Symbols defined with lambda forms inside the source text */
-static value inner_syms = 0;
-/* Symbols defined outside the source text */
-static value outer_syms = 0;
-/* Line numbers of outer symbols */
-static value outer_places = 0;
-
-/* Set a value reference to a new value. */
-static void set(value *pos, value val)
-	{
-	hold(val);
-	value old = *pos;
-	if (old) drop(old);
-	*pos = val;
-	}
-
-/* Push a value on the stack. */
-static void push(value *stack, value f)
-	{
-	set(stack, A(f,*stack));
-	}
-
-/* Pop a value from the stack. */
-static void pop(value *stack)
-	{
-	set(stack, (*stack)->R);
-	}
-
-/* Return the originally encountered occurrence of a symbol.  This unifies
-multiple occurrences into a single one. */
-static value orig_sym(value sym, long first_line)
-	{
-	hold(sym);
-	value orig = find_sym(inner_syms,sym);
-
-	if (!orig)
-		{
-		orig = find_sym(outer_syms,sym);
-
-		if (!orig)
-			{
-			/* new outer sym encountered */
-			orig = sym;
-			push(&outer_syms, orig);
-			push(&outer_places, Qlong(first_line));
-			}
-		}
-
-	drop(sym);
-	return orig;
-	}
+static value parse_exp(void);
 
 static value parse_term(void)
 	{
-	long first_line = line;
-
 	if (ch == '(')
 		{
+		long first_line = line;
 		next_ch();
 		value exp = parse_exp();
 		if (exp == 0)
@@ -330,45 +275,119 @@ static value parse_term(void)
 		}
 	else
 		{
-		value exp = parse_sym(1);
+		value exp = new_parse_sym(1);
+
 		if (exp == 0)
 			return exp;
-		else if (exp->T == type_name && string_len(exp) == 0)
+		else if (is_null_name(exp))
 			{
 			hold(exp);
-			line = first_line;
+			line = get_long(exp->R->R);
 			error = "Missing definition";
 			drop(exp);
 			return 0;
 			}
 		else
-			return orig_sym(exp,first_line);
+			return exp;
 		}
 	}
 
-static void type_open(value f) { type_error(); }
-
-int is_open(value f)
+/* Determine if two symbols (names or strings) are equivalent. */
+static int sym_eq(value x, value y)
 	{
-	return f->T == type_open || f->T == type_name || f->T == type_string;
+	return x->T == type_open && y->T == type_open
+		&& (x->L->T == type_name || x->L->T == type_string)
+		&& x->L->T == y->L->T
+		&& string_eq(x->R->L,y->R->L);
 	}
 
-/* This is a wrapper around the copy routine which prevents us from copying
-symbols, because we still rely on pointer comparison in get_pattern.  That will
-soon change, because in a new version of the code we won't even have symbols in
-expressions, and we'll compute lambda patterns in a bottom-up fashion. */
-
-static value copy_exp(value f)
-	{
-	if (f->T == type_name || f->T == type_string)
-		return f;
-	else
-		return copy(f);
-	}
-
+/* Apply f to x, marking the result as open if both sides are open. */
 static value apply(value f, value x)
 	{
+	value result = A(f,x);
+	if (f->T == type_open || x->T == type_open)
+		result->T = type_open;
+	return result;
+	}
+
+/* Get the pattern of occurrences of symbol x in form f. */
+static value get_pattern(value x, value f)
+	{
+	if (sym_eq(x,f))
+		return I;
+	else if (f->T != type_open)
+		return C;
+	else if (f->L->T == type_name || f->L->T == type_string)
+		return C;
+	else
+		{
+		value pl = get_pattern(x,f->L);
+		value pr = get_pattern(x,f->R);
+
+		if (pl->T == reduce_C && pr->T == reduce_C)
+			return C;
+		else
+			return A(pl,pr);
+		}
+	}
+
+/* LATER 20120921 unify with get_pattern into one lambda routine.  This is good
+preparation for when we go back to using combinators instead of pattern
+substitution.  Note that when we do use combinators again, they'll be of a very
+eager or "aggressive" variety, so they should be as fast as substitution, or
+even faster because I think they'll avoid extra work in cases where a value is
+not used during computation. */
+
+value remove_sym(value x, value f)
+	{
+	if (sym_eq(x,f))
+		return I;
+	else if (f->T != type_open)
+		return f;
+	else if (f->L->T == type_name || f->L->T == type_string)
+		return f;
+	else
+		return apply(remove_sym(x,f->L), remove_sym(x,f->R));
+	}
+
+/* Make a lambda form using the substitution pattern for symbol x in form f. */
+static value lambda(value x, value f)
+	{
+	hold(f);
+
+	value val;
+
 	if (f == 0)
+		val = 0;
+	else
+		{
+		value p = get_pattern(x,f);
+		hold(p);
+
+		if (p->T == reduce_C)
+			val = apply(C,f);
+		else if (p->T == reduce_I)
+			val = I;
+		else if (p->L->T == reduce_C && p->R->T == reduce_I)
+			/* Special case for the rule:  lam (C I) (L R) = L.  This greatly
+			compresses many parsed forms, saving memory and time.  We copy f->L
+			because it's a part of f and we'll be dropping f.  */
+			val = copy(f->L);
+		else
+			val = apply(A(lam,p),remove_sym(x,f));
+
+		drop(p);
+		}
+
+	drop(f);
+	return val;
+	}
+
+static value check_apply(value f, value x)
+	{
+	if (f == I)
+		return x;
+	else if (f == 0)
 		{
 		hold(x);
 		drop(x);
@@ -380,35 +399,8 @@ static value apply(value f, value x)
 		drop(f);
 		return 0;
 		}
-	else if (f == I)
-		return x;
 	else
-		{
-		value result = A(f,x);
-		if (is_open(f) || is_open(x))
-			result->T = type_open;
-		return result;
-		}
-	}
-
-/* In the new version we won't need these "scope_" routines because we'll
-compute lambda patterns in a bottom-up fashion and won't need any symbol
-stacks. */
-
-static value scope_parse_term(value sym)
-	{
-	push(&inner_syms,sym);
-	value val = parse_term();
-	pop(&inner_syms);
-	return val;
-	}
-
-static value scope_parse_exp(value sym)
-	{
-	push(&inner_syms,sym);
-	value val = parse_exp();
-	pop(&inner_syms);
-	return val;
+		return apply(f,x);
 	}
 
 /*
@@ -436,14 +428,14 @@ static value parse_lambda(void)
 	int allow_eq = at_white();
 	skip_white();
 
-	value sym = parse_sym(allow_eq);
+	value sym = new_parse_sym(allow_eq);
 	hold(sym);
 
 	value val;
 
 	if (sym == 0)
 		val = 0;
-	else if (sym->T == type_name && string_len(sym) == 0)
+	else if (is_null_name(sym))
 		{
 		error = "Missing lambda symbol";
 		val = 0;
@@ -451,7 +443,6 @@ static value parse_lambda(void)
 	else
 		{
 		skip_filler();
-
 		if (ch == '=')
 			{
 			next_ch();
@@ -461,7 +452,7 @@ static value parse_lambda(void)
 				/* Recursive definition */
 				next_ch();
 				skip_filler();
-				def = apply(Y,lambda(sym, scope_parse_term(sym)));
+				def = check_apply(Y,lambda(sym, parse_term()));
 				}
 			else
 				{
@@ -470,12 +461,12 @@ static value parse_lambda(void)
 				def = parse_term();
 				}
 
-			val = def ? lambda(sym, scope_parse_exp(sym)) : 0;
-			val = apply(val,def);
+			val = def ? lambda(sym, parse_exp()) : 0;
+			val = check_apply(val,def);
 			}
 		else
 			/* Normal parameter (symbol without definition) */
-			val = lambda(sym, scope_parse_exp(sym));
+			val = lambda(sym, parse_exp());
 		}
 
 	drop(sym);
@@ -532,7 +523,7 @@ static value parse_exp(void)
 			else
 				val = parse_term();
 
-			exp = apply(exp,val);
+			exp = check_apply(exp,val);
 
 			if (exp == 0)
 				return exp;
@@ -567,83 +558,6 @@ void type_lambda(value f)
 	f->T = reduce2_lambda;
 	}
 
-/* Get the pattern of occurrences of symbol x in form f. */
-static value get_pattern(value x, value f)
-	{
-	if (f == x)
-		return I;
-	else if (f->T != type_open)
-		return C;
-	else
-		{
-		value pl = get_pattern(x,f->L);
-		value pr = get_pattern(x,f->R);
-
-		if (pl->T == reduce_C && pr->T == reduce_C)
-			return C;
-		else
-			return A(pl,pr);
-		}
-	}
-
-/* LATER 20120921 unify with get_pattern into one lambda routine.  This is good
-preparation for when we go back to using combinators instead of pattern
-substitution.  Note that when we do use combinators again, they'll be of a very
-eager or "aggressive" variety, so they should be as fast as substitution, or
-even faster because I think they'll avoid extra work in cases where a value is
-not used during computation. */
-
-value remove_sym(value x, value f)
-	{
-	if (f == x)
-		return I;
-	else if (f->T != type_open)
-		return f;
-	else
-		{
-		value fl = remove_sym(x,f->L);
-		value fr = remove_sym(x,f->R);
-
-		value g = A(fl,fr);
-		if (is_open(g->L) || is_open(g->R))
-			g->T = type_open;
-		return g;
-		}
-	}
-
-/* Make a lambda form using the substitution pattern for symbol x in form f. */
-static value lambda(value x, value f)
-	{
-	hold(f);
-
-	value val;
-
-	if (f == 0)
-		val = 0;
-	else
-		{
-		value p = get_pattern(x,f);
-		hold(p);
-
-		if (p->T == reduce_C)
-			val = apply(C,f);
-		else if (p->T == reduce_I)
-			val = I;
-		else if (p->L->T == reduce_C && p->R->T == reduce_I)
-			/* Special case for the rule:  lam (C I) (L R) = L.  This greatly
-			compresses many parsed forms, saving memory and time.  We copy f->L
-			because it's a part of f and we'll be dropping f.  */
-			val = copy_exp(f->L);
-		else
-			val = apply(A(lam,p),remove_sym(x,f));
-
-		drop(p);
-		}
-
-	drop(f);
-	return val;
-	}
-
 static void beg_parse(void)
 	{
 	C = Q(reduce_C);
@@ -663,6 +577,31 @@ static void end_parse(void)
 	drop(I);
 	drop(Y);
 	drop(lam);
+	}
+
+/* I'm temporarily making this return the symbols in reverse order, since we're
+currently stacking them in reverse order in the final phase.  The next version
+will switch back to forward order and eliminate the reversal in the final
+phase.  I'm just dealing with one thing at a time here. */
+value next_sym(value f)
+	{
+	if (f == 0)
+		return 0;
+	else if (f->T == type_open)
+		{
+		if (f->L->T == type_name || f->L->T == type_string)
+			return f;
+		else
+			{
+			value x = next_sym(f->R);
+			if (x)
+				return x;
+			else
+				return next_sym(f->L);
+			}
+		}
+	else
+		return 0;
 	}
 
 /*
@@ -711,18 +650,17 @@ value parse_source(void)
 			}
 		}
 
+	/* LATER I'll soon eliminate the need for symbols here. */
 	value symbols = C;
 
-	while (outer_syms)
+	while (1)
 		{
-		value sym = outer_syms->L;
-		value place = outer_places->L;
+		value sym = next_sym(exp);
+		if (sym == 0)
+			break;
 
+		symbols = item(sym->R,symbols);
 		exp = lambda(sym,exp);
-		symbols = item(pair(sym,place),symbols);
-
-		pop(&outer_syms);
-		pop(&outer_places);
 		}
 
 	/* If there was an error, use (pair error line) as the expression. */
