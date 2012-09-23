@@ -34,53 +34,86 @@ Mr. Steensgaard-Madsen observes that all of what we ordinarily understand as
 as a single bit is in essence just a function.
 
 
-HOW TO INSTALL
+HOW TO INSTALL IN THE STANDARD SYSTEM DIRECTORY /usr
 
 Run this command:
 
-  ./build install
+	sudo ./build install
 
-That creates /usr/bin/fexl, /usr/lib/fexl, and /usr/share/fexl.  You may be
-prompted for your sudo (superuser) password during this process.
+That creates /usr/bin/fexl, /usr/lib/fexl, and /usr/share/fexl.
 
-Note that you should NOT preface the command with "sudo", because you don't
-want to create the local build objects with root permissions.
 
-If you need to install into a different place, change the dir_install
-variable inside the build script.
+HOW TO INSTALL SOMEWHERE ELSE
+
+To install in some other directory such as "~/myfexl", do this:
+
+	./build install in ~/myfexl
+
+That creates ~/myfexl/bin/fexl, ~/myfexl/lib/fexl, and ~/myfexl/share/fexl.
+Note that this is a completely independent, self-contained installation.
+
+The rule is that when you install into a directory X, you will have these
+files:
+
+	X/bin/fexl
+	X/lib/fexl/libfexl.so
+	X/share/fexl
+
+Furthermore, the following statements will be true:
+
+	X/bin/fexl uses the C library X/lib/fexl/libfexl.so.
+	X/bin/fexl uses the Fexl library X/share/fexl.
+
+I do that because, for me, the whole point of doing multiple installations in
+separate directories X1 and X2 is to try *different code* in the C and Fexl
+libraries.  I don't want X1 and X2 to share any code, be it bin, lib, or
+share.
+
+I say this because I've gotten a little guff that two installations such as
+~/myfexl and /usr do *not* share libfexl.so.  But that is by design, i.e. I
+want it that way.
 
 
 HOW TO BUILD LOCALLY
 
 If you wish to enhance or test the program, you might prefer to build it
-locally in the bin directory and run it from there, without installing into
-/usr/bin.  You do that with this command:
+locally in the bin directory and run it from there, without installing anywhere
+else.  You do that with this command:
 
-  ./build
+	./build
+
+
+OTHER BUILD OPTIONS
+
+To see other build options, do this:
+
+	./build help
+
+In particular you'll see other options such as quiet, clean, and erase.
 
 
 HOW TO RUN
 
 To run a fexl program which is read from standard input:
 
-  fexl
+	fexl
 
 To run a fexl program which is read from a file named "script":
 
-  fexl script
+	fexl script
 
 You may also use the "shebang" method to create an executable fexl file.  For
 example, create a file named "script" and put this on the first line:
 
-  #!/usr/bin/fexl
+	#!/usr/bin/fexl
 
 Then make your script executable with:
 
-  chmod +x script
+	chmod +x script
 
 Now you can run your script directly this way:
 
-  ./script
+	./script
 
 
 HELPFUL INFORMATION
