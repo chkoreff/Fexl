@@ -10,44 +10,58 @@ usage()
 	{
 	progname=$0
 
+	local dir=$default_place
+
 	cat <<EOM
 NAME
        $progname - build the Fexl program
 
 SYNOPSIS
-       $progname [quiet] [clean] [install] [uninstall] [erase]
+       $progname [install] [ uninstall] [in <dir>] [erase] [quiet] [clean]
 
 DESCRIPTION
 
+       $progname install
+              Build Fexl and install in $dir, or add "in <dir>" to install
+              somewhere else.
+
+       $progname uninstall
+              Uninstall Fexl from $dir, or add "in <dir>" to uninstall
+              somewhere else.
+
        $progname
-              Only compile what actually changed.
+              Do a local build, only compiling what actually changed.
 
        $progname clean
               Compile everything from scratch.
-
-       $progname install
-              Build Fexl and install in $dir_install.
-
-       $progname uninstall
-              Uninstall Fexl from $dir_install.
 
        $progname quiet
               Build quietly, without showing the commands that it runs.
 
        $progname erase
-              Erase all the output files and don't build anything.
+              Erase all the local output files and don't build anything.
 
-       You may also combine the options in various ways such as this:
+You may also combine the options in various ways such as this:
 
        $progname quiet clean install
+       $progname quiet install in ~/myfexl
 
 EOM
 	exit 2
 	}
 
+# Remove a directory without displaying an error message if it doesn't exist.
+quiet_rmdir()
+	{
+	if [ -d $1 ]; then
+		rmdir --ignore-fail-on-non-empty $1
+	fi
+	}
+
 handle_options()
 	{
-	dir_install="/usr"
+	default_place="/usr"
+	current_place=$default_place
 
 	# Check the command line.
 
@@ -58,14 +72,23 @@ handle_options()
 	install=0
 	uninstall=0
 
-	for verb in $@
-	do
+	while [ $# -gt 0 ]; do
+		verb=$1
+		shift
 		case $verb in
 			quiet) quiet=1 ;;
 			clean) clean=1 ;;
 			erase) erase=1 ;;
 			install) install=1 ;;
 			uninstall) uninstall=1 ;;
+			in)
+				if [ $# -gt 0 ]; then
+					current_place=$1
+					shift
+				else
+					valid=0
+				fi
+				;;
 			*) valid=0 ;;
 		esac
 	done
@@ -73,9 +96,15 @@ handle_options()
 	if [ $valid -eq 0 ]; then usage; fi
 
 	if [ $uninstall -eq 1 ]; then
-		sudo rm -f $dir_install/bin/fexl
-		sudo rm -rf $dir_install/lib/fexl
-		sudo rm -rf $dir_install/share/fexl
+		rm -f $current_place/bin/fexl
+		rm -rf $current_place/lib/fexl
+		rm -rf $current_place/share/fexl
+
+		# Now safely remove any directories that are empty.
+		quiet_rmdir $current_place/bin
+		quiet_rmdir $current_place/lib
+		quiet_rmdir $current_place/share
+		quiet_rmdir $current_place
 		exit
 	fi
 
@@ -159,7 +188,9 @@ done
 pwd=`pwd`
 
 if [ $install -eq 1 ]; then
-	base=$dir_install
+	base=$current_place
+	mkdir -p $base/bin
+	mkdir -p $base/share
 else
 	base=$pwd
 fi
@@ -184,11 +215,16 @@ done
 # for the local and installed versions.  We create the C files in the obj
 # directory to avoid modifying the src directory in any way.
 
+# We always create a fresh base_install.c because we don't want to use an old
+# one if you're installing in a different place now.
+
+rm -f obj/base_install.c
+
 for version in local install
 do
 	base_dir=
 	if [ "$version" = "install" ]; then
-		base_dir=$dir_install
+		base_dir=$current_place
 	else
 		base_dir=$pwd
 	fi
@@ -219,18 +255,15 @@ fi
 # LATER jturner says he had to remove -ldl when building on OpenBSD.
 # I should auto-detect that.
 if [ $update -eq 1 ]; then
-	sudo=
-	if [ $install -eq 1 ]; then sudo=sudo; fi
-	$sudo mkdir -p $dir_lib
-	run "$sudo gcc -shared -o $dir_lib/libfexl.so $objects -ldl"
+	mkdir -p $dir_lib
+	run "gcc -shared -o $dir_lib/libfexl.so $objects -ldl"
 fi
 
 if [ $install -eq 1 ]; then
-	# Copy the "share/fexl" directory to "$dir_install/share/fexl".
-	sudo=sudo
-	$sudo rm -rf $dir_install/share/fexl
-	$sudo cp -pr share/fexl $dir_install/share/
-	$sudo sudo chown -R root:root $dir_install/share/fexl
+	# Copy the "share/fexl" directory to "$current_place/share/fexl".
+	rm -rf $current_place/share/fexl
+	cp -pr share/fexl $current_place/share/fexl
+	chown -R $USER:$USER $current_place/share/fexl
 fi
 
 # Build the executables for any main programs.
@@ -247,12 +280,10 @@ do
 	file_o=obj/$name.o
 
 	dir_bin=bin
-	sudo=
 
 	if [ $install -eq 1 ]; then
 		if [ "$name" = "fexl" ]; then
-			dir_bin=$dir_install/bin
-			sudo=sudo
+			dir_bin=$current_place/bin
 		fi
 	fi
 
@@ -264,6 +295,6 @@ do
 	fi
 
 	if [ $update -eq 1 ]; then
-		run "$sudo gcc $file_o -o $file_x $dir_lib/libfexl.so"
+		run "gcc $file_o -o $file_x $dir_lib/libfexl.so"
 	fi
 done
