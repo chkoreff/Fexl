@@ -22,12 +22,12 @@ SYNOPSIS
 DESCRIPTION
 
        $progname install
-              Build Fexl and install in $dir, or add "in <dir>" to install
-              somewhere else.
+              Install Fexl in the $dir directory.
+              To use a different directory, say "in <dir>".
 
        $progname uninstall
-              Uninstall Fexl from $dir, or add "in <dir>" to uninstall
-              somewhere else.
+              Uninstall Fexl in the $dir directory.
+              To use a different directory, say "in <dir>".
 
        $progname
               Do a local build, only compiling what actually changed.
