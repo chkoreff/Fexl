@@ -304,7 +304,7 @@ done
 # owned by root in your local directory, which is annoying.
 
 if [ "$SUDO_USER" != "" ]; then
-	chown -R $SUDO_USER:$SUDO_USER bin
-	chown -R $SUDO_USER:$SUDO_USER lib
-	chown -R $SUDO_USER:$SUDO_USER obj
+	chown -f -R $SUDO_USER:$SUDO_USER bin
+	chown -f -R $SUDO_USER:$SUDO_USER lib
+	chown -f -R $SUDO_USER:$SUDO_USER obj
 fi
