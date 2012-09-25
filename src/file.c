@@ -1,8 +1,11 @@
 #include <stdio.h>
+#include <unistd.h> /* readlink */
 #include "buf.h"
 #include "value.h"
 #include "basic.h"
+#include "file.h"
 #include "long.h"
+#include "memory.h"
 #include "string.h"
 
 void type_file(value f) { type_error(); }
@@ -167,3 +170,66 @@ void reduce_file_string(value f)
 value const_stdin(void)  { return Qfile_const(stdin); }
 value const_stdout(void) { return Qfile_const(stdout); }
 value const_stderr(void) { return Qfile_const(stderr); }
+
+/*
+Safely call readlink, returning a NUL-terminated result in a dynamically
+allocated buffer.
+
+Note that the size of the buffer is always a power of two.  It doesn't have to
+be that way, but it feels right.
+*/
+void safe_readlink(const char *path,
+	char **result, long *result_len, long *result_size)
+	{
+	long size = 256;
+	while (1)
+		{
+		char *link = new_memory(size);
+		ssize_t len = readlink(path, link, size - 1);
+		if (len == -1)
+			{
+			free_memory(link, size);
+			*result = 0;
+			*result_len = 0;
+			*result_size = 0;
+			return;
+			}
+		else if (len == size - 1)
+			{
+			/* Assume the worst:  the result might be truncated. */
+			free_memory(link, size);
+			size = 2 * size;
+			}
+		else
+			{
+			link[len] = 0;
+			*result = link;
+			*result_len = len;
+			*result_size = size;
+			return;
+			}
+		}
+	}
+
+/* readlink path next = (next link), where link is the result of calling
+readlink(2) on the path. */
+static void reduce2_readlink(value f)
+	{
+	value x = arg(type_string,f->L->R);
+	char *path = string_data(x);
+
+	char *buf;
+	long len;
+	long size;
+	safe_readlink(path, &buf, &len, &size);
+
+	value result = Qcopy_chars(buf,len);
+	if (buf) free_memory(buf, size);
+
+	replace_apply(f,f->R,result);
+	}
+
+void reduce_readlink(value f)
+	{
+	f->T = reduce2_readlink;
+	}

@@ -167,7 +167,7 @@ do
 
 	update=`newer_than $file_c $file_o`
 	if [ $update -eq 0 ]; then
-		grep -e "^#include \".*\"$" $file_c |
+		grep -e "^#include \".*\"" $file_c |
 		sed "s/^#include \"\(.*\)\"/\1/" |
 		(
 		while read file; do
