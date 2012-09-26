@@ -211,46 +211,6 @@ do
 	fi
 done
 
-# Now create a couple of small C files which specify the base path name both
-# for the local and installed versions.  We create the C files in the obj
-# directory to avoid modifying the src directory in any way.
-
-# We always create a fresh base_install.c because we don't want to use an old
-# one if you're installing in a different place now.
-
-rm -f obj/base_install.c
-
-for version in local install
-do
-	base_dir=
-	if [ "$version" = "install" ]; then
-		base_dir=$current_place
-	else
-		base_dir=$pwd
-	fi
-
-	file_c=obj/base_$version.c
-	file_o=obj/base_$version.o
-
-	if [ ! -e $file_c ]; then
-		echo "char *base = \"$base_dir\";" >$file_c
-		run "gcc $cflags $file_c -o $file_o"
-	fi
-done
-
-# Now we choose the version of base to link into the library depending on
-# whether we're doing a final install or just building locally.
-if [ $install -eq 1 ]; then
-	base_o=obj/base_install.o
-else
-	base_o=obj/base_local.o
-fi
-
-objects="$objects $base_o"
-if [ $update -eq 0 ]; then
-	update=`newer_than $base_o $dir_lib/libfexl.so`
-fi
-
 # Build the shared library.  We use -ldl (libdl) for dlopen and dlsym.
 # LATER jturner says he had to remove -ldl when building on OpenBSD.
 # I should auto-detect that.
@@ -295,6 +255,10 @@ do
 	fi
 
 	if [ $update -eq 1 ]; then
+		# LATER 20120926 Possibly make it so we don't have to link directly
+		# with the library.  We should be able to do this using get_base_path
+		# in conjunction with explicit dlopen, instead of passing 0 to dlsym in
+		# src/dynamic.c.
 		run "gcc $file_o -o $file_x $dir_lib/libfexl.so"
 	fi
 done

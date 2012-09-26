@@ -171,65 +171,96 @@ value const_stdin(void)  { return Qfile_const(stdin); }
 value const_stdout(void) { return Qfile_const(stdout); }
 value const_stderr(void) { return Qfile_const(stderr); }
 
-/*
-Safely call readlink, returning a NUL-terminated result in a dynamically
-allocated buffer.
-
-Note that the size of the buffer is always a power of two.  It doesn't have to
-be that way, but it feels right.
-*/
-void safe_readlink(const char *path,
-	char **result, long *result_len, long *result_size)
+/* Call readlink, returning a Fexl string. */
+value safe_readlink(const char *path)
 	{
+	char *buf;
+	long len;
 	long size = 256;
+
 	while (1)
 		{
-		char *link = new_memory(size);
-		ssize_t len = readlink(path, link, size - 1);
-		if (len == -1)
+		buf = new_memory(size);
+		len = readlink(path, buf, size - 1);
+
+		if (len == size - 1)
 			{
-			free_memory(link, size);
-			*result = 0;
-			*result_len = 0;
-			*result_size = 0;
-			return;
-			}
-		else if (len == size - 1)
-			{
-			/* Assume the worst:  the result might be truncated. */
-			free_memory(link, size);
+			/* Used all available space, so the result might be truncated. */
+			free_memory(buf, size);
 			size = 2 * size;
 			}
 		else
 			{
-			link[len] = 0;
-			*result = link;
-			*result_len = len;
-			*result_size = size;
-			return;
+			/* Used less than available space, so the result fits just fine.
+			A system error yields len == -1, but that works robustly. */
+			value result = Qcopy_chars(buf,len);
+			free_memory(buf, size);
+			return result;
 			}
 		}
 	}
 
-/* readlink path next = (next link), where link is the result of calling
+/* (readlink path next) = (next link), where link is the result of calling
 readlink(2) on the path. */
 static void reduce2_readlink(value f)
 	{
 	value x = arg(type_string,f->L->R);
 	char *path = string_data(x);
-
-	char *buf;
-	long len;
-	long size;
-	safe_readlink(path, &buf, &len, &size);
-
-	value result = Qcopy_chars(buf,len);
-	if (buf) free_memory(buf, size);
-
+	value result = safe_readlink(path);
 	replace_apply(f,f->R,result);
 	}
 
 void reduce_readlink(value f)
 	{
 	f->T = reduce2_readlink;
+	}
+
+/*
+Get the base path of the currently running program, ending in "/".  If we could
+not get the path due to a system error, return "".
+
+First we get the full path of the program, for example "/PATH/bin/fexl".  This
+is equivalent to the $0 variable in the /bin/sh program.  Then we strip off the
+last two legs of that path, returning "/PATH/".
+*/
+value get_base_path(void)
+	{
+	value full_path = safe_readlink("/proc/self/exe");
+	hold(full_path);
+
+	char *buf = string_data(full_path);
+	long len = string_len(full_path);
+
+	int i;
+	for (i = 0; i < 2; i++)
+		while (len > 0 && buf[--len] != '/')
+			;
+
+	if (buf[len] == '/') len++;  /* keep the slash */
+	value base_path = Qcopy_chars(buf,len);
+	drop(full_path);
+	return base_path;
+	}
+
+/* (base_path next) = (next path) where path is the base path of the current
+Fexl executable. */
+void reduce_base_path(value f)
+	{
+	replace_apply(f, f->R, get_base_path());
+	}
+
+/* Concatenate the base path and the name. */
+value get_full_path(const char *name)
+	{
+	value base_path = get_base_path();
+
+	if (string_len(base_path) == 0)
+		return base_path;
+	else
+		{
+		value full_path = Qstrcat(string_data(base_path),name);
+		hold(base_path);
+		drop(base_path);
+		return full_path;
+		}
 	}

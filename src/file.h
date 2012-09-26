@@ -1,2 +1,3 @@
-extern void safe_readlink(const char *path,
-	char **result, long *result_len, long *result_size);
+extern value safe_readlink(const char *path);
+extern value get_base_path(void);
+extern value get_full_path(const char *name);

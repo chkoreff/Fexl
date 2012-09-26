@@ -45,7 +45,7 @@ void buf_add(struct buf **top, char ch)
 	}
 
 /* Add a NUL-terminated string. */
-void buf_add_string(struct buf **top, char *str)
+void buf_add_string(struct buf **top, const char *str)
 	{
 	while (*str)
 		buf_add(top, *str++);

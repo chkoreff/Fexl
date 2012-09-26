@@ -1,10 +1,7 @@
-#include "base.h"
-#include "buf.h"
 #include "die.h"
-#include "memory.h"
-
 #include "value.h"
 #include "basic.h"
+#include "file.h"
 #include "long.h"
 #include "parse_file.h"
 #include "resolve.h"
@@ -13,8 +10,7 @@
 
 /*
 Parse the top Fexl configuration file "base/share/fexl/main.fxl", where "base"
-is the base directory set by the build script:  either `pwd` when building
-locally, or "/usr" when doing a final install.
+is the base directory of the running program.
 
 Check the result of the parse, resolving all open symbols with the standard
 "resolve" function.  Report any errors, including syntax errors and undefined
@@ -22,15 +18,17 @@ symbols.  Return an evaluable function if all went well, or 0 otherwise.
 */
 static value parse_top(void)
 	{
-	char *top = "share/fexl/main.fxl";
+	value full_path = get_full_path("share/fexl/main.fxl");
+	hold(full_path);
 
-	struct buf *buf = 0;
-	buf_add_string(&buf, base);
-	buf_add(&buf,'/');
-	buf_add_string(&buf, top);
-	long len;
-	char *name = buf_clear(&buf,&len);
+	if (string_len(full_path) == 0)
+		{
+		warn("Can't locate the base path for the top level program.");
+		drop(full_path);
+		return 0;
+		}
 
+	char *name = string_data(full_path);
 	value result = parse_file(name);
 	hold(result);
 
@@ -67,7 +65,7 @@ static value parse_top(void)
 		symbols = symbols->R;
 		}
 
-	free_memory(name, len+1);
+	drop(full_path);
 	drop(result);
 
 	if (!ok)

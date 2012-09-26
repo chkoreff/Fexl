@@ -7,6 +7,6 @@ struct buf
 	};
 
 extern void buf_add(struct buf **top, char ch);
-extern void buf_add_string(struct buf **top, char *str);
+extern void buf_add_string(struct buf **top, const char *str);
 extern char *buf_clear(struct buf **top, long *len);
 extern void buf_discard(struct buf **top);

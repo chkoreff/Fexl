@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h> /* strtol, strtod */
+#include "buf.h"
 #include "die.h"
 #include "memory.h"
 #include "value.h"
@@ -73,6 +74,17 @@ value Qstring(const char *data)
 	value str = Qchars(data, strlen(data));
 	str->R->T = 0;  /* Don't clear static string. */
 	return str;
+	}
+
+/* Concatenate two null-terminated strings. */
+value Qstrcat(const char *x, const char *y)
+	{
+	struct buf *buf = 0;
+	buf_add_string(&buf, x);
+	buf_add_string(&buf, y);
+	long len;
+	char *string = buf_clear(&buf,&len);
+	return Qchars(string,len);
 	}
 
 /* Compare strings x and y, returning negative if x < y, zero if x == y, or

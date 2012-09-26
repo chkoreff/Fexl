@@ -4,7 +4,6 @@
 #include <sys/types.h> /* pid_t */
 #include <sys/wait.h> /* wait */
 #include <unistd.h> /* fork */
-#include "base.h"
 #include "memory.h"
 #include "value.h"
 #include "long.h"
@@ -52,13 +51,6 @@ void reduce_exit(value f)
 	{
 	long status = get_long(arg(type_long,f->R));
 	exit(status);
-	}
-
-/* (base_path next) = (next path) where path is the base path of the current
-Fexl executable. */
-void reduce_base_path(value f)
-	{
-	replace_apply(f, f->R, Qstring(base));
 	}
 
 /* (fork next) = (next pid), where pid is the result of calling fork(2). */
