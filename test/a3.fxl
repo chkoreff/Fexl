@@ -138,6 +138,7 @@ query
 quote_string
 rand
 range
+readlink
 resolve
 reverse
 RLIMIT_AS

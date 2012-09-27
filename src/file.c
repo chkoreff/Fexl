@@ -181,9 +181,9 @@ value safe_readlink(const char *path)
 	while (1)
 		{
 		buf = new_memory(size);
-		len = readlink(path, buf, size - 1);
+		len = readlink(path, buf, size);
 
-		if (len == size - 1)
+		if (len == size)
 			{
 			/* Used all available space, so the result might be truncated. */
 			free_memory(buf, size);
