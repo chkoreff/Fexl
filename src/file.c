@@ -117,7 +117,9 @@ static void reduce3_fwrite(value f)
 	FILE *fh = get_file(arg(type_file,f->L->L->R));
 	value y = arg(type_string,f->L->R);
 
-	fwrite(string_data(y), 1, string_len(y), fh);
+	size_t count = fwrite(string_data(y), 1, string_len(y), fh);
+	(void)count;
+	/* LATER make a version of fwrite that returns the count */
 	replace(f,f->R);
 	}
 
