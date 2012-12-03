@@ -1,138 +1,109 @@
-#include "value.h"
-#include "basic.h"
-#include "double.h"
-#include "long.h"
-#include "string.h"
-
-/*LATER ordinary built-in srand and rand routines */
-
-void type_double(value f) { type_error(); }
-
-/*
-Make a new value of type double.
-
-A double is guaranteed to fit in 64 bits.  The standard says:
-
-  Type        Range: Min   Max           Size (Bits)
-  double      2.225e-308   1.7977e+308   64
-
-(C Language Reference Manual, document 007-0701-150, Appendix A, Section F.3.6
-"Floating Point")
-
-We know that the L and R pointers are either 32 or 64 bits each, depending on
-the machine, so together they can definitely hold the 64 bits of a double.
-*/
-value Qdouble(double number)
+value type_double(value f)
 	{
-	value f = D(type_double);
-	double *p = (double *)(void *)(&f->R->L);
-	*p = number;
-	return f;
+	return type_error();
+	}
+
+struct atom_double
+	{
+	void (*free)(struct atom_double *);
+	double val;
+	};
+
+static void free_double(struct atom_double *x)
+	{
+	free_memory(x, sizeof(struct atom_double));
+	}
+
+value Qdouble(double val)
+	{
+	struct atom_double *x = new_memory(sizeof(struct atom_double));
+	x->free = free_double;
+	x->val = val;
+	return V(type_double,0,(value)x);
+	}
+
+double double_val(value f)
+	{
+	struct atom_double *x = (struct atom_double *)f->R;
+	return x->val;
+	}
+
+value type_double_add1(value f)
+	{
+	double x = double_val(arg(type_double,&f->L->L));
+	double y = double_val(arg(type_double,&f->R));
+	return Qdouble(x + y);
+	}
+
+value type_double_add(value f)
+	{
+	return V(type_double_add1,f->R,0);
+	}
+
+value type_double_sub1(value f)
+	{
+	double x = double_val(arg(type_double,&f->L->L));
+	double y = double_val(arg(type_double,&f->R));
+	return Qdouble(x - y);
+	}
+
+value type_double_sub(value f)
+	{
+	return V(type_double_sub1,f->R,0);
+	}
+
+value type_double_mul1(value f)
+	{
+	double x = double_val(arg(type_double,&f->L->L));
+	double y = double_val(arg(type_double,&f->R));
+	return Qdouble(x * y);
+	}
+
+value type_double_mul(value f)
+	{
+	return V(type_double_mul1,f->R,0);
 	}
 
 /*
-Note that we cannot retrieve a double value directly like this:
-	double x = *( (double *)&f->R->L );
-
-That yields an error:
-	dereferencing type-punned pointer will break strict-aliasing rules
-	[-Werror=strict-aliasing]
-
-Instead, we must first get a pointer to double, then dereference the pointer.
-*/
-double get_double(value f)
-	{
-	double *x = (double *)(void *)&f->R->L;
-	return *x;
-	}
-
-static void reduce2_double_add(value f)
-	{
-	double x = get_double(arg(type_double,f->L->R));
-	double y = get_double(arg(type_double,f->R));
-	replace(f, Qdouble(x + y));
-	}
-
-void reduce_double_add(value f)
-	{
-	f->T = reduce2_double_add;
-	}
-
-static void reduce2_double_sub(value f)
-	{
-	double x = get_double(arg(type_double,f->L->R));
-	double y = get_double(arg(type_double,f->R));
-	replace(f, Qdouble(x - y));
-	}
-
-void reduce_double_sub(value f)
-	{
-	f->T = reduce2_double_sub;
-	}
-
-static void reduce2_double_mul(value f)
-	{
-	double x = get_double(arg(type_double,f->L->R));
-	double y = get_double(arg(type_double,f->R));
-	replace(f, Qdouble(x * y));
-	}
-
-void reduce_double_mul(value f)
-	{
-	f->T = reduce2_double_mul;
-	}
-
-/*
-Note that dividing by zero is no problem here.  If you divide a non-zero by
-zero, it yields inf (infinity).  If you divide zero by zero, it yields -nan
+Note that dividing by zero is no problem here. If you divide a non-zero by
+zero, it yields inf (infinity). If you divide zero by zero, it yields -nan
 (not a number).
 */
-static void reduce2_double_div(value f)
+value type_double_div1(value f)
 	{
-	double x = get_double(arg(type_double,f->L->R));
-	double y = get_double(arg(type_double,f->R));
-	replace(f, Qdouble(x / y));
+	double x = double_val(arg(type_double,&f->L->L));
+	double y = double_val(arg(type_double,&f->R));
+	return Qdouble(x / y);
 	}
 
-void reduce_double_div(value f)
+value type_double_div(value f)
 	{
-	f->T = reduce2_double_div;
+	return V(type_double_div1,f->R,0);
 	}
 
-/* Determine if the value has type double. */
-void reduce_is_double(value f)
+/* (double_string x) Convert double to string. */
+value type_double_string(value f)
 	{
-	replace_boolean(f, if_type(type_double,f->R));
-	}
-
-/* double_string num */
-/*LATER note that sprintf "%.15g" shows 0.0 as "0", which looks like a long if
-we try to read it back in.  Perhaps force a ".0" suffix, not sure. */
-extern int sprintf(char *str, const char *format, ...);
-void reduce_double_string(value f)
-	{
-	double x = get_double(arg(type_double,f->R));
+	double x = double_val(arg(type_double,&f->R));
 	char buf[100]; /* being careful here */
 	/* We show 15 digits because that's what Perl does. */
 	sprintf(buf, "%.15g", x);
-	replace(f, Qcopy_string(buf));
+	return Qstring(buf);
 	}
 
-void reduce_double_long(value f)
+value resolve_double(const char *name)
 	{
-	double x = get_double(arg(type_double,f->R));
-	replace(f, Qlong(x));
+	if (strcmp(name,"add") == 0) return Q(type_double_add);
+	if (strcmp(name,"sub") == 0) return Q(type_double_sub);
+	if (strcmp(name,"mul") == 0) return Q(type_double_mul);
+	if (strcmp(name,"div") == 0) return Q(type_double_div);
+	if (strcmp(name,"string") == 0) return Q(type_double_string);
+	return 0;
 	}
 
-/* (double_cmp x y) compares x and y and returns <0, 0, or >0. */
-static void reduce2_double_cmp(value f)
-	{
-	double x = get_double(arg(type_double,f->L->R));
-	double y = get_double(arg(type_double,f->R));
-	replace(f, Qlong(x < y ? -1 : x > y ? 1 : 0));
-	}
-
-void reduce_double_cmp(value f)
-	{
-	f->T = reduce2_double_cmp;
-	}
+#if 0
+TODO more functions
+double_long
+double_string
+double_cmp
+#endif

@@ -1,7 +1,3 @@
-#include <stdlib.h>
-#include "die.h"
-#include "memory.h"
-
 /*
 Track the amount of memory used so we can detect memory leaks.  Normally this
 is impossible but we check it anyway in case of software error.

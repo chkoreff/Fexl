@@ -36,6 +36,12 @@
 	grep -ra "\<$1\>" src share test --exclude "*.swp"
 	}
 
+# Search source for stray trailing white space
+.ss()
+	{
+	grep -ra "\s$" src --exclude "*.swp"
+	}
+
 # Run a test script.
 .run()
 	{

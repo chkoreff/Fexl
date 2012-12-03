@@ -1,12 +1,8 @@
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include "die.h"
-
 void warn(const char *format, ...)
 	{
 	fflush(stdout);
 
+	if (format == 0) return;
 	va_list ap;
 	va_start(ap, format);
 	vfprintf(stderr, format, ap);

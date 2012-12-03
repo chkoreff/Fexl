@@ -1,131 +1,66 @@
-#include <string.h> /* strlen */
-#include <stdlib.h> /* exit */
-#include <sys/resource.h> /* setrlimit, getrlimit */
-#include <sys/types.h> /* pid_t */
-#include <sys/wait.h> /* wait */
-#include <unistd.h> /* fork */
-#include "memory.h"
-#include "value.h"
-#include "long.h"
-#include "run.h"
-#include "string.h"
-
-/* (argc next) = next val */
-void reduce_argc(value f)
+/* exit status : exits with the given status */
+value type_exit(value f)
 	{
-	replace_apply(f,f->R,Qlong(main_argc));
-	}
-
-/* (argv i next) = next val */
-static void reduce2_argv(value f)
-	{
-	long i = get_long(arg(type_long,f->L->R));
-	replace_apply(f, f->R, Qstring(i < main_argc ? main_argv[i] : ""));
-	}
-
-void reduce_argv(value f)
-	{
-	f->T = reduce2_argv;
-	}
-
-/* (envc next) = next val */
-void reduce_envc(value f)
-	{
-	replace_apply(f, f->R, Qlong(main_envc()));
-	}
-
-/* (envp i next) = next val */
-static void reduce2_envp(value f)
-	{
-	long i = get_long(arg(type_long,f->L->R));
-	replace_apply(f, f->R, Qstring(i < main_envc() ? main_envp[i] : ""));
-	}
-
-void reduce_envp(value f)
-	{
-	f->T = reduce2_envp;
-	}
-
-/* (exit status) exits immediately with the given status. */
-void reduce_exit(value f)
-	{
-	long status = get_long(arg(type_long,f->R));
+	long status = long_val(arg(type_long,&f->R));
 	exit(status);
+	return 0;
 	}
 
-/* (fork next) = (next pid), where pid is the result of calling fork(2). */
-void reduce_fork(value f)
+/* ? x y = y x, but with x evaluated first.  Use this to force eager evaluation
+when necessary. */
+value type_query1(value f)
 	{
-	replace_apply(f, f->R, Qlong(fork()));
+	return A(f->R,eval(&f->L->L));
 	}
 
-/* (wait next) = (next pid status) */
-void reduce_wait(value f)
+value type_query(value f)
 	{
-	int status;
-	pid_t pid = wait(&status);
-	replace_apply(f, A(f->R,Qlong(pid)), Qlong(status));
+	return V(type_query1,f->R,0);
 	}
 
-value const_RLIMIT_AS(void) { return Qlong(RLIMIT_AS); }
-value const_RLIMIT_CORE(void) { return Qlong(RLIMIT_CORE); }
-value const_RLIMIT_CPU(void) { return Qlong(RLIMIT_CPU); }
-value const_RLIMIT_DATA(void) { return Qlong(RLIMIT_DATA); }
-value const_RLIMIT_FSIZE(void) { return Qlong(RLIMIT_FSIZE); }
-value const_RLIMIT_LOCKS(void) { return Qlong(RLIMIT_LOCKS); }
-value const_RLIMIT_MEMLOCK(void) { return Qlong(RLIMIT_MEMLOCK); }
-value const_RLIMIT_MSGQUEUE(void) { return Qlong(RLIMIT_MSGQUEUE); }
-value const_RLIMIT_NICE(void) { return Qlong(RLIMIT_NICE); }
-value const_RLIMIT_NOFILE(void) { return Qlong(RLIMIT_NOFILE); }
-value const_RLIMIT_NPROC(void) { return Qlong(RLIMIT_NPROC); }
-value const_RLIMIT_RSS(void) { return Qlong(RLIMIT_RSS); }
-value const_RLIMIT_RTPRIO(void) { return Qlong(RLIMIT_RTPRIO); }
-value const_RLIMIT_RTTIME(void) { return Qlong(RLIMIT_RTTIME); }
-value const_RLIMIT_SIGPENDING(void) { return Qlong(RLIMIT_SIGPENDING); }
-value const_RLIMIT_STACK(void) { return Qlong(RLIMIT_STACK); }
-
-/* (setrlimit resource soft hard next) = (next status) */
-static void reduce4_setrlimit(value f)
+static long get_RLIMIT(const char *name, int *ok)
 	{
-	long resource = get_long(arg(type_long,f->L->L->L->R));
+	*ok = 1;
+	if (strcmp(name,"AS") == 0) return RLIMIT_AS;
+	if (strcmp(name,"CORE") == 0) return RLIMIT_CORE;
+	if (strcmp(name,"CPU") == 0) return RLIMIT_CPU;
+	if (strcmp(name,"DATA") == 0) return RLIMIT_DATA;
+	if (strcmp(name,"FSIZE") == 0) return RLIMIT_FSIZE;
+	if (strcmp(name,"LOCKS") == 0) return RLIMIT_LOCKS;
+	if (strcmp(name,"MEMLOCK") == 0) return RLIMIT_MEMLOCK;
+	if (strcmp(name,"MSGQUEUE") == 0) return RLIMIT_MSGQUEUE;
+	if (strcmp(name,"NICE") == 0) return RLIMIT_NICE;
+	if (strcmp(name,"NOFILE") == 0) return RLIMIT_NOFILE;
+	if (strcmp(name,"NPROC") == 0) return RLIMIT_NPROC;
+	if (strcmp(name,"RSS") == 0) return RLIMIT_RSS;
+	if (strcmp(name,"RTPRIO") == 0) return RLIMIT_RTPRIO;
+	if (strcmp(name,"RTTIME") == 0) return RLIMIT_RTTIME;
+	if (strcmp(name,"SIGPENDING") == 0) return RLIMIT_SIGPENDING;
+	if (strcmp(name,"STACK") == 0) return RLIMIT_STACK;
+	*ok = 0;
+	return -1;
+	}
+
+value resolve_RLIMIT(const char *name)
+	{
+	int ok;
+	long limit = get_RLIMIT(name,&ok);
+	return ok ? Qlong(limit) : 0;
+	}
+
+static void do_setrlimit(long resource, long limit) /*TODO in fexl */
+	{
 	struct rlimit rlim;
-	rlim.rlim_cur = get_long(arg(type_long,f->L->L->R));
-	rlim.rlim_max = get_long(arg(type_long,f->L->R));
-
+	rlim.rlim_cur = limit;
+	rlim.rlim_max = limit;
 	int status = setrlimit(resource, &rlim);
-	replace_apply(f, f->R, Qlong(status));
+	(void)status;
 	}
 
-static void reduce3_setrlimit(value f)
+void use_safe_limits(void)
 	{
-	f->T = reduce4_setrlimit;
+	do_setrlimit(RLIMIT_STACK,400000000);
+	do_setrlimit(RLIMIT_DATA,800000000);
+	do_setrlimit(RLIMIT_AS,800000000);
+	do_setrlimit(RLIMIT_CPU,20);
 	}
-
-static void reduce2_setrlimit(value f)
-	{
-	f->T = reduce3_setrlimit;
-	}
-
-void reduce_setrlimit(value f)
-	{
-	f->T = reduce2_setrlimit;
-	}
-
-/* (getrlimit resource next) = (next status soft hard) */
-static void reduce2_getrlimit(value f)
-	{
-	long resource = get_long(arg(type_long,f->L->R));
-	struct rlimit rlim;
-	int status = getrlimit(resource, &rlim);
-
-	replace_apply(f, A(A(f->R,Qlong(status)),
-		Qlong(rlim.rlim_cur)),
-		Qlong(rlim.rlim_max));
-	}
-
-void reduce_getrlimit(value f)
-	{
-	f->T = reduce2_getrlimit;
-	}
-
-/* LATER getrusage */

@@ -1,2 +1,1 @@
-extern int (*read_ch)(void);
-extern value parse_source(void);
+extern value parse_file(const char *name, value context, long line);

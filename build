@@ -3,31 +3,18 @@
 # Build and install the Fexl program as required.  Run "./build help" to see
 # the usage options.
 
-# LATER http://stackoverflow.com/questions/394230/detect-the-os-from-a-bash-script
-# Don't use backticks, use the newer clearer syntax: "unamestr = $(uname)".
-
 usage()
 	{
 	progname=$0
-
-	local dir=$default_place
 
 	cat <<EOM
 NAME
        $progname - build the Fexl program
 
 SYNOPSIS
-       $progname [install] [ uninstall] [in <dir>] [erase] [quiet] [clean]
+       $progname [quite] [clean] [erase]
 
 DESCRIPTION
-
-       $progname install
-              Install Fexl in the $dir directory.
-              To use a different directory, say "in <dir>".
-
-       $progname uninstall
-              Uninstall Fexl in the $dir directory.
-              To use a different directory, say "in <dir>".
 
        $progname
               Do a local build, only compiling what actually changed.
@@ -40,80 +27,8 @@ DESCRIPTION
 
        $progname erase
               Erase all the local output files and don't build anything.
-
-You may also combine the options in various ways such as this:
-
-       $progname quiet clean install
-       $progname quiet install in ~/myfexl
-
 EOM
 	exit 2
-	}
-
-# Remove a directory without displaying an error message if it doesn't exist.
-quiet_rmdir()
-	{
-	if [ -d $1 ]; then
-		rmdir --ignore-fail-on-non-empty $1
-	fi
-	}
-
-handle_options()
-	{
-	default_place="/usr"
-	current_place=$default_place
-
-	# Check the command line.
-
-	valid=1
-	quiet=0
-	clean=0
-	erase=0
-	install=0
-	uninstall=0
-
-	while [ $# -gt 0 ]; do
-		verb=$1
-		shift
-		case $verb in
-			quiet) quiet=1 ;;
-			clean) clean=1 ;;
-			erase) erase=1 ;;
-			install) install=1 ;;
-			uninstall) uninstall=1 ;;
-			in)
-				if [ $# -gt 0 ]; then
-					current_place=$1
-					shift
-				else
-					valid=0
-				fi
-				;;
-			*) valid=0 ;;
-		esac
-	done
-
-	if [ $valid -eq 0 ]; then usage; fi
-
-	if [ $uninstall -eq 1 ]; then
-		rm -f $current_place/bin/fexl
-		rm -rf $current_place/lib/fexl
-		rm -rf $current_place/share/fexl
-
-		# Now safely remove any directories that are empty.
-		quiet_rmdir $current_place/bin
-		quiet_rmdir $current_place/lib
-		quiet_rmdir $current_place/share
-		quiet_rmdir $current_place
-		exit
-	fi
-
-	if [ $clean -eq 1 -o $erase -eq 1 ]; then
-		rm -rf bin
-		rm -rf lib
-		rm -rf obj
-		if [ $erase -eq 1 ]; then exit; fi
-	fi
 	}
 
 # Return true if file_1 is newer than file_2.
@@ -131,144 +46,216 @@ newer_than()
 	echo $result
 	}
 
-# Run a system command and echo if not quiet.  Halt on any error.
-run()
+# Compile a module if it's out of date.
+module()
 	{
-	local command="$1"
-	if [ $quiet -eq 0 ]; then echo $command; fi
-	$command
-	local code=$?
-	if [ $code -ne 0 ]; then exit $code; fi
-	}
+	module=$1
 
-handle_options $@
-
-mkdir -p obj
-mkdir -p bin
-
-# Build any object files which are missing or out of date with respect to their
-# C source files or any included header files.
-#
-# I compile with -O3 because that enables -finline-functions.  You can see that
-# by running "gcc -c -Q -O3 --help=optimizers".
-#
-# I compile with -fPIC to generate Position Independent Code for shared
-# libraries.
-#
-# NOTE: I no longer use the -ansi flag because that makes the fdopen function
-# inaccessible in stdio.h for some strange reason.
-
-cflags="-c -Wall -Werror -O3 -fPIC"
-
-for file_c in src/*.c
-do
-	name=`basename $file_c .c`
-	file_o=obj/$name.o
-
-	update=`newer_than $file_c $file_o`
-	if [ $update -eq 0 ]; then
-		grep -e "^#include \".*\"" $file_c |
-		sed "s/^#include \"\(.*\)\"/\1/" |
-		(
-		while read file; do
-			file_h=src/$file
-			update=`newer_than $file_h $file_o`
-			if [ $update -eq 1 ]; then exit 1; fi
-		done
-		)
-		update=$?
+	# Always include the module's own header file if it exists.
+	if [ -e src/$module.h ]; then
+		set $@ $module
 	fi
+
+	shift
+
+	object="obj/$module.o"
+	source="src/$module.c"
+
+	objects="$objects $object"
+
+	headers=""
+	update=`newer_than $source $object`
+
+	while [ $# -gt 0 ]; do
+		name=$1
+		shift
+		if [ "$name" = "-" ]; then
+			# A "-" means the next arg is a system header, e.g. "- stdio".
+			name=$1
+			shift
+			header=$name.h
+		else
+			# This is a local header.
+			header=src/$name.h
+			if [ $update -eq 0 ]; then
+				update=`newer_than $header $object`
+			fi
+		fi
+		headers="$headers $header"
+	done
 
 	if [ $update -eq 1 ]; then
-		run "gcc $cflags $file_c -o $file_o"
+		includes=""
+		for header in $headers
+		do
+			includes="$includes -include $header"
+		done
+
+		local command="gcc $cflags $includes $source -o $object"
+		if [ $quiet -eq 0 ]; then echo "build module $module"; fi
+
+		$command
+		local code=$?
+		if [ $code -ne 0 ]; then exit $code; fi
+
+		relink=1
 	fi
-done
+	}
 
-# Determine the base directory for this build.
-pwd=`pwd`
-
-if [ $install -eq 1 ]; then
-	base=$current_place
-	mkdir -p $base/bin
-	mkdir -p $base/share
-else
-	base=$pwd
-fi
-
-# Determine where the library should go.
-dir_lib=$base/lib/fexl
-
-# Collect objects that are not main programs.  These go into the library.
-objects=
-update=0
-for file_c in `grep -L "^int main(" src/*.c`
-do
-	name=`basename $file_c .c`
-	file_o=obj/$name.o
-	objects="$objects $file_o"
-	if [ $update -eq 0 ]; then
-		update=`newer_than $file_o $dir_lib/libfexl.so`
+# Remove a module that we don't use but keep around just in case.
+no_module()
+	{
+	module=$1
+	object="obj/$module.o"
+	if [ -e $object ]; then
+		rm $object
+		relink=1
 	fi
-done
+	}
 
-# Build the shared library.  We use -ldl (libdl) for dlopen and dlsym.
-# LATER jturner says he had to remove -ldl when building on OpenBSD.
-# I should auto-detect that.
-if [ $update -eq 1 ]; then
-	mkdir -p $dir_lib
-	run "gcc -shared -o $dir_lib/libfexl.so $objects -ldl"
-fi
+# Link a program if it's out of date.
+program()
+	{
+	name=$1
+	program=bin/$name
 
-if [ $install -eq 1 ]; then
-	# Copy the "share/fexl" directory to "$current_place/share/fexl".
-	rm -rf $current_place/share/fexl
-	cp -pr share/fexl $current_place/share/fexl
-	chown -R $USER:$USER $current_place/share/fexl
-fi
-
-# Build the executables for any main programs.
-#
-# We link with an absolute library path.  That lets you run the executable
-# without having to be in the directory where you did the build.  It also does
-# not rely on the system search paths in /etc/ld.so.conf, which means the
-# program won't break if you change those search paths.  It also allows you to
-# install multiple versions of Fexl in different places if you like.
-
-for file_c in `grep -l "^int main(" src/*.c`
-do
-	name=`basename $file_c .c`
-	file_o=obj/$name.o
-
-	dir_bin=bin
-
-	if [ $install -eq 1 ]; then
-		if [ "$name" = "fexl" ]; then
-			dir_bin=$current_place/bin
+	if [ $relink -eq 0 ]; then
+		if [ ! -e $program ]; then
+			relink=1
 		fi
 	fi
 
-	file_x=$dir_bin/$name
+	if [ $relink -eq 1 ]; then
+		if [ $quiet -eq 0 ]; then echo "build program $name"; fi
 
-	update=`newer_than $file_o $file_x`
-	if [ $update -eq 0 ]; then
-		update=`newer_than $dir_lib/libfexl.so $file_x`
+		local flags=""
+
+		# We use -rdynamic (aka --export-dynamic) so that dynamically loaded
+		# libraries will link to the functions defined in the program.
+		flags="$flags -rdynamic"
+
+		# The -s removes all symbol table and relocation information.
+		flags="$flags -s"
+
+		local libs=""
+
+		# We use -ldl (libdl) so the program can call dlopen and dlsym.
+		# LATER jturner says he had to remove -ldl when building on OpenBSD.
+		# I suppose I should compare uname with "OpenBSD".
+		libs="$libs -ldl"
+
+		local command="gcc $flags $objects $libs -o $program"
+		$command
+	fi
+	}
+
+# Link a library if it's out of date.
+library()
+	{
+	name=$1
+
+	library=lib/fexl/$name.so
+
+	if [ $relink -eq 0 ]; then
+		if [ ! -e $library ]; then
+			relink=1
+		fi
 	fi
 
-	if [ $update -eq 1 ]; then
-		# LATER 20120926 Possibly make it so we don't have to link directly
-		# with the library.  We should be able to do this using get_base_path
-		# in conjunction with explicit dlopen, instead of passing 0 to dlsym in
-		# src/dynamic.c.
-		run "gcc $file_o -o $file_x $dir_lib/libfexl.so"
+	if [ $relink -eq 1 ]; then
+		if [ $quiet -eq 0 ]; then echo "build library $name"; fi
+		gcc -s -shared -o $library $objects
 	fi
-done
+	}
 
-# Now, in case you're running under sudo, change the permissions on the locally
-# created directories back to the underlying user.  Otherwise you'd have files
-# owned by root in your local directory, which is annoying.
+# Set up flags based on command line options.
+handle_options()
+	{
+	quiet=0
+	clean=0
+	erase=0
+	valid=1
 
-if [ "$SUDO_USER" != "" ]; then
-	chown -f -R $SUDO_USER:$SUDO_USER bin
-	chown -f -R $SUDO_USER:$SUDO_USER lib
-	chown -f -R $SUDO_USER:$SUDO_USER obj
+	while [ $# -gt 0 ]; do
+		verb=$1
+		shift
+		case $verb in
+			quiet) quiet=1 ;;
+			clean) clean=1 ;;
+			erase) erase=1 ;;
+			*) valid=0 ;;
+		esac
+	done
+
+	if [ $valid -eq 0 ]; then usage; fi
+	}
+
+# Begin a section for building something.
+begin_section()
+	{
+	objects=""
+	relink=0
+	}
+
+# Begin a section for building a program.
+begin_program()
+	{
+	cflags=$common_cflags
+	begin_section
+	}
+
+# Begin a section for building a library.
+begin_library()
+	{
+	# Add -fPIC (Position Independent Code) so we can link into shared library.
+	cflags="$common_cflags -fPIC"
+	begin_section
+	}
+
+# Now let's build.
+
+handle_options $@
+
+if [ $clean -eq 1 -o $erase -eq 1 ]; then
+	rm -rf obj
+	rm -rf bin
+	rm -rf lib
+	if [ $erase -eq 1 ]; then exit; fi
 fi
+
+mkdir -p obj
+mkdir -p bin
+mkdir -p lib/fexl
+
+# I compile with -O3 because that enables -finline-functions.  You can see that
+# by running "gcc -c -Q -O3 --help=optimizers".
+#
+# NOTE: I no longer use the -ansi flag because that makes the fdopen function
+# inaccessible in stdio.h for some strange reason.
+common_cflags="-c -Wall -Werror -O3"
+
+## Build the main Fexl program.
+
+begin_program
+module basic value
+module die - stdarg - stdio - stdlib
+module double - string memory value string
+module fexl value basic lib parse
+module file - stdio - string - unistd memory value basic long string
+module lib - dlfcn die value basic file string
+module long - string memory value string
+module memory - stdlib die
+module meta - stdlib - string - sys/resource value basic long
+module parse - ctype - stdio die value basic long string
+no_module show - stdio value basic double long string
+module string - stdlib - string memory value
+module type - string value basic
+module value memory die
+module var - string value basic memory meta
+program fexl
+
+## Build the dynamic libraries.
+
+begin_library
+module standard - string value basic double file long meta string type var
+library standard

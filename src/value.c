@@ -1,8 +1,4 @@
-#include "die.h"
-#include "memory.h"
-#include "value.h"
-
-value free_list = 0;
+static value free_list = 0;
 
 /* Put the value on the free list. */
 static void recycle(value f)
@@ -14,7 +10,7 @@ static void recycle(value f)
 /* Increment the reference count. */
 void hold(value f)
 	{
-	if (f) f->N++;
+	f->N++;
 	}
 
 /*
@@ -26,141 +22,96 @@ the program ends.
 */
 void drop(value f)
 	{
-	if (f && --f->N == 0) recycle(f);
+	if (--f->N == 0) recycle(f);
 	}
 
-/* Clear a value prior to reuse. */
-static void clear(value f)
+/* Recycle the value if is reference count is zero.  Shorthand for doing a hold
+and drop on the value. */
+void check(value f)
 	{
-	if (f->L)
+	if (f->N == 0) recycle(f);
+	}
+
+/* Evacuate the contents of a value retrieved from the free list. */
+void clear(value v)
+	{
+	if (v->L)
 		{
-		/* Clear a pair. */
-		if (--f->L->N == 0)
-			recycle(f->L);
-		if (f->R && --f->R->N == 0)
-			recycle(f->R);
+		drop(v->L);
+		if (v->R) drop(v->R);
+		}
+	else if (v->R)
+		{
+		struct atom *x = (struct atom *)v->R;
+		x->free(x);
+		}
+	}
+
+/* Return a value of type T with the given left and right side. */
+value V(type T, value L, value R)
+	{
+	value v = free_list;
+
+	if (v)
+		{
+		free_list = (value)v->N;
+		clear(v);
 		}
 	else
+		v = (value)new_memory(sizeof (struct value));
+
+	v->N = 0;
+	v->T = T;
+	v->L = L;
+	v->R = R;
+
+	if (L)
 		{
-		/* Clear an atom. */
-		if (f->R && --f->R->N == 0)
-			{
-			if (f->R->T)
-				f->R->T(f); /* Call the clear routine for the data. */
-			f->R->L = 0;
-			f->R->R = 0;
-			recycle(f->R);
-			}
+		hold(L);
+		if (R) hold(R);
 		}
+
+	return v;
 	}
 
-/* Create a function that applies L to R. */
-value A(value L, value R)
+/* Apply f to g with delayed evaluation. */
+value A(value f, value g)
 	{
-	value f = free_list;
-	if (f)
-		{
-		free_list = (value)f->N;
-		clear(f);
-		}
-	else
-		f = (value)new_memory(sizeof (struct value));
-
-	f->N = 0;
-	f->T = 0;
-	f->L = L;
-	f->R = R;
-
-	if (L) L->N++;
-	if (R) R->N++;
-
-	return f;
-	}
-
-/* Create a data object of type T. */
-value D(type T)
-	{
-	value f = A(0,A(0,0));
-	f->T = T;
-	return f;
+	return V(0,f,g);
 	}
 
 /* Create a combinator of type T.  Shorthand for "quote". */
 value Q(type T)
 	{
-	value f = A(0,0);
-	f->T = T;
+	return V(T,0,0);
+	}
+
+/* Evaluate the value at the given position, replacing it with its normal form
+if possible within any limits on space and time. */
+value eval(value *pos)
+	{
+	value f = *pos;
+	while (f->T == 0)
+		{
+		value g = eval(&f->L)->T(f);
+		hold(g);
+		drop(f);
+		f = g;
+		}
+	*pos = f;
 	return f;
 	}
 
-/* Return a copy of value f. */
-value copy(value f)
-	{
-	value g = A(f->L,f->R);
-	g->T = f->T;
-	return g;
-	}
-
-/* Replace the contents of f with the contents of g. */
-void replace(value f, value g)
-	{
-	g->N++;
-
-	value g0 = g->L;
-	value g1 = g->R;
-
-	if (g0) g0->N++;
-	if (g1) g1->N++;
-
-	clear(f);
-
-	f->T = g->T;
-	f->L = g0;
-	f->R = g1;
-
-	if (--g->N == 0) recycle(g);
-	}
-
-/* Equivalent to replace(f,A(g0,G1)). */
-void replace_apply(value f, value g0, value g1)
-	{
-	g0->N++;
-	g1->N++;
-
-	clear(f);
-
-	f->L = g0;
-	f->R = g1;
-	}
-
-/*
-Evaluate a value, reducing it to a final normal form if possible within any
-limits on time and space.
-*/
-void eval(value f)
-	{
-	while (f->T == 0)
-		{
-		eval(f->L);
-		f->L->T(f);
-		}
-	}
-
-/* Determine if a function argument has the correct type. */
-int if_type(type T, value x)
-	{
-	eval(x);
-	return x->T == T;
-	}
-
-void type_error(void)
+value type_error(void)
 	{
 	die("You used a data type incorrectly.");
+	return 0;
 	}
 
-value arg(type T, value x)
+/* Evaluate an argument and assert that its type is T. */
+value arg(type T, value *pos)
 	{
-	eval(x);
+	value x = eval(pos);
 	if (x->T != T) type_error();
 	return x;
 	}

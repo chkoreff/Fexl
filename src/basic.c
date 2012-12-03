@@ -1,174 +1,159 @@
-#include "value.h"
-#include "basic.h"
-#include "resolve.h"
-
-/*
-\C = (\x\y x)
-This is the "constancy function".  It always returns its first argument and
-ignores the second.  It also known as "T" because it behaves like the value
-"true".  It is also known as "end" because it behaves like the empty list.
-*/
-static void reduce2_C(value f)
+/* C x y = x */
+value type_C1(value f)
 	{
-	replace(f,f->L->R);
+	return f->L->L;
 	}
 
-void reduce_C(value f)
+value type_C(value f)
 	{
-	f->T = reduce2_C;
+	return V(type_C1,f->R,0);
 	}
 
-/*
-\F = (\x\y y)
-This represents "false", which always returns its second argument.
-*/
-void reduce_F(value f)
+/* S x y z = x z (y z) */
+value type_S2(value f)
 	{
-	replace(f,Q(reduce_I));
+	value x = f->L->L;
+	value y = f->L->R;
+	value z = f->R;
+
+	return A(A(x,z),A(y,z));
 	}
 
-/*
-\I = (\x x)
-This is the "identity" function, which simply returns its argument.
-*/
-void reduce_I(value f)
+value type_S1(value f)
 	{
-	replace(f,f->R);
+	return V(type_S2,f->L->L,f->R);
 	}
 
-/*
-\Y == (\f f (Y f))
-This is the "fixpoint" function, which is used to express recursive functions
-in a fully closed form with no need for circular references or symbol tables.
-*/
-void reduce_Y(value f)
+value type_S(value f)
 	{
-	replace_apply(f,f->R,A(f->L,f->R));
+	return V(type_S1,f->R,0);
 	}
 
-/*
-\query = (\x\y y x)   # but with x evaluated *before* y.
-The query function is used for eager evaluation.  It's also called "?" in the
-standard environment.
-*/
-static void reduce2_query(value f)
+/* I x = x */
+value type_I(value f)
 	{
-	replace_apply(f,f->R,f->L->R);
+	return f->R;
 	}
 
-void reduce_query(value f)
+/* F x = I.  In other words, F x y = y. */
+value type_F(value f)
 	{
-	eval(f->R);
-	f->T = reduce2_query;
+	return I;
 	}
 
-/*
-\pair = (\x\y\p p x y)
-This creates a pair of two things.
-*/
-static void reduce3_pair(value f)
+/* R x y z = x (y z) */
+value type_R2(value f)
 	{
-	replace_apply(f,A(f->R,f->L->L),f->L->R);
+	value x = f->L->L;
+	value y = f->L->R;
+	value z = f->R;
+
+	return A(x,A(y,z));
 	}
 
-static void reduce2_pair(value f)
+value type_R1(value f)
 	{
-	replace_apply(f,f->L->R,f->R);
-	f->T = reduce3_pair;
+	return V(type_R2,f->L->L,f->R);
 	}
 
-void reduce_pair(value f)
+value type_R(value f)
 	{
-	f->T = reduce2_pair;
+	return V(type_R1,f->R,0);
 	}
 
-/*
-\item = (\head\tail \end\item item head tail)
-This creates a list with the first element head, followed by the list tail.
-*/
-
-static void reduce3_item(value f)
+/* L x y z = x z y */
+value type_L2(value f)
 	{
-	replace_apply(f,f->L->L,f->L->R);
-	f->T = reduce3_pair;
+	value x = f->L->L;
+	value y = f->L->R;
+	value z = f->R;
+
+	return A(A(x,z),y);
 	}
 
-static void reduce2_item(value f)
+value type_L1(value f)
 	{
-	replace_apply(f,f->L->R,f->R);
-	f->T = reduce3_item;
+	return V(type_L2,f->L->L,f->R);
 	}
 
-void reduce_item(value f)
+value type_L(value f)
 	{
-	f->T = reduce2_item;
+	return V(type_L1,f->R,0);
 	}
 
-/* (yes x A B) = (A x) */
-static void reduce3_yes(value f)
+/* Y x = x (Y x) */
+value type_Y(value f)
 	{
-	replace_apply(f, f->L->R, f->L->L->R);
+	return A(f->R,A(f->L,f->R));
 	}
 
-static void reduce2_yes(value f)
+/* pair x y B = B x y */
+value type_pair2(value f)
 	{
-	f->T = reduce3_yes;
+	return A(A(f->R,f->L->L),f->L->R);
 	}
 
-void reduce_yes(value f)
+/* item x y A B = B x y */
+value type_item2(value f)
 	{
-	f->T = reduce2_yes;
+	return V(type_pair2,f->L->L,f->L->R);
 	}
 
-/* Replace with true or false based on flag. */
-void replace_boolean(value f, int flag)
+value type_item1(value f)
 	{
-	replace(f, Q(flag ? reduce_C : reduce_F));
+	return V(type_item2, f->L->L, f->R);
 	}
 
-/* \fold == (\fn\z\xs xs z \x\xs \z=(fn z x) eval z; fold fn z xs)
-It's about 75% faster implemented in C.
-*/
-static void reduce3_fold(value f)
+value type_item(value f)
 	{
-	value xs = f->R;
-	xs = A(A(xs,Q(reduce_C)),Q(reduce_pair));
-	hold(xs);
-	eval(xs);
-
-	if (xs->T == reduce_C)
-		replace(f, f->L->R);
-	else if (xs->T == reduce3_pair)
-		{
-		replace_apply(f, A(f->L->L,A(A(f->L->L->R,f->L->R),xs->L)), xs->R);
-		eval(f->L->R);
-		}
-	else
-		type_error();
-
-	drop(xs);
+	return V(type_item1, f->R, 0);
 	}
 
-static void reduce2_fold(value f)
+/* Return the list with head h and tail t, which is [h;t] in list notation. */
+value item(value h, value t)
 	{
-	f->T = reduce3_fold;
+	return V(type_item2,h,t);
 	}
 
-void reduce_fold(value f)
+/* Return T or F based on the flag. */
+value boolean(int flag)
 	{
-	f->T = reduce2_fold;
+	return Q(flag ? type_C : type_F);
 	}
 
-value pair(value x, value y)
+/* Return [x] if x is non-zero, otherwise []. */
+value maybe(value x)
 	{
-	value f = A(x,y);
-	f->T = reduce3_pair;
-	return f;
+	value C = Q(type_C);
+	return x ? item(x,C) : C;
 	}
 
-value item(value x, value y)
+value C;
+value S;
+value I;
+value R;
+value L;
+value Y;
+value Qitem;
+
+void beg_basic(void)
 	{
-	value f = A(x,y);
-	f->T = reduce3_item;
-	return f;
+	C = Q(type_C); hold(C);
+	S = Q(type_S); hold(S);
+	I = Q(type_I); hold(I);
+	R = Q(type_R); hold(R);
+	L = Q(type_L); hold(L);
+	Y = Q(type_Y); hold(Y);
+	Qitem = Q(type_item); hold(Qitem);
+	}
+
+void end_basic(void)
+	{
+	drop(C);
+	drop(S);
+	drop(I);
+	drop(R);
+	drop(L);
+	drop(Y);
+	drop(Qitem);
 	}

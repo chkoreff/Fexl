@@ -1,86 +1,31 @@
-#include "dynamic.h"
-#include "value.h"
-#include "basic.h"
-#include "long.h"
-#include "string.h"
-
-void type_type(value f) { type_error(); }
-
-/* Make a new value of type "type".  */
-value Qtype(type T)
+value type_is_atom(value f)
 	{
-	value f = Qlong((long)T);
-	f->T = type_type;
-	return f;
+	value x = eval(&f->R);
+	return boolean(x->L == 0 && x->R != 0);
 	}
 
-type get_type(value f)
+value type_is_list(value f)
 	{
-	return (type)f->R->L;
+	value x = eval(&f->R);
+	return boolean(x->T == type_C || x->T == type_item2);
 	}
 
-void reduce_type_of(value f)
+value type_is_type1(value f)
 	{
-	replace(f, Qtype((type)f->R->T));
+	value x = eval(&f->L->L);
+	value y = eval(&f->R);
+	return boolean(x->T == y->T);
 	}
 
-/* (type_eq x y) is true if types x and y are equal. */
-static void reduce2_type_eq(value f)
+value type_is_type(value f)
 	{
-	type x = get_type(arg(type_type,f->L->R));
-	type y = get_type(arg(type_type,f->R));
-	replace_boolean(f, x == y);
+	return V(type_is_type1,f->R,0);
 	}
 
-void reduce_type_eq(value f)
+value resolve_is(const char *name)
 	{
-	f->T = reduce2_type_eq;
-	}
-
-/* (atomic x) is true if x is an atomic form. */
-void reduce_atomic(value f)
-	{
-	replace_boolean(f, !f->R->L);
-	}
-
-/*
-is_apply x yes no
-	= (yes L R)  # if x is the function application (L R)
-	= no         # if x is atomic
-*/
-static void reduce3_is_apply(value f)
-	{
-	value x = f->L->L->R;
-
-	if (x->L)
-		replace_apply(f, A(f->L->R,x->L), x->R);
-	else
-		replace(f, f->R);
-	}
-
-static void reduce2_is_apply(value f)
-	{
-	f->T = reduce3_is_apply;
-	}
-
-void reduce_is_apply(value f)
-	{
-	f->T = reduce2_is_apply;
-	}
-
-/*
-Find the type with the given name.
-The value of (type_named name) is:
-  yes type     # if the type exists
-  no           # if not
-*/
-void reduce_type_named(value f)
-	{
-	value x = arg(type_string,f->R);
-
-	void *def = lib_sym("type_",string_data(x));
-	if (def)
-		replace_apply(f, Q(reduce_yes), Qtype(def));
-	else
-		replace(f, Q(reduce_F));
+	if (strcmp(name,"atom") == 0) return Q(type_is_atom);
+	if (strcmp(name,"list") == 0) return Q(type_is_list);
+	if (strcmp(name,"type") == 0) return Q(type_is_type);
+	return 0;
 	}

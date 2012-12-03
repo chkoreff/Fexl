@@ -1,11 +1,21 @@
-extern void type_string(value);
-extern value Qchars(const char *data, long len);
-extern value Qcopy_chars(const char *data, long len);
-extern value Qcopy_string(const char *data);
+struct buf
+	{
+	char *data;
+	long size;
+	long len;
+	struct buf *prev;
+	};
+
+extern void buf_add(struct buf **top, char ch);
+extern value type_string(value f);
+extern value Qstring_buffer(struct buf **buffer);
+extern value Qstring_data(const char *data, long len);
 extern value Qstring(const char *data);
-extern value Qstrcat(const char *x, const char *y);
-extern char *string_data(value);
-extern long string_len(value);
-extern int string_eq(value, value);
-extern int string_long(char *beg, long *num);
-extern int string_double(char *beg, double *num);
+extern const char *string_data(value f);
+extern long string_len(value f);
+extern int string_cmp(value x, value y);
+extern int string_long(const char *beg, long *num);
+extern int string_double(const char *beg, double *num);
+extern int sprintf(char *str, const char *format, ...);
+extern value type_string_append(value f);
+extern value resolve_string(const char *name);

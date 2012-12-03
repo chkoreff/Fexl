@@ -1,25 +1,3 @@
-#include <ctype.h>
-#include "value.h"
-#include "basic.h"
-#include "buf.h"
-#include "long.h"
-#include "memory.h"
-#include "parse.h"
-#include "run.h"
-#include "string.h"
-#include "sym.h"
-
-/* LATER 20120920 instead of returning 0 on syntax error, return
-syntax_error(msg,line) */
-
-static long line;     /* current line number */
-static char *error;   /* syntax error if any */
-
-static value C;
-static value I;
-static value Y;
-static value lam;
-
 /*
 Grammar:
 
@@ -46,17 +24,31 @@ string => complex_string
 The Fexl parser reads an expression from the input until it reaches -1 (end of
 file) or the special token "\\".  The \\ token stops the parser immediately, as
 if it had reached end of file.
+
+If you're parsing a possibly malicious script, you should use setrlimit to
+impose limits not only on stack depth, but also on total memory usage and CPU
+time.
+
+For example, if you parse an infinite stream of '(' characters, you'll see a
+segmentation fault due to stack overflow.  That happens due to the default
+limits on stack size, without any intervention.  But if you parse an infinite
+stream of ' ' characters, it will run forever unless you impose limits on CPU
+time with RLIMIT_CPU.  If you parse an infinite stream of 'a' characters, it
+will use an unbounded amount of memory which could slow your machine to a crawl
+until it finally reaches the very large default limits.  So you should set
+RLIMIT_AS, and also RLIMIT_DATA for good measure, to limit the total amount of
+memory.
 */
 
-/* The read_ch function reads the next character.  It can be set to read from
-any source such as a file or a string. */
-int (*read_ch)(void);
-
-static int ch = 0;      /* current character */
+static FILE *fh = 0;   /* current source file */
+static const char *label = 0;  /* current logical label of source file */
+static int ch;         /* current character */
+static long line;      /* current line number */
+static value context;  /* current context */
 
 static void next_ch(void)
 	{
-	ch = read_ch();
+	ch = fgetc(fh);
 	if (ch == '\n') line++;
 	}
 
@@ -103,24 +95,72 @@ static void skip_filler(void)
 		}
 	}
 
-static void type_open(value f) { type_error(); }
-
-static value make_sym(type t, struct buf **buf, long first_line)
+static void syntax_error(const char *msg, int line)
 	{
-	long len;
-	char *string = buf_clear(buf,&len);
-
-	value data = Qchars(string,len);
-	data->T = t;
-
-	value sym = A(Q(t),pair(data,Qlong(first_line)));
-	sym->T = type_open;
-	return sym;
+	die("%s on line %ld%s%s", msg, line,
+		label[0] ? " of " : "",
+		label);
 	}
 
-static value collect_string(char *term_string, long term_len, long first_line)
+static void undefined_symbol(const char *name, int line)
 	{
-	struct buf *buf = 0;
+	warn("Undefined symbol %s on line %ld%s%s", name, line,
+		label[0] ? " of " : "",
+		label
+		);
+	}
+
+value type_name(value f)
+	{
+	return type_error();
+	}
+
+value type_open(value f)
+	{
+	return type_error();
+	}
+
+static int is_null_name(value x)
+	{
+	return x->T == type_name && x->L != 0 && string_len(x->L) == 0;
+	}
+
+static int is_sym(value x)
+	{
+	return (x->T == type_name || x->T == type_string) && x->L != 0;
+	}
+
+static int sym_eq(value x, value y)
+	{
+	return is_sym(x) && is_sym(y)
+		&& x->T == y->T
+		&& string_cmp(x->L,y->L) == 0;
+	}
+
+static int is_open(value x)
+	{
+	return x->T == type_open || is_sym(x);
+	}
+
+/* Apply f to g, returning an open form if either one is open. */
+static value apply(value f, value g)
+	{
+	value v = A(f,g);
+	if (is_open(f) || is_open(g))
+		v->T = type_open;
+	return v;
+	}
+
+static value make_sym(type t, struct buf **buffer, long first_line)
+	{
+	return V(t,Qstring_buffer(buffer),Qlong(first_line));
+	}
+
+/* Collect the content of a string up to the given terminator. */
+static value collect_string(const char *term_string, long term_len,
+	long first_line)
+	{
+	struct buf *buffer = 0;
 	long match_pos = 0;
 
 	while (1)
@@ -133,26 +173,21 @@ static value collect_string(char *term_string, long term_len, long first_line)
 		else if (match_pos > 0)
 			{
 			if (match_pos >= term_len)
-				return make_sym(type_string,&buf,first_line);
+				return make_sym(type_string,&buffer,first_line);
 			else
 				{
 				long i;
 				for (i = 0; i < match_pos; i++)
-					buf_add(&buf, term_string[i]);
+					buf_add(&buffer, term_string[i]);
 
 				match_pos = 0;
 				}
 			}
 		else if (ch == -1)
-			{
-			buf_discard(&buf);
-			line = first_line;
-			error = "Unclosed string";
-			return 0;
-			}
+			syntax_error("Unclosed string", first_line);
 		else
 			{
-			buf_add(&buf, ch);
+			buf_add(&buffer, ch);
 			next_ch();
 			}
 		}
@@ -168,30 +203,26 @@ static value parse_simple_string(void)
 static value parse_complex_string(void)
 	{
 	long first_line = line;
-	struct buf *term = 0;
+	struct buf *buffer = 0;
 
 	while (1)
 		{
 		if (at_white())
 			{
-			long term_len;
-			char *term_string = buf_clear(&term,&term_len);
+			value terminator = Qstring_buffer(&buffer);
 
 			next_ch();
-			value sym = collect_string(term_string, term_len, first_line);
-			free_memory(term_string, term_len+1);
+			value sym = collect_string(string_data(terminator),
+				string_len(terminator), first_line);
+
+			check(terminator);
 			return sym;
 			}
 		else if (ch == -1)
-			{
-			line = first_line;
-			error = "Unclosed string terminator";
-			buf_discard(&term);
-			return 0;
-			}
+			syntax_error("Unclosed string terminator", first_line);
 		else
 			{
-			buf_add(&term, ch);
+			buf_add(&buffer, ch);
 			next_ch();
 			}
 		}
@@ -202,18 +233,17 @@ A name may contain just about anything, except for white space (including NUL)
 and a few other special characters.  This is the simplest possible rule that
 can work.
 */
-
 static value parse_name(int allow_eq)
 	{
 	long first_line = line;
-	struct buf *buf = 0;
+	struct buf *buffer = 0;
 	while (1)
 		{
 		if (
 			at_white()
 			|| ch == '\\'
-			|| ch == '('
-			|| ch == ')'
+			|| ch == '(' || ch == ')'
+			|| ch == '[' || ch == ']'
 			|| ch == ';'
 			|| ch == '"'
 			|| ch == '~'
@@ -221,24 +251,17 @@ static value parse_name(int allow_eq)
 			|| (ch == '=' && !allow_eq)
 			|| ch == -1
 			)
-			return make_sym(type_name,&buf,first_line);
+			return make_sym(type_name,&buffer,first_line);
 		else
 			{
-			buf_add(&buf, ch);
+			buf_add(&buffer, ch);
 			next_ch();
 			}
 		}
 	}
 
-static int is_null_name(value exp)
-	{
-	return exp->T == type_open
-		&& exp->L->T == type_name
-		&& string_len(exp->R->L) == 0;
-	}
-
 /* Parse a symbol. */
-static value new_parse_sym(int allow_eq)
+static value parse_sym(int allow_eq)
 	{
 	if (ch == '"')
 		return parse_simple_string();
@@ -248,7 +271,27 @@ static value new_parse_sym(int allow_eq)
 		return parse_name(allow_eq);
 	}
 
+static value parse_term(void);
 static value parse_exp(void);
+
+static value parse_list(void)
+	{
+	skip_filler();
+	if (ch == ';')
+		{
+		next_ch();
+		return parse_exp();
+		}
+
+	value x = parse_term();
+	if (is_null_name(x))
+		{
+		check(x);
+		return C;
+		}
+	else
+		return apply(apply(Qitem,x),parse_list());
+	}
 
 static value parse_term(void)
 	{
@@ -257,150 +300,79 @@ static value parse_term(void)
 		long first_line = line;
 		next_ch();
 		value exp = parse_exp();
-		if (exp == 0)
-			return exp;
-		else if (ch == ')')
-			{
-			next_ch();
-			return exp;
-			}
-		else
-			{
-			hold(exp);
-			line = first_line;
-			error = "Unclosed parenthesis";
-			drop(exp);
-			return 0;
-			}
+		if (ch != ')')
+			syntax_error("Unclosed parenthesis", first_line);
+
+		next_ch();
+		return exp;
+		}
+	else if (ch == '[')
+		{
+		long first_line = line;
+		next_ch();
+		value exp = parse_list();
+		if (ch != ']')
+			syntax_error("Unclosed bracket", first_line);
+
+		next_ch();
+		return exp;
 		}
 	else
+		return parse_sym(1);
+	}
+
+/* Return (S f g), optimizing if possible. */
+static value _fuse(value f, value g)
+	{
+	if (f->L == C)
 		{
-		value exp = new_parse_sym(1);
-
-		if (exp == 0)
-			return exp;
-		else if (is_null_name(exp))
+		if (g == I)
 			{
-			hold(exp);
-			line = get_long(exp->R->R);
-			error = "Missing definition";
-			drop(exp);
-			return 0;
+			/* S (C x) I = x */
+			value x = f->R;
+			/* Copy x because the caller drops f.  */
+			return V(x->T,x->L,x->R);
 			}
+		else if (g->L == C)
+			/* S (C x) (C y) = C (x y) */
+			return apply(C,apply(f->R,g->R));
 		else
-			return exp;
+			/* S (C x) y = R x y */
+			return apply(apply(R,f->R),g);
 		}
+	else if (g->L == C)
+		/* S x (C y) = L x y */
+		return apply(apply(L,f),g->R);
+	else
+		return apply(apply(S,f),g);
 	}
 
-/* Determine if two symbols (names or strings) are equivalent. */
-static int sym_eq(value x, value y)
+static value fuse(value f, value g)
 	{
-	return x->T == type_open && y->T == type_open
-		&& (x->L->T == type_name || x->L->T == type_string)
-		&& x->L->T == y->L->T
-		&& string_eq(x->R->L,y->R->L);
+	value v = _fuse(f,g);
+	check(f);
+	check(g);
+	return v;
 	}
 
-/* Apply f to x, marking the result as open if both sides are open. */
-static value apply(value f, value x)
+/* Abstract the symbol from the body, returning a form which is a function of
+that symbol, and no longer contains that symbol. */
+static value _abstract(value sym, value body)
 	{
-	value result = A(f,x);
-	if (f->T == type_open || x->T == type_open)
-		result->T = type_open;
-	return result;
-	}
-
-/* Get the pattern of occurrences of symbol x in form f. */
-static value get_pattern(value x, value f)
-	{
-	if (sym_eq(x,f))
+	if (body->T == type_open)
+		return fuse(_abstract(sym,body->L),_abstract(sym,body->R));
+	else if (sym_eq(sym,body))
 		return I;
-	else if (f->T != type_open)
-		return C;
-	else if (f->L->T == type_name || f->L->T == type_string)
-		return C;
 	else
-		{
-		value pl = get_pattern(x,f->L);
-		value pr = get_pattern(x,f->R);
-
-		if (pl->T == reduce_C && pr->T == reduce_C)
-			return C;
-		else
-			return A(pl,pr);
-		}
+		return apply(C,body);
 	}
 
-/* LATER 20120921 unify with get_pattern into one lambda routine.  This is good
-preparation for when we go back to using combinators instead of pattern
-substitution.  Note that when we do use combinators again, they'll be of a very
-eager or "aggressive" variety, so they should be as fast as substitution, or
-even faster because I think they'll avoid extra work in cases where a value is
-not used during computation. */
-
-value remove_sym(value x, value f)
+static value abstract(value sym, value body)
 	{
-	if (sym_eq(x,f))
-		return I;
-	else if (f->T != type_open)
-		return f;
-	else if (f->L->T == type_name || f->L->T == type_string)
-		return f;
-	else
-		return apply(remove_sym(x,f->L), remove_sym(x,f->R));
-	}
-
-/* Make a lambda form using the substitution pattern for symbol x in form f. */
-static value lambda(value x, value f)
-	{
-	hold(f);
-
-	value val;
-
-	if (f == 0)
-		val = 0;
-	else
-		{
-		value p = get_pattern(x,f);
-		hold(p);
-
-		if (p->T == reduce_C)
-			val = apply(C,f);
-		else if (p->T == reduce_I)
-			val = I;
-		else if (p->L->T == reduce_C && p->R->T == reduce_I)
-			/* Special case for the rule:  lam (C I) (L R) = L.  This greatly
-			compresses many parsed forms, saving memory and time.  We copy f->L
-			because it's a part of f and we'll be dropping f.  */
-			val = copy(f->L);
-		else
-			val = apply(A(lam,p),remove_sym(x,f));
-
-		drop(p);
-		}
-
-	drop(f);
-	return val;
-	}
-
-static value check_apply(value f, value x)
-	{
-	if (f == I)
-		return x;
-	else if (f == 0)
-		{
-		hold(x);
-		drop(x);
-		return 0;
-		}
-	else if (x == 0)
-		{
-		hold(f);
-		drop(f);
-		return 0;
-		}
-	else
-		return apply(f,x);
+	hold(body);
+	value v = _abstract(sym,body);
+	drop(body);
+	return v;
 	}
 
 /*
@@ -423,71 +395,69 @@ white space only, and not '='.  For example:
   \ >   = num_gt
   \ >=  = num_ge
 */
-static value parse_lambda(void)
+static value parse_lambda(long first_line)
 	{
 	int allow_eq = at_white();
 	skip_white();
 
-	value sym = new_parse_sym(allow_eq);
+	value sym = parse_sym(allow_eq);
+	if (is_null_name(sym))
+		syntax_error("Missing lambda symbol", first_line);
+
 	hold(sym);
+	value def = 0;
 
-	value val;
-
-	if (sym == 0)
-		val = 0;
-	else if (is_null_name(sym))
+	skip_filler();
+	if (ch == '=')
 		{
-		error = "Missing lambda symbol";
-		val = 0;
-		}
-	else
-		{
+		long first_line = line;
+		next_ch();
+		int is_recursive = (ch == '=');
+		if (is_recursive) next_ch();
 		skip_filler();
-		if (ch == '=')
-			{
-			next_ch();
-			value def;
-			if (ch == '=')
-				{
-				/* Recursive definition */
-				next_ch();
-				skip_filler();
-				def = check_apply(Y,lambda(sym, parse_term()));
-				}
-			else
-				{
-				/* Non-recursive definition */
-				skip_filler();
-				def = parse_term();
-				}
 
-			val = def ? lambda(sym, parse_exp()) : 0;
-			val = check_apply(val,def);
-			}
-		else
-			/* Normal parameter (symbol without definition) */
-			val = lambda(sym, parse_exp());
+		def = parse_term();
+
+		if (is_null_name(def))
+			syntax_error("Missing definition", first_line);
+
+		if (is_recursive)
+			def = apply(Y,abstract(sym,def));
 		}
 
+	value body = abstract(sym,parse_exp());
 	drop(sym);
-	return val;
+
+	return def ? apply(body,def) : body;
 	}
 
-/*
-If you're parsing a possibly malicious script, you should use setrlimit to
-impose limits not only on stack depth, but also on total memory usage and
-CPU time.
+/* Parse the next factor of an expression.  Return 0 if no factor found. */
+static value parse_factor(void)
+	{
+	skip_filler();
 
-For example, if you parse an infinite stream of '(' characters, you'll see a
-segmentation fault due to stack overflow.  That happens due to the default
-limits on stack size, without any intervention.  But if you parse an infinite
-stream of ' ' characters, it will run forever unless you impose limits on CPU
-time with RLIMIT_CPU.  If you parse an infinite stream of 'a' characters, it
-will use an unbounded amount of memory which could slow your machine to a crawl
-until it finally reaches the very large default limits.  So you should set
-RLIMIT_AS, and also RLIMIT_DATA for good measure, to limit the total amount of
-memory.
-*/
+	if (ch == -1 || ch == ')' || ch == ']')
+		return 0;
+	else if (ch == '\\')
+		{
+		long first_line = line;
+		next_ch();
+		if (ch == '\\')
+			{
+			ch = -1; /* Two backslashes simulates end of file. */
+			return 0;
+			}
+		else
+			return parse_lambda(first_line);
+		}
+	else if (ch == ';')
+		{
+		next_ch();
+		return parse_exp();
+		}
+	else
+		return parse_term();
+	}
 
 /* Parse an expression. */
 static value parse_exp(void)
@@ -496,183 +466,115 @@ static value parse_exp(void)
 
 	while (1)
 		{
-		skip_filler();
-
-		if (ch == -1 || ch == ')')
-			return exp;
-		else
-			{
-			value val;
-
-			if (ch == '\\')
-				{
-				next_ch();
-				if (ch == '\\')
-					{
-					ch = -1; /* Two backslashes simulates end of file. */
-					return exp;
-					}
-				else
-					val = parse_lambda();
-				}
-			else if (ch == ';')
-				{
-				next_ch();
-				val = parse_exp();
-				}
-			else
-				val = parse_term();
-
-			exp = check_apply(exp,val);
-
-			if (exp == 0)
-				return exp;
-			}
+		value val = parse_factor();
+		if (val == 0) return exp;
+		exp = exp == I ? val : apply(exp,val);
 		}
 	}
 
-/* Return a copy of f with x substituted according to pattern p. */
-static value subst(value p, value f, value x)
+/* Return the first symbol in the value, if any, in left to right order. */
+static value first_sym(value f)
 	{
-	if (p->T == reduce_C)
-		return f;
-	else if (p->T == reduce_I)
-		return x;
+	if (is_sym(f)) return f;
+	if (f->T != type_open) return 0;
+
+	value x = first_sym(f->L);
+	if (x) return x;
+	return first_sym(f->R);
+	}
+
+/* Return the definition of the symbol in the current context, returning [def].
+Strings are defined literally.  Names are defined using the current context,
+which is applied to the name and evaluated.  If a name is undefined, we report
+it as an error and use the symbol itself as the definition.  In that case, the
+is_open() check on the final expression will be true and the program will exit
+with status 1. */
+
+static value resolve_sym(value sym)
+	{
+	value result = 0;
+
+	if (sym->T == type_string)
+		result = item(sym->L,C);
 	else
-		return A(subst(p->L,f->L,x),subst(p->R,f->R,x));
-	}
+		result = A(context,sym->L);
 
-/* lambda pattern form value = subst(pattern,form,value) */
-static void reduce3_lambda(value f)
-	{
-	replace(f, subst(f->L->L->R,f->L->R,f->R));
-	}
+	hold(result);
+	eval(&result);
 
-static void reduce2_lambda(value f)
-	{
-	f->T = reduce3_lambda;
-	}
-
-void type_lambda(value f)
-	{
-	f->T = reduce2_lambda;
-	}
-
-static void beg_parse(void)
-	{
-	C = Q(reduce_C);
-	I = Q(reduce_I);
-	Y = Q(reduce_Y);
-	lam = Q(type_lambda);
-
-	hold(C);
-	hold(I);
-	hold(Y);
-	hold(lam);
-	}
-
-static void end_parse(void)
-	{
-	drop(C);
-	drop(I);
-	drop(Y);
-	drop(lam);
-	}
-
-/* I'm temporarily making this return the symbols in reverse order, since we're
-currently stacking them in reverse order in the final phase.  The next version
-will switch back to forward order and eliminate the reversal in the final
-phase.  I'm just dealing with one thing at a time here. */
-value next_sym(value f)
-	{
-	if (f == 0)
-		return 0;
-	else if (f->T == type_open)
+	if (result->T == type_C)
 		{
-		if (f->L->T == type_name || f->L->T == type_string)
-			return f;
-		else
-			{
-			value x = next_sym(f->R);
-			if (x)
-				return x;
-			else
-				return next_sym(f->L);
-			}
-		}
-	else
-		return 0;
-	}
+		const char *name = string_data(sym->L);
+		long line = long_val(sym->R);
+		undefined_symbol(name,line);
 
-/*
-Parse the source text, returning (pair ok; pair exp; symbols).
-
-ok is true if the source is well-formed, i.e. no syntax errors.
-
-If ok is true, exp is the parsed expression.
-If ok is false, exp is (pair error line), where error is the string describing
-the syntax error, and line is the line number on which it occurred.
-
-symbols is the list of all symbols used but not defined within the source text.
-It is a list of entries (pair sym line_no), where line_no is the line number on
-which the symbol first occurred.
-
-If ok is true, then the caller can take the exp and successively apply the
-definitions of each symbol in the symbols list.  The result will be the actual
-executable function which can then be run with "eval" in the Fexl intepreter.
-*/
-value parse_source(void)
-	{
-	beg_parse();
-
-	value exp;
-
-	if (read_ch == 0)
-		{
-		error = "Can't open file";
-		exp = 0;
-		}
-	else
-		{
-		line = 1;
-		next_ch();
-
-		exp = parse_exp();
-		if (exp)
-			{
-			if (ch != -1)
-				{
-				hold(exp);
-				error = "Extraneous input";
-				drop(exp);
-				exp = 0;
-				}
-			}
+		drop(result);
+		result = item(sym,C);
+		hold(result);
 		}
 
-	/* LATER I'll soon eliminate the need for symbols here. */
-	value symbols = C;
+	if (result->T != type_item2)
+		type_error();
 
-	while (1)
-		{
-		value sym = next_sym(exp);
-		if (sym == 0)
-			break;
-
-		symbols = item(sym->R,symbols);
-		exp = lambda(sym,exp);
-		}
-
-	/* If there was an error, use (pair error line) as the expression. */
-	if (exp == 0)
-		exp = pair(Qstring(error),Qlong(line));
-
-	value ok = Q(error ? reduce_F : reduce_C);
-	value result = pair(ok,pair(exp,symbols));
-
-	line = 0;
-	error = 0;
-
-	end_parse();
 	return result;
+	}
+
+/* Resolve all symbols in the value using the current context, returning a
+value with no more symbols and all the definitions baked in. */
+static value resolve_all(value f)
+	{
+	value sym = first_sym(f);
+	if (sym == 0) return f;
+
+	value result = resolve_sym(sym);
+	value exp = apply(resolve_all(abstract(sym,f)),result->L);
+	drop(result);
+	return exp;
+	}
+
+/* Parse the file in the context, starting with the given line number, using
+the label in any error messages. */
+value parse_fh(FILE *_fh, value _context, long _line, const char *_label)
+	{
+	FILE *save_fh = fh;
+	const char *save_label = label;
+	int save_ch = ch;
+	int save_line = line;
+	value save_context = context;
+
+	fh = _fh;
+	label = _label;
+	line = _line;
+	context = _context;
+
+	hold(context);
+
+	next_ch();
+	value exp = parse_exp();
+
+	if (ch != -1)
+		syntax_error("Extraneous input", line);
+
+	exp = resolve_all(exp);
+	if (is_open(exp))
+		die(0);
+
+	drop(context);
+
+	fh = save_fh;
+	label = save_label;
+	ch = save_ch;
+	line = save_line;
+	context = save_context;
+
+	return exp;
+	}
+
+value parse_file(const char *name, value context, long line)
+	{
+	FILE *fh = name[0] ? fopen(name,"r") : stdin;
+	if (fh == 0)
+		die("Can't open file %s", name);
+
+	return parse_fh(fh, context, 1, name);
 	}
