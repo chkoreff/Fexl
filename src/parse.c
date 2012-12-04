@@ -513,10 +513,10 @@ static value resolve_sym(value sym)
 		hold(result);
 		}
 
-	if (result->T != type_item2)
-		type_error();
+	if (result->T == type_item && result->L && result->L->L)
+		return result;
 
-	return result;
+	return type_error();
 	}
 
 /* Resolve all symbols in the value using the current context, returning a
@@ -527,7 +527,7 @@ static value resolve_all(value f)
 	if (sym == 0) return f;
 
 	value result = resolve_sym(sym);
-	value exp = apply(resolve_all(abstract(sym,f)),result->L);
+	value exp = apply(resolve_all(abstract(sym,f)),result->L->R);
 	drop(result);
 	return exp;
 	}

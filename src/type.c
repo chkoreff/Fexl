@@ -7,19 +7,16 @@ value type_is_atom(value f)
 value type_is_list(value f)
 	{
 	value x = eval(&f->R);
-	return boolean(x->T == type_C || x->T == type_item2);
+	return boolean(x->T == type_C || (x->T == type_item && x->L && x->L->L));
 	}
 
-value type_is_type1(value f)
-	{
-	value x = eval(&f->L->L);
-	value y = eval(&f->R);
-	return boolean(x->T == y->T);
-	}
-
+/* (is_type x y) is true if x and y have the same type. */
 value type_is_type(value f)
 	{
-	return V(type_is_type1,f->R,0);
+	if (!f->L->L) return 0;
+	value x = eval(&f->L->R);
+	value y = eval(&f->R);
+	return boolean(x->T == y->T);
 	}
 
 value resolve_is(const char *name)

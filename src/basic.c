@@ -1,32 +1,15 @@
 /* C x y = x */
-value type_C1(value f)
-	{
-	return f->L->L;
-	}
-
 value type_C(value f)
 	{
-	return V(type_C1,f->R,0);
+	if (!f->L->L) return 0;
+	return f->L->R;
 	}
 
 /* S x y z = x z (y z) */
-value type_S2(value f)
-	{
-	value x = f->L->L;
-	value y = f->L->R;
-	value z = f->R;
-
-	return A(A(x,z),A(y,z));
-	}
-
-value type_S1(value f)
-	{
-	return V(type_S2,f->L->L,f->R);
-	}
-
 value type_S(value f)
 	{
-	return V(type_S1,f->R,0);
+	if (!f->L->L || !f->L->L->L) return 0;
+	return A(A(f->L->L->R,f->R),A(f->L->R,f->R));
 	}
 
 /* I x = x */
@@ -42,43 +25,17 @@ value type_F(value f)
 	}
 
 /* R x y z = x (y z) */
-value type_R2(value f)
-	{
-	value x = f->L->L;
-	value y = f->L->R;
-	value z = f->R;
-
-	return A(x,A(y,z));
-	}
-
-value type_R1(value f)
-	{
-	return V(type_R2,f->L->L,f->R);
-	}
-
 value type_R(value f)
 	{
-	return V(type_R1,f->R,0);
+	if (!f->L->L || !f->L->L->L) return 0;
+	return A(f->L->L->R,A(f->L->R,f->R));
 	}
 
 /* L x y z = x z y */
-value type_L2(value f)
-	{
-	value x = f->L->L;
-	value y = f->L->R;
-	value z = f->R;
-
-	return A(A(x,z),y);
-	}
-
-value type_L1(value f)
-	{
-	return V(type_L2,f->L->L,f->R);
-	}
-
 value type_L(value f)
 	{
-	return V(type_L1,f->R,0);
+	if (!f->L->L || !f->L->L->L) return 0;
+	return A(A(f->L->L->R,f->R),f->L->R);
 	}
 
 /* Y x = x (Y x) */
@@ -87,32 +44,17 @@ value type_Y(value f)
 	return A(f->R,A(f->L,f->R));
 	}
 
-/* pair x y B = B x y */
-value type_pair2(value f)
-	{
-	return A(A(f->R,f->L->L),f->L->R);
-	}
-
 /* item x y A B = B x y */
-value type_item2(value f)
-	{
-	return V(type_pair2,f->L->L,f->L->R);
-	}
-
-value type_item1(value f)
-	{
-	return V(type_item2, f->L->L, f->R);
-	}
-
 value type_item(value f)
 	{
-	return V(type_item1, f->R, 0);
+	if (!f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
+	return A(A(f->R,f->L->L->L->R),f->L->L->R);
 	}
 
 /* Return the list with head h and tail t, which is [h;t] in list notation. */
 value item(value h, value t)
 	{
-	return V(type_item2,h,t);
+	return A(A(Qitem,h),t);
 	}
 
 /* Return T or F based on the flag. */

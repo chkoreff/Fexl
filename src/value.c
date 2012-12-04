@@ -38,7 +38,7 @@ void clear(value v)
 	if (v->L)
 		{
 		drop(v->L);
-		if (v->R) drop(v->R);
+		drop(v->R);
 		}
 	else if (v->R)
 		{
@@ -68,7 +68,7 @@ value V(type T, value L, value R)
 	if (L)
 		{
 		hold(L);
-		if (R) hold(R);
+		hold(R);
 		}
 
 	return v;
@@ -94,9 +94,14 @@ value eval(value *pos)
 	while (f->T == 0)
 		{
 		value g = eval(&f->L)->T(f);
-		hold(g);
-		drop(f);
-		f = g;
+		if (g)
+			{
+			hold(g);
+			drop(f);
+			f = g;
+			}
+		else
+			f->T = f->L->T;
 		}
 	*pos = f;
 	return f;

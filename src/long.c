@@ -28,53 +28,37 @@ long long_val(value f)
 	return x->val;
 	}
 
-value type_long_add1(value f)
+value type_long_add(value f)
 	{
-	long x = long_val(arg(type_long,&f->L->L));
+	if (!f->L->L) return 0;
+	long x = long_val(arg(type_long,&f->L->R));
 	long y = long_val(arg(type_long,&f->R));
 	return Qlong(x + y);
 	}
 
-value type_long_add(value f)
+value type_long_sub(value f)
 	{
-	return V(type_long_add1,f->R,0);
-	}
-
-value type_long_sub1(value f)
-	{
-	long x = long_val(arg(type_long,&f->L->L));
+	if (!f->L->L) return 0;
+	long x = long_val(arg(type_long,&f->L->R));
 	long y = long_val(arg(type_long,&f->R));
 	return Qlong(x - y);
 	}
 
-value type_long_sub(value f)
+value type_long_mul(value f)
 	{
-	return V(type_long_sub1,f->R,0);
-	}
-
-value type_long_mul1(value f)
-	{
-	long x = long_val(arg(type_long,&f->L->L));
+	if (!f->L->L) return 0;
+	long x = long_val(arg(type_long,&f->L->R));
 	long y = long_val(arg(type_long,&f->R));
 	return Qlong(x * y);
 	}
 
-value type_long_mul(value f)
-	{
-	return V(type_long_mul1,f->R,0);
-	}
-
 /* long_div returns 0 if you try to divide by 0. */
-value type_long_div1(value f)
-	{
-	long x = long_val(arg(type_long,&f->L->L));
-	long y = long_val(arg(type_long,&f->R));
-	return Qlong(y ? x / y : 0);
-	}
-
 value type_long_div(value f)
 	{
-	return V(type_long_div1,f->R,0);
+	if (!f->L->L) return 0;
+	long x = long_val(arg(type_long,&f->L->R));
+	long y = long_val(arg(type_long,&f->R));
+	return Qlong(y ? x / y : 0);
 	}
 
 /* (long_string x) Convert long to string. */
@@ -97,7 +81,7 @@ value resolve_long(const char *name)
 	}
 
 #if 0
-TODO more functions
+LATER more functions
 long_double
 long_string
 long_char

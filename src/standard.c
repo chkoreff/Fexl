@@ -54,7 +54,7 @@ value resolve_name(const char *name)
 	#endif
 
 	#if 0
-	/*TODO more functions */
+	/*LATER more functions */
 	if (strcmp(name,"argc") == 0) return Q(type_argc);
 	if (strcmp(name,"argv") == 0) return Q(type_argv);
 	if (strcmp(name,"getenv") == 0) return Q(type_getenv);

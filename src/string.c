@@ -179,9 +179,11 @@ int string_double(const char *beg, double *num)
 	}
 
 /* Append two strings. */
-value type_string_append1(value f)
+value type_string_append(value f)
 	{
-	value x = arg(type_string,&f->L->L);
+	if (!f->L->L) return 0;
+
+	value x = arg(type_string,&f->L->R);
 	value y = arg(type_string,&f->R);
 
 	long xlen = string_len(x);
@@ -204,11 +206,6 @@ value type_string_append1(value f)
 		}
 	}
 
-value type_string_append(value f)
-	{
-	return V(type_string_append1,f->R,0);
-	}
-
 value resolve_string(const char *name)
 	{
 	if (strcmp(name,"append") == 0) return Q(type_string_append);
@@ -216,7 +213,7 @@ value resolve_string(const char *name)
 	}
 
 #if 0
-TODO more functions
+LATER more functions
 string_cmp
 string_slice
 string_at

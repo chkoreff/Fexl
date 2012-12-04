@@ -28,40 +28,28 @@ double double_val(value f)
 	return x->val;
 	}
 
-value type_double_add1(value f)
+value type_double_add(value f)
 	{
-	double x = double_val(arg(type_double,&f->L->L));
+	if (!f->L->L) return 0;
+	double x = double_val(arg(type_double,&f->L->R));
 	double y = double_val(arg(type_double,&f->R));
 	return Qdouble(x + y);
 	}
 
-value type_double_add(value f)
+value type_double_sub(value f)
 	{
-	return V(type_double_add1,f->R,0);
-	}
-
-value type_double_sub1(value f)
-	{
-	double x = double_val(arg(type_double,&f->L->L));
+	if (!f->L->L) return 0;
+	double x = double_val(arg(type_double,&f->L->R));
 	double y = double_val(arg(type_double,&f->R));
 	return Qdouble(x - y);
 	}
 
-value type_double_sub(value f)
-	{
-	return V(type_double_sub1,f->R,0);
-	}
-
-value type_double_mul1(value f)
-	{
-	double x = double_val(arg(type_double,&f->L->L));
-	double y = double_val(arg(type_double,&f->R));
-	return Qdouble(x * y);
-	}
-
 value type_double_mul(value f)
 	{
-	return V(type_double_mul1,f->R,0);
+	if (!f->L->L) return 0;
+	double x = double_val(arg(type_double,&f->L->R));
+	double y = double_val(arg(type_double,&f->R));
+	return Qdouble(x * y);
 	}
 
 /*
@@ -69,16 +57,12 @@ Note that dividing by zero is no problem here. If you divide a non-zero by
 zero, it yields inf (infinity). If you divide zero by zero, it yields -nan
 (not a number).
 */
-value type_double_div1(value f)
-	{
-	double x = double_val(arg(type_double,&f->L->L));
-	double y = double_val(arg(type_double,&f->R));
-	return Qdouble(x / y);
-	}
-
 value type_double_div(value f)
 	{
-	return V(type_double_div1,f->R,0);
+	if (!f->L->L) return 0;
+	double x = double_val(arg(type_double,&f->L->R));
+	double y = double_val(arg(type_double,&f->R));
+	return Qdouble(x / y);
 	}
 
 /* (double_string x) Convert double to string. */
@@ -102,7 +86,7 @@ value resolve_double(const char *name)
 	}
 
 #if 0
-TODO more functions
+LATER more functions
 double_long
 double_string
 double_cmp

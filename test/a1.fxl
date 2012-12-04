@@ -42,7 +42,7 @@
 	exit 1;
 	)
 
-#TODO #\+ = ...
+#LATER \+ = ...
 \+ = long_add
 \* = long_mul
 
@@ -135,7 +135,7 @@ get \x
 announce "test_var_repeat"
 var_new 0 \var
 
-# TODO a "do" function (over a list)
+# LATER a "do" function (over a list)
 var_get var \x
 print ["x = " x NL]
 var_put var (+ x 3)
@@ -211,6 +211,7 @@ try "hello"
 try (I "hello")
 try (C "hello" S)
 try (C 4 S)
+try (item 4)
 )
 
 \test_is_type =

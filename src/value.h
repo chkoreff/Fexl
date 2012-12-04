@@ -36,12 +36,13 @@ evaluation.  When evaluating a form f, we first evaluate the left side, then
 call f->L->T(f).  This yields a new form which is functionally equivalent to f,
 and then we continue evaluating f from there.
 
-The L and R fields are the left and right components of the value.  Either one
-or both can be zero.
+The L and R fields are the left and right components of the value.
 
-If L == 0, the value is considered to be an atom.  If R != 0, it points to the
-additional data for the atom, which includes a function pointer for freeing the
-atom when its reference count drops to 0.
+If L == 0, the value represents an atom.  R may then point to an atom structure
+which holds extra data, including a function pointer for freeing the data when
+the atom's reference count drops to 0.
+
+If L != 0, then R != 0, and the value represents the application of L to R.
 */
 typedef struct value *value;
 typedef value (*type)(value);

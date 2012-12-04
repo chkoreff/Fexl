@@ -60,33 +60,25 @@ value type_putchar(value f)
 	}
 
 /* (fwrite file str) Write string to file. */
-value type_fwrite1(value f)
+value type_fwrite(value f)
 	{
-	FILE *fh = file_val(arg(type_file,&f->L->L));
+	if (!f->L->L) return 0;
+	FILE *fh = file_val(arg(type_file,&f->L->R));
 	value str = arg(type_string,&f->R);
 	size_t count = fwrite(string_data(str), 1, string_len(str), fh);
 	(void)count;  /* Ignore the return count. */
 	return I;
 	}
 
-value type_fwrite(value f)
-	{
-	return V(type_fwrite1,f->R,0);
-	}
-
 /* (fopen path mode) Open a file and return [fh] or []. */
-value type_fopen1(value f)
+value type_fopen(value f)
 	{
-	const char *path = string_data(arg(type_string,&f->L->L));
+	if (!f->L->L) return 0;
+	const char *path = string_data(arg(type_string,&f->L->R));
 	const char *mode = string_data(arg(type_string,&f->R));
 
 	FILE *fh = fopen(path,mode);
 	return maybe(fh ? Qfile(fh,1) : 0);
-	}
-
-value type_fopen(value f)
-	{
-	return V(type_fopen1,f->R,0);
 	}
 
 /* Call readlink, returning a Fexl string. */
@@ -119,15 +111,11 @@ static value safe_readlink(const char *path)
 	}
 
 /* (readlink path next) Call readlink(2) on the path. */
-value type_readlink1(value f)
-	{
-	const char *path = string_data(arg(type_string,&f->L->L));
-	return A(f->R,safe_readlink(path));
-	}
-
 value type_readlink(value f)
 	{
-	return V(type_readlink1,f->R,0);
+	if (!f->L->L) return 0;
+	const char *path = string_data(arg(type_string,&f->L->R));
+	return A(f->R,safe_readlink(path));
 	}
 
 /*
@@ -165,7 +153,7 @@ value type_base_path(value f)
 	}
 
 /*
-TODO fclose : (not necessary due to auto-close, but gives you some control.
+LATER fclose : (not necessary due to auto-close, but gives you some control.
 Just change the type to free_file.
 
 fmemopen str len mode
@@ -180,7 +168,7 @@ But we can use it for parsing from a string.
 /*LATER file_string */
 
 #if 0
-/*TODO sample code here */
+/*LATER sample code here */
 {
 char *s = "abcdefg";
 FILE *fp = fmemopen(s, strlen(s), "r");

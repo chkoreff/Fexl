@@ -8,14 +8,10 @@ value type_exit(value f)
 
 /* ? x y = y x, but with x evaluated first.  Use this to force eager evaluation
 when necessary. */
-value type_query1(value f)
-	{
-	return A(f->R,eval(&f->L->L));
-	}
-
 value type_query(value f)
 	{
-	return V(type_query1,f->R,0);
+	if (!f->L->L) return 0;
+	return A(f->R,eval(&f->L->R));
 	}
 
 static long get_RLIMIT(const char *name, int *ok)
@@ -48,7 +44,7 @@ value resolve_RLIMIT(const char *name)
 	return ok ? Qlong(limit) : 0;
 	}
 
-static void do_setrlimit(long resource, long limit) /*TODO in fexl */
+static void do_setrlimit(long resource, long limit) /*LATER in fexl */
 	{
 	struct rlimit rlim;
 	rlim.rlim_cur = limit;
