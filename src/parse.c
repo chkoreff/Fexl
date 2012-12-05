@@ -510,6 +510,7 @@ static value resolve_sym(value sym)
 
 		drop(result);
 		result = item(sym,C);
+		eval(&result);
 		hold(result);
 		}
 
