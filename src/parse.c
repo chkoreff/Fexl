@@ -110,13 +110,15 @@ static void undefined_symbol(const char *name, int line)
 		);
 	}
 
-value type_name(value f)
+static value type_name(value f)
 	{
+	if (!f->L) return 0;
 	return type_error();
 	}
 
-value type_open(value f)
+static value type_open(value f)
 	{
+	if (!f->L) return 0;
 	return type_error();
 	}
 
@@ -321,18 +323,21 @@ static value parse_term(void)
 		return parse_sym(1);
 	}
 
+/* Return a shallow copy. */
+static value copy(value f)
+	{
+	return V(f->T,f->L,f->R);
+	}
+
 /* Return (S f g), optimizing if possible. */
 static value _fuse(value f, value g)
 	{
 	if (f->L == C)
 		{
 		if (g == I)
-			{
 			/* S (C x) I = x */
-			value x = f->R;
-			/* Copy x because the caller drops f.  */
-			return V(x->T,x->L,x->R);
-			}
+			/* Copy x because the caller drops f. */
+			return copy(f->R);
 		else if (g->L == C)
 			/* S (C x) (C y) = C (x y) */
 			return apply(C,apply(f->R,g->R));
@@ -400,35 +405,55 @@ static value parse_lambda(long first_line)
 	int allow_eq = at_white();
 	skip_white();
 
+	/* Parse the symbol (function parameter). */
 	value sym = parse_sym(allow_eq);
 	if (is_null_name(sym))
 		syntax_error("Missing lambda symbol", first_line);
 
 	hold(sym);
-	value def = 0;
-
 	skip_filler();
-	if (ch == '=')
-		{
-		long first_line = line;
-		next_ch();
-		int is_recursive = (ch == '=');
-		if (is_recursive) next_ch();
-		skip_filler();
 
+	first_line = line;
+
+	/* Count the number of '=' chars up to three . */
+	int count_eq = 0;
+	while (ch == '=' && count_eq < 3)
+		{
+		count_eq++;
+		next_ch();
+		}
+
+	/* Parse the definition of the symbol if we saw an '=' char. */
+	value def = 0;
+	if (count_eq > 0)
+		{
+		skip_filler();
 		def = parse_term();
 
 		if (is_null_name(def))
 			syntax_error("Missing definition", first_line);
-
-		if (is_recursive)
-			def = apply(Y,abstract(sym,def));
 		}
 
+	/* Parse the body of the function. */
 	value body = abstract(sym,parse_exp());
-	drop(sym);
 
-	return def ? apply(body,def) : body;
+	/* Produce the result based on the kind of definition used, if any. */
+	value result;
+	if (count_eq == 0)
+		/* no definition */
+		result = body;
+	else if (count_eq == 1)
+		/* eager definition */
+		result = apply(apply(Qquery,def),body);
+	else if (count_eq == 2)
+		/* normal definition */
+		result = apply(body,def);
+	else
+		/* recursive definition */
+		result = apply(body,apply(Y,abstract(sym,def)));
+
+	drop(sym);
+	return result;
 	}
 
 /* Parse the next factor of an expression.  Return 0 if no factor found. */
@@ -492,32 +517,19 @@ with status 1. */
 
 static value resolve_sym(value sym)
 	{
-	value result = 0;
-
 	if (sym->T == type_string)
-		result = item(sym->L,C);
-	else
-		result = A(context,sym->L);
+		return item(sym->L,C);
 
-	hold(result);
-	eval(&result);
-
-	if (result->T == type_C)
-		{
-		const char *name = string_data(sym->L);
-		long line = long_val(sym->R);
-		undefined_symbol(name,line);
-
-		drop(result);
-		result = item(sym,C);
-		eval(&result);
-		hold(result);
-		}
-
+	value result = eval(A(context,sym->L));
 	if (result->T == type_item && result->L && result->L->L)
 		return result;
 
-	return type_error();
+	const char *name = string_data(sym->L);
+	long line = long_val(sym->R);
+	undefined_symbol(name,line);
+
+	check(result);
+	return item(sym,C);
 	}
 
 /* Resolve all symbols in the value using the current context, returning a
@@ -525,17 +537,18 @@ value with no more symbols and all the definitions baked in. */
 static value resolve_all(value f)
 	{
 	value sym = first_sym(f);
+
 	if (sym == 0) return f;
 
 	value result = resolve_sym(sym);
 	value exp = apply(resolve_all(abstract(sym,f)),result->L->R);
-	drop(result);
+	check(result);
 	return exp;
 	}
 
 /* Parse the file in the context, starting with the given line number, using
 the label in any error messages. */
-value parse_fh(FILE *_fh, value _context, long _line, const char *_label)
+static value parse_fh(FILE *_fh, value _context, long _line, const char *_label)
 	{
 	FILE *save_fh = fh;
 	const char *save_label = label;

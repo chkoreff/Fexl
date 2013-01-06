@@ -1,17 +1,58 @@
+/* (look x) returns [] if x is an atom, or [x0;x1] if x is (x0 x1). */
+value type_look(value f)
+	{
+	if (!f->L) return 0;
+	value x = f->R;
+	if (x->L)
+		return replace(f, type_item, A(Qitem,x->L), x->R);
+	else
+		return replace_value(f, C);
+	}
+
+/* (type x y) is true if x and y have the same type. */
+value type_type(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	value x = f->L->R;
+	value y = f->R;
+	return replace_boolean(f, x->T == y->T);
+	}
+
+/* TODO tag */
+
 /* exit status : exits with the given status */
 value type_exit(value f)
 	{
-	long status = long_val(arg(type_long,&f->R));
+	if (!f->L) return 0;
+	value x = arg(type_long,f->R);
+	long status = long_val(x);
 	exit(status);
 	return 0;
 	}
 
-/* ? x y = y x, but with x evaluated first.  Use this to force eager evaluation
-when necessary. */
-value type_query(value f)
+/* (setrlimit resource soft hard) = status */
+value type_setrlimit(value f)
 	{
-	if (!f->L->L) return 0;
-	return A(f->R,eval(&f->L->R));
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+
+	value x = arg(type_long,f->L->L->R);
+	value y = arg(type_long,f->L->R);
+	value z = arg(type_long,f->R);
+
+	long resource = long_val(x);
+	struct rlimit rlim;
+	rlim.rlim_cur = long_val(y);
+	rlim.rlim_max = long_val(z);
+
+	int status = setrlimit(resource, &rlim);
+
+	if (x != f->L->L->R || y != f->L->R || z != f->R)
+		{
+		check(x);
+		check(y);
+		check(z);
+		}
+	return Qlong(status);
 	}
 
 static long get_RLIMIT(const char *name, int *ok)
@@ -37,26 +78,27 @@ static long get_RLIMIT(const char *name, int *ok)
 	return -1;
 	}
 
-value resolve_RLIMIT(const char *name)
+static value resolve_RLIMIT(const char *name)
 	{
 	int ok;
 	long limit = get_RLIMIT(name,&ok);
 	return ok ? Qlong(limit) : 0;
 	}
 
-static void do_setrlimit(long resource, long limit) /*LATER in fexl */
+value resolve_meta(const char *name)
 	{
-	struct rlimit rlim;
-	rlim.rlim_cur = limit;
-	rlim.rlim_max = limit;
-	int status = setrlimit(resource, &rlim);
-	(void)status;
+	if (strncmp(name,"RLIMIT_",7) == 0) return resolve_RLIMIT(name+7);
+	if (strcmp(name,"setrlimit") == 0) return Q(type_setrlimit);
+	if (strcmp(name,"look") == 0) return Q(type_look);
+	if (strcmp(name,"type") == 0) return Q(type_type);
+	if (strcmp(name,"exit") == 0) return Q(type_exit);
+	return 0;
 	}
 
-void use_safe_limits(void)
-	{
-	do_setrlimit(RLIMIT_STACK,400000000);
-	do_setrlimit(RLIMIT_DATA,800000000);
-	do_setrlimit(RLIMIT_AS,800000000);
-	do_setrlimit(RLIMIT_CPU,20);
-	}
+/* TODO more functions
+if (strcmp(name,"argc") == 0) return Q(type_argc);
+if (strcmp(name,"argv") == 0) return Q(type_argv);
+if (strcmp(name,"getenv") == 0) return Q(type_getenv);
+if (strcmp(name,"setenv") == 0) return Q(type_setenv);
+if (strcmp(name,"source") == 0) return Qsource();
+*/

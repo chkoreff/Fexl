@@ -1,225 +1,164 @@
-# Miscellaneous tests
+#
 
-# Convert atom or list to a string.
-\to_string ==
-	(\x
-	is_atom x
+# Traverse the data value x.  A data value is expected to be either an atom or
+# a list of other data values, i.e. a nested list with atoms at the leaves.
+# While traversing the data, we use the atom function when we see an atom, and
+# we use the join and side functions when we see a list [h;t].  Any erroneously
+# typed values are treated like "?".
+
+# LATER it'll be interesting to see how to extend this elegantly with "tagged"
+# data types.
+
+\traverse =
+	(\atom\join\side\x
+	\x=x
+	\error==(atom "?")
+	look x
 		(
-		is_type "" x x;
-		is_type 0 x (long_string x);
-		is_type 0.0 x (double_string x);
-		""
-		);
-	is_list x
+		type x 0 (atom (long_string x));
+		type x 0.0 (atom (double_string x));
+		type x "" (atom x);
+		type x [] (atom "");
+		error
+		)
+	\x0\x1
+	look x0 error
+	\x00\x01
+	look x00
 		(
-		x "" \h\t
-		. (to_string h) (to_string t)
-		);
-	""
+		type x00 item (join (side x01) (side x1));
+		error
+		)
+	\_\_
+	error
 	)
 
-\fprint ==
-	(\fh\x
-	is_atom x (fwrite fh (to_string x));
-	is_list x
-		(
-		x () \h\t
-		fprint fh h;
-		fprint fh t;
-		);
-	)
+# Convert data to a string.
+\to_string === (traverse I .  to_string)
 
-\print = (fprint stdout)
-\warn = (fprint stderr)
+# Print data to file handle fh.
+\fprint === (\fh traverse (fwrite fh) I (fprint fh))
+
+# That's equivalent to:
+#\fprint=(\fh\x fwrite fh (to_string x))
+# except it streams over lists instead of appending them into a single string.
+
+\print=(fprint stdout)
+\warn=(fprint stderr)
 
 \NL="
 "
-\nl = (print NL)
+\nl==(print NL)
+
+\say=(\x print x nl)
 
 \die =
 	(\msg
-	warn [msg NL];
-	exit 1;
+	warn [msg NL]
+	exit 1
 	)
 
-#LATER \+ = ...
-\+ = long_add
-\* = long_mul
-
-### Define test functions.
-
-\announce = (\x print ["== " x NL])
-
-\test_var_trace =
-(
-announce "test_var_trace"
-var_new 0 \var
-\get=(var_get var)
-\put=(var_put var)
-
-# Override with a tracing version:
-\get =
-	(\next
-	get \x
-	print ["trace x = " x NL];
-	next x
+\setrlimit =
+	(\resource\limit
+	\status=(setrlimit resource limit limit)
 	)
 
-get \x
-put (+ x 7)
-get \x
-put (* x 3)
-get \x
-print ["final x = " x NL]
-)
-
-\test_var_counter =
-(
-announce "test_var_counter"
-\counter_new =
-	(\next
-	var_new 0 \current
-	\get=(var_get current)
-	\put=(var_put current)
-	\count =
-		(
-		get \x
-		\x = (+ x 1)
-		print ["count " x NL]
-		put x
-		)
-	next count
+\use_safe_limits ==
+	(
+	setrlimit RLIMIT_STACK 400000000
+	setrlimit RLIMIT_DATA 800000000
+	setrlimit RLIMIT_AS 800000000
+	setrlimit RLIMIT_CPU 20
 	)
 
-counter_new \ping
+use_safe_limits
 
-ping ping ping
-ping ping ping
-ping ping ping
-)
+## Define test routines
 
-\test_circular_structure =
+\+=long_add # TODO
+\*=long_mul
+
+\announce=(\x say ["== " x])
+
+\say_boolean = (\x say (x "yes" "no"))
+
+\test_is_atom ==
 (
-announce "test_circular_structure"
-# Create a circular structure and thus introduce a memory leak.
-var_new 0 \var
-var_put var var
-)
-
-\test_var_ops =
-(
-announce "test_var_ops"
-
-var_new 0 \var
-\get=(var_get var)
-\put=(var_put var)
-
-# Override with a tracing version:
-\get =
-	(\next
-	get \x
-	print ["trace x = " x NL];
-	next x
-	)
-
-put 14
-get \x
-put (+ x x)
-get \x
-put (* x x)
-get \x
-)
-
-\test_var_repeat =
-(
-announce "test_var_repeat"
-var_new 0 \var
-
-# LATER a "do" function (over a list)
-var_get var \x
-print ["x = " x NL]
-var_put var (+ x 3)
-
-var_get var \x
-print ["x = " x NL]
-var_put var (+ x 3)
-
-var_get var \x
-print ["x = " x NL]
-var_put var (+ x 3)
-)
-
-\test_print_repeat =
-(
-announce "test_print_repeat"
-
-\talk=
-(
-\x=(* 6; + 3 4)
-\y = ["Hello " "x = " x NL]
-\y = [y y]
-
-\z=["bananas"]
-\z=[z z NL]
-\z=["apples" "oranges"; z]
-
-print [y (to_string y) z NL]
-)
-
-talk talk
-)
-
-\test_is_atom =
-(
-announce "test_is_atom"
-\try =
+\is_atom =
 	(\x
-	print (is_atom x "yes" "no");nl;
+	\x=x
+	look x T \_\_ F
 	)
 
+announce "test_is_atom"
+\try = (\x say_boolean (is_atom x))
 # yes
+try ""
 try "hello"
+try (. "a" "b")
+try 3
+try 4.5
+try (C 0 5)
 try (I "hello")
 try (C "hello" S)
 try (C 4 S)
 try (C 4.5 S)
-try ""
-# no
 try C
+try S
 try (I C)
-try ["apple" "banana"]
 try []
+nl
+# no
+try (C C)
+try (S C)
+try ["apple" "banana"]
 try (\x\y y x)
 )
 
-\test_is_list =
+\test_is_list ==
 (
-announce "test_is_list"
-\try =
+\is_list =
 	(\x
-	print (is_list x "yes" "no");nl;
+	\x=x
+	look x (type x [])
+	\x0\x1
+	look x0 F
+	\x00\x01
+	look x00 (type x00 item)
+	\_\_
+	F
 	)
 
+announce "test_is_list"
+\try = (\x say_boolean (is_list x))
 # yes
 try C
 try (I C)
 try []
-try (item 3 [])
+try (item 3 end)
+try (item S [])
+try (item 3 4)
 try [3 4]
+try (C (item 3 end) 33)
+nl
 # no
+try (C C)
+try S
+try item
+try (item 3)
 try "hello"
 try (I "hello")
 try (C "hello" S)
 try (C 4 S)
-try (item 4)
 )
 
-\test_is_type =
+\test_type ==
 (
-announce "test_is_type"
-\try =
-	(\x\y
-	print (is_type x y "yes" "no");nl
+announce "test_type"
+\try=(\x\y
+	\x=x
+	\y=y
+	say_boolean (type x y)
 	)
 
 # yes
@@ -229,7 +168,7 @@ try (I 3) (I 5)
 try (I 3.5) (I 4.5)
 try [] C
 try "" "abc"
-
+nl
 # no
 try C S
 try (I C) (I S)
@@ -237,56 +176,622 @@ try (I 3) (I 4.5)
 try 0 "abc"
 )
 
-
-\test_big =
+\test_big ==
 (
-# Test an exponential tower, showing how eager evaluation helps.
 announce "test_big"
+# Test an exponential tower, showing how forcing eager evaluation can help.
 \f = (S C C)
 
 \g =
 	(\f
-	? f \f  # This line cuts time down to ~0.000s from 8.800s.
-	\f = (f f)
-	\f = (f f)
-	\f = (f f)
-	\f = (f f)
-	\f = (f f)
+	\f=f  # This line cuts time down to ~0.02s from ~9.6s.
+	\f == (f f)
+	\f == (f f)
+	\f == (f f)
+	\f == (f f)
+	\f == (f f)
 	f
 	)
 
-\f = (g f)
-\f = (g f)
-\f = (g f)
-\f = (g f)
-\f = (g f)
+\f == (g f)
+\f == (g f)
+\f == (g f)
+\f == (g f)
+\f == (g f)
 
 f
 )
 
-\test_fwrite =
+\test_putchar ==
+(
+announce "test_putchar"
+\f==(putchar 65)
+\f==(f f)
+\f==(f f)
+f f
+nl
+)
+
+\test_repeat_1 ==
+(
+announce "test_repeat_1"
+\f ==
+	(
+	\f==(say ["hello" " world"])
+
+	\f == (f f)
+	\f == (f f)
+
+	\f==
+		(
+		say "round 1"
+		f
+		say "round 2"
+		f
+		)
+
+	\f==(f f)
+	f
+	)
+
+f f
+)
+
+\test_repeat_2 ==
+(
+announce "test_repeat_2"
+\talk==(say "Hello world.")
+\talk==talk  # 1
+\talk==(talk talk) # 2
+\talk==(talk talk) # 4
+talk
+)
+
+\test_repeat_3 ==
+(
+announce "test_repeat_3"
+
+\talk==
+(
+\x=(* 6; + 3 4)
+\y = ["Hello " "x = " x NL]
+\y = [y y]
+
+\z=["bananas"]
+\z=[z z NL]
+\z=["apples" "oranges"; z]
+
+say [y (to_string y) z]
+# Test printing some erroneous forms.
+say
+[
+S
+(S S)
+(S S S)
+(item 3)
+(item 3 4) # this one's OK though.
+(item 3 4 5)
+]
+)
+
+talk
+talk
+)
+
+\ping_counter=(var_new 0)
+
+\ping==
+	(
+	\x=(var_get ping_counter)
+	# TODO using "=" here slows down the big ping test
+	#\x=(+ x 1)
+	\x==(+ x 1)
+	#say [x " ping"]
+	var_put ping_counter x
+	)
+
+\reset_ping ==
+	(
+	var_put ping_counter 0
+	)
+
+\show_ping==
+	(
+	\x=(var_get ping_counter)
+	say ["ping_counter = " x]
+	)
+
+\test_ping_8 ==
+(
+announce "test_ping_8"
+reset_ping
+
+\weird=I
+\ping2 == (ping (C ping weird))
+
+\f==ping2
+\f==(f f)
+\f==(f f)
+f
+
+show_ping
+)
+
+\test_ping_17 ==
+(
+announce "test_ping_17"
+reset_ping
+\f==I
+\f==(ping f)
+\f==(ping f)
+\f==(ping f)
+\f==(f f)
+\f==(f f)
+\f==(ping f)
+\f==(ping f)
+\f==(f ping)
+\f==(f ping)
+\f==(f ping)
+f
+show_ping
+)
+
+\test_ping_18 ==
+(
+announce "test_ping_18"
+reset_ping
+\f==(ping ping ping) # 3
+\f==(ping f) # 4
+\f==(f f) # 8
+\f==(ping f) # 9
+\f==(f f) # 18
+f
+show_ping
+)
+
+\test_ping_28 ==
+(
+announce "test_ping_28"
+reset_ping
+\f==(ping ping ping) # 3
+\f==(f f) # 6
+\f==(f f) # 12
+\f==(f ping) # 13
+\f==(ping f) # 14
+\f==(f f) # 28
+f
+show_ping
+)
+
+\test_ping_98==
+(
+announce "test_ping_98"
+reset_ping
+
+\test_ping_17==
+	(
+	\f==
+		(
+		\f==ping
+		\f==(f f)
+		\f==(f ping)
+		\f==(f f)
+		\f==(ping f)
+		\f==(f ping)
+		\f==(f f)
+		f
+		)
+
+	\f==(ping f)
+	f
+	)
+
+\test_ping_7 ==
+	(
+	\g==
+		(
+		\f==ping
+		\f==(f f)
+		f f f
+		)
+
+	\g==(ping g)
+	g
+	)
+
+\f==
+	(
+	test_ping_17
+	test_ping_17
+	test_ping_7
+	test_ping_7
+	) # 48
+
+\f==(f f) # 96
+\f==(ping f) # 97
+\f==(f ping)
+
+f
+show_ping
+)
+
+\test_ping_128 ==
+(
+announce "test_ping_128"
+reset_ping
+\f==ping
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+f
+show_ping
+)
+
+\test_ping_18874376 ==
+(
+announce "test_ping_18874376"
+reset_ping
+\f==I
+\f==(ping f)
+\f==(ping f)
+\f==(ping f)
+\f==(ping f)
+\f==(ping f)
+\f==(ping f)
+\f==(ping f)
+\f==(ping f)
+\f==(ping f)
+
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+
+\f==(ping f)
+\f==(ping f)
+\f==(ping f)
+
+\f==(f ping)
+\f==(f ping)
+\f==(f ping)
+\f==(f ping)
+\f==(f ping)
+
+f
+show_ping
+)
+
+\test_var_trace ==
+(
+announce "test_var_trace"
+\var=(var_new 0)
+\get==(var_get var)
+\put==(var_put var)
+
+# Override get with a tracing version:
+\get ==
+	(
+	\x=get
+	print ["trace x = " x NL]
+	x
+	)
+
+\x=get
+put (+ x 7)
+\x=get
+put (* x 3)
+\x=get
+print ["final x = " x NL]
+)
+
+\test_var_counter ==
+(
+announce "test_var_counter"
+
+\new_counter==
+	(
+	\current=(var_new 0)
+	\ping ==
+		(
+		\x=(var_get current)
+		# TODO
+		\x=(+ x 1)
+		print ["count " x NL]
+		var_put current x
+		)
+	return ping
+	)
+
+\ping=new_counter
+ping ping ping
+ping ping ping
+ping ping ping
+)
+
+\test_circular_structure ==
+(
+announce "test_circular_structure"
+# Create a circular structure and thus introduce a memory leak.
+\var=(var_new 0)
+var_put var var
+)
+
+\test_var_ops ==
+(
+announce "test_var_ops"
+
+\var=(var_new 0)
+\get=var_get
+\put=(var_put var)
+
+# Override with a tracing version:
+\get ==
+	(
+	\x=(get var)
+	print ["trace x = " x NL]
+	x
+	)
+
+put 14
+\x=get
+put (+ x x)
+\x=get
+put (* x x)
+\x=get
+)
+
+\test_var_repeat ==
+(
+announce "test_var_repeat"
+\var=(var_new 0)
+
+# LATER a "do" function (over a list)
+\f==
+(
+\x=(var_get var)
+print ["x = " x NL]
+var_put var (+ x 3)
+)
+
+f f f
+)
+
+\test_fwrite ==
 (
 announce "test_fwrite"
-\f = (fwrite stdout "Hello ")
+\f == (fwrite stdout "Hello ")
 f f f
 f f f
 fwrite stdout NL
 )
 
-### Call test functions.
+\test_big_string_append ==
+(
+announce "test_big_string_append"
+\x = (. "x" "y")
+\x = (. x x)
+\x = (. x x)
+\x = (. x x)
+\x = (. x x)
+\x = (. x x)
+\x = (. x x)
+\x = (. x x)
+\x = (. x x)
+\x = (. x x)
+\x = (. x x)
+\x = (. x x)
+\x = (. x x)
+\x = (. x x)
+\x = (. x x)
+\x = (. x x)
+\x = (. x x)
+\x = (. x x)
+\x = (. x x)
+\x = (. x x)
+\x = (. x x)
+\x = (. x x)
+\x = (. x x)
+\x = (. x x)
+\x = (. x x)  # 2^25 bytes = 33,554,432
+#fwrite stdout x
+say "done"
+)
 
-test_var_trace
-test_var_counter
-test_var_ops
-test_var_repeat
-test_print_repeat
+\test_many_writes==
+(
+# Timed this by piping into wc -l.
+# This takes 0.28s.
+\f==(fwrite stdout "Hello world.
+")
+
+# This takes 3.72s.
+#\f==(say "Hello world.")
+
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f)
+\f==(f f) # 1048576
+f
+)
+
+\test_long_1 ==
+(
+# Test some long operations with repeated embedded side effects.
+announce "test_long_1"
+\ping==(fwrite stdout "!")
+\+=long_add
+\x=(+ (ping + 1 1) (ping + 3 0))
+say ["+ (+ 1 1) (+ 3 0) = " x]
+)
+
+\test_long_2==
+(
+# Test some long operations with repeated embedded side effects.
+announce "test_long_2"
+
+\f==(say (long_add (print "A" 36) (print "B" 4)))
+f f
+\f==(say (long_sub (print "A" 36) (print "B" 4)))
+f f
+\f==(say (long_mul (print "A" 36) (print "B" 4)))
+f f
+\f==(say (long_div (print "A" 36) (print "B" 4)))
+f f
+\f==(say (long_div (print "A" 36) (print "B" 0)))
+f f
+\f==(say (long_string (print "A" 123)))
+f f
+)
+
+\test_double_1 ==
+(
+# Test some double operations with repeated embedded side effects.
+announce "test_double_1"
+\ping==(fwrite stdout "!")
+\+=double_add
+\x=(+ (ping + 1.1 1.2) (ping + 3.3 0.0))
+say ["+ (+ 1.1 1.2) (+ 3.3 0.0) = " x]
+)
+
+\test_double_2==
+(
+# Test some double operations with repeated embedded side effects.
+announce "test_double_2"
+\f==(say (double_add (print "A" 36.4) (print "B" 4.0)))
+f f
+\f==(say (double_sub (print "A" 36.4) (print "B" 4.0)))
+f f
+\f==(say (double_mul (print "A" 36.4) (print "B" 4.0)))
+f f
+\f==(say (double_div (print "A" 36.4) (print "B" 4.0)))
+f f
+\f==(say (double_div (print "A" 36.4) (print "B" 0.0)))
+f f
+\f==(say (double_string (print "A" 123.5)))
+f f
+)
+
+\test_getchar==
+(
+\f==
+(
+print "Please type a character and press enter: " \ch=getchar
+print "You typed " putchar ch nl
+\ch=getchar
+)
+f f
+)
+
+\test_resolve==
+(
+# Test the resolve function with embedded side effects.
+announce "test_resolve"
+\try==
+	(
+	#\f=(resolve "48.6")
+	\f=(resolve (print "!" "48.6"))
+	f () \x\_ fwrite stdout (double_string x) nl
+	)
+
+try try
+)
+
+\test_var_side==
+(
+# Test var with embedded side effects.
+announce "test_var_side"
+\var=(var_new 3)
+\x=(var_get (print "!" var))
+say ["x = " x]
+var_put (putchar 64 var) (putchar 37 "hi")
+\x=(var_get (print "!" var))
+say ["x = " x]
+)
+
+## LATER run these in separate process under safe limits
+#Y S S S
+# LATER this tests stack overflow (segfault).
+#Y Y
+#Y I
+#exit 42
+# LATER this tests stack overflow (segfault).
+#(
+#\f==S
+#\f==(f f)
+#\f==(f f)
+##\f==(f f)
+#\f==(f f)
+#f
+#)
+
+## Call test routines
+
 test_is_atom
 test_is_list
-test_is_type
+test_type
 test_big
-test_fwrite
-
-# LATER fork a process to test these.
+test_putchar
+test_repeat_1
+test_repeat_2
+test_repeat_3
+test_ping_98
+test_ping_17
+test_ping_18
+test_ping_28
+test_ping_128
+test_ping_18874376
+test_ping_8
+test_var_trace
+test_var_counter
+# LATER fork a process to test this.
 #test_circular_structure
-#Y I
-#Y Y
+test_var_ops
+test_var_repeat
+test_fwrite
+test_big_string_append
+#test_many_writes
+test_long_1
+test_long_2
+test_double_1
+test_double_2
+# LATER fork a process and cat string to its stdin.
+#test_getchar
+test_resolve
+test_var_side

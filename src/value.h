@@ -38,9 +38,9 @@ and then we continue evaluating f from there.
 
 The L and R fields are the left and right components of the value.
 
-If L == 0, the value represents an atom.  R may then point to an atom structure
-which holds extra data, including a function pointer for freeing the data when
-the atom's reference count drops to 0.
+If L == 0, the value represents an atom.  R may then point to a value which
+holds extra data, including a function pointer for freeing the data when the
+atom's reference count drops to 0.
 
 If L != 0, then R != 0, and the value represents the application of L to R.
 */
@@ -55,19 +55,16 @@ struct value
 	value R;
 	};
 
-struct atom
-	{
-	void (*free)(struct atom *);
-	long data[];
-	};
-
-extern void hold(value);
-extern void drop(value);
-extern void check(value);
+extern void hold(value f);
+extern void drop(value f);
+extern void check(value f);
+extern value replace(value f, type T, value L, value R);
 extern value V(type T, value L, value R);
-extern value A(value f, value g);
 extern value Q(type T);
-extern value eval(value *pos);
+extern value A(value f, value g);
+extern value replace_value(value f, value g);
+extern value replace_apply(value f, value L, value R);
+extern value eval(value f);
 extern value type_error(void);
-extern value arg(type T, value *x);
+extern value arg(type T, value f);
 extern void end_value(void);

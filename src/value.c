@@ -32,52 +32,56 @@ void check(value f)
 	if (f->N == 0) recycle(f);
 	}
 
-/* Evacuate the contents of a value retrieved from the free list. */
-void clear(value v)
+/* Replace value f with the given components, or make a new value if f==0. */
+value replace(value f, type T, value L, value R)
 	{
-	if (v->L)
+	if (f == 0)
 		{
-		drop(v->L);
-		drop(v->R);
+		f = free_list;
+
+		if (f)
+			free_list = (value)f->N;
+		else
+			{
+			f = (value)new_memory(sizeof (struct value));
+			f->L = 0;
+			f->R = 0;
+			}
+
+		f->N = 0;
 		}
-	else if (v->R)
+
+	if (L) hold(L);
+	if (R) hold(R);
+
+	if (f->L)
 		{
-		struct atom *x = (struct atom *)v->R;
-		x->free(x);
+		/* Clear pair. */
+		drop(f->L);
+		drop(f->R);
 		}
+	else if (f->R && --f->R->N == 0)
+		{
+		/* Clear data. */
+		if (f->R->T)
+			f->R->T(f->R); /* Call the clear routine for the data. */
+
+		f->R->L = 0;
+		f->R->R = 0;
+		recycle(f->R);
+		}
+
+	f->T = T;
+	f->L = L;
+	f->R = R;
+
+	return f;
 	}
 
 /* Return a value of type T with the given left and right side. */
 value V(type T, value L, value R)
 	{
-	value v = free_list;
-
-	if (v)
-		{
-		free_list = (value)v->N;
-		clear(v);
-		}
-	else
-		v = (value)new_memory(sizeof (struct value));
-
-	v->N = 0;
-	v->T = T;
-	v->L = L;
-	v->R = R;
-
-	if (L)
-		{
-		hold(L);
-		hold(R);
-		}
-
-	return v;
-	}
-
-/* Apply f to g with delayed evaluation. */
-value A(value f, value g)
-	{
-	return V(0,f,g);
+	return replace(0,T,L,R);
 	}
 
 /* Create a combinator of type T.  Shorthand for "quote". */
@@ -86,25 +90,57 @@ value Q(type T)
 	return V(T,0,0);
 	}
 
-/* Evaluate the value at the given position, replacing it with its normal form
-if possible within any limits on space and time. */
-value eval(value *pos)
+/* The reduction routine for function application. */
+value type_apply(value f)
 	{
-	value f = *pos;
-	while (f->T == 0)
+	value g = eval(f->L);
+	if (f->L == g)
 		{
-		value g = eval(&f->L)->T(f);
-		if (g)
+		f->T = f->L->T;
+		return f;
+		}
+	else
+		return V(g->T,g,f->R);
+	}
+
+/* Return a value which is f applied to g. */
+value A(value f, value g)
+	{
+	return V(type_apply,f,g);
+	}
+
+/* Replace value f with value g. */
+value replace_value(value f, value g)
+	{
+	return replace(f, g->T, g->L, g->R);
+	}
+
+/* Replace value f with A(L,R). */
+value replace_apply(value f, value L, value R)
+	{
+	return replace(f, type_apply, L, R);
+	}
+
+/* Evaluate the value, returning its normal form if possible within any limits
+on space and time. */
+value eval(value f)
+	{
+	hold(f);
+	while (1)
+		{
+		value g = f->T(f);
+		if (g == 0)
+			{
+			f->N--;
+			return f;
+			}
+		if (f != g)
 			{
 			hold(g);
 			drop(f);
 			f = g;
 			}
-		else
-			f->T = f->L->T;
 		}
-	*pos = f;
-	return f;
 	}
 
 value type_error(void)
@@ -113,12 +149,13 @@ value type_error(void)
 	return 0;
 	}
 
-/* Evaluate an argument and assert that its type is T. */
-value arg(type T, value *pos)
+/* Evaluate an argument and assert that it is of type T. */
+value arg(type T, value f)
 	{
-	value x = eval(pos);
-	if (x->T != T) type_error();
-	return x;
+	if (f->T == T) return f;
+	f = eval(f);
+	if (f->T == T) return f;
+	return type_error();
 	}
 
 /* Clear the free list and end the memory arena. */

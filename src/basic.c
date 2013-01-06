@@ -1,73 +1,98 @@
 /* C x y = x */
 value type_C(value f)
 	{
-	if (!f->L->L) return 0;
-	return f->L->R;
+	if (!f->L || !f->L->L) return 0;
+	return replace_value(f, f->L->R);
 	}
 
 /* S x y z = x z (y z) */
 value type_S(value f)
 	{
-	if (!f->L->L || !f->L->L->L) return 0;
-	return A(A(f->L->L->R,f->R),A(f->L->R,f->R));
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	return replace_apply(f, A(f->L->L->R,f->R), A(f->L->R,f->R));
 	}
 
 /* I x = x */
 value type_I(value f)
 	{
-	return f->R;
+	if (!f->L) return 0;
+	return replace_value(f, f->R);
 	}
 
 /* F x = I.  In other words, F x y = y. */
 value type_F(value f)
 	{
-	return I;
+	if (!f->L) return 0;
+	return replace_value(f, I);
 	}
 
 /* R x y z = x (y z) */
 value type_R(value f)
 	{
-	if (!f->L->L || !f->L->L->L) return 0;
-	return A(f->L->L->R,A(f->L->R,f->R));
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	return replace_apply(f, f->L->L->R, A(f->L->R,f->R));
 	}
 
 /* L x y z = x z y */
 value type_L(value f)
 	{
-	if (!f->L->L || !f->L->L->L) return 0;
-	return A(A(f->L->L->R,f->R),f->L->R);
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	return replace_apply(f, A(f->L->L->R,f->R), f->L->R);
 	}
 
 /* Y x = x (Y x) */
 value type_Y(value f)
 	{
-	return A(f->R,A(f->L,f->R));
+	if (!f->L) return 0;
+	return replace_apply(f, f->R, A(f->L,f->R));
 	}
 
 /* item x y A B = B x y */
 value type_item(value f)
 	{
-	if (!f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
-	return A(A(f->R,f->L->L->L->R),f->L->L->R);
+	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
+	return replace_apply(f, A(f->R,f->L->L->L->R), f->L->L->R);
 	}
 
-/* Return the list with head h and tail t, which is [h;t] in list notation. */
-value item(value h, value t)
+/* (query x y) = y x, except x is evaluated first. */
+value type_query(value f)
 	{
-	return A(A(Qitem,h),t);
+	if (!f->L || !f->L->L) return 0;
+
+	value x = eval(f->L->R);
+	value y = f->R;
+
+	if (x != f->L->R)
+		f = 0;
+	return replace_apply(f, y, x);
 	}
 
-/* Return T or F based on the flag. */
-value boolean(int flag)
+/* (return x) = x, except x is not evaluated right away.
+This is useful for returning a function without evaluating it.  For example,
+you may have a function which creates another function, and you want to return
+that function without actually calling it.  This is particularly important for
+functions which have side effects, otherwise we wouldn't really need this.
+*/
+value type_return(value f)
 	{
-	return Q(flag ? type_C : type_F);
+	if (!f->L) return 0;
+	replace_value(f, f->R);
+	return 0;
 	}
 
-/* Return [x] if x is non-zero, otherwise []. */
-value maybe(value x)
+/* Become T or F based on the flag. */
+value replace_boolean(value f, int flag)
 	{
-	value C = Q(type_C);
-	return x ? item(x,C) : C;
+	return replace(f, flag ? type_C : type_F, 0, 0);
+	}
+
+/* Become [x] if x is non-zero, otherwise []. */
+value replace_maybe(value f, value x)
+	{
+	if (x)
+		return replace_apply(f, A(Qitem,x), C);
+	else
+		return replace(f, type_C, 0, 0);
 	}
 
 value C;
@@ -77,6 +102,31 @@ value R;
 value L;
 value Y;
 value Qitem;
+value Qquery;
+
+/* Return the list with head h and tail t, which is [h;t] in list notation. */
+value item(value h, value t)
+	{
+	return A(A(Qitem,h),t);
+	}
+
+value resolve_basic(const char *name)
+	{
+	if (strcmp(name,"T") == 0) return C;
+	if (strcmp(name,"F") == 0) return Q(type_F);
+	if (strcmp(name,"I") == 0) return I;
+	if (strcmp(name,"C") == 0) return C;
+	if (strcmp(name,"S") == 0) return S;
+	if (strcmp(name,"Y") == 0) return Y;
+	if (strcmp(name,"R") == 0) return R;
+	if (strcmp(name,"L") == 0) return L;
+	if (strcmp(name,"end") == 0) return C;
+	if (strcmp(name,"item") == 0) return Qitem;
+	if (strcmp(name,"?") == 0) return Qquery;
+	if (strcmp(name,"query") == 0) return Qquery;
+	if (strcmp(name,"return") == 0) return Q(type_return);
+	return 0;
+	}
 
 void beg_basic(void)
 	{
@@ -87,6 +137,7 @@ void beg_basic(void)
 	L = Q(type_L); hold(L);
 	Y = Q(type_Y); hold(Y);
 	Qitem = Q(type_item); hold(Qitem);
+	Qquery = Q(type_query); hold(Qquery);
 	}
 
 void end_basic(void)
@@ -98,4 +149,5 @@ void end_basic(void)
 	drop(L);
 	drop(Y);
 	drop(Qitem);
+	drop(Qquery);
 	}

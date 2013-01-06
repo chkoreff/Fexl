@@ -47,34 +47,48 @@ void buf_add(struct buf **top, char ch)
 	buf->data[buf->len++] = ch;
 	}
 
-struct atom_string
+static void free_string(value f)
 	{
-	void (*free)(struct atom_string *);
-	long len;
-	char data[];
-	};
-
-static void free_string(struct atom_string *x)
-	{
-	free_memory(x, sizeof(struct atom_string) + x->len + 1);
+	free_memory((void *)f->R, (long)f->L + 1);
 	}
 
 value type_string(value f)
 	{
+	if (!f->L) return 0;
 	return type_error();
 	}
 
 /* Allocate a string which can hold len bytes plus trailing NUL. */
-static struct atom_string *new_string(long len)
+static value new_string(long len)
 	{
-	struct atom_string *x = new_memory(sizeof(struct atom_string) + len + 1);
-	x->free = free_string;
-	x->len = len;
-	return x;
+	value f = Q(0);
+	f->T = (type)free_string;
+	f->L = (value)len;
+	f->R = (value)new_memory(len + 1);
+	return f;
 	}
 
-/* Make a string value from the buffer contents. */
-value Qstring_buffer(struct buf **buffer)
+/* Replace with a string using the data with the given length. */
+value replace_string_vector(value f, const char *data, long len)
+	{
+	if (len < 0) len = 0;
+
+	value x = new_string(len);
+	char *dest = (char *)x->R;
+	if (data) memcpy(dest, data, len);
+	dest[len] = '\000'; /* add trailing NUL byte */
+
+	return replace(f, type_string, 0, x);
+	}
+
+/* Replace with a string using the NUL-terminated data. */
+value replace_string(value f, const char *data)
+	{
+	return replace_string_vector(f, data, data ? strlen(data) : 0);
+	}
+
+/* Replace with a string using the buffer contents. */
+value replace_string_buffer(value f, struct buf **buffer)
 	{
 	struct buf *curr;
 
@@ -89,7 +103,8 @@ value Qstring_buffer(struct buf **buffer)
 		}
 
 	/* Allocate a string which can hold all the bytes plus trailing NUL. */
-	struct atom_string *x = new_string(len);
+	value x = new_string(len);
+	char *dest = (char *)x->R;
 
 	/* Copy buffer bytes into the string, freeing chunks along the way. */
 
@@ -101,7 +116,7 @@ value Qstring_buffer(struct buf **buffer)
 		if (curr == 0) break;
 		offset -= curr->len;
 
-		memcpy(x->data + offset, curr->data, curr->len);
+		memcpy(dest + offset, curr->data, curr->len);
 		free_memory(curr->data, curr->size);
 
 		struct buf *prev = curr->prev;
@@ -109,39 +124,34 @@ value Qstring_buffer(struct buf **buffer)
 		curr = prev;
 		}
 
-	x->data[len] = '\000'; /* add trailing NUL byte */
+	dest[len] = '\000'; /* add trailing NUL byte */
 
-	return V(type_string, 0, (value)x);
+	return replace(f, type_string, 0, x);
 	}
 
-/* Make a string value from the data with the given length. */
-value Qstring_data(const char *data, long len)
+value Qstring_vector(const char *data, long len)
 	{
-	if (len < 0) len = 0;
-
-	struct atom_string *x = new_string(len);
-	if (data) memcpy(x->data, data, len);
-	x->data[len] = '\000'; /* add trailing NUL byte */
-
-	return V(type_string, 0, (value)x);
+	return replace_string_vector(0,data,len);
 	}
 
-/* Make a string value from the NUL-terminated chars. */
 value Qstring(const char *data)
 	{
-	return Qstring_data(data, data ? strlen(data) : 0);
+	return replace_string(0,data);
+	}
+
+value Qstring_buffer(struct buf **buffer)
+	{
+	return replace_string_buffer(0,buffer);
 	}
 
 const char *string_data(value f)
 	{
-	struct atom_string *x = (struct atom_string *)f->R;
-	return x->data;
+	return (const char *)f->R->R;
 	}
 
 long string_len(value f)
 	{
-	struct atom_string *x = (struct atom_string *)f->R;
-	return x->len;
+	return (long)f->R->L;
 	}
 
 /* Compare strings x and y, returning negative if x < y, zero if x == y, or
@@ -162,64 +172,64 @@ int string_cmp(value x, value y)
 	return cmp;
 	}
 
-/* Convert string to long and return true if successful. */
-int string_long(const char *beg, long *num)
-	{
-	char *end;
-	*num = strtol(beg, &end, 10);
-	return *beg != '\0' && *end == '\0';
-	}
-
-/* Convert string to double and return true if successful. */
-int string_double(const char *beg, double *num)
-	{
-	char *end;
-	*num = strtod(beg, &end);
-	return *beg != '\0' && *end == '\0';
-	}
-
 /* Append two strings. */
 value type_string_append(value f)
 	{
-	if (!f->L->L) return 0;
+	if (!f->L || !f->L->L) return 0;
 
-	value x = arg(type_string,&f->L->R);
-	value y = arg(type_string,&f->R);
+	value x = arg(type_string,f->L->R);
+	value y = arg(type_string,f->R);
 
 	long xlen = string_len(x);
 	long ylen = string_len(y);
 
+	value z;
 	if (xlen == 0)
-		return y;
+		z = y->R;
 	else if (ylen == 0)
-		return x;
+		z = x->R;
 	else
 		{
 		long len = xlen + ylen;
 
-		struct atom_string *z = new_string(len);
-		memcpy(z->data, string_data(x), xlen);
-		memcpy(z->data + xlen, string_data(y), ylen);
-		z->data[len] = '\000'; /* add trailing NUL byte */
+		z = new_string(len);
+		char *dest = (char *)z->R;
 
-		return V(type_string, 0, (value)z);
+		memcpy(dest, string_data(x), xlen);
+		memcpy(dest + xlen, string_data(y), ylen);
+		dest[len] = '\000'; /* add trailing NUL byte */
 		}
+
+	if (x != f->L->R || y != f->R)
+		{
+		check(x);
+		check(y);
+		f = 0;
+		}
+	return replace(f, type_string, 0, z);
 	}
 
-value resolve_string(const char *name)
+static value resolve_string_prefix(const char *name)
 	{
 	if (strcmp(name,"append") == 0) return Q(type_string_append);
 	return 0;
 	}
 
-#if 0
-LATER more functions
+value resolve_string(const char *name)
+	{
+	if (strcmp(name,".") == 0) return Q(type_string_append);
+	if (strncmp(name,"string_",7) == 0) return resolve_string_prefix(name+7);
+	return 0;
+	}
+
+/* TODO more functions
 string_cmp
 string_slice
 string_at
 string_eq (maybe just define in fexl)
-string_append
 string_common
 string_len
 string_index
-#endif
+string_long
+string_double
+*/

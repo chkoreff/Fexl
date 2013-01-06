@@ -1,0 +1,282 @@
+#
+
+# Traverse the data value x.  A data value is expected to be either an atom or
+# a list of other data values, i.e. a nested list with atoms at the leaves.
+# While traversing the data, we use the atom function when we see an atom, and
+# we use the join and side functions when we see a list [h;t].  Any erroneously
+# typed values are treated like "?".
+
+# LATER it'll be interesting to see how to extend this elegantly with "tagged"
+# data types.
+
+\traverse =
+	(\atom\join\side\x
+	\x=x
+	\error==(atom "?")
+	look x
+		(
+		type x 0 (atom (long_string x));
+		type x 0.0 (atom (double_string x));
+		type x "" (atom x);
+		type x [] (atom "");
+		error
+		)
+	\x0\x1
+	look x0 error
+	\x00\x01
+	look x00
+		(
+		type x00 item (join (side x01) (side x1));
+		error
+		)
+	\_\_
+	error
+	)
+
+# Convert data to a string.
+\to_string === (traverse I .  to_string)
+
+# Print data to file handle fh.
+\fprint === (\fh traverse (fwrite fh) I (fprint fh))
+
+# That's equivalent to:
+#\fprint=(\fh\x fwrite fh (to_string x))
+# except it streams over lists instead of appending them into a single string.
+
+\print=(fprint stdout)
+\warn=(fprint stderr)
+
+\NL="
+"
+\nl==(print NL)
+
+\say=(\x print x nl)
+
+\die =
+	(\msg
+	warn [msg NL]
+	exit 1
+	)
+
+\setrlimit =
+	(\resource\limit
+	\status=(setrlimit resource limit limit)
+	)
+
+\use_safe_limits ==
+	(
+	setrlimit RLIMIT_STACK 400000000
+	setrlimit RLIMIT_DATA 800000000
+	setrlimit RLIMIT_AS 800000000
+	setrlimit RLIMIT_CPU 30
+	)
+
+use_safe_limits
+
+## Define test routines
+
+\+=long_add
+\*=long_mul
+
+\announce=(\x say ["== " x])
+
+\say_boolean = (\x say (x "yes" "no"))
+
+\test_nat_math ==
+(
+announce "test_nat_math"
+
+# Convert atom or list to a string.
+
+# (map f xs) is the list of (f x) values for each x in xs.
+\map===(\f\xs xs [] \x\xs [(f x); map f xs])
+
+\length===(\xs xs 0 \_\xs long_add 1 (length xs))
+
+# (nat b n) is the natural number b + 2*n, where b is a bit and n is a natural
+# number.
+\nat = (\b\n b [T;n]; n [] \_\_ [F;n])
+
+# (nat_eq0 x) is true iff x = 0
+\nat_eq0=(\x x T \_\_ F)
+
+# (nat_inc x) is x+1.  (x incremented by 1).  Both x and the result are of
+# type nat.
+\nat_inc===(\x x [T] \b\n b [F; nat_inc n] [T;n])
+
+\bits = (map \b b "1" "0")
+
+# (nat_add x y) is x+y, the sum of x and y.
+\nat_add ===
+	(\x\y
+	x y \bx\nx
+	y x \by\ny
+	\sum=(nat_add nx ny)
+	bx
+		(by [F;nat_inc sum] [T;sum])
+		[by;sum]
+	)
+
+# (nat_mul x y) is x*y, the product of x and y.
+\nat_mul ===
+	(\x\y
+	x [] \bx\nx
+	y [] \by\ny
+	bx
+		(by
+			[T; nat_add nx; nat_mul ny x]
+			[F; nat_mul ny x])
+		(by
+			[F; nat_mul nx y]
+			[F F; nat_mul nx ny])
+	)
+
+# TODO rephrase the nat operators so they don't use yes/no.
+
+\pair=(\x\y\p p x y)
+\nat_0 = []
+\yes=(\x\yes\no yes x)
+\no=(\yes\no no)
+
+# Decrement x, returning:
+#   yes d     # if x > 0 and d = x - 1
+#   no        # if x = 0
+\nat_dec_clip ===
+	(\x
+	x no \bx\nx
+	bx
+		(yes (nat F nx))
+		(nat_dec_clip nx (\d yes (nat T d)) no)
+	)
+
+# Subtract x minus y, returning:
+#   yes d     # if x >= y and d = x - y
+#   no        # if x < y
+\nat_sub_clip ===
+	(\x\y
+	x (y (yes nat_0) \_\_ no) \bx\nx
+	y (yes x) \by\ny
+
+	nat_sub_clip nx ny
+		(\d
+		bx
+			(yes (nat (by F T) d))
+			(by
+				(nat_dec_clip (nat F d) yes no)
+				(yes (nat F d))
+			)
+		)
+		no
+	)
+
+# (div x y) divides x by y, returning the quotient q and remainder r which
+# satisfy: x = q*y + r and 0 <= r < y.  Or if y=0, the function returns q=0 and
+# r=0.
+\nat_div===
+	(\x\y
+	x (pair nat_0 nat_0) \bx\nx
+	y (pair nat_0 nat_0) \by\ny
+	by
+		(
+		# divide by odd
+		nat_div nx y \q\r
+		\r=(nat bx r)
+		nat_sub_clip r y
+			(\z pair (nat T q) z)
+			(pair (nat F q) r)
+		)
+		(
+		# divide by even
+		nat_div nx ny \q\r
+		pair q (nat bx r)
+		)
+	)
+
+# Show digits in binary.
+\digits=bits
+
+# Show the length in front of each number.
+\digits=
+	(\x
+	\xs=(digits x)
+	[ "[" (length xs) "] " (bits x) ]
+	)
+
+\try_mul =
+	(\x\y
+	\z = (nat_mul x y)
+
+	print
+	[
+	"mul" NL
+	"x = " (digits x) NL
+	"y = " (digits y) NL
+	"z = " (digits z) NL
+	]
+	)
+
+\try_div =
+	(\x\y
+	nat_div x y \q\r
+
+	print
+	[
+	"div" NL
+	"x = " (digits x) NL
+	"y = " (digits y) NL
+	"q = " (digits q) NL
+	"r = " (digits r) NL
+	]
+	)
+
+#\x = [T] # 1
+#\y = [F T] # 2
+
+#\x = [F T] # 2
+#\y = [F T] # 2
+
+#\x = [T F T F F T]  # 37
+#\y = [T F T T] # 13
+# 100001111 is 481 = 37*13
+
+\nat_31 = [T T T T T]
+\nat_19 = [T T F F T]
+\nat_17 = [T F F F T]
+\nat_10 = [F T F T]
+
+#\z = (nat_add x y)
+try_mul [F T] [F T] # 2 * 2
+try_mul [T F T F F T] [T F T T] # 37 * 13
+try_div [T F T F F T] [T F T T] # 37 / 13
+
+\churn = (\x nat_add nat_17; nat_mul x x)
+
+\x = (nat_mul nat_31 nat_19)
+
+\x=(churn x)
+\x=(churn x)
+\x=(churn x)
+\x=(churn x)
+\x=(churn x)
+\x=(churn x)
+
+\y=nat_10
+\y=(nat_mul y y)
+
+try_div x y
+
+\x=(churn x)
+
+\y=(churn y)
+\y=(churn y)
+\y=(churn y)
+\y=(churn y)
+\y=(churn y)
+\y=(churn y)
+
+try_div x y
+)
+
+##
+
+test_nat_math

@@ -237,25 +237,26 @@ common_cflags="-c -Wall -Werror -O3"
 ## Build the main Fexl program.
 
 begin_program
-module basic value
+module basic - string value
 module die - stdarg - stdio - stdlib
-module double - string memory value string
-module fexl value basic lib parse
+module double - stdio - stdlib - string value basic string
+module fexl value basic parse resolve
 module file - stdio - string - unistd memory value basic long string
-module lib - dlfcn die value basic file string
-module long - string memory value string
+module lib - dlfcn - stdio die value file string
+module long - stdio - stdlib - string value basic string
 module memory - stdlib die
 module meta - stdlib - string - sys/resource value basic long
 module parse - ctype - stdio die value basic long string
-no_module show - stdio value basic double long string
-module string - stdlib - string memory value
-module type - string value basic
+module resolve - stdio - string value basic double file long meta string var
+no_module show - stdio value
+module string - string memory value basic
 module value memory die
-module var - string value basic memory meta
+module var - string value basic
+
 program fexl
 
 ## Build the dynamic libraries.
 
-begin_library
-module standard - string value basic double file long meta string type var
-library standard
+#begin_library
+#module lib1 ...
+#library lib1

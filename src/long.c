@@ -1,82 +1,152 @@
 value type_long(value f)
 	{
+	if (!f->L) return 0;
 	return type_error();
 	}
 
-struct atom_long
+value replace_long(value f, long val)
 	{
-	void (*free)(struct atom_long *);
-	long val;
-	};
-
-static void free_long(struct atom_long *x)
-	{
-	free_memory(x, sizeof(struct atom_long));
+	value x = Q(0);
+	x->L = (value)val;
+	return replace(f, type_long, 0, x);
 	}
 
 value Qlong(long val)
 	{
-	struct atom_long *x = new_memory(sizeof(struct atom_long));
-	x->free = free_long;
-	x->val = val;
-	return V(type_long,0,(value)x);
+	return replace_long(0,val);
 	}
 
 long long_val(value f)
 	{
-	struct atom_long *x = (struct atom_long *)f->R;
-	return x->val;
+	return (long)f->R->L;
 	}
 
 value type_long_add(value f)
 	{
-	if (!f->L->L) return 0;
-	long x = long_val(arg(type_long,&f->L->R));
-	long y = long_val(arg(type_long,&f->R));
-	return Qlong(x + y);
+	if (!f->L || !f->L->L) return 0;
+
+	value x = arg(type_long,f->L->R);
+	value y = arg(type_long,f->R);
+
+	long vx = long_val(x);
+	long vy = long_val(y);
+	long vz = vx + vy;
+
+	if (x != f->L->R || y != f->R)
+		{
+		check(x);
+		check(y);
+		f = 0;
+		}
+	return replace_long(f,vz);
 	}
 
 value type_long_sub(value f)
 	{
-	if (!f->L->L) return 0;
-	long x = long_val(arg(type_long,&f->L->R));
-	long y = long_val(arg(type_long,&f->R));
-	return Qlong(x - y);
+	if (!f->L || !f->L->L) return 0;
+
+	value x = arg(type_long,f->L->R);
+	value y = arg(type_long,f->R);
+
+	long vx = long_val(x);
+	long vy = long_val(y);
+	long vz = vx - vy;
+
+	if (x != f->L->R || y != f->R)
+		{
+		check(x);
+		check(y);
+		f = 0;
+		}
+	return replace_long(f,vz);
 	}
 
 value type_long_mul(value f)
 	{
-	if (!f->L->L) return 0;
-	long x = long_val(arg(type_long,&f->L->R));
-	long y = long_val(arg(type_long,&f->R));
-	return Qlong(x * y);
+	if (!f->L || !f->L->L) return 0;
+
+	value x = arg(type_long,f->L->R);
+	value y = arg(type_long,f->R);
+
+	long vx = long_val(x);
+	long vy = long_val(y);
+	long vz = vx * vy;
+
+	if (x != f->L->R || y != f->R)
+		{
+		check(x);
+		check(y);
+		f = 0;
+		}
+	return replace_long(f,vz);
 	}
 
 /* long_div returns 0 if you try to divide by 0. */
 value type_long_div(value f)
 	{
-	if (!f->L->L) return 0;
-	long x = long_val(arg(type_long,&f->L->R));
-	long y = long_val(arg(type_long,&f->R));
-	return Qlong(y ? x / y : 0);
+	if (!f->L || !f->L->L) return 0;
+
+	value x = arg(type_long,f->L->R);
+	value y = arg(type_long,f->R);
+
+	long vx = long_val(x);
+	long vy = long_val(y);
+	long vz = vy ? vx / vy : 0;
+
+	if (x != f->L->R || y != f->R)
+		{
+		check(x);
+		check(y);
+		f = 0;
+		}
+	return replace_long(f,vz);
 	}
 
 /* (long_string x) Convert long to string. */
 value type_long_string(value f)
 	{
-	long x = long_val(arg(type_long,&f->R));
-	char buf[100]; /* being careful here */
-	sprintf(buf, "%ld", x);
-	return Qstring(buf);
+	if (!f->L) return 0;
+
+	value x = arg(type_long,f->R);
+	long vx = long_val(x);
+	char data[100]; /* being careful here */
+	sprintf(data, "%ld", vx);
+
+	if (x != f->R)
+		{
+		check(x);
+		f = 0;
+		}
+	return replace_string(f,data);
 	}
 
-value resolve_long(const char *name)
+static value resolve_long_prefix(const char *name)
 	{
 	if (strcmp(name,"add") == 0) return Q(type_long_add);
 	if (strcmp(name,"sub") == 0) return Q(type_long_sub);
 	if (strcmp(name,"mul") == 0) return Q(type_long_mul);
 	if (strcmp(name,"div") == 0) return Q(type_long_div);
 	if (strcmp(name,"string") == 0) return Q(type_long_string);
+	return 0;
+	}
+
+/* Convert string to long and return true if successful. */
+static int string_long(const char *beg, long *num)
+	{
+	char *end;
+	*num = strtol(beg, &end, 10);
+	return *beg != '\0' && *end == '\0';
+	}
+
+value resolve_long(const char *name)
+	{
+	/* Integer number (long) */
+	{
+	long num;
+	if (string_long(name,&num)) return Qlong(num);
+	}
+
+	if (strncmp(name,"long_",5) == 0) return resolve_long_prefix(name+5);
 	return 0;
 	}
 

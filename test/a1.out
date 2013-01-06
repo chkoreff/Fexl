@@ -1,3 +1,131 @@
+== test_is_atom
+yes
+yes
+yes
+yes
+yes
+yes
+yes
+yes
+yes
+yes
+yes
+yes
+yes
+yes
+
+no
+no
+no
+no
+== test_is_list
+yes
+yes
+yes
+yes
+yes
+yes
+yes
+yes
+
+no
+no
+no
+no
+no
+no
+no
+no
+== test_type
+yes
+yes
+yes
+yes
+yes
+yes
+
+no
+no
+no
+no
+== test_big
+== test_putchar
+AAAAAAAA
+== test_repeat_1
+round 1
+hello world
+hello world
+hello world
+hello world
+round 2
+hello world
+hello world
+hello world
+hello world
+round 1
+hello world
+hello world
+hello world
+hello world
+round 2
+hello world
+hello world
+hello world
+hello world
+round 1
+hello world
+hello world
+hello world
+hello world
+round 2
+hello world
+hello world
+hello world
+hello world
+round 1
+hello world
+hello world
+hello world
+hello world
+round 2
+hello world
+hello world
+hello world
+hello world
+== test_repeat_2
+Hello world.
+Hello world.
+Hello world.
+Hello world.
+== test_repeat_3
+Hello x = 42
+Hello x = 42
+Hello x = 42
+Hello x = 42
+applesorangesbananasbananas
+
+????34?
+Hello x = 42
+Hello x = 42
+Hello x = 42
+Hello x = 42
+applesorangesbananasbananas
+
+????34?
+== test_ping_98
+ping_counter = 98
+== test_ping_17
+ping_counter = 17
+== test_ping_18
+ping_counter = 18
+== test_ping_28
+ping_counter = 28
+== test_ping_128
+ping_counter = 128
+== test_ping_18874376
+ping_counter = 18874376
+== test_ping_8
+ping_counter = 8
 == test_var_trace
 trace x = 0
 trace x = 7
@@ -21,53 +149,43 @@ trace x = 784
 x = 0
 x = 3
 x = 6
-== test_print_repeat
-Hello x = 42
-Hello x = 42
-Hello x = 42
-Hello x = 42
-applesorangesbananasbananas
-
-Hello x = 42
-Hello x = 42
-Hello x = 42
-Hello x = 42
-applesorangesbananasbananas
-
-== test_is_atom
-yes
-yes
-yes
-yes
-yes
-yes
-no
-no
-no
-no
-no
-== test_is_list
-yes
-yes
-yes
-yes
-yes
-no
-no
-no
-no
-no
-== test_is_type
-yes
-yes
-yes
-yes
-yes
-yes
-no
-no
-no
-no
-== test_big
 == test_fwrite
 Hello Hello Hello Hello Hello Hello 
+== test_big_string_append
+done
+== test_long_1
+!!+ (+ 1 1) (+ 3 0) = 5
+== test_long_2
+AB40
+AB40
+AB32
+AB32
+AB144
+AB144
+AB9
+AB9
+AB0
+AB0
+A123
+A123
+== test_double_1
+!!+ (+ 1.1 1.2) (+ 3.3 0.0) = 5.6
+== test_double_2
+AB40.4
+AB40.4
+AB32.4
+AB32.4
+AB145.6
+AB145.6
+AB9.1
+AB9.1
+ABinf
+ABinf
+A123.5
+A123.5
+== test_resolve
+!48.6
+!48.6
+== test_var_side
+!x = 3
+@!%x = hi

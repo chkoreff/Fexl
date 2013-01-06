@@ -4,61 +4,61 @@ human user, redefining print to capture output in a memory buffer, etc. */
 
 value type_var(value f)
 	{
+	if (!f->L) return 0;
 	return type_error();
 	}
 
-struct atom_var
+static void free_var(value f)
 	{
-	void (*free)(struct atom_var *);
-	value val;
-	};
-
-static void free_var(struct atom_var *x)
-	{
-	drop(x->val);
-	free_memory(x, sizeof(struct atom_var));
+	drop(f->L);
 	}
 
-/* (var_new val next) Return a new variable with the given value. */
+/* (var_new val) Return a new variable with the given value. */
 value type_var_new(value f)
 	{
-	if (!f->L->L) return 0;
-	struct atom_var *x = new_memory(sizeof(struct atom_var));
-	x->free = free_var;
-	x->val = f->L->R;
-	hold(x->val);
-	return A(f->R,V(type_var,0,(value)x));
+	if (!f->L) return 0;
+	value x = V((type)free_var,f->R,0);
+	return V(type_var,0,x);
 	}
 
-static struct atom_var *arg_var(value *pos)
-	{
-	arg(type_var,pos);
-	return (struct atom_var *)(*pos)->R;
-	}
-
-/* (var_get var next) Get current value of variable. */
+/* (var_get var) Get current value of variable. */
 value type_var_get(value f)
 	{
-	if (!f->L->L) return 0;
-	struct atom_var *x = arg_var(&f->L->R);
-	return A(f->R,x->val);
+	if (!f->L) return 0;
+	value var = arg(type_var,f->R);
+	value val = var->R->L;
+
+	if (var != f->R)
+		check(var);
+	return val;
 	}
 
 /* (var_put var val) Put new value in variable. */
 value type_var_put(value f)
 	{
-	if (!f->L->L) return 0;
-	struct atom_var *x = arg_var(&f->L->R);
-	hold(f->R);
-	drop(x->val);
-	x->val = f->R;
+	if (!f->L || !f->L->L) return 0;
+	value var = arg(type_var,f->L->R);
+	value new = f->R;
+
+	hold(new);
+	drop(var->R->L);
+	var->R->L = new;
+
+	if (var != f->L->R)
+		check(var);
 	return I;
 	}
 
-value resolve_var(const char *name)
+static value resolve_var_prefix(const char *name)
 	{
 	if (strcmp(name,"new") == 0) return Q(type_var_new);
 	if (strcmp(name,"get") == 0) return Q(type_var_get);
 	if (strcmp(name,"put") == 0) return Q(type_var_put);
+	return 0;
+	}
+
+value resolve_var(const char *name)
+	{
+	if (strncmp(name,"var_",4) == 0) return resolve_var_prefix(name+4);
 	return 0;
 	}

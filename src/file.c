@@ -1,84 +1,121 @@
 value type_file(value f)
 	{
+	if (!f->L) return 0;
 	return type_error();
 	}
 
-struct atom_file
+FILE *file_val(value f)
 	{
-	void (*free)(struct atom_file *);
-	FILE *fh;
-	};
-
-static void free_file(struct atom_file *x)
-	{
-	free_memory(x, sizeof(struct atom_file));
+	return (FILE *)f->R->L;
 	}
 
-static void close_free_file(struct atom_file *x)
+static value free_file(value x)
 	{
-	if (x->fh) fclose(x->fh);
-	free_file(x);
+	if (x->L && x->R)
+		fclose((FILE *)x->L);
+	return 0;
 	}
 
 /* Make a file value from the given file handle.  The close flag determines
 whether the file handle should be closed automatically when the file object is
 no longer used. */
-value Qfile(FILE *fh, int close)
+value Qfile(FILE *fh, long close)
 	{
-	struct atom_file *x = new_memory(sizeof(struct atom_file));
-	x->free = close ? close_free_file : free_file;
-	x->fh = fh;
+	value x = Q(0);
+	x->T = free_file;
+	x->L = (value)fh;
+	x->R = (value)close;
 	return V(type_file,0,(value)x);
-	}
-
-FILE *file_val(value f)
-	{
-	struct atom_file *x = (struct atom_file *)f->R;
-	return x->fh;
-	}
-
-static FILE *get_std_file(const char *name)
-	{
-	if (strcmp(name,"in") == 0) return stdin;
-	if (strcmp(name,"out") == 0) return stdout;
-	if (strcmp(name,"err") == 0) return stderr;
-	return 0;
-	}
-
-value resolve_std_file(const char *name)
-	{
-	FILE *fh = get_std_file(name);
-	if (fh) return Qfile(fh,0);
-	return 0;
 	}
 
 /* (putchar ch) Write character to stdout. */
 value type_putchar(value f)
 	{
-	(void)putchar(long_val(arg(type_long,&f->R)));
+	if (!f->L) return 0;
+	value x = arg(type_long,f->R);
+	(void)putchar(long_val(x));
+
+	if (x != f->R)
+		check(x);
 	return I;
 	}
 
-/* (fwrite file str) Write string to file. */
+/* getchar : Return next char from stdin. */
+value type_getchar(value f)
+	{
+	return Qlong(getchar());
+	}
+
+/* (fputc file ch) Write character to stdout. */
+value type_fputc(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	value x = arg(type_file,f->L->R);
+	value y = arg(type_long,f->R);
+
+	FILE *fh = file_val(x);
+	(void)fputc(long_val(y),fh);
+
+	if (x != f->L->R || y != f->R)
+		{
+		check(x);
+		check(y);
+		}
+	return I;
+	}
+
+/* (fgetc file) returns the next character from the file. */
+value type_fgetc(value f)
+	{
+	if (!f->L) return 0;
+	value x = arg(type_file,f->R);
+
+	FILE *fh = file_val(x);
+	int ch = fgetc(fh);
+
+	if (x != f->R)
+		check(x);
+	return Qlong(ch);
+	}
+
+/* (fwrite fh str) Write string to file handle. */
 value type_fwrite(value f)
 	{
-	if (!f->L->L) return 0;
-	FILE *fh = file_val(arg(type_file,&f->L->R));
-	value str = arg(type_string,&f->R);
-	size_t count = fwrite(string_data(str), 1, string_len(str), fh);
+	if (!f->L || !f->L->L) return 0;
+	value x = arg(type_file,f->L->R);
+	value y = arg(type_string,f->R);
+
+	FILE *fh = file_val(x);
+	size_t count = fwrite(string_data(y), 1, string_len(y), fh);
 	(void)count;  /* Ignore the return count. */
+
+	if (x != f->L->R || y != f->R)
+		{
+		check(x);
+		check(y);
+		}
 	return I;
 	}
 
 /* (fopen path mode) Open a file and return [fh] or []. */
 value type_fopen(value f)
 	{
-	if (!f->L->L) return 0;
-	const char *path = string_data(arg(type_string,&f->L->R));
-	const char *mode = string_data(arg(type_string,&f->R));
+	if (!f->L || !f->L->L) return 0;
+	value x = arg(type_string,f->L->R);
+	value y = arg(type_string,f->R);
+
+	const char *path = string_data(x);
+	const char *mode = string_data(y);
 
 	FILE *fh = fopen(path,mode);
-	return maybe(fh ? Qfile(fh,1) : 0);
+	value g = fh ? Qfile(fh,1) : 0;
+
+	if (x != f->L->R || y != f->R)
+		{
+		check(x);
+		check(y);
+		}
+	return replace_maybe(0,g);
 	}
 
 /* Call readlink, returning a Fexl string. */
@@ -103,19 +140,24 @@ static value safe_readlink(const char *path)
 			{
 			/* Used less than available space, so the result fits just fine.
 			A system error yields len == -1, but that works robustly. */
-			value result = Qstring_data(buf,len);
+			value result = Qstring_vector(buf,len);
 			free_memory(buf, size);
 			return result;
 			}
 		}
 	}
 
-/* (readlink path next) Call readlink(2) on the path. */
+/* (readlink path) Call readlink(2) on the path. */
 value type_readlink(value f)
 	{
-	if (!f->L->L) return 0;
-	const char *path = string_data(arg(type_string,&f->L->R));
-	return A(f->R,safe_readlink(path));
+	if (!f->L) return 0;
+	value x = arg(type_string,f->R);
+
+	const char *path = string_data(x);
+	value g = safe_readlink(path);
+	if (x != f->R)
+		check(x);
+	return g;
 	}
 
 /*
@@ -128,11 +170,10 @@ last two legs of that path, returning "/PATH/".
 */
 static value get_base_path(void)
 	{
-	value full_path = safe_readlink("/proc/self/exe");
-	hold(full_path);
+	value path = safe_readlink("/proc/self/exe");
 
-	const char *buf = string_data(full_path);
-	long len = string_len(full_path);
+	const char *buf = string_data(path);
+	long len = string_len(path);
 
 	int i;
 	for (i = 0; i < 2; i++)
@@ -140,35 +181,60 @@ static value get_base_path(void)
 			;
 
 	if (buf[len] == '/') len++;  /* keep the slash */
-	value base_path = Qstring_data(buf,len);
-	drop(full_path);
-	return base_path;
+	value g = Qstring_vector(buf, len);
+	check(path);
+	return g;
 	}
 
-/* (base_path next) Return the base path of the current executable.  This is
+/* (base_path) Return the base path of the current executable.  This is
 equivalent to the $0 variable in /bin/sh. */
 value type_base_path(value f)
 	{
-	return A(f->R,get_base_path());
+	return get_base_path();
+	}
+
+static FILE *get_std_file(const char *name)
+	{
+	if (strcmp(name,"in") == 0) return stdin;
+	if (strcmp(name,"out") == 0) return stdout;
+	if (strcmp(name,"err") == 0) return stderr;
+	return 0;
+	}
+
+static value resolve_std_file(const char *name)
+	{
+	FILE *fh = get_std_file(name);
+	if (fh) return Qfile(fh,0);
+	return 0;
+	}
+
+value resolve_file(const char *name)
+	{
+	if (strncmp(name,"std",3) == 0) return resolve_std_file(name+3);
+	if (strcmp(name,"putchar") == 0) return Q(type_putchar);
+	if (strcmp(name,"getchar") == 0) return Q(type_getchar);
+	if (strcmp(name,"fgetc") == 0) return Q(type_fgetc);
+	if (strcmp(name,"fputc") == 0) return Q(type_fputc);
+	if (strcmp(name,"fwrite") == 0) return Q(type_fwrite);
+	if (strcmp(name,"fopen") == 0) return Q(type_fopen);
+	if (strcmp(name,"readlink") == 0) return Q(type_readlink);
+	if (strcmp(name,"base_path") == 0) return Q(type_base_path);
+	return 0;
 	}
 
 /*
 LATER fclose : (not necessary due to auto-close, but gives you some control.
-Just change the type to free_file.
-
-fmemopen str len mode
-Some variation thereof, since we don't typically do mutable strings.
-But we can use it for parsing from a string.
+Just change the close flag to 0
 */
 
 /*LATER fdopen */
-/*LATER fgetc */
-/*LATER fputc */
 /*LATER fflush */
 /*LATER file_string */
+/*LATER fmemopen */
 
 #if 0
-/*LATER sample code here */
+
+/* sample code here */
 {
 char *s = "abcdefg";
 FILE *fp = fmemopen(s, strlen(s), "r");

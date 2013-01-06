@@ -9,16 +9,9 @@ int main(int _argc, char *_argv[])
 
 	beg_basic();
 
-	#if 1
-	extern void use_safe_limits(void);
-	use_safe_limits(); /*LATER*/
-	#endif
-
-	value exp = parse_file(argc > 1 ? argv[1] : "", lib("standard"), 1);
-
-	hold(exp);
-	eval(&exp);
-	drop(exp);
+	value f = parse_file(argc > 1 ? argv[1] : "", Q(type_resolve), 1);
+	value g = eval(f);
+	check(g);
 
 	end_basic();
 	end_value();

@@ -1,55 +1,108 @@
 value type_double(value f)
 	{
+	if (!f->L) return 0;
 	return type_error();
 	}
 
-struct atom_double
-	{
-	void (*free)(struct atom_double *);
-	double val;
-	};
+/*
+A double is guaranteed to fit in 64 bits.  The standard says:
 
-static void free_double(struct atom_double *x)
+  Type        Range: Min   Max           Size (Bits)
+  double      2.225e-308   1.7977e+308   64
+
+(C Language Reference Manual, document 007-0701-150, Appendix A, Section F.3.6
+"Floating Point")
+
+We know that the L and R pointers are either 32 or 64 bits each, depending on
+the machine, so together they can definitely hold the 64 bits of a double.
+*/
+value replace_double(value f, double val)
 	{
-	free_memory(x, sizeof(struct atom_double));
+	value x = Q(0);
+	double *p = (double *)(&x->L);
+	*p = val;
+	return replace(f, type_double, 0, x);
 	}
 
 value Qdouble(double val)
 	{
-	struct atom_double *x = new_memory(sizeof(struct atom_double));
-	x->free = free_double;
-	x->val = val;
-	return V(type_double,0,(value)x);
+	return replace_double(0,val);
 	}
 
+/*
+Note that we cannot retrieve a double value directly like this:
+	double x = *( (double *)&f->R->L );
+
+That yields an error:
+	dereferencing type-punned pointer will break strict-aliasing rules
+	[-Werror=strict-aliasing]
+
+Instead, we must first get a pointer to double, then dereference the pointer.
+*/
 double double_val(value f)
 	{
-	struct atom_double *x = (struct atom_double *)f->R;
-	return x->val;
+	double *p = (double *)&f->R->L;
+	return *p;
 	}
 
 value type_double_add(value f)
 	{
-	if (!f->L->L) return 0;
-	double x = double_val(arg(type_double,&f->L->R));
-	double y = double_val(arg(type_double,&f->R));
-	return Qdouble(x + y);
+	if (!f->L || !f->L->L) return 0;
+
+	value x = arg(type_double,f->L->R);
+	value y = arg(type_double,f->R);
+
+	double vx = double_val(x);
+	double vy = double_val(y);
+	double vz = vx + vy;
+
+	if (x != f->L->R || y != f->R)
+		{
+		check(x);
+		check(y);
+		f = 0;
+		}
+	return replace_double(f,vz);
 	}
 
 value type_double_sub(value f)
 	{
-	if (!f->L->L) return 0;
-	double x = double_val(arg(type_double,&f->L->R));
-	double y = double_val(arg(type_double,&f->R));
-	return Qdouble(x - y);
+	if (!f->L || !f->L->L) return 0;
+
+	value x = arg(type_double,f->L->R);
+	value y = arg(type_double,f->R);
+
+	double vx = double_val(x);
+	double vy = double_val(y);
+	double vz = vx - vy;
+
+	if (x != f->L->R || y != f->R)
+		{
+		check(x);
+		check(y);
+		f = 0;
+		}
+	return replace_double(f,vz);
 	}
 
 value type_double_mul(value f)
 	{
-	if (!f->L->L) return 0;
-	double x = double_val(arg(type_double,&f->L->R));
-	double y = double_val(arg(type_double,&f->R));
-	return Qdouble(x * y);
+	if (!f->L || !f->L->L) return 0;
+
+	value x = arg(type_double,f->L->R);
+	value y = arg(type_double,f->R);
+
+	double vx = double_val(x);
+	double vy = double_val(y);
+	double vz = vx * vy;
+
+	if (x != f->L->R || y != f->R)
+		{
+		check(x);
+		check(y);
+		f = 0;
+		}
+	return replace_double(f,vz);
 	}
 
 /*
@@ -59,23 +112,44 @@ zero, it yields inf (infinity). If you divide zero by zero, it yields -nan
 */
 value type_double_div(value f)
 	{
-	if (!f->L->L) return 0;
-	double x = double_val(arg(type_double,&f->L->R));
-	double y = double_val(arg(type_double,&f->R));
-	return Qdouble(x / y);
+	if (!f->L || !f->L->L) return 0;
+
+	value x = arg(type_double,f->L->R);
+	value y = arg(type_double,f->R);
+
+	double vx = double_val(x);
+	double vy = double_val(y);
+	double vz = vx / vy;
+
+	if (x != f->L->R || y != f->R)
+		{
+		check(x);
+		check(y);
+		f = 0;
+		}
+	return replace_double(f,vz);
 	}
 
 /* (double_string x) Convert double to string. */
 value type_double_string(value f)
 	{
-	double x = double_val(arg(type_double,&f->R));
-	char buf[100]; /* being careful here */
+	if (!f->L) return 0;
+
+	value x = arg(type_double,f->R);
+	double vx = double_val(x);
+	char data[100]; /* being careful here */
 	/* We show 15 digits because that's what Perl does. */
-	sprintf(buf, "%.15g", x);
-	return Qstring(buf);
+	sprintf(data, "%.15g", vx);
+
+	if (x != f->R)
+		{
+		check(x);
+		f = 0;
+		}
+	return replace_string(f,data);
 	}
 
-value resolve_double(const char *name)
+static value resolve_double_prefix(const char *name)
 	{
 	if (strcmp(name,"add") == 0) return Q(type_double_add);
 	if (strcmp(name,"sub") == 0) return Q(type_double_sub);
@@ -85,9 +159,27 @@ value resolve_double(const char *name)
 	return 0;
 	}
 
-#if 0
-LATER more functions
+/* Convert string to double and return true if successful. */
+static int string_double(const char *beg, double *num)
+	{
+	char *end;
+	*num = strtod(beg, &end);
+	return *beg != '\0' && *end == '\0';
+	}
+
+value resolve_double(const char *name)
+	{
+	/* Floating point number (double) */
+	{
+	double num;
+	if (string_double(name,&num)) return Qdouble(num);
+	}
+
+	if (strncmp(name,"double_",7) == 0) return resolve_double_prefix(name+7);
+	return 0;
+	}
+
+/* TODO more functions
 double_long
-double_string
 double_cmp
-#endif
+*/
