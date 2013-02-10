@@ -1,43 +1,32 @@
 #
 
-# Traverse the data value x.  A data value is expected to be either an atom or
-# a list of other data values, i.e. a nested list with atoms at the leaves.
-# While traversing the data, we use the atom function when we see an atom, and
-# we use the join and side functions when we see a list [h;t].  Any erroneously
-# typed values are treated like "?".
-
-# LATER it'll be interesting to see how to extend this elegantly with "tagged"
-# data types.
-
-\traverse =
-	(\atom\join\side\x
+\to_string ===
+	(\x
 	\x=x
-	\error==(atom "?")
-	look x
+	x
 		(
-		type x 0 (atom (long_string x));
-		type x 0.0 (atom (double_string x));
-		type x "" (atom x);
-		type x [] (atom "");
-		error
+		is_string x x;
+		is_long x (long_string x);
+		is_double x (double_string x);
+		""
 		)
-	\x0\x1
-	look x0 error
-	\x00\x01
-	look x00
-		(
-		type x00 item (join (side x01) (side x1));
-		error
-		)
-	\_\_
-	error
+	\h\t
+	. (to_string h) (to_string t)
 	)
 
-# Convert data to a string.
-\to_string === (traverse I .  to_string)
-
-# Print data to file handle fh.
-\fprint === (\fh traverse (fwrite fh) I (fprint fh))
+\fprint ===
+	(\fh\x
+	\x=x
+	x
+		(
+		is_string x (fwrite fh x);
+		is_long x (fwrite fh (long_string x));
+		is_double x (fwrite fh (double_string x));
+		)
+	\h\t
+	fprint fh h;
+	fprint fh t
+	)
 
 # That's equivalent to:
 #\fprint=(\fh\x fwrite fh (to_string x))

@@ -1,7 +1,6 @@
 value type_file(value f)
 	{
-	if (!f->L) return 0;
-	return type_error();
+	return type_C(f);
 	}
 
 FILE *file_val(value f)

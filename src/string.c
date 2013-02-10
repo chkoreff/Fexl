@@ -54,8 +54,7 @@ static void free_string(value f)
 
 value type_string(value f)
 	{
-	if (!f->L) return 0;
-	return type_error();
+	return type_C(f);
 	}
 
 /* Allocate a string which can hold len bytes plus trailing NUL. */
@@ -209,9 +208,33 @@ value type_string_append(value f)
 	return replace(f, type_string, 0, z);
 	}
 
+/*TODO perhaps define in fexl itself (in terms of string_cmp and order) */
+value type_string_eq(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+
+	value x = arg(type_string,f->L->R);
+	value y = arg(type_string,f->R);
+
+	if (x != f->L->R || y != f->R)
+		{
+		check(x);
+		check(y);
+		f = 0;
+		}
+
+	return replace_boolean(f, string_cmp(x,y) == 0);
+	}
+
+value type_is_string(value f)
+	{
+	return replace_is_type(f, type_string);
+	}
+
 static value resolve_string_prefix(const char *name)
 	{
 	if (strcmp(name,"append") == 0) return Q(type_string_append);
+	if (strcmp(name,"eq") == 0) return Q(type_string_eq);
 	return 0;
 	}
 
@@ -219,6 +242,7 @@ value resolve_string(const char *name)
 	{
 	if (strcmp(name,".") == 0) return Q(type_string_append);
 	if (strncmp(name,"string_",7) == 0) return resolve_string_prefix(name+7);
+	if (strcmp(name,"is_string") == 0) return Q(type_is_string);
 	return 0;
 	}
 

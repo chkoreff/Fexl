@@ -1,24 +1,4 @@
-/* (look x) returns [] if x is an atom, or [x0;x1] if x is (x0 x1). */
-value type_look(value f)
-	{
-	if (!f->L) return 0;
-	value x = f->R;
-	if (x->L)
-		return replace(f, type_item, A(Qitem,x->L), x->R);
-	else
-		return replace_value(f, C);
-	}
-
-/* (type x y) is true if x and y have the same type. */
-value type_type(value f)
-	{
-	if (!f->L || !f->L->L) return 0;
-	value x = f->L->R;
-	value y = f->R;
-	return replace_boolean(f, x->T == y->T);
-	}
-
-/* TODO tag */
+/* TODO object (make a function into an atom) */
 
 /* exit status : exits with the given status */
 value type_exit(value f)
@@ -89,8 +69,6 @@ value resolve_meta(const char *name)
 	{
 	if (strncmp(name,"RLIMIT_",7) == 0) return resolve_RLIMIT(name+7);
 	if (strcmp(name,"setrlimit") == 0) return Q(type_setrlimit);
-	if (strcmp(name,"look") == 0) return Q(type_look);
-	if (strcmp(name,"type") == 0) return Q(type_type);
 	if (strcmp(name,"exit") == 0) return Q(type_exit);
 	return 0;
 	}

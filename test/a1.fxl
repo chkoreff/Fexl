@@ -1,43 +1,36 @@
 #
 
-# Traverse the data value x.  A data value is expected to be either an atom or
-# a list of other data values, i.e. a nested list with atoms at the leaves.
-# While traversing the data, we use the atom function when we see an atom, and
-# we use the join and side functions when we see a list [h;t].  Any erroneously
-# typed values are treated like "?".
+# TODO is_object
+# (object [type;data])
+# is_object x (x () \type\data _)
 
-# LATER it'll be interesting to see how to extend this elegantly with "tagged"
-# data types.
-
-\traverse =
-	(\atom\join\side\x
+\to_string ===
+	(\x
 	\x=x
-	\error==(atom "?")
-	look x
+	x
 		(
-		type x 0 (atom (long_string x));
-		type x 0.0 (atom (double_string x));
-		type x "" (atom x);
-		type x [] (atom "");
-		error
+		is_string x x;
+		is_long x (long_string x);
+		is_double x (double_string x);
+		""
 		)
-	\x0\x1
-	look x0 error
-	\x00\x01
-	look x00
-		(
-		type x00 item (join (side x01) (side x1));
-		error
-		)
-	\_\_
-	error
+	\h\t
+	. (to_string h) (to_string t)
 	)
 
-# Convert data to a string.
-\to_string === (traverse I .  to_string)
-
-# Print data to file handle fh.
-\fprint === (\fh traverse (fwrite fh) I (fprint fh))
+\fprint ===
+	(\fh\x
+	\x=x
+	x
+		(
+		is_string x (fwrite fh x);
+		is_long x (fwrite fh (long_string x));
+		is_double x (fwrite fh (double_string x));
+		)
+	\h\t
+	fprint fh h;
+	fprint fh t
+	)
 
 # That's equivalent to:
 #\fprint=(\fh\x fwrite fh (to_string x))
@@ -79,102 +72,6 @@ use_safe_limits
 \*=long_mul
 
 \announce=(\x say ["== " x])
-
-\say_boolean = (\x say (x "yes" "no"))
-
-\test_is_atom ==
-(
-\is_atom =
-	(\x
-	\x=x
-	look x T \_\_ F
-	)
-
-announce "test_is_atom"
-\try = (\x say_boolean (is_atom x))
-# yes
-try ""
-try "hello"
-try (. "a" "b")
-try 3
-try 4.5
-try (C 0 5)
-try (I "hello")
-try (C "hello" S)
-try (C 4 S)
-try (C 4.5 S)
-try C
-try S
-try (I C)
-try []
-nl
-# no
-try (C C)
-try (S C)
-try ["apple" "banana"]
-try (\x\y y x)
-)
-
-\test_is_list ==
-(
-\is_list =
-	(\x
-	\x=x
-	look x (type x [])
-	\x0\x1
-	look x0 F
-	\x00\x01
-	look x00 (type x00 item)
-	\_\_
-	F
-	)
-
-announce "test_is_list"
-\try = (\x say_boolean (is_list x))
-# yes
-try C
-try (I C)
-try []
-try (item 3 end)
-try (item S [])
-try (item 3 4)
-try [3 4]
-try (C (item 3 end) 33)
-nl
-# no
-try (C C)
-try S
-try item
-try (item 3)
-try "hello"
-try (I "hello")
-try (C "hello" S)
-try (C 4 S)
-)
-
-\test_type ==
-(
-announce "test_type"
-\try=(\x\y
-	\x=x
-	\y=y
-	say_boolean (type x y)
-	)
-
-# yes
-try C C
-try (I S) (I S)
-try (I 3) (I 5)
-try (I 3.5) (I 4.5)
-try [] C
-try "" "abc"
-nl
-# no
-try C S
-try (I C) (I S)
-try (I 3) (I 4.5)
-try 0 "abc"
-)
 
 \test_big ==
 (
@@ -262,16 +159,6 @@ announce "test_repeat_3"
 \z=["apples" "oranges"; z]
 
 say [y (to_string y) z]
-# Test printing some erroneous forms.
-say
-[
-S
-(S S)
-(S S S)
-(item 3)
-(item 3 4) # this one's OK though.
-(item 3 4 5)
-]
 )
 
 talk
@@ -621,12 +508,20 @@ say "done"
 \test_many_writes==
 (
 # Timed this by piping into wc -l.
-# This takes 0.28s.
+# This takes 0.37s.
 \f==(fwrite stdout "Hello world.
 ")
+# This takes 0.80s.
+\f==(fprint stdout "Hello world" nl)
 
-# This takes 3.72s.
-#\f==(say "Hello world.")
+# This takes 1.34s.
+\f==(say "Hello world.")
+#\f==(say [[["Hello world."]]])
+#\f==(say [["Hello world."]])
+#\f==(say ["Hello world."])
+#\f==(say [4])
+#\f==(say 4)
+#\f==(say 4.3)
 
 \f==(f f)
 \f==(f f)
@@ -763,9 +658,6 @@ say ["x = " x]
 
 ## Call test routines
 
-test_is_atom
-test_is_list
-test_type
 test_big
 test_putchar
 test_repeat_1

@@ -143,19 +143,14 @@ value eval(value f)
 		}
 	}
 
-value type_error(void)
-	{
-	die("You used a data type incorrectly.");
-	return 0;
-	}
-
 /* Evaluate an argument and assert that it is of type T. */
 value arg(type T, value f)
 	{
 	if (f->T == T) return f;
 	f = eval(f);
 	if (f->T == T) return f;
-	return type_error();
+	die("You used a data type incorrectly.");
+	return 0;
 	}
 
 /* Clear the free list and end the memory arena. */

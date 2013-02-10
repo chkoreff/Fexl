@@ -112,14 +112,12 @@ static void undefined_symbol(const char *name, int line)
 
 static value type_name(value f)
 	{
-	if (!f->L) return 0;
-	return type_error();
+	return type_C(f);
 	}
 
 static value type_open(value f)
 	{
-	if (!f->L) return 0;
-	return type_error();
+	return type_C(f);
 	}
 
 static int is_null_name(value x)

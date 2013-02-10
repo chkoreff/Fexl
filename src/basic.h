@@ -1,6 +1,8 @@
+extern value type_C(value f);
 extern value type_item(value f);
 extern value replace_boolean(value f, int flag);
 extern value replace_maybe(value f, value x);
+extern value replace_is_type(value f, type t);
 extern value C;
 extern value S;
 extern value I;

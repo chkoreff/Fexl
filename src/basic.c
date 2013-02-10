@@ -95,6 +95,18 @@ value replace_maybe(value f, value x)
 		return replace(f, type_C, 0, 0);
 	}
 
+/* Become T or F based on whether f->R is of type t. */
+value replace_is_type(value f, type t)
+	{
+	if (!f->L) return 0;
+	return replace_boolean(f, f->R->T == t);
+	}
+
+value type_is_end(value f)
+	{
+	return replace_is_type(f, type_C);
+	}
+
 value C;
 value S;
 value I;
@@ -125,6 +137,7 @@ value resolve_basic(const char *name)
 	if (strcmp(name,"?") == 0) return Qquery;
 	if (strcmp(name,"query") == 0) return Qquery;
 	if (strcmp(name,"return") == 0) return Q(type_return);
+	if (strcmp(name,"is_end") == 0) return Q(type_is_end);
 	return 0;
 	}
 

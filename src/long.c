@@ -1,7 +1,6 @@
 value type_long(value f)
 	{
-	if (!f->L) return 0;
-	return type_error();
+	return type_C(f);
 	}
 
 value replace_long(value f, long val)
@@ -120,6 +119,11 @@ value type_long_string(value f)
 	return replace_string(f,data);
 	}
 
+value type_is_long(value f)
+	{
+	return replace_is_type(f, type_long);
+	}
+
 static value resolve_long_prefix(const char *name)
 	{
 	if (strcmp(name,"add") == 0) return Q(type_long_add);
@@ -147,6 +151,7 @@ value resolve_long(const char *name)
 	}
 
 	if (strncmp(name,"long_",5) == 0) return resolve_long_prefix(name+5);
+	if (strcmp(name,"is_long") == 0) return Q(type_is_long);
 	return 0;
 	}
 

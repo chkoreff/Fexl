@@ -4,8 +4,7 @@ human user, redefining print to capture output in a memory buffer, etc. */
 
 value type_var(value f)
 	{
-	if (!f->L) return 0;
-	return type_error();
+	return type_C(f);
 	}
 
 static void free_var(value f)

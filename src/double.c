@@ -1,7 +1,6 @@
 value type_double(value f)
 	{
-	if (!f->L) return 0;
-	return type_error();
+	return type_C(f);
 	}
 
 /*
@@ -149,6 +148,11 @@ value type_double_string(value f)
 	return replace_string(f,data);
 	}
 
+value type_is_double(value f)
+	{
+	return replace_is_type(f, type_double);
+	}
+
 static value resolve_double_prefix(const char *name)
 	{
 	if (strcmp(name,"add") == 0) return Q(type_double_add);
@@ -176,6 +180,7 @@ value resolve_double(const char *name)
 	}
 
 	if (strncmp(name,"double_",7) == 0) return resolve_double_prefix(name+7);
+	if (strcmp(name,"is_double") == 0) return Q(type_is_double);
 	return 0;
 	}
 
