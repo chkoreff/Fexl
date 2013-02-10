@@ -4,9 +4,9 @@
 # (object [type;data])
 # is_object x (x () \type\data _)
 
-\to_string ===
+\to_string =\
 	(\x
-	\x=x
+	\x==x
 	x
 		(
 		is_string x x;
@@ -18,9 +18,9 @@
 	. (to_string h) (to_string t)
 	)
 
-\fprint ===
+\fprint =\
 	(\fh\x
-	\x=x
+	\x==x
 	x
 		(
 		is_string x (fwrite fh x);
@@ -41,7 +41,7 @@
 
 \NL="
 "
-\nl==(print NL)
+\nl=(print NL)
 
 \say=(\x print x nl)
 
@@ -53,10 +53,10 @@
 
 \setrlimit =
 	(\resource\limit
-	\status=(setrlimit resource limit limit)
+	\status==(setrlimit resource limit limit)
 	)
 
-\use_safe_limits ==
+\use_safe_limits =
 	(
 	setrlimit RLIMIT_STACK 400000000
 	setrlimit RLIMIT_DATA 800000000
@@ -73,7 +73,7 @@ use_safe_limits
 
 \announce=(\x say ["== " x])
 
-\test_big ==
+\test_big =
 (
 announce "test_big"
 # Test an exponential tower, showing how forcing eager evaluation can help.
@@ -81,45 +81,45 @@ announce "test_big"
 
 \g =
 	(\f
-	\f=f  # This line cuts time down to ~0.02s from ~9.6s.
-	\f == (f f)
-	\f == (f f)
-	\f == (f f)
-	\f == (f f)
-	\f == (f f)
+	\f==f  # This line cuts time down to ~0.02s from ~9.6s.
+	\f = (f f)
+	\f = (f f)
+	\f = (f f)
+	\f = (f f)
+	\f = (f f)
 	f
 	)
 
-\f == (g f)
-\f == (g f)
-\f == (g f)
-\f == (g f)
-\f == (g f)
+\f = (g f)
+\f = (g f)
+\f = (g f)
+\f = (g f)
+\f = (g f)
 
 f
 )
 
-\test_putchar ==
+\test_putchar =
 (
 announce "test_putchar"
-\f==(putchar 65)
-\f==(f f)
-\f==(f f)
+\f=(putchar 65)
+\f=(f f)
+\f=(f f)
 f f
 nl
 )
 
-\test_repeat_1 ==
+\test_repeat_1 =
 (
 announce "test_repeat_1"
-\f ==
+\f =
 	(
-	\f==(say ["hello" " world"])
+	\f=(say ["hello" " world"])
 
-	\f == (f f)
-	\f == (f f)
+	\f = (f f)
+	\f = (f f)
 
-	\f==
+	\f=
 		(
 		say "round 1"
 		f
@@ -127,28 +127,28 @@ announce "test_repeat_1"
 		f
 		)
 
-	\f==(f f)
+	\f=(f f)
 	f
 	)
 
 f f
 )
 
-\test_repeat_2 ==
+\test_repeat_2 =
 (
 announce "test_repeat_2"
-\talk==(say "Hello world.")
-\talk==talk  # 1
-\talk==(talk talk) # 2
-\talk==(talk talk) # 4
+\talk=(say "Hello world.")
+\talk=talk  # 1
+\talk=(talk talk) # 2
+\talk=(talk talk) # 4
 talk
 )
 
-\test_repeat_3 ==
+\test_repeat_3 =
 (
 announce "test_repeat_3"
 
-\talk==
+\talk=
 (
 \x=(* 6; + 3 4)
 \y = ["Hello " "x = " x NL]
@@ -165,127 +165,126 @@ talk
 talk
 )
 
-\ping_counter=(var_new 0)
+\ping_counter==(var_new 0)
 
-\ping==
+\ping=
 	(
-	# TODO
-	\x==(var_get ping_counter)
-	\x==(+ x 1)
-	\x=x
+	\x=(var_get ping_counter)
+	\x=(+ x 1)
+	\x==x
 	var_put ping_counter x
 	)
 
-\reset_ping ==
+\reset_ping =
 	(
 	var_put ping_counter 0
 	)
 
-\show_ping==
+\show_ping=
 	(
 	\x=(var_get ping_counter)
 	say ["ping_counter = " x]
 	)
 
-\test_ping_8 ==
+\test_ping_8 =
 (
 announce "test_ping_8"
 reset_ping
 
 \weird=I
-\ping2 == (ping (C ping weird))
+\ping2 = (ping (C ping weird))
 
-\f==ping2
-\f==(f f)
-\f==(f f)
+\f=ping2
+\f=(f f)
+\f=(f f)
 f
 
 show_ping
 )
 
-\test_ping_17 ==
+\test_ping_17 =
 (
 announce "test_ping_17"
 reset_ping
-\f==I
-\f==(ping f)
-\f==(ping f)
-\f==(ping f)
-\f==(f f)
-\f==(f f)
-\f==(ping f)
-\f==(ping f)
-\f==(f ping)
-\f==(f ping)
-\f==(f ping)
+\f=I
+\f=(ping f)
+\f=(ping f)
+\f=(ping f)
+\f=(f f)
+\f=(f f)
+\f=(ping f)
+\f=(ping f)
+\f=(f ping)
+\f=(f ping)
+\f=(f ping)
 f
 show_ping
 )
 
-\test_ping_18 ==
+\test_ping_18 =
 (
 announce "test_ping_18"
 reset_ping
-\f==(ping ping ping) # 3
-\f==(ping f) # 4
-\f==(f f) # 8
-\f==(ping f) # 9
-\f==(f f) # 18
+\f=(ping ping ping) # 3
+\f=(ping f) # 4
+\f=(f f) # 8
+\f=(ping f) # 9
+\f=(f f) # 18
 f
 show_ping
 )
 
-\test_ping_28 ==
+\test_ping_28 =
 (
 announce "test_ping_28"
 reset_ping
-\f==(ping ping ping) # 3
-\f==(f f) # 6
-\f==(f f) # 12
-\f==(f ping) # 13
-\f==(ping f) # 14
-\f==(f f) # 28
+\f=(ping ping ping) # 3
+\f=(f f) # 6
+\f=(f f) # 12
+\f=(f ping) # 13
+\f=(ping f) # 14
+\f=(f f) # 28
 f
 show_ping
 )
 
-\test_ping_98==
+\test_ping_98=
 (
 announce "test_ping_98"
 reset_ping
 
-\test_ping_17==
+\test_ping_17=
 	(
-	\f==
+	\f=
 		(
-		\f==ping
-		\f==(f f)
-		\f==(f ping)
-		\f==(f f)
-		\f==(ping f)
-		\f==(f ping)
-		\f==(f f)
+		\f=ping
+		\f=(f f)
+		\f=(f ping)
+		\f=(f f)
+		\f=(ping f)
+		\f=(f ping)
+		\f=(f f)
 		f
 		)
 
-	\f==(ping f)
+	\f=(ping f)
 	f
 	)
 
-\test_ping_7 ==
+\test_ping_7 =
 	(
-	\g==
+	\g=
 		(
-		\f==ping
-		\f==(f f)
+		\f=ping
+		\f=(f f)
 		f f f
 		)
 
-	\g==(ping g)
+	\g=(ping g)
 	g
 	)
 
-\f==
+\f=
 	(
 	test_ping_17
 	test_ping_17
@@ -293,117 +292,116 @@ reset_ping
 	test_ping_7
 	) # 48
 
-\f==(f f) # 96
-\f==(ping f) # 97
-\f==(f ping)
+\f=(f f) # 96
+\f=(ping f) # 97
+\f=(f ping)
 
 f
 show_ping
 )
 
-\test_ping_128 ==
+\test_ping_128 =
 (
 announce "test_ping_128"
 reset_ping
-\f==ping
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
+\f=ping
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
 f
 show_ping
 )
 
-\test_ping_18874376 ==
+\test_ping_18874376 =
 (
 announce "test_ping_18874376"
 reset_ping
-\f==I
-\f==(ping f)
-\f==(ping f)
-\f==(ping f)
-\f==(ping f)
-\f==(ping f)
-\f==(ping f)
-\f==(ping f)
-\f==(ping f)
-\f==(ping f)
+\f=I
+\f=(ping f)
+\f=(ping f)
+\f=(ping f)
+\f=(ping f)
+\f=(ping f)
+\f=(ping f)
+\f=(ping f)
+\f=(ping f)
+\f=(ping f)
 
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
 
-\f==(ping f)
-\f==(ping f)
-\f==(ping f)
+\f=(ping f)
+\f=(ping f)
+\f=(ping f)
 
-\f==(f ping)
-\f==(f ping)
-\f==(f ping)
-\f==(f ping)
-\f==(f ping)
+\f=(f ping)
+\f=(f ping)
+\f=(f ping)
+\f=(f ping)
+\f=(f ping)
 
 f
 show_ping
 )
 
-\test_var_trace ==
+\test_var_trace =
 (
 announce "test_var_trace"
-\var=(var_new 0)
-\get==(var_get var)
-\put==(var_put var)
+\var==(var_new 0)
+\get=(var_get var)
+\put=(var_put var)
 
 # Override get with a tracing version:
-\get ==
+\get =
 	(
-	\x=get
+	\x==get
 	print ["trace x = " x NL]
 	x
 	)
 
-\x=get
+\x==get
 put (+ x 7)
-\x=get
+\x==get
 put (* x 3)
-\x=get
+\x==get
 print ["final x = " x NL]
 )
 
-\test_var_counter ==
+\test_var_counter =
 (
 announce "test_var_counter"
 
-\new_counter==
+\new_counter=
 	(
-	\current=(var_new 0)
-	\ping ==
+	\current==(var_new 0)
+	\ping =
 		(
-		# TODO
-		\x==(var_get current)
-		\x==(+ x 1)
-		\x=x
+		\x=(var_get current)
+		\x=(+ x 1)
+		\x==x
 
 		print ["count " x NL]
 		var_put current x
@@ -411,53 +409,53 @@ announce "test_var_counter"
 	return ping
 	)
 
-\ping=new_counter
+\ping==new_counter
 ping ping ping
 ping ping ping
 ping ping ping
 )
 
-\test_circular_structure ==
+\test_circular_structure =
 (
 announce "test_circular_structure"
 # Create a circular structure and thus introduce a memory leak.
-\var=(var_new 0)
+\var==(var_new 0)
 var_put var var
 )
 
-\test_var_ops ==
+\test_var_ops =
 (
 announce "test_var_ops"
 
-\var=(var_new 0)
+\var==(var_new 0)
 \get=var_get
 \put=(var_put var)
 
 # Override with a tracing version:
-\get ==
+\get =
 	(
-	\x=(get var)
+	\x==(get var)
 	print ["trace x = " x NL]
 	x
 	)
 
 put 14
-\x=get
+\x==get
 put (+ x x)
-\x=get
+\x==get
 put (* x x)
-\x=get
+\x==get
 )
 
-\test_var_repeat ==
+\test_var_repeat =
 (
 announce "test_var_repeat"
-\var=(var_new 0)
+\var==(var_new 0)
 
 # LATER a "do" function (over a list)
-\f==
+\f=
 (
-\x=(var_get var)
+\x==(var_get var)
 print ["x = " x NL]
 var_put var (+ x 3)
 )
@@ -465,16 +463,16 @@ var_put var (+ x 3)
 f f f
 )
 
-\test_fwrite ==
+\test_fwrite =
 (
 announce "test_fwrite"
-\f == (fwrite stdout "Hello ")
+\f = (fwrite stdout "Hello ")
 f f f
 f f f
 fwrite stdout NL
 )
 
-\test_big_string_append ==
+\test_big_string_append =
 (
 announce "test_big_string_append"
 \x = (. "x" "y")
@@ -502,143 +500,143 @@ announce "test_big_string_append"
 \x = (. x x)
 \x = (. x x)
 \x = (. x x)  # 2^25 bytes = 33,554,432
-# TODO alternatively, just examine the value of x instead of eagerly evaluating
+\x==x
 #fwrite stdout x
 say "done"
 )
 
-\test_many_writes==
+\test_many_writes=
 (
 # Timed this by piping into wc -l.
 # This takes 0.37s.
-\f==(fwrite stdout "Hello world.
+\f=(fwrite stdout "Hello world.
 ")
 # This takes 0.80s.
-\f==(fprint stdout "Hello world" nl)
+\f=(fprint stdout "Hello world" nl)
 
 # This takes 1.34s.
-\f==(say "Hello world.")
-#\f==(say [[["Hello world."]]])
-#\f==(say [["Hello world."]])
-#\f==(say ["Hello world."])
-#\f==(say [4])
-#\f==(say 4)
-#\f==(say 4.3)
+\f=(say "Hello world.")
+#\f=(say [[["Hello world."]]])
+#\f=(say [["Hello world."]])
+#\f=(say ["Hello world."])
+#\f=(say [4])
+#\f=(say 4)
+#\f=(say 4.3)
 
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f)
-\f==(f f) # 1048576
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f)
+\f=(f f) # 1048576
 f
 )
 
-\test_long_1 ==
+\test_long_1 =
 (
 # Test some long operations with repeated embedded side effects.
 announce "test_long_1"
-\ping==(fwrite stdout "!")
+\ping=(fwrite stdout "!")
 \+=long_add
-\x=(+ (ping + 1 1) (ping + 3 0))
+\x==(+ (ping + 1 1) (ping + 3 0))
 say ["+ (+ 1 1) (+ 3 0) = " x]
 )
 
-\test_long_2==
+\test_long_2=
 (
 # Test some long operations with repeated embedded side effects.
 announce "test_long_2"
 
-\f==(say (long_add (print "A" 36) (print "B" 4)))
+\f=(say (long_add (print "A" 36) (print "B" 4)))
 f f
-\f==(say (long_sub (print "A" 36) (print "B" 4)))
+\f=(say (long_sub (print "A" 36) (print "B" 4)))
 f f
-\f==(say (long_mul (print "A" 36) (print "B" 4)))
+\f=(say (long_mul (print "A" 36) (print "B" 4)))
 f f
-\f==(say (long_div (print "A" 36) (print "B" 4)))
+\f=(say (long_div (print "A" 36) (print "B" 4)))
 f f
-\f==(say (long_div (print "A" 36) (print "B" 0)))
+\f=(say (long_div (print "A" 36) (print "B" 0)))
 f f
-\f==(say (long_string (print "A" 123)))
+\f=(say (long_string (print "A" 123)))
 f f
 )
 
-\test_double_1 ==
+\test_double_1 =
 (
 # Test some double operations with repeated embedded side effects.
 announce "test_double_1"
-\ping==(fwrite stdout "!")
+\ping=(fwrite stdout "!")
 \+=double_add
-\x=(+ (ping + 1.1 1.2) (ping + 3.3 0.0))
+\x==(+ (ping + 1.1 1.2) (ping + 3.3 0.0))
 say ["+ (+ 1.1 1.2) (+ 3.3 0.0) = " x]
 )
 
-\test_double_2==
+\test_double_2=
 (
 # Test some double operations with repeated embedded side effects.
 announce "test_double_2"
-\f==(say (double_add (print "A" 36.4) (print "B" 4.0)))
+\f=(say (double_add (print "A" 36.4) (print "B" 4.0)))
 f f
-\f==(say (double_sub (print "A" 36.4) (print "B" 4.0)))
+\f=(say (double_sub (print "A" 36.4) (print "B" 4.0)))
 f f
-\f==(say (double_mul (print "A" 36.4) (print "B" 4.0)))
+\f=(say (double_mul (print "A" 36.4) (print "B" 4.0)))
 f f
-\f==(say (double_div (print "A" 36.4) (print "B" 4.0)))
+\f=(say (double_div (print "A" 36.4) (print "B" 4.0)))
 f f
-\f==(say (double_div (print "A" 36.4) (print "B" 0.0)))
+\f=(say (double_div (print "A" 36.4) (print "B" 0.0)))
 f f
-\f==(say (double_string (print "A" 123.5)))
+\f=(say (double_string (print "A" 123.5)))
 f f
 )
 
-\test_getchar==
+\test_getchar=
 (
-\f==
+\f=
 (
-print "Please type a character and press enter: " \ch=getchar
+print "Please type a character and press enter: " \ch==getchar
 print "You typed " putchar ch nl
-\ch=getchar
+\ch==getchar
 )
 f f
 )
 
-\test_resolve==
+\test_resolve=
 (
 # Test the resolve function with embedded side effects.
 announce "test_resolve"
-\try==
+\try=
 	(
-	#\f=(resolve "48.6")
-	\f=(resolve (print "!" "48.6"))
+	#\f==(resolve "48.6")
+	\f==(resolve (print "!" "48.6"))
 	f () \x\_ fwrite stdout (double_string x) nl
 	)
 
 try try
 )
 
-\test_var_side==
+\test_var_side=
 (
 # Test var with embedded side effects.
 announce "test_var_side"
-\var=(var_new 3)
-\x=(var_get (print "!" var))
+\var==(var_new 3)
+\x==(var_get (print "!" var))
 say ["x = " x]
 var_put (putchar 64 var) (putchar 37 "hi")
-\x=(var_get (print "!" var))
+\x==(var_get (print "!" var))
 say ["x = " x]
 )
 
@@ -650,11 +648,11 @@ say ["x = " x]
 #exit 42
 # LATER this tests stack overflow (segfault).
 #(
-#\f==S
-#\f==(f f)
-#\f==(f f)
-##\f==(f f)
-#\f==(f f)
+#\f=S
+#\f=(f f)
+#\f=(f f)
+##\f=(f f)
+#\f=(f f)
 #f
 #)
 

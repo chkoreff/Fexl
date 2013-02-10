@@ -1,8 +1,8 @@
 #
 
-\to_string ===
+\to_string =\
 	(\x
-	\x=x
+	\x==x
 	x
 		(
 		is_string x x;
@@ -14,9 +14,9 @@
 	. (to_string h) (to_string t)
 	)
 
-\fprint ===
+\fprint =\
 	(\fh\x
-	\x=x
+	\x==x
 	x
 		(
 		is_string x (fwrite fh x);
@@ -37,7 +37,7 @@
 
 \NL="
 "
-\nl==(print NL)
+\nl=(print NL)
 
 \say=(\x print x nl)
 
@@ -49,10 +49,10 @@
 
 \setrlimit =
 	(\resource\limit
-	\status=(setrlimit resource limit limit)
+	\status==(setrlimit resource limit limit)
 	)
 
-\use_safe_limits ==
+\use_safe_limits =
 	(
 	setrlimit RLIMIT_STACK 400000000
 	setrlimit RLIMIT_DATA 800000000
@@ -71,16 +71,16 @@ use_safe_limits
 
 \say_boolean = (\x say (x "yes" "no"))
 
-\test_nat_math ==
+\test_nat_math =
 (
 announce "test_nat_math"
 
 # Convert atom or list to a string.
 
 # (map f xs) is the list of (f x) values for each x in xs.
-\map===(\f\xs xs [] \x\xs [(f x); map f xs])
+\map=\(\f\xs xs [] \x\xs [(f x); map f xs])
 
-\length===(\xs xs 0 \_\xs long_add 1 (length xs))
+\length=\(\xs xs 0 \_\xs long_add 1 (length xs))
 
 # (nat b n) is the natural number b + 2*n, where b is a bit and n is a natural
 # number.
@@ -91,23 +91,23 @@ announce "test_nat_math"
 
 # (nat_inc x) is x+1.  (x incremented by 1).  Both x and the result are of
 # type nat.
-\nat_inc===(\x x [T] \b\n b [F; nat_inc n] [T;n])
+\nat_inc=\(\x x [T] \b\n b [F; nat_inc n] [T;n])
 
 \bits = (map \b b "1" "0")
 
 # (nat_add x y) is x+y, the sum of x and y.
-\nat_add ===
+\nat_add =\
 	(\x\y
 	x y \bx\nx
 	y x \by\ny
-	\sum=(nat_add nx ny)
+	\sum==(nat_add nx ny)
 	bx
 		(by [F;nat_inc sum] [T;sum])
 		[by;sum]
 	)
 
 # (nat_mul x y) is x*y, the product of x and y.
-\nat_mul ===
+\nat_mul =\
 	(\x\y
 	x [] \bx\nx
 	y [] \by\ny
@@ -130,7 +130,7 @@ announce "test_nat_math"
 # Decrement x, returning:
 #   yes d     # if x > 0 and d = x - 1
 #   no        # if x = 0
-\nat_dec_clip ===
+\nat_dec_clip =\
 	(\x
 	x no \bx\nx
 	bx
@@ -141,7 +141,7 @@ announce "test_nat_math"
 # Subtract x minus y, returning:
 #   yes d     # if x >= y and d = x - y
 #   no        # if x < y
-\nat_sub_clip ===
+\nat_sub_clip =\
 	(\x\y
 	x (y (yes nat_0) \_\_ no) \bx\nx
 	y (yes x) \by\ny
@@ -161,7 +161,7 @@ announce "test_nat_math"
 # (div x y) divides x by y, returning the quotient q and remainder r which
 # satisfy: x = q*y + r and 0 <= r < y.  Or if y=0, the function returns q=0 and
 # r=0.
-\nat_div===
+\nat_div=\
 	(\x\y
 	x (pair nat_0 nat_0) \bx\nx
 	y (pair nat_0 nat_0) \by\ny
@@ -169,7 +169,7 @@ announce "test_nat_math"
 		(
 		# divide by odd
 		nat_div nx y \q\r
-		\r=(nat bx r)
+		\r==(nat bx r)
 		nat_sub_clip r y
 			(\z pair (nat T q) z)
 			(pair (nat F q) r)
@@ -187,13 +187,13 @@ announce "test_nat_math"
 # Show the length in front of each number.
 \digits=
 	(\x
-	\xs=(digits x)
+	\xs==(digits x)
 	[ "[" (length xs) "] " (bits x) ]
 	)
 
 \try_mul =
 	(\x\y
-	\z = (nat_mul x y)
+	\z == (nat_mul x y)
 
 	print
 	[
@@ -240,28 +240,28 @@ try_div [T F T F F T] [T F T T] # 37 / 13
 
 \churn = (\x nat_add nat_17; nat_mul x x)
 
-\x = (nat_mul nat_31 nat_19)
+\x == (nat_mul nat_31 nat_19)
 
-\x=(churn x)
-\x=(churn x)
-\x=(churn x)
-\x=(churn x)
-\x=(churn x)
-\x=(churn x)
+\x==(churn x)
+\x==(churn x)
+\x==(churn x)
+\x==(churn x)
+\x==(churn x)
+\x==(churn x)
 
-\y=nat_10
-\y=(nat_mul y y)
+\y==nat_10
+\y==(nat_mul y y)
 
 try_div x y
 
-\x=(churn x)
+\x==(churn x)
 
-\y=(churn y)
-\y=(churn y)
-\y=(churn y)
-\y=(churn y)
-\y=(churn y)
-\y=(churn y)
+\y==(churn y)
+\y==(churn y)
+\y==(churn y)
+\y==(churn y)
+\y==(churn y)
+\y==(churn y)
 
 try_div x y
 )

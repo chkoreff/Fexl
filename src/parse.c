@@ -413,17 +413,24 @@ static value parse_lambda(long first_line)
 
 	first_line = line;
 
-	/* Count the number of '=' chars up to three . */
-	int count_eq = 0;
-	while (ch == '=' && count_eq < 3)
+	/* Now see if we have "=" or "==" or "=\". */
+	char eq_1 = 0;
+	char eq_2 = 0;
+
+	if (ch == '=')
 		{
-		count_eq++;
+		eq_1 = ch;
 		next_ch();
+		if (ch == '=' || ch == '\\')
+			{
+			eq_2 = ch;
+			next_ch();
+			}
 		}
 
 	/* Parse the definition of the symbol if we saw an '=' char. */
 	value def = 0;
-	if (count_eq > 0)
+	if (eq_1)
 		{
 		skip_filler();
 		def = parse_term();
@@ -437,17 +444,17 @@ static value parse_lambda(long first_line)
 
 	/* Produce the result based on the kind of definition used, if any. */
 	value result;
-	if (count_eq == 0)
+	if (eq_1 == 0)
 		/* no definition */
 		result = body;
-	else if (count_eq == 1)
-		/* eager definition */
-		result = apply(apply(Qquery,def),body);
-	else if (count_eq == 2)
-		/* normal definition */
+	else if (eq_2 == 0)
+		/* = normal definition */
 		result = apply(body,def);
+	else if (eq_2 == '=')
+		/* == eager definition */
+		result = apply(apply(Qquery,def),body);
 	else
-		/* recursive definition */
+		/* =\ recursive definition */
 		result = apply(body,apply(Y,abstract(sym,def)));
 
 	drop(sym);
