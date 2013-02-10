@@ -169,11 +169,10 @@ talk
 
 \ping==
 	(
-	\x=(var_get ping_counter)
-	# TODO using "=" here slows down the big ping test
-	#\x=(+ x 1)
+	# TODO
+	\x==(var_get ping_counter)
 	\x==(+ x 1)
-	#say [x " ping"]
+	\x=x
 	var_put ping_counter x
 	)
 
@@ -401,9 +400,11 @@ announce "test_var_counter"
 	\current=(var_new 0)
 	\ping ==
 		(
-		\x=(var_get current)
 		# TODO
-		\x=(+ x 1)
+		\x==(var_get current)
+		\x==(+ x 1)
+		\x=x
+
 		print ["count " x NL]
 		var_put current x
 		)
@@ -501,6 +502,7 @@ announce "test_big_string_append"
 \x = (. x x)
 \x = (. x x)
 \x = (. x x)  # 2^25 bytes = 33,554,432
+# TODO alternatively, just examine the value of x instead of eagerly evaluating
 #fwrite stdout x
 say "done"
 )
