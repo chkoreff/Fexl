@@ -9,7 +9,9 @@ int main(int _argc, char *_argv[])
 
 	beg_basic();
 
-	value f = parse_file(argc > 1 ? argv[1] : "", Q(type_resolve), 1);
+	const char *name = argc > 1 ? argv[1] : "";
+	value context = Q(type_resolve);
+	value f = parse_file(name, context);
 	value g = eval(f);
 	check(g);
 

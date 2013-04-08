@@ -63,7 +63,7 @@ value type_fputc(value f)
 	return I;
 	}
 
-/* (fgetc file) returns the next character from the file. */
+/* (fgetc fh) returns the next character from the file handle. */
 value type_fgetc(value f)
 	{
 	if (!f->L) return 0;

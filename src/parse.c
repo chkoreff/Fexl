@@ -14,6 +14,7 @@ def  =>  is term
 
 is   =>  =
 is   =>  ==
+is   =>  =\
 
 sym  => name
 sym  => string
@@ -551,9 +552,10 @@ static value resolve_all(value f)
 	return exp;
 	}
 
-/* Parse the file in the context, starting with the given line number, using
+/* Parse the stream in the context, starting with the given line number, using
 the label in any error messages. */
-static value parse_fh(FILE *_fh, value _context, long _line, const char *_label)
+static value parse_stream(FILE *_fh, value _context, const char *_label,
+	long *_line)
 	{
 	FILE *save_fh = fh;
 	const char *save_label = label;
@@ -563,7 +565,7 @@ static value parse_fh(FILE *_fh, value _context, long _line, const char *_label)
 
 	fh = _fh;
 	label = _label;
-	line = _line;
+	line = *_line;
 	context = _context;
 
 	hold(context);
@@ -580,6 +582,8 @@ static value parse_fh(FILE *_fh, value _context, long _line, const char *_label)
 
 	drop(context);
 
+	*_line = line;
+
 	fh = save_fh;
 	label = save_label;
 	ch = save_ch;
@@ -589,11 +593,54 @@ static value parse_fh(FILE *_fh, value _context, long _line, const char *_label)
 	return exp;
 	}
 
-value parse_file(const char *name, value context, long line)
+value parse_file(const char *name, value context)
 	{
 	FILE *fh = name[0] ? fopen(name,"r") : stdin;
 	if (fh == 0)
 		die("Can't open file %s", name);
 
-	return parse_fh(fh, context, 1, name);
+	long line = 1;
+	return parse_stream(fh, context, name, &line);
+	}
+
+/* (parse_stream fh context label line)
+The line is a var containing the initial line number, and this is updated
+during the parse.
+*/
+value type_parse_stream(value f)
+	{
+	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
+
+	value arg_fh = arg(type_file,f->L->L->L->R);
+	value arg_context = f->L->L->R;
+	value arg_label = arg(type_string,f->L->R);
+	value arg_line = arg(type_var,f->R);
+
+	value arg_line_no = arg(type_long,arg_line->R->L);
+	long line_no = long_val(arg_line_no);
+	if (arg_line_no != arg_line->R->L)
+		check(arg_line_no);
+
+	value g = parse_stream(file_val(arg_fh), arg_context,
+		string_data(arg_label), &line_no);
+
+	value new = Qlong(line_no);
+	hold(new);
+	drop(arg_line->R->L);
+	arg_line->R->L = new;
+
+	if (arg_fh != f->L->L->L->R || arg_label != f->L->R || arg_line != f->R)
+		{
+		check(arg_fh);
+		check(arg_label);
+		check(arg_line);
+		}
+
+	return g;
+	}
+
+value resolve_parse(const char *name)
+	{
+	if (strcmp(name,"parse_stream") == 0) return Q(type_parse_stream);
+	return 0;
 	}

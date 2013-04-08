@@ -11,9 +11,9 @@ static value resolve(const char *name)
 	if ((f = resolve_file(name))) return f;
 	if ((f = resolve_meta(name))) return f;
 	if ((f = resolve_var(name))) return f;
+	if ((f = resolve_parse(name))) return f;
 
 	/* TODO more functions
-	if (strcmp(name,"parse") == 0) return Q(type_parse);
 	if (strcmp(name,"lib") == 0) return Q(type_lib);
 	*/
 
@@ -26,13 +26,13 @@ static value resolve(const char *name)
 value type_resolve(value f)
 	{
 	if (!f->L) return 0;
-	value x = arg(type_string,f->R);
-	const char *name = string_data(x);
+	value arg_name = arg(type_string,f->R);
+	const char *name = string_data(arg_name);
 	value def = resolve(name);
 
-	if (x != f->R)
+	if (arg_name != f->R)
 		{
-		check(x);
+		check(arg_name);
 		f = 0;
 		}
 	return replace_maybe(f, def);

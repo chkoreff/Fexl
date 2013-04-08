@@ -1,9 +1,5 @@
 #
 
-# TODO is_object
-# (object [type;data])
-# is_object x (x () \type\data _)
-
 \to_string =\
 	(\x
 	\x==x

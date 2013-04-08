@@ -246,8 +246,8 @@ module lib - dlfcn - stdio die value file string
 module long - stdio - stdlib - string value basic string
 module memory - stdlib die
 module meta - stdlib - string - sys/resource value basic long
-module parse - ctype - stdio die value basic long string
-module resolve - stdio - string value basic double file long meta string var
+module parse - ctype - stdio - string die value basic file long string var
+module resolve - stdio - string value basic double file long meta parse string var
 no_module show - stdio value
 module string - string memory value basic
 module value memory die

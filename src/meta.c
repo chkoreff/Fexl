@@ -1,5 +1,3 @@
-/* TODO object (make a function into an atom) */
-
 /* exit status : exits with the given status */
 value type_exit(value f)
 	{
