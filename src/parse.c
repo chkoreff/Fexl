@@ -616,6 +616,7 @@ value type_parse_stream(value f)
 	value arg_label = arg(type_string,f->L->R);
 	value arg_line = arg(type_var,f->R);
 
+	/*TODO use a var API */
 	value arg_line_no = arg(type_long,arg_line->R->L);
 	long line_no = long_val(arg_line_no);
 	if (arg_line_no != arg_line->R->L)
