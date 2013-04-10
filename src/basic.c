@@ -127,6 +127,11 @@ value resolve_basic(const char *name)
 	if (strcmp(name,"T") == 0) return C;
 	if (strcmp(name,"F") == 0) return Q(type_F);
 	if (strcmp(name,"I") == 0) return I;
+
+	/* Define "@" as the fixpoint operator because it suggests making a
+	"label" for looping. */
+	if (strcmp(name,"@") == 0) return Y;
+
 	if (strcmp(name,"C") == 0) return C;
 	if (strcmp(name,"S") == 0) return S;
 	if (strcmp(name,"Y") == 0) return Y;

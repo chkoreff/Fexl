@@ -1,7 +1,7 @@
 #
 
-\to_string =\
-	(\x
+\to_string=
+	(@\to_string\x
 	\x==x
 	x
 		(
@@ -14,8 +14,8 @@
 	. (to_string h) (to_string t)
 	)
 
-\fprint =\
-	(\fh\x
+\fprint=
+	(@\fprint\fh\x
 	\x==x
 	x
 		(
