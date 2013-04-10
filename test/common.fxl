@@ -1,0 +1,104 @@
+#
+
+\append=(@\append\xs\ys xs ys \x\xs [x;append xs ys])
+
+\join=
+	(@\join\sep\list
+	list [] \h\t
+	t [h] \_\_ [h sep; (join sep t)]
+	)
+
+\to_string =
+	(@\to_string\x
+	\x==x
+	x
+		(
+		is_string x x;
+		is_long x (long_string x);
+		is_double x (double_string x);
+		""
+		)
+	\h\t
+	. (to_string h) (to_string t)
+	)
+
+\fprint=
+	(@\fprint\fh\x
+	\x==x
+	x
+		(
+		is_string x (fwrite fh x);
+		is_long x (fwrite fh (long_string x));
+		is_double x (fwrite fh (double_string x));
+		)
+	\h\t
+	fprint fh h;
+	fprint fh t
+	)
+
+# That's equivalent to:
+#\fprint=(\fh\x fwrite fh (to_string x))
+# except it streams over lists instead of appending them into a single string.
+
+\print=(fprint stdout)
+\warn=(fprint stderr)
+
+\NL="
+"
+\nl=(print NL)
+
+\say=(\x print x nl)
+
+\die =
+	(\msg
+	warn [msg NL]
+	exit 1
+	)
+
+# TODO full math operators
+\+=long_add
+\*=long_mul
+
+\setrlimit =
+	(\resource\limit
+	#\resource=(say "woot1" resource)
+	#\limit=(say "woot2" limit)
+	\status==(setrlimit resource limit limit)
+	)
+
+\use_safe_limits =
+	(
+	setrlimit RLIMIT_STACK 400000000
+	setrlimit RLIMIT_DATA 800000000
+	setrlimit RLIMIT_AS 800000000
+	setrlimit RLIMIT_CPU 30
+	setrlimit RLIMIT_CPU 3
+	#say "I am using safe limits for this test."
+	)
+
+use_safe_limits
+
+# Message from Uncle Leo:
+#say "HELLO Jerry!"
+
+# Extend the current context.
+\context =
+	(@\extended\x
+	\case=(\name\val string_eq x name [val])
+	case "fprint" fprint;
+	case "print" print;
+	case "warn" warn;
+	case "nl" nl;
+	case "NL" NL;
+	case "say" say;
+	case "die" die;
+	case "+" +;
+	case "*" *;
+	case "join" join;
+	case "to_string" to_string;
+	case "announce" (\x say ["== " x]);
+	case "context" extended;
+	context x
+	)
+
+context

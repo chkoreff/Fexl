@@ -541,6 +541,11 @@ static value resolve_all(value f)
 	return exp;
 	}
 
+/*TODO clean up.  This stuff's pretty nasty. */
+FILE *curr_fh;
+long curr_line;
+const char *curr_label;
+
 /* Parse the stream in the context, starting with the given line number, using
 the label in any error messages. */
 static value parse_stream(FILE *_fh, value _context, const char *_label,
@@ -551,6 +556,10 @@ static value parse_stream(FILE *_fh, value _context, const char *_label,
 	int save_ch = ch;
 	int save_line = line;
 	value save_context = context;
+
+	curr_fh = _fh;
+	curr_line = *_line;
+	curr_label = _label;
 
 	fh = _fh;
 	label = _label;
@@ -570,6 +579,8 @@ static value parse_stream(FILE *_fh, value _context, const char *_label,
 		die(0);
 
 	drop(context);
+
+	curr_line = line;
 
 	*_line = line;
 
@@ -606,6 +617,7 @@ value type_parse_stream(value f)
 	value arg_line = arg(type_var,f->R);
 
 	/*TODO use a var API */
+	/*TODO a more functional approach may avoid need for var altogether. */
 	value arg_line_no = arg(type_long,arg_line->R->L);
 	long line_no = long_val(arg_line_no);
 	if (arg_line_no != arg_line->R->L)
@@ -629,8 +641,61 @@ value type_parse_stream(value f)
 	return g;
 	}
 
+/* Return a handle to the remainder of the current source file. */
+value type_source(value f)
+	{
+	return Qfile(curr_fh,0);
+	}
+
+/* (use file) Read context from file and parse remainder of source in that
+context. */
+value type_use(value f)
+	{
+	if (!f->L) return 0;
+	value arg_file = arg(type_string,f->R);
+	const char *local_path = string_data(arg_file);
+
+	/*TODO clean up */
+	FILE *save_source = curr_fh;
+	const char *save_label = curr_label;
+	long save_line = curr_line;
+
+	value string_append = Q(type_string_append);
+	value path;
+	path = Q(type_base_path);
+	path = A(A(string_append,path),Qstring(local_path));
+	path = eval(path);
+
+	const char *full_path = string_data(path);
+
+	FILE *fh = fopen(full_path,"r");
+	if (fh == 0)
+		{
+		fprintf(stderr,"Could not open %s\n", full_path);
+		die(0);
+		}
+
+	/* I think it looks better to show local_path rather than full_path on
+	error messages. */
+	long line_no = 1;
+	value context = eval(
+		parse_stream(fh, Q(type_resolve), local_path, &line_no));
+
+	check(path);
+
+	line_no = save_line;
+	value g = parse_stream(save_source, context, save_label, &line_no);
+
+	if (arg_file != f->R)
+		check(arg_file);
+
+	return g;
+	}
+
 value resolve_parse(const char *name)
 	{
 	if (strcmp(name,"parse_stream") == 0) return Q(type_parse_stream);
+	if (strcmp(name,"use") == 0) return Q(type_use);
+	if (strcmp(name,"source") == 0) return Q(type_source);
 	return 0;
 	}

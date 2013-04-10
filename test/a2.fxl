@@ -1,75 +1,7 @@
 #
-
-\to_string=
-	(@\to_string\x
-	\x==x
-	x
-		(
-		is_string x x;
-		is_long x (long_string x);
-		is_double x (double_string x);
-		""
-		)
-	\h\t
-	. (to_string h) (to_string t)
-	)
-
-\fprint=
-	(@\fprint\fh\x
-	\x==x
-	x
-		(
-		is_string x (fwrite fh x);
-		is_long x (fwrite fh (long_string x));
-		is_double x (fwrite fh (double_string x));
-		)
-	\h\t
-	fprint fh h;
-	fprint fh t
-	)
-
-# That's equivalent to:
-#\fprint=(\fh\x fwrite fh (to_string x))
-# except it streams over lists instead of appending them into a single string.
-
-\print=(fprint stdout)
-\warn=(fprint stderr)
-
-\NL="
-"
-\nl=(print NL)
-
-\say=(\x print x nl)
-
-\die =
-	(\msg
-	warn [msg NL]
-	exit 1
-	)
-
-\setrlimit =
-	(\resource\limit
-	\status==(setrlimit resource limit limit)
-	)
-
-\use_safe_limits =
-	(
-	setrlimit RLIMIT_STACK 400000000
-	setrlimit RLIMIT_DATA 800000000
-	setrlimit RLIMIT_AS 800000000
-	setrlimit RLIMIT_CPU 30
-	)
-
-use_safe_limits
+use "test/common.fxl" \\
 
 ## Define test routines
-
-\+=long_add
-\*=long_mul
-
-\announce=(\x say ["== " x])
-
-\say_boolean = (\x say (x "yes" "no"))
 
 \test_nat_math =
 (

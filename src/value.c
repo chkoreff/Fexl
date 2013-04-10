@@ -134,7 +134,7 @@ value eval(value f)
 			f->N--;
 			return f;
 			}
-		if (f != g)
+		if (g != f)
 			{
 			hold(g);
 			drop(f);
