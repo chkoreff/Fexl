@@ -122,6 +122,12 @@ value item(value h, value t)
 	return A(A(Qitem,h),t);
 	}
 
+/*TODO doc yield */
+value yield(value f, value g)
+	{
+	return A(A(L,f),g);
+	}
+
 value resolve_basic(const char *name)
 	{
 	if (strcmp(name,"T") == 0) return C;

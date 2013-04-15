@@ -40,16 +40,17 @@ RLIMIT_AS, and also RLIMIT_DATA for good measure, to limit the total amount of
 memory.
 */
 
-static FILE *fh = 0;   /* current source file */
-static const char *label = 0;  /* current logical label of source file */
+/*TODO*/
+static FILE *this_fh = 0;   /* current source file */
+static const char *this_label = 0;  /* current label of source file */
 static int ch;         /* current character */
-static long line;      /* current line number */
-static value context;  /* current context */
+static long this_line;      /* current line number */
+static value this_context;  /* current context */
 
 static void next_ch(void)
 	{
-	ch = fgetc(fh);
-	if (ch == '\n') line++;
+	ch = fgetc(this_fh);
+	if (ch == '\n') this_line++;
 	}
 
 static void skip_line(void)
@@ -98,15 +99,15 @@ static void skip_filler(void)
 static void syntax_error(const char *msg, int line)
 	{
 	die("%s on line %ld%s%s", msg, line,
-		label[0] ? " of " : "",
-		label);
+		this_label[0] ? " of " : "",
+		this_label);
 	}
 
 static void undefined_symbol(const char *name, int line)
 	{
 	warn("Undefined symbol %s on line %ld%s%s", name, line,
-		label[0] ? " of " : "",
-		label
+		this_label[0] ? " of " : "",
+		this_label
 		);
 	}
 
@@ -195,14 +196,14 @@ static value collect_string(const char *term_string, long term_len,
 
 static value parse_simple_string(void)
 	{
-	long first_line = line;
+	long first_line = this_line;
 	next_ch();
 	return collect_string("\"", 1, first_line);
 	}
 
 static value parse_complex_string(void)
 	{
-	long first_line = line;
+	long first_line = this_line;
 	struct buf *buffer = 0;
 
 	while (1)
@@ -235,7 +236,7 @@ can work.
 */
 static value parse_name(int allow_eq)
 	{
-	long first_line = line;
+	long first_line = this_line;
 	struct buf *buffer = 0;
 	while (1)
 		{
@@ -297,7 +298,7 @@ static value parse_term(void)
 	{
 	if (ch == '(')
 		{
-		long first_line = line;
+		long first_line = this_line;
 		next_ch();
 		value exp = parse_exp();
 		if (ch != ')')
@@ -308,7 +309,7 @@ static value parse_term(void)
 		}
 	else if (ch == '[')
 		{
-		long first_line = line;
+		long first_line = this_line;
 		next_ch();
 		value exp = parse_list();
 		if (ch != ']')
@@ -411,7 +412,7 @@ static value parse_lambda(long first_line)
 	hold(sym);
 	skip_filler();
 
-	first_line = line;
+	first_line = this_line;
 
 	/* Count any '=' signs, up to 2. */
 	int count_eq = 0;
@@ -460,7 +461,7 @@ static value parse_factor(void)
 		return 0;
 	else if (ch == '\\')
 		{
-		long first_line = line;
+		long first_line = this_line;
 		next_ch();
 		if (ch == '\\')
 			{
@@ -515,7 +516,7 @@ static value resolve_sym(value sym)
 	if (sym->T == type_string)
 		return item(sym->L,C);
 
-	value result = eval(A(context,sym->L));
+	value result = eval(A(this_context,sym->L));
 	if (result->T == type_item && result->L && result->L->L)
 		return result;
 
@@ -541,55 +542,31 @@ static value resolve_all(value f)
 	return exp;
 	}
 
-/*TODO clean up.  This stuff's pretty nasty. */
-FILE *curr_fh;
-long curr_line;
-const char *curr_label;
+/*TODO*/
 
-/* Parse the stream in the context, starting with the given line number, using
-the label in any error messages. */
-static value parse_stream(FILE *_fh, value _context, const char *_label,
-	long *_line)
+/* Parse a fully resolved value. */
+static value parse_value(FILE *fh,  const char *label, value context,
+	long *p_line)
 	{
-	FILE *save_fh = fh;
-	const char *save_label = label;
-	int save_ch = ch;
-	int save_line = line;
-	value save_context = context;
+	this_fh = fh;
+	this_label = label;
+	this_context = context;
+	this_line = *p_line;
 
-	curr_fh = _fh;
-	curr_line = *_line;
-	curr_label = _label;
-
-	fh = _fh;
-	label = _label;
-	line = *_line;
-	context = _context;
-
-	hold(context);
-
+	hold(this_context);
 	next_ch();
 	value exp = parse_exp();
 
 	if (ch != -1)
-		syntax_error("Extraneous input", line);
+		syntax_error("Extraneous input", this_line);
+
+	*p_line = this_line;
 
 	exp = resolve_all(exp);
 	if (is_open(exp))
 		die(0);
 
-	drop(context);
-
-	curr_line = line;
-
-	*_line = line;
-
-	fh = save_fh;
-	label = save_label;
-	ch = save_ch;
-	line = save_line;
-	context = save_context;
-
+	drop(this_context);
 	return exp;
 	}
 
@@ -600,12 +577,13 @@ value parse_file(const char *name, value context)
 		die("Can't open file %s", name);
 
 	long line = 1;
-	return parse_stream(fh, context, name, &line);
+	return parse_value(fh, name, context, &line);
 	}
 
 /* (parse_stream fh context label line)
-The line is a var containing the initial line number, and this is updated
-during the parse.
+Parse the stream with the given context, label, and initial line number.
+Return (\: : exp line), where exp is the parsed expression, and line is the
+updated line number.
 */
 value type_parse_stream(value f)
 	{
@@ -614,22 +592,11 @@ value type_parse_stream(value f)
 	value arg_fh = arg(type_file,f->L->L->L->R);
 	value arg_context = f->L->L->R;
 	value arg_label = arg(type_string,f->L->R);
-	value arg_line = arg(type_var,f->R);
+	value arg_line = arg(type_long,f->R);
 
-	/*TODO use a var API */
-	/*TODO a more functional approach may avoid need for var altogether. */
-	value arg_line_no = arg(type_long,arg_line->R->L);
-	long line_no = long_val(arg_line_no);
-	if (arg_line_no != arg_line->R->L)
-		check(arg_line_no);
-
-	value g = parse_stream(file_val(arg_fh), arg_context,
-		string_data(arg_label), &line_no);
-
-	value new = Qlong(line_no);
-	hold(new);
-	drop(arg_line->R->L);
-	arg_line->R->L = new;
+	long line = long_val(arg_line);
+	value g = parse_value(file_val(arg_fh), string_data(arg_label),
+		arg_context, &line);
 
 	if (arg_fh != f->L->L->L->R || arg_label != f->L->R || arg_line != f->R)
 		{
@@ -638,13 +605,14 @@ value type_parse_stream(value f)
 		check(arg_line);
 		}
 
-	return g;
+	return yield(yield(I,g),Qlong(line));
 	}
 
-/* Return a handle to the remainder of the current source file. */
-value type_source(value f)
+/* Return a handle to the remainder of the current source stream. */
+value type_this_fh(value f)
 	{
-	return Qfile(curr_fh,0);
+	/*TODO*/
+	return Qfile(this_fh,0);
 	}
 
 /* (use file) Read context from file and parse remainder of source in that
@@ -652,13 +620,14 @@ context. */
 value type_use(value f)
 	{
 	if (!f->L) return 0;
-	value arg_file = arg(type_string,f->R);
-	const char *local_path = string_data(arg_file);
 
 	/*TODO clean up */
-	FILE *save_source = curr_fh;
-	const char *save_label = curr_label;
-	long save_line = curr_line;
+	FILE *orig_fh = this_fh;
+	const char *orig_label = this_label;
+	long orig_line = this_line;
+
+	value arg_file = arg(type_string,f->R);
+	const char *local_path = string_data(arg_file);
 
 	value string_append = Q(type_string_append);
 	value path;
@@ -675,16 +644,17 @@ value type_use(value f)
 		die(0);
 		}
 
-	/* I think it looks better to show local_path rather than full_path on
-	error messages. */
-	long line_no = 1;
-	value context = eval(
-		parse_stream(fh, Q(type_resolve), local_path, &line_no));
-
+	/*TODO always Q(type_resolve) here?  Can we use the "current" context?
+	We'll probably make a version that takes current fh, label, line, and
+	context as parameters.  That way we're not counting on global variables
+	remaining in a particular state.
+	*/
+	long line = 1;
+	value use_context = eval(
+		parse_value(fh, local_path, Q(type_resolve), &line));
 	check(path);
 
-	line_no = save_line;
-	value g = parse_stream(save_source, context, save_label, &line_no);
+	value g = parse_value(orig_fh, orig_label, use_context, &orig_line);
 
 	if (arg_file != f->R)
 		check(arg_file);
@@ -694,8 +664,9 @@ value type_use(value f)
 
 value resolve_parse(const char *name)
 	{
-	if (strcmp(name,"parse_stream") == 0) return Q(type_parse_stream);
 	if (strcmp(name,"use") == 0) return Q(type_use);
-	if (strcmp(name,"source") == 0) return Q(type_source);
+	/*TODO name?*/
+	if (strcmp(name,"parse_stream") == 0) return Q(type_parse_stream);
+	if (strcmp(name,"this_fh") == 0) return Q(type_this_fh);
 	return 0;
 	}

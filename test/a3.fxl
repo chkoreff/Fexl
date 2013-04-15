@@ -7,26 +7,47 @@ use "test/common.fxl" \\
 # "\\" separately.
 \test_parse=
 (
+# Here we take the trouble to model a "stream" object which contains the
+# file handle, name, and line number.
+
+\parse_stream =
+	(\stream
+	stream \fh\name\line
+	parse_stream fh context name line \exp\line
+	\stream=(\: : fh name line)
+	\: : exp stream
+	)
+
+\curr_line =
+	(\stream
+	stream \_\_\line
+	line
+	)
+
+\parse=
+	(\stream
+	parse_stream stream \exp\stream
+	exp
+	say ["  at line " (curr_line stream)]
+	\: : stream
+	)
+
 \fopen=(\name\mode
 	fopen name mode (die ["Could not open " name]) \fh\_
 	fh)
 
-\file_name==(. base_path "test/a3_1.fxl")
-\fh==(fopen file_name "r")
-\line==(var_new (say "Initialize line number." + 1 0))
+\name==(. base_path "test/a3_1.fxl")
+\fh==(fopen name "r")
+\line==(say "Initialize line number." + 1 0)
+\stream=(\: : fh name line)
 
-\try=
-	(
-	parse_stream fh context file_name line
-	say ["  at line " (var_get line)]
-	)
-
-try
-try
-try
+parse stream \stream
+parse stream \stream
+parse stream \stream
 )
 
 # Example of reporting an arbitrarily complex result in an extensible way.
+# TODO use the tuple technique
 \test_report=
 (
 \test_report=
