@@ -1,6 +1,100 @@
 #
 
+\if=I
+
 \append=(@\append\xs\ys xs ys \x\xs [x;append xs ys])
+
+# TODO doc
+\fold=(@\fold\fn\z\xs xs z \x\xs \z==(fn z x) fold fn z xs)
+
+# (filter f xs) filters the list xs with function f, only returning the entries
+# for which (f x) is true.
+\filter=(@\filter\f\xs xs end \x\xs f x (item x) I; filter f xs)
+
+# (map f xs) is the list of (f x) values for each x in xs.
+\map = (@\map\f\xs xs end \x\xs item (f x) (map f xs))
+
+# Apply function f to each entry in xs, ending with next.  This is useful for
+# producing a side-effect for each entry in a list.
+\do = (@\do\xs\f xs () \x\xs f x; do xs f)
+
+# (choose xs ys) returns the list of all y in ys where the corresponding x in
+# xs is true.  The xs is a list of bits which serves as a "mask".
+\choose =
+	(@\choose\xs\ys
+	xs end \x\xs
+	ys end \y\ys
+	x (item y) I (choose xs ys)
+	)
+
+# (sort keep compare xs) sorts the list xs using the three-way comparison
+# function.  It keeps duplicates if the keep flag is true, otherwise it
+# discards them and returns only the unique entries.
+\sort =
+	(@\sort\keep\compare\xs
+	xs end \x\xs
+
+	\lo = (filter (\y compare y x T F F) xs)
+	\hi = (filter (\y compare y x F keep T) xs)
+
+	append (sort keep compare lo);
+	item x;
+	sort keep compare hi
+	)
+
+\long_compare=(\x\y order (long_cmp x y))
+
+# TODO
+\entry=
+	(
+	@\loop\n\xs
+	xs [] \x\xs
+	long_compare n 1
+		[]
+		x
+		(loop (long_sub n 1) xs)
+	)
+
+\column=(\n map (entry n))
+
+\length=(fold (\z\_ long_add z 1) 0)
+
+# TODO
+\string_compare=(\x\y order (string_cmp x y))
+\string_ne=(\x\y order (string_cmp x y) T F F)
+
+# TODO
+\long_le=(\x\y order (long_cmp x y) T T F)
+#\long_lt=(\x\y order (long_cmp x y) T F F)
+#\long_gt=(\x\y order (long_cmp x y) F F T)
+#\long_eq=(\x\y order (long_cmp x y) F T F)
+\ <= = long_le
+
+# TODO
+#\ < = long_lt
+#\ = = long_eq
+#\ <= = long_le
+
+# TODO
+#\eq=string_eq
+
+# TODO what about lists with doubles etc?
+#\max=(fold (\z\x if (<= z x) x z) 0)
+\max=(fold (\z\x if (<= z x) x z) 0)
+
+\long_gt=(\x\y order (long_cmp x y) F F T)
+
+\range=
+	(
+	@\range\lo\hi
+	long_gt lo hi [];
+	[lo;range (long_add lo 1) hi]
+	)
+
+\columns=
+	(\xs
+	map (\n column n xs) (range 1 (max (map length xs)))
+	)
 
 \join=
 	(@\join\sep\list
@@ -83,8 +177,25 @@ use_safe_limits
 
 # Extend the current context.
 \context =
-	(@\extended\x
+	(\x
+	\x==x
 	\case=(\name\val string_eq x name [val])
+	case "if" if;
+	case "append" append;
+	case "choose" choose;
+	case "column" column;
+	case "columns" columns;
+	case "do" do;
+	case "entry" entry;
+	case "map" map;
+	case "fold" fold;
+	case "filter" filter;
+	case "sort" sort;
+	case "max" max;
+	case "length" length;
+	case "range" range;
+	case "string_ne" string_ne;
+	case "string_compare" string_compare;
 	case "fprint" fprint;
 	case "print" print;
 	case "warn" warn;
@@ -97,8 +208,7 @@ use_safe_limits
 	case "join" join;
 	case "to_string" to_string;
 	case "announce" (\x say ["== " x]);
-	case "context" extended;
-	context x
+	source_context x
 	)
 
 context

@@ -10,10 +10,30 @@ use "test/common.fxl" \\
 # Here we take the trouble to model a "stream" object which contains the
 # file handle, name, and line number.
 
+# TODO temporarily re-shape parse_steam to return a list
+\parse_stream =
+	(\fh\context\name\line
+	parse_stream fh context name line \exp\line
+	[exp line]
+	#[exp]
+	)
+
+# TODO now show how we'd transform back into plain tuple.  It's a PITA to
+# shift off the args one by one.
+\parse_stream =
+	(\fh\context\name\line
+	\result==(parse_stream fh context name line)
+	result () \exp\result
+	result () \line\result
+	\: : exp line
+	# TODO possibly:
+	#{exp line}
+	)
+
 \parse_stream =
 	(\stream
 	stream \fh\name\line
-	parse_stream fh context name line \exp\line
+	parse_stream fh source_context name line \exp\line
 	\stream=(\: : fh name line)
 	\: : exp stream
 	)
@@ -47,7 +67,7 @@ parse stream \stream
 )
 
 # Example of reporting an arbitrarily complex result in an extensible way.
-# TODO use the tuple technique
+# TODO use the tuple technique?
 \test_report=
 (
 \test_report=

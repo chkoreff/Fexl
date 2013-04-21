@@ -17,13 +17,11 @@ static value resolve(const char *name)
 	if (strcmp(name,"lib") == 0) return Q(type_lib);
 	*/
 
-	/* The general convention is that "resolve" refers to the core built-in
-	context, and "context" refers to the current context, which initially is
-	the core context but can be extended subsequently.  In a highly restricted
-	context you'll probably disable access the the core context altogether.
-	*/
 	if (strcmp(name,"resolve") == 0) return Q(type_resolve);
+	/*TODO get rid */
+	#if 0
 	if (strcmp(name,"context") == 0) return Q(type_resolve);
+	#endif
 
 	return 0;
 	}

@@ -226,6 +226,24 @@ value type_string_eq(value f)
 	return replace_boolean(f, string_cmp(x,y) == 0);
 	}
 
+/* (string_cmp x y) compares x and y and returns <0, 0, or >0. */
+value type_string_cmp(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+
+	value x = arg(type_string,f->L->R);
+	value y = arg(type_string,f->R);
+
+	if (x != f->L->R || y != f->R)
+		{
+		check(x);
+		check(y);
+		f = 0;
+		}
+
+	return replace_long(f, string_cmp(x,y));
+	}
+
 value type_is_string(value f)
 	{
 	return replace_is_type(f, type_string);
@@ -235,6 +253,7 @@ static value resolve_string_prefix(const char *name)
 	{
 	if (strcmp(name,"append") == 0) return Q(type_string_append);
 	if (strcmp(name,"eq") == 0) return Q(type_string_eq);
+	if (strcmp(name,"cmp") == 0) return Q(type_string_cmp);
 	return 0;
 	}
 
@@ -247,7 +266,6 @@ value resolve_string(const char *name)
 	}
 
 /* TODO more functions
-string_cmp
 string_slice
 string_at
 string_eq (maybe just define in fexl)

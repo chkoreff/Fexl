@@ -547,11 +547,13 @@ f f
 \test_resolve=
 (
 # Test the resolve function with embedded side effects.
+# Actually using the full source_context just to test that.
 announce "test_resolve"
 \try=
 	(
 	#\f==(resolve "48.6")
-	\f==(resolve (print "!" "48.6"))
+	#\f==(resolve (print "!" "48.6"))
+	\f==(source_context (print "!" "48.6"))
 	f () \x\_ fwrite stdout (double_string x) nl
 	)
 

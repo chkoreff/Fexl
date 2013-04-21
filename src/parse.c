@@ -41,16 +41,16 @@ memory.
 */
 
 /*TODO*/
-static FILE *this_fh = 0;   /* current source file */
-static const char *this_label = 0;  /* current label of source file */
+static FILE *source_fh = 0;   /* current source file */
+static const char *source_label = 0;  /* current label of source file */
 static int ch;         /* current character */
-static long this_line;      /* current line number */
-static value this_context;  /* current context */
+static long source_line;      /* current line number */
+static value source_context;  /* current context */
 
 static void next_ch(void)
 	{
-	ch = fgetc(this_fh);
-	if (ch == '\n') this_line++;
+	ch = fgetc(source_fh);
+	if (ch == '\n') source_line++;
 	}
 
 static void skip_line(void)
@@ -99,15 +99,15 @@ static void skip_filler(void)
 static void syntax_error(const char *msg, int line)
 	{
 	die("%s on line %ld%s%s", msg, line,
-		this_label[0] ? " of " : "",
-		this_label);
+		source_label[0] ? " of " : "",
+		source_label);
 	}
 
 static void undefined_symbol(const char *name, int line)
 	{
 	warn("Undefined symbol %s on line %ld%s%s", name, line,
-		this_label[0] ? " of " : "",
-		this_label
+		source_label[0] ? " of " : "",
+		source_label
 		);
 	}
 
@@ -196,14 +196,14 @@ static value collect_string(const char *term_string, long term_len,
 
 static value parse_simple_string(void)
 	{
-	long first_line = this_line;
+	long first_line = source_line;
 	next_ch();
 	return collect_string("\"", 1, first_line);
 	}
 
 static value parse_complex_string(void)
 	{
-	long first_line = this_line;
+	long first_line = source_line;
 	struct buf *buffer = 0;
 
 	while (1)
@@ -236,7 +236,7 @@ can work.
 */
 static value parse_name(int allow_eq)
 	{
-	long first_line = this_line;
+	long first_line = source_line;
 	struct buf *buffer = 0;
 	while (1)
 		{
@@ -298,7 +298,7 @@ static value parse_term(void)
 	{
 	if (ch == '(')
 		{
-		long first_line = this_line;
+		long first_line = source_line;
 		next_ch();
 		value exp = parse_exp();
 		if (ch != ')')
@@ -309,7 +309,7 @@ static value parse_term(void)
 		}
 	else if (ch == '[')
 		{
-		long first_line = this_line;
+		long first_line = source_line;
 		next_ch();
 		value exp = parse_list();
 		if (ch != ']')
@@ -412,7 +412,7 @@ static value parse_lambda(long first_line)
 	hold(sym);
 	skip_filler();
 
-	first_line = this_line;
+	first_line = source_line;
 
 	/* Count any '=' signs, up to 2. */
 	int count_eq = 0;
@@ -461,7 +461,7 @@ static value parse_factor(void)
 		return 0;
 	else if (ch == '\\')
 		{
-		long first_line = this_line;
+		long first_line = source_line;
 		next_ch();
 		if (ch == '\\')
 			{
@@ -516,7 +516,7 @@ static value resolve_sym(value sym)
 	if (sym->T == type_string)
 		return item(sym->L,C);
 
-	value result = eval(A(this_context,sym->L));
+	value result = eval(A(source_context,sym->L));
 	if (result->T == type_item && result->L && result->L->L)
 		return result;
 
@@ -548,25 +548,25 @@ static value resolve_all(value f)
 static value parse_value(FILE *fh,  const char *label, value context,
 	long *p_line)
 	{
-	this_fh = fh;
-	this_label = label;
-	this_context = context;
-	this_line = *p_line;
+	source_fh = fh;
+	source_label = label;
+	source_context = context;
+	source_line = *p_line;
 
-	hold(this_context);
+	hold(source_context);
 	next_ch();
 	value exp = parse_exp();
 
 	if (ch != -1)
-		syntax_error("Extraneous input", this_line);
+		syntax_error("Extraneous input", source_line);
 
-	*p_line = this_line;
+	*p_line = source_line;
 
 	exp = resolve_all(exp);
 	if (is_open(exp))
 		die(0);
 
-	drop(this_context);
+	drop(source_context);
 	return exp;
 	}
 
@@ -605,15 +605,18 @@ value type_parse_stream(value f)
 		check(arg_line);
 		}
 
-	return yield(yield(I,g),Qlong(line));
+	return yield(yield(I,g),Qlong(line)); /*TODO nice but should we use list?*/
 	}
 
 /* Return a handle to the remainder of the current source stream. */
-value type_this_fh(value f)
+/*TODO*/
+#if 0
+value type_source_fh(value f)
 	{
 	/*TODO*/
-	return Qfile(this_fh,0);
+	return Qfile(source_fh,0);
 	}
+#endif
 
 /* (use file) Read context from file and parse remainder of source in that
 context. */
@@ -622,9 +625,9 @@ value type_use(value f)
 	if (!f->L) return 0;
 
 	/*TODO clean up */
-	FILE *orig_fh = this_fh;
-	const char *orig_label = this_label;
-	long orig_line = this_line;
+	FILE *orig_fh = source_fh;
+	const char *orig_label = source_label;
+	long orig_line = source_line;
 
 	value arg_file = arg(type_string,f->R);
 	const char *local_path = string_data(arg_file);
@@ -667,6 +670,12 @@ value resolve_parse(const char *name)
 	if (strcmp(name,"use") == 0) return Q(type_use);
 	/*TODO name?*/
 	if (strcmp(name,"parse_stream") == 0) return Q(type_parse_stream);
-	if (strcmp(name,"this_fh") == 0) return Q(type_this_fh);
+	#if 0
+	if (strcmp(name,"source_fh") == 0) return Q(type_source_fh);
+	#endif
+	if (strcmp(name,"source_fh") == 0) return Qfile(source_fh,0);
+	if (strcmp(name,"source_label") == 0) return Qstring(source_label);
+	if (strcmp(name,"source_line") == 0) return Qlong(source_line);
+	if (strcmp(name,"source_context") == 0) return source_context;
 	return 0;
 	}
