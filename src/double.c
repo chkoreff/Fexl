@@ -44,16 +44,13 @@ double double_val(value f)
 	return *p;
 	}
 
-value type_double_add(value f)
+static value replace_double2(value f, double op(double,double))
 	{
 	if (!f->L || !f->L->L) return 0;
 
 	value x = arg(type_double,f->L->R);
 	value y = arg(type_double,f->R);
-
-	double vx = double_val(x);
-	double vy = double_val(y);
-	double vz = vx + vy;
+	double z = op(double_val(x),double_val(y));
 
 	if (x != f->L->R || y != f->R)
 		{
@@ -61,73 +58,23 @@ value type_double_add(value f)
 		check(y);
 		f = 0;
 		}
-	return replace_double(f,vz);
+	return replace_double(f,z);
 	}
 
-value type_double_sub(value f)
-	{
-	if (!f->L || !f->L->L) return 0;
-
-	value x = arg(type_double,f->L->R);
-	value y = arg(type_double,f->R);
-
-	double vx = double_val(x);
-	double vy = double_val(y);
-	double vz = vx - vy;
-
-	if (x != f->L->R || y != f->R)
-		{
-		check(x);
-		check(y);
-		f = 0;
-		}
-	return replace_double(f,vz);
-	}
-
-value type_double_mul(value f)
-	{
-	if (!f->L || !f->L->L) return 0;
-
-	value x = arg(type_double,f->L->R);
-	value y = arg(type_double,f->R);
-
-	double vx = double_val(x);
-	double vy = double_val(y);
-	double vz = vx * vy;
-
-	if (x != f->L->R || y != f->R)
-		{
-		check(x);
-		check(y);
-		f = 0;
-		}
-	return replace_double(f,vz);
-	}
-
+static double double_add(double x, double y) { return x + y; }
+static double double_sub(double x, double y) { return x - y; }
+static double double_mul(double x, double y) { return x * y; }
 /*
 Note that dividing by zero is no problem here. If you divide a non-zero by
 zero, it yields inf (infinity). If you divide zero by zero, it yields -nan
 (not a number).
 */
-value type_double_div(value f)
-	{
-	if (!f->L || !f->L->L) return 0;
+static double double_div(double x, double y) { return x / y; }
 
-	value x = arg(type_double,f->L->R);
-	value y = arg(type_double,f->R);
-
-	double vx = double_val(x);
-	double vy = double_val(y);
-	double vz = vx / vy;
-
-	if (x != f->L->R || y != f->R)
-		{
-		check(x);
-		check(y);
-		f = 0;
-		}
-	return replace_double(f,vz);
-	}
+value type_double_add(value f) { return replace_double2(f,double_add); }
+value type_double_sub(value f) { return replace_double2(f,double_sub); }
+value type_double_mul(value f) { return replace_double2(f,double_mul); }
+value type_double_div(value f) { return replace_double2(f,double_div); }
 
 /* (double_string x) Convert double to string. */
 value type_double_string(value f)
@@ -148,6 +95,30 @@ value type_double_string(value f)
 	return replace_string(f,data);
 	}
 
+/* Convert string to double and return true if successful. */
+static int string_double(const char *beg, double *num)
+	{
+	char *end;
+	*num = strtod(beg, &end);
+	return *beg != '\0' && *end == '\0';
+	}
+
+static int op_cmp(double x, double y)
+	{
+	return x < y ? -1 : x > y ? 1 : 0;
+	}
+
+static int double_cmp(value x, value y)
+	{
+	return op_cmp(double_val(x),double_val(y));
+	}
+
+/* (double_compare x y lt eq gt) */
+value type_double_compare(value f)
+	{
+	return replace_compare(f,type_double,double_cmp);
+	}
+
 value type_is_double(value f)
 	{
 	return replace_is_type(f, type_double);
@@ -159,16 +130,9 @@ static value resolve_double_prefix(const char *name)
 	if (strcmp(name,"sub") == 0) return Q(type_double_sub);
 	if (strcmp(name,"mul") == 0) return Q(type_double_mul);
 	if (strcmp(name,"div") == 0) return Q(type_double_div);
+	if (strcmp(name,"compare") == 0) return Q(type_double_compare);
 	if (strcmp(name,"string") == 0) return Q(type_double_string);
 	return 0;
-	}
-
-/* Convert string to double and return true if successful. */
-static int string_double(const char *beg, double *num)
-	{
-	char *end;
-	*num = strtod(beg, &end);
-	return *beg != '\0' && *end == '\0';
 	}
 
 value resolve_double(const char *name)
@@ -184,7 +148,8 @@ value resolve_double(const char *name)
 	return 0;
 	}
 
-/* TODO more functions
+#if 0
+LATER more functions
 double_long
-double_cmp
-*/
+double_string
+#endif

@@ -1,10 +1,20 @@
 #
 
+# TODO make sure we have tests for all these
+
+# The "if" function just enhances readability, for example:
+#   if (= x 0) (say "It's zero.") (say "It's not zero.")
 \if=I
 
+# Return the length of a list.
+\length=(@\length\xs xs 0 \_\xs long_add 1 (length xs))
+
+# (append xs ys) appends the two lists.
 \append=(@\append\xs\ys xs ys \x\xs [x;append xs ys])
 
-# TODO doc
+# (fold fn z xs) is the result of applying function fn to each element of list,
+# starting with z.  So for example (+ fold 0) is the function which adds up all
+# the elements of a list.
 \fold=(@\fold\fn\z\xs xs z \x\xs \z==(fn z x) fold fn z xs)
 
 # (filter f xs) filters the list xs with function f, only returning the entries
@@ -12,7 +22,7 @@
 \filter=(@\filter\f\xs xs end \x\xs f x (item x) I; filter f xs)
 
 # (map f xs) is the list of (f x) values for each x in xs.
-\map = (@\map\f\xs xs end \x\xs item (f x) (map f xs))
+\map=(@\map\f\xs xs [] \x\xs [(f x); map f xs])
 
 # Apply function f to each entry in xs, ending with next.  This is useful for
 # producing a side-effect for each entry in a list.
@@ -42,48 +52,79 @@
 	sort keep compare hi
 	)
 
-\long_compare=(\x\y order (long_cmp x y))
-
-# TODO
+# The entry function returns the entry at a given position in a list, starting
+# with 0.  If the position is beyond the end of the list, it returns [].
 \entry=
 	(
-	@\loop\n\xs
+	@\entry\n\xs
 	xs [] \x\xs
-	long_compare n 1
-		[]
-		x
-		(loop (long_sub n 1) xs)
+	long_compare n 0 [] x;
+	entry (long_sub n 1) xs
 	)
 
-\column=(\n map (entry n))
+# Generate ordering functions.
+\ordering=
+	(\compare
+	\lt=(\x\y compare x y T F F)
+	\le=(\x\y compare x y T T F)
+	\eq=(\x\y compare x y F T F)
+	\ne=(\x\y compare x y T F T)
+	\gt=(\x\y compare x y F F T)
+	\ge=(\x\y compare x y F T T)
+	\: : lt le eq ne gt ge
+	)
 
-\length=(fold (\z\_ long_add z 1) 0)
+ordering string_compare
+\string_lt
+\string_le
+\string_eq
+\string_ne
+\string_gt
+\string_ge
 
-# TODO
-\string_compare=(\x\y order (string_cmp x y))
-\string_ne=(\x\y order (string_cmp x y) T F F)
+ordering long_compare
+\long_lt
+\long_le
+\long_eq
+\long_ne
+\long_gt
+\long_ge
 
-# TODO
-\long_le=(\x\y order (long_cmp x y) T T F)
-#\long_lt=(\x\y order (long_cmp x y) T F F)
-#\long_gt=(\x\y order (long_cmp x y) F F T)
-#\long_eq=(\x\y order (long_cmp x y) F T F)
-\ <= = long_le
+ordering double_compare
+\double_lt
+\double_le
+\double_eq
+\double_ne
+\double_gt
+\double_ge
 
-# TODO
-#\ < = long_lt
-#\ = = long_eq
-#\ <= = long_le
+# TODO make these the generic versions
+\lt = long_lt
+\le = long_le
+\eq = long_eq
+\ne = long_ne
+\gt = long_gt
+\ge = long_ge
 
-# TODO
-#\eq=string_eq
+\ <   = lt
+\ <=  = le
+\ =   = eq
+\ !=  = ne
+\ >   = gt
+\ >=  = ge
 
-# TODO what about lists with doubles etc?
-#\max=(fold (\z\x if (<= z x) x z) 0)
-\max=(fold (\z\x if (<= z x) x z) 0)
+# TODO full math operators
+\add = long_add
+\sub = long_sub
+\mul = long_mul
+\div = long_div
 
-\long_gt=(\x\y order (long_cmp x y) F F T)
+\ +  = add
+\ -  = sub
+\ *  = mul
+\ /  = mul
 
+# Return the list of long values in the range lo through hi.
 \range=
 	(
 	@\range\lo\hi
@@ -91,17 +132,38 @@
 	[lo;range (long_add lo 1) hi]
 	)
 
+# TODO with generic <= this would work with longs and doubles, but what if the
+# list has strings too?  I suppose when comparing a number with a string we
+# should auto-convert the number to string.
+
+# Return the maximum element of a list, or 0 if the list is empty.
+\max=(fold (\z\x if (> z x) z x) 0)
+# Return the minimum element of a list, or 0 if the list is empty.
+\min=(fold (\z\x if (< z x) z x) 0)
+
+# The column function extracts column n from a matrix (list of rows).
+\column=(\n map (entry n))
+
+# The "columns" function takes a list of columns and produces the matrix with
+# those columns.  This is also known as the "transpose" function.  For example:
+#   (columns [["a" "b" "c"] [1 2 3]])) =
+#   [["a" 1]
+#    ["b" 2]
+#    ["c" 3]]
+
 \columns=
 	(\xs
 	map (\n column n xs) (range 1 (max (map length xs)))
 	)
 
+# Insert a separator between the elements of a list.
 \join=
 	(@\join\sep\list
 	list [] \h\t
 	t [h] \_\_ [h sep; (join sep t)]
 	)
 
+# Convert nested list data to a flat string.
 \to_string =
 	(@\to_string\x
 	\x==x
@@ -113,9 +175,10 @@
 		""
 		)
 	\h\t
-	. (to_string h) (to_string t)
+	string_append (to_string h) (to_string t)
 	)
 
+# Print nested list data to a file handle.
 \fprint=
 	(@\fprint\fh\x
 	\x==x
@@ -149,10 +212,6 @@
 	exit 1
 	)
 
-# TODO full math operators
-\+=long_add
-\*=long_mul
-
 \setrlimit =
 	(\resource\limit
 	#\resource=(say "woot1" resource)
@@ -166,36 +225,18 @@
 	setrlimit RLIMIT_DATA 800000000
 	setrlimit RLIMIT_AS 800000000
 	setrlimit RLIMIT_CPU 30
-	setrlimit RLIMIT_CPU 3
+	setrlimit RLIMIT_CPU 10
 	#say "I am using safe limits for this test."
 	)
 
 use_safe_limits
-
-# Message from Uncle Leo:
-#say "HELLO Jerry!"
 
 # Extend the current context.
 \context =
 	(\x
 	\x==x
 	\case=(\name\val string_eq x name [val])
-	case "if" if;
-	case "append" append;
-	case "choose" choose;
-	case "column" column;
-	case "columns" columns;
-	case "do" do;
-	case "entry" entry;
-	case "map" map;
-	case "fold" fold;
-	case "filter" filter;
-	case "sort" sort;
-	case "max" max;
-	case "length" length;
-	case "range" range;
-	case "string_ne" string_ne;
-	case "string_compare" string_compare;
+
 	case "fprint" fprint;
 	case "print" print;
 	case "warn" warn;
@@ -207,6 +248,33 @@ use_safe_limits
 	case "*" *;
 	case "join" join;
 	case "to_string" to_string;
+
+	case "if" if;
+	case "append" append;
+	case "choose" choose;
+	case "column" column;
+	case "columns" columns;
+	case "do" do;
+	case "entry" entry;
+	case "map" map;
+
+	case "fold" fold;
+	case "filter" filter;
+	case "sort" sort;
+
+	#case "max" max;
+	#case "min" min;
+
+	case "length" length;
+	case "range" range;
+
+	case "string_lt" string_lt;
+	case "string_le" string_le;
+	case "string_eq" string_eq;
+	case "string_ne" string_ne;
+	case "string_gt" string_gt;
+	case "string_ge" string_ge;
+
 	case "announce" (\x say ["== " x]);
 	source_context x
 	)

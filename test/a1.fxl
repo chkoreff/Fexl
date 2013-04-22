@@ -405,6 +405,7 @@ fwrite stdout NL
 \test_big_string_append =
 (
 announce "test_big_string_append"
+\. = string_append
 \x = (. "x" "y")
 \x = (. x x)
 \x = (. x x)
@@ -533,6 +534,65 @@ f f
 f f
 )
 
+# Test three-way comparisons of string, long, and double.
+\test_compare=
+(
+announce "test_compare"
+
+\try_compare=
+	(\compare
+	\try=
+		(\x\y
+		# Testing with embedded side effects.
+		\x=(print "" x)
+		\y=(print "" y)
+		\result = (compare x y "LT" "EQ" "GT")
+		print result
+		)
+
+	# Try both ways.
+	\try=
+		(\x\y
+		try x y
+		print " "
+		try y x
+		nl
+		)
+	try
+	)
+
+say "string"
+\try=(try_compare string_compare)
+
+try "" "b"
+try "a" "b"
+try "a" "aa"
+
+try "" ""
+try "b" "b"
+try "bb" "bb"
+
+say "long"
+\try=(try_compare long_compare)
+
+try 0 1
+try -1 0
+try 1 3
+try 0 0
+try -2 -2
+try 34 34
+
+say "double"
+\try=(try_compare double_compare)
+
+try 0.1 1.0
+try -1.0 0.0
+try 1.0 3.0
+try 0.0 0.0
+try -2.0 -2.0
+try 34.0 34.0
+)
+
 \test_getchar=
 (
 \f=
@@ -615,6 +675,7 @@ test_long_1
 test_long_2
 test_double_1
 test_double_2
+test_compare
 # LATER fork a process and cat string to its stdin.
 #test_getchar
 test_resolve

@@ -1,4 +1,4 @@
-/*TODO use this to grab a fexl function from a shared library */
+/*LATER use this to grab a fexl function from a shared library */
 value lib(const char *name)
 	{
 	value string_append = Q(type_string_append);

@@ -10,7 +10,7 @@ use "test/common.fxl" \\
 # Here we take the trouble to model a "stream" object which contains the
 # file handle, name, and line number.
 
-# TODO temporarily re-shape parse_steam to return a list
+# TODO temporarily re-shape parse_stream to return a list
 \parse_stream =
 	(\fh\context\name\line
 	parse_stream fh context name line \exp\line
@@ -56,7 +56,7 @@ use "test/common.fxl" \\
 	fopen name mode (die ["Could not open " name]) \fh\_
 	fh)
 
-\name==(. base_path "test/a3_1.fxl")
+\name==(string_append base_path "test/a3_1.fxl")
 \fh==(fopen name "r")
 \line==(say "Initialize line number." + 1 0)
 \stream=(\: : fh name line)
@@ -67,7 +67,6 @@ parse stream \stream
 )
 
 # Example of reporting an arbitrarily complex result in an extensible way.
-# TODO use the tuple technique?
 \test_report=
 (
 \test_report=

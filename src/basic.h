@@ -13,6 +13,7 @@ extern value Qitem;
 extern value Qquery;
 extern value item(value f, value g);
 extern value yield(value f, value g);
+extern value replace_compare(value f, type t, int cmp(value,value));
 extern value resolve_basic(const char *name);
 extern void beg_basic(void);
 extern void end_basic(void);

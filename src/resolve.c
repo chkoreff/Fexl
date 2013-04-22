@@ -13,15 +13,11 @@ static value resolve(const char *name)
 	if ((f = resolve_var(name))) return f;
 	if ((f = resolve_parse(name))) return f;
 
-	/* TODO more functions
+	/* LATER more functions
 	if (strcmp(name,"lib") == 0) return Q(type_lib);
 	*/
 
 	if (strcmp(name,"resolve") == 0) return Q(type_resolve);
-	/*TODO get rid */
-	#if 0
-	if (strcmp(name,"context") == 0) return Q(type_resolve);
-	#endif
 
 	return 0;
 	}

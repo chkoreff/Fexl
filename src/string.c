@@ -208,40 +208,10 @@ value type_string_append(value f)
 	return replace(f, type_string, 0, z);
 	}
 
-/*TODO perhaps define in fexl itself (in terms of string_cmp and order) */
-value type_string_eq(value f)
+/* (string_compare x y lt eq gt) */
+value type_string_compare(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
-
-	value x = arg(type_string,f->L->R);
-	value y = arg(type_string,f->R);
-
-	if (x != f->L->R || y != f->R)
-		{
-		check(x);
-		check(y);
-		f = 0;
-		}
-
-	return replace_boolean(f, string_cmp(x,y) == 0);
-	}
-
-/* (string_cmp x y) compares x and y and returns <0, 0, or >0. */
-value type_string_cmp(value f)
-	{
-	if (!f->L || !f->L->L) return 0;
-
-	value x = arg(type_string,f->L->R);
-	value y = arg(type_string,f->R);
-
-	if (x != f->L->R || y != f->R)
-		{
-		check(x);
-		check(y);
-		f = 0;
-		}
-
-	return replace_long(f, string_cmp(x,y));
+	return replace_compare(f,type_string,string_cmp);
 	}
 
 value type_is_string(value f)
@@ -252,26 +222,24 @@ value type_is_string(value f)
 static value resolve_string_prefix(const char *name)
 	{
 	if (strcmp(name,"append") == 0) return Q(type_string_append);
-	if (strcmp(name,"eq") == 0) return Q(type_string_eq);
-	if (strcmp(name,"cmp") == 0) return Q(type_string_cmp);
+	if (strcmp(name,"compare") == 0) return Q(type_string_compare);
 	return 0;
 	}
 
 value resolve_string(const char *name)
 	{
-	if (strcmp(name,".") == 0) return Q(type_string_append);
 	if (strncmp(name,"string_",7) == 0) return resolve_string_prefix(name+7);
 	if (strcmp(name,"is_string") == 0) return Q(type_is_string);
 	return 0;
 	}
 
-/* TODO more functions
+#if 0
+LATER more functions
 string_slice
 string_at
-string_eq (maybe just define in fexl)
 string_common
 string_len
 string_index
 string_long
 string_double
-*/
+#endif

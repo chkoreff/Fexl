@@ -71,10 +71,9 @@ value resolve_meta(const char *name)
 	return 0;
 	}
 
-/* TODO more functions
+/* LATER more functions
 if (strcmp(name,"argc") == 0) return Q(type_argc);
 if (strcmp(name,"argv") == 0) return Q(type_argv);
 if (strcmp(name,"getenv") == 0) return Q(type_getenv);
 if (strcmp(name,"setenv") == 0) return Q(type_setenv);
-if (strcmp(name,"source") == 0) return Qsource();
 */

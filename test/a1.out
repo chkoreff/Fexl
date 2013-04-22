@@ -131,6 +131,28 @@ ABinf
 ABinf
 A123.5
 A123.5
+== test_compare
+string
+LT GT
+LT GT
+LT GT
+EQ EQ
+EQ EQ
+EQ EQ
+long
+LT GT
+LT GT
+LT GT
+EQ EQ
+EQ EQ
+EQ EQ
+double
+LT GT
+LT GT
+LT GT
+EQ EQ
+EQ EQ
+EQ EQ
 == test_resolve
 !48.6
 !48.6

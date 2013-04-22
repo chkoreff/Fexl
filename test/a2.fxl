@@ -9,11 +9,6 @@ announce "test_nat_math"
 
 # Convert atom or list to a string.
 
-# (map f xs) is the list of (f x) values for each x in xs.
-\map=(@\map\f\xs xs [] \x\xs [(f x); map f xs])
-
-\length=(@\length\xs xs 0 \_\xs long_add 1 (length xs))
-
 # (nat b n) is the natural number b + 2*n, where b is a bit and n is a natural
 # number.
 \nat = (\b\n b [T;n]; n [] \_\_ [F;n])
@@ -52,12 +47,12 @@ announce "test_nat_math"
 			[F F; nat_mul nx ny])
 	)
 
-# TODO rephrase the nat operators so they don't use yes/no.
-
-\pair=(\x\y\p p x y)
-\nat_0 = []
+# TODO rephrase the nat operators so they don't yes, no, and pair.
 \yes=(\x\yes\no yes x)
 \no=(\yes\no no)
+\pair=(\x\y\p p x y)
+
+\nat_0 = []
 
 # Decrement x, returning:
 #   yes d     # if x > 0 and d = x - 1

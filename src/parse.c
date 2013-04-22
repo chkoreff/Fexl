@@ -40,12 +40,11 @@ RLIMIT_AS, and also RLIMIT_DATA for good measure, to limit the total amount of
 memory.
 */
 
-/*TODO*/
-static FILE *source_fh = 0;   /* current source file */
+static int ch;                        /* current character */
+static FILE *source_fh = 0;           /* current source file */
 static const char *source_label = 0;  /* current label of source file */
-static int ch;         /* current character */
-static long source_line;      /* current line number */
-static value source_context;  /* current context */
+static long source_line;              /* current line number */
+static value source_context;          /* current context */
 
 static void next_ch(void)
 	{
@@ -542,8 +541,6 @@ static value resolve_all(value f)
 	return exp;
 	}
 
-/*TODO*/
-
 /* Parse a fully resolved value. */
 static value parse_value(FILE *fh,  const char *label, value context,
 	long *p_line)
@@ -605,18 +602,8 @@ value type_parse_stream(value f)
 		check(arg_line);
 		}
 
-	return yield(yield(I,g),Qlong(line)); /*TODO nice but should we use list?*/
+	return yield(yield(I,g),Qlong(line));
 	}
-
-/* Return a handle to the remainder of the current source stream. */
-/*TODO*/
-#if 0
-value type_source_fh(value f)
-	{
-	/*TODO*/
-	return Qfile(source_fh,0);
-	}
-#endif
 
 /* (use file) Read context from file and parse remainder of source in that
 context. */
@@ -670,9 +657,6 @@ value resolve_parse(const char *name)
 	if (strcmp(name,"use") == 0) return Q(type_use);
 	/*TODO name?*/
 	if (strcmp(name,"parse_stream") == 0) return Q(type_parse_stream);
-	#if 0
-	if (strcmp(name,"source_fh") == 0) return Q(type_source_fh);
-	#endif
 	if (strcmp(name,"source_fh") == 0) return Qfile(source_fh,0);
 	if (strcmp(name,"source_label") == 0) return Qstring(source_label);
 	if (strcmp(name,"source_line") == 0) return Qlong(source_line);

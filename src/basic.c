@@ -122,10 +122,35 @@ value item(value h, value t)
 	return A(A(Qitem,h),t);
 	}
 
-/*TODO doc yield */
+/* We use this to return an arbitrary tuple of values.  For example, to return
+the triple (\: : x y z), we would say:
+	return yield(yield(yield(I,x),y),z);
+*/
 value yield(value f, value g)
 	{
 	return A(A(L,f),g);
+	}
+
+/* (compare x y lt eq gt) compares x and y and returns lt, eq, or gt. */
+value replace_compare(value f, type t, int cmp(value,value))
+	{
+	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L
+		|| !f->L->L->L->L->L) return 0;
+
+	value x = arg(t,f->L->L->L->L->R);
+	value y = arg(t,f->L->L->L->R);
+	int n = cmp(x,y);
+
+	value result = n < 0 ? f->L->L->R : n > 0 ? f->R : f->L->R;
+
+	if (x != f->L->L->L->L->R || y != f->L->L->L->R)
+		{
+		check(x);
+		check(y);
+		f = 0;
+		}
+
+	return replace_value(f, result);
 	}
 
 value resolve_basic(const char *name)
