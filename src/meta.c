@@ -1,4 +1,5 @@
 /* exit status : exits with the given status */
+/*TODO maybe rename this module as "system" */
 value type_exit(value f)
 	{
 	if (!f->L) return 0;

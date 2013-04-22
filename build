@@ -247,9 +247,11 @@ module long - stdio - stdlib - string value basic string
 module memory - stdlib die
 module meta - stdlib - string - sys/resource value basic long
 module parse - ctype - stdio - string die value basic file long resolve string
-module resolve - stdio - string value basic double file long meta parse string var
+module resolve - stdio - string value basic \
+	double file long meta parse string type var
 no_module show - stdio value
 module string - string memory value basic
+module type - string value basic long double string
 module value memory die
 module var - string value basic
 

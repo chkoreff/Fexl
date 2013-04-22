@@ -10,6 +10,7 @@ static value resolve(const char *name)
 	if ((f = resolve_basic(name))) return f;
 	if ((f = resolve_file(name))) return f;
 	if ((f = resolve_meta(name))) return f;
+	if ((f = resolve_type(name))) return f;
 	if ((f = resolve_var(name))) return f;
 	if ((f = resolve_parse(name))) return f;
 

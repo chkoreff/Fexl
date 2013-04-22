@@ -229,7 +229,8 @@ static value resolve_string_prefix(const char *name)
 value resolve_string(const char *name)
 	{
 	if (strncmp(name,"string_",7) == 0) return resolve_string_prefix(name+7);
-	if (strcmp(name,"is_string") == 0) return Q(type_is_string);
+	if (strcmp(name,"is_string") == 0) return Q(type_is_string); /*TODO*/
+	if (strcmp(name,"concat") == 0) return Q(type_string_append); /*TODO*/
 	return 0;
 	}
 

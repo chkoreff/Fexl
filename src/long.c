@@ -1,6 +1,6 @@
 value type_long(value f)
 	{
-	return type_C(f);
+	return type_C(f); /*TODO*/
 	}
 
 value replace_long(value f, long val)

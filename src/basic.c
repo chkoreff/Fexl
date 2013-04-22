@@ -87,7 +87,7 @@ value replace_boolean(value f, int flag)
 	}
 
 /* Become [x] if x is non-zero, otherwise []. */
-value replace_maybe(value f, value x)
+value replace_maybe(value f, value x) /*TODO*/
 	{
 	if (x)
 		return replace_apply(f, A(Qitem,x), C);
@@ -96,13 +96,13 @@ value replace_maybe(value f, value x)
 	}
 
 /* Become T or F based on whether f->R is of type t. */
-value replace_is_type(value f, type t)
+value replace_is_type(value f, type t) /*TODO*/
 	{
 	if (!f->L) return 0;
 	return replace_boolean(f, f->R->T == t);
 	}
 
-value type_is_end(value f)
+value type_is_end(value f) /*TODO*/
 	{
 	return replace_is_type(f, type_C);
 	}
