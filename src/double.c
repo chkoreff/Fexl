@@ -1,4 +1,4 @@
-value type_double(value f) { return type_C(f); } /*TODO*/
+static value type_double(value f) { return type_C(f); } /*TODO*/
 
 /*
 A double is guaranteed to fit in 64 bits.  The standard says:
@@ -12,7 +12,7 @@ A double is guaranteed to fit in 64 bits.  The standard says:
 We know that the L and R pointers are either 32 or 64 bits each, depending on
 the machine, so together they can definitely hold the 64 bits of a double.
 */
-value replace_double(value f, double val)
+static value replace_double(value f, double val)
 	{
 	value x = Q(0);
 	double *p = (double *)(&x->L);
