@@ -1,6 +1,5 @@
 /* exit status : exits with the given status */
-/*TODO maybe rename this module as "system" */
-value type_exit(value f)
+static value type_exit(value f)
 	{
 	if (!f->L) return 0;
 	value x = arg(type_long,f->R);
@@ -10,7 +9,7 @@ value type_exit(value f)
 	}
 
 /* (setrlimit resource soft hard) = status */
-value type_setrlimit(value f)
+static value type_setrlimit(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 
@@ -64,7 +63,7 @@ static value resolve_RLIMIT(const char *name)
 	return ok ? Qlong(limit) : 0;
 	}
 
-value resolve_meta(const char *name)
+value resolve_system(const char *name)
 	{
 	if (strncmp(name,"RLIMIT_",7) == 0) return resolve_RLIMIT(name+7);
 	if (strcmp(name,"setrlimit") == 0) return Q(type_setrlimit);

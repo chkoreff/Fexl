@@ -91,7 +91,7 @@ value Q(type T)
 	}
 
 /* The reduction routine for function application. */
-value type_apply(value f)
+static value type_apply(value f)
 	{
 	value g = eval(f->L);
 	if (f->L == g)
@@ -143,14 +143,25 @@ value eval(value f)
 		}
 	}
 
+static value type_error(void)
+	{
+	die("You used a data type incorrectly.");
+	return 0;
+	}
+
+value type_data(value f)
+	{
+	if (!f->L) return 0;
+	return type_error();
+	}
+
 /* Evaluate an argument and assert that it is of type T. */
 value arg(type T, value f)
 	{
 	if (f->T == T) return f;
 	f = eval(f);
 	if (f->T == T) return f;
-	die("You used a data type incorrectly.");
-	return 0;
+	return type_error();
 	}
 
 /* Clear the free list and end the memory arena. */

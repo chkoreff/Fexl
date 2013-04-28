@@ -52,10 +52,7 @@ static void free_string(value f)
 	free_memory((void *)f->R, (long)f->L + 1);
 	}
 
-value type_string(value f)
-	{
-	return type_C(f);
-	}
+value type_string(value f) { return type_C(f); } /*TODO*/
 
 /* Allocate a string which can hold len bytes plus trailing NUL. */
 static value new_string(long len)
@@ -209,14 +206,14 @@ value type_string_append(value f)
 	}
 
 /* (string_compare x y lt eq gt) */
-value type_string_compare(value f)
+static value type_string_compare(value f)
 	{
-	return replace_compare(f,type_string,string_cmp);
+	return op_compare(f,type_string,string_cmp);
 	}
 
-value type_is_string(value f)
+static value type_is_string(value f)
 	{
-	return replace_is_type(f, type_string);
+	return op_is_atom(f, type_string);
 	}
 
 static value resolve_string_prefix(const char *name)

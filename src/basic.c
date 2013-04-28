@@ -6,48 +6,48 @@ value type_C(value f)
 	}
 
 /* S x y z = x z (y z) */
-value type_S(value f)
+static value type_S(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 	return replace_apply(f, A(f->L->L->R,f->R), A(f->L->R,f->R));
 	}
 
 /* I x = x */
-value type_I(value f)
+static value type_I(value f)
 	{
 	if (!f->L) return 0;
 	return replace_value(f, f->R);
 	}
 
 /* F x = I.  In other words, F x y = y. */
-value type_F(value f)
+static value type_F(value f)
 	{
 	if (!f->L) return 0;
 	return replace_value(f, I);
 	}
 
 /* R x y z = x (y z) */
-value type_R(value f)
+static value type_R(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 	return replace_apply(f, f->L->L->R, A(f->L->R,f->R));
 	}
 
 /* L x y z = x z y */
-value type_L(value f)
+static value type_L(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 	return replace_apply(f, A(f->L->L->R,f->R), f->L->R);
 	}
 
 /* Y x = x (Y x) */
-value type_Y(value f)
+static value type_Y(value f)
 	{
 	if (!f->L) return 0;
-	return replace_apply(f, f->R, A(f->L,f->R));
+	return replace_apply(f, f->R, A(Y,f->R));
 	}
 
-/* item x y A B = B x y */
+/* item x y p q = q x y */
 value type_item(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
@@ -55,7 +55,7 @@ value type_item(value f)
 	}
 
 /* (query x y) = y x, except x is evaluated first. */
-value type_query(value f)
+static value type_query(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 
@@ -73,7 +73,7 @@ you may have a function which creates another function, and you want to return
 that function without actually calling it.  This is particularly important for
 functions which have side effects, otherwise we wouldn't really need this.
 */
-value type_return(value f)
+static value type_return(value f)
 	{
 	if (!f->L) return 0;
 	replace_value(f, f->R);
@@ -96,15 +96,15 @@ value replace_maybe(value f, value x) /*TODO*/
 	}
 
 /* Become T or F based on whether f->R is of type t. */
-value replace_is_type(value f, type t) /*TODO*/
+value op_is_atom(value f, type t)
 	{
 	if (!f->L) return 0;
 	return replace_boolean(f, f->R->T == t);
 	}
 
-value type_is_end(value f) /*TODO*/
+static value type_is_end(value f) /*TODO*/
 	{
-	return replace_is_type(f, type_C);
+	return op_is_atom(f, type_C);
 	}
 
 value C;
@@ -132,7 +132,7 @@ value yield(value f, value g)
 	}
 
 /* (compare x y lt eq gt) compares x and y and returns lt, eq, or gt. */
-value replace_compare(value f, type t, int cmp(value,value))
+value op_compare(value f, type t, int cmp(value,value))
 	{
 	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L
 		|| !f->L->L->L->L->L) return 0;

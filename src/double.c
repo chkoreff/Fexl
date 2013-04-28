@@ -1,7 +1,4 @@
-value type_double(value f)
-	{
-	return type_C(f);
-	}
+value type_double(value f) { return type_C(f); } /*TODO*/
 
 /*
 A double is guaranteed to fit in 64 bits.  The standard says:
@@ -23,7 +20,7 @@ value replace_double(value f, double val)
 	return replace(f, type_double, 0, x);
 	}
 
-value Qdouble(double val)
+static value Qdouble(double val)
 	{
 	return replace_double(0,val);
 	}
@@ -38,13 +35,13 @@ That yields an error:
 
 Instead, we must first get a pointer to double, then dereference the pointer.
 */
-double double_val(value f)
+static double double_val(value f)
 	{
 	double *p = (double *)&f->R->L;
 	return *p;
 	}
 
-static value replace_double2(value f, double op(double,double))
+static value op2(value f, double op(double,double))
 	{
 	if (!f->L || !f->L->L) return 0;
 
@@ -61,23 +58,23 @@ static value replace_double2(value f, double op(double,double))
 	return replace_double(f,z);
 	}
 
-static double double_add(double x, double y) { return x + y; }
-static double double_sub(double x, double y) { return x - y; }
-static double double_mul(double x, double y) { return x * y; }
+static double op_add(double x, double y) { return x + y; }
+static double op_sub(double x, double y) { return x - y; }
+static double op_mul(double x, double y) { return x * y; }
 /*
 Note that dividing by zero is no problem here. If you divide a non-zero by
 zero, it yields inf (infinity). If you divide zero by zero, it yields -nan
 (not a number).
 */
-static double double_div(double x, double y) { return x / y; }
+static double op_div(double x, double y) { return x / y; }
 
-value type_double_add(value f) { return replace_double2(f,double_add); }
-value type_double_sub(value f) { return replace_double2(f,double_sub); }
-value type_double_mul(value f) { return replace_double2(f,double_mul); }
-value type_double_div(value f) { return replace_double2(f,double_div); }
+static value type_double_add(value f) { return op2(f,op_add); }
+static value type_double_sub(value f) { return op2(f,op_sub); }
+static value type_double_mul(value f) { return op2(f,op_mul); }
+static value type_double_div(value f) { return op2(f,op_div); }
 
 /* (double_string x) Convert double to string. */
-value type_double_string(value f)
+static value type_double_string(value f)
 	{
 	if (!f->L) return 0;
 
@@ -114,14 +111,14 @@ static int double_cmp(value x, value y)
 	}
 
 /* (double_compare x y lt eq gt) */
-value type_double_compare(value f)
+static value type_double_compare(value f)
 	{
-	return replace_compare(f,type_double,double_cmp);
+	return op_compare(f,type_double,double_cmp);
 	}
 
-value type_is_double(value f)
+static value type_is_double(value f)
 	{
-	return replace_is_type(f, type_double);
+	return op_is_atom(f, type_double);
 	}
 
 static value resolve_double_prefix(const char *name)

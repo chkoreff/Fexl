@@ -65,5 +65,6 @@ extern value A(value f, value g);
 extern value replace_value(value f, value g);
 extern value replace_apply(value f, value L, value R);
 extern value eval(value f);
+extern value type_data(value f);
 extern value arg(type T, value f);
 extern void end_value(void);

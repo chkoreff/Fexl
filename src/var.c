@@ -2,10 +2,7 @@
 with things like caching, simulating a dynamic entity such as a file system or
 human user, redefining print to capture output in a memory buffer, etc. */
 
-value type_var(value f)
-	{
-	return type_C(f);
-	}
+value type_var(value f) { return type_C(f); } /*TODO*/
 
 static void free_var(value f)
 	{
@@ -13,7 +10,7 @@ static void free_var(value f)
 	}
 
 /* (var_new val) Return a new variable with the given value. */
-value type_var_new(value f)
+static value type_var_new(value f)
 	{
 	if (!f->L) return 0;
 	value x = V((type)free_var,f->R,0);
@@ -21,7 +18,7 @@ value type_var_new(value f)
 	}
 
 /* (var_get var) Get current value of variable. */
-value type_var_get(value f)
+static value type_var_get(value f)
 	{
 	if (!f->L) return 0;
 	value var = arg(type_var,f->R);
@@ -33,7 +30,7 @@ value type_var_get(value f)
 	}
 
 /* (var_put var val) Put new value in variable. */
-value type_var_put(value f)
+static value type_var_put(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	value var = arg(type_var,f->L->R);

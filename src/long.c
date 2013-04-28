@@ -1,7 +1,4 @@
-value type_long(value f)
-	{
-	return type_C(f); /*TODO*/
-	}
+value type_long(value f) { return type_C(f); } /*TODO*/
 
 value replace_long(value f, long val)
 	{
@@ -20,7 +17,7 @@ long long_val(value f)
 	return (long)f->R->L;
 	}
 
-static value replace_long2(value f, long op(long,long))
+static value op2(value f, long op(long,long))
 	{
 	if (!f->L || !f->L->L) return 0;
 
@@ -37,19 +34,19 @@ static value replace_long2(value f, long op(long,long))
 	return replace_long(f,z);
 	}
 
-static long long_add(long x, long y) { return x + y; }
-static long long_sub(long x, long y) { return x - y; }
-static long long_mul(long x, long y) { return x * y; }
-/* long_div returns 0 if you try to divide by 0. */
-static long long_div(long x, long y) { return y ? x / y : 0; }
+static long op_add(long x, long y) { return x + y; }
+static long op_sub(long x, long y) { return x - y; }
+static long op_mul(long x, long y) { return x * y; }
+/* op_div returns 0 if you try to divide by 0. */
+static long op_div(long x, long y) { return y ? x / y : 0; }
 
-value type_long_add(value f) { return replace_long2(f,long_add); }
-value type_long_sub(value f) { return replace_long2(f,long_sub); }
-value type_long_mul(value f) { return replace_long2(f,long_mul); }
-value type_long_div(value f) { return replace_long2(f,long_div); }
+static value type_long_add(value f) { return op2(f,op_add); }
+static value type_long_sub(value f) { return op2(f,op_sub); }
+static value type_long_mul(value f) { return op2(f,op_mul); }
+static value type_long_div(value f) { return op2(f,op_div); }
 
 /* (long_string x) Convert long to string. */
-value type_long_string(value f)
+static value type_long_string(value f)
 	{
 	if (!f->L) return 0;
 
@@ -85,14 +82,14 @@ static int long_cmp(value x, value y)
 	}
 
 /* (long_compare x y lt eq gt) */
-value type_long_compare(value f)
+static value type_long_compare(value f)
 	{
-	return replace_compare(f,type_long,long_cmp);
+	return op_compare(f,type_long,long_cmp);
 	}
 
-value type_is_long(value f)
+static value type_is_long(value f)
 	{
-	return replace_is_type(f, type_long);
+	return op_is_atom(f, type_long);
 	}
 
 static value resolve_long_prefix(const char *name)

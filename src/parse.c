@@ -655,7 +655,6 @@ value type_use(value f)
 value resolve_parse(const char *name)
 	{
 	if (strcmp(name,"use") == 0) return Q(type_use);
-	/*TODO name?*/
 	if (strcmp(name,"parse_stream") == 0) return Q(type_parse_stream);
 	if (strcmp(name,"source_fh") == 0) return Qfile(source_fh,0);
 	if (strcmp(name,"source_label") == 0) return Qstring(source_label);

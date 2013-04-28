@@ -1,7 +1,4 @@
-value type_file(value f)
-	{
-	return type_C(f);
-	}
+value type_file(value f) { return type_C(f); } /*TODO*/
 
 FILE *file_val(value f)
 	{
@@ -28,7 +25,7 @@ value Qfile(FILE *fh, long close)
 	}
 
 /* (putchar ch) Write character to stdout. */
-value type_putchar(value f)
+static value type_putchar(value f)
 	{
 	if (!f->L) return 0;
 	value x = arg(type_long,f->R);
@@ -40,13 +37,13 @@ value type_putchar(value f)
 	}
 
 /* getchar : Return next char from stdin. */
-value type_getchar(value f)
+static value type_getchar(value f)
 	{
 	return Qlong(getchar());
 	}
 
 /* (fputc file ch) Write character to stdout. */
-value type_fputc(value f)
+static value type_fputc(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	value x = arg(type_file,f->L->R);
@@ -64,7 +61,7 @@ value type_fputc(value f)
 	}
 
 /* (fgetc fh) returns the next character from the file handle. */
-value type_fgetc(value f)
+static value type_fgetc(value f)
 	{
 	if (!f->L) return 0;
 	value x = arg(type_file,f->R);
@@ -78,7 +75,7 @@ value type_fgetc(value f)
 	}
 
 /* (fwrite fh str) Write string to file handle. */
-value type_fwrite(value f)
+static value type_fwrite(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	value x = arg(type_file,f->L->R);
@@ -97,7 +94,7 @@ value type_fwrite(value f)
 	}
 
 /* (fopen path mode) Open a file and return [fh] or []. */
-value type_fopen(value f)
+static value type_fopen(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	value x = arg(type_string,f->L->R);
@@ -147,7 +144,7 @@ static value safe_readlink(const char *path)
 	}
 
 /* (readlink path) Call readlink(2) on the path. */
-value type_readlink(value f)
+static value type_readlink(value f)
 	{
 	if (!f->L) return 0;
 	value x = arg(type_string,f->R);
