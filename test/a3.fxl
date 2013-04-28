@@ -10,26 +10,6 @@ use "test/common.fxl" \\
 # Here we take the trouble to model a "stream" object which contains the
 # file handle, name, and line number.
 
-# TODO temporarily re-shape parse_stream to return a list
-\parse_stream =
-	(\fh\context\name\line
-	parse_stream fh context name line \exp\line
-	[exp line]
-	#[exp]
-	)
-
-# TODO now show how we'd transform back into plain tuple.  It's a PITA to
-# shift off the args one by one.
-\parse_stream =
-	(\fh\context\name\line
-	\result==(parse_stream fh context name line)
-	result () \exp\result
-	result () \line\result
-	\: : exp line
-	# TODO possibly:
-	#{exp line}
-	)
-
 \parse_stream =
 	(\stream
 	stream \fh\name\line
@@ -71,6 +51,8 @@ parse stream \stream
 (
 \test_report=
 	(\result
+	\is_list=(\x \x==x is_end x T; is_item x (\_\_ T); F)
+	not (is_list result) (say "Not a list");
 	result (say "No result") \status\result
 	string_eq status "ok"
 		(

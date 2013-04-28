@@ -180,35 +180,11 @@ ordering double_compare
 	[]
 	)
 
-# Convert nested list data to a flat string.
-\to_string =
-	(@\to_string\x
-	\x==x
-	x
-		(
-		is_string x x;
-		is_long x (long_string x);
-		is_double x (double_string x);
-		""
-		)
-	\h\t
-	string_append (to_string h) (to_string t)
-	)
+# Convert nested data to a string.
+\to_string=(\x fold string_append "" (flatten x))
 
-# Print nested list data to a file handle.
-\fprint=
-	(@\fprint\fh\x
-	\x==x
-	x
-		(
-		is_string x (fwrite fh x);
-		is_long x (fwrite fh (long_string x));
-		is_double x (fwrite fh (double_string x));
-		)
-	\h\t
-	fprint fh h;
-	fprint fh t
-	)
+# Print nested data to a file handle.
+\fprint=(\fh\x each (flatten x) (fwrite fh))
 
 # That's equivalent to:
 #\fprint=(\fh\x fwrite fh (to_string x))

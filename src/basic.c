@@ -10,7 +10,7 @@ static value F;
 static value Y;
 
 /* C x y = x */
-value type_C(value f)
+static value type_C(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	return replace_value(f, f->L->R);
@@ -134,9 +134,9 @@ static value type_is_item(value f)
 	value data = f->R;
 
 	if (is_item(data))
-		return A(A(R,C),yield(yield(I,data->L->R),data->R));
+		return replace_apply(f, A(R,C), yield(yield(I,data->L->R),data->R));
 	else
-		return F;
+		return replace_value(f, F);
 	}
 
 /* Return the list with head h and tail t, which is [h;t] in list notation. */

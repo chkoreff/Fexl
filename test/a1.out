@@ -159,3 +159,29 @@ EQ EQ
 == test_var_side
 !x = 3
 @!%x = hi
+== test_type
+try long
+long 0
+long 7
+long 5
+try double
+double 0
+double 3.14159265358979
+double -2.6
+try string
+string 
+string hello
+try list
+list 
+list 
+list a
+list ab
+list ab
+list ab
+try var
+var ab2
+try unknown
+unknown
+unknown
+unknown
+unknown

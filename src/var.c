@@ -2,7 +2,7 @@
 with things like caching, simulating a dynamic entity such as a file system or
 human user, redefining print to capture output in a memory buffer, etc. */
 
-value type_var(value f) { return type_C(f); } /*TODO*/
+static value type_var(value f) { return type_data(f); }
 
 static void free_var(value f)
 	{

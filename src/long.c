@@ -1,4 +1,4 @@
-value type_long(value f) { return type_C(f); } /*TODO*/
+value type_long(value f) { return type_data(f); }
 
 value replace_long(value f, long val)
 	{

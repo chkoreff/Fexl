@@ -47,42 +47,34 @@ announce "test_nat_math"
 			[F F; nat_mul nx ny])
 	)
 
-# TODO rephrase the nat operators so they don't yes, no, and pair.
-\yes=(\x\yes\no yes x)
-\no=(\yes\no no)
-\pair=(\x\y\p p x y)
-
 \nat_0 = []
 
 # Decrement x, returning:
-#   yes d     # if x > 0 and d = x - 1
 #   no        # if x = 0
+#   yes d     # if x > 0 and d = x - 1
 \nat_dec_clip=
 	(@\nat_dec_clip\x
 	x no \bx\nx
 	bx
 		(yes (nat F nx))
-		(nat_dec_clip nx (\d yes (nat T d)) no)
+		(nat_dec_clip nx no \d yes (nat T d))
 	)
 
 # Subtract x minus y, returning:
-#   yes d     # if x >= y and d = x - y
 #   no        # if x < y
+#   yes d     # if x >= y and d = x - y
 \nat_sub_clip=
 	(@\nat_sub_clip\x\y
 	x (y (yes nat_0) \_\_ no) \bx\nx
 	y (yes x) \by\ny
 
-	nat_sub_clip nx ny
-		(\d
-		bx
-			(yes (nat (by F T) d))
-			(by
-				(nat_dec_clip (nat F d) yes no)
-				(yes (nat F d))
-			)
+	nat_sub_clip nx ny no \d
+	bx
+		(yes (nat (by F T) d))
+		(by
+			(nat_dec_clip (nat F d))
+			(yes (nat F d))
 		)
-		no
 	)
 
 # (div x y) divides x by y, returning the quotient q and remainder r which
@@ -98,8 +90,8 @@ announce "test_nat_math"
 		nat_div nx y \q\r
 		\r==(nat bx r)
 		nat_sub_clip r y
-			(\z pair (nat T q) z)
 			(pair (nat F q) r)
+			(\z pair (nat T q) z)
 		)
 		(
 		# divide by even

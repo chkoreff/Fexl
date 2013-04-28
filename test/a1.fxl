@@ -382,7 +382,6 @@ put (* x x)
 announce "test_var_repeat"
 \var==(var_new 0)
 
-# LATER a "do" function (over a list)
 \f=
 (
 \x==(var_get var)
@@ -593,6 +592,7 @@ try -2.0 -2.0
 try 34.0 34.0
 )
 
+# LATER test fgetc also
 \test_getchar=
 (
 \f=
@@ -618,6 +618,9 @@ announce "test_resolve"
 	)
 
 try try
+
+# Call resolve with a side effect on the name.
+resolve (print "" "C") () \_\_
 )
 
 \test_var_side=
@@ -647,6 +650,56 @@ say ["x = " x]
 #\f=(f f)
 #f
 #)
+
+\test_type=
+(
+announce "test_type"
+
+\get_type_name=
+	(\x
+	\x==x
+	is_long x (yes "long");
+	is_double x (yes "double");
+	is_string x (yes "string");
+	is_item x (\h\t yes "list");
+	is_end x (yes "list");
+	is_var x (yes "var");
+	no
+	)
+
+\try=
+	(\x
+	get_type_name x (say "unknown") \type
+	say [type " " x]
+	#say [type " " (to_string x)]  # Use this to test to_string.
+	)
+
+say "try long"
+try 0
+try (long_add 4 3)
+try (print "" 5)
+say "try double"
+try 0.0
+try 3.14159265358979
+try -2.6
+say "try string"
+try ""
+try "hello"
+say "try list"
+try []
+try C
+try ["a"]
+try ["a";"b"]
+try ["a" "b"]
+try (item "a" "b")
+say "try var"
+try (var_new ["a" "b" (long_add 1 1)])
+say "try unknown"
+try S
+try (C S)
+try (item "a")
+try (item "a" "b" "c")
+)
 
 ## Call test routines
 
@@ -680,3 +733,4 @@ test_compare
 #test_getchar
 test_resolve
 test_var_side
+test_type

@@ -110,8 +110,8 @@ static void undefined_symbol(const char *name, int line)
 		);
 	}
 
-static value type_name(value f) { return type_C(f); }
-static value type_open(value f) { return type_C(f); }
+static value type_name(value f) { return type_data(f); }
+static value type_open(value f) { return type_data(f); }
 
 static int is_null_name(value x)
 	{

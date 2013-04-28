@@ -5,7 +5,6 @@ extern value R;
 extern value L;
 extern value Qitem;
 extern value Qquery;
-extern value type_C(value f); /*TODO*/
 extern value replace_boolean(value f, int flag);
 extern value replace_maybe(value f, value x);
 extern value op_is_atom(value f, type t);

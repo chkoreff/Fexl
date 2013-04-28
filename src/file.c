@@ -1,4 +1,4 @@
-value type_file(value f) { return type_C(f); } /*TODO*/
+value type_file(value f) { return type_data(f); }
 
 FILE *file_val(value f)
 	{

@@ -52,7 +52,7 @@ static void free_string(value f)
 	free_memory((void *)f->R, (long)f->L + 1);
 	}
 
-value type_string(value f) { return type_C(f); } /*TODO*/
+value type_string(value f) { return type_data(f); }
 
 /* Allocate a string which can hold len bytes plus trailing NUL. */
 static value new_string(long len)
@@ -65,7 +65,7 @@ static value new_string(long len)
 	}
 
 /* Replace with a string using the data with the given length. */
-value replace_string_vector(value f, const char *data, long len)
+static value replace_string_vector(value f, const char *data, long len)
 	{
 	if (len < 0) len = 0;
 
@@ -84,7 +84,7 @@ value replace_string(value f, const char *data)
 	}
 
 /* Replace with a string using the buffer contents. */
-value replace_string_buffer(value f, struct buf **buffer)
+static value replace_string_buffer(value f, struct buf **buffer)
 	{
 	struct buf *curr;
 

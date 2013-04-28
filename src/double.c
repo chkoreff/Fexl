@@ -1,4 +1,4 @@
-static value type_double(value f) { return type_C(f); } /*TODO*/
+static value type_double(value f) { return type_data(f); }
 
 /*
 A double is guaranteed to fit in 64 bits.  The standard says:
