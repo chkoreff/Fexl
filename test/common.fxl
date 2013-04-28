@@ -2,9 +2,21 @@
 
 # TODO make sure we have tests for all these
 
-# The "if" function just enhances readability, for example:
-#   if (= x 0) (say "It's zero.") (say "It's not zero.")
+# The "if" function can enhance readability, e.g. instead of this:
+#   (= x 0) A B
+# you may prefer this:
+#   if (= x 0) A B
 \if=I
+
+\not = (\x x F T)
+\and = (\x\y x y F)
+\or  = (\x\y x T y)
+
+# Optional ("maybe") values:  no or (yes x)
+\no  = (   \no\yes no)
+\yes = (\x \no\yes yes x)
+
+\pair=(\x\y\p p x y)
 
 # Return the length of a list.
 \length=(@\length\xs xs 0 \_\xs long_add 1 (length xs))
@@ -26,7 +38,7 @@
 
 # Apply function f to each entry in xs, ending with next.  This is useful for
 # producing a side-effect for each entry in a list.
-\do = (@\do\xs\f xs () \x\xs f x; do xs f)
+\each = (@\each\xs\f xs () \x\xs f x; each xs f)
 
 # (choose xs ys) returns the list of all y in ys where the corresponding x in
 # xs is true.  The xs is a list of bits which serves as a "mask".
@@ -75,28 +87,19 @@
 	)
 
 ordering string_compare
-\string_lt
-\string_le
-\string_eq
-\string_ne
-\string_gt
-\string_ge
+\string_lt\string_le
+\string_eq\string_ne
+\string_gt\string_ge
 
 ordering long_compare
-\long_lt
-\long_le
-\long_eq
-\long_ne
-\long_gt
-\long_ge
+\long_lt\long_le
+\long_eq\long_ne
+\long_gt\long_ge
 
 ordering double_compare
-\double_lt
-\double_le
-\double_eq
-\double_ne
-\double_gt
-\double_ge
+\double_lt\double_le
+\double_eq\double_ne
+\double_gt\double_ge
 
 # TODO make these the generic versions
 \lt = long_lt
@@ -163,6 +166,20 @@ ordering double_compare
 	t [h] \_\_ [h sep; (join sep t)]
 	)
 
+# TODO use the "properties" technique instead
+
+# Convert nested data to a list of strings.
+\flatten=
+	(@\flatten\x
+	\x==x
+	is_string x [x];
+	is_long x [(long_string x)];
+	is_double x [(double_string x)];
+	is_item x (\h\t append (flatten h) (flatten t));
+	is_var x (flatten (var_get x));
+	[]
+	)
+
 # Convert nested list data to a flat string.
 \to_string =
 	(@\to_string\x
@@ -224,8 +241,7 @@ ordering double_compare
 	setrlimit RLIMIT_STACK 400000000
 	setrlimit RLIMIT_DATA 800000000
 	setrlimit RLIMIT_AS 800000000
-	setrlimit RLIMIT_CPU 30
-	setrlimit RLIMIT_CPU 10
+	setrlimit RLIMIT_CPU 20
 	#say "I am using safe limits for this test."
 	)
 
@@ -254,7 +270,7 @@ use_safe_limits
 	case "choose" choose;
 	case "column" column;
 	case "columns" columns;
-	case "do" do;
+	case "each" each;
 	case "entry" entry;
 	case "map" map;
 

@@ -45,6 +45,11 @@ static value type_var_put(value f)
 	return I;
 	}
 
+static value type_is_var(value f)
+	{
+	return op_is_atom(f, type_var);
+	}
+
 static value resolve_var_prefix(const char *name)
 	{
 	if (strcmp(name,"new") == 0) return Q(type_var_new);
@@ -56,5 +61,6 @@ static value resolve_var_prefix(const char *name)
 value resolve_var(const char *name)
 	{
 	if (strncmp(name,"var_",4) == 0) return resolve_var_prefix(name+4);
+	if (strcmp(name,"is_var") == 0) return Q(type_is_var);
 	return 0;
 	}
