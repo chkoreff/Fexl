@@ -281,8 +281,23 @@ use_safe_limits
 	#case "max" max;
 	#case "min" min;
 
+	case "not" not;
+	case "and" and;
+	case "or" or;
+
+	case "yes" yes;
+	case "no" no;
+	case "pair" pair;
+
 	case "length" length;
 	case "range" range;
+
+	case "long_lt" long_lt;
+	case "long_le" long_le;
+	case "long_eq" long_eq;
+	case "long_ne" long_ne;
+	case "long_gt" long_gt;
+	case "long_ge" long_ge;
 
 	case "string_lt" string_lt;
 	case "string_le" string_le;
