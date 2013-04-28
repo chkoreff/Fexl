@@ -1,3 +1,14 @@
+value C;
+value S;
+value I;
+value R;
+value L;
+value Qitem;
+value Qquery;
+
+static value F;
+static value Y;
+
 /* C x y = x */
 value type_C(value f)
 	{
@@ -48,7 +59,7 @@ static value type_Y(value f)
 	}
 
 /* item x y p q = q x y */
-value type_item(value f)
+static value type_item(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
 	return replace_apply(f, A(f->R,f->L->L->L->R), f->L->L->R);
@@ -95,26 +106,38 @@ value replace_maybe(value f, value x) /*TODO*/
 		return replace(f, type_C, 0, 0);
 	}
 
-/* Become T or F based on whether f->R is of type t. */
+/* Become T or F based on whether f->R is an atom of type t. */
 value op_is_atom(value f, type t)
 	{
 	if (!f->L) return 0;
-	return replace_boolean(f, f->R->T == t);
+	value x = f->R;
+	return replace_boolean(f, x->T == t && !x->L);
 	}
 
-static value type_is_end(value f) /*TODO*/
+int is_item(value f)
+	{
+	return f->T == type_item && f->L && f->L->L && !f->L->L->L;
+	}
+
+static value type_is_end(value f)
 	{
 	return op_is_atom(f, type_C);
 	}
 
-value C;
-value S;
-value I;
-value R;
-value L;
-value Y;
-value Qitem;
-value Qquery;
+/* (is_item data yes no) =
+   (yes h t)   # if data is of the form (item h t), also known as [h;t]
+   no          # otherwise
+*/
+static value type_is_item(value f)
+	{
+	if (!f->L) return 0;
+	value data = f->R;
+
+	if (is_item(data))
+		return A(A(R,C),yield(yield(I,data->L->R),data->R));
+	else
+		return F;
+	}
 
 /* Return the list with head h and tail t, which is [h;t] in list notation. */
 value item(value h, value t)
@@ -156,7 +179,7 @@ value op_compare(value f, type t, int cmp(value,value))
 value resolve_basic(const char *name)
 	{
 	if (strcmp(name,"T") == 0) return C;
-	if (strcmp(name,"F") == 0) return Q(type_F);
+	if (strcmp(name,"F") == 0) return F;
 	if (strcmp(name,"I") == 0) return I;
 
 	/* Define "@" as the fixpoint operator because it suggests making a
@@ -174,6 +197,7 @@ value resolve_basic(const char *name)
 	if (strcmp(name,"query") == 0) return Qquery;
 	if (strcmp(name,"return") == 0) return Q(type_return);
 	if (strcmp(name,"is_end") == 0) return Q(type_is_end);
+	if (strcmp(name,"is_item") == 0) return Q(type_is_item);
 	return 0;
 	}
 
@@ -185,6 +209,7 @@ void beg_basic(void)
 	R = Q(type_R); hold(R);
 	L = Q(type_L); hold(L);
 	Y = Q(type_Y); hold(Y);
+	F = Q(type_F); hold(F);
 	Qitem = Q(type_item); hold(Qitem);
 	Qquery = Q(type_query); hold(Qquery);
 	}
@@ -197,6 +222,7 @@ void end_basic(void)
 	drop(R);
 	drop(L);
 	drop(Y);
+	drop(F);
 	drop(Qitem);
 	drop(Qquery);
 	}

@@ -110,15 +110,8 @@ static void undefined_symbol(const char *name, int line)
 		);
 	}
 
-static value type_name(value f)
-	{
-	return type_C(f);
-	}
-
-static value type_open(value f)
-	{
-	return type_C(f);
-	}
+static value type_name(value f) { return type_C(f); }
+static value type_open(value f) { return type_C(f); }
 
 static int is_null_name(value x)
 	{
@@ -515,8 +508,9 @@ static value resolve_sym(value sym)
 	if (sym->T == type_string)
 		return item(sym->L,C);
 
-	value result = eval(A(source_context,sym->L));
-	if (result->T == type_item && result->L && result->L->L)
+	value result = A(source_context,sym->L);
+	result = eval(A(A(result,C),Qitem));
+	if (is_item(result))
 		return result;
 
 	const char *name = string_data(sym->L);
@@ -582,7 +576,7 @@ Parse the stream with the given context, label, and initial line number.
 Return (\: : exp line), where exp is the parsed expression, and line is the
 updated line number.
 */
-value type_parse_stream(value f)
+static value type_parse_stream(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
 
@@ -607,7 +601,7 @@ value type_parse_stream(value f)
 
 /* (use file) Read context from file and parse remainder of source in that
 context. */
-value type_use(value f)
+static value type_use(value f)
 	{
 	if (!f->L) return 0;
 

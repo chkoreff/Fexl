@@ -247,10 +247,9 @@ module long - stdio - stdlib - string value basic string
 module memory - stdlib die
 module parse - ctype - stdio - string die value basic file long resolve string
 module resolve - stdio - string value basic double file long parse string \
-	system type var
+	system var
 module string - string memory value basic
 module system - stdlib - string - sys/resource value basic long
-module type - string value basic long double string
 module value memory die
 module var - string value basic
 
