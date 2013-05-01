@@ -536,9 +536,21 @@ static value resolve_all(value f)
 	}
 
 /* Parse a fully resolved value. */
+/*TODO arg order consistent with parse_stream */
 static value parse_value(FILE *fh,  const char *label, value context,
 	long *p_line)
 	{
+	/*TODO You *cannot* save/restore here. */
+	#if 0
+	FILE *save_fh = source_fh;
+	const char *save_label = source_label;
+	long save_line = source_line;
+	value save_context = source_context;
+	#endif
+
+	if (fh == 0)
+		die("WHY????"); /*TODO*/
+
 	source_fh = fh;
 	source_label = label;
 	source_context = context;
@@ -558,6 +570,13 @@ static value parse_value(FILE *fh,  const char *label, value context,
 		die(0);
 
 	drop(source_context);
+
+	#if 0
+	source_fh = save_fh;
+	source_label = save_label;
+	source_line = save_line;
+	source_context = save_context;
+	#endif
 	return exp;
 	}
 
@@ -568,7 +587,28 @@ value parse_file(const char *name, value context)
 		die("Can't open file %s", name);
 
 	long line = 1;
+	/*TODO*/
+	#if 0
 	return parse_value(fh, name, context, &line);
+	#endif
+
+	FILE *save_fh = source_fh;
+	#if 0
+	const char *save_label = source_label;
+	long save_line = source_line;
+	value save_context = source_context;
+	#endif
+
+	value g = parse_value(fh, name, context, &line);
+
+	source_fh = save_fh;
+	#if 0
+	source_label = save_label;
+	source_line = save_line;
+	source_context = save_context;
+	#endif
+
+	return g;
 	}
 
 /* (parse_stream fh context label line)
@@ -586,8 +626,24 @@ static value type_parse_stream(value f)
 	value arg_line = arg(type_long,f->R);
 
 	long line = long_val(arg_line);
+
+	/*TODO*/
+	#if 0
+	FILE *save_fh = source_fh;
+	const char *save_label = source_label;
+	long save_line = source_line;
+	value save_context = source_context;
+	#endif
+
 	value g = parse_value(file_val(arg_fh), string_data(arg_label),
 		arg_context, &line);
+
+	#if 0
+	source_fh = save_fh;
+	source_label = save_label;
+	source_line = save_line;
+	source_context = save_context;
+	#endif
 
 	if (arg_fh != f->L->L->L->R || arg_label != f->L->R || arg_line != f->R)
 		{
@@ -599,6 +655,64 @@ static value type_parse_stream(value f)
 	return yield(yield(I,g),Qlong(line));
 	}
 
+/*TODO static */
+/*
+\inner_use=
+	(\outer_fh\outer_context\outer_label\outer_line\local_path
+	\full_path==(concat base_path local_path)
+	fopen full_path "r" (die ["Could not open " full_path]) \use_fh\_
+	parse_stream use_fh outer_context full_path 1 \use_context\line
+	parse_stream outer_fh use_context outer_label outer_line \exp\line
+	exp
+	)
+*/
+value type_inner_use(value f)
+	{
+	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L
+		|| !f->L->L->L->L->L) return 0;
+
+	value arg_outer_fh = arg(type_file,f->L->L->L->L->R);
+	value arg_outer_context = f->L->L->L->R;
+	value arg_outer_label = arg(type_string,f->L->L->R);
+	value arg_outer_line = arg(type_long,f->L->R);
+	value arg_local_path = arg(type_string,f->R);
+
+	const char *local_path = string_data(arg_local_path);
+
+	value string_append = Q(type_string_append);
+	value path;
+	path = Q(type_base_path);
+	path = A(A(string_append,path),Qstring(local_path));
+	path = eval(path);
+
+	const char *full_path = string_data(path);
+
+	FILE *fh = fopen(full_path,"r");
+	if (fh == 0)
+		{
+		fprintf(stderr,"Could not open %s\n", full_path);
+		die(0);
+		}
+
+	long line = 1;
+	value use_context = eval(
+		parse_value(fh, local_path, arg_outer_context,
+		&line));
+
+	check(path);
+
+	line = long_val(arg_outer_line);
+	value g = parse_value(file_val(arg_outer_fh), string_data(arg_outer_label),
+		use_context, &line);
+
+	check(arg_outer_fh);
+	check(arg_outer_label);
+	check(arg_outer_line);
+	check(arg_local_path);
+
+	return g;
+	}
+
 /* (use file) Read context from file and parse remainder of source in that
 context. */
 static value type_use(value f)
@@ -606,9 +720,14 @@ static value type_use(value f)
 	if (!f->L) return 0;
 
 	/*TODO clean up */
+	#if 1
 	FILE *orig_fh = source_fh;
 	const char *orig_label = source_label;
 	long orig_line = source_line;
+	#endif
+	#if 0
+	value orig_context = source_context;
+	#endif
 
 	value arg_file = arg(type_string,f->R);
 	const char *local_path = string_data(arg_file);
@@ -633,12 +752,64 @@ static value type_use(value f)
 	context as parameters.  That way we're not counting on global variables
 	remaining in a particular state.
 	*/
+
+	/*TODO is there a test case which demonstrates need for eval here?
+	TODO when I try using orig_context here I get
+	"Could not open ... /project/fexl/string_compare"
+	*/
+	#if 0
 	long line = 1;
 	value use_context = eval(
 		parse_value(fh, local_path, Q(type_resolve), &line));
+	#endif
+
+	value use_context;
+	{
+	long line = 1;
+
+	#if 0
+	FILE *save_fh = source_fh;
+	const char *save_label = source_label;
+	long save_line = source_line;
+	value save_context = source_context;
+	#endif
+
+	use_context = eval(
+		parse_value(fh, local_path, Q(type_resolve), &line));
+
+	#if 0
+	source_fh = save_fh;
+	source_label = save_label;
+	source_line = save_line;
+	source_context = save_context;
+	#endif
+	}
+
 	check(path);
 
+	#if 0
 	value g = parse_value(orig_fh, orig_label, use_context, &orig_line);
+	#endif
+
+
+	value g;
+	{
+	#if 0
+	FILE *save_fh = source_fh;
+	const char *save_label = source_label;
+	long save_line = source_line;
+	value save_context = source_context;
+	#endif
+
+	g = parse_value(orig_fh, orig_label, use_context, &orig_line);
+
+	#if 0
+	source_fh = save_fh;
+	source_label = save_label;
+	source_line = save_line;
+	source_context = save_context;
+	#endif
+	}
 
 	if (arg_file != f->R)
 		check(arg_file);
@@ -648,7 +819,27 @@ static value type_use(value f)
 
 value resolve_parse(const char *name)
 	{
+	/*TODO*/
+	if (strcmp(name,"source_fh") == 0)
+		{
+		if (source_fh == 0)
+			die("WTF");
+		}
 	if (strcmp(name,"use") == 0) return Q(type_use);
+	if (strcmp(name,"inner_use") == 0)
+		{
+		/*TODO*/
+		return Q(type_inner_use);
+		}
+	if (strcmp(name,"Use") == 0)
+		{
+		/*TODO*/
+/*
+\Use=(inner_use source_fh source_context source_label source_line)
+*/
+		return A(A(A(A(Q(type_inner_use),Qfile(source_fh,0)),source_context),
+			Qstring(source_label)),Qlong(source_line));
+		}
 	if (strcmp(name,"parse_stream") == 0) return Q(type_parse_stream);
 	if (strcmp(name,"source_fh") == 0) return Qfile(source_fh,0);
 	if (strcmp(name,"source_label") == 0) return Qstring(source_label);
