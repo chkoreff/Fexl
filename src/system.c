@@ -24,12 +24,10 @@ static value type_setrlimit(value f)
 
 	int status = setrlimit(resource, &rlim);
 
-	if (x != f->L->L->R || y != f->L->R || z != f->R)
-		{
-		check(x);
-		check(y);
-		check(z);
-		}
+	check(x);
+	check(y);
+	check(z);
+
 	return Qlong(status);
 	}
 

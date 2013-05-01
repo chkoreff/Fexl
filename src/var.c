@@ -21,11 +21,9 @@ static value type_var_new(value f)
 static value type_var_get(value f)
 	{
 	if (!f->L) return 0;
-	value var = arg(type_var,f->R);
-	value val = var->R->L;
-
-	if (var != f->R)
-		check(var);
+	value arg_var = arg(type_var,f->R);
+	value val = arg_var->R->L;
+	check(arg_var);
 	return val;
 	}
 
@@ -33,15 +31,14 @@ static value type_var_get(value f)
 static value type_var_put(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
-	value var = arg(type_var,f->L->R);
+	value arg_var = arg(type_var,f->L->R);
 	value new = f->R;
 
 	hold(new);
-	drop(var->R->L);
-	var->R->L = new;
+	drop(arg_var->R->L);
+	arg_var->R->L = new;
 
-	if (var != f->L->R)
-		check(var);
+	check(arg_var);
 	return I;
 	}
 

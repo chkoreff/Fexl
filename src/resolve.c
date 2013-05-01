@@ -18,6 +18,8 @@ static value resolve(const char *name)
 	*/
 
 	if (strcmp(name,"resolve") == 0) return Q(type_resolve);
+
+	/*TODO lastly, consult share/fexl/main.fxl */
 	return 0;
 	}
 

@@ -28,11 +28,9 @@ value Qfile(FILE *fh, long close)
 static value type_putchar(value f)
 	{
 	if (!f->L) return 0;
-	value x = arg(type_long,f->R);
-	(void)putchar(long_val(x));
-
-	if (x != f->R)
-		check(x);
+	value arg_ch = arg(type_long,f->R);
+	(void)putchar(long_val(arg_ch));
+	check(arg_ch);
 	return I;
 	}
 
@@ -42,21 +40,17 @@ static value type_getchar(value f)
 	return Qlong(getchar());
 	}
 
-/* (fputc file ch) Write character to stdout. */
+/* (fputc fh ch) Write character to the file. */
 static value type_fputc(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
-	value x = arg(type_file,f->L->R);
-	value y = arg(type_long,f->R);
+	value arg_fh = arg(type_file,f->L->R);
+	value arg_ch = arg(type_long,f->R);
 
-	FILE *fh = file_val(x);
-	(void)fputc(long_val(y),fh);
+	(void)fputc(long_val(arg_ch),file_val(arg_fh));
 
-	if (x != f->L->R || y != f->R)
-		{
-		check(x);
-		check(y);
-		}
+	check(arg_fh);
+	check(arg_ch);
 	return I;
 	}
 
@@ -64,13 +58,9 @@ static value type_fputc(value f)
 static value type_fgetc(value f)
 	{
 	if (!f->L) return 0;
-	value x = arg(type_file,f->R);
-
-	FILE *fh = file_val(x);
-	int ch = fgetc(fh);
-
-	if (x != f->R)
-		check(x);
+	value arg_fh = arg(type_file,f->R);
+	int ch = fgetc(file_val(arg_fh));
+	check(arg_fh);
 	return Qlong(ch);
 	}
 
@@ -78,18 +68,15 @@ static value type_fgetc(value f)
 static value type_fwrite(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
-	value x = arg(type_file,f->L->R);
-	value y = arg(type_string,f->R);
+	value arg_fh = arg(type_file,f->L->R);
+	value arg_str = arg(type_string,f->R);
 
-	FILE *fh = file_val(x);
-	size_t count = fwrite(string_data(y), 1, string_len(y), fh);
+	size_t count = fwrite(string_data(arg_str), 1, string_len(arg_str),
+		file_val(arg_fh));
 	(void)count;  /* Ignore the return count. */
 
-	if (x != f->L->R || y != f->R)
-		{
-		check(x);
-		check(y);
-		}
+	check(arg_fh);
+	check(arg_str);
 	return I;
 	}
 
@@ -97,20 +84,17 @@ static value type_fwrite(value f)
 static value type_fopen(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
-	value x = arg(type_string,f->L->R);
-	value y = arg(type_string,f->R);
+	value arg_path = arg(type_string,f->L->R);
+	value arg_mode = arg(type_string,f->R);
 
-	const char *path = string_data(x);
-	const char *mode = string_data(y);
+	const char *path = string_data(arg_path);
+	const char *mode = string_data(arg_mode);
 
 	FILE *fh = fopen(path,mode);
 	value g = fh ? Qfile(fh,1) : 0;
 
-	if (x != f->L->R || y != f->R)
-		{
-		check(x);
-		check(y);
-		}
+	check(arg_path);
+	check(arg_mode);
 	return replace_maybe(0,g);
 	}
 
@@ -147,12 +131,9 @@ static value safe_readlink(const char *path)
 static value type_readlink(value f)
 	{
 	if (!f->L) return 0;
-	value x = arg(type_string,f->R);
-
-	const char *path = string_data(x);
-	value g = safe_readlink(path);
-	if (x != f->R)
-		check(x);
+	value arg_path = arg(type_string,f->R);
+	value g = safe_readlink(string_data(arg_path));
+	check(arg_path);
 	return g;
 	}
 

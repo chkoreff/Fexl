@@ -588,7 +588,7 @@ value parse_file(const char *name, value context)
 
 /* (parse_stream fh context label line)
 Parse the stream with the given context, label, and initial line number.
-Return (\: : exp line), where exp is the parsed expression, and line is the
+Return (pair exp line), where exp is the parsed expression, and line is the
 updated line number.
 */
 static value type_parse_stream(value f)
@@ -605,12 +605,9 @@ static value type_parse_stream(value f)
 	value g = parse_value(file_val(arg_fh), arg_context,
 		string_data(arg_label), &line);
 
-	if (arg_fh != f->L->L->L->R || arg_label != f->L->R || arg_line != f->R)
-		{
-		check(arg_fh);
-		check(arg_label);
-		check(arg_line);
-		}
+	check(arg_fh);
+	check(arg_label);
+	check(arg_line);
 
 	return yield(yield(I,g),Qlong(line));
 	}
