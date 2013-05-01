@@ -1,9 +1,9 @@
 Initialize line number.
-Hello from test/a0_1.fxl
+Hello from test/a3_1.fxl
   at line 3
-Hello again from test/a0_1.fxl
+Hello again from test/a3_1.fxl
   at line 6
-Hello yet again from test/a0_1.fxl
+Hello yet again from test/a3_1.fxl
   at line 8
 Value is 12
 Missing value
