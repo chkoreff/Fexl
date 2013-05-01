@@ -1,6 +1,5 @@
 #
-# TODO
-Use "test/common.fxl" \\
+use "test/common.fxl" \\
 
 ## Define test routines
 

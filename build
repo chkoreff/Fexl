@@ -245,7 +245,7 @@ module file - stdio - string - unistd memory value basic long string
 module lib - dlfcn - stdio die value file string
 module long - stdio - stdlib - string value basic string
 module memory - stdlib die
-module parse - ctype - stdio - string die value basic file long resolve string
+module parse - ctype - stdio - string die value basic file long string
 module resolve - stdio - string value basic double file long parse string \
 	system var
 module string - string memory value basic
