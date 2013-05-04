@@ -580,7 +580,7 @@ value parse_file(const char *name, value context)
 	{
 	FILE *fh = name[0] ? fopen(name,"r") : stdin;
 	if (fh == 0)
-		die("Can't open file %s", name);
+		die("Could not open file %s", name);
 
 	long line = 1;
 	return parse_value(fh, context, name, &line);
@@ -645,20 +645,16 @@ static value type_use_with(value f)
 	value string_append = Q(type_string_append);
 	value path;
 	path = Q(type_base_path);
-	path = A(A(string_append,path),Qstring(local_path));
+	path = A(A(string_append,path),arg_local_path);
 	path = eval(path);
 
 	const char *full_path = string_data(path);
 
 	FILE *fh = fopen(full_path,"r");
 	if (fh == 0)
-		{
-		fprintf(stderr,"Could not open %s\n", full_path);
-		die(0);
-		}
+		die("Could not open file %s", full_path);
 
 	long line = 1;
-	/*TODO need test case for the eval here */
 	value use_context = eval(
 		parse_value(fh, arg_outer_context, local_path, &line));
 

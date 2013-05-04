@@ -1,1 +1,1 @@
-extern value type_resolve(value f);
+extern value standard_context(void);

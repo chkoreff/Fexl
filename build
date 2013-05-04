@@ -242,7 +242,6 @@ module die - stdarg - stdio - stdlib
 module double - stdio - stdlib - string value basic string
 module fexl value basic parse resolve
 module file - stdio - string - unistd memory value basic long string
-module lib - dlfcn - stdio die value file string
 module long - stdio - stdlib - string value basic string
 module memory - stdlib die
 module parse - ctype - stdio - string die value basic file long string

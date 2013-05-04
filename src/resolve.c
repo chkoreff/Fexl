@@ -1,6 +1,8 @@
 /* This is the standard context which supplies definitions for any symbols used
 in a Fexl program. */
 
+static value type_resolve(value f);
+
 static value resolve(const char *name)
 	{
 	value f;
@@ -18,13 +20,11 @@ static value resolve(const char *name)
 	*/
 
 	if (strcmp(name,"resolve") == 0) return Q(type_resolve);
-
-	/*TODO lastly, consult share/fexl/main.fxl */
 	return 0;
 	}
 
 /* (resolve name) returns [def] if name is defined, or [] otherwise. */
-value type_resolve(value f)
+static value type_resolve(value f)
 	{
 	if (!f->L) return 0;
 	value arg_name = arg(type_string,f->R);
@@ -37,4 +37,19 @@ value type_resolve(value f)
 		f = 0;
 		}
 	return replace_maybe(f, def);
+	}
+
+/* This is the standard context for Fexl programs. */
+value standard_context(void)
+	{
+	value string_append = Q(type_string_append);
+	value path;
+	path = Q(type_base_path);
+	path = A(A(string_append,path),Qstring("share/fexl/main.fxl"));
+	path = eval(path);
+
+	const char *full_path = string_data(path);
+	value context = parse_file(full_path, Q(type_resolve));
+	check(path);
+	return context;
 	}
