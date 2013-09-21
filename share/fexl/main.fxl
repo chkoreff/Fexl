@@ -266,7 +266,7 @@ ordering double_compare
 	case "gt" gt;
 	case "ge" ge;
 
-	case "<" <;
+	case "<"   <;
 	case "<="  <=;
 	case "="   =;
 	case "!="  !=;
