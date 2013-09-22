@@ -1,3 +1,11 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "value.h"
+#include "basic.h"
+#include "string.h"
+#include "double.h"
+
 static value type_double(value f) { return type_data(f); }
 
 /*

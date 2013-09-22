@@ -1,3 +1,10 @@
+#include <stdlib.h>
+#include <string.h>
+#include <sys/resource.h>
+#include "value.h"
+#include "long.h"
+#include "system.h"
+
 /* exit status : exits with the given status */
 static value type_exit(value f)
 	{

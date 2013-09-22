@@ -36,9 +36,9 @@
 # (map f xs) is the list of (f x) values for each x in xs.
 \map=(@\map\f\xs xs [] \x\xs [(f x); map f xs])
 
-# Apply function f to each entry in xs, ending with next.  This is useful for
-# producing a side-effect for each entry in a list.
-\each = (@\each\xs\f xs () \x\xs f x; each xs f)
+# Apply function f to each entry in xs.  This is useful for producing a side-
+# effect for each entry in a list.
+\each=(@\each\xs\f xs () \x\xs f x; each xs f)
 
 # (choose xs ys) returns the list of all y in ys where the corresponding x in
 # xs is true.  The xs is a list of bits which serves as a "mask".
@@ -166,7 +166,7 @@ ordering double_compare
 	map (\n column n xs) (range 1 (max (map length xs)))
 	)
 
-# TODO use the "properties" technique instead
+# TODO use the "properties" technique instead?
 
 # Convert nested data to a list of strings.
 \flatten=

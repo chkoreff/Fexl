@@ -1,3 +1,14 @@
+#include <ctype.h>
+#include <stdio.h>
+#include <string.h>
+#include "die.h"
+#include "value.h"
+#include "basic.h"
+#include "file.h"
+#include "long.h"
+#include "string.h"
+#include "parse.h"
+
 /*
 Grammar:
 

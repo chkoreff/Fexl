@@ -6,17 +6,17 @@
 
 .todo()
 	{
-	grep -ra TODO build test src share --exclude=".*.swp"
+	grep -ra TODO run test src share --exclude=".*.swp"
 	}
 
 .later()
 	{
-	grep -ra "LATER" build test src share --exclude=".*.swp"
+	grep -ra "LATER" run test src share --exclude=".*.swp"
 	}
 
 .build()
 	{
-	./build quiet
+	./run quiet build
 	}
 
 .fexl()

@@ -1,3 +1,9 @@
+#include "value.h"
+#include "basic.h"
+#include "parse.h"
+#include "resolve.h"
+#include "fexl.h"
+
 /* Command line arguments */
 int argc;
 char **argv;

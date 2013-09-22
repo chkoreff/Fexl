@@ -1,3 +1,7 @@
+#include <string.h>
+#include "value.h"
+#include "basic.h"
+
 value C;
 value S;
 value I;

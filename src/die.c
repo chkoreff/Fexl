@@ -1,3 +1,8 @@
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "die.h"
+
 void warn(const char *format, ...)
 	{
 	fflush(stdout);

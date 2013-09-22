@@ -1,3 +1,9 @@
+#include <string.h>
+#include "memory.h"
+#include "value.h"
+#include "basic.h"
+#include "string.h"
+
 /* A string has a length field, followed by that number of bytes (which may
 include NULs), followed by a trailing NUL byte.  The trailing NUL byte makes it
 easier to call system functions that expect it.

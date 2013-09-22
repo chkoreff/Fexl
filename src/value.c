@@ -1,3 +1,7 @@
+#include "die.h"
+#include "memory.h"
+#include "value.h"
+
 static value free_list = 0;
 
 /* Put the value on the free list. */

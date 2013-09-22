@@ -1,3 +1,13 @@
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h> /* readlink */
+#include "memory.h"
+#include "value.h"
+#include "basic.h"
+#include "long.h"
+#include "string.h"
+#include "file.h"
+
 value type_file(value f) { return type_data(f); }
 
 FILE *file_val(value f)

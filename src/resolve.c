@@ -1,3 +1,16 @@
+#include <stdio.h>
+#include <string.h>
+#include "value.h"
+#include "basic.h"
+#include "double.h"
+#include "file.h"
+#include "long.h"
+#include "parse.h"
+#include "string.h"
+#include "system.h"
+#include "var.h"
+#include "resolve.h"
+
 /* This is the standard context which supplies definitions for any symbols used
 in a Fexl program. */
 

@@ -1,3 +1,11 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "value.h"
+#include "basic.h"
+#include "string.h"
+#include "long.h"
+
 value type_long(value f) { return type_data(f); }
 
 value replace_long(value f, long val)
