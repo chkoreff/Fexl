@@ -1,1 +1,1 @@
-extern value standard_context(void);
+extern value resolve(value f);

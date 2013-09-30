@@ -19,7 +19,6 @@ bytes that it causes an integer overflow.
 void *new_memory(long num_bytes)
 	{
 	long new_total_bytes = total_bytes + num_bytes;
-
 	void *data = new_total_bytes > total_bytes ? malloc(num_bytes) : 0;
 
 	if (data == 0)

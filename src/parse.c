@@ -1,13 +1,14 @@
 #include <ctype.h>
 #include <stdio.h>
-#include <string.h>
+#include "buf.h"
 #include "die.h"
+#include "str.h"
+
 #include "value.h"
 #include "basic.h"
-#include "file.h"
-#include "long.h"
-#include "string.h"
+#include "form.h"
 #include "parse.h"
+#include "qstr.h"
 
 /*
 Grammar:
@@ -51,11 +52,11 @@ RLIMIT_AS, and also RLIMIT_DATA for good measure, to limit the total amount of
 memory.
 */
 
-static int ch;                        /* current character */
-static FILE *source_fh = 0;           /* current source file */
-static const char *source_label = 0;  /* current label of source file */
-static long source_line;              /* current line number */
-static value source_context;          /* current context */
+FILE *source_fh = 0;           /* current source file */
+const char *source_name = 0;   /* current name of source file */
+long source_line;              /* current line number */
+
+static int ch;                 /* current character */
 
 static void next_ch(void)
 	{
@@ -106,65 +107,20 @@ static void skip_filler(void)
 		}
 	}
 
+/*TODO propagate syntax error without die */
 static void syntax_error(const char *msg, int line)
 	{
 	die("%s on line %ld%s%s", msg, line,
-		source_label[0] ? " of " : "",
-		source_label);
-	}
-
-static void undefined_symbol(const char *name, int line)
-	{
-	warn("Undefined symbol %s on line %ld%s%s", name, line,
-		source_label[0] ? " of " : "",
-		source_label
-		);
-	}
-
-static value type_name(value f) { return type_data(f); }
-static value type_open(value f) { return type_data(f); }
-
-static int is_null_name(value x)
-	{
-	return x->T == type_name && x->L != 0 && string_len(x->L) == 0;
-	}
-
-static int is_sym(value x)
-	{
-	return (x->T == type_name || x->T == type_string) && x->L != 0;
-	}
-
-static int sym_eq(value x, value y)
-	{
-	return is_sym(x) && is_sym(y)
-		&& x->T == y->T
-		&& string_cmp(x->L,y->L) == 0;
-	}
-
-static int is_open(value x)
-	{
-	return x->T == type_open || is_sym(x);
-	}
-
-/* Apply f to g, returning an open form if either one is open. */
-static value apply(value f, value g)
-	{
-	value v = A(f,g);
-	if (is_open(f) || is_open(g))
-		v->T = type_open;
-	return v;
-	}
-
-static value make_sym(type t, struct buf **buffer, long first_line)
-	{
-	return V(t,Qstring_buffer(buffer),Qlong(first_line));
+		source_name[0] ? " of " : "",
+		source_name);
 	}
 
 /* Collect the content of a string up to the given terminator. */
 static value collect_string(const char *term_string, long term_len,
 	long first_line)
 	{
-	struct buf *buffer = 0;
+	struct buf buffer;
+	buf_start(&buffer);
 	long match_pos = 0;
 
 	while (1)
@@ -177,7 +133,7 @@ static value collect_string(const char *term_string, long term_len,
 		else if (match_pos > 0)
 			{
 			if (match_pos >= term_len)
-				return make_sym(type_string,&buffer,first_line);
+				return symbol(type_string,buf_finish(&buffer),first_line);
 			else
 				{
 				long i;
@@ -207,19 +163,17 @@ static value parse_simple_string(void)
 static value parse_complex_string(void)
 	{
 	long first_line = source_line;
-	struct buf *buffer = 0;
+	struct buf buffer;
+	buf_start(&buffer);
 
 	while (1)
 		{
 		if (at_white())
 			{
-			value terminator = Qstring_buffer(&buffer);
-
+			struct str *term = buf_finish(&buffer);
 			next_ch();
-			value sym = collect_string(string_data(terminator),
-				string_len(terminator), first_line);
-
-			check(terminator);
+			value sym = collect_string(term->data, term->len, first_line);
+			str_free(term);
 			return sym;
 			}
 		else if (ch == -1)
@@ -240,7 +194,9 @@ can work.
 static value parse_name(int allow_eq)
 	{
 	long first_line = source_line;
-	struct buf *buffer = 0;
+	struct buf buffer;
+	buf_start(&buffer);
+
 	while (1)
 		{
 		if (
@@ -248,6 +204,7 @@ static value parse_name(int allow_eq)
 			|| ch == '\\'
 			|| ch == '(' || ch == ')'
 			|| ch == '[' || ch == ']'
+			|| ch == '{' || ch == '}'
 			|| ch == ';'
 			|| ch == '"'
 			|| ch == '~'
@@ -255,7 +212,7 @@ static value parse_name(int allow_eq)
 			|| (ch == '=' && !allow_eq)
 			|| ch == -1
 			)
-			return make_sym(type_name,&buffer,first_line);
+			return symbol(type_name,buf_finish(&buffer),first_line);
 		else
 			{
 			buf_add(&buffer, ch);
@@ -265,7 +222,7 @@ static value parse_name(int allow_eq)
 	}
 
 /* Parse a symbol. */
-static value parse_sym(int allow_eq)
+static value parse_symbol(int allow_eq)
 	{
 	if (ch == '"')
 		return parse_simple_string();
@@ -275,27 +232,7 @@ static value parse_sym(int allow_eq)
 		return parse_name(allow_eq);
 	}
 
-static value parse_term(void);
 static value parse_exp(void);
-
-static value parse_list(void)
-	{
-	skip_filler();
-	if (ch == ';')
-		{
-		next_ch();
-		return parse_exp();
-		}
-
-	value x = parse_term();
-	if (is_null_name(x))
-		{
-		check(x);
-		return C;
-		}
-	else
-		return apply(apply(Qitem,x),parse_list());
-	}
 
 static value parse_term(void)
 	{
@@ -310,7 +247,8 @@ static value parse_term(void)
 		next_ch();
 		return exp;
 		}
-	else if (ch == '[')
+	#if 0
+	else if (ch == '[') /*TODO*/
 		{
 		long first_line = source_line;
 		next_ch();
@@ -321,65 +259,20 @@ static value parse_term(void)
 		next_ch();
 		return exp;
 		}
-	else
-		return parse_sym(1);
-	}
-
-/* Return a shallow copy. */
-static value copy(value f)
-	{
-	return V(f->T,f->L,f->R);
-	}
-
-/* Return (S f g), optimizing if possible. */
-static value _fuse(value f, value g)
-	{
-	if (f->L == C)
+	#endif
+	else if (ch == '{')
 		{
-		if (g == I)
-			/* S (C x) I = x */
-			/* Copy x because the caller drops f. */
-			return copy(f->R);
-		else if (g->L == C)
-			/* S (C x) (C y) = C (x y) */
-			return apply(C,apply(f->R,g->R));
-		else
-			/* S (C x) y = R x y */
-			return apply(apply(R,f->R),g);
+		long first_line = source_line;
+		next_ch();
+		value exp = parse_exp();
+		if (ch != '}')
+			syntax_error("Unclosed brace", first_line);
+
+		next_ch();
+		return A(I,exp);
 		}
-	else if (g->L == C)
-		/* S x (C y) = L x y */
-		return apply(apply(L,f),g->R);
 	else
-		return apply(apply(S,f),g);
-	}
-
-static value fuse(value f, value g)
-	{
-	value v = _fuse(f,g);
-	check(f);
-	check(g);
-	return v;
-	}
-
-/* Abstract the symbol from the body, returning a form which is a function of
-that symbol, and no longer contains that symbol. */
-static value _abstract(value sym, value body)
-	{
-	if (body->T == type_open)
-		return fuse(_abstract(sym,body->L),_abstract(sym,body->R));
-	else if (sym_eq(sym,body))
-		return I;
-	else
-		return apply(C,body);
-	}
-
-static value abstract(value sym, value body)
-	{
-	hold(body);
-	value v = _abstract(sym,body);
-	drop(body);
-	return v;
+		return parse_symbol(1);
 	}
 
 /*
@@ -408,7 +301,7 @@ static value parse_lambda(long first_line)
 	skip_white();
 
 	/* Parse the symbol (function parameter). */
-	value sym = parse_sym(allow_eq);
+	value sym = parse_symbol(allow_eq);
 	if (is_null_name(sym))
 		syntax_error("Missing lambda symbol", first_line);
 
@@ -449,7 +342,7 @@ static value parse_lambda(long first_line)
 		result = apply(body,def);
 	else
 		/* == eager definition */
-		result = apply(apply(Qquery,def),body);
+		result = apply(apply(query,def),body);
 
 	drop(sym);
 	return result;
@@ -460,7 +353,7 @@ static value parse_factor(void)
 	{
 	skip_filler();
 
-	if (ch == -1 || ch == ')' || ch == ']')
+	if (ch == -1 || ch == ')' || ch == ']' || ch == '}')
 		return 0;
 	else if (ch == '\\')
 		{
@@ -496,203 +389,11 @@ static value parse_exp(void)
 		}
 	}
 
-/* Return the first symbol in the value, if any, in left to right order. */
-static value first_sym(value f)
+value parse(void)
 	{
-	if (is_sym(f)) return f;
-	if (f->T != type_open) return 0;
-
-	value x = first_sym(f->L);
-	if (x) return x;
-	return first_sym(f->R);
-	}
-
-/* Return the definition of the symbol in the current context, returning [def].
-Strings are defined literally.  Names are defined using the current context,
-which is applied to the name and evaluated.  If a name is undefined, we report
-it as an error and use the symbol itself as the definition.  In that case, the
-is_open() check on the final expression will be true and the program will exit
-with status 1. */
-
-static value resolve_sym(value sym)
-	{
-	if (sym->T == type_string)
-		return item(sym->L,C);
-
-	value result = A(source_context,sym->L);
-	result = eval(A(A(result,C),Qitem));
-	if (is_item(result))
-		return result;
-
-	const char *name = string_data(sym->L);
-	long line = long_val(sym->R);
-	undefined_symbol(name,line);
-
-	check(result);
-	return item(sym,C);
-	}
-
-/* Resolve all symbols in the value using the current context, returning a
-value with no more symbols and all the definitions baked in. */
-static value resolve_all(value f)
-	{
-	value sym = first_sym(f);
-
-	if (sym == 0) return f;
-
-	value result = resolve_sym(sym);
-	value exp = apply(resolve_all(abstract(sym,f)),result->L->R);
-	check(result);
-	return exp;
-	}
-
-/* Parse a fully resolved value. */
-static value parse_value(FILE *fh, value context, const char *label,
-	long *p_line)
-	{
-	/*TODO why bother with save/restore?  Is there a test case for it? */
-	#if 0
-	FILE *save_fh = source_fh;
-	const char *save_label = source_label;
-	long save_line = source_line;
-	value save_context = source_context;
-	#endif
-
-	source_fh = fh;
-	source_label = label;
-	source_context = context;
-	source_line = *p_line;
-
-	hold(source_context);
-	next_ch();
 	value exp = parse_exp();
-
 	if (ch != -1)
 		syntax_error("Extraneous input", source_line);
 
-	*p_line = source_line;
-
-	exp = resolve_all(exp);
-	if (is_open(exp))
-		die(0);
-
-	drop(source_context);
-
-	#if 0
-	source_fh = save_fh;
-	source_label = save_label;
-	source_line = save_line;
-	source_context = save_context;
-	#endif
 	return exp;
-	}
-
-value parse_file(const char *name, value context)
-	{
-	FILE *fh = name[0] ? fopen(name,"r") : stdin;
-	if (fh == 0)
-		die("Could not open file %s", name);
-
-	long line = 1;
-	return parse_value(fh, context, name, &line);
-	}
-
-/* (parse_stream fh context label line)
-Parse the stream with the given context, label, and initial line number.
-Return (pair exp line), where exp is the parsed expression, and line is the
-updated line number.
-*/
-static value type_parse_stream(value f)
-	{
-	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
-
-	value arg_fh = arg(type_file,f->L->L->L->R);
-	value arg_context = f->L->L->R;
-	value arg_label = arg(type_string,f->L->R);
-	value arg_line = arg(type_long,f->R);
-
-	long line = long_val(arg_line);
-
-	value g = parse_value(file_val(arg_fh), arg_context,
-		string_data(arg_label), &line);
-
-	check(arg_fh);
-	check(arg_label);
-	check(arg_line);
-
-	return yield(yield(I,g),Qlong(line));
-	}
-
-/*
-(use file) Read context from file and parse remainder of source in that
-context.
-
-We define "use" in terms of a helper function "use_with", as follows:
-
-\use_with=
-	(\outer_fh\outer_context\outer_label\outer_line\local_path
-	\full_path==(concat base_path local_path)
-	fopen full_path "r" (die ["Could not open " full_path]) \use_fh\_
-	parse_stream use_fh outer_context full_path 1 \use_context\line
-	parse_stream outer_fh use_context outer_label outer_line \exp\line
-	exp
-	)
-
-\use=(use_with source_fh source_context source_label source_line)
-*/
-static value type_use_with(value f)
-	{
-	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L
-		|| !f->L->L->L->L->L) return 0;
-
-	value arg_outer_fh = arg(type_file,f->L->L->L->L->R);
-	value arg_outer_context = f->L->L->L->R;
-	value arg_outer_label = arg(type_string,f->L->L->R);
-	value arg_outer_line = arg(type_long,f->L->R);
-	value arg_local_path = arg(type_string,f->R);
-
-	const char *local_path = string_data(arg_local_path);
-
-	value string_append = Q(type_string_append);
-	value path;
-	path = Q(type_base_path);
-	path = A(A(string_append,path),arg_local_path);
-	path = eval(path);
-
-	const char *full_path = string_data(path);
-
-	FILE *fh = fopen(full_path,"r");
-	if (fh == 0)
-		die("Could not open file %s", full_path);
-
-	long line = 1;
-	value use_context = eval(
-		parse_value(fh, arg_outer_context, local_path, &line));
-
-	check(path);
-
-	line = long_val(arg_outer_line);
-	value g = parse_value(file_val(arg_outer_fh), use_context,
-		string_data(arg_outer_label), &line);
-
-	check(arg_outer_fh);
-	check(arg_outer_label);
-	check(arg_outer_line);
-	check(arg_local_path);
-
-	return g;
-	}
-
-value resolve_parse(const char *name)
-	{
-	if (strcmp(name,"use") == 0)
-		return A(A(A(A(Q(type_use_with),Qfile(source_fh,0)),source_context),
-			Qstring(source_label)),Qlong(source_line));
-
-	if (strcmp(name,"parse_stream") == 0) return Q(type_parse_stream);
-	if (strcmp(name,"source_fh") == 0) return Qfile(source_fh,0);
-	if (strcmp(name,"source_label") == 0) return Qstring(source_label);
-	if (strcmp(name,"source_line") == 0) return Qlong(source_line);
-	if (strcmp(name,"source_context") == 0) return source_context;
-	return 0;
 	}

@@ -1,0 +1,447 @@
+#!/bin/sh
+
+# (Patrick Chkoreff)
+# This script builds or installs a project based on a very simple file named
+# "src/config" which you create in your C source directory.
+#
+# It standardizes everything I know about building and installation, doing
+# everything precisely, efficiently, and reliably, with the least amount of
+# configuration.
+#
+# The script checks time stamps and builds only what is out of date.  It
+# automatically finds header dependencies, which it caches in obj/*i files.
+#
+# The installer honours the standard structure (e.g. the way perl does it):
+#
+#   /usr/bin/project
+#   /usr/lib/project
+#   /usr/share/project
+#
+# You can run it with no options to see the usage message.
+
+usage()
+	{
+	local prog=`basename $0`
+
+	cat 1>&2 <<EOM
+NAME
+       $prog - Build or install the $g_project system as required.
+
+SYNOPSIS
+       $prog [quiet] [clean] [install] [uninstall] [in <dir>]
+
+DESCRIPTION
+       $prog here
+              Build here, in the current directory.
+
+       $prog install
+       $prog uninstall
+              Install or uninstall in the default system directory "$g_sysdir".
+
+       $prog install in <dir>
+       $prog uninstall in <dir>
+              Install or uninstall in the specified directory <dir>.
+
+       $prog clean
+              Erase all the local output files before doing anything else.
+
+       $prog quiet here
+              Build quietly, without showing the commands that it runs.
+
+You may also combine the options in various ways such as this:
+
+       $prog quiet here
+       $prog quiet install
+       $prog quiet clean install
+       $prog quiet install in ~/my$g_project
+       $prog in ~/my$g_project install  # like Yoda
+
+EOM
+	exit 2
+	}
+
+# Return true if file_1 is newer than file_2.
+newer_than()
+	{
+	local file_1=$1
+	local file_2=$2
+
+	local result=0
+	if [ -e $file_2 ]; then
+		if [ $file_1 -nt $file_2 ]; then result=1; fi
+	else
+		result=1
+	fi
+	echo $result
+	}
+
+# Remove a directory without displaying an error message if it doesn't exist.
+quiet_rmdir()
+	{
+	if [ -d $1 ]; then
+		rmdir --ignore-fail-on-non-empty $1
+	fi
+	}
+
+# Run a system command.
+run()
+	{
+	local command="$1"
+	if [ $g_quiet -eq 0 ]; then echo "$command"; fi
+	$command
+	local code=$?
+	if [ $code -ne 0 ]; then exit $code; fi
+	}
+
+# Get the list of header files that a C source file includes.
+get_headers()
+	{
+	local name=$1
+	local file_c=src/$name.c
+
+	grep -e "^#include \".*\"" $file_c |
+	sed 's/^#include "\(.*\)".*$/\1/' |
+	(
+	while read file_h; do
+		echo -n "src/$file_h "
+	done;
+	)
+	}
+
+# Make an object file from a C source file.
+#
+# We compile with -O3 because that enables -finline-functions.  You can see
+# that by running "gcc -c -Q -O3 --help=optimizers".
+#
+# NOTE: We no longer use the -ansi option because that makes the fdopen
+# function inaccessible in stdio.h for some strange reason.
+make_obj()
+	{
+	local name=$1
+	local options="$2"
+
+	local file_c=src/$name.c
+	local file_o=obj/$name.o
+
+	# Make sure header cache file obj/$name.i is up to date.
+	local file_i=obj/$name.i
+	if [ `newer_than $file_c $file_i` -eq 1 ]; then
+		local headers="`get_headers $name`"
+		echo $headers >$file_i
+	fi
+
+	local update=`newer_than $file_c $file_o`
+	if [ $update -eq 0 ]; then
+		local headers="`cat $file_i`"
+
+		local file_h
+		for file_h in $headers
+		do
+			update=`newer_than $file_h $file_o`
+			if [ $update -eq 1 ]; then
+				break
+			fi
+		done
+	fi
+
+	if [ $update -eq 1 ]; then
+		run "gcc -c -Wall -Werror -O3$options $file_c -o $file_o"
+	fi
+	}
+
+# Make a library.  We use -fPIC (Position Independent Code) so the object can
+# be linked into a shared library.
+make_lib()
+	{
+	local name=$1
+
+	local file_so=lib/$g_project/lib$name.so
+	local update=0
+	local list_obj=""
+
+	while [ $# -gt 0 ]; do
+		local obj="$1"
+		shift
+		make_obj $obj " -fPIC"
+		local file_o=obj/$obj.o
+		list_obj="$list_obj $file_o"
+		if [ $update -eq 0 ]; then
+			update=`newer_than $file_o $file_so`
+		fi
+	done
+
+	if [ $update -eq 1 ]; then
+		run "gcc -s -shared -o $file_so$list_obj"
+	fi
+	}
+
+# Make an executable program.
+#
+# We need the -Wl option so the program can find the local dynamic libraries.
+# (Run ldd on bin/$name to see the dynamic linkage.)
+#
+# We use -s to remove all symbol table and relocation information.
+#
+# We use -rdynamic (aka --export-dynamic) so that dynamically loaded libraries
+# will link to the functions defined in the program.  You must use this option
+# for reliable results.
+#
+# LATER jturner says he had to remove -ldl when building on OpenBSD.
+# I suppose I should compare uname with "OpenBSD", and skip -ldl if I see it.
+make_bin()
+	{
+	local name=$1
+
+	local file_e=bin/$name
+	local update=0
+	local list_obj=""
+
+	while [ $# -gt 0 ]; do
+		local obj="$1"
+		shift
+		if [ "$obj" = "-" ]; then break; fi
+		make_obj $obj ""
+		local file_o=obj/$obj.o
+		list_obj="$list_obj $file_o"
+		if [ $update -eq 0 ]; then
+			update=`newer_than $file_o $file_e`
+		fi
+	done
+
+	while [ $# -gt 0 ]; do
+		local lib="$1"
+		shift
+		local file_so=lib/$g_project/lib$lib.so
+		if [ $update -eq 0 ]; then
+			update=`newer_than $file_so $file_e`
+		fi
+		# TODO perhaps don't do the -l convention for locally generated
+		# libraries, so we use simple names like "ping.so" instead of
+		# "libping.so".  The "-ldl" case can just be explicit in the config.
+		list_obj="$list_obj -l$lib"
+	done
+
+	if [ $update -eq 1 ]; then
+		local options="-L lib/$g_project -Wl,-rpath,lib/$g_project$list_obj"
+		run "gcc -rdynamic -s $options -o $file_e"
+	fi
+	}
+
+do_build()
+	{
+	mkdir -p bin
+	mkdir -p obj
+	mkdir -p lib/$g_project
+
+	eval "$g_script"
+	}
+
+do_clean()
+	{
+	rm -rf obj
+	rm -rf lib
+	rm -rf bin
+	}
+
+# Validate command line options and set global variables accordingly.
+validate_options()
+	{
+	local valid=1
+
+	g_quiet=0
+	g_clean=0
+	g_here=0
+	g_install=0
+	g_uninstall=0
+	g_sysdir=/usr
+	g_place=$g_sysdir
+
+	while [ $# -gt 0 ]; do
+		local verb="$1"
+		shift
+		case $verb in
+			here) g_here=1 ;;
+			quiet) g_quiet=1 ;;
+			clean) g_clean=1 ;;
+			install) g_install=1 ;;
+			uninstall) g_uninstall=1 ;;
+			in)
+				if [ $# -gt 0 ]; then
+					g_place="$1"
+					shift
+				else
+					valid=0
+				fi
+				;;
+			*) valid=0 ;;
+		esac
+	done
+
+	if [ $g_here -eq 0 -a $g_install -eq 0 -a $g_uninstall -eq 0 -a \
+		$g_clean -eq 0 ]; then
+		valid=0
+	fi
+
+	if [ $valid -eq 0 ]; then usage; fi
+
+	if [ $g_install -eq 1 -a $g_here -eq 1 ]; then
+		valid=0
+	fi
+	if [ $g_uninstall -eq 1 -a $g_here -eq 1 ]; then
+		valid=0
+	fi
+	if [ $g_install -eq 1 -a $g_uninstall -eq 1 ]; then
+		valid=0
+	fi
+
+	if [ $valid -eq 0 ]; then
+		echo 2>&1 "That combination of options makes no sense."
+		exit 2
+	fi
+
+	if [ $g_install -eq 1 -o $g_uninstall -eq 1 ]; then
+		if [ $g_place -ef . ]; then
+			echo 2>&1 "You can't install or uninstall in the current directory."
+			exit 2
+		fi
+	fi
+	}
+
+do_install()
+	{
+	sanity_check
+	run "mkdir -p $g_place"
+	run "mkdir -p $g_place/bin"
+	run "mkdir -p $g_place/lib"
+	run "mkdir -p $g_place/share"
+
+	local name
+	for name in $g_list_bin
+	do
+		run "cp -p bin/$name $g_place/bin/"
+	done
+
+	run "rm -rf $g_place/lib/$g_project"
+	run "cp -pr lib/$g_project $g_place/lib/"
+
+	run "rm -rf $g_place/share/$g_project"
+	run "cp -pr share/$g_project $g_place/share/"
+
+	for name in $g_list_bin
+	do
+		run "chown $USER:$USER $g_place/bin/$name"
+	done
+
+	run "chown -R $USER:$USER $g_place/lib/$g_project"
+	run "chown -R $USER:$USER $g_place/share/$g_project"
+
+	# Now, in case you're running under sudo, change the permissions on the
+	# locally created directories back to the underlying user. Otherwise you'd
+	# have files owned by root in your local directory, which is annoying.
+
+	if [ "$SUDO_USER" != "" ]; then
+		run "chown -f -R $SUDO_USER:$SUDO_USER bin"
+		run "chown -f -R $SUDO_USER:$SUDO_USER obj"
+		run "chown -f -R $SUDO_USER:$SUDO_USER lib"
+	fi
+	}
+
+do_uninstall()
+	{
+	sanity_check
+
+	local name
+	for name in $g_list_bin
+	do
+		run "rm -f $g_place/bin/$name"
+	done
+
+	run "rm -rf $g_place/lib/$g_project"
+	run "rm -rf $g_place/share/$g_project"
+	run "quiet_rmdir $g_place/bin"
+	run "quiet_rmdir $g_place/lib"
+	run "quiet_rmdir $g_place/share"
+	run "quiet_rmdir $g_place"
+	}
+
+# Guard against disaster.
+sanity_check()
+	{
+	if [ "$g_place" = "" ]; then
+		echo 2>&1 "Sorry, this script is broken (it didn't set g_place)."
+		exit 1
+	fi
+	if [ "$g_project" = "" ]; then
+		echo 2>&1 "Missing project name in src/config"
+		exit 1
+	fi
+	}
+
+##[ These routines are called from your src/config script.
+project()
+	{
+	if [ "$g_project" != "" ]; then
+		echo 2>&1 "You can't have more than one project name in src/config"
+		exit 2
+	fi
+	g_project=$1
+	}
+
+lib()
+	{
+	g_script="${g_script}make_lib $@
+"
+	}
+
+bin()
+	{
+	g_script="${g_script}make_bin $@
+"
+	}
+
+# Set the list of bin files to install.
+public()
+	{
+	g_list_bin="$@"
+	}
+##]
+
+# Execute the src/config script.  That populates the $build_script variable.
+read_config()
+	{
+	g_project=""
+	g_list_bin=""
+	g_script=""
+	if [ ! -e src/config ]; then
+		echo 2>&1 "Missing src/config file"
+		exit 2
+	fi
+	local script="`cat src/config`"
+	eval "$script"
+	}
+
+main()
+	{
+	read_config
+	validate_options "$@"
+	sanity_check
+
+	if [ $g_clean -eq 1 ]; then
+		do_clean
+	fi
+
+	if [ $g_uninstall -eq 1 ]; then
+		do_uninstall
+		exit
+	fi
+
+	if [ $g_here -eq 1 -o $g_install -eq 1 ]; then
+		do_build
+	fi
+
+	if [ $g_install -eq 1 ]; then
+		do_install
+	fi
+	}
+
+main "$@"

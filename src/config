@@ -1,0 +1,15 @@
+#
+project fexl
+
+# NOTE: These libraries are just for testing.
+lib ping
+lib test
+lib show
+
+# TODO
+#bin fexl basic buf die double file form lib long memory parse resolve str \
+#	qfile qstr value - dl test show
+bin fexl basic buf die double file form lib long memory parse resolve str \
+	qfile qstr value - dl
+
+public fexl

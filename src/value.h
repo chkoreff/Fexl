@@ -32,16 +32,11 @@ an N-bit machine, which can only address 2^N words.  Therefore an integer
 overflow is impossible.
 
 The T field is the type, a pointer to a function which reduces a form during
-evaluation.  When evaluating a form f, we first evaluate the left side, then
-call f->L->T(f).  This yields a new form which is functionally equivalent to f,
-and then we continue evaluating f from there.
+evaluation.  It also serves as a function to clear an atom when its reference
+count drops to 0.
 
 The L and R fields are the left and right components of the value.
-
-If L == 0, the value represents an atom.  R may then point to a value which
-holds extra data, including a function pointer for freeing the data when the
-atom's reference count drops to 0.
-
+If L == 0, the value is an atom, and R is the atom data, if any.
 If L != 0, then R != 0, and the value represents the application of L to R.
 */
 typedef struct value *value;
@@ -57,14 +52,8 @@ struct value
 
 extern void hold(value f);
 extern void drop(value f);
-extern void check(value f);
-extern value replace(value f, type T, value L, value R);
 extern value V(type T, value L, value R);
 extern value Q(type T);
 extern value A(value f, value g);
-extern value replace_value(value f, value g);
-extern value replace_apply(value f, value L, value R);
 extern value eval(value f);
-extern value type_data(value f);
-extern value arg(type T, value f);
 extern void end_value(void);

@@ -1,736 +1,289 @@
 #
-use "test/common.fxl" \\
 
-## Define test routines
+# Missing lambda symbol:
+#\= \\
+# Missing definition:
+#\x= \\
 
-\test_big =
-(
-announce "test_big"
-# Test an exponential tower, showing how forcing eager evaluation can help.
-\f = (S C C)
+# TODO detect (Q 0) and die instead */
 
-\g =
-	(\f
-	\f==f  # This line cuts time down to ~0.02s from ~9.6s.
-	\f = (f f)
-	\f = (f f)
-	\f = (f f)
-	\f = (f f)
-	\f = (f f)
-	f
-	)
+\load=(\lib_name\sym_name Q; dlsym (dlopen lib_name) sym_name)
+\.==(load "" "type_string_append")
+\long_add==(load "" "type_long_add")
 
-\f = (g f)
-\f = (g f)
-\f = (g f)
-\f = (g f)
-\f = (g f)
+# TODO automatically put base_path if name is not null
+\library=(\name . base_path; . "lib/fexl/" name)
 
+\show==(load (library "libshow.so") "type_show")
+
+\test==(load (library "libtest.so") "type_test_pattern")
+\test==test
+\test==(long_add 4 2)
+
+\C==(load "" "type_C")
+
+show test
+show "bye"
+show C
+#\x==(library "X") show x
+\x==base_path show x
+
+\\\\
+
+# Don't need to use base_path when opening "" library.
+\readlink==(Q (dlsym (dlopen "") "type_readlink"))
+\bin_path==(readlink "/proc/self/exe")
+bin_path
+\\\\
+
+\C==(Q (dlsym (dlopen "") "type_C"))
+\I==(Q (dlsym (dlopen "") "type_I"))
+(I; C {x} I)
+\\
+
+\@==(Q (dlsym (dlopen "") "type_Y"))
+\I==(Q (dlsym (dlopen "") "type_I"))
+\inf=(@ I)
+\\
+
+\C==(Q (dlsym (dlopen "") "type_C"))
+\f={string_len "abcd"}
+C f C
+
+\\
+
+\C==(Q (dlsym (dlopen "") "type_C"))
+\S==(Q (dlsym (dlopen "") "type_S"))
+\I==(Q (dlsym (dlopen "") "type_I"))
+
+\x={x}
+\y={y}
+\z={z}
+
+S x y z
+
+\\\
+
+
+\string_append==(Q; dlsym (dlopen "") "type_string_append")
+\string_common==(Q; dlsym (dlopen "") "type_string_common")
+\string_at==(Q; dlsym (dlopen "") "type_string_at")
+\string_cmp==(Q; dlsym (dlopen "") "type_string_cmp")
+\length==(Q; dlsym (dlopen "") "type_string_len")
+\long_add==(Q (dlsym (dlopen "") "type_long_add"))
+\long_div==(Q (dlsym (dlopen "") "type_long_div"))
+\double_add==(Q (dlsym (dlopen "") "type_double_add"))
+\double_div==(Q (dlsym (dlopen "") "type_double_div"))
+\+==long_add
+\.=string_append
+
+#\x=(string_append "Hello " "world.  ")
+#\x=(string_append x x)
+#x
+
+#\x="abcdef"
+#\y="abcDEF"
+#\x=(string_append x "")
+#\y=(string_append y "")
+#string_common x y
+
+#string_at (. "abc" "def") (+ 1 2)  # 100
+
+#length (. "abc" "de")  # 5
+
+#string_cmp "abc" "abcd"
+
+#\x=(long_div 13 4)
+#\x=(long_add x x)
+#x
+
+\x=(double_add 13.2 4.5)
+\x=(double_add x x)
+\x=(double_div x 0.5)
+x
+
+#double_div 0.0 0.0  # -nan
+#double_div 1.0 0.0  # inf
+#double_div -1.0 0.0  # -inf
+
+#long_div 12 0  # 0
+
+\\\\
+
+\later==(Q; dlsym (dlopen "") "type_later")
+\I==(Q; dlsym (dlopen "") "type_I")
+\C==(Q; dlsym (dlopen "") "type_C")
+\?==(Q; dlsym (dlopen "") "type_query")
+#later later
+#later (I C)
+#? (I C) I
+
+#? (later; later (I C)) I
+
+
+# Test peeling off "later" layers with eager evaluation.
+\f=(I C)
+\f=(later f)
+\f=(later f)
+\f==f
+\f==f
 f
-)
 
-\test_putchar =
-(
-announce "test_putchar"
-\f=(putchar 65)
-\f=(f f)
-\f=(f f)
-f f
-nl
-)
 
-\test_repeat_1 =
-(
-announce "test_repeat_1"
-\f =
-	(
-	\f=(say ["hello" " world"])
+\\\\
 
-	\f = (f f)
-	\f = (f f)
+# (later C)
+\C=(Q; dlsym (dlopen "") "type_C")
+C
 
-	\f=
-		(
-		say "round 1"
-		f
-		say "round 2"
-		f
-		)
+\\\\
 
-	\f=(f f)
-	f
-	)
+\ping==(Q; dlsym (dlopen "libping.so") "type_ping")
+\ping=(ping ping)
+\ping=(ping ping)
+ping
 
-f f
-)
+\\\\
 
-\test_repeat_2 =
-(
-announce "test_repeat_2"
-\talk=(say "Hello world.")
-\talk=talk  # 1
-\talk=(talk talk) # 2
-\talk=(talk talk) # 4
-talk
-)
+\readlink==(Q (dlsym (dlopen "") "type_readlink"))
+readlink "/proc/self/exe"
 
-\test_repeat_3 =
-(
-announce "test_repeat_3"
+\\\
 
-\talk=
-(
-\x=(* 6; + 3 4)
-\y = ["Hello " "x = " x NL]
-\y = [y y]
+#argv 0
+#argv 1
+#argv 2
+#argv -1
 
-\z=["bananas"]
-\z=[z z NL]
-\z=["apples" "oranges"; z]
+#\+==(Q (dlsym (dlopen "") "type_long_add"))
+#+ 42 37
 
-say [y (to_string y) z]
-)
+\pi=3.14159265358979323846
+\*==(Q (dlsym (dlopen "") "type_double_mul"))
+* 2.0 pi
 
-talk
-talk
-)
+#42 3.14159265358979323846
+#1e5
 
-\ping_counter==(var_new 0)
+\\
 
-\ping=
-	(
-	\x=(var_get ping_counter)
-	\x=(+ x 1)
-	\x==x
-	var_put ping_counter x
-	)
+\x=dlopen
+C
+	S "abc" x
+	source_file
+	source_name
+	source_line
 
-\reset_ping =
-	(
-	var_put ping_counter 0
-	)
+#C {x}
 
-\show_ping=
-	(
-	\x=(var_get ping_counter)
-	say ["ping_counter = " x]
-	)
+#C (string_len "abc") I
+#C S I
 
-\test_ping_8 =
-(
-announce "test_ping_8"
-reset_ping
+#~ "~
+#x
 
-\weird=I
-\ping2 = (ping (C ping weird))
+#:: f = ((C {{string_len :14} {"abc" :17}}) I)
+#:: g = {{string_len :14} {"abc" :17}}
 
-\f=ping2
-\f=(f f)
-\f=(f f)
-f
 
-show_ping
-)
+#say "Hello world." # TODO
 
-\test_ping_17 =
-(
-announce "test_ping_17"
-reset_ping
-\f=I
-\f=(ping f)
-\f=(ping f)
-\f=(ping f)
-\f=(f f)
-\f=(f f)
-\f=(ping f)
-\f=(ping f)
-\f=(f ping)
-\f=(f ping)
-\f=(f ping)
-f
-show_ping
-)
+\\\
+# Good test case for the need to hold things correctly in the abstract routine.
+# ((S ((R S) ((R (R S)) S))) S)
+(\x\y\z ((x z) (y z)) ((x z) (y z)))
 
-\test_ping_18 =
-(
-announce "test_ping_18"
-reset_ping
-\f=(ping ping ping) # 3
-\f=(ping f) # 4
-\f=(f f) # 8
-\f=(ping f) # 9
-\f=(f f) # 18
-f
-show_ping
-)
+\\\
 
-\test_ping_28 =
-(
-announce "test_ping_28"
-reset_ping
-\f=(ping ping ping) # 3
-\f=(f f) # 6
-\f=(f f) # 12
-\f=(f ping) # 13
-\f=(ping f) # 14
-\f=(f f) # 28
-f
-show_ping
-)
+#\x x # I
+#\x y # C y
+#\x\y y x  # L I
 
-\test_ping_98=
-(
-announce "test_ping_98"
-reset_ping
+#(\S=(\x\y\z (x z) (y z)) \x S x)  # S
+#(\S=(\x\y\z (x z) (y z)) S) # S
 
-\test_ping_17=
-	(
-	\f=
-		(
-		\f=ping
-		\f=(f f)
-		\f=(f ping)
-		\f=(f f)
-		\f=(ping f)
-		\f=(f ping)
-		\f=(f f)
-		f
-		)
+#\x\y\z x z y # L
+#\x\y\z x (y z)  # R
+#(\x\y\z x; y z)  # R
 
-	\f=(ping f)
-	f
-	)
+\\\\
 
-\test_ping_7 =
-	(
-	\g=
-		(
-		\f=ping
-		\f=(f f)
-		f f f
-		)
+#\x=C x
+#\x=() x
+#\x=(()()()) x
 
-	\g=(ping g)
-	g
-	)
+#\x=(C) x
+#\x=C x
+#\x=(() () C) x
+
+#\x=(C S) x
+
+#\x="" x
+#\x=~ "~ x
+#\x=~ ~ x
+
+#\x=
+#\x=S
+#\x=C x
+
+#\
+#=
+#\x
+#\ =
+
+#\=
+
+#\ = = eq (=)
+
+#\x==(+ 3 4) x
+
+\\\\
+
+#\f=(\x\y\z (x z) (y z)) f
+
+#\f=(\x\y x) f
+#\f=(\x x) f
+#\f=() f
+
+#\=(\x x)
+
+#\()
+#\=()
+#\==()
+#\f=
+
+#\
+#\ \
+
+#\ =
+
+#\ \(\x\y x)
+
+#\x
+
+#\ \=
+
+#\
+#\x
+
+#\=3
+#\ = = eq
+#=
+
 
 \f=
-	(
-	test_ping_17
-	test_ping_17
-	test_ping_7
-	test_ping_7
-	) # 48
 
-\f=(f f) # 96
-\f=(ping f) # 97
-\f=(f ping)
+\\\\\
 
-f
-show_ping
-)
+#\x x
+#\"x" "x"
+#\"x" x
+\x "x"
 
-\test_ping_128 =
-(
-announce "test_ping_128"
-reset_ping
-\f=ping
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-f
-show_ping
-)
+#"hi"
 
-\test_ping_18874376 =
-(
-announce "test_ping_18874376"
-reset_ping
-\f=I
-\f=(ping f)
-\f=(ping f)
-\f=(ping f)
-\f=(ping f)
-\f=(ping f)
-\f=(ping f)
-\f=(ping f)
-\f=(ping f)
-\f=(ping f)
-
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-
-\f=(ping f)
-\f=(ping f)
-\f=(ping f)
-
-\f=(f ping)
-\f=(f ping)
-\f=(f ping)
-\f=(f ping)
-\f=(f ping)
-
-f
-show_ping
-)
-
-\test_var_trace =
-(
-announce "test_var_trace"
-\var==(var_new 0)
-\get=(var_get var)
-\put=(var_put var)
-
-# Override get with a tracing version:
-\get =
-	(
-	\x==get
-	print ["trace x = " x NL]
-	x
-	)
-
-\x==get
-put (+ x 7)
-\x==get
-put (* x 3)
-\x==get
-print ["final x = " x NL]
-)
-
-\test_var_counter =
-(
-announce "test_var_counter"
-
-\new_counter=
-	(
-	\current==(var_new 0)
-	\ping =
-		(
-		\x=(var_get current)
-		\x=(+ x 1)
-		\x==x
-
-		print ["count " x NL]
-		var_put current x
-		)
-	return ping
-	)
-
-\ping==new_counter
-ping ping ping
-ping ping ping
-ping ping ping
-)
-
-\test_circular_structure =
-(
-announce "test_circular_structure"
-# Create a circular structure and thus introduce a memory leak.
-\var==(var_new 0)
-var_put var var
-)
-
-\test_var_ops =
-(
-announce "test_var_ops"
-
-\var==(var_new 0)
-\get=var_get
-\put=(var_put var)
-
-# Override with a tracing version:
-\get =
-	(
-	\x==(get var)
-	print ["trace x = " x NL]
-	x
-	)
-
-put 14
-\x==get
-put (+ x x)
-\x==get
-put (* x x)
-\x==get
-)
-
-\test_var_repeat =
-(
-announce "test_var_repeat"
-\var==(var_new 0)
-
-\f=
-(
-\x==(var_get var)
-print ["x = " x NL]
-var_put var (+ x 3)
-)
-
-f f f
-)
-
-\test_fwrite =
-(
-announce "test_fwrite"
-\f = (fwrite stdout "Hello ")
-f f f
-f f f
-fwrite stdout NL
-)
-
-\test_big_string_append =
-(
-announce "test_big_string_append"
-\. = string_append
-\x = (. "x" "y")
-\x = (. x x)
-\x = (. x x)
-\x = (. x x)
-\x = (. x x)
-\x = (. x x)
-\x = (. x x)
-\x = (. x x)
-\x = (. x x)
-\x = (. x x)
-\x = (. x x)
-\x = (. x x)
-\x = (. x x)
-\x = (. x x)
-\x = (. x x)
-\x = (. x x)
-\x = (. x x)
-\x = (. x x)
-\x = (. x x)
-\x = (. x x)
-\x = (. x x)
-\x = (. x x)
-\x = (. x x)
-\x = (. x x)
-\x = (. x x)  # 2^25 bytes = 33,554,432
-\x==x
-#fwrite stdout x
-say "done"
-)
-
-\test_many_writes=
-(
-# Timed this by piping into wc -l.
-# This takes 0.37s.
-\f=(fwrite stdout "Hello world.
-")
-# This takes 0.80s.
-\f=(fprint stdout "Hello world" nl)
-
-# This takes 1.34s.
-\f=(say "Hello world.")
-#\f=(say [[["Hello world."]]])
-#\f=(say [["Hello world."]])
-#\f=(say ["Hello world."])
-#\f=(say [4])
-#\f=(say 4)
-#\f=(say 4.3)
-
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f)
-\f=(f f) # 1048576
-f
-)
-
-\test_long_1 =
-(
-# Test some long operations with repeated embedded side effects.
-announce "test_long_1"
-\ping=(fwrite stdout "!")
-\+=long_add
-\x==(+ (ping + 1 1) (ping + 3 0))
-say ["+ (+ 1 1) (+ 3 0) = " x]
-)
-
-\test_long_2=
-(
-# Test some long operations with repeated embedded side effects.
-announce "test_long_2"
-
-\f=(say (long_add (print "A" 36) (print "B" 4)))
-f f
-\f=(say (long_sub (print "A" 36) (print "B" 4)))
-f f
-\f=(say (long_mul (print "A" 36) (print "B" 4)))
-f f
-\f=(say (long_div (print "A" 36) (print "B" 4)))
-f f
-\f=(say (long_div (print "A" 36) (print "B" 0)))
-f f
-\f=(say (long_string (print "A" 123)))
-f f
-)
-
-\test_double_1 =
-(
-# Test some double operations with repeated embedded side effects.
-announce "test_double_1"
-\ping=(fwrite stdout "!")
-\+=double_add
-\x==(+ (ping + 1.1 1.2) (ping + 3.3 0.0))
-say ["+ (+ 1.1 1.2) (+ 3.3 0.0) = " x]
-)
-
-\test_double_2=
-(
-# Test some double operations with repeated embedded side effects.
-announce "test_double_2"
-\f=(say (double_add (print "A" 36.4) (print "B" 4.0)))
-f f
-\f=(say (double_sub (print "A" 36.4) (print "B" 4.0)))
-f f
-\f=(say (double_mul (print "A" 36.4) (print "B" 4.0)))
-f f
-\f=(say (double_div (print "A" 36.4) (print "B" 4.0)))
-f f
-\f=(say (double_div (print "A" 36.4) (print "B" 0.0)))
-f f
-\f=(say (double_string (print "A" 123.5)))
-f f
-)
-
-# Test three-way comparisons of string, long, and double.
-\test_compare=
-(
-announce "test_compare"
-
-\try_compare=
-	(\compare
-	\try=
-		(\x\y
-		# Testing with embedded side effects.
-		\x=(print "" x)
-		\y=(print "" y)
-		\result = (compare x y "LT" "EQ" "GT")
-		print result
-		)
-
-	# Try both ways.
-	\try=
-		(\x\y
-		try x y
-		print " "
-		try y x
-		nl
-		)
-	try
-	)
-
-say "string"
-\try=(try_compare string_compare)
-
-try "" "b"
-try "a" "b"
-try "a" "aa"
-
-try "" ""
-try "b" "b"
-try "bb" "bb"
-
-say "long"
-\try=(try_compare long_compare)
-
-try 0 1
-try -1 0
-try 1 3
-try 0 0
-try -2 -2
-try 34 34
-
-say "double"
-\try=(try_compare double_compare)
-
-try 0.1 1.0
-try -1.0 0.0
-try 1.0 3.0
-try 0.0 0.0
-try -2.0 -2.0
-try 34.0 34.0
-)
-
-# LATER test fgetc also
-\test_getchar=
-(
-\f=
-(
-print "Please type a character and press enter: " \ch==getchar
-print "You typed " putchar ch nl
-\ch==getchar
-)
-f f
-)
-
-\test_resolve=
-(
-# Test the resolve function with embedded side effects.
-# Actually using the full source_context just to test that.
-announce "test_resolve"
-\try=
-	(
-	#\f==(resolve "48.6")
-	#\f==(resolve (print "!" "48.6"))
-	\f==(source_context (print "!" "48.6"))
-	f () \x\_ fwrite stdout (double_string x) nl
-	)
-
-try try
-
-# Call resolve with a side effect on the name.
-resolve (print "" "C") () \_\_
-)
-
-\test_var_side=
-(
-# Test var with embedded side effects.
-announce "test_var_side"
-\var==(var_new 3)
-\x==(var_get (print "!" var))
-say ["x = " x]
-var_put (putchar 64 var) (putchar 37 "hi")
-\x==(var_get (print "!" var))
-say ["x = " x]
-)
-
-## LATER run these in separate process under safe limits
-#Y S S S
-# LATER this tests stack overflow (segfault).
-#Y Y
-#Y I
-#exit 42
-# LATER this tests stack overflow (segfault).
-#(
-#\f=S
-#\f=(f f)
-#\f=(f f)
-##\f=(f f)
-#\f=(f f)
-#f
-#)
-
-\test_type=
-(
-announce "test_type"
-
-\get_type_name=
-	(\x
-	\x==x
-	is_long x (yes "long");
-	is_double x (yes "double");
-	is_string x (yes "string");
-	is_item x (\h\t yes "list");
-	is_end x (yes "list");
-	is_var x (yes "var");
-	no
-	)
-
-\try=
-	(\x
-	get_type_name x (say "unknown") \type
-	say [type " " x]
-	#say [type " " (to_string x)]  # Use this to test to_string.
-	)
-
-say "try long"
-try 0
-try (long_add 4 3)
-try (print "" 5)
-say "try double"
-try 0.0
-try 3.14159265358979
-try -2.6
-say "try string"
-try ""
-try "hello"
-say "try list"
-try []
-try C
-try ["a"]
-try ["a";"b"]
-try ["a" "b"]
-try (item "a" "b")
-say "try var"
-try (var_new ["a" "b" (long_add 1 1)])
-say "try unknown"
-try S
-try (C S)
-try (item "a")
-try (item "a" "b" "c")
-)
-
-## Call test routines
-
-test_big
-test_putchar
-test_repeat_1
-test_repeat_2
-test_repeat_3
-test_ping_98
-test_ping_17
-test_ping_18
-test_ping_28
-test_ping_128
-test_ping_18874376
-test_ping_8
-test_var_trace
-test_var_counter
-# LATER fork a process to test this.
-#test_circular_structure
-test_var_ops
-test_var_repeat
-test_fwrite
-test_big_string_append
-#test_many_writes
-test_long_1
-test_long_2
-test_double_1
-test_double_2
-test_compare
-# LATER fork a process and cat string to its stdin.
-#test_getchar
-test_resolve
-test_var_side
-test_type
+#~ foo~
+~
+hello there
+bye now
+~

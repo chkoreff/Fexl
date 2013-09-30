@@ -1,22 +1,14 @@
 #!/bin/sh
-# The bang line is for syntax highlighting only.
+# The bang line above is for syntax highlighting only.
 
 # Handy shell functions for development and testing.  You can source these in a
 # new shell with ". alias".
 
-.todo()
-	{
-	grep -ra TODO run test src share --exclude=".*.swp"
-	}
-
-.later()
-	{
-	grep -ra "LATER" run test src share --exclude=".*.swp"
-	}
+sources="README.md build share test src"
 
 .build()
 	{
-	./run quiet build
+	./build quiet here
 	}
 
 .fexl()
@@ -27,19 +19,31 @@
 # Search source.
 .s()
 	{
-	grep -ra "$1" src share test --exclude "*.swp"
+	if [ "$1" != "" ]; then
+		grep -ra "$1" $sources --exclude "*.swp"
+	fi
 	}
 
 # Search source for whole word.
 .sw()
 	{
-	grep -ra "\<$1\>" src share test --exclude "*.swp"
+	.s "\<$1\>"
 	}
 
 # Search source for stray trailing white space
 .ss()
 	{
-	grep -ra "\s$" src --exclude "*.swp"
+	.s "\s$"
+	}
+
+.todo()
+	{
+	.s TODO
+	}
+
+.later()
+	{
+	.s LATER
 	}
 
 # Run a test script.

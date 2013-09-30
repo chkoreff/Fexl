@@ -1,68 +1,96 @@
 #include <stdio.h>
 #include <string.h>
+#include "die.h"
+#include "str.h"
+
 #include "value.h"
-#include "basic.h"
 #include "double.h"
-#include "file.h"
+#include "fexl.h"
+#include "form.h"
+#include "lib.h"
 #include "long.h"
 #include "parse.h"
-#include "string.h"
-#include "system.h"
-#include "var.h"
+#include "qfile.h"
+#include "qstr.h"
 #include "resolve.h"
 
-/* This is the standard context which supplies definitions for any symbols used
-in a Fexl program. */
-
-static value type_resolve(value f);
-
-static value resolve(const char *name)
+static void report_undef(value sym)
 	{
-	value f;
-	if ((f = resolve_long(name))) return f;
-	if ((f = resolve_double(name))) return f;
-	if ((f = resolve_string(name))) return f;
-	if ((f = resolve_basic(name))) return f;
-	if ((f = resolve_file(name))) return f;
-	if ((f = resolve_system(name))) return f;
-	if ((f = resolve_var(name))) return f;
-	if ((f = resolve_parse(name))) return f;
+	char *name = atom_str(sym->R->L)->data;
+	long line = get_long(sym->R->R);
 
-	/* LATER more functions
-	if (strcmp(name,"lib") == 0) return Q(type_lib);
-	*/
+	warn("Undefined symbol %s on line %ld%s%s", name, line,
+		source_name[0] ? " of " : "",
+		source_name
+		);
+	}
 
-	if (strcmp(name,"resolve") == 0) return Q(type_resolve);
+value type_argv(value f)
+	{
+	if (!f->L) return f;
+	value x = eval(f->R);
+	long i = get_long(x);
+	value z = Qstr0(i >= 0 && i < argc ? argv[i] : "");
+	drop(x);
+	return z;
+	}
+
+/* This is the minimal core context needed to bootstrap Fexl. */
+static value context(char *name)
+	{
+	if (strcmp(name,"dlopen") == 0) return Q(type_dlopen);
+	if (strcmp(name,"dlsym") == 0) return Q(type_dlsym);
+	if (strcmp(name,"Q") == 0) return Q(type_Q);
+	if (strcmp(name,"source_file") == 0) return Qfile(source_fh);
+	if (strcmp(name,"source_name") == 0) return Qstr0(source_name);
+	if (strcmp(name,"source_line") == 0) return Qlong(source_line);
+	if (strcmp(name,"argc") == 0) return Qlong(argc);
+	if (strcmp(name,"argv") == 0) return Q(type_argv);
+	if (strcmp(name,"base_path") == 0) return Q(type_base_path);
+
+	/* Integer number (long) */
+	{
+	long num;
+	if (string_long(name,&num)) return Qlong(num);
+	}
+
+    /* Floating point number (double) */
+	{
+	double num;
+	if (string_double(name,&num)) return Qdouble(num);
+	}
+
 	return 0;
 	}
 
-/* (resolve name) returns [def] if name is defined, or [] otherwise. */
-static value type_resolve(value f)
+/* Resolve all symbols in form f with the core context, reporting any undefined
+symbols to stderr. */
+value resolve(value f)
 	{
-	if (!f->L) return 0;
-	value arg_name = arg(type_string,f->R);
-	const char *name = string_data(arg_name);
-	value def = resolve(name);
+	hold(f);
+	value sym = first_symbol(f);
+	if (sym == 0) return f;
 
-	if (arg_name != f->R)
+	value def = 0;
+
+	value content = sym->R->L;
+	if (content->T == type_name)
 		{
-		check(arg_name);
-		f = 0;
+		char *name = atom_str(content)->data;
+		def = context(name);
+		if (!def)
+			{
+			report_undef(sym);
+			def = sym;
+			}
 		}
-	return replace_maybe(f, def);
-	}
+	else
+		def = content; /* string literal */
 
-/* This is the standard context for Fexl programs. */
-value standard_context(void)
-	{
-	value string_append = Q(type_string_append);
-	value path;
-	path = Q(type_base_path);
-	path = A(A(string_append,path),Qstring("share/fexl/main.fxl"));
-	path = eval(path);
-
-	const char *full_path = string_data(path);
-	value context = parse_file(full_path, Q(type_resolve));
-	check(path);
-	return context;
+	value g = resolve(abstract(sym,f));
+	value h = apply(g,def);
+	hold(h);
+	drop(g);
+	drop(f);
+	return h;
 	}
