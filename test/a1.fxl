@@ -5,64 +5,160 @@
 # Missing definition:
 #\x= \\
 
+
 # TODO detect (Q 0) and die instead */
 
-\load=(\lib_name\sym_name Q; dlsym (dlopen lib_name) sym_name)
-\.==(load "" "type_string_append")
-\long_add==(load "" "type_long_add")
+\load_path=
+	(\lib_name\type_name
+	\lib=(dlopen lib_name)
+	\type=(dlsym lib type_name)
+	\function=(Q type)
+	function
+	)
 
-# TODO automatically put base_path if name is not null
-\library=(\name . base_path; . "lib/fexl/" name)
+# TODO (\x=F x) is not the same as (F) here.  Need to understand why.
+\load=
+	(\type_name
+	\function=(load_path "" type_name)
+	function
+	#(load_path "" type_name) # TODO core dump
+	)
 
-\show==(load (library "libshow.so") "type_show")
+\.==(load "type_string_append")
 
-\test==(load (library "libtest.so") "type_test_pattern")
+\load_from=
+	(\lib_name\type_name
+	\path=(. base_path; . "lib/fexl/" lib_name)
+	load_path path type_name
+	)
+
+\eval=(\x \x==x x)
+\T=(\T\F T)
+\F=(\T\F F)
+
+\S==(load "type_S")
+\C==(load "type_C")
+\I==(load "type_I")
+\@==(load "type_Y")
+
+\long_add==(load "type_long_add")
+\putchar==(load "type_putchar")
+\getchar==(load "type_getchar")
+\fputc==(load "type_fputc")
+\fgetc==(load "type_fgetc")
+\fwrite==(load "type_fwrite")
+
+\stdin==(eval (load "type_stdin"))
+\stdout==(eval (load "type_stdout"))
+\stderr==(eval (load "type_stderr"))
+
+\show==(load_from "libshow.so" "type_show")
+\test==(load_from "libtest.so" "type_test_pattern")
 \test==test
-\test==(long_add 4 2)
-
-\C==(load "" "type_C")
 
 show test
-show "bye"
-show C
-#\x==(library "X") show x
-\x==base_path show x
+show stdin
+show stdout
+show stderr
 
-\\\\
 
-# Don't need to use base_path when opening "" library.
-\readlink==(Q (dlsym (dlopen "") "type_readlink"))
+(
+putchar 97
+putchar 98
+putchar 99
+putchar 10
+)
+
+I
+(
+\putchar=(fputc stdout)
+putchar 97
+putchar 98
+putchar 99
+putchar 100
+putchar 10
+)
+
+I
+(
+\readlink==(load "type_readlink")
 \bin_path==(readlink "/proc/self/exe")
-bin_path
-\\\\
+show bin_path
+)
 
-\C==(Q (dlsym (dlopen "") "type_C"))
-\I==(Q (dlsym (dlopen "") "type_I"))
-(I; C {x} I)
-\\
+I
+(
+\test=(I; C {x} I)
+\test==test
+show test
+)
 
-\@==(Q (dlsym (dlopen "") "type_Y"))
-\I==(Q (dlsym (dlopen "") "type_I"))
-\inf=(@ I)
-\\
+F
+(
+\inf=(@ I) inf
+)
 
-\C==(Q (dlsym (dlopen "") "type_C"))
+I
+(
 \f={string_len "abcd"}
-C f C
+\f==f
+show f
+)
 
-\\
-
-\C==(Q (dlsym (dlopen "") "type_C"))
-\S==(Q (dlsym (dlopen "") "type_S"))
-\I==(Q (dlsym (dlopen "") "type_I"))
-
+I
+(
 \x={x}
 \y={y}
 \z={z}
 
-S x y z
+\f=(S x y z)
+\f==f
+show f
+)
+
+F
+(
+\f=
+(
+putchar 63
+\ch==(fgetc stdin)
+putchar 33 putchar ch putchar 10
+)
+
+f f
+)
+
+\fprint=(\fh\x fwrite fh x)  # TODO core dump
+#\fprint=(\fh fwrite fh) # TODO no effect
+#\fprint=fwrite # TODO works
+
+\print=(fprint stdout)
+
+print "Hello world.
+"
+
 
 \\\
+
+#\NL="
+#"
+#\nl=(print NL)
+
+#\say=(\x print x nl)
+
+# TODO
+#fwrite stdout "hello world
+#"
+#say "Hello world."
+
+#fwrite stdout "Hello world."  # TODO works
+#fprint stdout "Hello world."  # TODO no effect
+#print "Hello world."  # TODO segfault
+
+#fwrite stderr "goodbye
+#"
+
+\\\\
 
 
 \string_append==(Q; dlsym (dlopen "") "type_string_append")

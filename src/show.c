@@ -74,9 +74,9 @@ void show(value f)
 		else if (f->T == type_long)
 			printf("%ld",get_long(f));
 		else if (f->T == type_string)
-			printf("\"%s\"",atom_str(f)->data);
+			printf("\"%s\"",as_str(f)->data);
 		else if (f->T == type_name)
-			printf("%s",atom_str(f)->data);
+			printf("%s",as_str(f)->data);
 		else if (f->T == type_form)
 			{
 			printf("{");

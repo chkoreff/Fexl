@@ -16,7 +16,7 @@
 
 static void report_undef(value sym)
 	{
-	char *name = atom_str(sym->R->L)->data;
+	char *name = as_str(sym->R->L)->data;
 	long line = get_long(sym->R->R);
 
 	warn("Undefined symbol %s on line %ld%s%s", name, line,
@@ -76,7 +76,7 @@ value resolve(value f)
 	value content = sym->R->L;
 	if (content->T == type_name)
 		{
-		char *name = atom_str(content)->data;
+		char *name = as_str(content)->data;
 		def = context(name);
 		if (!def)
 			{

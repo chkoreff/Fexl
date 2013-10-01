@@ -11,7 +11,7 @@ large-scale buffering */
 
 value type_string(value f)
 	{
-	if (!f->N) str_free(atom_str(f));
+	if (!f->N) str_free(as_str(f));
 	return f;
 	}
 
@@ -25,7 +25,7 @@ value Qstr0(const char *data)
 	return Qstr(str_new_data0(data));
 	}
 
-struct str *atom_str(value f)
+struct str *as_str(value f)
 	{
 	return (struct str *)f->R;
 	}
@@ -33,7 +33,7 @@ struct str *atom_str(value f)
 struct str *get_str(value f)
 	{
 	if (f->T != type_string) bad_type();
-	return atom_str(f);
+	return as_str(f);
 	}
 
 /* (string_at str pos) is the character at pos, or 0 if out of bounds. */

@@ -47,7 +47,7 @@ int is_null_name(value x)
 		{
 		value content = x->R->L;
 		if (content->T == type_name)
-			return atom_str(content)->len == 0;
+			return as_str(content)->len == 0;
 		}
 	return 0;
 	}
@@ -62,7 +62,7 @@ value first_symbol(value f)
 	}
 
 /* Return (S f g), optimizing if possible. */
-value fuse(value f, value g)
+static value fuse(value f, value g)
 	{
 	hold(f);
 	hold(g);
@@ -119,7 +119,7 @@ value abstract(value sym, value body)
 			value yl = body->R->L;
 
 			if (xl->T == yl->T &&
-				str_cmp(atom_str(xl),atom_str(yl)) == 0)
+				str_cmp(as_str(xl),as_str(yl)) == 0)
 				h = I;  /* (\x x) = I */
 			}
 		}
