@@ -336,7 +336,11 @@ static value parse_lambda(long first_line)
 	value result;
 	if (count_eq == 0)
 		/* no definition */
+		{
+		if (!body->L && body->R)
+			hold(body->R); /*TODO kludge until I change symbol structure */
 		result = V(body->T,body->L,body->R); /* Make a copy. */
+		}
 	else if (count_eq == 1)
 		/* = normal definition */
 		result = apply(body,def);

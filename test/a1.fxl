@@ -36,7 +36,7 @@
 \getchar==(load "type_getchar")
 \fputc==(load "type_fputc")
 \fgetc==(load "type_fgetc")
-\fwrite==(load "type_fwrite")
+\fwrite==(load_from "libqfile2.so" "type_fwrite")
 
 \stdin==(eval (load "type_stdin"))
 \stdout==(eval (load "type_stdout"))
@@ -79,7 +79,7 @@ putchar 10
 
 I
 (
-\readlink==(load "type_readlink")
+\readlink==(load_from "libqfile2.so" "type_readlink")
 \bin_path==(readlink "/proc/self/exe")
 show bin_path
 )
@@ -126,6 +126,7 @@ putchar 33 putchar ch putchar 10
 f f
 )
 
+
 (
 \fprint=(\fh\x fwrite fh x)  # TODO will allow x to be nested list
 
@@ -145,7 +146,7 @@ say "Hello world."
 
 (
 print_to stderr \print\nl\say
-say "Goodbye"
+say "This goes to stderr."
 )
 
 )

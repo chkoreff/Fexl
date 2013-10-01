@@ -1,12 +1,16 @@
 #
 project fexl
 
+bin fexl basic buf die double file form lib long memory parse resolve str \
+	qfile qstr value - dl
+
+# Libraries of functions that don't have to be linked with bin.
+lib qfile2
+lib var
+
 # NOTE: These libraries are just for testing.
 lib ping
 lib test
 lib show
-
-bin fexl basic buf die double file form lib long memory parse resolve str \
-	qfile qstr value - dl
 
 public fexl
