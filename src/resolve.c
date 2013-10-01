@@ -87,10 +87,13 @@ value resolve(value f)
 	else
 		def = content; /* string literal */
 
-	value g = resolve(abstract(sym,f));
-	value h = apply(g,def);
-	hold(h);
-	drop(g);
+	value form = abstract(sym,f);
+	value resolved = resolve(form);
+	value result = apply(resolved,def);
+
+	hold(result);
+	drop(form);
+	drop(resolved);
 	drop(f);
-	return h;
+	return result;
 	}

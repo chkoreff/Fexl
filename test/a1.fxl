@@ -16,12 +16,9 @@
 	function
 	)
 
-# TODO (\x=F x) is not the same as (F) here.  Need to understand why.
 \load=
 	(\type_name
-	\function=(load_path "" type_name)
-	function
-	#(load_path "" type_name) # TODO core dump
+	load_path "" type_name
 	)
 
 \.==(load "type_string_append")
@@ -128,35 +125,29 @@ putchar 33 putchar ch putchar 10
 f f
 )
 
-\fprint=(\fh\x fwrite fh x)  # TODO core dump
-#\fprint=(\fh fwrite fh) # TODO no effect
-#\fprint=fwrite # TODO works
+(
+\fprint=(\fh\x fwrite fh x)  # TODO will allow x to be nested list
 
-\print=(fprint stdout)
-
-print "Hello world.
+\NL="
 "
 
+\print_to=
+	(\out
+	\print=(fprint out)
+	\nl=(print NL)
+	\say=(\x print x nl)
+	\: : print nl say
+	)
 
-\\\
+print_to stdout \print\nl\say
+say "Hello world."
 
-#\NL="
-#"
-#\nl=(print NL)
+(
+print_to stderr \print\nl\say
+say "Goodbye"
+)
 
-#\say=(\x print x nl)
-
-# TODO
-#fwrite stdout "hello world
-#"
-#say "Hello world."
-
-#fwrite stdout "Hello world."  # TODO works
-#fprint stdout "Hello world."  # TODO no effect
-#print "Hello world."  # TODO segfault
-
-#fwrite stderr "goodbye
-#"
+)
 
 \\\\
 
@@ -281,8 +272,6 @@ C
 #:: f = ((C {{string_len :14} {"abc" :17}}) I)
 #:: g = {{string_len :14} {"abc" :17}}
 
-
-#say "Hello world." # TODO
 
 \\\
 # Good test case for the need to hold things correctly in the abstract routine.

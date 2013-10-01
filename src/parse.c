@@ -336,7 +336,7 @@ static value parse_lambda(long first_line)
 	value result;
 	if (count_eq == 0)
 		/* no definition */
-		result = body;
+		result = apply(I,body);
 	else if (count_eq == 1)
 		/* = normal definition */
 		result = apply(body,def);
@@ -344,6 +344,7 @@ static value parse_lambda(long first_line)
 		/* == eager definition */
 		result = apply(apply(query,def),body);
 
+	drop(body);
 	drop(sym);
 	return result;
 	}

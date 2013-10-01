@@ -6,9 +6,6 @@ lib ping
 lib test
 lib show
 
-# TODO
-#bin fexl basic buf die double file form lib long memory parse resolve str \
-#	qfile qstr value - dl test show
 bin fexl basic buf die double file form lib long memory parse resolve str \
 	qfile qstr value - dl
 

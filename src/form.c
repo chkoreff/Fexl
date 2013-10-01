@@ -105,8 +105,8 @@ value abstract(value sym, value body)
 		{
 		if (body->L)
 			{
-			value f = abstract(sym,body->L); hold(f);
-			value g = abstract(sym,body->R); hold(g);
+			value f = abstract(sym,body->L);
+			value g = abstract(sym,body->R);
 
 			h = fuse(f,g); /* (\x F G) = (S (\x F) (\x G)) */
 
@@ -127,8 +127,8 @@ value abstract(value sym, value body)
 	if (h == 0)
 		h = apply(C,body);  /* (\x F) = (C F) */
 
+	hold(h);
 	drop(sym);
 	drop(body);
-
 	return h;
 	}
