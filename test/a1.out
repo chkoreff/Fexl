@@ -1,0 +1,15 @@
+== test_buf
+len=4
+:: I
+:: C
+:: S
+:: I
+:: R
+:: L
+:: (L I)
+abc
+abcd
+:: "/home/patrick/project/fexl/bin/fexl"
+:: {x}
+:: {{string_len} {"abcd"}}
+:: {{{x} (I {z})} ((I {y}) (I {z}))}

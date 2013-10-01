@@ -336,7 +336,7 @@ static value parse_lambda(long first_line)
 	value result;
 	if (count_eq == 0)
 		/* no definition */
-		result = apply(I,body);
+		result = V(body->T,body->L,body->R); /* Make a copy. */
 	else if (count_eq == 1)
 		/* = normal definition */
 		result = apply(body,def);

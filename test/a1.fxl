@@ -9,16 +9,10 @@
 
 \load_path=
 	(\lib_name\type_name
-	\lib=(dlopen lib_name)
-	\type=(dlsym lib type_name)
-	\function=(Q type)
-	function
+	Q (dlsym (dlopen lib_name) type_name)
 	)
 
-\load=
-	(\type_name
-	load_path "" type_name
-	)
+\load=(load_path "")
 
 \.==(load "type_string_append")
 
@@ -53,10 +47,18 @@
 \test==test
 
 show test
-show stdin
-show stdout
-show stderr
+#show stdin
+#show stdout
+#show stderr
 
+(
+show (\x\y x)            # C
+show (\x\y\z x z; y z)   # S
+show (\x x)              # I
+show (\x\y\z x; y z)     # R
+show (\x\y\z x z y)      # L
+show (\x\y y x)          # (L I)
+)
 
 (
 putchar 97
