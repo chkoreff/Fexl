@@ -174,9 +174,6 @@ make_lib()
 	while [ $# -gt 0 ]; do
 		local lib="$1"
 		shift
-		# TODO perhaps don't do the -l convention for locally generated
-		# libraries, so we use simple names like "ping.so" instead of
-		# "libping.so".  The "-ldl" case can just be explicit in the config.
 		list_obj="$list_obj -l$lib"
 	done
 
@@ -223,9 +220,6 @@ make_bin()
 		local lib="$1"
 		shift
 		local file_so=lib/$g_project/lib$lib.so
-		# TODO perhaps don't do the -l convention for locally generated
-		# libraries, so we use simple names like "ping.so" instead of
-		# "libping.so".  The "-ldl" case can just be explicit in the config.
 		list_obj="$list_obj -l$lib"
 	done
 
