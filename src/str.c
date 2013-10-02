@@ -59,6 +59,8 @@ int str_cmp(struct str *x, struct str *y)
 	return cmp;
 	}
 
+/*TODO move some to separate lib */
+
 /* Return the number of starting bytes the strings have in common. */
 long str_common(struct str *x, struct str *y)
 	{

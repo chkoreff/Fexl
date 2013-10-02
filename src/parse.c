@@ -236,7 +236,7 @@ static value parse_exp(void);
 
 static value parse_term(void)
 	{
-	if (ch == '(')
+	if (ch == '(') /* parenthesized expression */
 		{
 		long first_line = source_line;
 		next_ch();
@@ -248,7 +248,7 @@ static value parse_term(void)
 		return exp;
 		}
 	#if 0
-	else if (ch == '[') /*TODO*/
+	else if (ch == '[') /* list TODO*/
 		{
 		long first_line = source_line;
 		next_ch();
@@ -260,7 +260,7 @@ static value parse_term(void)
 		return exp;
 		}
 	#endif
-	else if (ch == '{')
+	else if (ch == '{') /* quoted form */
 		{
 		long first_line = source_line;
 		next_ch();
@@ -336,11 +336,7 @@ static value parse_lambda(long first_line)
 	value result;
 	if (count_eq == 0)
 		/* no definition */
-		{
-		if (!body->L && body->R)
-			hold(body->R); /*TODO kludge until I change symbol structure */
 		result = V(body->T,body->L,body->R); /* Make a copy. */
-		}
 	else if (count_eq == 1)
 		/* = normal definition */
 		result = apply(body,def);

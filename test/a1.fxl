@@ -55,6 +55,7 @@ show test
 show (\x\y x)            # C
 show (\x\y\z x z; y z)   # S
 show (\x x)              # I
+show (\"x" "x")          # I
 show (\x\y\z x; y z)     # R
 show (\x\y\z x z y)      # L
 show (\x\y y x)          # (L I)
@@ -98,8 +99,7 @@ F
 
 I
 (
-\f={string_len "abcd"}
-\f==f
+\f=={string_len "abcd"}
 show f
 )
 
@@ -109,8 +109,7 @@ I
 \y={y}
 \z={z}
 
-\f=(S x y z)
-\f==f
+\f==(S x y z)
 show f
 )
 

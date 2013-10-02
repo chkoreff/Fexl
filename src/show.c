@@ -28,12 +28,25 @@ void show(value f)
 	{
 	if (f->L)
 		{
-		int is_form = (f->T == type_form);
-		printf(is_form ? "{" : "(");
-		show(f->L);
-		printf(" ");
-		show(f->R);
-		printf(is_form ? "}" : ")");
+		if (f->T == type_form)
+			{
+			printf("{");
+			show(f->L);
+			if (f->L->T != type_name && f->L->T != type_string)
+				{
+				printf(" ");
+				show(f->R);
+				}
+			printf("}");
+			}
+		else
+			{
+			printf("(");
+			show(f->L);
+			printf(" ");
+			show(f->R);
+			printf(")");
+			}
 		}
 	else
 		{
@@ -77,12 +90,6 @@ void show(value f)
 			printf("\"%s\"",as_str(f)->data);
 		else if (f->T == type_name)
 			printf("%s",as_str(f)->data);
-		else if (f->T == type_form)
-			{
-			printf("{");
-			show(f->R->L);
-			printf("}");
-			}
 		else if (f->T == type_double)
 			{
 			double *p = (double *)f->R;

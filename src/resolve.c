@@ -16,8 +16,8 @@
 
 static void report_undef(value sym)
 	{
-	char *name = as_str(sym->R->L)->data;
-	long line = get_long(sym->R->R);
+	char *name = as_str(sym->L)->data;
+	long line = get_long(sym->R);
 
 	warn("Undefined symbol %s on line %ld%s%s", name, line,
 		source_name[0] ? " of " : "",
@@ -25,7 +25,7 @@ static void report_undef(value sym)
 		);
 	}
 
-value type_argv(value f)
+value type_argv(value f) /*TODO move to lib */
 	{
 	if (!f->L) return f;
 	value x = eval(f->R);
@@ -35,7 +35,7 @@ value type_argv(value f)
 	return z;
 	}
 
-/* This is the minimal core context needed to bootstrap Fexl. */
+/* This is the core context needed to bootstrap a larger context in Fexl. */
 static value context(char *name)
 	{
 	if (strcmp(name,"dlopen") == 0) return Q(type_dlopen);
@@ -44,9 +44,10 @@ static value context(char *name)
 	if (strcmp(name,"source_file") == 0) return Qfile(source_fh);
 	if (strcmp(name,"source_name") == 0) return Qstr0(source_name);
 	if (strcmp(name,"source_line") == 0) return Qlong(source_line);
-	if (strcmp(name,"argc") == 0) return Qlong(argc);
-	if (strcmp(name,"argv") == 0) return Q(type_argv);
 	if (strcmp(name,"base_path") == 0) return Q(type_base_path);
+
+	if (strcmp(name,"argc") == 0) return Qlong(argc); /*TODO in Fexl */
+	if (strcmp(name,"argv") == 0) return Q(type_argv); /*TODO in Fexl */
 
 	/* Integer number (long) */
 	{
@@ -73,7 +74,7 @@ value resolve(value f)
 
 	value def = 0;
 
-	value content = sym->R->L;
+	value content = sym->L;
 	if (content->T == type_name)
 		{
 		char *name = as_str(content)->data;

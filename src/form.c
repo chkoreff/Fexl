@@ -18,7 +18,6 @@ value Qname(struct str *p)
 
 value type_form(value f)
 	{
-	if (!f->N) drop(f->R);
 	return f;
 	}
 
@@ -34,29 +33,22 @@ value apply(value f, value g)
 /* Create a symbol of type_name or type_string. */
 value symbol(type t, struct str *name, long line)
 	{
-	value content = V(t,0,(value)name);
-	value sym = V(type_form,0,A(content,Qlong(line)));
-	hold(sym->R);
-	return sym;
+	return V(type_form, V(t,0,(value)name), Qlong(line));
 	}
 
 /* Return true if the value is a symbol with a null name. */
 int is_null_name(value x)
 	{
-	if (x->T == type_form && !x->L)
-		{
-		value content = x->R->L;
-		if (content->T == type_name)
-			return as_str(content)->len == 0;
-		}
-	return 0;
+	return x->T == type_form
+		&& x->L->T == type_name
+		&& as_str(x->L)->len == 0;
 	}
 
 /* Return the first symbol in the value, if any, in left to right order. */
 value first_symbol(value f)
 	{
 	if (f->T != type_form) return 0;
-	if (!f->L) return f;
+	if (f->L->T == type_name || f->L->T == type_string) return f;
 	value x = first_symbol(f->L);
 	return x ? x : first_symbol(f->R);
 	}
@@ -103,24 +95,22 @@ value abstract(value sym, value body)
 	value h = 0;
 	if (body->T == type_form)
 		{
-		if (body->L)
+		value f = body->L;
+		value g = body->R;
+
+		if (f->T == type_name || f->T == type_string)
 			{
-			value f = abstract(sym,body->L);
-			value g = abstract(sym,body->R);
-
-			h = fuse(f,g); /* (\x F G) = (S (\x F) (\x G)) */
-
-			drop(f);
-			drop(g);
+			value name = sym->L;
+			if (name->T == f->T && str_cmp(as_str(name),as_str(f)) == 0)
+				h = I;  /* (\x x) = I */
 			}
 		else
 			{
-			value xl = sym->R->L;
-			value yl = body->R->L;
-
-			if (xl->T == yl->T &&
-				str_cmp(as_str(xl),as_str(yl)) == 0)
-				h = I;  /* (\x x) = I */
+			f = abstract(sym,f);
+			g = abstract(sym,g);
+			h = fuse(f,g); /* (\x F G) = (S (\x F) (\x G)) */
+			drop(f);
+			drop(g);
 			}
 		}
 
