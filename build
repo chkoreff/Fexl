@@ -162,6 +162,7 @@ make_lib()
 	while [ $# -gt 0 ]; do
 		local obj="$1"
 		shift
+		if [ "$obj" = "-" ]; then break; fi
 		make_obj $obj " -fPIC"
 		local file_o=obj/$obj.o
 		list_obj="$list_obj $file_o"
@@ -170,8 +171,18 @@ make_lib()
 		fi
 	done
 
+	while [ $# -gt 0 ]; do
+		local lib="$1"
+		shift
+		# TODO perhaps don't do the -l convention for locally generated
+		# libraries, so we use simple names like "ping.so" instead of
+		# "libping.so".  The "-ldl" case can just be explicit in the config.
+		list_obj="$list_obj -l$lib"
+	done
+
 	if [ $update -eq 1 ]; then
-		run "gcc -s -shared -o $file_so$list_obj"
+		local options="-L lib/$g_project"
+		run "gcc -s -shared $options$list_obj -o $file_so"
 	fi
 	}
 
@@ -212,9 +223,6 @@ make_bin()
 		local lib="$1"
 		shift
 		local file_so=lib/$g_project/lib$lib.so
-		if [ $update -eq 0 ]; then
-			update=`newer_than $file_so $file_e`
-		fi
 		# TODO perhaps don't do the -l convention for locally generated
 		# libraries, so we use simple names like "ping.so" instead of
 		# "libping.so".  The "-ldl" case can just be explicit in the config.
@@ -222,8 +230,8 @@ make_bin()
 	done
 
 	if [ $update -eq 1 ]; then
-		local options="-L lib/$g_project -Wl,-rpath,lib/$g_project$list_obj"
-		run "gcc -rdynamic -s $options -o $file_e"
+		local options="-L lib/$g_project -Wl,-rpath,lib/$g_project"
+		run "gcc -rdynamic -s $options$list_obj -o $file_e"
 	fi
 	}
 

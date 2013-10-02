@@ -7,6 +7,12 @@
 #include "form.h"
 #include "qstr.h"
 
+value type_ping(value f)
+	{
+	printf("Ping!\n");
+	return I;
+	}
+
 value tower(value f, int n) /*TODO*/
 	{
 	value dual = A(A(S,I),I);

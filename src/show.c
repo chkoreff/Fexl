@@ -19,7 +19,6 @@ extern value type_long(value);
 extern value type_double(value);
 extern value type_later(value);
 extern value type_string(value);
-extern value type_long_add(value);
 extern value type_name(value);
 extern value type_form(value);
 extern value type_file(value);
@@ -66,8 +65,6 @@ void show(value f)
 			printf("?");
 		else if (f->T == type_later)
 			printf("later");
-		else if (f->T == type_long_add)
-			printf("long_add");
 		else if (f->T == type_dlopen)
 			printf("dlopen");
 		else if (f->T == type_dlsym)
@@ -105,7 +102,7 @@ void nl(void)
 	putchar('\n');
 	}
 
-value type_show(value f) /*TODO*/
+value type_show(value f)
 	{
 	if (!f->L) return f;
 	printf(":: ");

@@ -1,10 +1,5 @@
 #
 
-# Missing lambda symbol:
-#\= \\
-# Missing definition:
-#\x= \\
-
 # TODO detect (Q 0) and die instead */
 
 \load_path=
@@ -14,11 +9,13 @@
 
 \load=(load_path "")
 
-\.==(load "type_string_append")
+\string_append==(load "type_string_append")
+\.==string_append
 
 \load_from=
 	(\lib_name\type_name
-	\path=(. base_path; . "lib/fexl/" lib_name)
+	\lib_name=(. "lib/fexl/"; . "lib"; . lib_name ".so")
+	\path=(. base_path lib_name)
 	load_path path type_name
 	)
 
@@ -31,102 +28,17 @@
 \I==(load "type_I")
 \@==(load "type_Y")
 
-\long_add==(load "type_long_add")
-\putchar==(load "type_putchar")
-\getchar==(load "type_getchar")
-\fputc==(load "type_fputc")
-\fgetc==(load "type_fgetc")
-\fwrite==(load_from "libqfile2.so" "type_fwrite")
+\Load=(load_from "qfile2")
+\putchar==(Load "type_putchar")
+\getchar==(Load "type_getchar")
+\fputc==(Load "type_fputc")
+\fgetc==(Load "type_fgetc")
+\fwrite==(Load "type_fwrite")
 
-\stdin==(eval (load "type_stdin"))
-\stdout==(eval (load "type_stdout"))
-\stderr==(eval (load "type_stderr"))
+\stdin==(eval; Load "type_stdin")
+\stdout==(eval; Load "type_stdout")
+\stderr==(eval; Load "type_stderr")
 
-\show==(load_from "libshow.so" "type_show")
-\test==(load_from "libtest.so" "type_test_pattern")
-\test==test
-
-show test
-#show stdin
-#show stdout
-#show stderr
-
-(
-show (\x\y x)            # C
-show (\x\y\z x z; y z)   # S
-show (\x x)              # I
-show (\"x" "x")          # I
-show (\x\y\z x; y z)     # R
-show (\x\y\z x z y)      # L
-show (\x\y y x)          # (L I)
-)
-
-(
-putchar 97
-putchar 98
-putchar 99
-putchar 10
-)
-
-I
-(
-\putchar=(fputc stdout)
-putchar 97
-putchar 98
-putchar 99
-putchar 100
-putchar 10
-)
-
-I
-(
-\readlink==(load_from "libqfile2.so" "type_readlink")
-\bin_path==(readlink "/proc/self/exe")
-show bin_path
-)
-
-I
-(
-\test=(I; C {x} I)
-\test==test
-show test
-)
-
-F
-(
-\inf=(@ I) inf
-)
-
-I
-(
-\f=={string_len "abcd"}
-show f
-)
-
-I
-(
-\x={x}
-\y={y}
-\z={z}
-
-\f==(S x y z)
-show f
-)
-
-F
-(
-\f=
-(
-putchar 63
-\ch==(fgetc stdin)
-putchar 33 putchar ch putchar 10
-)
-
-f f
-)
-
-
-(
 \fprint=(\fh\x fwrite fh x)  # TODO will allow x to be nested list
 
 \NL="
@@ -141,6 +53,96 @@ f f
 	)
 
 print_to stdout \print\nl\say
+
+\show==(load_from "show" "type_show")
+
+(
+\test==(load_from "test" "type_test_pattern")
+\test==test
+
+show test
+#show stdin
+#show stdout
+#show stderr
+)
+
+(
+say "== test forms"
+\show!=
+	(\x
+	\x==x
+	show x
+	)
+
+show (\x\y x)            # C
+show (\x\y\z x z; y z)   # S
+show (\x x)              # I
+show (\"x" "x")          # I
+show (\x "x")            # (C "x")
+show (\x\y\z x; y z)     # R
+show (\x\y\z x z y)      # L
+show (\x\y y x)          # (L I)
+show (\x\y\z ((x z) (y z)) ((x z) (y z)))  # ((S ((R S) ((R (R S)) S))) S)
+show ()           # I
+show (()(()))     # I
+show ((())()"x")  # (I "x")
+
+show! (I; C {x} I)
+show! {string_len "abcd"}
+
+show!
+	(
+	\x={x}
+	\y={y}
+	\z={z}
+	S x y z
+	)
+)
+
+(
+say "== test putchar"
+putchar 97
+putchar 98
+putchar 99
+putchar 10
+)
+
+(
+say "== test fputc"
+\putchar=(fputc stdout)
+putchar 97
+putchar 98
+putchar 99
+putchar 100
+putchar 10
+)
+
+(
+say "== test readlink"
+\readlink==(load_from "qfile2" "type_readlink")
+\bin_path==(readlink "/proc/self/exe")
+show bin_path
+)
+
+F  # Don't run the infinite loop.
+(
+\inf=(@ I) inf
+)
+
+F
+(
+\f=
+(
+putchar 63
+\ch==(fgetc stdin)
+#\ch==getchar
+putchar 33 putchar ch putchar 10
+)
+
+f f
+)
+
+(
 say "Hello world."
 
 (
@@ -150,226 +152,197 @@ say "This goes to stderr."
 
 )
 
-\\\\
+(
+\ping==(load_from "test" "type_ping")
+\ping=(ping ping)
+\ping=(ping ping)
+ping
+)
 
+(
+say "== test long"
+\Load=(load_from "long2")
+\+==(Load "type_long_add")
+\-==(Load "type_long_sub")
+\*==(Load "type_long_mul")
+\/==(Load "type_long_div")
 
-\string_append==(Q; dlsym (dlopen "") "type_string_append")
-\string_common==(Q; dlsym (dlopen "") "type_string_common")
-\string_at==(Q; dlsym (dlopen "") "type_string_at")
-\string_cmp==(Q; dlsym (dlopen "") "type_string_cmp")
-\length==(Q; dlsym (dlopen "") "type_string_len")
-\long_add==(Q (dlsym (dlopen "") "type_long_add"))
-\long_div==(Q (dlsym (dlopen "") "type_long_div"))
-\double_add==(Q (dlsym (dlopen "") "type_double_add"))
-\double_div==(Q (dlsym (dlopen "") "type_double_div"))
-\+==long_add
-\.=string_append
+\try=
+	(\x
+	\x==x
+	show x
+	)
 
-#\x=(string_append "Hello " "world.  ")
-#\x=(string_append x x)
-#x
+try (+ 0 0)
+try (+ 1 2)
+try (- 1 2)
+try (+ 42 37)
+try (* 5 3)
+try (* 5 0)
+try (/ 29 4)
+try (/ 0 0)
+try (/ 1 0)
+try (\x=(* 7 3) + x x)
+)
 
-#\x="abcdef"
-#\y="abcDEF"
-#\x=(string_append x "")
-#\y=(string_append y "")
-#string_common x y
+(
+say "== test double"
+\Load=(load_from "double2")
+\+==(Load "type_double_add")
+\-==(Load "type_double_sub")
+\/==(Load "type_double_div")
+\*==(Load "type_double_mul")
 
-#string_at (. "abc" "def") (+ 1 2)  # 100
+\try=
+	(\x
+	\x==x
+	show x
+	)
 
-#length (. "abc" "de")  # 5
+try
+	(
+	\x=(+ 13.2 4.5)
+	\x=(+ x x)
+	\x=(/ x 0.5)
+	x
+	)
 
-#string_cmp "abc" "abcd"
+try (/ 0.0 0.0)  # -nan
+try (/ 1.0 0.0)  # inf
+try (/ -1.0 0.0) # -inf
 
-#\x=(long_div 13 4)
-#\x=(long_add x x)
-#x
+try
+	(
+	\pi=3.14159265358979323846
+	\tau=(* 2.0 pi)
+	tau
+	)
 
-\x=(double_add 13.2 4.5)
-\x=(double_add x x)
-\x=(double_div x 0.5)
-x
+try (- 1e5 1.0)
+)
 
-#double_div 0.0 0.0  # -nan
-#double_div 1.0 0.0  # inf
-#double_div -1.0 0.0  # -inf
+(
+say "== test string_common"
+\string_common==(load_from "qstr2" "type_string_common")
+\x="abcdef"
+\y="abcDEF"
+\x=(. x "")
+\y=(. y "")
+\n==(string_common x y)
+show n
+)
 
-#long_div 12 0  # 0
+(
+say "== test string_len"
+\string_len==(load_from "qstr2" "type_string_len")
+\try=
+	(\x
+	\len==(string_len x)
+	show len
+	)
+try ""
+try "a"
+try ~ "~
+try (. "a" "b")
+try (. "abc" "de")
+try ~
+hello
+~
+)
 
-\\\\
+(
+say "== test string_cmp"
+\string_cmp==(load_from "qstr2" "type_string_cmp")
+\try=
+	(\x\y
+	\order==(string_cmp x y)
+	show order
+	)
 
-\later==(Q; dlsym (dlopen "") "type_later")
-\I==(Q; dlsym (dlopen "") "type_I")
-\C==(Q; dlsym (dlopen "") "type_C")
-\?==(Q; dlsym (dlopen "") "type_query")
-#later later
-#later (I C)
-#? (I C) I
+# -1
+try "" "a"
+try "a" "b"
+try "abc" "abcd"
+# 0
+try "" ""
+try "a" "a"
+try "abc" "abc"
+# 1
+try "a" ""
+try "b" "a"
+try "abcd" "abc"
+)
 
-#? (later; later (I C)) I
+(
+say "== test string_at"
+\string_at==(load_from "qstr2" "type_string_at")
+\try=
+	(\str\pos
+	\ch==(string_at str pos)
+	show ch
+	)
+try "" -1
+try "" 0
+try "" 1
+try "a" -1
+try "a" 0
+try "a" 1
+try "abc" 0
+try "abc" 1
+try "abc" 2
+try (. "abc" "def") 3
+)
 
+(
+say "== test argv"
+\argc==(eval; load_from "system" "type_argc")
+\argv==(load_from "system" "type_argv")
+
+\try=(\n
+	\x==(argv n)
+	show x
+	)
+
+show argc
+try -1
+try 0
+try 1
+try 2
+)
+
+(
+say "== test source"
+
+# Echo the first few chars of the extra data after virtual end of file.
+\next=(\ch==(fgetc source_file) putchar ch)
+next next next next next
+next next next next next
+nl
+
+show source_name
+show source_line
+)
+
+(
+say ~ == test "later"~
+\later==(load "type_later")
 
 # Test peeling off "later" layers with eager evaluation.
 \f=(I C)
 \f=(later f)
 \f=(later f)
-\f==f
-\f==f
-f
+show f
+\f==f  show f
+\f==f  show f
+\f==f  show f
+)
 
+\\Extra data here
 
-\\\\
+# \ = = eq
+# (= x y) F G
 
-# (later C)
-\C=(Q; dlsym (dlopen "") "type_C")
-C
-
-\\\\
-
-\ping==(Q; dlsym (dlopen "libping.so") "type_ping")
-\ping=(ping ping)
-\ping=(ping ping)
-ping
-
-\\\\
-
-\readlink==(Q (dlsym (dlopen "") "type_readlink"))
-readlink "/proc/self/exe"
-
-\\\
-
-#argv 0
-#argv 1
-#argv 2
-#argv -1
-
-#\+==(Q (dlsym (dlopen "") "type_long_add"))
-#+ 42 37
-
-\pi=3.14159265358979323846
-\*==(Q (dlsym (dlopen "") "type_double_mul"))
-* 2.0 pi
-
-#42 3.14159265358979323846
-#1e5
-
-\\
-
-\x=dlopen
-C
-	S "abc" x
-	source_file
-	source_name
-	source_line
-
-#C {x}
-
-#C (string_len "abc") I
-#C S I
-
-#~ "~
-#x
-
-#:: f = ((C {{string_len :14} {"abc" :17}}) I)
-#:: g = {{string_len :14} {"abc" :17}}
-
-
-\\\
-# Good test case for the need to hold things correctly in the abstract routine.
-# ((S ((R S) ((R (R S)) S))) S)
-(\x\y\z ((x z) (y z)) ((x z) (y z)))
-
-\\\
-
-#\x x # I
-#\x y # C y
-#\x\y y x  # L I
-
-#(\S=(\x\y\z (x z) (y z)) \x S x)  # S
-#(\S=(\x\y\z (x z) (y z)) S) # S
-
-#\x\y\z x z y # L
-#\x\y\z x (y z)  # R
-#(\x\y\z x; y z)  # R
-
-\\\\
-
-#\x=C x
-#\x=() x
-#\x=(()()()) x
-
-#\x=(C) x
-#\x=C x
-#\x=(() () C) x
-
-#\x=(C S) x
-
-#\x="" x
-#\x=~ "~ x
-#\x=~ ~ x
-
-#\x=
-#\x=S
-#\x=C x
-
-#\
-#=
-#\x
-#\ =
-
-#\=
-
-#\ = = eq (=)
-
-#\x==(+ 3 4) x
-
-\\\\
-
-#\f=(\x\y\z (x z) (y z)) f
-
-#\f=(\x\y x) f
-#\f=(\x x) f
-#\f=() f
-
-#\=(\x x)
-
-#\()
-#\=()
-#\==()
-#\f=
-
-#\
-#\ \
-
-#\ =
-
-#\ \(\x\y x)
-
-#\x
-
-#\ \=
-
-#\
-#\x
-
-#\=3
-#\ = = eq
-#=
-
-
-\f=
-
-\\\\\
-
-#\x x
-#\"x" "x"
-#\"x" x
-\x "x"
-
-#"hi"
-
-#~ foo~
-~
-hello there
-bye now
-~
+# Missing lambda symbol:
+#\= \\
+# Missing definition:
+#\x= \\

@@ -5,11 +5,15 @@ bin fexl basic buf die double file form lib long memory parse resolve str \
 	qfile qstr value - dl
 
 # Libraries of functions that don't have to be linked with bin.
+lib double2
+lib long2
+lib str2
 lib qfile2
+lib qstr2 - str2
+lib system
 lib var
 
 # NOTE: These libraries are just for testing.
-lib ping
 lib test
 lib show
 

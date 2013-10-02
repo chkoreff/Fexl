@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "die.h"
+#include "file.h"
 #include "str.h"
 
 #include "value.h"
@@ -25,14 +26,9 @@ static void report_undef(value sym)
 		);
 	}
 
-value type_argv(value f) /*TODO move to lib */
+value type_base_path(value f)
 	{
-	if (!f->L) return f;
-	value x = eval(f->R);
-	long i = get_long(x);
-	value z = Qstr0(i >= 0 && i < argc ? argv[i] : "");
-	drop(x);
-	return z;
+	return Qstr(base_path());
 	}
 
 /* This is the core context needed to bootstrap a larger context in Fexl. */
@@ -45,9 +41,6 @@ static value context(char *name)
 	if (strcmp(name,"source_name") == 0) return Qstr0(source_name);
 	if (strcmp(name,"source_line") == 0) return Qlong(source_line);
 	if (strcmp(name,"base_path") == 0) return Q(type_base_path);
-
-	if (strcmp(name,"argc") == 0) return Qlong(argc); /*TODO in Fexl */
-	if (strcmp(name,"argv") == 0) return Q(type_argv); /*TODO in Fexl */
 
 	/* Integer number (long) */
 	{

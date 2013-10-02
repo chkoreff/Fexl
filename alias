@@ -53,19 +53,16 @@ sources="README.md build share test src"
 	bin/fexl "test/$1.fxl"
 	}
 
-# Check that the output of a test script equals its reference output.  I use
-# the "cat" form here in case the script uses interactive input like char_get.
+# Check that the output of a test script equals its reference output.
 .check()
 	{
-	.build &&
-	cat "test/$1.fxl" | bin/fexl | diff -a - "test/$1.out"
+	.run $1 | diff -a - "test/$1.out"
 	}
 
 # Time a test script, also checking its output.
 .time()
 	{
-	.build &&
-	time (cat "test/$1.fxl" | bin/fexl | diff -a - "test/$1.out")
+	time (.run $1 | diff -a - "test/$1.out")
 	}
 
 # git status

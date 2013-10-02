@@ -1,17 +1,93 @@
 == test_buf
 len=4
 :: I
+== test forms
 :: C
 :: S
 :: I
 :: I
+:: (C "x")
 :: R
 :: L
 :: (L I)
-abc
-abcd
-:: "/home/patrick/project/fexl/bin/fexl"
+:: ((S ((R S) ((R (R S)) S))) S)
+:: I
+:: I
+:: (I "x")
 :: {x}
 :: {{string_len} {"abcd"}}
 :: {{{x} (I {z})} ((I {y}) (I {z}))}
+== test putchar
+abc
+== test fputc
+abcd
+== test readlink
+:: "/home/patrick/project/fexl/bin/fexl"
 Hello world.
+Ping!
+Ping!
+Ping!
+Ping!
+== test long
+:: 0
+:: 3
+:: -1
+:: 79
+:: 15
+:: 0
+:: 7
+:: 0
+:: 0
+:: 42
+== test double
+:: 70.8
+:: -nan
+:: inf
+:: -inf
+:: 6.28318530717959
+:: 99999
+== test string_common
+:: 3
+== test string_len
+:: 0
+:: 1
+:: 1
+:: 2
+:: 5
+:: 6
+== test string_cmp
+:: -1
+:: -1
+:: -1
+:: 0
+:: 0
+:: 0
+:: 1
+:: 1
+:: 1
+== test string_at
+:: 0
+:: 0
+:: 0
+:: 0
+:: 97
+:: 0
+:: 97
+:: 98
+:: 99
+:: 100
+== test argv
+:: 2
+:: ""
+:: "bin/fexl"
+:: "test/a1.fxl"
+:: ""
+== test source
+Extra data
+:: "test/a1.fxl"
+:: 340
+== test "later"
+:: (later ((I later) (((L I) C) I)))
+:: ((I later) (((L I) C) I))
+:: (((L I) C) I)
+:: C

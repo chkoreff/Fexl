@@ -4,8 +4,8 @@ fexl - Function EXpression Language
 [Fexl](http://fexl.com) is the simplest and most powerful language I've been
 able to devise.  You can do low-level system programming in it, but you can
 also create secure "sandboxes" to allow restricted high-level scripting.  The
-interpreter is tiny -- about 31K at the moment, and that's with a bunch of
-built-in functions.  It is easy to call external C routines.
+interpreter is tiny, about 27K at the moment.  It is easy to call external C
+routines.
 
 The interpreter creates an initial value which represents your entire program.
 It then evaluates that value, reducing it one step at a time until it finally
@@ -60,6 +60,28 @@ So if you install in /usr, it will create these:
 	/usr/bin/fexl
 	/usr/lib/fexl/*
 	/usr/share/fexl/*
+
+Testing
+-------
+
+First, source the "alias" file into your shell:
+
+	. alias
+
+To run "test/a1.fxl" and see the output:
+
+	.run a1
+
+To run "test/a1.fxl" and compare with the reference output "test/a1.out":
+
+	.check a1
+
+If the test passes, you should see no output, unless the test deliberately
+prints something to stderr.
+
+To do the check but also report the execution time:
+
+	.time a1
 
 Guide to the Source Code
 ------------------------
