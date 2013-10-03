@@ -72,6 +72,12 @@ value type_query(value f)
 	return z;
 	}
 
+/* (pair x y) = (\: : x y) = (L (L I x) y) */
+value pair(value x, value y)
+	{
+	return A(A(L,A(A(L,I),x)),y);
+	}
+
 void bad_type(void)
 	{
 	die("You used a data type incorrectly.");

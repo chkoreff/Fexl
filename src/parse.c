@@ -7,7 +7,9 @@
 #include "value.h"
 #include "basic.h"
 #include "form.h"
+#include "long.h"
 #include "parse.h"
+#include "qfile.h"
 #include "qstr.h"
 
 /*
@@ -392,9 +394,41 @@ static value parse_exp(void)
 
 value parse(void)
 	{
+	ch = 0;
 	value exp = parse_exp();
 	if (ch != -1)
 		syntax_error("Extraneous input", source_line);
 
 	return exp;
+	}
+
+/* (parse fh name line)
+Parse the stream fh with the given source name and initial line number.
+Return (pair exp line), where exp is the parsed expression, and line is the
+updated line number. */
+/* TODO now I need functions to resolve symbols in the resulting form. */
+value type_parse(value f)
+	{
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
+
+	value x = eval(f->L->L->R);
+	value y = eval(f->L->R);
+	value z = eval(f->R);
+
+	FILE *fh = get_file(x);
+	struct str *name = get_str(y);
+	long line = get_long(z);
+
+	source_fh = fh;
+	source_name = name->data;
+	source_line = line;
+
+	value exp = parse();
+	value result = pair(exp,Qlong(source_line));
+
+	drop(x);
+	drop(y);
+	drop(z);
+
+	return result;
 	}

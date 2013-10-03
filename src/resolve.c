@@ -37,10 +37,10 @@ static value context(char *name)
 	if (strcmp(name,"dlopen") == 0) return Q(type_dlopen);
 	if (strcmp(name,"dlsym") == 0) return Q(type_dlsym);
 	if (strcmp(name,"Q") == 0) return Q(type_Q);
+	if (strcmp(name,"base_path") == 0) return Q(type_base_path);
 	if (strcmp(name,"source_file") == 0) return Qfile(source_fh);
 	if (strcmp(name,"source_name") == 0) return Qstr0(source_name);
 	if (strcmp(name,"source_line") == 0) return Qlong(source_line);
-	if (strcmp(name,"base_path") == 0) return Q(type_base_path);
 
 	/* Integer number (long) */
 	{

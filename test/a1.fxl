@@ -311,19 +311,6 @@ try 2
 )
 
 (
-say "== test source"
-
-# Echo the first few chars of the extra data after virtual end of file.
-\next=(\ch==(fgetc source_file) putchar ch)
-next next next next next
-next next next next next
-nl
-
-show source_name
-show source_line
-)
-
-(
 say ~ == test "later"~
 \later==(load "type_later")
 
@@ -337,12 +324,28 @@ show f
 \f==f  show f
 )
 
-\\Extra data here
+(
+say "== test parse"
+\parse==(load "type_parse")
+print "Parsing the tail of " print source_name nl
+parse source_file "test" source_line \form\line
+print "form " show form
+print "line " show line
+)
 
-# \ = = eq
-# (= x y) F G
+# For testing purposes the tail program below starting with "\x=3" appears
+# immediately after the virtual EOF "\\".  Normally there'd be a newline.
+\\\x=3
 
+\hello=(say "Hello world." say x)
+hello
+hello
+
+\\
+
+# LATER test some syntax errors after you do error propagation in parse.c.
 # Missing lambda symbol:
 #\= \\
+
 # Missing definition:
 #\x= \\

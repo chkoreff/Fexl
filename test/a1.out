@@ -82,12 +82,12 @@ Ping!
 :: "bin/fexl"
 :: "test/a1.fxl"
 :: ""
-== test source
-Extra data
-:: "test/a1.fxl"
-:: 340
 == test "later"
 :: (later ((I later) (((L I) C) I)))
 :: ((I later) (((L I) C) I))
 :: (((L I) C) I)
 :: C
+== test parse
+Parsing the tail of test/a1.fxl
+form :: {{(R ((S I) I)) {{{say} {"Hello world."}} {say}}} {3}}
+line :: 344
