@@ -406,7 +406,6 @@ value parse(void)
 Parse the stream fh with the given source name and initial line number.
 Return (pair exp line), where exp is the parsed expression, and line is the
 updated line number. */
-/* TODO now I need functions to resolve symbols in the resulting form. */
 value type_parse(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return f;

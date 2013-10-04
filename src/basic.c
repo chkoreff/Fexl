@@ -78,6 +78,12 @@ value pair(value x, value y)
 	return A(A(L,A(A(L,I),x)),y);
 	}
 
+/* (item x y) = (C (pair x y)) */
+value item(value x, value y)
+	{
+	return A(C,pair(x,y));
+	}
+
 void bad_type(void)
 	{
 	die("You used a data type incorrectly.");

@@ -5,6 +5,7 @@
 #include "str.h"
 
 #include "value.h"
+#include "basic.h"
 #include "double.h"
 #include "fexl.h"
 #include "form.h"
@@ -90,4 +91,26 @@ value resolve(value f)
 	drop(resolved);
 	drop(f);
 	return result;
+	}
+
+value type_pop_symbol(value f)
+	{
+	if (!f->L) return f;
+
+	value form = eval(f->R);
+	value sym = first_symbol(form);
+
+	value g;
+
+	if (sym == 0)
+		g = C;
+	else
+		{
+		value new_form = abstract(sym,form);
+		g = item(sym,new_form);
+		drop(new_form);
+		}
+
+	drop(form);
+	return g;
 	}

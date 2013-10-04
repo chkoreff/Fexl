@@ -90,4 +90,14 @@ Ping!
 == test parse
 Parsing the tail of test/a1.fxl
 form :: {{(R ((S I) I)) {{{say} {"Hello world."}} {say}}} {3}}
-line :: 344
+line :: 401
+== Loop through symbols
+sym  :: {say}
+form :: {{L {(R (R ((S I) I))) {{S {(L I) {"Hello world."}}} I}}} {3}}
+
+sym  :: {"Hello world."}
+form :: {(L ((R L) ((R (R (R ((S I) I)))) ((L ((R S) (L I))) I)))) {3}}
+
+sym  :: {3}
+form :: (L ((R L) ((R (R (R ((S I) I)))) ((L ((R S) (L I))) I))))
+

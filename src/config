@@ -1,10 +1,7 @@
 #
 project fexl
 
-bin fexl basic buf die double file form lib long memory parse resolve str \
-	qfile qstr value - dl
-
-# Libraries of functions that don't have to be linked with bin.
+# Libraries
 lib double2
 lib long2
 lib str2
@@ -12,9 +9,17 @@ lib qfile2
 lib qstr2 - str2
 lib system
 lib var
-
-# NOTE: These libraries are just for testing.
+# These are just for testing.
 lib test
 lib show
+
+# Executable
+# Note that I link with the "show" library in case you need to trace things
+# while developing.  What's neat is that the linker is intelligent, so if you
+# don't actually use any functions in the library, the linker doesn't bother
+# linking with the library.  You can see the effect using "ldd bin/fexl".
+
+bin fexl basic buf die double file form lib long memory parse resolve str \
+	qfile qstr value - dl show
 
 public fexl

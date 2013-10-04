@@ -56,6 +56,9 @@ print_to stdout \print\nl\say
 
 \show==(load_from "show" "type_show")
 
+## test functions
+
+\test_built_in_pattern=
 (
 \test==(load_from "test" "type_test_pattern")
 \test==test
@@ -66,6 +69,7 @@ show test
 #show stderr
 )
 
+\test_forms=
 (
 say "== test forms"
 \show!=
@@ -99,6 +103,7 @@ show!
 	)
 )
 
+\test_putchar=
 (
 say "== test putchar"
 putchar 97
@@ -107,6 +112,7 @@ putchar 99
 putchar 10
 )
 
+\test_fputc=
 (
 say "== test fputc"
 \putchar=(fputc stdout)
@@ -117,6 +123,7 @@ putchar 100
 putchar 10
 )
 
+\test_readlink=
 (
 say "== test readlink"
 \readlink==(load_from "qfile2" "type_readlink")
@@ -124,12 +131,13 @@ say "== test readlink"
 show bin_path
 )
 
-F  # Don't run the infinite loop.
-(
-\inf=(@ I) inf
-)
+\test_inf=
+	(
+	\inf=(@ I) # infinite loop
+	inf
+	)
 
-F
+\test_getc=
 (
 \f=
 (
@@ -142,6 +150,7 @@ putchar 33 putchar ch putchar 10
 f f
 )
 
+\test_say=
 (
 say "Hello world."
 
@@ -152,6 +161,7 @@ say "This goes to stderr."
 
 )
 
+\test_ping=
 (
 \ping==(load_from "test" "type_ping")
 \ping=(ping ping)
@@ -159,6 +169,7 @@ say "This goes to stderr."
 ping
 )
 
+\test_long=
 (
 say "== test long"
 \Load=(load_from "long2")
@@ -185,6 +196,7 @@ try (/ 1 0)
 try (\x=(* 7 3) + x x)
 )
 
+\test_double=
 (
 say "== test double"
 \Load=(load_from "double2")
@@ -221,6 +233,7 @@ try
 try (- 1e5 1.0)
 )
 
+\test_string_common=
 (
 say "== test string_common"
 \string_common==(load_from "qstr2" "type_string_common")
@@ -232,6 +245,7 @@ say "== test string_common"
 show n
 )
 
+\test_string_len=
 (
 say "== test string_len"
 \string_len==(load_from "qstr2" "type_string_len")
@@ -250,6 +264,7 @@ hello
 ~
 )
 
+\test_string_cmp=
 (
 say "== test string_cmp"
 \string_cmp==(load_from "qstr2" "type_string_cmp")
@@ -273,6 +288,7 @@ try "b" "a"
 try "abcd" "abc"
 )
 
+\test_string_at=
 (
 say "== test string_at"
 \string_at==(load_from "qstr2" "type_string_at")
@@ -293,6 +309,7 @@ try "abc" 2
 try (. "abc" "def") 3
 )
 
+\test_argv=
 (
 say "== test argv"
 \argc==(eval; load_from "system" "type_argc")
@@ -310,6 +327,7 @@ try 1
 try 2
 )
 
+\test_later=
 (
 say ~ == test "later"~
 \later==(load "type_later")
@@ -324,14 +342,53 @@ show f
 \f==f  show f
 )
 
+\test_parse=
 (
 say "== test parse"
 \parse==(load "type_parse")
+\pop_symbol==(load "type_pop_symbol")
 print "Parsing the tail of " print source_name nl
 parse source_file "test" source_line \form\line
 print "form " show form
 print "line " show line
+
+# TODO Need a way to examine the sym, distinguishing between type_name and
+# type_string, and getting the line number.
+
+\resolve=
+	(@\resolve
+	\form
+	pop_symbol form form \sym\form
+	print "sym  " show sym
+	print "form " show form
+	nl
+	resolve form
+	)
+
+say "== Loop through symbols"
+\form==(resolve form)
+
 )
+
+## main
+test_built_in_pattern
+test_forms
+test_putchar
+test_fputc
+test_readlink
+#test_inf
+#test_getc
+test_say
+test_ping
+test_long
+test_double
+test_string_common
+test_string_len
+test_string_cmp
+test_string_at
+test_argv
+test_later
+test_parse
 
 # For testing purposes the tail program below starting with "\x=3" appears
 # immediately after the virtual EOF "\\".  Normally there'd be a newline.
