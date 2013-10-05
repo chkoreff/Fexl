@@ -91,7 +91,7 @@ value abstract(value sym, value body)
 
 		if (f->T == type_string)
 			{
-			if (sym->R->L->T == body->R->L->T
+			if (sym->R->L->T == g->L->T
 				&& str_cmp(get_str(sym->L),get_str(f)) == 0)
 				h = I;  /* (\x x) = I */
 			}
