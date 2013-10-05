@@ -80,10 +80,19 @@ value type_query(value f)
 	return z;
 	}
 
-/* (pair x y) = (\: : x y) = (L (L I x) y) */
+/* We use this to return an arbitrary tuple of values.  For example, to return
+the triple (\: : x y z), we would say:
+	return yield(yield(yield(I,x),y),z);
+*/
+value yield(value f, value g)
+	{
+	return A(A(L,f),g);
+	}
+
+/* (pair x y) = (\: : x y) */
 value pair(value x, value y)
 	{
-	return A(A(L,A(A(L,I),x)),y);
+	return yield(yield(I,x),y);
 	}
 
 /* (item x y) = (C (pair x y)) */

@@ -104,15 +104,18 @@ test/a1.fxl
 :: C
 == test_parse
 Parsing the tail of test/a1.fxl
-form :: {{(R ((S I) I)) {{{say} {"Hello world."}} {say}}} {3}}
-line :: 424
+form :: {{(R ((S I) I)) {{R {{{say} {"Hello world."}} {say}}} {long_string}}} {3}}
+line :: 427
 == Loop through symbols
-sym  :: {say}
-form :: {{L {(R (R ((S I) I))) {{S {(L I) {"Hello world."}}} I}}} {3}}
+symbol name: say
+form :: {{L {(R (R ((S I) I))) {{L {(R R) {{S {(L I) {"Hello world."}}} I}}} {long_string}}}} {3}}
 
-sym  :: {"Hello world."}
-form :: {(L ((R L) ((R (R (R ((S I) I)))) ((L ((R S) (L I))) I)))) {3}}
+symbol string: Hello world.
+form :: {{L {(R L) {(R (R (R ((S I) I)))) {(L ((R L) ((R (R R)) ((L ((R S) (L I))) I)))) {long_string}}}}} {3}}
 
-sym  :: {3}
-form :: (L ((R L) ((R (R (R ((S I) I)))) ((L ((R S) (L I))) I))))
+symbol name: long_string
+form :: {(L ((R L) ((R (R L)) ((R (R (R (R ((S I) I))))) (L ((R L) ((R (R R)) ((L ((R S) (L I))) I)))))))) {3}}
+
+symbol name: 3
+form :: (L ((R L) ((R (R L)) ((R (R (R (R ((S I) I))))) (L ((R L) ((R (R R)) ((L ((R S) (L I))) I))))))))
 

@@ -26,6 +26,7 @@
 \S==(load "type_S")
 \C==(load "type_C")
 \I==(load "type_I")
+\L==(load "type_L")
 \@==(load "type_Y")
 
 ##
@@ -376,13 +377,15 @@ parse source_file "test" source_line \form\line
 print "form " show form
 print "line " show line
 
-# TODO Need a way to examine the sym, getting label, is_name, and line.
-
 \resolve=
 	(@\resolve
 	\form
-	pop_symbol form form \sym\form
-	print "sym  " show sym
+
+	pop_symbol form form \label\is_name\line\form
+
+	print "symbol "
+	#print "(line " print (long_string line) print ") "
+	print (is_name "name" "string") print ": " print label nl
 	print "form " show form
 	nl
 	resolve form
@@ -417,7 +420,7 @@ test_parse
 # immediately after the virtual EOF "\\".  Normally there'd be a newline.
 \\\x=3
 
-\hello=(say "Hello world." say x)
+\hello=(say "Hello world." say (long_string x))
 hello
 hello
 
