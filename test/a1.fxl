@@ -28,16 +28,47 @@
 \I==(load "type_I")
 \@==(load "type_Y")
 
-\Load=(load_from "qfile2")
-\putchar==(Load "type_putchar")
-\getchar==(Load "type_getchar")
-\fputc==(Load "type_fputc")
-\fgetc==(Load "type_fgetc")
-\fwrite==(Load "type_fwrite")
+##
+\load_long=(load_from "long2")
+\long_add==(load_long "type_long_add")
+\long_sub==(load_long "type_long_sub")
+\long_div==(load_long "type_long_div")
+\long_mul==(load_long "type_long_mul")
+\long_string==(load_long "type_long_string")
 
-\stdin==(eval; Load "type_stdin")
-\stdout==(eval; Load "type_stdout")
-\stderr==(eval; Load "type_stderr")
+##
+\load_double=(load_from "double2")
+\double_add==(load_double "type_double_add")
+\double_sub==(load_double "type_double_sub")
+\double_div==(load_double "type_double_div")
+\double_mul==(load_double "type_double_mul")
+\double_string==(load_double "type_double_string")
+
+##
+\load_str=(load_from "qstr2")
+\string_len==(load_str "type_string_len")
+\string_cmp==(load_str "type_string_cmp")
+\string_at==(load_str "type_string_at")
+\string_common==(load_str "type_string_common")
+
+##
+\load_system=(load_from "system")
+\argc==(eval; load_system "type_argc")
+\argv==(load_system "type_argv")
+
+##
+\load_file=(load_from "qfile2")
+\putchar==(load_file "type_putchar")
+\getchar==(load_file "type_getchar")
+\fputc==(load_file "type_fputc")
+\fgetc==(load_file "type_fgetc")
+\fwrite==(load_file "type_fwrite")
+
+\stdin==(eval; load_file "type_stdin")
+\stdout==(eval; load_file "type_stdout")
+\stderr==(eval; load_file "type_stderr")
+
+\readlink==(load_file "type_readlink")
 
 \fprint=(\fh\x fwrite fh x)  # TODO will allow x to be nested list
 
@@ -71,7 +102,7 @@ show test
 
 \test_forms=
 (
-say "== test forms"
+say "== test_forms"
 \show!=
 	(\x
 	\x==x
@@ -105,7 +136,7 @@ show!
 
 \test_putchar=
 (
-say "== test putchar"
+say "== test_putchar"
 putchar 97
 putchar 98
 putchar 99
@@ -114,7 +145,7 @@ putchar 10
 
 \test_fputc=
 (
-say "== test fputc"
+say "== test_fputc"
 \putchar=(fputc stdout)
 putchar 97
 putchar 98
@@ -125,10 +156,9 @@ putchar 10
 
 \test_readlink=
 (
-say "== test readlink"
-\readlink==(load_from "qfile2" "type_readlink")
+say "== test_readlink"
 \bin_path==(readlink "/proc/self/exe")
-show bin_path
+say bin_path
 )
 
 \test_inf=
@@ -139,6 +169,7 @@ show bin_path
 
 \test_getc=
 (
+say "== test_getc"
 \f=
 (
 putchar 63
@@ -152,6 +183,7 @@ f f
 
 \test_say=
 (
+say "== test_say"
 say "Hello world."
 
 (
@@ -163,6 +195,7 @@ say "This goes to stderr."
 
 \test_ping=
 (
+say "== test_ping"
 \ping==(load_from "test" "type_ping")
 \ping=(ping ping)
 \ping=(ping ping)
@@ -171,18 +204,13 @@ ping
 
 \test_long=
 (
-say "== test long"
-\Load=(load_from "long2")
-\+==(Load "type_long_add")
-\-==(Load "type_long_sub")
-\*==(Load "type_long_mul")
-\/==(Load "type_long_div")
+say "== test_long"
+\+ = long_add
+\- = long_sub
+\* = long_mul
+\/ = long_div
 
-\try=
-	(\x
-	\x==x
-	show x
-	)
+\try=(\x say (long_string x))
 
 try (+ 0 0)
 try (+ 1 2)
@@ -194,22 +222,36 @@ try (/ 29 4)
 try (/ 0 0)
 try (/ 1 0)
 try (\x=(* 7 3) + x x)
+
+try 0
+try 1
+try -1
+try 57
+try -57
+
+# Test highest and lowest 64-bit signed values.
+try 9223372036854775807   #  2^63 - 1
+try -9223372036854775808  # -2^63
+
+# Try it with some arithmetic.
+try (- 0; + 1 -9223372036854775808)  #   2^63 - 1
+try (- -1 9223372036854775807)       #  -2^63
+
+# Test over/underflow.
+try 18446744073709551615    #  2^64 - 1
+try -18446744073709551616   # -2^64
 )
 
 \test_double=
 (
-say "== test double"
-\Load=(load_from "double2")
-\+==(Load "type_double_add")
-\-==(Load "type_double_sub")
-\/==(Load "type_double_div")
-\*==(Load "type_double_mul")
+say "== test_double"
 
-\try=
-	(\x
-	\x==x
-	show x
-	)
+\+ = double_add
+\- = double_sub
+\/ = double_div
+\* = double_mul
+
+\try=(\x say (double_string x))
 
 try
 	(
@@ -231,29 +273,25 @@ try
 	)
 
 try (- 1e5 1.0)
+try -907.285
+try 42.333
 )
 
 \test_string_common=
 (
-say "== test string_common"
-\string_common==(load_from "qstr2" "type_string_common")
+say "== test_string_common"
 \x="abcdef"
 \y="abcDEF"
 \x=(. x "")
 \y=(. y "")
 \n==(string_common x y)
-show n
+say (long_string n)
 )
 
 \test_string_len=
 (
-say "== test string_len"
-\string_len==(load_from "qstr2" "type_string_len")
-\try=
-	(\x
-	\len==(string_len x)
-	show len
-	)
+say "== test_string_len"
+\try=(\x say (long_string; string_len x))
 try ""
 try "a"
 try ~ "~
@@ -266,13 +304,8 @@ hello
 
 \test_string_cmp=
 (
-say "== test string_cmp"
-\string_cmp==(load_from "qstr2" "type_string_cmp")
-\try=
-	(\x\y
-	\order==(string_cmp x y)
-	show order
-	)
+say "== test_string_cmp"
+\try=(\x\y say (long_string; string_cmp x y))
 
 # -1
 try "" "a"
@@ -290,13 +323,9 @@ try "abcd" "abc"
 
 \test_string_at=
 (
-say "== test string_at"
-\string_at==(load_from "qstr2" "type_string_at")
-\try=
-	(\str\pos
-	\ch==(string_at str pos)
-	show ch
-	)
+say "== test_string_at"
+\try=(\str\pos say (long_string; string_at str pos))
+
 try "" -1
 try "" 0
 try "" 1
@@ -311,16 +340,11 @@ try (. "abc" "def") 3
 
 \test_argv=
 (
-say "== test argv"
-\argc==(eval; load_from "system" "type_argc")
-\argv==(load_from "system" "type_argv")
+say "== test_argv"
 
-\try=(\n
-	\x==(argv n)
-	show x
-	)
+\try=(\n say (argv n))
 
-show argc
+say (long_string argc)
 try -1
 try 0
 try 1
@@ -329,7 +353,7 @@ try 2
 
 \test_later=
 (
-say ~ == test "later"~
+say "== test_later"
 \later==(load "type_later")
 
 # Test peeling off "later" layers with eager evaluation.
@@ -344,7 +368,7 @@ show f
 
 \test_parse=
 (
-say "== test parse"
+say "== test_parse"
 \parse==(load "type_parse")
 \pop_symbol==(load "type_pop_symbol")
 print "Parsing the tail of " print source_name nl

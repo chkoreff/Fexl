@@ -1,5 +1,8 @@
+#include "str.h"
+
 #include "value.h"
 #include "double.h"
+#include "qstr.h"
 
 static double op_add(double x, double y) { return x + y; }
 static double op_sub(double x, double y) { return x - y; }
@@ -27,4 +30,28 @@ value type_double_sub(value f) { return op2(f,op_sub); }
 value type_double_mul(value f) { return op2(f,op_mul); }
 value type_double_div(value f) { return op2(f,op_div); }
 
+/* double_string num */
+/*LATER note that sprintf "%.15g" shows 0.0 as "0", which looks like a long if
+we try to read it back in.  Perhaps force a ".0" suffix, not sure. */
+extern int sprintf(char *str, const char *format, ...);
+value type_double_string(value f)
+	{
+	if (!f->L) return f;
+
+	value x = eval(f->R);
+
+	char buf[100]; /* being careful here */
+	/* We show 15 digits because that's what Perl does. */
+	sprintf(buf, "%.15g", get_double(x));
+
+	value g = Qstr0(buf);
+	drop(x);
+	return g;
+	}
+
 /*TODO more functions */
+#if 0
+is_double
+double_long
+double_cmp
+#endif

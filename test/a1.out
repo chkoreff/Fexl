@@ -1,7 +1,7 @@
 == test_buf
 len=4
 :: I
-== test forms
+== test_forms
 :: C
 :: S
 :: I
@@ -17,80 +17,95 @@ len=4
 :: {x}
 :: {{string_len} {"abcd"}}
 :: {{{x} (I {z})} ((I {y}) (I {z}))}
-== test putchar
+== test_putchar
 abc
-== test fputc
+== test_fputc
 abcd
-== test readlink
-:: "/home/patrick/project/fexl/bin/fexl"
+== test_readlink
+/home/patrick/project/fexl/bin/fexl
+== test_say
 Hello world.
+== test_ping
 Ping!
 Ping!
 Ping!
 Ping!
-== test long
-:: 0
-:: 3
-:: -1
-:: 79
-:: 15
-:: 0
-:: 7
-:: 0
-:: 0
-:: 42
-== test double
-:: 70.8
-:: -nan
-:: inf
-:: -inf
-:: 6.28318530717959
-:: 99999
-== test string_common
-:: 3
-== test string_len
-:: 0
-:: 1
-:: 1
-:: 2
-:: 5
-:: 6
-== test string_cmp
-:: -1
-:: -1
-:: -1
-:: 0
-:: 0
-:: 0
-:: 1
-:: 1
-:: 1
-== test string_at
-:: 0
-:: 0
-:: 0
-:: 0
-:: 97
-:: 0
-:: 97
-:: 98
-:: 99
-:: 100
-== test argv
-:: 2
-:: ""
-:: "bin/fexl"
-:: "test/a1.fxl"
-:: ""
-== test "later"
+== test_long
+0
+3
+-1
+79
+15
+0
+7
+0
+0
+42
+0
+1
+-1
+57
+-57
+9223372036854775807
+-9223372036854775808
+9223372036854775807
+-9223372036854775808
+9223372036854775807
+-9223372036854775808
+== test_double
+70.8
+-nan
+inf
+-inf
+6.28318530717959
+99999
+-907.285
+42.333
+== test_string_common
+3
+== test_string_len
+0
+1
+1
+2
+5
+6
+== test_string_cmp
+-1
+-1
+-1
+0
+0
+0
+1
+1
+1
+== test_string_at
+0
+0
+0
+0
+97
+0
+97
+98
+99
+100
+== test_argv
+2
+
+bin/fexl
+test/a1.fxl
+
+== test_later
 :: (later ((I later) (((L I) C) I)))
 :: ((I later) (((L I) C) I))
 :: (((L I) C) I)
 :: C
-== test parse
+== test_parse
 Parsing the tail of test/a1.fxl
 form :: {{(R ((S I) I)) {{{say} {"Hello world."}} {say}}} {3}}
-line :: 400
+line :: 424
 == Loop through symbols
 sym  :: {say}
 form :: {{L {(R (R ((S I) I))) {{S {(L I) {"Hello world."}}} I}}} {3}}
