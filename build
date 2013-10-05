@@ -28,7 +28,7 @@ NAME
        $prog - Build or install the $g_project system as required.
 
 SYNOPSIS
-       $prog [quiet] [clean] [install] [uninstall] [in <dir>]
+       $prog [quiet] [clean] [here] [install] [uninstall] [in <dir>]
 
 DESCRIPTION
        $prog here
