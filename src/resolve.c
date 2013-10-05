@@ -18,8 +18,8 @@
 
 static void report_undef(value sym)
 	{
-	char *name = as_str(sym->L)->data;
-	long line = get_long(sym->R);
+	char *name = get_str(sym->L)->data;
+	long line = get_long(sym->R->R);
 
 	warn("Undefined symbol %s on line %ld%s%s", name, line,
 		source_name[0] ? " of " : "",
@@ -68,11 +68,10 @@ value resolve(value f)
 
 	value def = 0;
 
-	value content = sym->L;
-	if (content->T == type_name)
+	value name = sym->L;
+	if (sym->R->L->T == type_C)
 		{
-		char *name = as_str(content)->data;
-		def = context(name);
+		def = context(get_str(name)->data);
 		if (!def)
 			{
 			report_undef(sym);
@@ -80,7 +79,7 @@ value resolve(value f)
 			}
 		}
 	else
-		def = content; /* string literal */
+		def = name; /* string literal */
 
 	value form = abstract(sym,f);
 	value resolved = resolve(form);

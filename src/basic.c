@@ -5,6 +5,7 @@
 value C;
 value S;
 value I;
+value F;
 value L;
 value R;
 value Y;
@@ -30,6 +31,13 @@ value type_I(value f)
 	{
 	if (!f->L) return f;
 	return f->R;
+	}
+
+/* F x = I.  In other words, F x y = y. */
+value type_F(value f)
+	{
+	if (!f->L) return f;
+	return I;
 	}
 
 /* R x y z = x (y z) */
@@ -94,6 +102,7 @@ void beg_basic(void)
 	C = Q(type_C); hold(C);
 	S = Q(type_S); hold(S);
 	I = Q(type_I); hold(I);
+	F = Q(type_F); hold(F);
 	L = Q(type_L); hold(L);
 	R = Q(type_R); hold(R);
 	Y = Q(type_Y); hold(Y);
@@ -106,6 +115,7 @@ void end_basic(void)
 	drop(C);
 	drop(S);
 	drop(I);
+	drop(F);
 	drop(L);
 	drop(R);
 	drop(Y);

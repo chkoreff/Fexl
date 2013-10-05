@@ -10,7 +10,7 @@ large-scale buffering */
 
 value type_string(value f)
 	{
-	if (!f->N) str_free(as_str(f));
+	if (!f->N) str_free(get_str(f));
 	return f;
 	}
 
@@ -24,15 +24,10 @@ value Qstr0(const char *data)
 	return Qstr(str_new_data0(data));
 	}
 
-struct str *as_str(value f)
-	{
-	return (struct str *)f->R;
-	}
-
 struct str *get_str(value f)
 	{
 	if (f->T != type_string) bad_type();
-	return as_str(f);
+	return (struct str *)f->R;
 	}
 
 /* (string_append x y) is the concanation of strings x and y. */

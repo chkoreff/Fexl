@@ -19,7 +19,6 @@ extern value type_long(value);
 extern value type_double(value);
 extern value type_later(value);
 extern value type_string(value);
-extern value type_name(value);
 extern value type_form(value);
 extern value type_file(value);
 
@@ -30,9 +29,14 @@ void show(value f)
 		if (f->T == type_form)
 			{
 			printf("{");
-			show(f->L);
-			if (f->L->T != type_name && f->L->T != type_string)
+			if (f->L->T == type_string)
 				{
+				const char *format = f->R->L->T == type_C ? "%s" : "\"%s\"";
+				printf(format,get_str(f->L)->data);
+				}
+			else
+				{
+				show(f->L);
 				printf(" ");
 				show(f->R);
 				}
@@ -84,9 +88,7 @@ void show(value f)
 		else if (f->T == type_long)
 			printf("%ld",get_long(f));
 		else if (f->T == type_string)
-			printf("\"%s\"",as_str(f)->data);
-		else if (f->T == type_name)
-			printf("%s",as_str(f)->data);
+			printf("\"%s\"",get_str(f)->data);
 		else if (f->T == type_double)
 			{
 			double *p = (double *)f->R;

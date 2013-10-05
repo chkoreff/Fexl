@@ -135,7 +135,7 @@ static value collect_string(const char *term_string, long term_len,
 		else if (match_pos > 0)
 			{
 			if (match_pos >= term_len)
-				return symbol(type_string,buf_finish(&buffer),first_line);
+				return symbol(F,buf_finish(&buffer),first_line);
 			else
 				{
 				long i;
@@ -214,7 +214,7 @@ static value parse_name(int allow_eq)
 			|| (ch == '=' && !allow_eq)
 			|| ch == -1
 			)
-			return symbol(type_name,buf_finish(&buffer),first_line);
+			return symbol(C,buf_finish(&buffer),first_line);
 		else
 			{
 			buf_add(&buffer, ch);

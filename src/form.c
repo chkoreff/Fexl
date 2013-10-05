@@ -6,16 +6,6 @@
 #include "long.h"
 #include "qstr.h"
 
-value type_name(value f)
-	{
-	return type_string(f);
-	}
-
-value Qname(struct str *p)
-	{
-	return V(type_name,0,(value)p);
-	}
-
 value type_form(value f)
 	{
 	return f;
@@ -30,25 +20,26 @@ value apply(value f, value g)
 	return v;
 	}
 
-/* Create a symbol of type_name or type_string. */
-value symbol(type t, struct str *name, long line)
+/* Create a symbol, either a name or a literal. */
+value symbol(value is_name, struct str *name, long line)
 	{
-	return V(type_form, V(t,0,(value)name), Qlong(line));
+	return V(type_form, Qstr(name), A(is_name,Qlong(line)));
 	}
 
 /* Return true if the value is a symbol with a null name. */
 int is_null_name(value x)
 	{
 	return x->T == type_form
-		&& x->L->T == type_name
-		&& as_str(x->L)->len == 0;
+		&& x->L->T == type_string
+		&& x->R->L->T == type_C
+		&& get_str(x->L)->len == 0;
 	}
 
 /* Return the first symbol in the value, if any, in left to right order. */
 value first_symbol(value f)
 	{
 	if (f->T != type_form) return 0;
-	if (f->L->T == type_name || f->L->T == type_string) return f;
+	if (f->L->T == type_string) return f;
 	value x = first_symbol(f->L);
 	return x ? x : first_symbol(f->R);
 	}
@@ -98,10 +89,10 @@ value abstract(value sym, value body)
 		value f = body->L;
 		value g = body->R;
 
-		if (f->T == type_name || f->T == type_string)
+		if (f->T == type_string)
 			{
-			value name = sym->L;
-			if (name->T == f->T && str_cmp(as_str(name),as_str(f)) == 0)
+			if (sym->R->L->T == body->R->L->T
+				&& str_cmp(get_str(sym->L),get_str(f)) == 0)
 				h = I;  /* (\x x) = I */
 			}
 		else

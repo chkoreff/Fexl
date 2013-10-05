@@ -352,8 +352,7 @@ parse source_file "test" source_line \form\line
 print "form " show form
 print "line " show line
 
-# TODO Need a way to examine the sym, distinguishing between type_name and
-# type_string, and getting the line number.
+# TODO Need a way to examine the sym, getting label, is_name, and line.
 
 \resolve=
 	(@\resolve

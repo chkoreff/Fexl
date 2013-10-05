@@ -1,6 +1,8 @@
+extern value type_C(value);
 extern value C;
 extern value S;
 extern value I;
+extern value F;
 extern value R;
 extern value L;
 extern value Y;
