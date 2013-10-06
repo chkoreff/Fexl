@@ -70,6 +70,7 @@
 \stderr==(eval; load_file "type_stderr")
 
 \readlink==(load_file "type_readlink")
+\fopen==(load_file "type_fopen")
 
 \fprint=(\fh\x fwrite fh x)  # TODO will allow x to be nested list
 
@@ -398,7 +399,19 @@ print "form " show form
 
 say "== Loop through symbols"
 \form==(resolve form)
+)
 
+\test_file=
+(
+say "== test_file"
+\try=
+	(\name
+	print "fopen " print name print " : "
+	\fh==(fopen name "r")
+	print (fh "no" \fh "yes") nl
+	)
+try "test/a1.fxl"
+try "test/a1x.fxl"
 )
 
 ## main
@@ -419,6 +432,7 @@ test_string_cmp
 test_string_at
 test_argv
 test_later
+test_file
 test_parse
 
 # For testing purposes the tail program below starting with "\x=3" appears
