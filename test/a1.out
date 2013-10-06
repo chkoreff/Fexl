@@ -103,9 +103,8 @@ test/a1.fxl
 :: (((L I) C) I)
 :: C
 == test_parse
-Parsing the tail of test/a1.fxl
+Parsing the tail of test/a1.fxl on line 426
 form :: {{(R ((S I) I)) {{R {{{say} {"Hello world."}} {say}}} {long_string}}} {3}}
-line :: 427
 == Loop through symbols
 symbol name: say
 form :: {{L {(R (R ((S I) I))) {{L {(R R) {{S {(L I) {"Hello world."}}} I}}} {long_string}}}} {3}}

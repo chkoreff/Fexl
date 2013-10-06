@@ -92,14 +92,10 @@ value resolve(value f)
 	return result;
 	}
 
-/* (pop_symbol form no yes)
-Get the first symbol in the form.  Return no if there is no symbol.  Otherwise
-return (yes label is_name line new_form), where:
-
-	label is the string label
-	is_name is true if it's a name, or false if it's a literal string.
-	line is the line number.
-	new_form is the form with the symbol abstracted from it.
+/* (pop_symbol format)
+Get the first symbol in the form, in left to right order.  Return end if there
+is no symbol, otherwise return (item sym new_form), where sym is the symbol,
+and new_form is the form with sym abstracted from it.
 */
 value type_pop_symbol(value f)
 	{
@@ -115,14 +111,33 @@ value type_pop_symbol(value f)
 	else
 		{
 		value new_form = abstract(sym,form);
-		value label = sym->L;
-		value is_name = sym->R->L;
-		value line = sym->R->R;
-
-		g = A(C,yield(yield(yield(yield(I,label),is_name),line),new_form));
+		g = item(sym,new_form);
 		drop(new_form);
 		}
 
 	drop(form);
+	return g;
+	}
+
+/* (look_symbol sym)  Look at the symbol and return (\: : label is_name line),
+where:
+
+	label is the string label
+	is_name is true if it's a name, or false if it's a literal string
+	line is the line number
+*/
+value type_look_symbol(value f)
+	{
+	if (!f->L) return f;
+
+	value x = eval(f->R);
+	if (x->T != type_form || x->L->T != type_string) bad_type();
+
+	value label = x->L;
+	value is_name = x->R->L;
+	value line = x->R->R;
+
+	value g = yield(yield(yield(I,label),is_name),line);
+	drop(x);
 	return g;
 	}

@@ -109,7 +109,6 @@ static void skip_filler(void)
 		}
 	}
 
-/*TODO propagate syntax error without die */
 static void syntax_error(const char *msg, int line)
 	{
 	die("%s on line %ld%s%s", msg, line,

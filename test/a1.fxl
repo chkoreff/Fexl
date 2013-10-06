@@ -372,16 +372,21 @@ show f
 say "== test_parse"
 \parse==(load "type_parse")
 \pop_symbol==(load "type_pop_symbol")
-print "Parsing the tail of " print source_name nl
+\look_symbol==(load "type_look_symbol")
+print "Parsing the tail of " print source_name
+print " on line "
+print (long_string source_line)
+nl
 parse source_file "test" source_line \form\line
 print "form " show form
-print "line " show line
+#print "line " show line
 
 \resolve=
 	(@\resolve
 	\form
 
-	pop_symbol form form \label\is_name\line\form
+	pop_symbol form form \sym\form
+	look_symbol sym \label\is_name\line
 
 	print "symbol "
 	#print "(line " print (long_string line) print ") "
