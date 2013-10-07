@@ -1,36 +1,41 @@
 #
 
 # TODO detect (Q 0) and die instead */
+\load=(\lib\name Q (dlsym lib name))
 
-\load_path=
-	(\lib_name\type_name
-	Q (dlsym (dlopen lib_name) type_name)
-	)
+\load_bin==(\lib==(dlopen "") load lib)
 
-\load=(load_path "")
-
-\string_append==(load "type_string_append")
+\string_append==(load_bin "type_string_append")
 \.==string_append
 
 \load_from=
-	(\lib_name\type_name
-	\lib_name=(. "lib/fexl/"; . "lib"; . lib_name ".so")
-	\path=(. base_path lib_name)
-	load_path path type_name
+	(\name
+	\path==(. "lib/fexl/"; . "lib"; . name ".so")
+	\path==(. base_path path)
+	\lib==(dlopen path)
+	load lib
 	)
+
+# TODO open these lazily, one time, on demand only.
+\load_long==(load_from "long2")
+\load_double==(load_from "double2")
+\load_str==(load_from "qstr2")
+\load_system==(load_from "system")
+\load_file==(load_from "qfile2")
+\load_test==(load_from "test")
+\load_show==(load_from "show")
 
 \eval=(\x \x==x x)
 \T=(\T\F T)
 \F=(\T\F F)
 
-\S==(load "type_S")
-\C==(load "type_C")
-\I==(load "type_I")
-\L==(load "type_L")
-\@==(load "type_Y")
+\S==(load_bin "type_S")
+\C==(load_bin "type_C")
+\I==(load_bin "type_I")
+\L==(load_bin "type_L")
+\@==(load_bin "type_Y")
 
 ##
-\load_long=(load_from "long2")
 \long_add==(load_long "type_long_add")
 \long_sub==(load_long "type_long_sub")
 \long_div==(load_long "type_long_div")
@@ -38,7 +43,6 @@
 \long_string==(load_long "type_long_string")
 
 ##
-\load_double=(load_from "double2")
 \double_add==(load_double "type_double_add")
 \double_sub==(load_double "type_double_sub")
 \double_div==(load_double "type_double_div")
@@ -46,19 +50,16 @@
 \double_string==(load_double "type_double_string")
 
 ##
-\load_str=(load_from "qstr2")
 \string_len==(load_str "type_string_len")
 \string_cmp==(load_str "type_string_cmp")
 \string_at==(load_str "type_string_at")
 \string_common==(load_str "type_string_common")
 
 ##
-\load_system=(load_from "system")
 \argc==(eval; load_system "type_argc")
 \argv==(load_system "type_argv")
 
 ##
-\load_file=(load_from "qfile2")
 \putchar==(load_file "type_putchar")
 \getchar==(load_file "type_getchar")
 \fputc==(load_file "type_fputc")
@@ -87,13 +88,13 @@
 
 print_to stdout \print\nl\say
 
-\show==(load_from "show" "type_show")
+\show==(load_show "type_show")
 
 ## test functions
 
 \test_built_in_pattern=
 (
-\test==(load_from "test" "type_test_pattern")
+\test==(load_test "type_test_pattern")
 \test==test
 
 show test
@@ -198,7 +199,7 @@ say "This goes to stderr."
 \test_ping=
 (
 say "== test_ping"
-\ping==(load_from "test" "type_ping")
+\ping==(load_test "type_ping")
 \ping=(ping ping)
 \ping=(ping ping)
 ping
@@ -356,7 +357,7 @@ try 2
 \test_later=
 (
 say "== test_later"
-\later==(load "type_later")
+\later==(load_bin "type_later")
 
 # Test peeling off "later" layers with eager evaluation.
 \f=(I C)
@@ -371,9 +372,9 @@ show f
 \test_parse=
 (
 say "== test_parse"
-\parse==(load "type_parse")
-\pop_symbol==(load "type_pop_symbol")
-\look_symbol==(load "type_look_symbol")
+\parse==(load_bin "type_parse")
+\pop_symbol==(load_bin "type_pop_symbol")
+\look_symbol==(load_bin "type_look_symbol")
 print "Parsing the tail of " print source_name
 print " on line "
 print (long_string source_line)
