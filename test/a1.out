@@ -41,6 +41,17 @@ Ping!
 0
 0
 42
+
+0
+0
+0
+-1
+-1
+-1
+1
+1
+1
+
 0
 1
 -1
@@ -61,6 +72,16 @@ inf
 99999
 -907.285
 42.333
+
+0
+0
+0
+-1
+-1
+-1
+1
+1
+1
 == test_string_common
 3
 == test_string_len
@@ -113,7 +134,7 @@ a b c d
 a b c d c d 
 x y x y x y x y 
 == test_parse
-Parsing the tail of test/a1.fxl on line 475
+Parsing the tail of test/a1.fxl on line 506
 form :: {{(R ((S I) I)) {{R {{{say} {"Hello world."}} {say}}} {long_string}}} {3}}
 == Loop through symbols
 symbol name: say

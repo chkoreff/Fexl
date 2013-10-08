@@ -38,15 +38,17 @@
 ##
 \long_add==(load_long "type_long_add")
 \long_sub==(load_long "type_long_sub")
-\long_div==(load_long "type_long_div")
 \long_mul==(load_long "type_long_mul")
+\long_div==(load_long "type_long_div")
+\long_cmp==(load_long "type_long_cmp")
 \long_string==(load_long "type_long_string")
 
 ##
 \double_add==(load_double "type_double_add")
 \double_sub==(load_double "type_double_sub")
-\double_div==(load_double "type_double_div")
 \double_mul==(load_double "type_double_mul")
+\double_div==(load_double "type_double_div")
+\double_cmp==(load_double "type_double_cmp")
 \double_string==(load_double "type_double_string")
 
 ##
@@ -212,6 +214,7 @@ say "== test_long"
 \- = long_sub
 \* = long_mul
 \/ = long_div
+\cmp = long_cmp
 
 \try=(\x say (long_string x))
 
@@ -225,6 +228,20 @@ try (/ 29 4)
 try (/ 0 0)
 try (/ 1 0)
 try (\x=(* 7 3) + x x)
+nl
+
+try (cmp 0 0)
+try (cmp 1 1)
+try (cmp -1 -1)
+
+try (cmp 0 1)
+try (cmp -1 0)
+try (cmp 1 2)
+
+try (cmp 1 0)
+try (cmp 0 -1)
+try (cmp 2 1)
+nl
 
 try 0
 try 1
@@ -251,8 +268,9 @@ say "== test_double"
 
 \+ = double_add
 \- = double_sub
-\/ = double_div
 \* = double_mul
+\/ = double_div
+\cmp = double_cmp
 
 \try=(\x say (double_string x))
 
@@ -278,6 +296,19 @@ try
 try (- 1e5 1.0)
 try -907.285
 try 42.333
+nl
+
+try (cmp 0.0 0.0)
+try (cmp 1.0 1.0)
+try (cmp -1.0 -1.0)
+
+try (cmp 0.0 1.0)
+try (cmp -1.0 0.0)
+try (cmp 1.0 2.0)
+
+try (cmp 1.0 0.0)
+try (cmp 0.0 -1.0)
+try (cmp 2.0 1.0)
 )
 
 \test_string_common=

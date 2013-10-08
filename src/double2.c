@@ -14,6 +14,8 @@ zero, it yields inf (infinity). If you divide zero by zero, it yields -nan
 */
 static double op_div(double x, double y) { return x / y; }
 
+static double op_cmp(double x, double y) { return x < y ? -1 : x > y ? 1 : 0; }
+
 static value op2(value f, double op(double,double))
 	{
 	if (!f->L || !f->L->L) return f;
@@ -29,6 +31,9 @@ value type_double_add(value f) { return op2(f,op_add); }
 value type_double_sub(value f) { return op2(f,op_sub); }
 value type_double_mul(value f) { return op2(f,op_mul); }
 value type_double_div(value f) { return op2(f,op_div); }
+
+/* (double_cmp x y) compares x and y and returns -1, 0, or +1. */
+value type_double_cmp(value f) { return op2(f,op_cmp); }
 
 /* double_string num */
 /*LATER note that sprintf "%.15g" shows 0.0 as "0", which looks like a long if
@@ -53,5 +58,4 @@ value type_double_string(value f)
 #if 0
 is_double
 double_long
-double_cmp
 #endif

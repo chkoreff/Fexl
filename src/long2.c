@@ -10,6 +10,8 @@ static long op_mul(long x, long y) { return x * y; }
 /* op_div returns 0 if you try to divide by 0. */
 static long op_div(long x, long y) { return y ? x / y : 0; }
 
+static long op_cmp(long x, long y) { return x < y ? -1 : x > y ? 1 : 0; }
+
 static value op2(value f, long op(long,long))
 	{
 	if (!f->L || !f->L->L) return f;
@@ -25,6 +27,9 @@ value type_long_add(value f) { return op2(f,op_add); }
 value type_long_sub(value f) { return op2(f,op_sub); }
 value type_long_mul(value f) { return op2(f,op_mul); }
 value type_long_div(value f) { return op2(f,op_div); }
+
+/* (long_cmp x y) compares x and y and returns -1, 0, or +1. */
+value type_long_cmp(value f) { return op2(f,op_cmp); }
 
 /* Convert long to string. */
 extern int sprintf(char *str, const char *format, ...);
@@ -46,6 +51,5 @@ value type_long_string(value f)
 is_long
 long_double
 long_char
-long_cmp
 order
 #endif
