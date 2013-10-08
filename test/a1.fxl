@@ -1,4 +1,4 @@
-#
+#!bin/fexl
 
 # TODO detect (Q 0) and die instead */
 \load=(\lib\name Q (dlsym lib name))
