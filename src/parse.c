@@ -233,7 +233,30 @@ static value parse_symbol(int allow_eq)
 		return parse_name(allow_eq);
 	}
 
+static value parse_term(void);
 static value parse_exp(void);
+
+static value parse_list(void)
+	{
+	skip_filler();
+	if (ch == ';')
+		{
+		next_ch();
+		return parse_exp();
+		}
+
+	value x = parse_term();
+	hold(x);
+
+	value g;
+	if (is_null_name(x))
+		g = C;
+	else
+		g = apply(apply(Qitem,x),parse_list());
+
+	drop(x);
+	return g;
+	}
 
 static value parse_term(void)
 	{
@@ -248,8 +271,7 @@ static value parse_term(void)
 		next_ch();
 		return exp;
 		}
-	#if 0
-	else if (ch == '[') /* list TODO*/
+	else if (ch == '[') /* list */
 		{
 		long first_line = source_line;
 		next_ch();
@@ -260,7 +282,6 @@ static value parse_term(void)
 		next_ch();
 		return exp;
 		}
-	#endif
 	else if (ch == '{') /* quoted form */
 		{
 		long first_line = source_line;

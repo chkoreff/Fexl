@@ -369,6 +369,52 @@ show f
 \f==f  show f
 )
 
+\test_file=
+(
+say "== test_file"
+\try=
+	(\name
+	print "fopen " print name print " : "
+	\fh==(fopen name "r")
+	print (fh "no" \fh "yes") nl
+	)
+try "test/a1.fxl"
+try "test/a1x.fxl"
+)
+
+\test_list=
+(
+say "== test_list"
+\try=
+	(\list
+	\print_items=
+		(
+		@\loop\list
+		list () \h\t
+		print h
+		print " "
+		loop t
+		)
+	print_items list nl
+	)
+
+\append=(@\append\x\y x y \h\t [h;append t y])
+
+try []
+try ["a"]
+try ["a" "b"]
+
+\tail=["c" "d"]
+try ["a" "b"; tail]
+
+try ["a" "b"; append tail tail]
+
+\list=["x" "y"]
+\list=(append list list)
+\list=(append list list)
+try list
+)
+
 \test_parse=
 (
 say "== test_parse"
@@ -402,19 +448,6 @@ say "== Loop through symbols"
 \form==(resolve form)
 )
 
-\test_file=
-(
-say "== test_file"
-\try=
-	(\name
-	print "fopen " print name print " : "
-	\fh==(fopen name "r")
-	print (fh "no" \fh "yes") nl
-	)
-try "test/a1.fxl"
-try "test/a1x.fxl"
-)
-
 ## main
 test_built_in_pattern
 test_forms
@@ -434,6 +467,7 @@ test_string_at
 test_argv
 test_later
 test_file
+test_list
 test_parse
 
 # For testing purposes the tail program below starting with "\x=3" appears

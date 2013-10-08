@@ -105,8 +105,15 @@ test/a1.fxl
 == test_file
 fopen test/a1.fxl : yes
 fopen test/a1x.fxl : no
+== test_list
+
+a 
+a b 
+a b c d 
+a b c d c d 
+x y x y x y x y 
 == test_parse
-Parsing the tail of test/a1.fxl on line 441
+Parsing the tail of test/a1.fxl on line 475
 form :: {{(R ((S I) I)) {{R {{{say} {"Hello world."}} {say}}} {long_string}}} {3}}
 == Loop through symbols
 symbol name: say

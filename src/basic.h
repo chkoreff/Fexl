@@ -8,6 +8,7 @@ extern value L;
 extern value Y;
 extern value query;
 extern value later;
+extern value Qitem;
 extern value yield(value f, value g);
 extern value pair(value x, value y);
 extern value item(value x, value y);
