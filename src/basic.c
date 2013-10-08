@@ -114,6 +114,13 @@ void bad_type(void)
 	die("You used a data type incorrectly.");
 	}
 
+/* Assert that f is an atomic data value of type t. */
+void data_type(value f, type t)
+	{
+	if (f->L == 0 && f->T == t) return;
+	bad_type();
+	}
+
 void beg_basic(void)
 	{
 	C = Q(type_C); hold(C);

@@ -18,7 +18,7 @@ value type_file(value f)
 
 FILE *get_file(value f)
 	{
-	if (f->T != type_file) bad_type();
+	data_type(f,type_file);
 	return (FILE *)f->R;
 	}
 

@@ -26,7 +26,7 @@ value Qstr0(const char *data)
 
 struct str *get_str(value f)
 	{
-	if (f->T != type_string) bad_type();
+	data_type(f,type_string);
 	return (struct str *)f->R;
 	}
 

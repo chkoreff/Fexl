@@ -15,7 +15,7 @@ value Qlong(long val)
 
 long get_long(value f)
 	{
-	if (f->T != type_long) bad_type();
+	data_type(f,type_long);
 	return (long)f->R;
 	}
 

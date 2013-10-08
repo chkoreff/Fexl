@@ -49,7 +49,7 @@ value type_dlsym(value f)
 	value x = eval(f->L->R);
 	value y = eval(f->R);
 
-	if (x->T != type_lib) bad_type();
+	data_type(x,type_lib);
 	void *lib = (void *)x->R;
 	void *p = lib ? dlsym(lib, get_str(y)->data) : 0;
 	value result = Qlong((long)p);

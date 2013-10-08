@@ -24,7 +24,7 @@ value Qdouble(double val)
 
 double get_double(value f)
 	{
-	if (f->T != type_double) bad_type();
+	data_type(f,type_double);
 	double *p = (double *)f->R;
 	return *p;
 	}

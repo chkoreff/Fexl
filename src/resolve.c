@@ -131,7 +131,8 @@ value type_look_symbol(value f)
 	if (!f->L) return f;
 
 	value x = eval(f->R);
-	if (x->T != type_form || x->L->T != type_string) bad_type();
+	if (x->T != type_form) bad_type();
+	data_type(x->L,type_string);
 
 	value label = x->L;
 	value is_name = x->R->L;
