@@ -63,6 +63,12 @@ Ping!
 -9223372036854775808
 9223372036854775807
 -9223372036854775808
+= order
+LT
+LT
+EQ
+GT
+GT
 == test_double
 70.8
 -nan
@@ -134,7 +140,7 @@ a b c d
 a b c d c d 
 x y x y x y x y 
 == test_parse
-Parsing the tail of test/a1.fxl on line 506
+Parsing the tail of test/a1.fxl on line 519
 form :: {{(R ((S I) I)) {{R {{{say} {"Hello world."}} {say}}} {long_string}}} {3}}
 == Loop through symbols
 symbol name: say

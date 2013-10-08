@@ -41,6 +41,7 @@
 \long_mul==(load_long "type_long_mul")
 \long_div==(load_long "type_long_div")
 \long_cmp==(load_long "type_long_cmp")
+\order==(load_long "type_order")
 \long_string==(load_long "type_long_string")
 
 ##
@@ -260,6 +261,18 @@ try (- -1 9223372036854775807)       #  -2^63
 # Test over/underflow.
 try 18446744073709551615    #  2^64 - 1
 try -18446744073709551616   # -2^64
+
+say "= order"
+\try=
+	(\x
+	\y=(order x "LT" "EQ" "GT")
+	say y
+	)
+try -2
+try -1
+try 0
+try 1
+try 2
 )
 
 \test_double=
