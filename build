@@ -408,7 +408,7 @@ public()
 	}
 ##]
 
-# Execute the src/config script.  That populates the $build_script variable.
+# Execute the src/config script, which calls lib, bin, and public above.
 read_config()
 	{
 	g_project=""
