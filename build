@@ -9,7 +9,7 @@
 # configuration.
 #
 # The script checks time stamps and builds only what is out of date.  It
-# automatically finds header dependencies, which it caches in obj/*i files.
+# automatically finds header dependencies, which it caches in obj/*.dep files.
 #
 # The installer honours the standard structure (e.g. the way perl does it):
 #
@@ -123,16 +123,16 @@ make_obj()
 	local file_c=src/$name.c
 	local file_o=obj/$name.o
 
-	# Make sure header cache file obj/$name.i is up to date.
-	local file_i=obj/$name.i
-	if [ `newer_than $file_c $file_i` -eq 1 ]; then
+	# Make sure header cache file obj/$name.dep is up to date.
+	local file_dep=obj/$name.dep
+	if [ `newer_than $file_c $file_dep` -eq 1 ]; then
 		local headers="`get_headers $name`"
-		echo $headers >$file_i
+		echo $headers >$file_dep
 	fi
 
 	local update=`newer_than $file_c $file_o`
 	if [ $update -eq 0 ]; then
-		local headers="`cat $file_i`"
+		local headers="`cat $file_dep`"
 
 		local file_h
 		for file_h in $headers
