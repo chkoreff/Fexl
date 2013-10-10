@@ -69,7 +69,7 @@ value resolve(value f)
 	value def = 0;
 
 	value name = sym->L;
-	if (sym->R->L->T == type_C)
+	if (sym->R->L->T != type_C)
 		{
 		def = context(get_str(name)->data);
 		if (!def)
@@ -119,12 +119,13 @@ value type_pop_symbol(value f)
 	return g;
 	}
 
-/* (look_symbol sym)  Look at the symbol and return (\: : label is_name line),
-where:
+/* (look_symbol sym)  Look at the symbol and return:
+	(\: : label quoted line)
 
-	label is the string label
-	is_name is true if it's a name, or false if it's a literal string
-	line is the line number
+where:
+	label is the string label.
+	quoted is true if it's a quoted string, or false if it's a name.
+	line is the line number.
 */
 value type_look_symbol(value f)
 	{
@@ -135,10 +136,10 @@ value type_look_symbol(value f)
 	data_type(x->L,type_string);
 
 	value label = x->L;
-	value is_name = x->R->L;
+	value quoted = x->R->L;
 	value line = x->R->R;
 
-	value g = yield(yield(yield(I,label),is_name),line);
+	value g = yield(yield(yield(I,label),quoted),line);
 	drop(x);
 	return g;
 	}

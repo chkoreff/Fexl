@@ -478,11 +478,11 @@ print "form " show form
 	\form
 
 	pop_symbol form form \sym\form
-	look_symbol sym \label\is_name\line
+	look_symbol sym \label\quoted\line
 
 	print "symbol "
 	#print "(line " print (long_string line) print ") "
-	print (is_name "name" "string") print ": " print label nl
+	print (quoted "string" "name") print ": " print label nl
 	print "form " show form
 	nl
 	resolve form

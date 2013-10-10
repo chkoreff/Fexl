@@ -20,10 +20,10 @@ value apply(value f, value g)
 	return v;
 	}
 
-/* Create a symbol, either a name or a literal. */
-value symbol(value is_name, struct str *name, long line)
+/* Create a symbol, either a name or a quoted string. */
+value symbol(value quoted, struct str *name, long line)
 	{
-	return V(type_form, Qstr(name), A(is_name,Qlong(line)));
+	return V(type_form, Qstr(name), A(quoted,Qlong(line)));
 	}
 
 /* Return true if the value is a symbol with a null name. */
@@ -31,7 +31,7 @@ int is_null_name(value x)
 	{
 	return x->T == type_form
 		&& x->L->T == type_string
-		&& x->R->L->T == type_C
+		&& x->R->L->T != type_C
 		&& get_str(x->L)->len == 0;
 	}
 

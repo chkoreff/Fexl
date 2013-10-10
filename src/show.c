@@ -8,7 +8,6 @@
 #include "qstr.h"
 #include "show.h"
 
-extern value type_C(value);
 extern value type_S(value);
 extern value type_I(value);
 extern value type_L(value);
@@ -31,7 +30,8 @@ void show(value f)
 			printf("{");
 			if (f->L->T == type_string)
 				{
-				const char *format = f->R->L->T == type_C ? "%s" : "\"%s\"";
+				int quoted = (f->R->L->T == type_C);
+				const char *format = quoted ? "\"%s\"" : "%s";
 				printf(format,get_str(f->L)->data);
 				}
 			else
