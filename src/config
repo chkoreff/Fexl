@@ -2,25 +2,13 @@
 project fexl
 
 # Libraries
-lib double # TODO
-lib double2
-
+lib double
 lib file
-
 lib lib - dl
-
 lib long
-lib long2
-
-lib str # TODO
-lib str2
-
-lib qfile # TODO
-lib qfile2
-
-lib qstr # TODO
-lib qstr2 - str2
-
+lib str
+lib qfile
+lib qstr
 lib system
 lib var
 # These are just for testing.

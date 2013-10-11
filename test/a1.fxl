@@ -17,11 +17,11 @@
 	)
 
 # TODO open these lazily, one time, on demand only.
-\load_long==(load_from "long2")
-\load_double==(load_from "double2")
-\load_str==(load_from "qstr2")
+\load_long==(load_from "long")
+\load_double==(load_from "double")
+\load_str==(load_from "qstr")
 \load_system==(load_from "system")
-\load_file==(load_from "qfile2")
+\load_file==(load_from "qfile")
 \load_test==(load_from "test")
 \load_show==(load_from "show")
 
