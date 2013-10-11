@@ -525,7 +525,7 @@ hello
 
 \\
 
-# LATER test some syntax errors after you do error propagation in parse.c.
+# LATER test some syntax errors by forking a process.
 # Missing lambda symbol:
 #\= \\
 

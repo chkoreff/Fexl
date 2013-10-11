@@ -104,7 +104,7 @@ value type_readlink(value f)
 	return y;
 	}
 
-/*TODO more functions */
+/*LATER more functions */
 
 /*
 LATER fclose : (not necessary due to auto-close, but gives you some control.

@@ -51,7 +51,7 @@ value type_string_common(value f)
 	}
 
 #if 0
-TODO more functions
+LATER more functions
 string_slice str pos len
 string_index
 string_long

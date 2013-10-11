@@ -54,7 +54,7 @@ value type_double_string(value f)
 	return g;
 	}
 
-/*TODO more functions */
+/*LATER more functions */
 #if 0
 is_double
 double_long

@@ -2,11 +2,25 @@
 project fexl
 
 # Libraries
+lib double # TODO
 lib double2
+
+lib file
+
+lib lib - dl
+
+lib long
 lib long2
+
+lib str # TODO
 lib str2
+
+lib qfile # TODO
 lib qfile2
+
+lib qstr # TODO
 lib qstr2 - str2
+
 lib system
 lib var
 # These are just for testing.
@@ -19,7 +33,7 @@ lib show
 # don't actually use any functions in the library, the linker doesn't bother
 # linking with the library.  You can see the effect using "ldd bin/fexl".
 
-bin fexl basic buf die double file form lib long memory parse resolve str \
-	qfile qstr value - dl show
+bin fexl basic buf die form memory parse resolve value \
+	- double file lib long qfile qstr str show
 
 public fexl

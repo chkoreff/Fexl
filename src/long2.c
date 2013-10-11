@@ -59,7 +59,7 @@ value type_order(value f)
 	return g;
 	}
 
-/*TODO more functions */
+/*LATER more functions */
 #if 0
 is_long
 long_double
