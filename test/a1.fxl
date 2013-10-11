@@ -76,6 +76,8 @@
 \readlink==(load_file "type_readlink")
 \fopen==(load_file "type_fopen")
 
+\show==(load_show "type_show")
+
 \fprint=(\fh\x fwrite fh x)  # TODO will allow x to be nested list
 
 \NL="
@@ -91,8 +93,6 @@
 
 print_to stdout \print\nl\say
 
-\show==(load_show "type_show")
-
 ## test functions
 
 \test_built_in_pattern=
@@ -101,9 +101,6 @@ print_to stdout \print\nl\say
 \test==test
 
 show test
-#show stdin
-#show stdout
-#show stderr
 )
 
 \test_forms=
@@ -165,6 +162,7 @@ putchar 10
 say "== test_readlink"
 \bin_path==(readlink "/proc/self/exe")
 say bin_path
+say base_path
 )
 
 \test_inf=
@@ -422,6 +420,9 @@ say "== test_file"
 	\fh==(fopen name "r")
 	print (fh "no" \fh "yes") nl
 	)
+show stdin
+show stdout
+show stderr
 try "test/a1.fxl"
 try "test/a1x.fxl"
 )

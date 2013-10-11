@@ -224,7 +224,7 @@ make_bin()
 	done
 
 	if [ $update -eq 1 ]; then
-		local options="-L lib/$g_project -Wl,-rpath,lib/$g_project"
+		local options="-L lib/$g_project -Wl,-rpath,\$ORIGIN/../lib/$g_project"
 		run "gcc -rdynamic -s $options$list_obj -o $file_e"
 	fi
 	}

@@ -5,6 +5,7 @@
 #include "basic.h"
 #include "lib.h"
 #include "long.h"
+#include "qfile.h"
 #include "qstr.h"
 #include "show.h"
 
@@ -81,10 +82,7 @@ void show(value f)
 			printf("lib:%ld", id);
 			}
 		else if (f->T == type_file)
-			{
-			long id = (long)f->R;
-			printf("file:%ld", id);
-			}
+			printf("file:%d", fileno(get_file(f)));
 		else if (f->T == type_long)
 			printf("%ld",get_long(f));
 		else if (f->T == type_string)
