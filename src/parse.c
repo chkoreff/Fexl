@@ -54,11 +54,10 @@ RLIMIT_AS, and also RLIMIT_DATA for good measure, to limit the total amount of
 memory.
 */
 
-FILE *source_fh = 0;           /* current source file */
-const char *source_name = 0;   /* current name of source file */
-long source_line;              /* current line number */
-
-static int ch;                 /* current character */
+static FILE *source_fh = 0;           /* current source file */
+static const char *source_name = 0;   /* current name of source file */
+static long source_line;              /* current line number */
+static int ch;                        /* current character */
 
 static void next_ch(void)
 	{
@@ -412,8 +411,12 @@ static value parse_exp(void)
 		}
 	}
 
-value parse(void)
+value parse(FILE *fh, const char *name, long line)
 	{
+	source_fh = fh;
+	source_name = name;
+	source_line = line;
+
 	ch = 0;
 	value exp = parse_exp();
 	if (ch != -1)
@@ -438,11 +441,7 @@ value type_parse(value f)
 	struct str *name = get_str(y);
 	long line = get_long(z);
 
-	source_fh = fh;
-	source_name = name->data;
-	source_line = line;
-
-	value exp = parse();
+	value exp = parse(fh,name->data,line);
 	value result = pair(exp,Qlong(source_line));
 
 	drop(x);
@@ -450,4 +449,19 @@ value type_parse(value f)
 	drop(z);
 
 	return result;
+	}
+
+value const_source_file(void) { return Qfile(source_fh); }
+value const_source_name(void) { return Qstr0(source_name); }
+value const_source_line(void) { return Qlong(source_line); }
+
+void report_undef(value sym)
+	{
+	char *name = get_str(sym->L)->data;
+	long line = get_long(sym->R->R);
+
+	warn("Undefined symbol %s on line %ld%s%s", name, line,
+		source_name[0] ? " of " : "",
+		source_name
+		);
 	}

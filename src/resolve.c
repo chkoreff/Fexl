@@ -1,47 +1,33 @@
+#include <dlfcn.h>
 #include <stdio.h>
-#include <string.h>
-#include "die.h"
-#include "file.h"
 #include "str.h"
 
 #include "value.h"
 #include "basic.h"
 #include "double.h"
-#include "fexl.h"
 #include "form.h"
-#include "lib.h"
 #include "long.h"
 #include "parse.h"
-#include "qfile.h"
 #include "qstr.h"
 #include "resolve.h"
 
-static void report_undef(value sym)
+static void *find_symbol(const char *prefix0, struct str *label)
 	{
-	char *name = get_str(sym->L)->data;
-	long line = get_long(sym->R->R);
+	struct str *prefix = str_new_data0(prefix0);
+	struct str *full_name = str_append(prefix, label);
 
-	warn("Undefined symbol %s on line %ld%s%s", name, line,
-		source_name[0] ? " of " : "",
-		source_name
-		);
+	void *def = dlsym(NULL, full_name->data);
+
+	str_free(prefix);
+	str_free(full_name);
+
+	return def;
 	}
 
-value type_base_path(value f)
+/* This is the core context (environment) for Fexl. */
+static value context(struct str *label)
 	{
-	return Qstr(base_path());
-	}
-
-/* This is the core context needed to bootstrap a larger context in Fexl. */
-static value context(char *name)
-	{
-	if (strcmp(name,"dlopen") == 0) return Q(type_dlopen);
-	if (strcmp(name,"dlsym") == 0) return Q(type_dlsym);
-	if (strcmp(name,"Q") == 0) return Q(type_Q);
-	if (strcmp(name,"base_path") == 0) return Q(type_base_path);
-	if (strcmp(name,"source_file") == 0) return Qfile(source_fh);
-	if (strcmp(name,"source_name") == 0) return Qstr0(source_name);
-	if (strcmp(name,"source_line") == 0) return Qlong(source_line);
+	char *name = label->data;
 
 	/* Integer number (long) */
 	{
@@ -53,6 +39,18 @@ static value context(char *name)
 	{
 	double num;
 	if (string_double(name,&num)) return Qdouble(num);
+	}
+
+	/* Look up type_<name>. */
+	{
+	value (*fn)(value) = find_symbol("type_",label);
+	if (fn) return Q(fn);
+	}
+
+	/* Look up const_<name>. */
+	{
+	value (*fn)(void) = find_symbol("const_",label);
+	if (fn) return fn();
 	}
 
 	return 0;
@@ -69,17 +67,17 @@ value resolve(value f)
 	value def = 0;
 
 	value name = sym->L;
-	if (sym->R->L->T != type_C)
+	if (sym->R->L->T == type_C)
+		def = name; /* quoted string */
+	else
 		{
-		def = context(get_str(name)->data);
+		def = context(get_str(name));
 		if (!def)
 			{
 			report_undef(sym);
 			def = sym;
 			}
 		}
-	else
-		def = name; /* string literal */
 
 	value form = abstract(sym,f);
 	value resolved = resolve(form);
@@ -97,7 +95,7 @@ Get the first symbol in the form, in left to right order.  Return end if there
 is no symbol, otherwise return (item sym new_form), where sym is the symbol,
 and new_form is the form with sym abstracted from it.
 */
-value type_pop_symbol(value f)
+value type_pop_symbol(value f) /*TODO won't need */
 	{
 	if (!f->L) return f;
 
@@ -127,7 +125,7 @@ where:
 	quoted is true if it's a quoted string, or false if it's a name.
 	line is the line number.
 */
-value type_look_symbol(value f)
+value type_look_symbol(value f) /*TODO won't need */
 	{
 	if (!f->L) return f;
 

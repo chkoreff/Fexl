@@ -3,7 +3,6 @@
 
 #include "value.h"
 #include "basic.h"
-#include "lib.h"
 #include "long.h"
 #include "qstr.h"
 

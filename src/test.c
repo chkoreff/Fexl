@@ -13,7 +13,7 @@ value type_ping(value f)
 	return I;
 	}
 
-value tower(value f, int n) /*TODO*/
+value tower(value f, int n) /*LATER do in fexl*/
 	{
 	value dual = A(A(S,I),I);
 	hold(dual);
@@ -26,7 +26,7 @@ value tower(value f, int n) /*TODO*/
 	return result;
 	}
 
-void test_buf(void) /*TODO*/
+void test_buf(void) /*LATER do in fexl*/
 	{
 	printf("== test_buf\n");
 	struct buf buf;

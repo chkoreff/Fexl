@@ -47,9 +47,9 @@ value type_getchar(value f)
 	return Qlong(getchar());
 	}
 
-value type_stdin(value f)  { return Qfile(stdin); }
-value type_stdout(value f) { return Qfile(stdout); }
-value type_stderr(value f) { return Qfile(stderr); }
+value const_stdin(void)  { return Qfile(stdin); }
+value const_stdout(void) { return Qfile(stdout); }
+value const_stderr(void) { return Qfile(stderr); }
 
 /* (fputc file ch) Write character to stdout. */
 value type_fputc(value f)
@@ -126,6 +126,8 @@ value type_readlink(value f)
 	drop(x);
 	return y;
 	}
+
+value const_base_path(void) { return Qstr(base_path()); }
 
 /*LATER more functions */
 

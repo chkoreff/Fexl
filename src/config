@@ -15,13 +15,7 @@ lib var
 lib test
 lib show
 
-# Executable
-# Note that I link with the "show" library in case you need to trace things
-# while developing.  What's neat is that the linker is intelligent, so if you
-# don't actually use any functions in the library, the linker doesn't bother
-# linking with the library.  You can see the effect using "ldd bin/fexl".
-
 bin fexl basic buf die form memory parse resolve value \
-	- double file lib long qfile qstr str show
+	- double file lib long qfile qstr str system var show test
 
 public fexl

@@ -1,82 +1,8 @@
 #!bin/fexl
 
-# TODO detect (Q 0) and die instead */
-\load=(\lib\name Q (dlsym lib name))
-
-\load_bin==(\lib==(dlopen "") load lib)
-
-\string_append==(load_bin "type_string_append")
-\.==string_append
-
-\load_from=
-	(\name
-	\path==(. "lib/fexl/"; . "lib"; . name ".so")
-	\path==(. base_path path)
-	\lib==(dlopen path)
-	load lib
-	)
-
-# TODO open these lazily, one time, on demand only.
-\load_long==(load_from "long")
-\load_double==(load_from "double")
-\load_str==(load_from "qstr")
-\load_system==(load_from "system")
-\load_file==(load_from "qfile")
-\load_test==(load_from "test")
-\load_show==(load_from "show")
-
-\eval=(\x \x==x x)
 \T=(\T\F T)
-\F=(\T\F F)
-
-\S==(load_bin "type_S")
-\C==(load_bin "type_C")
-\I==(load_bin "type_I")
-\L==(load_bin "type_L")
-\@==(load_bin "type_Y")
-
-##
-\long_add==(load_long "type_long_add")
-\long_sub==(load_long "type_long_sub")
-\long_mul==(load_long "type_long_mul")
-\long_div==(load_long "type_long_div")
-\long_cmp==(load_long "type_long_cmp")
-\order==(load_long "type_order")
-\long_string==(load_long "type_long_string")
-
-##
-\double_add==(load_double "type_double_add")
-\double_sub==(load_double "type_double_sub")
-\double_mul==(load_double "type_double_mul")
-\double_div==(load_double "type_double_div")
-\double_cmp==(load_double "type_double_cmp")
-\double_string==(load_double "type_double_string")
-
-##
-\string_len==(load_str "type_string_len")
-\string_cmp==(load_str "type_string_cmp")
-\string_at==(load_str "type_string_at")
-\string_common==(load_str "type_string_common")
-
-##
-\argc==(eval; load_system "type_argc")
-\argv==(load_system "type_argv")
-
-##
-\putchar==(load_file "type_putchar")
-\getchar==(load_file "type_getchar")
-\fputc==(load_file "type_fputc")
-\fgetc==(load_file "type_fgetc")
-\fwrite==(load_file "type_fwrite")
-
-\stdin==(eval; load_file "type_stdin")
-\stdout==(eval; load_file "type_stdout")
-\stderr==(eval; load_file "type_stderr")
-
-\readlink==(load_file "type_readlink")
-\fopen==(load_file "type_fopen")
-
-\show==(load_show "type_show")
+\@=Y
+\.==string_append
 
 \fprint=(\fh\x fwrite fh x)  # TODO will allow x to be nested list
 
@@ -97,10 +23,8 @@ print_to stdout \print\nl\say
 
 \test_built_in_pattern=
 (
-\test==(load_test "type_test_pattern")
-\test==test
-
-show test
+\result==test_pattern
+show result
 )
 
 \test_forms=
@@ -200,7 +124,6 @@ say "This goes to stderr."
 \test_ping=
 (
 say "== test_ping"
-\ping==(load_test "type_ping")
 \ping=(ping ping)
 \ping=(ping ping)
 ping
@@ -399,8 +322,6 @@ try 2
 \test_later=
 (
 say "== test_later"
-\later==(load_bin "type_later")
-
 # Test peeling off "later" layers with eager evaluation.
 \f=(I C)
 \f=(later f)
@@ -463,9 +384,6 @@ try list
 \test_parse=
 (
 say "== test_parse"
-\parse==(load_bin "type_parse")
-\pop_symbol==(load_bin "type_pop_symbol")
-\look_symbol==(load_bin "type_look_symbol")
 print "Parsing the tail of " print source_name
 print " on line "
 print (long_string source_line)

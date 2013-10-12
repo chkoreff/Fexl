@@ -5,10 +5,7 @@
 #include "long.h"
 #include "qstr.h"
 
-value type_argc(value f)
-	{
-	return Qlong(argc);
-	}
+value const_argc(void) { return Qlong(argc); }
 
 value type_argv(value f)
 	{
@@ -20,4 +17,6 @@ value type_argv(value f)
 	return z;
 	}
 
-/*LATER more functions */
+/*LATER more functions
+set_rlimit
+*/

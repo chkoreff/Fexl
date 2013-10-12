@@ -20,16 +20,14 @@ int main(int _argc, char *_argv[])
 
 	beg_basic();
 
-	source_name = argc > 1 ? argv[1] : "";
-	source_fh = source_name[0] ? fopen(source_name,"r") : stdin;
+	char *name = argc > 1 ? argv[1] : "";
+	FILE *fh = name[0] ? fopen(name,"r") : stdin;
+	if (fh == 0)
+		die("Could not open file %s", name);
 
-	if (source_fh == 0)
-		die("Could not open file %s", source_name);
-
-	source_line = 1;
-
-	value f = resolve(parse());
+	value f = resolve(parse(fh,name,1));
 	int exit_code = f->T == type_form ? 2 : 0;
+
 	value g = eval(f);
 
 	drop(f);

@@ -194,8 +194,16 @@ make_lib()
 # will link to the functions defined in the program.  You must use this option
 # for reliable results.
 #
+# We use $ORIGIN so the program can always find shared libraries relative to
+# its own location, regardless of where you install it and from where you run
+# it.  You can see the effect with "readelf -d bin/$g_project"
+#
+# We use --no-as-needed to force linkage with the shared libraries, which makes
+# their functions available to the program with dlsym(NULL).
+#
 # LATER jturner says he had to remove -ldl when building on OpenBSD.
 # I suppose I should compare uname with "OpenBSD", and skip -ldl if I see it.
+
 make_bin()
 	{
 	local name=$1
@@ -224,7 +232,8 @@ make_bin()
 	done
 
 	if [ $update -eq 1 ]; then
-		local options="-L lib/$g_project -Wl,-rpath,\$ORIGIN/../lib/$g_project"
+		local options="-L lib/$g_project"
+		options="$options -Wl,-rpath,\$ORIGIN/../lib/$g_project,--no-as-needed"
 		run "gcc -rdynamic -s $options$list_obj -o $file_e"
 	fi
 	}
