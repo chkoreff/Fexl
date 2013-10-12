@@ -457,10 +457,11 @@ value const_source_line(void) { return Qlong(source_line); }
 
 void report_undef(value sym)
 	{
-	char *name = get_str(sym->L)->data;
+	const char *kind = (sym->R->L->T == type_C) ? "string" : "symbol";
+	const char *name = get_str(sym->L)->data;
 	long line = get_long(sym->R->R);
 
-	warn("Undefined symbol %s on line %ld%s%s", name, line,
+	warn("Undefined %s %s on line %ld%s%s", kind, name, line,
 		source_name[0] ? " of " : "",
 		source_name
 		);

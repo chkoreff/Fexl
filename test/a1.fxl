@@ -3,11 +3,24 @@
 \T=(\T\F T)
 \@=Y
 \.==string_append
+\no=C
+
+\string_eq=(\x\y order (string_cmp x y) F T F)
 
 \fprint=(\fh\x fwrite fh x)  # TODO will allow x to be nested list
 
 \NL="
 "
+
+# Context constructors.  A context is a function which maps a name (string) to
+# an optional value, either (yes val) if defined or no if not defined.
+
+# ((define key val next) name) is (yes val) if name equals key, or (next name)
+# otherwise.
+\define = (\key\val\next \sym string_eq sym key (yes val) (next sym))
+
+# (void name) is always no.
+\void = (\name no)
 
 \print_to=
 	(\out
@@ -385,30 +398,29 @@ try list
 (
 say "== test_parse"
 print "Parsing the tail of " print source_name
-print " on line "
-print (long_string source_line)
-nl
+print " on line " print (long_string source_line) nl
+
 parse source_file "test" source_line \form\line
-print "form " show form
-#print "line " show line
 
-\resolve=
-	(@\resolve
-	\form
+# Now set up a context (environment) for resolving the parsed form.
 
-	pop_symbol form form \sym\form
-	look_symbol sym \label\quoted\line
-
-	print "symbol "
-	#print "(line " print (long_string line) print ") "
-	print (quoted "string" "name") print ": " print label nl
-	print "form " show form
-	nl
-	resolve form
+# Strings always map to themselves.
+\define_string=yes
+# Define some more names.
+\define_name=
+	(
+	define "say" say;
+	define_name
 	)
+# Make a simple "resolve" function with everything baked in.
+\resolve=(resolve define_string define_name)
 
-say "== Loop through symbols"
-\form==(resolve form)
+print "== form      = " show form
+\exp==(resolve form)
+print "== resolved  = " show exp
+say "== Now evaluate"
+\exp==exp
+print "== value     = " show exp
 )
 
 ## main
@@ -449,3 +461,6 @@ hello
 
 # Missing definition:
 #\x= \\
+
+# Just an undefined var:
+#x

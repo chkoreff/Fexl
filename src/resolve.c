@@ -1,5 +1,6 @@
 #include <dlfcn.h>
 #include <stdio.h>
+#include "die.h"
 #include "str.h"
 
 #include "value.h"
@@ -11,10 +12,10 @@
 #include "qstr.h"
 #include "resolve.h"
 
-static void *find_symbol(const char *prefix0, struct str *label)
+static void *find_symbol(const char *prefix0, struct str *name)
 	{
 	struct str *prefix = str_new_data0(prefix0);
-	struct str *full_name = str_append(prefix, label);
+	struct str *full_name = str_append(prefix, name);
 
 	void *def = dlsym(NULL, full_name->data);
 
@@ -25,119 +26,130 @@ static void *find_symbol(const char *prefix0, struct str *label)
 	}
 
 /* This is the core context (environment) for Fexl. */
-static value context(struct str *label)
+static value define_name(struct str *name)
 	{
-	char *name = label->data;
-
 	/* Integer number (long) */
 	{
 	long num;
-	if (string_long(name,&num)) return Qlong(num);
+	if (string_long(name->data,&num)) return Qlong(num);
 	}
 
     /* Floating point number (double) */
 	{
 	double num;
-	if (string_double(name,&num)) return Qdouble(num);
+	if (string_double(name->data,&num)) return Qdouble(num);
 	}
 
 	/* Look up type_<name>. */
 	{
-	value (*fn)(value) = find_symbol("type_",label);
+	value (*fn)(value) = find_symbol("type_",name);
 	if (fn) return Q(fn);
 	}
 
 	/* Look up const_<name>. */
 	{
-	value (*fn)(void) = find_symbol("const_",label);
+	value (*fn)(void) = find_symbol("const_",name);
 	if (fn) return fn();
 	}
 
 	return 0;
 	}
 
-/* Resolve all symbols in form f with the core context, reporting any undefined
-symbols to stderr. */
-value resolve(value f)
+/* (define_name name) Looks up name in the core context and returns (yes val)
+or no. */
+value type_define_name(value f)
 	{
-	hold(f);
-	value sym = first_symbol(f);
-	if (sym == 0) return f;
-
-	value def = 0;
-
-	value name = sym->L;
-	if (sym->R->L->T == type_C)
-		def = name; /* quoted string */
-	else
-		{
-		def = context(get_str(name));
-		if (!def)
-			{
-			report_undef(sym);
-			def = sym;
-			}
-		}
-
-	value form = abstract(sym,f);
-	value resolved = resolve(form);
-	value result = apply(resolved,def);
-
-	hold(result);
-	drop(form);
-	drop(resolved);
-	drop(f);
+	if (!f->L) return f;
+	value x = eval(f->R);
+	value def = define_name(get_str(x));
+	value result = maybe(def);
+	drop(x);
 	return result;
 	}
 
-/* (pop_symbol format)
-Get the first symbol in the form, in left to right order.  Return end if there
-is no symbol, otherwise return (item sym new_form), where sym is the symbol,
-and new_form is the form with sym abstracted from it.
-*/
-value type_pop_symbol(value f) /*TODO won't need */
+static value case_no;
+static value case_yes;
+static value curr_define_string;
+static value curr_define_name;
+
+/* Resolve all symbols in the form with the core context, reporting any
+undefined symbols to stderr. */
+static value resolve(value form)
 	{
-	if (!f->L) return f;
-
-	value form = eval(f->R);
 	value sym = first_symbol(form);
+	if (sym == 0) return form;
 
-	value g;
+	value define = (sym->R->L->T == type_C)
+		? curr_define_string : curr_define_name;
+	value name = sym->L;
 
-	if (sym == 0)
-		g = C;
+	value def = eval(A(A(A(define,name),case_no),case_yes));
+
+	value fn;
+	if (def->L == case_yes)
+		fn = def->R;
 	else
 		{
-		value new_form = abstract(sym,form);
-		g = item(sym,new_form);
-		drop(new_form);
+		report_undef(sym);
+		fn = sym;
+		if (def != case_no)
+			bad_type();
 		}
 
-	drop(form);
-	return g;
+	value new_form = abstract(sym,form);
+	value resolved = resolve(new_form);
+	value result = apply(resolved,fn);
+
+	drop(def);
+	drop(new_form);
+	return result;
 	}
 
-/* (look_symbol sym)  Look at the symbol and return:
-	(\: : label quoted line)
-
-where:
-	label is the string label.
-	quoted is true if it's a quoted string, or false if it's a name.
-	line is the line number.
-*/
-value type_look_symbol(value f) /*TODO won't need */
+/* (resolve define_string define_name form) */
+value type_resolve(value f)
 	{
-	if (!f->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
 
-	value x = eval(f->R);
-	if (x->T != type_form) bad_type();
-	data_type(x->L,type_string);
+	curr_define_string = eval(f->L->L->R);
+	curr_define_name = eval(f->L->R);
+	value form = eval(f->R);
 
-	value label = x->L;
-	value quoted = x->R->L;
-	value line = x->R->R;
+	case_no = Qlong(1); hold(case_no);
+	case_yes = Qlong(2); hold(case_yes);
 
-	value g = yield(yield(yield(I,label),quoted),line);
-	drop(x);
-	return g;
+	value result = resolve(form);
+
+	drop(case_no);
+	drop(case_yes);
+
+	drop(curr_define_string);
+	drop(curr_define_name);
+	drop(form);
+
+	return A(later,result);
+	}
+
+value resolve_standard(value form)
+	{
+	curr_define_string = eval(yes);
+	curr_define_name = eval(Q(type_define_name));
+
+	case_no = Qlong(1); hold(case_no);
+	case_yes = Qlong(2); hold(case_yes);
+
+	hold(form);
+	value f = resolve(form);
+	hold(f);
+	drop(form);
+
+	if (f->T == type_form)
+		die(0); /* Form has undefined symbols. */
+
+	drop(case_no);
+	drop(case_yes);
+
+	drop(curr_define_string);
+	drop(curr_define_name);
+
+	return f;
 	}

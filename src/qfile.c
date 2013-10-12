@@ -107,15 +107,11 @@ value type_fopen(value f)
 	struct str *mode = get_str(y);
 
 	FILE *fh = fopen(path->data, mode->data);
-	value g;
-	if (fh)
-		g = A(C,yield(I,Qfile(fh)));
-	else
-		g = C;
+	value result = maybe(fh ? Qfile(fh) : 0);
 
 	drop(x);
 	drop(y);
-	return g;
+	return result;
 	}
 
 value type_readlink(value f)

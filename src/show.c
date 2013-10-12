@@ -24,6 +24,8 @@ extern value type_lib(value f);
 extern value type_dlopen(value f);
 extern value type_dlsym(value f);
 extern value type_Q(value f);
+extern value type_fwrite(value f);
+extern value type_long_string(value f);
 
 void show(value f)
 	{
@@ -69,6 +71,10 @@ void show(value f)
 			printf("R");
 		else if (f->T == type_Y)
 			printf("@");
+		else if (f->T == type_fwrite)
+			printf("fwrite");
+		else if (f->T == type_long_string)
+			printf("long_string");
 		else if (f->T == type_query)
 			printf("?");
 		else if (f->T == type_later)
@@ -108,8 +114,6 @@ void nl(void)
 value type_show(value f)
 	{
 	if (!f->L) return f;
-	printf(":: ");
-	show(f->R);
-	nl();
+	show(f->R); nl();
 	return I;
 	}

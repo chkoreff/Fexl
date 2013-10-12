@@ -5,7 +5,6 @@
 #include "value.h"
 #include "basic.h"
 #include "fexl.h"
-#include "form.h"
 #include "parse.h"
 #include "resolve.h"
 
@@ -25,9 +24,7 @@ int main(int _argc, char *_argv[])
 	if (fh == 0)
 		die("Could not open file %s", name);
 
-	value f = resolve(parse(fh,name,1));
-	int exit_code = f->T == type_form ? 2 : 0;
-
+	value f = resolve_standard(parse(fh,name,1));
 	value g = eval(f);
 
 	drop(f);
@@ -35,5 +32,5 @@ int main(int _argc, char *_argv[])
 
 	end_basic();
 	end_value();
-	return exit_code;
+	return 0;
 	}

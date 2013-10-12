@@ -12,6 +12,7 @@ value Y;
 value query;
 value later;
 value Qitem;
+value yes;
 
 /* C x y = x */
 value type_C(value f)
@@ -81,32 +82,42 @@ value type_query(value f)
 	return z;
 	}
 
-/* item x y p q = q x y */
+/* item x y F G = G x y */
 value type_item(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return f;
 	return A(A(f->R,f->L->L->L->R),f->L->L->R);
 	}
 
+/* (yes x F G) = (G x) */
+value type_yes(value f)
+	{
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
+	return A(f->R,f->L->L->R);
+	}
+
 /* We use this to return an arbitrary tuple of values.  For example, to return
 the triple (\: : x y z), we would say:
 	return yield(yield(yield(I,x),y),z);
 */
-value yield(value f, value g)
+static value yield(value f, value g) /* TODO */
 	{
 	return A(A(L,f),g);
 	}
 
-/* (pair x y) = (\: : x y) */
 value pair(value x, value y)
 	{
-	return yield(yield(I,x),y);
+	return yield(yield(I,x),y); /*TODO*/
 	}
 
-/* (item x y) = (C (pair x y)) */
 value item(value x, value y)
 	{
-	return A(C,pair(x,y));
+	return A(A(Qitem,x),y);
+	}
+
+value maybe(value x)
+	{
+	return x ? A(yes,x) : C;
 	}
 
 void bad_type(void)
@@ -133,6 +144,7 @@ void beg_basic(void)
 	query = Q(type_query); hold(query);
 	later = Q(type_later); hold(later);
 	Qitem = Q(type_item); hold(Qitem);
+	yes = Q(type_yes); hold(yes);
 	}
 
 void end_basic(void)
@@ -147,4 +159,5 @@ void end_basic(void)
 	drop(query);
 	drop(later);
 	drop(Qitem);
+	drop(yes);
 	}
