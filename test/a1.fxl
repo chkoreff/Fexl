@@ -392,6 +392,11 @@ try ["a" "b"; append tail tail]
 \list=(append list list)
 \list=(append list list)
 try list
+
+# Check the built-in pair function.
+pair "x" "y" \x\y
+say x
+say y
 )
 
 \test_parse=

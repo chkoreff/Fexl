@@ -60,7 +60,7 @@ value type_L(value f)
 value type_Y(value f)
 	{
 	if (!f->L) return f;
-	return A(f->R,A(Y,f->R));
+	return A(f->R,f);
 	}
 
 /* (later x) delays evaluation of x.  It is used to return a function which
@@ -82,6 +82,13 @@ value type_query(value f)
 	return z;
 	}
 
+/* pair x y F = F x y */
+value type_pair(value f)
+	{
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
+	return A(A(f->R,f->L->L->R),f->L->R);
+	}
+
 /* item x y F G = G x y */
 value type_item(value f)
 	{
@@ -96,28 +103,14 @@ value type_yes(value f)
 	return A(f->R,f->L->L->R);
 	}
 
-/* We use this to return an arbitrary tuple of values.  For example, to return
-the triple (\: : x y z), we would say:
-	return yield(yield(yield(I,x),y),z);
-*/
-static value yield(value f, value g) /* TODO */
-	{
-	return A(A(L,f),g);
-	}
-
 value pair(value x, value y)
 	{
-	return yield(yield(I,x),y); /*TODO*/
-	}
-
-value item(value x, value y)
-	{
-	return A(A(Qitem,x),y);
+	return V(type_pair,V(type_pair,Q(type_pair),x),y);
 	}
 
 value maybe(value x)
 	{
-	return x ? A(yes,x) : C;
+	return x ? V(type_yes,yes,x) : C;
 	}
 
 void bad_type(void)
