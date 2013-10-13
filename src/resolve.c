@@ -72,9 +72,8 @@ static value case_yes;
 static value curr_define_string;
 static value curr_define_name;
 
-/* Resolve all symbols in the form with the core context, reporting any
-undefined symbols to stderr. */
-static value resolve(value form)
+/* This function is called from resolve(form) below. */
+static value _resolve(value form)
 	{
 	value sym = first_symbol(form);
 	if (sym == 0) return form;
@@ -97,7 +96,7 @@ static value resolve(value form)
 		}
 
 	value new_form = abstract(sym,form);
-	value resolved = resolve(new_form);
+	value resolved = _resolve(new_form);
 	value result = apply(resolved,fn);
 
 	drop(def);
@@ -105,44 +104,19 @@ static value resolve(value form)
 	return result;
 	}
 
-/* (resolve define_string define_name form) */
-value type_resolve(value f)
+/* Resolve the form in the given context, reporting any undefined symbols to
+stderr. */
+static value resolve(value define_string, value define_name, value form)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return f;
-
-	curr_define_string = eval(f->L->L->R);
-	curr_define_name = eval(f->L->R);
-	value form = eval(f->R);
+	curr_define_string = eval(define_string);
+	curr_define_name = eval(define_name);
+	form = eval(form);
 
 	case_no = Qlong(1); hold(case_no);
 	case_yes = Qlong(2); hold(case_yes);
 
-	value result = resolve(form);
-
-	drop(case_no);
-	drop(case_yes);
-
-	drop(curr_define_string);
-	drop(curr_define_name);
-	drop(form);
-
-	return A(later,result);
-	}
-
-value resolve_standard(value form)
-	{
-	curr_define_string = eval(yes);
-	curr_define_name = eval(Q(type_define_name));
-
-	case_no = Qlong(1); hold(case_no);
-	case_yes = Qlong(2); hold(case_yes);
-
-	hold(form);
-	value f = resolve(form);
-	hold(f);
-	drop(form);
-
-	if (f->T == type_form)
+	value result = _resolve(form);
+	if (result->T == type_form)
 		die(0); /* Form has undefined symbols. */
 
 	drop(case_no);
@@ -150,6 +124,20 @@ value resolve_standard(value form)
 
 	drop(curr_define_string);
 	drop(curr_define_name);
+	drop(form);
 
-	return f;
+	return result;
+	}
+
+/* (resolve define_string define_name form) */
+value type_resolve(value f)
+	{
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
+	return A(later,resolve(f->L->L->R,f->L->R,f->R));
+	}
+
+/* Resolve the form in the standard context. */
+value resolve_standard(value form)
+	{
+	return resolve(yes,Q(type_define_name),form);
 	}

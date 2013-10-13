@@ -24,11 +24,7 @@ int main(int _argc, char *_argv[])
 	if (fh == 0)
 		die("Could not open file %s", name);
 
-	value f = resolve_standard(parse(fh,name,1));
-	value g = eval(f);
-
-	drop(f);
-	drop(g);
+	drop(eval(resolve_standard(parse(fh,name,1))));
 
 	end_basic();
 	end_value();
