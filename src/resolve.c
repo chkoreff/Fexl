@@ -1,6 +1,5 @@
 #include <dlfcn.h>
 #include <stdio.h>
-#include <string.h>
 #include "die.h"
 #include "str.h"
 
@@ -10,7 +9,6 @@
 #include "form.h"
 #include "long.h"
 #include "parse.h"
-#include "qfile.h"
 #include "qstr.h"
 #include "resolve.h"
 
@@ -143,19 +141,10 @@ static value standard_name(value f)
 	if (!f->L) return f;
 	value x = eval(f->R);
 	struct str *name = get_str(x);
+
 	value def = define_name(name);
-
-	if (def == 0 && strcmp(name->data,"source_file") == 0)
-		def = Qfile(source_fh);
-
-	if (def == 0 && strcmp(name->data,"source_name") == 0)
-		def = Qstr0(source_name);
-
-	if (def == 0 && strcmp(name->data,"source_line") == 0)
-		def = Qlong(source_line);
-
-	if (def == 0 && strcmp(name->data,"define_name") == 0)
-		def = Q(type_define_name);
+	if (def == 0)
+		def = resolve_parse(name->data);
 
 	value result = maybe(def);
 	drop(x);

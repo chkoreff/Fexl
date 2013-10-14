@@ -4,7 +4,7 @@ fexl - Function EXpression Language
 [Fexl](http://fexl.com) is the simplest and most powerful language I've been
 able to devise.  You can do low-level system programming in it, but you can
 also create secure "sandboxes" to allow restricted high-level scripting.  The
-interpreter is tiny, about 27K at the moment.  It is easy to call external C
+interpreter is tiny, about 23K at the moment.  It is easy to call external C
 routines.
 
 The interpreter creates an initial value which represents your entire program.

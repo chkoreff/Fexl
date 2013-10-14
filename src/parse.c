@@ -1,5 +1,6 @@
 #include <ctype.h>
 #include <stdio.h>
+#include <string.h>
 #include "buf.h"
 #include "die.h"
 #include "str.h"
@@ -54,11 +55,10 @@ RLIMIT_AS, and also RLIMIT_DATA for good measure, to limit the total amount of
 memory.
 */
 
-FILE *source_fh = 0;           /* current source file */
-const char *source_name = 0;   /* current name of source file */
-long source_line;              /* current line number */
-
-static int ch;                 /* current character */
+static FILE *source_fh = 0;           /* current source file */
+static const char *source_name = 0;   /* current name of source file */
+static long source_line;              /* current line number */
+static int ch;                        /* current character */
 
 static void next_ch(void)
 	{
@@ -450,6 +450,14 @@ value type_parse(value f)
 	drop(z);
 
 	return result;
+	}
+
+value resolve_parse(const char *name)
+	{
+	if (strcmp(name,"source_file") == 0) return Qfile(source_fh);
+	if (strcmp(name,"source_name") == 0) return Qstr0(source_name);
+	if (strcmp(name,"source_line") == 0) return Qlong(source_line);
+	return 0;
 	}
 
 void report_undef(value sym)
