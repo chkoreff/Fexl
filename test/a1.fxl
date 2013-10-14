@@ -9,6 +9,8 @@
 
 \fprint=(\fh\x fwrite fh x)  # TODO will allow x to be nested list
 
+\append=(@\append\x\y x y \h\t [h;append t y])
+
 \NL="
 "
 
@@ -31,6 +33,31 @@
 	)
 
 print_to stdout \print\nl\say
+
+parse source_file source_name source_line \form\line
+\define_name=
+	(
+	define "append" append;
+	define "define" define;
+	define "@" @;
+	define "." .;
+	define "NL" NL;
+	define "fprint" fprint;
+	define "say" say;
+	define "print" print;
+	define "nl" nl;
+	define "print_to" print_to;
+	define "source_file" source_file;
+	define "source_name" source_name;
+	define "source_line" line;
+	define_name
+	)
+
+\resolve=(resolve yes define_name)
+\exp==(resolve form)
+\exp==exp
+
+\\
 
 ## test functions
 
@@ -376,8 +403,6 @@ say "== test_list"
 		)
 	print_items list nl
 	)
-
-\append=(@\append\x\y x y \h\t [h;append t y])
 
 try []
 try ["a"]

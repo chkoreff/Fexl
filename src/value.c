@@ -4,7 +4,6 @@
 static value free_list = 0;
 
 /* Put the value on the free list. */
-/* LATER reconsider clearing atoms immediately upon going on the free list. */
 static void recycle(value f)
 	{
 	f->N = (long)free_list;

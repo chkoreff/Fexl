@@ -54,10 +54,11 @@ RLIMIT_AS, and also RLIMIT_DATA for good measure, to limit the total amount of
 memory.
 */
 
-static FILE *source_fh = 0;           /* current source file */
-static const char *source_name = 0;   /* current name of source file */
-static long source_line;              /* current line number */
-static int ch;                        /* current character */
+FILE *source_fh = 0;           /* current source file */
+const char *source_name = 0;   /* current name of source file */
+long source_line;              /* current line number */
+
+static int ch;                 /* current character */
 
 static void next_ch(void)
 	{
@@ -450,10 +451,6 @@ value type_parse(value f)
 
 	return result;
 	}
-
-value const_source_file(void) { return Qfile(source_fh); }
-value const_source_name(void) { return Qstr0(source_name); }
-value const_source_line(void) { return Qlong(source_line); }
 
 void report_undef(value sym)
 	{
