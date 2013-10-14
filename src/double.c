@@ -62,19 +62,19 @@ static value op2(value f, double op(double,double))
 	return z;
 	}
 
-value type_double_add(value f) { return op2(f,op_add); }
-value type_double_sub(value f) { return op2(f,op_sub); }
-value type_double_mul(value f) { return op2(f,op_mul); }
-value type_double_div(value f) { return op2(f,op_div); }
+value fexl_double_add(value f) { return op2(f,op_add); }
+value fexl_double_sub(value f) { return op2(f,op_sub); }
+value fexl_double_mul(value f) { return op2(f,op_mul); }
+value fexl_double_div(value f) { return op2(f,op_div); }
 
 /* (double_cmp x y) compares x and y and returns -1, 0, or +1. */
-value type_double_cmp(value f) { return op2(f,op_cmp); }
+value fexl_double_cmp(value f) { return op2(f,op_cmp); }
 
 /* double_string num */
 /*LATER note that sprintf "%.15g" shows 0.0 as "0", which looks like a long if
 we try to read it back in.  Perhaps force a ".0" suffix, not sure. */
 extern int sprintf(char *str, const char *format, ...);
-value type_double_string(value f)
+value fexl_double_string(value f)
 	{
 	if (!f->L) return f;
 

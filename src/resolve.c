@@ -40,15 +40,15 @@ static value define_name(struct str *name)
 	if (string_double(name->data,&num)) return Qdouble(num);
 	}
 
-	/* Look up type_<name>. */
+	/* Look up fexl_<name>. */
 	{
-	value (*fn)(value) = find_symbol("type_",name);
+	value (*fn)(value) = find_symbol("fexl_",name);
 	if (fn) return Q(fn);
 	}
 
-	/* Look up const_<name>. */
+	/* Look up const_fexl_<name>. */
 	{
-	value (*fn)(void) = find_symbol("const_",name);
+	value (*fn)(void) = find_symbol("const_fexl_",name);
 	if (fn) return fn();
 	}
 
@@ -57,7 +57,7 @@ static value define_name(struct str *name)
 
 /* (define_name name) Looks up name in the core context and returns (yes val)
 or no. */
-value type_define_name(value f)
+value fexl_define_name(value f)
 	{
 	if (!f->L) return f;
 	value x = eval(f->R);
@@ -78,7 +78,7 @@ static value _resolve(value form)
 	value sym = first_symbol(form);
 	if (sym == 0) return form;
 
-	value define = (sym->R->L->T == type_C)
+	value define = (sym->R->L->T == fexl_C)
 		? curr_define_string : curr_define_name;
 	value name = sym->L;
 
@@ -130,7 +130,7 @@ static value resolve(value define_string, value define_name, value form)
 	}
 
 /* (resolve define_string define_name form) */
-value type_resolve(value f)
+value fexl_resolve(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return f;
 	return A(later,resolve(f->L->L->R,f->L->R,f->R));

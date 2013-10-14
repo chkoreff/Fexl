@@ -49,17 +49,17 @@ static value op2(value f, long op(long,long))
 	return z;
 	}
 
-value type_long_add(value f) { return op2(f,op_add); }
-value type_long_sub(value f) { return op2(f,op_sub); }
-value type_long_mul(value f) { return op2(f,op_mul); }
-value type_long_div(value f) { return op2(f,op_div); }
+value fexl_long_add(value f) { return op2(f,op_add); }
+value fexl_long_sub(value f) { return op2(f,op_sub); }
+value fexl_long_mul(value f) { return op2(f,op_mul); }
+value fexl_long_div(value f) { return op2(f,op_div); }
 
 /* (long_cmp x y) compares x and y and returns -1, 0, or +1. */
-value type_long_cmp(value f) { return op2(f,op_cmp); }
+value fexl_long_cmp(value f) { return op2(f,op_cmp); }
 
 /* Convert long to string. */
 extern int sprintf(char *str, const char *format, ...);
-value type_long_string(value f)
+value fexl_long_string(value f)
 	{
 	if (!f->L) return f;
 
@@ -75,7 +75,7 @@ value type_long_string(value f)
 /* (order x lt eq gt) compares x and 0 and returns lt, eq, or gt.  This allows
 three-way branching on the sign of a long value, typically the result of a
 comparison function T_cmp */
-value type_order(value f)
+value fexl_order(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return f;
 	value xv = eval(f->L->L->L->R);

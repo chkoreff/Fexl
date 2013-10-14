@@ -32,7 +32,7 @@ value Qfile(FILE *fh)
 	}
 
 /* (putchar ch) Write character to stdout. */
-value type_putchar(value f)
+value fexl_putchar(value f)
 	{
 	if (!f->L) return f;
 	value x = eval(f->R);
@@ -42,17 +42,17 @@ value type_putchar(value f)
 	}
 
 /* getchar : Return next char from stdin. */
-value type_getchar(value f)
+value fexl_getchar(value f)
 	{
 	return Qlong(getchar());
 	}
 
-value const_stdin(void)  { return Qfile(stdin); }
-value const_stdout(void) { return Qfile(stdout); }
-value const_stderr(void) { return Qfile(stderr); }
+value const_fexl_stdin(void)  { return Qfile(stdin); }
+value const_fexl_stdout(void) { return Qfile(stdout); }
+value const_fexl_stderr(void) { return Qfile(stderr); }
 
 /* (fputc file ch) Write character to stdout. */
-value type_fputc(value f)
+value fexl_fputc(value f)
 	{
 	if (!f->L || !f->L->L) return f;
 	value x = eval(f->L->R);
@@ -67,7 +67,7 @@ value type_fputc(value f)
 	}
 
 /* (fgetc fh) returns the next character from the file handle. */
-value type_fgetc(value f)
+value fexl_fgetc(value f)
 	{
 	if (!f->L) return f;
 	value x = eval(f->R);
@@ -80,7 +80,7 @@ value type_fgetc(value f)
 	}
 
 /* (fwrite fh str) Write string to file handle. */
-value type_fwrite(value f)
+value fexl_fwrite(value f)
 	{
 	if (!f->L || !f->L->L) return f;
 	value x = eval(f->L->R);
@@ -97,7 +97,7 @@ value type_fwrite(value f)
 	}
 
 /* (fopen path mode) Open a file and return no or (yes fh). */
-value type_fopen(value f)
+value fexl_fopen(value f)
 	{
 	if (!f->L || !f->L->L) return f;
 	value x = eval(f->L->R);
@@ -114,7 +114,7 @@ value type_fopen(value f)
 	return result;
 	}
 
-value type_readlink(value f)
+value fexl_readlink(value f)
 	{
 	if (!f->L) return f;
 	value x = eval(f->R);
@@ -123,7 +123,7 @@ value type_readlink(value f)
 	return y;
 	}
 
-value const_base_path(void) { return Qstr(base_path()); }
+value const_fexl_base_path(void) { return Qstr(base_path()); }
 
 /*LATER more functions */
 

@@ -31,7 +31,7 @@ int is_null_name(value x)
 	{
 	return x->T == type_form
 		&& x->L->T == type_string
-		&& x->R->L->T != type_C
+		&& x->R->L->T != fexl_C
 		&& get_str(x->L)->len == 0;
 	}
 

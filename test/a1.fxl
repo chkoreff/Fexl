@@ -58,8 +58,13 @@ parse source_file source_name source_line \form\line
 \exp==exp
 
 \\
-
 ## test functions
+
+\show!=
+	(\x
+	\x==x
+	show x
+	)
 
 \test_built_in_pattern=
 (
@@ -70,12 +75,6 @@ show result
 \test_forms=
 (
 say "== test_forms"
-\show!=
-	(\x
-	\x==x
-	show x
-	)
-
 show (\x\y x)            # C
 show (\x\y\z x z; y z)   # S
 show (\x x)              # I
@@ -424,6 +423,19 @@ say x
 say y
 )
 
+\test_var=
+(
+say "== test_var"
+\x==var
+\show_val=(print "x contains " print (long_string; get x) nl)
+print "x is " show! x
+set x (long_add 4 3)
+print "x is " show! x
+show_val
+set x (long_mul 6 (get x))
+show_val
+)
+
 \test_parse=
 (
 say "== test_parse"
@@ -473,6 +485,7 @@ test_argv
 test_later
 test_file
 test_list
+test_var
 test_parse
 
 # For testing purposes the tail program below starting with "\x=3" appears

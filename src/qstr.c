@@ -32,7 +32,7 @@ struct str *get_str(value f)
 	}
 
 /* (string_append x y) is the concanation of strings x and y. */
-value type_string_append(value f)
+value fexl_string_append(value f)
 	{
 	if (!f->L || !f->L->L) return f;
 	value x = eval(f->L->R);
@@ -44,7 +44,7 @@ value type_string_append(value f)
 	}
 
 /* (string_at str pos) is the character at pos, or 0 if out of bounds. */
-value type_string_at(value f)
+value fexl_string_at(value f)
 	{
 	if (!f->L || !f->L->L) return f;
 	value x = eval(f->L->R);
@@ -56,7 +56,7 @@ value type_string_at(value f)
 	}
 
 /* (string_cmp x y) compares x and y and returns <0, 0, or >0. */
-value type_string_cmp(value f)
+value fexl_string_cmp(value f)
 	{
 	if (!f->L || !f->L->L) return f;
 	value x = eval(f->L->R);
@@ -68,7 +68,7 @@ value type_string_cmp(value f)
 	}
 
 /* (string_len x) is the length of string x */
-value type_string_len(value f)
+value fexl_string_len(value f)
 	{
 	if (!f->L) return f;
 	value x = eval(f->R);
@@ -78,7 +78,7 @@ value type_string_len(value f)
 	}
 
 /* Compute the length of the longest common prefix of two strings. */
-value type_string_common(value f)
+value fexl_string_common(value f)
 	{
 	if (!f->L || !f->L->L) return f;
 	value x = eval(f->L->R);

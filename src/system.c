@@ -5,9 +5,9 @@
 #include "long.h"
 #include "qstr.h"
 
-value const_argc(void) { return Qlong(argc); }
+value const_fexl_argc(void) { return Qlong(argc); }
 
-value type_argv(value f)
+value fexl_argv(value f)
 	{
 	if (!f->L) return f;
 	value x = eval(f->R);

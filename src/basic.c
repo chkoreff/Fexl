@@ -15,49 +15,49 @@ value Qitem;
 value yes;
 
 /* C x y = x */
-value type_C(value f)
+value fexl_C(value f)
 	{
 	if (!f->L || !f->L->L) return f;
 	return f->L->R;
 	}
 
 /* S x y z = x z (y z) */
-value type_S(value f)
+value fexl_S(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return f;
 	return A(A(f->L->L->R,f->R),A(f->L->R,f->R));
 	}
 
 /* I x = x */
-value type_I(value f)
+value fexl_I(value f)
 	{
 	if (!f->L) return f;
 	return f->R;
 	}
 
 /* F x = I.  In other words, F x y = y. */
-value type_F(value f)
+value fexl_F(value f)
 	{
 	if (!f->L) return f;
 	return I;
 	}
 
 /* R x y z = x (y z) */
-value type_R(value f)
+value fexl_R(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return f;
 	return A(f->L->L->R,A(f->L->R,f->R));
 	}
 
 /* L x y z = x z y */
-value type_L(value f)
+value fexl_L(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return f;
 	return A(A(f->L->L->R,f->R),f->L->R);
 	}
 
 /* Y x = x (Y x) */
-value type_Y(value f)
+value fexl_Y(value f)
 	{
 	if (!f->L) return f;
 	return A(f->R,f);
@@ -66,38 +66,38 @@ value type_Y(value f)
 /* (later x) delays evaluation of x.  It is used to return a function which
 should be evaluated later.  The query function recognizes the (later x) form
 and peels off the outer "later" layer. */
-value type_later(value f)
+value fexl_later(value f)
 	{
 	return f;
 	}
 
 /* (query x y) = y x, except x is evaluated first. */
-value type_query(value f)
+value fexl_query(value f)
 	{
 	if (!f->L || !f->L->L) return f;
 	value x = eval(f->L->R);
-	value xp = (x->T == type_later && x->R) ? x->R : x;
+	value xp = (x->T == fexl_later && x->R) ? x->R : x;
 	value z = A(f->R,xp);
 	drop(x);
 	return z;
 	}
 
 /* pair x y F = F x y */
-value type_pair(value f)
+value fexl_pair(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return f;
 	return A(A(f->R,f->L->L->R),f->L->R);
 	}
 
 /* item x y F G = G x y */
-value type_item(value f)
+value fexl_item(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return f;
 	return A(A(f->R,f->L->L->L->R),f->L->L->R);
 	}
 
 /* (yes x F G) = (G x) */
-value type_yes(value f)
+value fexl_yes(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return f;
 	return A(f->R,f->L->L->R);
@@ -105,12 +105,12 @@ value type_yes(value f)
 
 value pair(value x, value y)
 	{
-	return V(type_pair,V(type_pair,Q(type_pair),x),y);
+	return V(fexl_pair,V(fexl_pair,Q(fexl_pair),x),y);
 	}
 
 value maybe(value x)
 	{
-	return x ? V(type_yes,yes,x) : C;
+	return x ? V(fexl_yes,yes,x) : C;
 	}
 
 void bad_type(void)
@@ -127,17 +127,17 @@ void data_type(value f, type t)
 
 void beg_basic(void)
 	{
-	C = Q(type_C); hold(C);
-	S = Q(type_S); hold(S);
-	I = Q(type_I); hold(I);
-	F = Q(type_F); hold(F);
-	L = Q(type_L); hold(L);
-	R = Q(type_R); hold(R);
-	Y = Q(type_Y); hold(Y);
-	query = Q(type_query); hold(query);
-	later = Q(type_later); hold(later);
-	Qitem = Q(type_item); hold(Qitem);
-	yes = Q(type_yes); hold(yes);
+	C = Q(fexl_C); hold(C);
+	S = Q(fexl_S); hold(S);
+	I = Q(fexl_I); hold(I);
+	F = Q(fexl_F); hold(F);
+	L = Q(fexl_L); hold(L);
+	R = Q(fexl_R); hold(R);
+	Y = Q(fexl_Y); hold(Y);
+	query = Q(fexl_query); hold(query);
+	later = Q(fexl_later); hold(later);
+	Qitem = Q(fexl_item); hold(Qitem);
+	yes = Q(fexl_yes); hold(yes);
 	}
 
 void end_basic(void)

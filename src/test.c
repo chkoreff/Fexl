@@ -7,7 +7,7 @@
 #include "form.h"
 #include "qstr.h"
 
-value type_ping(value f)
+value fexl_ping(value f)
 	{
 	printf("Ping!\n");
 	return I;
@@ -57,7 +57,7 @@ void test_buf(void) /*LATER do in fexl*/
 	str_free(str);
 	}
 
-value type_test_pattern(value f)
+value fexl_test_pattern(value f)
 	{
 	if (0)
 		{

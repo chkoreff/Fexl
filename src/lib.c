@@ -26,7 +26,7 @@ specify what will happen then.  In practice it seems to work fine, but it might
 not be portable.  Therefore I take the extra step of checking for an empty
 string and using NULL instead in that case, just to be sure.
 */
-value type_dlopen(value f)
+value fexl_dlopen(value f)
 	{
 	if (!f->L) return f;
 	value x = eval(f->R);
@@ -42,7 +42,7 @@ value type_dlopen(value f)
 	return result;
 	}
 
-value type_dlsym(value f)
+value fexl_dlsym(value f)
 	{
 	if (!f->L || !f->L->L) return f;
 	value x = eval(f->L->R);
@@ -57,7 +57,7 @@ value type_dlsym(value f)
 	return result;
 	}
 
-value type_Q(value f)
+value fexl_Q(value f)
 	{
 	if (!f->L) return f;
 	value x = eval(f->R);

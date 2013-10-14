@@ -430,7 +430,7 @@ value parse(FILE *fh, const char *name, long line)
 Parse the stream fh with the given source name and initial line number.
 Return (pair exp line), where exp is the parsed expression, and line is the
 updated line number. */
-value type_parse(value f)
+value fexl_parse(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return f;
 
@@ -462,7 +462,7 @@ value resolve_parse(const char *name)
 
 void report_undef(value sym)
 	{
-	const char *kind = (sym->R->L->T == type_C) ? "string" : "symbol";
+	const char *kind = (sym->R->L->T == fexl_C) ? "string" : "symbol";
 	const char *name = get_str(sym->L)->data;
 	long line = get_long(sym->R->R);
 
