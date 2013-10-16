@@ -87,7 +87,7 @@ static void report_undef(value sym)
 	}
 
 /* This function is called from resolve below. */
-static value _resolve(value form)
+static value do_resolve(value form)
 	{
 	value sym = first_symbol(form);
 	if (sym == 0)
@@ -113,7 +113,7 @@ static value _resolve(value form)
 			bad_type();
 		}
 
-	value result = apply(_resolve(abstract(sym,form)),fn);
+	value result = apply(do_resolve(abstract(sym,form)),fn);
 
 	drop(def);
 	drop(form);
@@ -122,16 +122,20 @@ static value _resolve(value form)
 
 /* Resolve the form in the given context, reporting any undefined symbols to
 stderr. */
-static value resolve(value define_string, value define_name, value form)
+static value resolve(value form, value define_string, value define_name,
+	value new_source_name)
 	{
+	form = eval(form);
 	curr_define_string = eval(define_string);
 	curr_define_name = eval(define_name);
-	form = eval(form);
+	new_source_name = eval(new_source_name);
+
+	source_name = get_str(new_source_name)->data;
 
 	case_no = Qlong(1); hold(case_no);
 	case_yes = Qlong(2); hold(case_yes);
 
-	value result = _resolve(form);
+	value result = do_resolve(form);
 	if (result->T == type_form)
 		die(0); /* Form has undefined symbols. */
 
@@ -140,15 +144,16 @@ static value resolve(value define_string, value define_name, value form)
 
 	drop(curr_define_string);
 	drop(curr_define_name);
+	drop(new_source_name);
 
 	return result;
 	}
 
-/* (resolve define_string define_name form) */
+/* (resolve form define_string define_name source_name) */
 value fexl_resolve(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return f;
-	return A(later,resolve(f->L->L->R,f->L->R,f->R));
+	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return f;
+	return A(later,resolve(f->L->L->L->R,f->L->L->R,f->L->R,f->R));
 	}
 
 static value resolve_source(const char *name)
@@ -177,5 +182,5 @@ static value standard_name(value f)
 /* Resolve the form in the standard context. */
 value resolve_standard(value form)
 	{
-	return resolve(yes,Q(standard_name),form);
+	return resolve(form,yes,Q(standard_name),Qstr0(source_name));
 	}

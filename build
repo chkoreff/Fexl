@@ -53,6 +53,7 @@ You may also combine the options in various ways such as this:
        $prog quiet here
        $prog quiet install
        $prog quiet clean install
+       $prog install in ~
        $prog quiet install in ~/my$g_project
        $prog in ~/my$g_project install  # like Yoda
 

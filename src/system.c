@@ -17,6 +17,9 @@ value fexl_argv(value f)
 	return z;
 	}
 
+value const_fexl___DATE__(value f) { return Qstr0(__DATE__); }
+value const_fexl___TIME__(value f) { return Qstr0(__TIME__); }
+
 /*LATER more functions
 set_rlimit
 */

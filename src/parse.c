@@ -432,20 +432,12 @@ value fexl_parse(value f)
 	value y = eval(f->L->R);
 	value z = eval(f->R);
 
-	FILE *save_fh = source_fh;
-	const char *save_name = source_name;
-	long save_line = source_line;
-
 	source_fh = get_file(x);
 	source_name = get_str(y)->data;
 	source_line = get_long(z);
 
 	value exp = parse();
 	value result = pair(exp,Qlong(source_line));
-
-	source_fh = save_fh;
-	source_name = save_name;
-	source_line = save_line;
 
 	drop(x);
 	drop(y);

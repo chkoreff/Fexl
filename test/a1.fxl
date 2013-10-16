@@ -63,8 +63,7 @@ parse source_file source_name source_line \form\line
 	define_name
 	)
 
-\resolve=(resolve yes define_name)
-\exp==(resolve form)
+\exp==(resolve form yes define_name source_name)
 \exp==exp
 
 \\
@@ -464,11 +463,9 @@ parse source_file "test" source_line \form\line
 	define "say" say;
 	define_name
 	)
-# Make a simple "resolve" function with everything baked in.
-\resolve=(resolve define_string define_name)
 
 print "== form      = " show form
-\exp==(resolve form)
+\exp==(resolve form define_string define_name source_name)
 print "== resolved  = " show exp
 say "== Now evaluate"
 \exp==exp
@@ -520,5 +517,5 @@ hello
 
 ## Test the (sym==0) case in _resolve:
 #\form=(C I)
-#\exp==(resolve yes define_name form)
+#\exp==(resolve form yes define_name source_name)
 #show exp
