@@ -1,1 +1,1 @@
-extern value resolve_standard(value f);
+extern value resolve_standard(value form);

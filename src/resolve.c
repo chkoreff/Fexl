@@ -1,5 +1,6 @@
 #include <dlfcn.h>
 #include <stdio.h>
+#include <string.h>
 #include "die.h"
 #include "str.h"
 
@@ -9,6 +10,7 @@
 #include "form.h"
 #include "long.h"
 #include "parse.h"
+#include "qfile.h"
 #include "qstr.h"
 #include "resolve.h"
 
@@ -72,11 +74,27 @@ static value case_yes;
 static value curr_define_string;
 static value curr_define_name;
 
-/* This function is called from resolve(form) below. */
+static void report_undef(value sym)
+	{
+	const char *kind = (sym->R->L->T == fexl_C) ? "string" : "symbol";
+	const char *name = get_str(sym->L)->data;
+	long line = get_long(sym->R->R);
+
+	warn("Undefined %s %s on line %ld%s%s", kind, name, line,
+		source_name[0] ? " of " : "",
+		source_name
+		);
+	}
+
+/* This function is called from resolve below. */
 static value _resolve(value form)
 	{
 	value sym = first_symbol(form);
-	if (sym == 0) return form;
+	if (sym == 0)
+		{
+		form->N--;
+		return form;
+		}
 
 	value define = (sym->R->L->T == fexl_C)
 		? curr_define_string : curr_define_name;
@@ -95,12 +113,10 @@ static value _resolve(value form)
 			bad_type();
 		}
 
-	value new_form = abstract(sym,form);
-	value resolved = _resolve(new_form);
-	value result = apply(resolved,fn);
+	value result = apply(_resolve(abstract(sym,form)),fn);
 
 	drop(def);
-	drop(new_form);
+	drop(form);
 	return result;
 	}
 
@@ -124,7 +140,6 @@ static value resolve(value define_string, value define_name, value form)
 
 	drop(curr_define_string);
 	drop(curr_define_name);
-	drop(form);
 
 	return result;
 	}
@@ -136,6 +151,14 @@ value fexl_resolve(value f)
 	return A(later,resolve(f->L->L->R,f->L->R,f->R));
 	}
 
+static value resolve_source(const char *name)
+	{
+	if (strcmp(name,"source_file") == 0) return Qfile(source_fh);
+	if (strcmp(name,"source_name") == 0) return Qstr0(source_name);
+	if (strcmp(name,"source_line") == 0) return Qlong(source_line);
+	return 0;
+	}
+
 static value standard_name(value f)
 	{
 	if (!f->L) return f;
@@ -144,7 +167,7 @@ static value standard_name(value f)
 
 	value def = define_name(name);
 	if (def == 0)
-		def = resolve_parse(name->data);
+		def = resolve_source(name->data);
 
 	value result = maybe(def);
 	drop(x);

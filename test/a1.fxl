@@ -24,6 +24,9 @@
 # (void name) is always no.
 \void = (\name no)
 
+# (chain f g) chains two contexts f and g together.
+\chain = (\f\g \name f name (g name) yes)
+
 \print_to=
 	(\out
 	\print=(fprint out)
@@ -34,7 +37,7 @@
 
 print_to stdout \print\nl\say
 
-parse source_file source_name source_line \form\line
+# Enhance the context.
 \define_name=
 	(
 	define "append" append;
@@ -49,6 +52,13 @@ parse source_file source_name source_line \form\line
 	define "print_to" print_to;
 	define "source_file" source_file;
 	define "source_name" source_name;
+	define_name
+	)
+
+parse source_file source_name source_line \form\line
+
+\define_name=
+	(
 	define "source_line" line;
 	define_name
 	)
@@ -507,3 +517,8 @@ hello
 
 # Just an undefined var:
 #x
+
+## Test the (sym==0) case in _resolve:
+#\form=(C I)
+#\exp==(resolve yes define_name form)
+#show exp

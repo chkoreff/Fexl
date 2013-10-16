@@ -1,6 +1,5 @@
 #include <ctype.h>
 #include <stdio.h>
-#include <string.h>
 #include "buf.h"
 #include "die.h"
 #include "str.h"
@@ -55,10 +54,10 @@ RLIMIT_AS, and also RLIMIT_DATA for good measure, to limit the total amount of
 memory.
 */
 
-static FILE *source_fh = 0;           /* current source file */
-static const char *source_name = 0;   /* current name of source file */
-static long source_line;              /* current line number */
-static int ch;                        /* current character */
+FILE *source_fh = 0;           /* current source file */
+const char *source_name = 0;   /* current name of source file */
+long source_line;              /* current line number */
+static int ch;                 /* current character */
 
 static void next_ch(void)
 	{
@@ -412,17 +411,12 @@ static value parse_exp(void)
 		}
 	}
 
-value parse(FILE *fh, const char *name, long line)
+value parse(void)
 	{
-	source_fh = fh;
-	source_name = name;
-	source_line = line;
-
 	ch = 0;
 	value exp = parse_exp();
 	if (ch != -1)
 		syntax_error("Extraneous input", source_line);
-
 	return exp;
 	}
 
@@ -438,36 +432,24 @@ value fexl_parse(value f)
 	value y = eval(f->L->R);
 	value z = eval(f->R);
 
-	FILE *fh = get_file(x);
-	struct str *name = get_str(y);
-	long line = get_long(z);
+	FILE *save_fh = source_fh;
+	const char *save_name = source_name;
+	long save_line = source_line;
 
-	value exp = parse(fh,name->data,line);
+	source_fh = get_file(x);
+	source_name = get_str(y)->data;
+	source_line = get_long(z);
+
+	value exp = parse();
 	value result = pair(exp,Qlong(source_line));
+
+	source_fh = save_fh;
+	source_name = save_name;
+	source_line = save_line;
 
 	drop(x);
 	drop(y);
 	drop(z);
 
 	return result;
-	}
-
-value resolve_parse(const char *name)
-	{
-	if (strcmp(name,"source_file") == 0) return Qfile(source_fh);
-	if (strcmp(name,"source_name") == 0) return Qstr0(source_name);
-	if (strcmp(name,"source_line") == 0) return Qlong(source_line);
-	return 0;
-	}
-
-void report_undef(value sym)
-	{
-	const char *kind = (sym->R->L->T == fexl_C) ? "string" : "symbol";
-	const char *name = get_str(sym->L)->data;
-	long line = get_long(sym->R->R);
-
-	warn("Undefined %s %s on line %ld%s%s", kind, name, line,
-		source_name[0] ? " of " : "",
-		source_name
-		);
 	}
