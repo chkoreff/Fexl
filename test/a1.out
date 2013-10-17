@@ -26,6 +26,7 @@ abcd
 /home/patrick/project/fexl/
 == test_say
 Hello world.
+x = !5
 == test_ping
 Ping!
 Ping!
@@ -189,7 +190,7 @@ F
 T
 F
 == test_parse
-Parsing the tail of test/a1.fxl on line 560
+Parsing the tail of test/a1.fxl on line 563
 == form      = {{(R ((R I) ((S I) I))) {{R {say}} {{R {item {"x = "}}} ((L item) C)}}} {3}}
 == Now evaluate
 x = 3
