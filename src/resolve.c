@@ -54,6 +54,8 @@ static value define_name(struct str *name)
 	if (fn) return fn();
 	}
 
+	if (strcmp(name->data,"@") == 0) return Y;
+
 	return 0;
 	}
 
@@ -69,11 +71,6 @@ value fexl_define_name(value f)
 	return result;
 	}
 
-static value case_no;
-static value case_yes;
-static value curr_define_string;
-static value curr_define_name;
-
 static void report_undef(value sym)
 	{
 	const char *kind = (sym->R->L->T == fexl_C) ? "string" : "symbol";
@@ -81,86 +78,95 @@ static void report_undef(value sym)
 	long line = get_long(sym->R->R);
 
 	warn("Undefined %s %s on line %ld%s%s", kind, name, line,
-		source_name[0] ? " of " : "",
-		source_name
+		curr_name[0] ? " of " : "",
+		curr_name
 		);
 	}
 
-/* This function is called from resolve below. */
+static value curr_define_string;
+static value curr_define_name;
+static int curr_strict;
+
 static value do_resolve(value form)
 	{
+	hold(form);
 	value sym = first_symbol(form);
-	if (sym == 0)
-		{
-		form->N--;
-		return form;
-		}
+	if (sym == 0) return form;
 
 	value define = (sym->R->L->T == fexl_C)
 		? curr_define_string : curr_define_name;
 	value name = sym->L;
 
-	value def = eval(A(A(A(define,name),case_no),case_yes));
+	value def = eval(A(A(A(define,name),C),yes));
 
 	value fn;
-	if (def->L == case_yes)
+	if (def->L == yes)
 		fn = def->R;
 	else
 		{
-		report_undef(sym);
 		fn = sym;
-		if (def != case_no)
+		if (curr_strict)
+			report_undef(sym);
+		if (def != C)
 			bad_type();
 		}
 
-	value result = apply(do_resolve(abstract(sym,form)),fn);
+	value new_form = abstract(sym,form);
+	value resolved = do_resolve(new_form);
+	value result = apply(resolved,fn);
+
+	hold(result);
+	drop(form);
+	drop(resolved);
+	drop(new_form);
 
 	drop(def);
-	drop(form);
 	return result;
 	}
 
-/* Resolve the form in the given context, reporting any undefined symbols to
-stderr. */
 static value resolve(value form, value define_string, value define_name,
-	value new_source_name)
+	value source_name, value strict)
 	{
 	form = eval(form);
 	curr_define_string = eval(define_string);
 	curr_define_name = eval(define_name);
-	new_source_name = eval(new_source_name);
 
-	source_name = get_str(new_source_name)->data;
+	source_name = eval(source_name);
+	curr_name = get_str(source_name)->data;
 
-	case_no = Qlong(1); hold(case_no);
-	case_yes = Qlong(2); hold(case_yes);
+	strict = eval(A(A(strict,C),F));
+	if (strict != C && strict != F)
+		bad_type();
+	curr_strict = (strict == C);
 
 	value result = do_resolve(form);
-	if (result->T == type_form)
+	if (curr_strict && result->T == type_form)
 		die(0); /* Form has undefined symbols. */
 
-	drop(case_no);
-	drop(case_yes);
-
+	drop(form);
 	drop(curr_define_string);
 	drop(curr_define_name);
-	drop(new_source_name);
+	drop(source_name);
+	drop(strict);
 
+	result->N--; /* LATER Try to avoid this. */
 	return result;
 	}
 
-/* (resolve form define_string define_name source_name) */
+/* (resolve form define_string define_name source_name strict) */
 value fexl_resolve(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return f;
-	return A(later,resolve(f->L->L->L->R,f->L->L->R,f->L->R,f->R));
+	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L
+		|| !f->L->L->L->L->L) return f;
+	return A(later,resolve(f->L->L->L->L->R, f->L->L->L->R, f->L->L->R,
+		f->L->R, f->R));
 	}
 
 static value resolve_source(const char *name)
 	{
-	if (strcmp(name,"source_file") == 0) return Qfile(source_fh);
-	if (strcmp(name,"source_name") == 0) return Qstr0(source_name);
-	if (strcmp(name,"source_line") == 0) return Qlong(source_line);
+	if (strcmp(name,"source_file") == 0) return Qfile(curr_fh);
+	if (strcmp(name,"source_name") == 0) return Qstr0(curr_name);
+	if (strcmp(name,"source_line") == 0) return Qlong(curr_line);
 	return 0;
 	}
 
@@ -182,5 +188,5 @@ static value standard_name(value f)
 /* Resolve the form in the standard context. */
 value resolve_standard(value form)
 	{
-	return resolve(form,yes,Q(standard_name),Qstr0(source_name));
+	return resolve(form,yes,Q(standard_name),Qstr0(curr_name),C);
 	}

@@ -54,15 +54,15 @@ RLIMIT_AS, and also RLIMIT_DATA for good measure, to limit the total amount of
 memory.
 */
 
-FILE *source_fh = 0;           /* current source file */
-const char *source_name = 0;   /* current name of source file */
-long source_line;              /* current line number */
-static int ch;                 /* current character */
+FILE *curr_fh = 0;          /* current source file */
+const char *curr_name = 0;  /* current name of source file */
+long curr_line;             /* current line number */
+static int ch;              /* current character */
 
 static void next_ch(void)
 	{
-	ch = fgetc(source_fh);
-	if (ch == '\n') source_line++;
+	ch = fgetc(curr_fh);
+	if (ch == '\n') curr_line++;
 	}
 
 static void skip_line(void)
@@ -111,8 +111,8 @@ static void skip_filler(void)
 static void syntax_error(const char *msg, int line)
 	{
 	die("%s on line %ld%s%s", msg, line,
-		source_name[0] ? " of " : "",
-		source_name);
+		curr_name[0] ? " of " : "",
+		curr_name);
 	}
 
 /* Collect the content of a string up to the given terminator. */
@@ -155,14 +155,14 @@ static value collect_string(const char *term_string, long term_len,
 
 static value parse_simple_string(void)
 	{
-	long first_line = source_line;
+	long first_line = curr_line;
 	next_ch();
 	return collect_string("\"", 1, first_line);
 	}
 
 static value parse_complex_string(void)
 	{
-	long first_line = source_line;
+	long first_line = curr_line;
 	struct buf buffer;
 	buf_start(&buffer);
 
@@ -193,7 +193,7 @@ can work.
 */
 static value parse_name(int allow_eq)
 	{
-	long first_line = source_line;
+	long first_line = curr_line;
 	struct buf buffer;
 	buf_start(&buffer);
 
@@ -261,7 +261,7 @@ static value parse_term(void)
 	{
 	if (ch == '(') /* parenthesized expression */
 		{
-		long first_line = source_line;
+		long first_line = curr_line;
 		next_ch();
 		value exp = parse_exp();
 		if (ch != ')')
@@ -272,7 +272,7 @@ static value parse_term(void)
 		}
 	else if (ch == '[') /* list */
 		{
-		long first_line = source_line;
+		long first_line = curr_line;
 		next_ch();
 		value exp = parse_list();
 		if (ch != ']')
@@ -283,7 +283,7 @@ static value parse_term(void)
 		}
 	else if (ch == '{') /* quoted form */
 		{
-		long first_line = source_line;
+		long first_line = curr_line;
 		next_ch();
 		value exp = parse_exp();
 		if (ch != '}')
@@ -329,7 +329,7 @@ static value parse_lambda(long first_line)
 	hold(sym);
 	skip_filler();
 
-	first_line = source_line;
+	first_line = curr_line;
 
 	/* Count any '=' signs, up to 2. */
 	int count_eq = 0;
@@ -379,7 +379,7 @@ static value parse_factor(void)
 		return 0;
 	else if (ch == '\\')
 		{
-		long first_line = source_line;
+		long first_line = curr_line;
 		next_ch();
 		if (ch == '\\')
 			{
@@ -416,7 +416,7 @@ value parse(void)
 	ch = 0;
 	value exp = parse_exp();
 	if (ch != -1)
-		syntax_error("Extraneous input", source_line);
+		syntax_error("Extraneous input", curr_line);
 	return exp;
 	}
 
@@ -432,12 +432,12 @@ value fexl_parse(value f)
 	value y = eval(f->L->R);
 	value z = eval(f->R);
 
-	source_fh = get_file(x);
-	source_name = get_str(y)->data;
-	source_line = get_long(z);
+	curr_fh = get_file(x);
+	curr_name = get_str(y)->data;
+	curr_line = get_long(z);
 
 	value exp = parse();
-	value result = pair(exp,Qlong(source_line));
+	value result = pair(exp,Qlong(curr_line));
 
 	drop(x);
 	drop(y);

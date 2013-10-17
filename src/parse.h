@@ -1,4 +1,4 @@
-extern FILE *source_fh;
-extern const char *source_name;
-extern long source_line;
+extern FILE *curr_fh;
+extern const char *curr_name;
+extern long curr_line;
 extern value parse(void);

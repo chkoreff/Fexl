@@ -17,10 +17,10 @@ int main(int _argc, char *_argv[])
 	argv = _argv;
 	beg_basic();
 
-	source_name = argc > 1 ? argv[1] : "";
-	source_fh = source_name[0] ? fopen(source_name,"r") : stdin;
-	if (source_fh == 0) die("Could not open file %s", source_name);
-	source_line = 1;
+	curr_name = argc > 1 ? argv[1] : "";
+	curr_fh = curr_name[0] ? fopen(curr_name,"r") : stdin;
+	if (curr_fh == 0) die("Could not open file %s", curr_name);
+	curr_line = 1;
 
 	drop(eval(resolve_standard(parse())));
 

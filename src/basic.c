@@ -42,6 +42,8 @@ value fexl_F(value f)
 	return I;
 	}
 
+value const_fexl_T(void) { return C; }
+
 /* R x y z = x (y z) */
 value fexl_R(value f)
 	{
@@ -102,6 +104,8 @@ value fexl_yes(value f)
 	if (!f->L || !f->L->L || !f->L->L->L) return f;
 	return A(f->R,f->L->L->R);
 	}
+
+value const_fexl_no(void) { return C; }
 
 value pair(value x, value y)
 	{

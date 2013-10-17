@@ -1,16 +1,9 @@
 #!bin/fexl
 
-\T=(\T\F T)
-\@=Y
 \.==string_append
-\no=C
-
 \string_eq=(\x\y order (string_cmp x y) F T F)
-
-\fprint=(\fh\x fwrite fh x)  # TODO will allow x to be nested list
-
+\fprint=(\fh\x fwrite fh x)  # LATER will allow x to be nested list
 \append=(@\append\x\y x y \h\t [h;append t y])
-
 \NL="
 "
 
@@ -63,7 +56,7 @@ parse source_file source_name source_line \form\line
 	define_name
 	)
 
-\exp==(resolve form yes define_name source_name)
+\exp==(resolve form yes define_name source_name T)
 \exp==exp
 
 \\
@@ -371,7 +364,7 @@ try 2
 (
 say "== test_later"
 # Test peeling off "later" layers with eager evaluation.
-\f=(I C)
+\f=(I T)
 \f=(later f)
 \f=(later f)
 show f
@@ -465,7 +458,7 @@ parse source_file "test" source_line \form\line
 	)
 
 print "== form      = " show form
-\exp==(resolve form define_string define_name source_name)
+\exp==(resolve form define_string define_name source_name T)
 print "== resolved  = " show exp
 say "== Now evaluate"
 \exp==exp
@@ -498,7 +491,6 @@ test_parse
 # For testing purposes the tail program below starting with "\x=3" appears
 # immediately after the virtual EOF "\\".  Normally there'd be a newline.
 \\\x=3
-
 \hello=(say "Hello world." say (long_string x))
 hello
 hello
@@ -514,8 +506,3 @@ hello
 
 # Just an undefined var:
 #x
-
-## Test the (sym==0) case in _resolve:
-#\form=(C I)
-#\exp==(resolve form yes define_name source_name)
-#show exp
