@@ -70,6 +70,17 @@ LT
 EQ
 GT
 GT
+= long_double
+4
+0
+-1
+-37
+126478
+= long_char
+a
+b
+c
+d
 == test_double
 70.8
 -nan
@@ -89,6 +100,23 @@ inf
 1
 1
 1
+= double_long
+4
+0
+-1
+-37
+126478
+4
+0
+-1
+-37
+126478
+4
+0
+-1
+-37
+126478
+-126478
 == test_string_common
 3
 == test_string_len
@@ -151,7 +179,7 @@ x is var:7
 x contains 7
 x contains 42
 == test_parse
-Parsing the tail of test/a1.fxl on line 493
+Parsing the tail of test/a1.fxl on line 542
 == form      = {{(R ((S I) I)) {{R {{{say} {"Hello world."}} {say}}} {long_string}}} {3}}
 == resolved  = (((((L ((R L) ((R (R L)) ((R (R (R (R ((S I) I))))) (L ((R L) ((R (R R)) ((L ((R S) (L I))) I)))))))) 3) long_string) "Hello world.") ((L (fwrite file:1)) (((L I) "
 ") (fwrite file:1))))

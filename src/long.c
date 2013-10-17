@@ -3,6 +3,7 @@
 
 #include "value.h"
 #include "basic.h"
+#include "double.h"
 #include "long.h"
 #include "qstr.h"
 
@@ -85,9 +86,23 @@ value fexl_order(value f)
 	return g;
 	}
 
-/*LATER more functions */
-#if 0
-is_long
-long_double
-long_char
-#endif
+value fexl_long_double(value f)
+	{
+	if (!f->L) return f;
+	value x = eval(f->R);
+	value y = Qdouble(get_long(x));
+	drop(x);
+	return y;
+	}
+
+/* Convert long to char (string of length 1). */
+value fexl_long_char(value f)
+	{
+	if (!f->L) return f;
+	value x = eval(f->R);
+	char buf[1];
+	buf[0] = get_long(x);
+	value result = Qstr(str_new_data(buf,1));
+	drop(x);
+	return result;
+	}

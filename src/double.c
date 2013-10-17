@@ -5,6 +5,7 @@
 #include "value.h"
 #include "basic.h"
 #include "double.h"
+#include "long.h"
 #include "qstr.h"
 
 value type_double(value f)
@@ -71,8 +72,6 @@ value fexl_double_div(value f) { return op2(f,op_div); }
 value fexl_double_cmp(value f) { return op2(f,op_cmp); }
 
 /* double_string num */
-/*LATER note that sprintf "%.15g" shows 0.0 as "0", which looks like a long if
-we try to read it back in.  Perhaps force a ".0" suffix, not sure. */
 extern int sprintf(char *str, const char *format, ...);
 value fexl_double_string(value f)
 	{
@@ -89,8 +88,11 @@ value fexl_double_string(value f)
 	return g;
 	}
 
-/*LATER more functions */
-#if 0
-is_double
-double_long
-#endif
+value fexl_double_long(value f)
+	{
+	if (!f->L) return f;
+	value x = eval(f->R);
+	value y = Qlong(get_double(x));
+	drop(x);
+	return y;
+	}

@@ -235,6 +235,31 @@ try -1
 try 0
 try 1
 try 2
+
+say "= long_double"
+\try=
+	(\x
+	\y==(long_double x)
+	say (double_string y)
+	)
+
+try 4
+try 0
+try -1
+try -37
+try 126478
+
+say "= long_char"
+\try=
+	(\x
+	\y==(long_char x)
+	say y
+	)
+
+try 97
+try 98
+try 99
+try 100
 )
 
 \test_double=
@@ -284,6 +309,30 @@ try (cmp 1.0 2.0)
 try (cmp 1.0 0.0)
 try (cmp 0.0 -1.0)
 try (cmp 2.0 1.0)
+
+say "= double_long"
+\try=
+	(\x
+	\y==(double_long x)
+	say (long_string y)
+	)
+
+try 4.0
+try 0.0
+try -1.0
+try -37.0
+try 126478.0
+try 4.3
+try 0.3
+try -1.3
+try -37.3
+try 126478.3
+try 4.9
+try 0.9
+try -1.9
+try -37.9
+try 126478.9
+try -126478.9
 )
 
 \test_string_common=
