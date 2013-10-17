@@ -16,12 +16,13 @@
 	\x
 	\x==x
 	examine x \type\content
+	\case=(long_eq type)
 	content
 		(
-		long_eq type type_string (done x);
-		long_eq type type_long (done; long_string x);
-		long_eq type type_double (done; double_string x);
-		long_eq type type_var (loop; get x);
+		case type_string (done x);
+		case type_long (done; long_string x);
+		case type_double (done; double_string x);
+		case type_var (loop; get x);
 		)
 	\h\t
 	loop h loop t
