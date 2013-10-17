@@ -10,17 +10,18 @@
 	examine 0.0 \type_double\_
 	examine "" \type_string\_
 	examine var \type_var\_
-
-	@\fprint\fh\x
+	@\fprint\fh
+	\done=(fwrite fh)
 	\loop=(fprint fh)
+	\x
 	\x==x
 	examine x \type\content
 	content
 		(
-		long_eq type type_string (fwrite fh x);
-		long_eq type type_long (fwrite fh (long_string x));
-		long_eq type type_double (fwrite fh (double_string x));
-		long_eq type type_var (loop (get x));
+		long_eq type type_string (done x);
+		long_eq type type_long (done; long_string x);
+		long_eq type type_double (done; double_string x);
+		long_eq type type_var (loop; get x);
 		)
 	\h\t
 	loop h loop t
