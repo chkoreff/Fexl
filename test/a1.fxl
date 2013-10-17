@@ -2,19 +2,28 @@
 
 \.==string_append
 \string_eq=(\x\y order (string_cmp x y) F T F)
+\long_eq=(\x\y order (long_cmp x y) F T F)
 
 \fprint==
 	(
-	\a_var==var
+	examine 0 \type_long\_
+	examine 0.0 \type_double\_
+	examine "" \type_string\_
+	examine var \type_var\_
+
 	@\fprint\fh\x
-	\x==x
 	\loop=(fprint fh)
-	like x "" (fwrite fh x);
-	like x 0 (fwrite fh (long_string x));
-	like x 0.0 (fwrite fh (double_string x));
-	like x a_var (loop (get x));
-	# Not an atom, so assume it's a list.
-	x () \h\t loop h loop t
+	\x==x
+	examine x \type\content
+	content
+		(
+		long_eq type type_string (fwrite fh x);
+		long_eq type type_long (fwrite fh (long_string x));
+		long_eq type type_double (fwrite fh (double_string x));
+		long_eq type type_var (loop (get x));
+		)
+	\h\t
+	loop h loop t
 	)
 
 \append=(@\append\x\y x y \h\t [h;append t y])
@@ -56,6 +65,7 @@ print_to stdout \print\nl\say
 	define "say" say;
 	define "print" print;
 	define "nl" nl;
+	define "long_eq" long_eq;
 	define "print_to" print_to;
 	define "source_file" source_file;
 	define "source_name" source_name;
@@ -177,6 +187,14 @@ say ["This goes to " "stderr."]
 # Ensure that say eagerly evaluates its arguments.
 \x=(long_add 1 4)
 say ["x = " (fwrite stdout "!"; x)]
+
+# Ensure that saying a weird form works well, and doesn't hang.
+say "x"
+say C
+say Y
+say S
+say (S "x")
+say ((S "x") (S "y"))
 )
 
 \test_ping=
@@ -491,24 +509,6 @@ set x (long_mul 6 (get x))
 show_val
 )
 
-\test_like=
-(
-say "== test_like"
-\try=
-	(\x\y
-	say (like x y "T" "F")
-	)
-try C C
-try C S
-try (I C) (C C C)
-try (I S) (C S C)
-try 4 5
-try 4 5.0
-try 3.0 3
-try "a" "bc"
-try "3" 3
-)
-
 \test_parse=
 (
 say "== test_parse"
@@ -555,7 +555,6 @@ test_later
 test_file
 test_list
 test_var
-test_like
 test_parse
 
 # For testing purposes the tail program below starting with "\x=3" appears

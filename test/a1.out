@@ -27,6 +27,12 @@ abcd
 == test_say
 Hello world.
 x = !5
+x
+
+
+
+x
+xy
 == test_ping
 Ping!
 Ping!
@@ -179,18 +185,8 @@ x is var:C
 x is var:7
 x contains 7
 x contains 42
-== test_like
-T
-F
-T
-T
-T
-F
-F
-T
-F
 == test_parse
-Parsing the tail of test/a1.fxl on line 563
+Parsing the tail of test/a1.fxl on line 562
 == form      = {{(R ((R I) ((S I) I))) {{R {say}} {{R {item {"x = "}}} ((L item) C)}}} {3}}
 == Now evaluate
 x = 3

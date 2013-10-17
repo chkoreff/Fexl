@@ -21,15 +21,17 @@ value fexl_argv(value f)
 value const_fexl___DATE__(value f) { return Qstr0(__DATE__); }
 value const_fexl___TIME__(value f) { return Qstr0(__TIME__); }
 
-/* (like x y) return true if x and y are atoms of the same type. */
-value fexl_like(value f)
+/* (examine x) returns (pair type content).  The type of x is a long value.
+The content of x is [] if x is an atom, or [left;right] if x is the application
+of left to right. */
+value fexl_examine(value f)
 	{
-	if (!f->L || !f->L->L) return f;
-	value x = eval(f->L->R);
-	value y = eval(f->R);
-	value result = (x->L == 0 && y->L == 0 && x->T == y->T) ? C : F;
+	if (!f->L) return f;
+	value x = eval(f->R);
+	value the_type = Qlong((long)x->T);
+	value the_content = x->L == 0 ? C : item(x->L,x->R);
+	value result = pair(the_type,the_content);
 	drop(x);
-	drop(y);
 	return result;
 	}
 

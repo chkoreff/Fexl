@@ -112,6 +112,11 @@ value pair(value x, value y)
 	return V(fexl_pair,V(fexl_pair,Q(fexl_pair),x),y);
 	}
 
+value item(value x, value y)
+	{
+	return V(fexl_item,V(fexl_item,Qitem,x),y);
+	}
+
 value maybe(value x)
 	{
 	return x ? V(fexl_yes,yes,x) : C;

@@ -11,6 +11,7 @@ extern value later;
 extern value Qitem;
 extern value yes;
 extern value pair(value x, value y);
+extern value item(value x, value y);
 extern value maybe(value x);
 extern void bad_type(void);
 extern void data_type(value f, type t);
