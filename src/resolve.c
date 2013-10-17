@@ -89,7 +89,6 @@ static int curr_strict;
 
 static value do_resolve(value form)
 	{
-	hold(form);
 	value sym = first_symbol(form);
 	if (sym == 0) return form;
 
@@ -115,12 +114,9 @@ static value do_resolve(value form)
 	value resolved = do_resolve(new_form);
 	value result = apply(resolved,fn);
 
-	hold(result);
-	drop(form);
-	drop(resolved);
 	drop(new_form);
-
 	drop(def);
+
 	return result;
 	}
 
@@ -149,7 +145,6 @@ static value resolve(value form, value define_string, value define_name,
 	drop(source_name);
 	drop(strict);
 
-	result->N--; /* LATER Try to avoid this. */
 	return result;
 	}
 
