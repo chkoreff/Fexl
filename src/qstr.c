@@ -3,6 +3,7 @@
 
 #include "value.h"
 #include "basic.h"
+#include "double.h"
 #include "long.h"
 #include "qstr.h"
 
@@ -89,10 +90,32 @@ value fexl_string_common(value f)
 	return z;
 	}
 
+/* (string_long x) converts string x to a possible long value. */
+value fexl_string_long(value f)
+	{
+	if (!f->L) return f;
+	value x = eval(f->R);
+	long num;
+	int ok = string_long(get_str(x)->data,&num);
+	value result = maybe(ok ? Qlong(num) : 0);
+	drop(x);
+	return result;
+	}
+
+/* (string_double x) converts string x to a possible double value. */
+value fexl_string_double(value f)
+	{
+	if (!f->L) return f;
+	value x = eval(f->R);
+	double num;
+	int ok = string_double(get_str(x)->data,&num);
+	value result = maybe(ok ? Qdouble(num) : 0);
+	drop(x);
+	return result;
+	}
+
 #if 0
-LATER more functions
+TODO more functions
 string_slice str pos len
 string_index
-string_long
-string_double
 #endif

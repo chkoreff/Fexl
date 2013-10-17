@@ -154,6 +154,41 @@ inf
 98
 99
 100
+== test_string_long
+yes 0
+yes 1
+yes -1
+yes 123
+yes -123
+no
+no
+no
+no
+no
+no
+no
+== test_string_double
+yes 0
+yes 1
+yes -1
+yes 123
+yes -123
+no
+no
+no
+no
+no
+yes 456.78
+no
+yes 1.6
+yes 0
+yes -0
+yes -0
+yes -0.0123
+yes 3.14159265358979
+yes 1
+yes 120000
+yes -2.84e-06
 == test_argv
 2
 
@@ -186,7 +221,7 @@ x is var:7
 x contains 7
 x contains 42
 == test_parse
-Parsing the tail of test/a1.fxl on line 564
+Parsing the tail of test/a1.fxl on line 621
 == form      = {{(R ((R I) ((S I) I))) {{R {say}} {{R {item {"x = "}}} ((L item) C)}}} {3}}
 == Now evaluate
 x = 3

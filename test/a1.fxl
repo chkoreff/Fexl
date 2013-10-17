@@ -32,6 +32,8 @@
 \NL="
 "
 
+# TODO generic [+ - * / eq lt gt ge ne] functions.
+
 # Context constructors.  A context is a function which maps a name (string) to
 # an optional value, either (yes val) if defined or no if not defined.
 
@@ -420,6 +422,59 @@ try "abc" 2
 try (. "abc" "def") 3
 )
 
+\test_string_long=
+(
+say "== test_string_long"
+\try=
+	(\x
+	say (string_long x "no" \n ["yes " n])
+	)
+
+try "0"
+try "1"
+try "-1"
+try "123"
+try "-123"
+try "x123"
+try "1x23"
+try ""
+try "   456   "
+try "456   "
+try "1.6"
+try "0."
+)
+
+\test_string_double=
+(
+say "== test_string_double"
+\try=
+	(\x
+	say (string_double x "no" \n ["yes " n])
+	)
+
+try "0"
+try "1"
+try "-1"
+try "123"
+try "-123"
+try "x123"
+try "1x23"
+try ""
+try "   456   "
+try "   456.78   "
+try "456.78"
+try "456   "
+try "1.6"
+try "0."
+try "-0"
+try "-0.0"
+try "-0.0123"
+try "3.14159265358979323846"
+try "1e0"
+try "1.2e5"
+try "-2.84e-6"
+)
+
 \test_argv=
 (
 say "== test_argv"
@@ -552,6 +607,8 @@ test_string_common
 test_string_len
 test_string_cmp
 test_string_at
+test_string_long
+test_string_double
 test_argv
 test_later
 test_file
