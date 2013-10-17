@@ -27,6 +27,7 @@ extern value fexl_Q(value f);
 extern value fexl_fwrite(value f);
 extern value fexl_long_string(value f);
 extern value type_var(value f);
+extern value fexl_item(value f);
 
 void show(value f)
 	{
@@ -86,6 +87,8 @@ void show(value f)
 			printf("dlsym");
 		else if (f->T == fexl_Q)
 			printf("Q");
+		else if (f->T == fexl_item)
+			printf("item");
 		else if (f->T == type_lib)
 			{
 			long id = (long)f->R;

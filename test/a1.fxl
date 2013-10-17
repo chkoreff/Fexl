@@ -2,7 +2,21 @@
 
 \.==string_append
 \string_eq=(\x\y order (string_cmp x y) F T F)
-\fprint=(\fh\x fwrite fh x)  # LATER will allow x to be nested list
+
+\fprint==
+	(
+	\a_var==var
+	@\fprint\fh\x
+	like x "" (fwrite fh x);
+	like x 0 (fwrite fh (long_string x));
+	like x 0.0 (fwrite fh (double_string x));
+	like x a_var (fprint fh (get x));
+	# Not an atom, so assume it's a list.
+	x () \h\t
+	fprint fh h
+	fprint fh t
+	)
+
 \append=(@\append\x\y x y \h\t [h;append t y])
 \NL="
 "
@@ -157,7 +171,7 @@ say "Hello world."
 
 (
 print_to stderr \print\nl\say
-say "This goes to stderr."
+say ["This goes to " "stderr."]
 )
 
 )
@@ -179,7 +193,7 @@ say "== test_long"
 \/ = long_div
 \cmp = long_cmp
 
-\try=(\x say (long_string x))
+\try=say
 
 try (+ 0 0)
 try (+ 1 2)
@@ -237,11 +251,7 @@ try 1
 try 2
 
 say "= long_double"
-\try=
-	(\x
-	\y==(long_double x)
-	say (double_string y)
-	)
+\try=(\x say (long_double x))
 
 try 4
 try 0
@@ -250,11 +260,7 @@ try -37
 try 126478
 
 say "= long_char"
-\try=
-	(\x
-	\y==(long_char x)
-	say y
-	)
+\try=(\x say (long_char x))
 
 try 97
 try 98
@@ -272,7 +278,7 @@ say "== test_double"
 \/ = double_div
 \cmp = double_cmp
 
-\try=(\x say (double_string x))
+\try=say
 
 try
 	(
@@ -311,11 +317,7 @@ try (cmp 0.0 -1.0)
 try (cmp 2.0 1.0)
 
 say "= double_long"
-\try=
-	(\x
-	\y==(double_long x)
-	say (long_string y)
-	)
+\try=(\x say (double_long x))
 
 try 4.0
 try 0.0
@@ -342,14 +344,13 @@ say "== test_string_common"
 \y="abcDEF"
 \x=(. x "")
 \y=(. y "")
-\n==(string_common x y)
-say (long_string n)
+say (string_common x y)
 )
 
 \test_string_len=
 (
 say "== test_string_len"
-\try=(\x say (long_string; string_len x))
+\try=(\x say (string_len x))
 try ""
 try "a"
 try ~ "~
@@ -363,7 +364,7 @@ hello
 \test_string_cmp=
 (
 say "== test_string_cmp"
-\try=(\x\y say (long_string; string_cmp x y))
+\try=(\x\y say (string_cmp x y))
 
 # -1
 try "" "a"
@@ -382,7 +383,7 @@ try "abcd" "abc"
 \test_string_at=
 (
 say "== test_string_at"
-\try=(\str\pos say (long_string; string_at str pos))
+\try=(\str\pos say (string_at str pos))
 
 try "" -1
 try "" 0
@@ -402,7 +403,7 @@ say "== test_argv"
 
 \try=(\n say (argv n))
 
-say (long_string argc)
+say argc
 try -1
 try 0
 try 1
@@ -427,7 +428,7 @@ show f
 say "== test_file"
 \try=
 	(\name
-	print "fopen " print name print " : "
+	print ["fopen " name " : "]
 	\fh==(fopen name "r")
 	print (fh "no" \fh "yes") nl
 	)
@@ -447,8 +448,7 @@ say "== test_list"
 		(
 		@\loop\list
 		list () \h\t
-		print h
-		print " "
+		print [h " "]
 		loop t
 		)
 	print_items list nl
@@ -478,7 +478,8 @@ say y
 (
 say "== test_var"
 \x==var
-\show_val=(print "x contains " print (long_string; get x) nl)
+\show_val=(say ["x contains " x])
+
 print "x is " show! x
 set x (long_add 4 3)
 print "x is " show! x
@@ -487,11 +488,28 @@ set x (long_mul 6 (get x))
 show_val
 )
 
+\test_like=
+(
+say "== test_like"
+\try=
+	(\x\y
+	say (like x y "T" "F")
+	)
+try C C
+try C S
+try (I C) (C C C)
+try (I S) (C S C)
+try 4 5
+try 4 5.0
+try 3.0 3
+try "a" "bc"
+try "3" 3
+)
+
 \test_parse=
 (
 say "== test_parse"
-print "Parsing the tail of " print source_name
-print " on line " print (long_string source_line) nl
+say ["Parsing the tail of " source_name " on line " source_line]
 
 parse source_file "test" source_line \form\line
 
@@ -508,7 +526,6 @@ parse source_file "test" source_line \form\line
 
 print "== form      = " show form
 \exp==(resolve form define_string define_name source_name T)
-print "== resolved  = " show exp
 say "== Now evaluate"
 \exp==exp
 print "== value     = " show exp
@@ -535,14 +552,15 @@ test_later
 test_file
 test_list
 test_var
+test_like
 test_parse
 
 # For testing purposes the tail program below starting with "\x=3" appears
 # immediately after the virtual EOF "\\".  Normally there'd be a newline.
 \\\x=3
-\hello=(say "Hello world." say (long_string x))
-hello
-hello
+\talk=(say ["x = " x])
+\talk=(talk talk)
+talk
 
 \\
 

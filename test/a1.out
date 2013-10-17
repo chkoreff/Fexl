@@ -178,14 +178,20 @@ x is var:C
 x is var:7
 x contains 7
 x contains 42
+== test_like
+T
+F
+T
+T
+T
+F
+F
+T
+F
 == test_parse
-Parsing the tail of test/a1.fxl on line 542
-== form      = {{(R ((S I) I)) {{R {{{say} {"Hello world."}} {say}}} {long_string}}} {3}}
-== resolved  = (((((L ((R L) ((R (R L)) ((R (R (R (R ((S I) I))))) (L ((R L) ((R (R R)) ((L ((R S) (L I))) I)))))))) 3) long_string) "Hello world.") ((L (fwrite file:1)) (((L I) "
-") (fwrite file:1))))
+Parsing the tail of test/a1.fxl on line 560
+== form      = {{(R ((R I) ((S I) I))) {{R {say}} {{R {item {"x = "}}} ((L item) C)}}} {3}}
 == Now evaluate
-Hello world.
-3
-Hello world.
-3
+x = 3
+x = 3
 == value     = I
