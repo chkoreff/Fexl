@@ -537,6 +537,7 @@ try "abcd" 2 -3
 # Various out of bounds
 say "=="
 try "" 0 1
+try "" 1 2 # test max < 0
 try "a" 0 2
 try "a" 1 1
 try "abc" 0 4
@@ -591,6 +592,11 @@ try "abcde" -5 900
 say "=="
 try "" 0 800
 try "" -30 800
+say "=="
+try "a" 0 9223372036854775807
+try "a" 1 9223372036854775807
+try "a" -9223372036854775808 9223372036854775807
+try "a" 9223372036854775807 -9223372036854775808 # test max < 0
 )
 
 \test_argv=

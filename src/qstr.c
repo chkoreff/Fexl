@@ -127,6 +127,8 @@ value fexl_string_slice(value f)
 	long pos = get_long(y);
 	long len = get_long(z);
 
+	/*TODO make negative pos like Perl (from end of string) */
+	/*TODO double-check over- and under-flow of long values */
 	if (pos < 0)
 		{
 		len += pos;
@@ -137,10 +139,13 @@ value fexl_string_slice(value f)
 		len = 0;
 
 	long max = str->len - pos;
+	if (max < 0)
+		max = 0;
+
 	if (len > max)
 		len = max;
 
-	assert(pos >= 0 && len >= 0 && pos + len <= str->len);
+	assert(pos >= 0 && len >= 0 && len <= max);
 	value result = Qstr(str_new_data(str->data + pos, len));
 
 	drop(x);

@@ -237,6 +237,7 @@ abcd
 
 ==
 
+
 a
 
 abc
@@ -287,6 +288,11 @@ abcde
 ==
 
 
+==
+a
+
+
+
 == test_argv
 2
 
@@ -319,7 +325,7 @@ x is var:7
 x contains 7
 x contains 42
 == test_parse
-Parsing the tail of test/a1.fxl on line 740
+Parsing the tail of test/a1.fxl on line 746
 == form      = {{(R ((R I) ((S I) I))) {{R {say}} {{R {item {"x = "}}} ((L item) C)}}} {3}}
 == Now evaluate
 x = 3
