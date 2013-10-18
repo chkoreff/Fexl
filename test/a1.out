@@ -189,6 +189,104 @@ yes 3.14159265358979
 yes 1
 yes 120000
 yes -2.84e-06
+== test_string_slice
+==
+
+==
+
+a
+
+==
+
+a
+ab
+abc
+
+b
+bc
+
+c
+==
+
+
+
+==
+
+
+a
+==
+
+
+a
+ab
+abc
+abcd
+abcd
+==
+
+
+
+a
+ab
+abc
+abcd
+abcd
+==
+
+
+
+==
+
+a
+
+abc
+c
+abcde
+abcde
+==
+
+
+a
+ab
+abc
+abc
+==
+
+a
+ab
+abc
+abc
+==
+
+b
+bc
+bc
+==
+
+c
+c
+==
+a
+a
+a
+a
+
+==
+abcde
+abcd
+abc
+ab
+a
+
+a
+ab
+abc
+abcd
+abcde
+abcde
+==
+
+
 == test_argv
 2
 
@@ -221,7 +319,7 @@ x is var:7
 x contains 7
 x contains 42
 == test_parse
-Parsing the tail of test/a1.fxl on line 621
+Parsing the tail of test/a1.fxl on line 740
 == form      = {{(R ((R I) ((S I) I))) {{R {say}} {{R {item {"x = "}}} ((L item) C)}}} {3}}
 == Now evaluate
 x = 3

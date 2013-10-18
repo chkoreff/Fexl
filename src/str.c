@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <string.h>
 #include "memory.h"
 #include "str.h"
@@ -5,7 +6,7 @@
 /* Create a string capable of holding len bytes plus trailing NUL. */
 struct str *str_new(long len)
 	{
-	if (len < 0) len = 0;
+	assert(len >= 0);
 	struct str *x = new_memory(sizeof(struct str) + len + 1);
 	x->len = len;
 	return x;

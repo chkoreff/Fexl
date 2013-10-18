@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "memory.h"
 #include "str.h"
 
@@ -114,8 +115,42 @@ value fexl_string_double(value f)
 	return result;
 	}
 
+/* (string_slice str pos len) */
+value fexl_string_slice(value f)
+	{
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
+	value x = eval(f->L->L->R);
+	value y = eval(f->L->R);
+	value z = eval(f->R);
+
+	struct str *str = get_str(x);
+	long pos = get_long(y);
+	long len = get_long(z);
+
+	if (pos < 0)
+		{
+		len += pos;
+		pos = 0;
+		}
+
+	if (len < 0)
+		len = 0;
+
+	long max = str->len - pos;
+	if (len > max)
+		len = max;
+
+	assert(pos >= 0 && len >= 0 && pos + len <= str->len);
+	value result = Qstr(str_new_data(str->data + pos, len));
+
+	drop(x);
+	drop(y);
+	drop(z);
+
+	return result;
+	}
+
 #if 0
 TODO more functions
-string_slice str pos len
 string_index
 #endif
