@@ -115,7 +115,7 @@ value fexl_string_double(value f)
 	return result;
 	}
 
-/* (string_slice str pos len) */
+/* (string_slice str pos len)  Consistent with "substr" in Perl. */
 value fexl_string_slice(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return f;
@@ -127,21 +127,31 @@ value fexl_string_slice(value f)
 	long pos = get_long(y);
 	long len = get_long(z);
 
-	/*TODO make negative pos like Perl (from end of string) */
-	/*TODO double-check over- and under-flow of long values */
+	/* Negative pos: start that far back from end of string. */
+	if (pos < 0)
+		pos = str->len + pos;
+
+	/* Negative len: leave that many characters off end of string. */
+	if (len < 0)
+		len = str->len + len - pos;
+
+	/* Negative pos: offset length by that amount and use pos 0. */
 	if (pos < 0)
 		{
 		len += pos;
 		pos = 0;
 		}
 
+	/* Negative len: use len 0. */
 	if (len < 0)
 		len = 0;
 
+	/* Compute max allowable length. */
 	long max = str->len - pos;
 	if (max < 0)
 		max = 0;
 
+	/* If it's too long, use max. */
 	if (len > max)
 		len = max;
 
@@ -156,6 +166,5 @@ value fexl_string_slice(value f)
 	}
 
 #if 0
-TODO more functions
-string_index
+TODO string_index
 #endif

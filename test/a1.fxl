@@ -516,9 +516,9 @@ try "abc" 1 2
 try "abc" 2 0
 try "abc" 2 1
 
-# Negative position (length offset by position and position set to zero)
+# Negative position
 nl
-try "" -1 0
+try "" -1 0 # Perl gives warning.
 try "" -1 1
 try "" -1 2
 nl
@@ -543,7 +543,20 @@ try "abcd" -2 5
 try "abcd" -2 6
 try "abcd" -2 7
 
-# Negative length (same as length 0)
+try "a" -1 0
+try "a" -1 1
+try "a" -1 2
+try "a" -2 1
+try "a" -7 6
+try "abcdefg" -4 2
+try "abcdefg" -6 3
+try "abcdefg" -7 3
+try "abcdefg" -8 3
+try "abcdefg" -8 2
+try "abcdefg" -8 1
+try "abcdefg" -8 0 # Perl gives warning.
+
+# Negative length
 nl
 try "abcd" 0 -1
 try "abcd" 2 -1
@@ -552,7 +565,7 @@ try "abcd" 2 -3
 # Various out of bounds
 nl
 try "" 0 1
-try "" 1 2 # test max < 0
+try "" 1 2 # test max < 0.  Perl gives warning.
 try "a" 0 2
 try "a" 1 1
 try "abc" 0 4
@@ -589,7 +602,7 @@ try "a" 0 1
 try "a" -1 2
 try "a" -2 3
 try "a" -2 4
-try "a" -2 0
+try "a" -2 0 # Perl gives warning.
 
 nl
 try "abcde" 0 5
@@ -611,7 +624,9 @@ nl
 try "a" 0 9223372036854775807
 try "a" 1 9223372036854775807
 try "a" -9223372036854775808 9223372036854775807
-try "a" 9223372036854775807 -9223372036854775808 # test max < 0
+try "a" -7 6
+try "a" 9223372036854775807 -9223372036854775808
+	# test max < 0.  Perl gives warning.
 )
 
 \test_argv=
