@@ -72,6 +72,13 @@ value fexl_define_name(value f)
 	return result;
 	}
 
+static value curr_define_string;
+static value curr_define_name;
+static int curr_strict;
+static FILE *curr_fh;
+static const char *curr_name;
+static long curr_line;
+
 static void report_undef(value sym)
 	{
 	const char *kind = (sym->R->L->T == fexl_C) ? "string" : "symbol";
@@ -83,10 +90,6 @@ static void report_undef(value sym)
 		curr_name
 		);
 	}
-
-static value curr_define_string;
-static value curr_define_name;
-static int curr_strict;
 
 static value do_resolve(value form)
 	{
@@ -121,9 +124,13 @@ static value do_resolve(value form)
 	return result;
 	}
 
-static value resolve(value form, value define_string, value define_name,
+value resolve(value form, value define_string, value define_name,
 	value source_name, value strict)
 	{
+	value save_define_string = curr_define_string;
+	value save_define_name = curr_define_name;
+	const char *save_name = curr_name;
+
 	form = eval(form);
 	curr_define_string = eval(define_string);
 	curr_define_name = eval(define_name);
@@ -146,6 +153,10 @@ static value resolve(value form, value define_string, value define_name,
 	drop(source_name);
 	drop(strict);
 
+	curr_define_string = save_define_string;
+	curr_define_name = save_define_name;
+	curr_name = save_name;
+
 	return result;
 	}
 
@@ -158,15 +169,7 @@ value fexl_resolve(value f)
 		f->L->R, f->R));
 	}
 
-static value resolve_source(const char *name)
-	{
-	if (strcmp(name,"source_file") == 0) return Qfile(curr_fh);
-	if (strcmp(name,"source_name") == 0) return Qstr0(curr_name);
-	if (strcmp(name,"source_line") == 0) return Qlong(curr_line);
-	return 0;
-	}
-
-struct str *get_full_path(struct str *name)
+static struct str *get_full_path(struct str *name)
 	{
 	struct str *base = base_path();
 	struct str *path = str_concat(base,name);
@@ -174,49 +177,28 @@ struct str *get_full_path(struct str *name)
 	return path;
 	}
 
-/*LATER clean up, unify save/restore approach */
-value parse_local(struct str *name)
+static value parse_local(struct str *name)
 	{
 	struct str *path = get_full_path(name);
-
-	FILE *save_fh = curr_fh;
-	const char *save_name = curr_name;
-	long save_line = curr_line;
-
-	curr_fh = fopen(path->data,"r");
-	curr_name = name->data;
-	curr_line = 1;
-
-	value exp = parse();
-
-	/*LATER close? */
-
-	curr_fh = save_fh;
-	curr_name = save_name;
-	curr_line = save_line;
-
+	FILE *fh = fopen(path->data,"r");
 	str_free(path);
+
+	if (fh == 0)
+		die("Missing file: %s", name->data);
+
+	long line = 1;
+	value exp = parse(fh,name->data,&line);
+	fclose(fh);
 
 	return exp;
 	}
 
-/*LATER clean up, unify save/restore approach */
-value Resolve(value form, value define_string, value define_name,
-	value source_name, value strict)
+static value resolve_source(const char *name)
 	{
-	value resolved;
-
-	value save_define_string = curr_define_string;
-	value save_define_name = curr_define_name;
-	const char *save_name = curr_name;
-
-	resolved = resolve(form,define_string,define_name,source_name,strict);
-
-	curr_define_string = save_define_string;
-	curr_define_name = save_define_name;
-	curr_name = save_name;
-
-	return resolved;
+	if (strcmp(name,"source_file") == 0) return Qfile(curr_fh);
+	if (strcmp(name,"source_name") == 0) return Qstr0(curr_name);
+	if (strcmp(name,"source_line") == 0) return Qlong(curr_line);
+	return 0;
 	}
 
 value cache_context = 0;
@@ -238,9 +220,10 @@ static value standard_name(value f)
 		if (context == 0)
 			{
 			struct str *file_name = str_new_data0("share/fexl/fexl.fxl");
-			value exp = parse_local(file_name);
 
-			context = Resolve(exp,yes,Q(fexl_define_name),Qstr(file_name),C);
+			value exp = parse_local(file_name);
+			context = resolve(exp,yes,Q(fexl_define_name),Qstr(file_name),C);
+
 			hold(context);
 			cache_context = context;
 			}
@@ -266,9 +249,13 @@ static value standard_name(value f)
 	}
 
 /* Resolve the form in the standard context. */
-value resolve_standard(value form)
+value resolve_standard(value form, FILE *fh, const char *name, long line)
 	{
-	value result = resolve(form,yes,Q(standard_name),Qstr0(curr_name),C);
+	curr_fh = fh;
+	curr_name = name;
+	curr_line = line;
+
+	value result = resolve(form,yes,Q(standard_name),Qstr0(name),C);
 	if (cache_context)
 		drop(cache_context);
 	return result;

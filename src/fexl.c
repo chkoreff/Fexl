@@ -17,12 +17,15 @@ int main(int _argc, char *_argv[])
 	argv = _argv;
 	beg_basic();
 
-	curr_name = argc > 1 ? argv[1] : "";
-	curr_fh = curr_name[0] ? fopen(curr_name,"r") : stdin;
-	if (curr_fh == 0) die("Could not open file %s", curr_name);
-	curr_line = 1;
+	const char *name = argc > 1 ? argv[1] : "";
+	FILE *fh = name[0] ? fopen(name,"r") : stdin;
+	if (fh == 0) die("Could not open file %s", name);
 
-	drop(eval(resolve_standard(parse())));
+	long line = 1;
+	value f = parse(fh,name,&line);
+	f = resolve_standard(f,fh,name,line);
+	f = eval(f);
+	drop(f);
 
 	end_basic();
 	end_value();

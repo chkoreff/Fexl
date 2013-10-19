@@ -54,10 +54,10 @@ RLIMIT_AS, and also RLIMIT_DATA for good measure, to limit the total amount of
 memory.
 */
 
-FILE *curr_fh = 0;          /* current source file */
-const char *curr_name = 0;  /* current name of source file */
-long curr_line;             /* current line number */
-static int ch;              /* current character */
+static FILE *curr_fh = 0;          /* current source file */
+static const char *curr_name = 0;  /* current name of source file */
+static long curr_line;             /* current line number */
+static int ch;                     /* current character */
 
 static void next_ch(void)
 	{
@@ -411,12 +411,18 @@ static value parse_exp(void)
 		}
 	}
 
-value parse(void)
+value parse(FILE *fh, const char *name, long *line)
 	{
+	curr_fh = fh;
+	curr_name = name;
+	curr_line = *line;
+
 	ch = 0;
 	value exp = parse_exp();
 	if (ch != -1)
 		syntax_error("Extraneous input", curr_line);
+
+	*line = curr_line;
 	return exp;
 	}
 
@@ -432,12 +438,9 @@ value fexl_parse(value f)
 	value y = eval(f->L->R);
 	value z = eval(f->R);
 
-	curr_fh = get_file(x);
-	curr_name = get_str(y)->data;
-	curr_line = get_long(z);
-
-	value exp = parse();
-	value result = pair(exp,Qlong(curr_line));
+	long line = get_long(z);
+	value exp = parse(get_file(x),get_str(y)->data,&line);
+	value result = pair(exp,Qlong(line));
 
 	drop(x);
 	drop(y);
