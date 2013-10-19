@@ -190,109 +190,108 @@ yes 1
 yes 120000
 yes -2.84e-06
 == test_string_slice
-==
+try "" 0 0 = ""
 
-==
+try "a" 0 0 = ""
+try "a" 0 1 = "a"
+try "a" 1 0 = ""
 
-a
+try "abc" 0 0 = ""
+try "abc" 0 1 = "a"
+try "abc" 0 2 = "ab"
+try "abc" 0 3 = "abc"
+try "abc" 1 0 = ""
+try "abc" 1 1 = "b"
+try "abc" 1 2 = "bc"
+try "abc" 2 0 = ""
+try "abc" 2 1 = "c"
 
-==
+try "" -1 0 = ""
+try "" -1 1 = ""
+try "" -1 2 = ""
 
-a
-ab
-abc
+try "a" -1 0 = ""
+try "a" -1 1 = ""
+try "a" -1 2 = "a"
 
-b
-bc
+try "abcd" -1 0 = ""
+try "abcd" -1 1 = ""
+try "abcd" -1 2 = "a"
+try "abcd" -1 3 = "ab"
+try "abcd" -1 4 = "abc"
+try "abcd" -1 5 = "abcd"
+try "abcd" -1 6 = "abcd"
 
-c
-==
+try "abcd" -2 0 = ""
+try "abcd" -2 1 = ""
+try "abcd" -2 2 = ""
+try "abcd" -2 3 = "a"
+try "abcd" -2 4 = "ab"
+try "abcd" -2 5 = "abc"
+try "abcd" -2 6 = "abcd"
+try "abcd" -2 7 = "abcd"
 
+try "abcd" 0 -1 = ""
+try "abcd" 2 -1 = ""
+try "abcd" 2 -3 = ""
 
+try "" 0 1 = ""
+try "" 1 2 = ""
+try "a" 0 2 = "a"
+try "a" 1 1 = ""
+try "abc" 0 4 = "abc"
+try "abc" 2 2 = "c"
+try "abcde" 0 700 = "abcde"
+try "abcde" 0 6 = "abcde"
 
-==
+try "abc" -1 0 = ""
+try "abc" -1 1 = ""
+try "abc" -1 2 = "a"
+try "abc" -1 3 = "ab"
+try "abc" -1 4 = "abc"
+try "abc" -1 5 = "abc"
 
+try "abc" 0 0 = ""
+try "abc" 0 1 = "a"
+try "abc" 0 2 = "ab"
+try "abc" 0 3 = "abc"
+try "abc" 0 4 = "abc"
 
-a
-==
+try "abc" 1 0 = ""
+try "abc" 1 1 = "b"
+try "abc" 1 2 = "bc"
+try "abc" 1 3 = "bc"
 
+try "abc" 2 0 = ""
+try "abc" 2 1 = "c"
+try "abc" 2 2 = "c"
 
-a
-ab
-abc
-abcd
-abcd
-==
+try "a" 0 1 = "a"
+try "a" -1 2 = "a"
+try "a" -2 3 = "a"
+try "a" -2 4 = "a"
+try "a" -2 0 = ""
 
+try "abcde" 0 5 = "abcde"
+try "abcde" -1 5 = "abcd"
+try "abcde" -2 5 = "abc"
+try "abcde" -3 5 = "ab"
+try "abcde" -4 5 = "a"
+try "abcde" -5 5 = ""
+try "abcde" -5 6 = "a"
+try "abcde" -5 7 = "ab"
+try "abcde" -5 8 = "abc"
+try "abcde" -5 9 = "abcd"
+try "abcde" -5 10 = "abcde"
+try "abcde" -5 900 = "abcde"
 
+try "" 0 800 = ""
+try "" -30 800 = ""
 
-a
-ab
-abc
-abcd
-abcd
-==
-
-
-
-==
-
-
-a
-
-abc
-c
-abcde
-abcde
-==
-
-
-a
-ab
-abc
-abc
-==
-
-a
-ab
-abc
-abc
-==
-
-b
-bc
-bc
-==
-
-c
-c
-==
-a
-a
-a
-a
-
-==
-abcde
-abcd
-abc
-ab
-a
-
-a
-ab
-abc
-abcd
-abcde
-abcde
-==
-
-
-==
-a
-
-
-
+try "a" 0 9223372036854775807 = "a"
+try "a" 1 9223372036854775807 = ""
+try "a" -9223372036854775808 9223372036854775807 = ""
+try "a" 9223372036854775807 -9223372036854775808 = ""
 == test_argv
 2
 
@@ -312,11 +311,11 @@ fopen test/a1.fxl : yes
 fopen test/a1x.fxl : no
 == test_list
 
-a 
-a b 
-a b c d 
-a b c d c d 
-x y x y x y x y 
+a
+a b
+a b c d
+a b c d c d
+x y x y x y x y
 x
 y
 == test_var
@@ -325,7 +324,7 @@ x is var:7
 x contains 7
 x contains 42
 == test_parse
-Parsing the tail of test/a1.fxl on line 746
+Parsing the tail of test/a1.fxl on line 755
 == form      = {{(R ((R I) ((S I) I))) {{R {say}} {{R {item {"x = "}}} ((L item) C)}}} {3}}
 == Now evaluate
 x = 3

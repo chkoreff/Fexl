@@ -17,7 +17,7 @@
 static void *find_symbol(const char *prefix0, struct str *name)
 	{
 	struct str *prefix = str_new_data0(prefix0);
-	struct str *full_name = str_append(prefix, name);
+	struct str *full_name = str_concat(prefix, name);
 
 	void *def = dlsym(NULL, full_name->data);
 

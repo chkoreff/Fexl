@@ -36,8 +36,8 @@ long str_at(struct str *str, long pos)
 	return pos >= 0 && pos < str->len ? str->data[pos] : 0;
 	}
 
-/* Append x and y. */
-struct str *str_append(struct str *x, struct str *y)
+/* Concatenate x and y. */
+struct str *str_concat(struct str *x, struct str *y)
 	{
 	struct str *z = str_new(x->len + y->len);
 	memcpy(z->data, x->data, x->len);

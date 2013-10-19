@@ -1,6 +1,5 @@
 #!bin/fexl
 
-\.==string_append
 \string_eq=(\x\y order (string_cmp x y) F T F)
 \long_eq=(\x\y order (long_cmp x y) F T F)
 
@@ -32,7 +31,20 @@
 \NL="
 "
 
-# TODO generic [+ - * / eq lt gt ge ne] functions.
+\QU=~ "~
+\qu=(\x concat QU; concat x; QU)
+
+# Insert a separator between the elements of a list.
+\join=
+	(@\join\sep\xs
+	xs [] \x\xs
+	xs [x] \_\_ [x sep; join sep xs]
+	)
+
+# LATER define "." as the "to_string" (flatten) function.
+# \x=(.["abc" " de " "fg"])
+
+# LATER generic [+ - * / eq lt gt ge ne] functions.
 
 # Context constructors.  A context is a function which maps a name (string) to
 # an optional value, either (yes val) if defined or no if not defined.
@@ -63,13 +75,15 @@ print_to stdout \print\nl\say
 	define "append" append;
 	define "define" define;
 	define "@" @;
-	define "." .;
 	define "NL" NL;
 	define "fprint" fprint;
 	define "say" say;
 	define "print" print;
 	define "nl" nl;
 	define "long_eq" long_eq;
+	define "QU" QU;
+	define "qu" qu;
+	define "join" join;
 	define "print_to" print_to;
 	define "source_file" source_file;
 	define "source_name" source_name;
@@ -95,6 +109,8 @@ parse source_file source_name source_line \form\line
 	\x==x
 	show x
 	)
+
+\Say=(\x say (join " " x))
 
 \test_built_in_pattern=
 (
@@ -367,8 +383,8 @@ try -126478.9
 say "== test_string_common"
 \x="abcdef"
 \y="abcDEF"
-\x=(. x "")
-\y=(. y "")
+\x=(concat x "")
+\y=(concat y "")
 say (string_common x y)
 )
 
@@ -379,8 +395,8 @@ say "== test_string_len"
 try ""
 try "a"
 try ~ "~
-try (. "a" "b")
-try (. "abc" "de")
+try (concat "a" "b")
+try (concat "abc" "de")
 try ~
 hello
 ~
@@ -419,7 +435,7 @@ try "a" 1
 try "abc" 0
 try "abc" 1
 try "abc" 2
-try (. "abc" "def") 3
+try (concat "abc" "def") 3
 )
 
 \test_string_long=
@@ -480,17 +496,16 @@ try "-2.84e-6"
 say "== test_string_slice"
 \try=
 	(\str\pos\len
-	say (string_slice str pos len)
+	Say ["try" (qu str) pos len "=" (qu; string_slice str pos len)]
 	)
 
 # Normal cases
-say "=="
 try "" 0 0
-say "=="
+nl
 try "a" 0 0
 try "a" 0 1
 try "a" 1 0
-say "=="
+nl
 try "abc" 0 0
 try "abc" 0 1
 try "abc" 0 2
@@ -502,15 +517,15 @@ try "abc" 2 0
 try "abc" 2 1
 
 # Negative position (length offset by position and position set to zero)
-say "=="
+nl
 try "" -1 0
 try "" -1 1
 try "" -1 2
-say "=="
+nl
 try "a" -1 0
 try "a" -1 1
 try "a" -1 2
-say "=="
+nl
 try "abcd" -1 0
 try "abcd" -1 1
 try "abcd" -1 2
@@ -518,7 +533,7 @@ try "abcd" -1 3
 try "abcd" -1 4
 try "abcd" -1 5
 try "abcd" -1 6
-say "=="
+nl
 try "abcd" -2 0
 try "abcd" -2 1
 try "abcd" -2 2
@@ -529,13 +544,13 @@ try "abcd" -2 6
 try "abcd" -2 7
 
 # Negative length (same as length 0)
-say "=="
+nl
 try "abcd" 0 -1
 try "abcd" 2 -1
 try "abcd" 2 -3
 
 # Various out of bounds
-say "=="
+nl
 try "" 0 1
 try "" 1 2 # test max < 0
 try "a" 0 2
@@ -546,37 +561,37 @@ try "abcde" 0 700
 try "abcde" 0 6
 
 # Run through some possibilities.
-say "=="
+nl
 try "abc" -1 0
 try "abc" -1 1
 try "abc" -1 2
 try "abc" -1 3
 try "abc" -1 4
 try "abc" -1 5
-say "=="
+nl
 try "abc" 0 0
 try "abc" 0 1
 try "abc" 0 2
 try "abc" 0 3
 try "abc" 0 4
-say "=="
+nl
 try "abc" 1 0
 try "abc" 1 1
 try "abc" 1 2
 try "abc" 1 3
-say "=="
+nl
 try "abc" 2 0
 try "abc" 2 1
 try "abc" 2 2
 
-say "=="
+nl
 try "a" 0 1
 try "a" -1 2
 try "a" -2 3
 try "a" -2 4
 try "a" -2 0
 
-say "=="
+nl
 try "abcde" 0 5
 try "abcde" -1 5
 try "abcde" -2 5
@@ -589,10 +604,10 @@ try "abcde" -5 8
 try "abcde" -5 9
 try "abcde" -5 10
 try "abcde" -5 900
-say "=="
+nl
 try "" 0 800
 try "" -30 800
-say "=="
+nl
 try "a" 0 9223372036854775807
 try "a" 1 9223372036854775807
 try "a" -9223372036854775808 9223372036854775807
@@ -644,17 +659,7 @@ try "test/a1x.fxl"
 \test_list=
 (
 say "== test_list"
-\try=
-	(\list
-	\print_items=
-		(
-		@\loop\list
-		list () \h\t
-		print [h " "]
-		loop t
-		)
-	print_items list nl
-	)
+\try=Say
 
 try []
 try ["a"]
@@ -715,7 +720,8 @@ say "== Now evaluate"
 print "== value     = " show exp
 )
 
-## main
+\test_all=
+(
 test_built_in_pattern
 test_forms
 test_putchar
@@ -740,6 +746,9 @@ test_file
 test_list
 test_var
 test_parse
+)
+
+test_all
 
 # For testing purposes the tail program below starting with "\x=3" appears
 # immediately after the virtual EOF "\\".  Normally there'd be a newline.

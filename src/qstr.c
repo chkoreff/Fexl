@@ -33,13 +33,13 @@ struct str *get_str(value f)
 	return (struct str *)f->R;
 	}
 
-/* (string_append x y) is the concanation of strings x and y. */
-value fexl_string_append(value f)
+/* (concat x y) is the concanation of strings x and y. */
+value fexl_concat(value f)
 	{
 	if (!f->L || !f->L->L) return f;
 	value x = eval(f->L->R);
 	value y = eval(f->R);
-	value z = Qstr(str_append(get_str(x),get_str(y)));
+	value z = Qstr(str_concat(get_str(x),get_str(y)));
 	drop(x);
 	drop(y);
 	return z;
