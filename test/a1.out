@@ -305,6 +305,28 @@ try "a" 1 9223372036854775807 = ""
 try "a" -9223372036854775808 9223372036854775807 = ""
 try "a" -7 6 = ""
 try "a" 9223372036854775807 -9223372036854775808 = ""
+== test_string_index
+try "abcdefg" "de" 0 = 3
+try "abcdefg" "de" 2 = 3
+try "abcdefg" "de" 3 = 3
+try "abcdefg" "de" 4 = -1
+try "" "" 0 = 0
+try "" "a" 0 = -1
+try "" "" -1 = 0
+try "abcdefghijklmnop" "" 0 = 0
+try "abcdefghijklmnop" "" 7 = 7
+try "abcdefghijklmnop" "" 15 = 15
+try "abcdefghijklmnop" "ghI" 0 = -1
+try "abcdefghijklmnop" "ghi" 0 = 6
+try "abcdefghijklmnop" "mnop" 0 = 12
+try "abcdefghijklmnop" "mnopq" 0 = -1
+try "abcdefghijklmnop" "p" 0 = 15
+try "abcdefghijklmnop" "q" 0 = -1
+try "abcdefghijklmnop" "abcdefghijklmnop" 0 = 0
+try "abcdefghijklmnop" "abcdefghijklmnop" 1 = -1
+try "abcdefghijklmnop" "abcdefghijklmnopq" 0 = -1
+try "a" "ab" 0 = -1
+try "a" "a" 0 = 0
 == test_argv
 2
 
@@ -337,7 +359,7 @@ x is var:7
 x contains 7
 x contains 42
 == test_parse
-Parsing the tail of test/a1.fxl on line 770
+Parsing the tail of test/a1.fxl on line 812
 == form      = {{(R ((R I) ((S I) I))) {{R {say}} {{R {item {"x = "}}} ((L item) C)}}} {3}}
 == Now evaluate
 x = 3

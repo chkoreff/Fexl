@@ -165,6 +165,67 @@ value fexl_string_slice(value f)
 	return result;
 	}
 
-#if 0
-TODO string_index
-#endif
+/* (string_index haystack needle offset) Consistent with "index" in Perl. */
+value fexl_string_index(value f)
+	{
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
+	value x = eval(f->L->L->R);
+	value y = eval(f->L->R);
+	value z = eval(f->R);
+
+	struct str *haystack = get_str(x);
+	char *xs = haystack->data;
+	long xn = haystack->len;
+
+	struct str *needle = get_str(y);
+	char *ys = needle->data;
+	long yn = needle->len;
+
+	long offset = get_long(z);
+
+	if (offset < 0) offset = 0;
+	if (offset > xn) offset = xn;
+
+	value result;
+
+	if (yn == 0)
+		/* Always consider null string to be found at adjusted offset. */
+		result = Qlong(offset);
+	else if (offset + yn > xn)
+		/* Avoid unnecessary work if match is impossible based on length. */
+		result = Qlong(-1);
+	else
+		{
+		long xi = offset;
+		long yi = 0;
+
+		while (1)
+			{
+			if (yi >= yn)
+				{
+				result = Qlong(xi - yi);
+				break;
+				}
+			if (xi >= xn)
+				{
+				result = Qlong(-1);
+				break;
+				}
+
+			if (xs[xi] == ys[yi])
+				yi++;
+			else
+				{
+				xi -= yi;
+				yi = 0;
+				}
+
+			xi++;
+			}
+		}
+
+	drop(x);
+	drop(y);
+	drop(z);
+	return result;
+	}

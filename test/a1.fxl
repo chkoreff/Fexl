@@ -33,6 +33,8 @@
 
 \QU=~ "~
 \qu=(\x concat QU; concat x; QU)
+	# LATER use (to_string [QU x QU])
+	# LATER use ~ forms if x has quotes.
 
 # Insert a separator between the elements of a list.
 \join=
@@ -629,6 +631,45 @@ try "a" 9223372036854775807 -9223372036854775808
 	# test max < 0.  Perl gives warning.
 )
 
+\test_string_index =
+(
+say "== test_string_index"
+\try=
+	(\haystack\needle\offset
+	Say ["try" (qu haystack) (qu needle) offset "="
+		(string_index haystack needle offset)]
+	)
+
+# NOTE: All of these results agree with the results of Perl's built-in "index"
+# function, and were confirmed with a Perl script.
+
+try "abcdefg" "de" 0 # 3
+
+try "abcdefg" "de" 2 # 3
+try "abcdefg" "de" 3 # 3
+try "abcdefg" "de" 4 # -1
+
+try "" "" 0 # 0
+try "" "a" 0 # -1
+try "" "" -1 # 0
+
+try "abcdefghijklmnop" "" 0 # 0
+try "abcdefghijklmnop" "" 7 # 7
+try "abcdefghijklmnop" "" 15 # 15
+
+try "abcdefghijklmnop" "ghI" 0 # -1
+try "abcdefghijklmnop" "ghi" 0 # 6
+try "abcdefghijklmnop" "mnop" 0 # 12
+try "abcdefghijklmnop" "mnopq" 0 # -1
+try "abcdefghijklmnop" "p" 0 # 15
+try "abcdefghijklmnop" "q" 0 # -1
+try "abcdefghijklmnop" "abcdefghijklmnop" 0 # 0
+try "abcdefghijklmnop" "abcdefghijklmnop" 1 # -1
+try "abcdefghijklmnop" "abcdefghijklmnopq" 0 # -1
+try "a" "ab" 0 # -1
+try "a" "a" 0 # 0
+)
+
 \test_argv=
 (
 say "== test_argv"
@@ -755,6 +796,7 @@ test_string_at
 test_string_long
 test_string_double
 test_string_slice
+test_string_index
 test_argv
 test_later
 test_file
