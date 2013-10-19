@@ -1,0 +1,94 @@
+# Enhanced context for Fexl.
+
+\string_eq=(\x\y order (string_cmp x y) F T F)
+\long_eq=(\x\y order (long_cmp x y) F T F)
+\append=(@\append\x\y x y \h\t [h;append t y])
+
+\NL="
+"
+
+\fprint==
+	(
+	examine 0 \type_long\_
+	examine 0.0 \type_double\_
+	examine "" \type_string\_
+	examine var \type_var\_
+	@\fprint\fh
+	\done=(fwrite fh)
+	\loop=(fprint fh)
+	\x
+	\x==x
+	examine x \type\content
+	\case=(long_eq type)
+	content
+		(
+		case type_string (done x);
+		case type_long (done; long_string x);
+		case type_double (done; double_string x);
+		case type_var (loop; get x);
+		)
+	\h\t
+	loop h loop t
+	)
+
+# LATER perhaps use a var for "current" output handle, and have "print_to" be a
+# function that saves and restores that handle.
+\print_to=
+	(\out
+	\print=(fprint out)
+	\nl=(print NL)
+	\say=(\x print x nl)
+	\: : print nl say
+	)
+
+print_to stdout \print\nl\say
+
+\QU=~ "~
+\qu=(\x concat QU; concat x; QU)
+	# LATER use (to_string [QU x QU])
+	# LATER use ~ forms if x has quotes.
+
+# Insert a separator between the elements of a list.
+\join=
+	(@\join\sep\xs
+	xs [] \x\xs
+	xs [x] \_\_ [x sep; join sep xs]
+	)
+
+# LATER define "." as the "to_string" (flatten) function.
+# \x=(.["abc" " de " "fg"])
+
+# LATER generic [+ - * / eq lt gt ge ne] functions.
+
+# Context constructors.  A context is a function which maps a name (string) to
+# an optional value, either (yes val) if defined or no if not defined.
+
+# ((define key val next) name) is (yes val) if name equals key, or (next name)
+# otherwise.
+\define = (\key\val\next \sym string_eq sym key (yes val) (next sym))
+
+# (void name) is always no.
+\void = (\name no)
+
+# (chain f g) chains two contexts f and g together.
+\chain = (\f\g \name f name (g name) yes)
+
+## Now here's the actual context:
+
+define "say" say;
+define "print" print;
+define "nl" nl;
+define "fprint" fprint;
+define "print_to" print_to;
+
+define "string_eq" string_eq;
+define "long_eq" long_eq;
+define "append" append;
+define "join" join;
+define "qu" qu;
+define "NL" NL;
+define "QU" QU;
+define "define" define;
+define "chain" chain;
+define "void" void;
+void

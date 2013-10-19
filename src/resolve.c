@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "die.h"
+#include "file.h"
 #include "str.h"
 
 #include "value.h"
@@ -165,6 +166,61 @@ static value resolve_source(const char *name)
 	return 0;
 	}
 
+struct str *get_full_path(struct str *name)
+	{
+	struct str *base = base_path();
+	struct str *path = str_concat(base,name);
+	str_free(base);
+	return path;
+	}
+
+/*LATER clean up, unify save/restore approach */
+value parse_local(struct str *name)
+	{
+	struct str *path = get_full_path(name);
+
+	FILE *save_fh = curr_fh;
+	const char *save_name = curr_name;
+	long save_line = curr_line;
+
+	curr_fh = fopen(path->data,"r");
+	curr_name = name->data;
+	curr_line = 1;
+
+	value exp = parse();
+
+	/*LATER close? */
+
+	curr_fh = save_fh;
+	curr_name = save_name;
+	curr_line = save_line;
+
+	str_free(path);
+
+	return exp;
+	}
+
+/*LATER clean up, unify save/restore approach */
+value Resolve(value form, value define_string, value define_name,
+	value source_name, value strict)
+	{
+	value resolved;
+
+	value save_define_string = curr_define_string;
+	value save_define_name = curr_define_name;
+	const char *save_name = curr_name;
+
+	resolved = resolve(form,define_string,define_name,source_name,strict);
+
+	curr_define_string = save_define_string;
+	curr_define_name = save_define_name;
+	curr_name = save_name;
+
+	return resolved;
+	}
+
+value cache_context = 0;
+
 static value standard_name(value f)
 	{
 	if (!f->L) return f;
@@ -175,6 +231,35 @@ static value standard_name(value f)
 	if (def == 0)
 		def = resolve_source(name->data);
 
+	if (def == 0)
+		{
+		value context = cache_context;
+
+		if (context == 0)
+			{
+			struct str *file_name = str_new_data0("share/fexl/fexl.fxl");
+			value exp = parse_local(file_name);
+
+			context = Resolve(exp,yes,Q(fexl_define_name),Qstr(file_name),C);
+			hold(context);
+			cache_context = context;
+			}
+
+		value this_def = eval(A(A(A(context,x),C),yes));
+
+		value fn;
+		if (this_def->L == yes)
+			fn = this_def->R;
+		else
+			{
+			fn = 0;
+			if (this_def != C)
+				bad_type();
+			}
+		def = fn;
+		drop(this_def); /*LATER any issues here? */
+		}
+
 	value result = maybe(def);
 	drop(x);
 	return result;
@@ -183,5 +268,8 @@ static value standard_name(value f)
 /* Resolve the form in the standard context. */
 value resolve_standard(value form)
 	{
-	return resolve(form,yes,Q(standard_name),Qstr0(curr_name),C);
+	value result = resolve(form,yes,Q(standard_name),Qstr0(curr_name),C);
+	if (cache_context)
+		drop(cache_context);
+	return result;
 	}
