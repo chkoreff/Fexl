@@ -221,7 +221,23 @@ static value resolve_source(const char *name)
 	return 0;
 	}
 
-value cache_context = 0;
+static value cache_context = 0;
+
+static value enhanced_context(void)
+	{
+	value context = cache_context;
+	if (context == 0)
+		{
+		struct str *file_name = str_new_data0("share/fexl/fexl.fxl");
+
+		value exp = parse_local(file_name);
+		context = resolve(exp,yes,Q(fexl_define_name),Qstr(file_name),C);
+
+		hold(context);
+		cache_context = context;
+		}
+	return context;
+	}
 
 /* LATER make this whole context available within Fexl. */
 static value standard_name(value f)
@@ -235,22 +251,7 @@ static value standard_name(value f)
 		def = resolve_source(name->data);
 
 	if (def == 0)
-		{
-		value context = cache_context;
-
-		if (context == 0)
-			{
-			struct str *file_name = str_new_data0("share/fexl/fexl.fxl");
-
-			value exp = parse_local(file_name);
-			context = resolve(exp,yes,Q(fexl_define_name),Qstr(file_name),C);
-
-			hold(context);
-			cache_context = context;
-			}
-
-		def = eval_maybe(A(context,x));
-		}
+		def = eval_maybe(A(enhanced_context(),x));
 	else
 		hold(def);
 
