@@ -49,8 +49,7 @@ sources="README.md build share test src"
 # Run a test script.
 .run()
 	{
-	.build &&
-	bin/fexl "test/$1.fxl"
+	.build && bin/fexl "test/$1.fxl"
 	}
 
 # Check that the output of a test script equals its reference output.
@@ -62,7 +61,7 @@ sources="README.md build share test src"
 # Time a test script, also checking its output.
 .time()
 	{
-	time (.run $1 | diff -a - "test/$1.out")
+	.build && time (bin/fexl test/$1.fxl | diff -a - "test/$1.out")
 	}
 
 # git status
