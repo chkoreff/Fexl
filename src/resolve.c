@@ -256,7 +256,8 @@ static value standard_name(value f)
 		hold(def);
 
 	value result = maybe(def);
-	drop(def);
+	if (def)
+		drop(def);
 	drop(x);
 	return result;
 	}
