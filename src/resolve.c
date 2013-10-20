@@ -91,6 +91,35 @@ static void report_undef(value sym)
 		);
 	}
 
+static int eval_boolean(value form)
+	{
+	form = eval(A(A(form,C),F));
+	if (form != C && form != F)
+		bad_type();
+	drop(form);
+	return form == C;
+	}
+
+static value eval_maybe(value form)
+	{
+	value def = eval(A(A(form,C),yes));
+
+	value fn;
+	if (def->L == yes)
+		{
+		fn = def->R;
+		hold(fn);
+		}
+	else
+		{
+		fn = 0;
+		if (def != C)
+			bad_type();
+		}
+	drop(def);
+	return fn;
+	}
+
 static value do_resolve(value form)
 	{
 	value sym = first_symbol(form);
@@ -100,18 +129,13 @@ static value do_resolve(value form)
 		? curr_define_string : curr_define_name;
 	value name = sym->L;
 
-	value def = eval(A(A(A(define,name),C),yes));
-
-	value fn;
-	if (def->L == yes)
-		fn = def->R;
-	else
+	value fn = eval_maybe(A(define,name));
+	if (fn == 0)
 		{
 		fn = sym;
+		hold(fn);
 		if (curr_strict)
 			report_undef(sym);
-		if (def != C)
-			bad_type();
 		}
 
 	value new_form = abstract(sym,form);
@@ -119,7 +143,7 @@ static value do_resolve(value form)
 	value result = apply(resolved,fn);
 
 	drop(new_form);
-	drop(def);
+	drop(fn);
 
 	return result;
 	}
@@ -138,10 +162,7 @@ value resolve(value form, value define_string, value define_name,
 	source_name = eval(source_name);
 	curr_name = get_str(source_name)->data;
 
-	strict = eval(A(A(strict,C),F));
-	if (strict != C && strict != F)
-		bad_type();
-	curr_strict = (strict == C);
+	curr_strict = eval_boolean(strict);
 
 	value result = do_resolve(form);
 	if (curr_strict && result->T == type_form)
@@ -151,7 +172,6 @@ value resolve(value form, value define_string, value define_name,
 	drop(curr_define_string);
 	drop(curr_define_name);
 	drop(source_name);
-	drop(strict);
 
 	curr_define_string = save_define_string;
 	curr_define_name = save_define_name;
@@ -203,6 +223,7 @@ static value resolve_source(const char *name)
 
 value cache_context = 0;
 
+/* LATER make this whole context available within Fexl. */
 static value standard_name(value f)
 	{
 	if (!f->L) return f;
@@ -228,22 +249,13 @@ static value standard_name(value f)
 			cache_context = context;
 			}
 
-		value this_def = eval(A(A(A(context,x),C),yes));
-
-		value fn;
-		if (this_def->L == yes)
-			fn = this_def->R;
-		else
-			{
-			fn = 0;
-			if (this_def != C)
-				bad_type();
-			}
-		def = fn;
-		drop(this_def); /*LATER any issues here? */
+		def = eval_maybe(A(context,x));
 		}
+	else
+		hold(def);
 
 	value result = maybe(def);
+	drop(def);
 	drop(x);
 	return result;
 	}
