@@ -9,7 +9,7 @@
 
 value type_long(value f)
 	{
-	return f;
+	return 0;
 	}
 
 value Qlong(long val)
@@ -41,7 +41,7 @@ static long op_cmp(long x, long y) { return x < y ? -1 : x > y ? 1 : 0; }
 
 static value op2(value f, long op(long,long))
 	{
-	if (!f->L || !f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 	value x = eval(f->L->R);
 	value y = eval(f->R);
 	value z = Qlong(op(get_long(x),get_long(y)));
@@ -62,7 +62,7 @@ value fexl_long_cmp(value f) { return op2(f,op_cmp); }
 extern int sprintf(char *str, const char *format, ...);
 value fexl_long_string(value f)
 	{
-	if (!f->L) return f;
+	if (!f->L) return 0;
 
 	value x = eval(f->R);
 	char buf[100]; /* being careful here */
@@ -78,7 +78,7 @@ three-way branching on the sign of a long value, typically the result of a
 comparison function T_cmp */
 value fexl_order(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
 	value xv = eval(f->L->L->L->R);
 	long x = get_long(xv);
 	value g = x < 0 ? f->L->L->R : x > 0 ? f->R : f->L->R;
@@ -88,7 +88,7 @@ value fexl_order(value f)
 
 value fexl_long_double(value f)
 	{
-	if (!f->L) return f;
+	if (!f->L) return 0;
 	value x = eval(f->R);
 	value y = Qdouble(get_long(x));
 	drop(x);
@@ -98,7 +98,7 @@ value fexl_long_double(value f)
 /* Convert long to char (string of length 1). */
 value fexl_long_char(value f)
 	{
-	if (!f->L) return f;
+	if (!f->L) return 0;
 	value x = eval(f->R);
 	char buf[1];
 	buf[0] = get_long(x);

@@ -9,7 +9,7 @@
 value type_lib(value f)
 	{
 	if (!f->N) dlclose((void *)f->R);
-	return f;
+	return 0;
 	}
 
 /*
@@ -28,7 +28,7 @@ string and using NULL instead in that case, just to be sure.
 */
 value fexl_dlopen(value f)
 	{
-	if (!f->L) return f;
+	if (!f->L) return 0;
 	value x = eval(f->R);
 	const char *path = get_str(x)->data;
 
@@ -44,7 +44,7 @@ value fexl_dlopen(value f)
 
 value fexl_dlsym(value f)
 	{
-	if (!f->L || !f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 	value x = eval(f->L->R);
 	value y = eval(f->R);
 
@@ -59,7 +59,7 @@ value fexl_dlsym(value f)
 
 value fexl_Q(value f)
 	{
-	if (!f->L) return f;
+	if (!f->L) return 0;
 	value x = eval(f->R);
 	type t = (type)get_long(x);
 	value y = A(later,Q(t));

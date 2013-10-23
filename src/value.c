@@ -92,7 +92,7 @@ value eval(value f)
 		{
 		hold(f);
 		value g = f->T(f);
-		if (g == f) return f;
+		if (g == 0) return f;
 		drop(f);
 		f = g;
 		}

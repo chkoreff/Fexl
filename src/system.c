@@ -10,7 +10,7 @@ value const_fexl_argc(void) { return Qlong(argc); }
 
 value fexl_argv(value f)
 	{
-	if (!f->L) return f;
+	if (!f->L) return 0;
 	value x = eval(f->R);
 	long i = get_long(x);
 	value z = Qstr0(i >= 0 && i < argc ? argv[i] : "");
@@ -26,7 +26,7 @@ The content of x is [] if x is an atom, or [left;right] if x is the application
 of left to right. */
 value fexl_examine(value f)
 	{
-	if (!f->L) return f;
+	if (!f->L) return 0;
 	value x = eval(f->R);
 	value the_type = Qlong((long)x->T);
 	value the_content = x->L == 0 ? C : item(x->L,x->R);

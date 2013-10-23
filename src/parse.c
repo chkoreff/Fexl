@@ -432,7 +432,7 @@ Return (pair exp line), where exp is the parsed expression, and line is the
 updated line number. */
 value fexl_parse(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 
 	value x = eval(f->L->L->R);
 	value y = eval(f->L->R);
