@@ -75,6 +75,7 @@ print_to stdout \print\nl\say
 
 ## Now here's the actual context:
 
+@\enhanced_context
 define "say" say;
 define "print" print;
 define "nl" nl;
@@ -91,4 +92,6 @@ define "QU" QU;
 define "define" define;
 define "chain" chain;
 define "void" void;
+
+define "standard_context" (chain core_context enhanced_context);
 void

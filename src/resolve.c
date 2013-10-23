@@ -29,7 +29,7 @@ static void *find_symbol(const char *prefix0, struct str *name)
 	}
 
 /* This is the core context (environment) for Fexl. */
-static value define_name(struct str *name)
+static value core_context(struct str *name)
 	{
 	/* Integer number (long) */
 	{
@@ -60,13 +60,13 @@ static value define_name(struct str *name)
 	return 0;
 	}
 
-/* (define_name name) Looks up name in the core context and returns (yes val)
+/* (core_context name) Looks up name in the core context and returns (yes val)
 or no. */
-value fexl_define_name(value f)
+value fexl_core_context(value f)
 	{
 	if (!f->L) return f;
 	value x = eval(f->R);
-	value def = define_name(get_str(x));
+	value def = core_context(get_str(x));
 	value result = maybe(def);
 	drop(x);
 	return result;
@@ -213,7 +213,7 @@ static value parse_local(struct str *name)
 	return exp;
 	}
 
-static value resolve_source(const char *name)
+static value source_context(const char *name)
 	{
 	if (strcmp(name,"source_file") == 0) return Qfile(curr_fh);
 	if (strcmp(name,"source_name") == 0) return Qstr0(curr_name);
@@ -230,23 +230,22 @@ static value enhanced_context(void)
 		{
 		struct str *file_name = str_new_data0("share/fexl/fexl.fxl");
 		value exp = parse_local(file_name);
-		context = resolve(exp,yes,Q(fexl_define_name),Qstr(file_name),C);
+		context = resolve(exp,yes,Q(fexl_core_context),Qstr(file_name),C);
 		hold(context);
 		cache_context = context;
 		}
 	return context;
 	}
 
-/* LATER make this whole context available within Fexl. */
 static value type_standard_name(value f)
 	{
 	if (!f->L) return f;
 	value x = eval(f->R);
 	struct str *name = get_str(x);
 
-	value def = define_name(name);
+	value def = core_context(name);
 	if (def == 0)
-		def = resolve_source(name->data);
+		def = source_context(name->data);
 
 	if (def == 0)
 		def = eval_maybe(A(enhanced_context(),x));

@@ -1,5 +1,18 @@
 #!bin/fexl
+# TODO idiom
+parse source_file source_name source_line \form\line
+\context=
+	(
+	chain standard_context;
+	define "source_file" source_file;
+	define "source_name" source_name;
+	define "source_line" line;
+	void
+	)
+\exp==(resolve form yes context source_name T)
+\exp==exp
 
+\\
 \show!=
 	(\x
 	\x==x
@@ -649,22 +662,9 @@ show_val
 (
 say "== test_parse"
 say ["Parsing the tail of " source_name " on line " source_line]
-
 parse source_file "test" source_line \form\line
-
-# Now set up a context (environment) for resolving the parsed form.
-
-# Strings always map to themselves.
-\define_string=yes
-# Define some more names.
-\define_name=
-	(
-	define "say" say;
-	define_name
-	)
-
 print "== form      = " show form
-\exp==(resolve form define_string define_name source_name T)
+\exp==(resolve form yes standard_context source_name T)
 say "== Now evaluate"
 \exp==exp
 print "== value     = " show exp
