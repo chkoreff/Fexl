@@ -47,40 +47,29 @@ value first_symbol(value f)
 /* Return (S f g), optimizing if possible. */
 static value fuse(value f, value g)
 	{
-	hold(f);
-	hold(g);
-
-	value h = 0;
 	if (f->L == C)
 		{
 		if (g == I)
 			/* S (C x) I = x */
-			h = f->R;
+			return f->R;
 		else if (g->L == C)
 			/* S (C x) (C y) = C (x y) */
-			h = apply(C,apply(f->R,g->R));
+			return apply(C,apply(f->R,g->R));
 		else
 			/* S (C x) y = R x y */
-			h = apply(apply(R,f->R),g);
+			return apply(apply(R,f->R),g);
 		}
 	else if (g->L == C)
 		/* S x (C y) = L x y */
-		h = apply(apply(L,f),g->R);
-
-	if (h == 0)
-		h = apply(apply(S,f),g);
-
-	drop(f);
-	drop(g);
-
-	return h;
+		return apply(apply(L,f),g->R);
+	else
+		return apply(apply(S,f),g);
 	}
 
 /* Abstract the symbol from the body, returning a form which is a function of
 that symbol, and no longer contains that symbol. */
 value abstract(value sym, value body)
 	{
-	hold(sym);
 	hold(body);
 
 	value h = 0;
@@ -109,7 +98,6 @@ value abstract(value sym, value body)
 		h = apply(C,body);  /* (\x F) = (C F) */
 
 	hold(h);
-	drop(sym);
 	drop(body);
 	return h;
 	}
