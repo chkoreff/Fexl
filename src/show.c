@@ -122,7 +122,7 @@ void nl(void)
 
 value fexl_show(value f)
 	{
-	if (!f->L) return 0;
+	if (!f->L) return f;
 	show(f->R); nl();
 	return I;
 	}

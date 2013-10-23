@@ -9,8 +9,9 @@ routines.
 
 The interpreter creates an initial value which represents your entire program.
 It then evaluates that value, reducing it one step at a time until it finally
-reaches a zero value.  Each step may possibly create side effects -- after all,
-the entire purpose of a computer program is to create side effects.
+reaches a value that is identical to the previous one.  Each step may possibly
+create side effects -- after all, the entire purpose of a computer program is
+to create side effects.
 
 A *value* is either an atom or a pair.  An *atom* represents either a built-in
 function (with a pointer to a C function), or a piece of data (e.g. long,

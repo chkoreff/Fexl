@@ -4,7 +4,7 @@
 value type_var(value f)
 	{
 	if (!f->N) drop(f->R);
-	return 0;
+	return f;
 	}
 
 /* var creates a new variable with initial value C. */
@@ -18,7 +18,7 @@ value fexl_var(value f)
 /* (set var val) Set the variable to the new value. */
 value fexl_set(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (!f->L || !f->L->L) return f;
 
 	value var = eval(f->L->R);
 	data_type(var,type_var);
@@ -34,7 +34,7 @@ value fexl_set(value f)
 /* (get var) Return the current value of the variable. */
 value fexl_get(value f)
 	{
-	if (!f->L) return 0;
+	if (!f->L) return f;
 	value var = eval(f->R);
 	data_type(var,type_var);
 

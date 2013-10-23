@@ -17,28 +17,28 @@ value yes;
 /* C x y = x */
 value fexl_C(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (!f->L || !f->L->L) return f;
 	return f->L->R;
 	}
 
 /* S x y z = x z (y z) */
 value fexl_S(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
 	return A(A(f->L->L->R,f->R),A(f->L->R,f->R));
 	}
 
 /* I x = x */
 value fexl_I(value f)
 	{
-	if (!f->L) return 0;
+	if (!f->L) return f;
 	return f->R;
 	}
 
 /* F x = I.  In other words, F x y = y. */
 value fexl_F(value f)
 	{
-	if (!f->L) return 0;
+	if (!f->L) return f;
 	return I;
 	}
 
@@ -47,21 +47,21 @@ value const_fexl_T(void) { return C; }
 /* R x y z = x (y z) */
 value fexl_R(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
 	return A(f->L->L->R,A(f->L->R,f->R));
 	}
 
 /* L x y z = x z y */
 value fexl_L(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
 	return A(A(f->L->L->R,f->R),f->L->R);
 	}
 
 /* Y x = x (Y x) */
 value fexl_Y(value f)
 	{
-	if (!f->L) return 0;
+	if (!f->L) return f;
 	return A(f->R,f);
 	}
 
@@ -70,13 +70,13 @@ should be evaluated later.  The query function recognizes the (later x) form
 and peels off the outer "later" layer. */
 value fexl_later(value f)
 	{
-	return 0;
+	return f;
 	}
 
 /* (query x y) = y x, except x is evaluated first. */
 value fexl_query(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (!f->L || !f->L->L) return f;
 	value x = eval(f->L->R);
 	value xp = (x->T == fexl_later && x->R) ? x->R : x;
 	value z = A(f->R,xp);
@@ -87,21 +87,21 @@ value fexl_query(value f)
 /* pair x y F = F x y */
 value fexl_pair(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
 	return A(A(f->R,f->L->L->R),f->L->R);
 	}
 
 /* item x y F G = G x y */
 value fexl_item(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
+	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return f;
 	return A(A(f->R,f->L->L->L->R),f->L->L->R);
 	}
 
 /* (yes x F G) = (G x) */
 value fexl_yes(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
 	return A(f->R,f->L->L->R);
 	}
 

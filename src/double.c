@@ -15,7 +15,7 @@ value type_double(value f)
 		double *p = (double *)f->R;
 		free_memory(p, sizeof(double));
 		}
-	return 0;
+	return f;
 	}
 
 value Qdouble(double val)
@@ -54,7 +54,7 @@ static double op_cmp(double x, double y) { return x < y ? -1 : x > y ? 1 : 0; }
 
 static value op2(value f, double op(double,double))
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (!f->L || !f->L->L) return f;
 	value x = eval(f->L->R);
 	value y = eval(f->R);
 	value z = Qdouble(op(get_double(x),get_double(y)));
@@ -75,7 +75,7 @@ value fexl_double_cmp(value f) { return op2(f,op_cmp); }
 extern int sprintf(char *str, const char *format, ...);
 value fexl_double_string(value f)
 	{
-	if (!f->L) return 0;
+	if (!f->L) return f;
 
 	value x = eval(f->R);
 
@@ -90,7 +90,7 @@ value fexl_double_string(value f)
 
 value fexl_double_long(value f)
 	{
-	if (!f->L) return 0;
+	if (!f->L) return f;
 	value x = eval(f->R);
 	value y = Qlong(get_double(x));
 	drop(x);

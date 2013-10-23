@@ -14,7 +14,7 @@ large-scale buffering */
 value type_string(value f)
 	{
 	if (!f->N) str_free(get_str(f));
-	return 0;
+	return f;
 	}
 
 value Qstr(struct str *p)
@@ -36,7 +36,7 @@ struct str *get_str(value f)
 /* (concat x y) is the concanation of strings x and y. */
 value fexl_concat(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (!f->L || !f->L->L) return f;
 	value x = eval(f->L->R);
 	value y = eval(f->R);
 	value z = Qstr(str_concat(get_str(x),get_str(y)));
@@ -48,7 +48,7 @@ value fexl_concat(value f)
 /* (string_at str pos) is the character at pos, or 0 if out of bounds. */
 value fexl_string_at(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (!f->L || !f->L->L) return f;
 	value x = eval(f->L->R);
 	value y = eval(f->R);
 	value z = Qlong(str_at(get_str(x),get_long(y)));
@@ -60,7 +60,7 @@ value fexl_string_at(value f)
 /* (string_cmp x y) compares x and y and returns <0, 0, or >0. */
 value fexl_string_cmp(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (!f->L || !f->L->L) return f;
 	value x = eval(f->L->R);
 	value y = eval(f->R);
 	value z = Qlong(str_cmp(get_str(x),get_str(y)));
@@ -72,7 +72,7 @@ value fexl_string_cmp(value f)
 /* (string_len x) is the length of string x */
 value fexl_string_len(value f)
 	{
-	if (!f->L) return 0;
+	if (!f->L) return f;
 	value x = eval(f->R);
 	value z = Qlong(get_str(x)->len);
 	drop(x);
@@ -82,7 +82,7 @@ value fexl_string_len(value f)
 /* Compute the length of the longest common prefix of two strings. */
 value fexl_string_common(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (!f->L || !f->L->L) return f;
 	value x = eval(f->L->R);
 	value y = eval(f->R);
 	value z = Qlong(str_common(get_str(x),get_str(y)));
@@ -94,7 +94,7 @@ value fexl_string_common(value f)
 /* (string_long x) converts string x to a possible long value. */
 value fexl_string_long(value f)
 	{
-	if (!f->L) return 0;
+	if (!f->L) return f;
 	value x = eval(f->R);
 	long num;
 	int ok = string_long(get_str(x)->data,&num);
@@ -106,7 +106,7 @@ value fexl_string_long(value f)
 /* (string_double x) converts string x to a possible double value. */
 value fexl_string_double(value f)
 	{
-	if (!f->L) return 0;
+	if (!f->L) return f;
 	value x = eval(f->R);
 	double num;
 	int ok = string_double(get_str(x)->data,&num);
@@ -118,7 +118,7 @@ value fexl_string_double(value f)
 /* (string_slice str pos len)  Consistent with "substr" in Perl. */
 value fexl_string_slice(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
 	value x = eval(f->L->L->R);
 	value y = eval(f->L->R);
 	value z = eval(f->R);
@@ -168,7 +168,7 @@ value fexl_string_slice(value f)
 /* (string_index haystack needle offset) Consistent with "index" in Perl. */
 value fexl_string_index(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
 	value x = eval(f->L->L->R);
 	value y = eval(f->L->R);
 	value z = eval(f->R);

@@ -64,7 +64,7 @@ static value define_name(struct str *name)
 or no. */
 value fexl_define_name(value f)
 	{
-	if (!f->L) return 0;
+	if (!f->L) return f;
 	value x = eval(f->R);
 	value def = define_name(get_str(x));
 	value result = maybe(def);
@@ -184,7 +184,7 @@ value resolve(value form, value define_string, value define_name,
 value fexl_resolve(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L
-		|| !f->L->L->L->L->L) return 0;
+		|| !f->L->L->L->L->L) return f;
 	return A(later,resolve(f->L->L->L->L->R, f->L->L->L->R, f->L->L->R,
 		f->L->R, f->R));
 	}
@@ -238,9 +238,9 @@ static value enhanced_context(void)
 	}
 
 /* LATER make this whole context available within Fexl. */
-static value standard_name(value f)
+static value type_standard_name(value f)
 	{
-	if (!f->L) return 0;
+	if (!f->L) return f;
 	value x = eval(f->R);
 	struct str *name = get_str(x);
 
@@ -267,7 +267,7 @@ value resolve_standard(value form, FILE *fh, const char *name, long line)
 	curr_name = name;
 	curr_line = line;
 
-	value result = resolve(form,yes,Q(standard_name),Qstr0(name),C);
+	value result = resolve(form,yes,Q(type_standard_name),Qstr0(name),C);
 	if (cache_context)
 		drop(cache_context);
 	return result;

@@ -8,7 +8,7 @@
 
 value type_form(value f)
 	{
-	return 0;
+	return f;
 	}
 
 /* Apply f to g, returning a form if either one is a form. */
