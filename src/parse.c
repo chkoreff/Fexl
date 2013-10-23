@@ -259,41 +259,36 @@ static value parse_list(void)
 
 static value parse_term(void)
 	{
+	long first_line = curr_line;
+	value exp;
 	if (ch == '(') /* parenthesized expression */
 		{
-		long first_line = curr_line;
 		next_ch();
-		value exp = parse_exp();
+		exp = parse_exp();
 		if (ch != ')')
 			syntax_error("Unclosed parenthesis", first_line);
-
 		next_ch();
-		return exp;
 		}
 	else if (ch == '[') /* list */
 		{
-		long first_line = curr_line;
 		next_ch();
-		value exp = parse_list();
+		exp = parse_list();
 		if (ch != ']')
 			syntax_error("Unclosed bracket", first_line);
-
 		next_ch();
-		return exp;
 		}
 	else if (ch == '{') /* quoted form */
 		{
-		long first_line = curr_line;
 		next_ch();
-		value exp = parse_exp();
+		exp = A(I,parse_exp());
 		if (ch != '}')
 			syntax_error("Unclosed brace", first_line);
-
 		next_ch();
-		return A(I,exp);
 		}
 	else
-		return parse_symbol(1);
+		exp = parse_symbol(1);
+
+	return exp;
 	}
 
 /*
@@ -402,7 +397,6 @@ static value parse_factor(void)
 static value parse_exp(void)
 	{
 	value exp = I;
-
 	while (1)
 		{
 		value val = parse_factor();
