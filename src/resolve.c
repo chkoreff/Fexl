@@ -229,10 +229,8 @@ static value enhanced_context(void)
 	if (context == 0)
 		{
 		struct str *file_name = str_new_data0("share/fexl/fexl.fxl");
-
 		value exp = parse_local(file_name);
 		context = resolve(exp,yes,Q(fexl_define_name),Qstr(file_name),C);
-
 		hold(context);
 		cache_context = context;
 		}
