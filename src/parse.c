@@ -14,26 +14,29 @@
 
 /*
 Grammar:
+[
+exp    => terms
+exp    => \ sym def exp
 
-exp  =>  empty
-exp  =>  term exp
-exp  =>  ; exp
-exp  =>  \ sym def exp
+terms  => empty
+terms  => term terms
+terms  => ; exp
 
-term =>  sym
-term =>  ( exp )
+term   => ( exp )
+term   => [ terms ]
+term   => { exp }
+term   => sym
 
-def  =>  empty
-def  =>  is term
+def    => empty
+def    => = term
+def    => == term
 
-is   =>  =
-is   =>  ==
-
-sym  => name
-sym  => string
+sym    => name
+sym    => string
 
 string => simple_string
 string => complex_string
+]
 
 The Fexl parser reads an expression from the input until it reaches -1 (end of
 file) or the special token "\\".  The \\ token stops the parser immediately, as

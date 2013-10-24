@@ -73,6 +73,45 @@ print_to stdout \print\nl\say
 # (chain f g) chains two contexts f and g together.
 \chain = (\f\g \name f name (g name) yes)
 
+# TODO unfortunately I have to pass in the various source symbols because I
+# don't yet know how to make them relative to current file.
+\use=
+	(
+	\the_source_file
+	\the_source_name
+	\the_source_line
+	\the_source_context
+	\context_name
+
+	\missing_context=
+		(\name
+		print_to stderr \print\nl\say # TODO
+		say ["Missing context file " (qu name)]
+		# TODO die here
+		)
+
+	\get_context=
+		(\name
+		fopen name "r" (missing_context name) \fh
+		parse fh name 1 \form\line
+		\exp==(resolve form yes the_source_context name T)
+		exp
+		)
+
+	\context==(get_context context_name)
+	parse the_source_file the_source_name the_source_line \form\line
+	\context=
+		(
+		chain context;
+		define "source_file" the_source_file;
+		define "source_name" the_source_name;
+		define "source_line" line;
+		void
+		)
+	\exp==(resolve form yes context the_source_name T)
+	exp
+	)
+
 ## Now here's the actual context:
 
 @\enhanced_context
@@ -80,18 +119,21 @@ define "say" say;
 define "print" print;
 define "nl" nl;
 define "fprint" fprint;
-define "print_to" print_to;
+define "use" use;
 
 define "string_eq" string_eq;
 define "long_eq" long_eq;
+
+define "define" define;
+define "chain" chain;
+define "void" void;
+
 define "append" append;
 define "join" join;
 define "qu" qu;
 define "NL" NL;
 define "QU" QU;
-define "define" define;
-define "chain" chain;
-define "void" void;
+define "print_to" print_to;
 
-define "standard_context" (chain core_context enhanced_context);
+define "source_context" (chain core_context enhanced_context);
 void
