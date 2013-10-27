@@ -72,25 +72,6 @@ value fexl_core_context(value f)
 	return result;
 	}
 
-static value curr_define_string;
-static value curr_define_name;
-static int curr_strict;
-static FILE *curr_fh;
-static const char *curr_name;
-static long curr_line;
-
-static void report_undef(value sym)
-	{
-	const char *kind = (sym->R->L->T == fexl_C) ? "string" : "symbol";
-	const char *name = get_str(sym->L)->data;
-	long line = get_long(sym->R->R);
-
-	warn("Undefined %s %s on line %ld%s%s", kind, name, line,
-		curr_name[0] ? " of " : "",
-		curr_name
-		);
-	}
-
 static int eval_boolean(value form)
 	{
 	form = eval(A(A(form,C),F));
@@ -118,6 +99,28 @@ static value eval_maybe(value form)
 		}
 	drop(def);
 	return fn;
+	}
+
+static value curr_define_string;
+static value curr_define_name;
+static int curr_strict;
+
+static value source_file;
+static value source_name;
+static value source_line;
+
+static void report_undef(value sym)
+	{
+	const char *kind = (sym->R->L->T == fexl_C) ? "string" : "symbol";
+	const char *name = get_str(sym->L)->data;
+	long line = get_long(sym->R->R);
+
+	const char *file_name = get_str(source_name)->data;
+
+	warn("Undefined %s %s on line %ld%s%s", kind, name, line,
+		file_name[0] ? " of " : "",
+		file_name
+		);
 	}
 
 static value do_resolve(value form)
@@ -153,14 +156,13 @@ value resolve(value form, value define_string, value define_name,
 	{
 	value save_define_string = curr_define_string;
 	value save_define_name = curr_define_name;
-	const char *save_name = curr_name;
+	value save_source_name = source_name;
 
 	form = eval(form);
 	curr_define_string = eval(define_string);
 	curr_define_name = eval(define_name);
 
 	source_name = eval(source_name);
-	curr_name = get_str(source_name)->data;
 
 	curr_strict = eval_boolean(strict);
 
@@ -175,7 +177,7 @@ value resolve(value form, value define_string, value define_name,
 
 	curr_define_string = save_define_string;
 	curr_define_name = save_define_name;
-	curr_name = save_name;
+	source_name = save_source_name;
 
 	return result;
 	}
@@ -215,10 +217,28 @@ static value parse_local(struct str *name)
 
 static value source_context(const char *name)
 	{
-	if (strcmp(name,"source_file") == 0) return Qfile(curr_fh);
-	if (strcmp(name,"source_name") == 0) return Qstr0(curr_name);
-	if (strcmp(name,"source_line") == 0) return Qlong(curr_line);
+	if (strcmp(name,"source_file") == 0) return source_file;
+	if (strcmp(name,"source_name") == 0) return source_name;
+	if (strcmp(name,"source_line") == 0) return source_line;
 	return 0;
+	}
+
+static value top_context(struct str *name)
+	{
+	value def = core_context(name);
+	if (def == 0)
+		def = source_context(name->data);
+	return def;
+	}
+
+static value type_top_context(value f)
+	{
+	if (!f->L) return f;
+	value x = eval(f->R);
+	value def = top_context(get_str(x));
+	value result = maybe(def);
+	drop(x);
+	return result;
 	}
 
 static value cache_context = 0;
@@ -230,7 +250,7 @@ static value enhanced_context(void)
 		{
 		struct str *file_name = str_new_data0("share/fexl/fexl.fxl");
 		value exp = parse_local(file_name);
-		context = resolve(exp,yes,Q(fexl_core_context),Qstr(file_name),C);
+		context = resolve(exp,yes,Q(type_top_context),Qstr(file_name),C);
 		hold(context);
 		cache_context = context;
 		}
@@ -243,10 +263,7 @@ static value type_standard_name(value f)
 	value x = eval(f->R);
 	struct str *name = get_str(x);
 
-	value def = core_context(name);
-	if (def == 0)
-		def = source_context(name->data);
-
+	value def = top_context(name);
 	if (def == 0)
 		def = eval_maybe(A(enhanced_context(),x));
 	else
@@ -262,12 +279,17 @@ static value type_standard_name(value f)
 /* Resolve the form in the standard context. */
 value resolve_standard(value form, FILE *fh, const char *name, long line)
 	{
-	curr_fh = fh;
-	curr_name = name;
-	curr_line = line;
+	source_file = Qfile(fh); hold(source_file);
+	source_name = Qstr0(name); hold(source_name);
+	source_line = Qlong(line); hold(source_line);
 
 	value result = resolve(form,yes,Q(type_standard_name),Qstr0(name),C);
 	if (cache_context)
 		drop(cache_context);
+
+	drop(source_file);
+	drop(source_name);
+	drop(source_line);
+
 	return result;
 	}

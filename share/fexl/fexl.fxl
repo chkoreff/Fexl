@@ -73,48 +73,52 @@ print_to stdout \print\nl\say
 # (chain f g) chains two contexts f and g together.
 \chain = (\f\g \name f name (g name) yes)
 
-# TODO unfortunately I have to pass in the various source symbols because I
-# don't yet know how to make them relative to current file.
-\use=
-	(
-	\the_source_file
-	\the_source_name
-	\the_source_line
-	\the_source_context
-	\context_name
-
-	\missing_context=
-		(\name
-		print_to stderr \print\nl\say # TODO
-		say ["Missing context file " (qu name)]
-		# TODO die here
-		)
-
-	\get_context=
-		(\name
-		fopen name "r" (missing_context name) \fh
-		parse fh name 1 \form\line
-		\exp==(resolve form yes the_source_context name T)
-		exp
-		)
-
-	\context==(get_context context_name)
-	parse the_source_file the_source_name the_source_line \form\line
-	\context=
-		(
-		chain context;
-		define "source_file" the_source_file;
-		define "source_name" the_source_name;
-		define "source_line" line;
-		void
-		)
-	\exp==(resolve form yes context the_source_name T)
-	exp
-	)
-
 ## Now here's the actual context:
 
 @\enhanced_context
+
+\source_context=(chain core_context enhanced_context)
+
+\use=
+	(
+	\context_name
+
+	\missing_context=
+		(
+		print_to stderr \print\nl\say # TODO
+		say ["Undefined context " (qu context_name)
+			" on line " source_line " of " source_name]
+		# TODO die here
+		)
+
+	# TODO how about a path relative to the *script*?
+	fopen context_name "r" missing_context \fh
+	parse fh context_name 1 \form\line
+
+	# TODO here you need to redefine source_context to include the
+	# updated source_ symbols and a new "use" function as well!
+	\context==(resolve form yes source_context context_name T)
+
+	# foo # TODO doesn't give proper error message
+	# TODO maybe provide "parent_context" so we can report source_ symbols
+	# from "upstairs".  Could be dangerous though, because to do a restricted
+	# context you'd need to disable parent_context.  Then again, any time you
+	# provide the original source_context, that's just as "dangerous", so it's
+	# really no different.
+
+	parse source_file source_name source_line \form\line
+
+	\context=
+		(
+		@\self
+		define "source_line" line;
+		define "source_context" self;
+		context
+		)
+	\exp==(resolve form yes context source_name T)
+	exp
+	)
+
 define "say" say;
 define "print" print;
 define "nl" nl;
@@ -135,5 +139,8 @@ define "NL" NL;
 define "QU" QU;
 define "print_to" print_to;
 
-define "source_context" (chain core_context enhanced_context);
+define "source_file" source_file;
+define "source_name" source_name;
+define "source_line" source_line;
+define "source_context" source_context;
 void

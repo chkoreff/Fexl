@@ -1,9 +1,5 @@
 #!bin/fexl
 
-# TODO make it so we don't have to pass in the source_ symbols.  Somehow they
-# need to be relative symbols so it can all be encoded in fexl.fxl.
-\use=(use source_file source_name source_line source_context)
-
 use "test/common.fxl" \\
 
 \test_built_in_pattern=
