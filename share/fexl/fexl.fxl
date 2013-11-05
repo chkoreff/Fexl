@@ -88,7 +88,7 @@ print_to stdout \print\nl\say
 		print_to stderr \print\nl\say # TODO
 		say ["Undefined context " (qu context_name)
 			" on line " source_line " of " source_name]
-		# TODO die here
+		exit 1
 		)
 
 	# TODO how about a path relative to the *script*?

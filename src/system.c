@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "str.h"
 
 #include "value.h"
@@ -30,6 +31,16 @@ value fexl_examine(value f)
 	value result = pair(the_type,the_content);
 	drop(x);
 	return result;
+	}
+
+value fexl_exit(value f)
+	{
+	if (!f->L) return f;
+	value x = eval(f->R);
+	long status = get_long(x);
+	drop(x);
+	exit(status);
+	return I;
 	}
 
 /*LATER more functions
