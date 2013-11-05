@@ -43,6 +43,13 @@
 
 print_to stdout \print\nl\say
 
+\die=
+	(\msg
+	print_to stderr \print\nl\say # TODO
+	say msg
+	exit 1
+	)
+
 \QU=~ "~
 \qu=(\x concat QU; concat x; QU)
 	# LATER use (to_string [QU x QU])
@@ -85,10 +92,8 @@ print_to stdout \print\nl\say
 
 	\missing_context=
 		(
-		print_to stderr \print\nl\say # TODO
-		say ["Undefined context " (qu context_name)
+		die ["Undefined context " (qu context_name)
 			" on line " source_line " of " source_name]
-		exit 1
 		)
 
 	# TODO how about a path relative to the *script*?
@@ -124,6 +129,7 @@ define "print" print;
 define "nl" nl;
 define "fprint" fprint;
 define "use" use;
+define "die" die;
 
 define "string_eq" string_eq;
 define "long_eq" long_eq;
