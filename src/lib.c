@@ -18,6 +18,10 @@ references them is executed.
 
 RTLD_NODELETE: Do not unload the library during dlclose().  This flag is not
 specified in POSIX.1-2001.
+NOTE 20131108:  jturner notes that OpenBSD does not support RTLD_NODELETE.  I
+could wrap "#ifdef __linux" around it, but I'm just going to remove it for now.
+I'm sure I could work around any issues which arise, but we're not even relying
+on dlopen at this point anyway.
 
 The dlopen man page says that if the path is NULL, then the returned handle is
 for the main program.  That's fine, but when we want to reference the main
@@ -35,7 +39,10 @@ value fexl_dlopen(value f)
 	/* Portability guard for unspecified behavior (see above). */
 	if (path[0] == '\000') path = 0;
 
+	#if 0
 	void *lib = dlopen(path, RTLD_LAZY|RTLD_NODELETE);
+	#endif
+	void *lib = dlopen(path, RTLD_LAZY);  /* Be compatible with OpenBSD. */
 
 	value result = V(type_lib,0,(value)lib);
 	drop(x);

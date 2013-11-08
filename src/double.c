@@ -50,7 +50,7 @@ zero, it yields inf (infinity). If you divide zero by zero, it yields -nan
 */
 static double op_div(double x, double y) { return x / y; }
 
-static double op_cmp(double x, double y) { return x < y ? -1 : x > y ? 1 : 0; }
+static long op_cmp(double x, double y) { return x < y ? -1 : x > y ? 1 : 0; }
 
 static value op2(value f, double op(double,double))
 	{
@@ -69,7 +69,16 @@ value fexl_double_mul(value f) { return op2(f,op_mul); }
 value fexl_double_div(value f) { return op2(f,op_div); }
 
 /* (double_cmp x y) compares x and y and returns -1, 0, or +1. */
-value fexl_double_cmp(value f) { return op2(f,op_cmp); }
+value fexl_double_cmp(value f)
+	{
+	if (!f->L || !f->L->L) return f;
+	value x = eval(f->L->R);
+	value y = eval(f->R);
+	value z = Qlong(op_cmp(get_double(x),get_double(y)));
+	drop(x);
+	drop(y);
+	return z;
+	}
 
 /* double_string num */
 extern int sprintf(char *str, const char *format, ...);

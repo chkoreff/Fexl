@@ -90,7 +90,7 @@ c
 d
 == test_double
 70.8
--nan
+nan
 inf
 -inf
 6.28318530717959
@@ -107,6 +107,14 @@ inf
 1
 1
 1
+LT
+LT
+LT
+EQ
+EQ
+GT
+GT
+GT
 = double_long
 4
 0
@@ -359,7 +367,7 @@ x is var:7
 x contains 7
 x contains 42
 == test_parse
-Parsing the tail of test/a1.fxl on line 687
+Parsing the tail of test/a1.fxl on line 708
 == form      = {{(R ((R I) ((S I) I))) {{R {say}} {{R {item {"x = "}}} ((L item) C)}}} {3}}
 == Now evaluate
 x = 3
