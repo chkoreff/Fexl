@@ -672,6 +672,22 @@ say "== Now evaluate"
 print "== value     = " show exp
 )
 
+\test_lib=
+(
+say "== test_lib"
+\lib==(dlopen "lib/fexl/liblong.so")
+\try=
+	(\name
+	\fn=(dlsym lib name)
+	say ["Symbol " name (long_eq fn 0 " does not exist." " exists.")]
+	)
+try "fexl_long_string"
+try "foobar"
+try "fexl_order"
+try "string_long"
+try "op_cmp"
+)
+
 \test_all=
 (
 test_built_in_pattern
@@ -698,6 +714,7 @@ test_later
 test_file
 test_list
 test_var
+test_lib
 test_parse
 )
 

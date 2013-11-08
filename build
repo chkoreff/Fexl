@@ -201,9 +201,6 @@ make_lib()
 #
 # We use --no-as-needed to force linkage with the shared libraries, which makes
 # their functions available to the program with dlsym(NULL).
-#
-# LATER jturner says he had to remove -ldl when building on OpenBSD.
-# I suppose I should compare uname with "OpenBSD", and skip -ldl if I see it.
 
 make_bin()
 	{

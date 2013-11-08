@@ -4,7 +4,15 @@ project fexl
 # Libraries
 lib double
 lib file
-lib lib - dl
+
+# jturner notes that -ldl is incompatible with OpenBSD, and is not needed.
+local os=`uname`
+if [ "$os" = "Linux" ]; then
+	lib lib - dl
+else
+	lib lib
+fi
+
 lib long
 lib str
 lib qfile
