@@ -1,12 +1,17 @@
 # Enhanced context for Fexl.
 
 \string_eq=(\x\y order (string_cmp x y) F T F)
+
 \long_eq=(\x\y order (long_cmp x y) F T F)
+\long_le=(\x\y order (long_cmp x y) T T F)
+\long_gt=(\x\y order (long_cmp x y) F F T)
+
 \append=(@\append\x\y x y \h\t [h;append t y])
 
 \NL="
 "
 
+# LATER just do this in C.
 \fprint==
 	(
 	examine 0 \type_long\_
@@ -14,12 +19,13 @@
 	examine "" \type_string\_
 	examine var \type_var\_
 	@\fprint\fh
-	\done=(fwrite fh)
+	\done==(fwrite fh)
+	#\loop==(fprint fh) # TODO seg fault
 	\loop=(fprint fh)
 	\x
 	\x==x
 	examine x \type\content
-	\case=(long_eq type)
+	\case==(long_eq type)
 	content
 		(
 		case type_string (done x);
@@ -33,6 +39,7 @@
 
 # LATER perhaps use a var for "current" output handle, and have "print_to" be a
 # function that saves and restores that handle.
+# LATER or maybe a context thing
 \print_to=
 	(\out
 	\print=(fprint out)
@@ -52,7 +59,6 @@ print_to stdout \print\nl\say
 
 \QU=~ "~
 \qu=(\x concat QU; concat x; QU)
-	# LATER use (to_string [QU x QU])
 	# LATER use ~ forms if x has quotes.
 
 # Insert a separator between the elements of a list.
@@ -133,6 +139,8 @@ define "die" die;
 
 define "string_eq" string_eq;
 define "long_eq" long_eq;
+define "long_le" long_le;
+define "long_gt" long_gt;
 
 define "define" define;
 define "chain" chain;
