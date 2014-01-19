@@ -1,4 +1,5 @@
 extern value fexl_C(value);
+extern value fexl_item(value f);
 extern value C;
 extern value S;
 extern value I;

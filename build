@@ -115,7 +115,8 @@ get_headers()
 # that by running "gcc -c -Q -O3 --help=optimizers".
 #
 # NOTE: We no longer use the -ansi option because that makes the fdopen
-# function inaccessible in stdio.h for some strange reason.
+# function inaccessible in stdio.h, and makes readlink inaccessible in
+# unistd.h.
 make_obj()
 	{
 	local name=$1

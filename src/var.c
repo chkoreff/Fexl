@@ -1,5 +1,6 @@
 #include "value.h"
 #include "basic.h"
+#include "var.h"
 
 value type_var(value f)
 	{

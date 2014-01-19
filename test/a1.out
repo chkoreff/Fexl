@@ -30,7 +30,6 @@ x = !5
 x
 
 
-
 x
 xy
 == test_ping
@@ -373,9 +372,16 @@ Symbol fexl_order exists.
 Symbol string_long exists.
 Symbol op_cmp does not exist.
 == test_parse
-Parsing the tail of test/a1.fxl on line 725
+Parsing the tail of test/a1.fxl on line 735
 == form      = {{(R ((R I) ((S I) I))) {{R {say}} {{R {item {"x = "}}} ((L item) C)}}} {3}}
 == Now evaluate
 x = 3
 x = 3
 == value     = I
+== test_range
+The count goes on
+  4,
+  3,
+  2,
+  1,
+Earth below us

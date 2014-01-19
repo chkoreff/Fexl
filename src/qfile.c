@@ -4,9 +4,11 @@
 
 #include "value.h"
 #include "basic.h"
+#include "double.h"
 #include "long.h"
 #include "qfile.h"
 #include "qstr.h"
+#include "var.h"
 
 value type_file(value f)
 	{
@@ -124,6 +126,49 @@ value fexl_readlink(value f)
 	}
 
 value const_fexl_base_path(void) { return Qstr(base_path()); }
+
+static FILE *curr_fh;
+
+static void fprint(value f)
+	{
+	f = eval(f);
+	if (f->T == type_string)
+		{
+		struct str *str = get_str(f);
+		size_t count = fwrite(str->data, 1, str->len, curr_fh);
+		(void)count;  /* Ignore the return count. */
+		}
+	else if (f->T == type_long)
+		fprintf(curr_fh, "%ld", get_long(f));
+	else if (f->T == type_double)
+		fprintf(curr_fh, "%.15g", get_double(f));
+	else if (f->T == fexl_item)
+		{
+		if (!f->L || !f->L->L) bad_type();
+		fprint(f->L->R);
+		fprint(f->R);
+		}
+	else if (f->T == fexl_C)
+		;
+	else if (f->T == type_var)
+		fprint(f->R);
+	else
+		bad_type();
+
+	drop(f);
+	}
+
+value fexl_fprint(value f)
+	{
+	if (!f->L || !f->L->L) return f;
+	value x = eval(f->L->R);
+	FILE *save_fh = curr_fh;
+	curr_fh = get_file(x);
+	fprint(f->R);
+	curr_fh = save_fh;
+	drop(x);
+	return I;
+	}
 
 /*LATER more functions */
 

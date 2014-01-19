@@ -11,35 +11,9 @@
 \NL="
 "
 
-# LATER just do this in C.
-\fprint==
-	(
-	examine 0 \type_long\_
-	examine 0.0 \type_double\_
-	examine "" \type_string\_
-	examine var \type_var\_
-	@\fprint\fh
-	\done==(fwrite fh)
-	#\loop==(fprint fh) # TODO seg fault
-	\loop=(fprint fh)
-	\x
-	\x==x
-	examine x \type\content
-	\case==(long_eq type)
-	content
-		(
-		case type_string (done x);
-		case type_long (done; long_string x);
-		case type_double (done; double_string x);
-		case type_var (loop; get x);
-		)
-	\h\t
-	loop h loop t
-	)
-
-# LATER perhaps use a var for "current" output handle, and have "print_to" be a
+# TODO perhaps use a var for "current" output handle, and have "print_to" be a
 # function that saves and restores that handle.
-# LATER or maybe a context thing
+# TODO or maybe a context thing
 \print_to=
 	(\out
 	\print=(fprint out)
@@ -67,6 +41,22 @@ print_to stdout \print\nl\say
 	xs [] \x\xs
 	xs [x] \_\_ [x sep; join sep xs]
 	)
+
+# Return the list of long values in the range x through y.  It works forwards
+# or backwards.
+\range=
+	(@\range\x\y
+	\x==x
+	item x;
+	order (long_cmp x y)
+		(range (long_add x 1) y)
+		[]
+		(range (long_sub x 1) y)
+	)
+
+# Apply function f to each entry in xs, ending with next.  This is useful for
+# producing a side-effect for each entry in a list.
+\do=(@\do\xs\f xs I \x\xs f x; do xs f)
 
 # LATER define "." as the "to_string" (flatten) function.
 # \x=(.["abc" " de " "fg"])
@@ -148,6 +138,8 @@ define "void" void;
 
 define "append" append;
 define "join" join;
+define "range" range;
+define "do" do;
 define "qu" qu;
 define "NL" NL;
 define "QU" QU;

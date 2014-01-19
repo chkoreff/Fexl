@@ -98,13 +98,11 @@ say ["This goes to " "stderr."]
 \x=(long_add 1 4)
 say ["x = " (fwrite stdout "!"; x)]
 
-# Ensure that saying a weird form works well, and doesn't hang.
 say "x"
-say C
-say Y
-say S
-say (S "x")
-say ((S "x") (S "y"))
+say []
+say []
+say [[["x"] []]]
+say [[["x"] ["y"]]]
 )
 
 \test_ping=
@@ -688,6 +686,17 @@ try "string_long"
 try "op_cmp"
 )
 
+\test_range=
+(
+say "== test_range"
+say "The count goes on"
+do (range 4 1)
+	(\n
+	say ["  " n ","]
+	)
+say "Earth below us"
+)
+
 \test_all=
 (
 test_built_in_pattern
@@ -716,6 +725,7 @@ test_list
 test_var
 test_lib
 test_parse
+test_range
 )
 
 test_all
