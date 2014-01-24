@@ -129,33 +129,43 @@ value const_fexl_base_path(void) { return Qstr(base_path()); }
 
 static FILE *curr_fh;
 
+/* I removed the tail recursion in the cases for fexl_item and type_var. */
 static void fprint(value f)
 	{
-	f = eval(f);
-	if (f->T == type_string)
+	while (1)
 		{
-		struct str *str = get_str(f);
-		size_t count = fwrite(str->data, 1, str->len, curr_fh);
-		(void)count;  /* Ignore the return count. */
-		}
-	else if (f->T == type_long)
-		fprintf(curr_fh, "%ld", get_long(f));
-	else if (f->T == type_double)
-		fprintf(curr_fh, "%.15g", get_double(f));
-	else if (f->T == fexl_item)
-		{
-		if (!f->L || !f->L->L) bad_type();
-		fprint(f->L->R);
-		fprint(f->R);
-		}
-	else if (f->T == fexl_C)
-		;
-	else if (f->T == type_var)
-		fprint(f->R);
-	else
-		bad_type();
+		if (f->T == type_string)
+			{
+			struct str *str = get_str(f);
+			size_t count = fwrite(str->data, 1, str->len, curr_fh);
+			(void)count;  /* Ignore the return count. */
+			}
+		else if (f->T == type_long)
+			fprintf(curr_fh, "%ld", get_long(f));
+		else if (f->T == type_double)
+			fprintf(curr_fh, "%.15g", get_double(f));
+		else if (f->T == fexl_item)
+			{
+			if (!f->L || !f->L->L) bad_type();
+			fprint(eval(f->L->R));
+			drop(f);
+			f = eval(f->R);
+			continue;
+			}
+		else if (f->T == fexl_C)
+			;
+		else if (f->T == type_var)
+			{
+			drop(f);
+			f = eval(f->R);
+			continue;
+			}
+		else
+			bad_type();
 
-	drop(f);
+		drop(f);
+		break;
+		}
 	}
 
 value fexl_fprint(value f)
@@ -164,7 +174,7 @@ value fexl_fprint(value f)
 	value x = eval(f->L->R);
 	FILE *save_fh = curr_fh;
 	curr_fh = get_file(x);
-	fprint(f->R);
+	fprint(eval(f->R));
 	curr_fh = save_fh;
 	drop(x);
 	return I;

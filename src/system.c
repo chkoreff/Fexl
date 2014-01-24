@@ -19,9 +19,9 @@ value fexl_argv(value f)
 	return z;
 	}
 
-/* (examine x) returns (pair type content).  The type of x is a long value.
-The content of x is [] if x is an atom, or [left;right] if x is the application
-of left to right. */
+/* (examine x) returns (pair type content).  The type is a long value.  The
+content [] if x is an atom, or [left;right] if x is the application of left to
+right. */
 value fexl_examine(value f)
 	{
 	if (!f->L) return f;
