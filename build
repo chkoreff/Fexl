@@ -1,38 +1,33 @@
 #!/bin/sh
 
 # (Patrick Chkoreff)
-# This script builds or installs a project based on a very simple file named
-# "src/config" which you create in your C source directory.
 #
-# It standardizes everything I know about building and installation, doing
-# everything precisely, efficiently, and reliably, with the least amount of
-# configuration.
-#
-# The script checks time stamps and builds only what is out of date.  It
-# automatically finds header dependencies, which it caches in obj/*.dep files.
+# This script builds or installs the Fexl project.  It checks time stamps and
+# builds only what is out of date.  It automatically finds header dependencies,
+# which it caches in obj/*.dep files.
 #
 # The installer honours the standard structure (e.g. the way perl does it):
 #
-#   /usr/bin/project
-#   /usr/lib/project
-#   /usr/share/project
+#   /usr/bin/fexl
+#   /usr/lib/fexl
+#   /usr/share/fexl
 #
-# You can run it with no options to see the usage message.
+# Run "./build help" to see the full usage message.
 
 usage()
 	{
-	local prog=`basename $0`
+	local prog=$0
 
 	cat 1>&2 <<EOM
 NAME
        $prog - Build or install the $g_project system as required.
 
 SYNOPSIS
-       $prog [quiet] [clean] [here] [install] [uninstall] [in <dir>]
+       $prog [quiet] [clean] [install] [uninstall] [in <dir>]
 
 DESCRIPTION
-       $prog here
-              Build here, in the current directory.
+       $prog
+              Build in the current directory.
 
        $prog install
        $prog uninstall
@@ -42,20 +37,20 @@ DESCRIPTION
        $prog uninstall in <dir>
               Install or uninstall in the specified directory <dir>.
 
-       $prog clean
-              Erase all the local output files before doing anything else.
-
-       $prog quiet here
+       $prog quiet
               Build quietly, without showing the commands that it runs.
 
-You may also combine the options in various ways such as this:
+       $prog clean
+              Build after erasing all local output files.
 
-       $prog quiet here
+       $prog erase
+              Erase all local output files and do nothing else.
+
+You may also combine options in various ways such as:
+
        $prog quiet install
        $prog quiet clean install
-       $prog install in ~
        $prog quiet install in ~/my$g_project
-       $prog in ~/my$g_project install  # like Yoda
 
 EOM
 	exit 2
@@ -126,10 +121,12 @@ make_obj()
 	local file_o=obj/$name.o
 
 	# Make sure header cache file obj/$name.dep is up to date.
-	local file_dep=obj/$name.dep
-	if [ `newer_than $file_c $file_dep` -eq 1 ]; then
-		local headers="`get_headers $name`"
-		echo $headers >$file_dep
+	if [ -e $file_c ]; then
+		local file_dep=obj/$name.dep
+		if [ `newer_than $file_c $file_dep` -eq 1 ]; then
+			local headers="`get_headers $name`"
+			echo $headers >$file_dep
+		fi
 	fi
 
 	local update=`newer_than $file_c $file_o`
@@ -237,20 +234,24 @@ make_bin()
 	fi
 	}
 
-do_build()
-	{
-	mkdir -p bin
-	mkdir -p obj
-	mkdir -p lib/$g_project
-
-	eval "$g_script"
-	}
-
-do_clean()
+do_erase()
 	{
 	rm -rf obj
 	rm -rf lib
 	rm -rf bin
+	}
+
+# Guard against disaster.
+sanity_check()
+	{
+	if [ "$g_place" = "" ]; then
+		echo 2>&1 "Sorry, this script is broken (it didn't set g_place)."
+		exit 1
+	fi
+	if [ "$g_project" = "" ]; then
+		echo 2>&1 "Sorry, this script is broken (it didn't set g_project)."
+		exit 1
+	fi
 	}
 
 # Validate command line options and set global variables accordingly.
@@ -260,7 +261,7 @@ validate_options()
 
 	g_quiet=0
 	g_clean=0
-	g_here=0
+	g_erase=0
 	g_install=0
 	g_uninstall=0
 	g_sysdir=/usr
@@ -270,9 +271,9 @@ validate_options()
 		local verb="$1"
 		shift
 		case $verb in
-			here) g_here=1 ;;
 			quiet) g_quiet=1 ;;
 			clean) g_clean=1 ;;
+			erase) g_erase=1 ;;
 			install) g_install=1 ;;
 			uninstall) g_uninstall=1 ;;
 			in)
@@ -287,24 +288,9 @@ validate_options()
 		esac
 	done
 
-	if [ $g_here -eq 0 -a $g_install -eq 0 -a $g_uninstall -eq 0 -a \
-		$g_clean -eq 0 ]; then
-		valid=0
-	fi
-
 	if [ $valid -eq 0 ]; then usage; fi
 
-	if [ $g_install -eq 1 -a $g_here -eq 1 ]; then
-		valid=0
-	fi
-	if [ $g_uninstall -eq 1 -a $g_here -eq 1 ]; then
-		valid=0
-	fi
 	if [ $g_install -eq 1 -a $g_uninstall -eq 1 ]; then
-		valid=0
-	fi
-
-	if [ $valid -eq 0 ]; then
 		echo 2>&1 "That combination of options makes no sense."
 		exit 2
 	fi
@@ -315,6 +301,8 @@ validate_options()
 			exit 2
 		fi
 	fi
+
+	sanity_check
 	}
 
 do_install()
@@ -326,7 +314,7 @@ do_install()
 	run "mkdir -p $g_place/share"
 
 	local name
-	for name in $g_list_bin
+	for name in $g_publish_bin
 	do
 		run "cp -p bin/$name $g_place/bin/"
 	done
@@ -337,7 +325,7 @@ do_install()
 	run "rm -rf $g_place/share/$g_project"
 	run "cp -pr share/$g_project $g_place/share/"
 
-	for name in $g_list_bin
+	for name in $g_publish_bin
 	do
 		run "chown $USER:$USER $g_place/bin/$name"
 	done
@@ -361,7 +349,7 @@ do_uninstall()
 	sanity_check
 
 	local name
-	for name in $g_list_bin
+	for name in $g_publish_bin
 	do
 		run "rm -f $g_place/bin/$name"
 	done
@@ -374,80 +362,55 @@ do_uninstall()
 	run "quiet_rmdir $g_place"
 	}
 
-# Guard against disaster.
-sanity_check()
+do_build()
 	{
-	if [ "$g_place" = "" ]; then
-		echo 2>&1 "Sorry, this script is broken (it didn't set g_place)."
-		exit 1
+	make_lib double
+	make_lib file
+
+	# jturner notes that -ldl is incompatible with OpenBSD, and is not needed.
+	local os=`uname`
+	if [ "$os" = "Linux" ]; then
+		make_lib lib - dl
+	else
+		make_lib lib
 	fi
-	if [ "$g_project" = "" ]; then
-		echo 2>&1 "Missing project name in src/config"
-		exit 1
-	fi
-	}
 
-##[ These routines are called from your src/config script.
-project()
-	{
-	if [ "$g_project" != "" ]; then
-		echo 2>&1 "You can't have more than one project name in src/config"
-		exit 2
-	fi
-	g_project=$1
-	}
+	make_lib long
+	make_lib str
+	make_lib qfile
+	make_lib qstr
+	make_lib system
+	make_lib var
+	# These are just for testing.
+	make_lib test
+	make_lib show
 
-lib()
-	{
-	g_script="${g_script}make_lib $@
-"
-	}
-
-bin()
-	{
-	g_script="${g_script}make_bin $@
-"
-	}
-
-# Set the list of bin files to install.
-public()
-	{
-	g_list_bin="$@"
-	}
-##]
-
-# Execute the src/config script, which calls lib, bin, and public above.
-read_config()
-	{
-	g_project=""
-	g_list_bin=""
-	g_script=""
-	if [ ! -e src/config ]; then
-		echo 2>&1 "Missing src/config file"
-		exit 2
-	fi
-	local script="`cat src/config`"
-	eval "$script"
+	make_bin fexl basic buf die form memory parse resolve value \
+		- double file lib long qfile qstr str system var show test
 	}
 
 main()
 	{
-	read_config
-	validate_options "$@"
-	sanity_check
+	g_project=fexl
+	g_publish_bin="fexl"
 
-	if [ $g_clean -eq 1 ]; then
-		do_clean
-	fi
+	validate_options "$@"
 
 	if [ $g_uninstall -eq 1 ]; then
 		do_uninstall
 		exit
 	fi
 
-	if [ $g_here -eq 1 -o $g_install -eq 1 ]; then
-		do_build
+	if [ $g_clean -eq 1 -o $g_erase -eq 1 ]; then
+		do_erase
+        if [ $g_erase -eq 1 ]; then exit; fi
 	fi
+
+	mkdir -p bin
+	mkdir -p obj
+	mkdir -p lib/$g_project
+
+	do_build
 
 	if [ $g_install -eq 1 ]; then
 		do_install

@@ -8,7 +8,7 @@ sources="README.md build share test src"
 
 .build()
 	{
-	./build quiet here
+	./build quiet
 	}
 
 .fexl()
