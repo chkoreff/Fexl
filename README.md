@@ -37,8 +37,8 @@ First get the code:
 	git clone git@github.com:chkoreff/Fexl.git
 	cd Fexl
 
-There you will see a script called "build".  You can run `./build` by itself
-to see all the options, but here's a quick summary:
+There you will see a script called "build".  You can run `./build help` to see
+all the options, but here's a quick summary:
 
 To install in the standard /usr directory:
 
@@ -52,7 +52,7 @@ You can use "uninstall" the same way to remove an installation.
 
 To build it in the current directory without installing anywhere else:
 
-	./build here
+	./build
 
 Fexl honours the standard installation structure (e.g. the way perl does it).
 So if you install in /usr, it will create these:
