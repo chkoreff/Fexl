@@ -1,14 +1,8 @@
-struct buf_chunk
-	{
-	char *data;
-	long size;
-	long len;
-	struct buf_chunk *prev;
-	};
-
 struct buf
 	{
-	struct buf_chunk *top;
+	int pos;
+	struct str *str;
+	struct buf *next;
 	};
 
 extern void buf_start(struct buf *buf);

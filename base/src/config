@@ -1,0 +1,124 @@
+#!/bin/sh
+
+# stale $target $source1 ... $sourceN
+# Return true if $target does not exist or is older than any $source.
+stale()
+	{
+	local target="$1"; shift
+
+	if [ ! -e $target ]; then
+		true
+		return
+	fi
+
+	for source in "$@"; do
+		if [ $source -nt $target ]; then
+			true
+			return
+		fi
+	done
+
+	false
+	}
+
+trace()
+	{
+	if [ $verbose -lt 1 ]; then return; fi
+	echo "$@"
+	}
+
+# Run a system command and exit if unsuccessful.
+run()
+	{
+	if [ $verbose -gt 1 ]; then
+		trace "  " "$@"
+	fi
+	$@
+	local code=$?
+	if [ $code -ne 0 ]; then exit $code; fi
+	}
+
+compile="gcc -c -Wall -Werror -std=c99 -pedantic -Wunused-parameter -O3"
+
+make_obj()
+	{
+	local name="$1"
+
+	[ -e "$name.h" ] && set $@ $name
+	shift
+
+	local include=""
+	local headers=""
+
+	for module in "$@"; do
+		file="$module.h"
+		if [ -e $file ]; then
+			headers="$headers $file"
+			include="$include -include $file"
+		else
+			local parent=`dirname $module`
+			local base=`basename $module`
+			file="$parent/src/$base.h"
+			if [ -e $file ]; then
+				headers="$headers $file"
+				include="$include -include $file"
+			else
+				file="$module.h"
+				include="$include -include $file"
+			fi
+		fi
+	done
+
+	stale ../obj/$name.o $name.c $headers
+	if [ $? -ne 0 ]; then return; fi
+
+	trace Compile $name
+	mkdir -p ../obj
+	run $compile $name.c $include -o ../obj/$name.o
+	}
+
+make_bin()
+	{
+	local name="$1"; shift
+
+	set $@ $name
+
+	local objects
+	for module in "$@"; do
+		local parent=`dirname $module`
+		local base=`basename $module`
+		if [ "$parent" = "." ]; then
+			parent=".."
+		fi
+		local file="$parent/obj/$base.o"
+		objects="$objects $file"
+	done
+
+	stale ../bin/$name $objects
+	if [ $? -ne 0 ]; then return; fi
+
+	trace Link $name
+	mkdir -p ../bin
+	# LATER -Wl,--gc-sections
+	run gcc -s $objects -o ../bin/$name
+	}
+
+# Remove a directory without displaying an error message if it doesn't exist or
+# is not empty.
+quiet_rmdir()
+	{
+	if [ -d $1 ]; then
+		rmdir --ignore-fail-on-non-empty $1
+	fi
+	}
+
+# Erase a directory and remove its parent if empty.
+erase()
+	{
+	local name="$1"
+	local parent=`dirname $name`
+	rm -rf $name
+	quiet_rmdir $parent
+	}
+
+[ "$verbose" = "" ] && verbose=1

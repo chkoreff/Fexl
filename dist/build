@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# Create fexl.tar.bz2, which can be extracted with tar -xjf.
+
+here=$(basename $(pwd))
+
+cd ..
+
+tar --transform="s,^,fexl/," -cjf $here/fexl.tar.bz2 \
+	base/src \
+	dist/build \
+	dist/erase \
+	erase \
+	handy \
+	LICENSE \
+	README.md \
+	test/src
+
+# LATER sign the archive.

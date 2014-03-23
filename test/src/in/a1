@@ -1,0 +1,58 @@
+#
+
+x y <=
+abcdefghijklmnopqrstuvwxyz
+a
+"
+"
+
+""
+"a"
+
+~" "
+~" a"
+~| a|
+"hi"x
+~EOM aEOM
+~ABC abcdABAABC
+"
+"
+~ABCD AABABCABCDABCD
+
+"
+"
+
+~| "Ain't nothin' simple when you're doin' it for real." (Gus Baird)|
+"
+"
+
+~@
+My fathers sleep on the sunrise plains,
+And each one sleeps alone.
+Their trails may dim to the grass and rains,
+For I choose to make my own.
+I lay proud claim to their blood and name,
+But I lean on no dead kin;
+My name is mine, for the praise or scorn,
+And the world began when I was born
+And the world is mine to win. ...
+
+  (Badger Clark, "The Westerner")
+@
+
+# Multiple layers of quotation.
+
+"hello"
+"
+"
+~(1) "hello"(1)
+"
+"
+~(2) ~(1) "hello"(1)(2)
+"
+"
+~(3) ~(2) ~(1) "hello"(1)(2)(3)
+"
+"
+abcd ef 47.806 99 -22
+(a (b c); d e (f g) h)

@@ -1,0 +1,14 @@
+extern value type_C(value f, value g);
+extern value type_I(value f, value g);
+extern value type_S(value f, value g);
+extern value type_L(value f, value g);
+extern value type_R(value f, value g);
+extern value type_Y(value f, value g);
+extern value C;
+extern value I;
+extern value S;
+extern value L;
+extern value R;
+extern value Y;
+extern void beg_base(void);
+extern void end_base(void);

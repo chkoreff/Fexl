@@ -1,10 +1,10 @@
-#include <assert.h>
-#include <string.h>
-#include "memory.h"
-#include "str.h"
+/* A string has a length field, followed by that number of bytes (which may
+include NULs), followed by a trailing NUL byte.  The trailing NUL byte makes it
+easier to call system functions that expect it.
+*/
 
 /* Create a string capable of holding len bytes plus trailing NUL. */
-struct str *str_new(long len)
+struct str *str_new(int len)
 	{
 	assert(len >= 0);
 	struct str *x = new_memory(sizeof(struct str) + len + 1);
@@ -12,7 +12,7 @@ struct str *str_new(long len)
 	return x;
 	}
 
-struct str *str_new_data(const char *data, long len)
+struct str *str_new_data(const char *data, int len)
 	{
 	struct str *x = str_new(len);
 	memcpy(x->data, data, len);
@@ -31,7 +31,7 @@ void str_free(struct str *x)
 	}
 
 /* Return byte at pos, or 0 if out of bounds. */
-long str_at(struct str *str, long pos)
+char str_at(struct str *str, int pos)
 	{
 	return pos >= 0 && pos < str->len ? str->data[pos] : 0;
 	}
@@ -51,7 +51,7 @@ positive if x > y. */
 int str_cmp(struct str *x, struct str *y)
 	{
 	if (x == y) return 0;
-	long min_len = x->len < y->len ? x->len : y->len;
+	int min_len = x->len < y->len ? x->len : y->len;
 	int cmp = memcmp(x->data, y->data, min_len);
 
 	if (cmp == 0 && x->len != y->len)
@@ -60,15 +60,24 @@ int str_cmp(struct str *x, struct str *y)
 	return cmp;
 	}
 
-/* Return the number of starting bytes the strings have in common. */
-long str_common(struct str *x, struct str *y)
+/* Return true if the strings are equal. */
+int str_eq(struct str *x, struct str *y)
 	{
-	long min_len = x->len < y->len ? x->len : y->len;
+	if (x == y) return 1;
+	if (x->len != y->len) return 0;
+	return memcmp(x->data, y->data, x->len) == 0;
+	}
+
+/* Return the number of starting bytes the strings have in common. */
+int str_common(struct str *x, struct str *y)
+	{
+	/*LATER return x->len if x == y */
+	int min_len = x->len < y->len ? x->len : y->len;
 
 	const char *xd = x->data;
 	const char *yd = y->data;
 
-	long len = 0;
+	int len = 0;
 	while (len < min_len)
 		{
 		if (xd[len] != yd[len]) break;

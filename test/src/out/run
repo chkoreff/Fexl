@@ -1,0 +1,193 @@
+: str_eq "hi" "hi" = 1
+: str_eq "hi" "bye" = 0
+: str_eq "hi" "hi" = 1
+: str_eq "hi" "hj" = 0
+: str_eq "" "" = 1
+: str_eq "abcd" "abcd" = 1
+: str_eq "abcd" "abcde" = 0
+: str_eq "hi" "h" = 0
+: binary str_eq = 1
+: binary str_eq = 0
+: concat "" "" = ""
+: concat "a" "b" = "ab"
+: concat "abc" "d" = "abcd"
+: concat "abc" "" = "abc"
+: concat "" "def" = "def"
+: eval ((C {x}) {y})
+= {x}
+
+: eval (I {x})
+= {x}
+
+: eval (((S {x}) {y}) {z})
+= {{{x} {z}} ({y} {z})}
+
+: eval (((L {x}) {y}) {z})
+= {{{x} {z}} {y}}
+
+: eval (((R {x}) {y}) {z})
+= {{x} ({y} {z})}
+
+: eval {{x} {y}}
+= {{x} {y}}
+
+: eval (((S C) C) C)
+= C
+
+: eval (((S C) S) Y)
+= Y
+
+: eval (((S C) "hi") {x})
+= {x}
+
+: eval ((((S S) C) {x}) {y})
+= {{{x} {y}} ((C {x}) {y})}
+
+: eval ...
+= "xyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxy"
+
+: eval "x"
+= "x"
+
+: eval ((C "x") I)
+= "x"
+
+: eval ({y} "x")
+= {{y} "x"}
+
+: eval (({x} I) C)
+= {{{x} I} C}
+
+: eval ((halt C) I)
+= halt
+
+: eval ((I halt) C)
+= halt
+
+: eval ping
+= ping
+
+: eval (ping I)
+ping!
+= I
+
+: eval (ping ping)
+ping!
+= ping
+
+: eval ((ping ping) I)
+ping!
+ping!
+= I
+
+: eval ((ping ping) {x})
+ping!
+ping!
+= {x}
+
+: eval ...
+= C
+
+: eval ...
+= (C C)
+
+: eval ...
+= I
+
+: lam {x} I
+= (C I)
+
+: lam {x} {x}
+= I
+
+: lam {x} {y}
+= {C {y}}
+
+: lam {abc} {abc}
+= I
+
+: lam {abc} {ab}
+= {C {ab}}
+
+: lam {abc} {"abc"}
+= {C {"abc"}}
+
+: lam {"abc"} {"abc"}
+= I
+
+: lam {"ab"} {"abc"}
+= {C {"abc"}}
+
+: lam {"abc"} {abc}
+= {C {abc}}
+
+: lam {x} {{x} {x}}
+= ((S I) I)
+
+: lam {x} {{x} {y}}
+= {(L I) {y}}
+
+: lam {x} {{y} {x}}
+= {y}
+
+: lam {x} {{y} {z}}
+= {C {{y} {z}}}
+
+: lam {y} {{x} {{y} {y}}}
+= {{R {x}} ((S I) I)}
+
+: lam {x} {{R {x}} ((S I) I)}
+= ((L R) ((S I) I))
+
+: lam {x} {{S {x}} {(L I) {x}}}
+= ((S S) (L I))
+
+: parse file in/a1
+= {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{x} {y}} {<=}} {abcdefghijklmnopqrstuvwxyz}} {a}} {"
+"}} {""}} {"a"}} {""}} {"a"}} {"a"}} {"hi"}} {x}} {"a"}} {"abcdABA"}} {"
+"}} {"AABABC"}} {ABCD}} {"
+"}} {""Ain't nothin' simple when you're doin' it for real." (Gus Baird)"}} {"
+"}} {"My fathers sleep on the sunrise plains,
+And each one sleeps alone.
+Their trails may dim to the grass and rains,
+For I choose to make my own.
+I lay proud claim to their blood and name,
+But I lean on no dead kin;
+My name is mine, for the praise or scorn,
+And the world began when I was born
+And the world is mine to win. ...
+
+  (Badger Clark, "The Westerner")
+"}} {"hello"}} {"
+"}} {""hello""}} {"
+"}} {"~(1) "hello"(1)"}} {"
+"}} {"~(2) ~(1) "hello"(1)(2)"}} {"
+"}} {abcd}} {ef}} {47.806}} {99}} {-22}} {{{a} {{b} {c}}} {{{{d} {e}} {{f} {g}}} {h}}}}
+  line 59
+
+: parse repeat 'a' 60
+= {aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa}
+  line 1
+
+: parse repeat 'a' 1
+= {a}
+  line 1
+
+: parse repeat 'a' 0
+= I
+  line 1
+
+: Buffering 0 bytes
+  null
+
+: Buffering 26 bytes
+  length = 26
+  "abcdefghijklmnopqrstuvwxyz"
+
+: Buffering 74 bytes
+  length = 74
+  "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuv"
+
+: Buffering 2600000 bytes
+  length = 2600000
+

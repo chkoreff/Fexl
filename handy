@@ -1,0 +1,29 @@
+#!/bin/sh
+
+.s()
+	{
+	if [ "$1" != "" ]; then
+		grep -r -I "$1" ./*
+	fi
+	}
+
+.sw()
+	{
+	.s "\<$1\>"
+	}
+
+# Search source for stray trailing white space
+.ss()
+	{
+	.s "\s$"
+	}
+
+.todo()
+	{
+	.s "T""ODO"
+	}
+
+.later()
+	{
+	.s "L""ATER"
+	}
