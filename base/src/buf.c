@@ -27,7 +27,7 @@ void buf_add(struct buf *buf, char ch)
 		buf->next = new;
 		}
 
-	assert(buf->pos <= buf->str->len);
+	assert(buf->pos < buf->str->len);
 	buf->str->data[buf->pos++] = ch;
 	}
 
