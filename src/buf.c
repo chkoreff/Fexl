@@ -31,7 +31,7 @@ void buf_add(struct buf *buf, char ch)
 	}
 
 /* Clear the buffer and return its contents in a string. */
-extern struct str *buf_finish(struct buf *buf)
+struct str *buf_finish(struct buf *buf)
 	{
 	/* Determine total number of bytes held in buffer. */
 	long length = 0;

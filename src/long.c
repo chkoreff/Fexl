@@ -75,7 +75,7 @@ value fexl_long_string(value f)
 
 /* (order x lt eq gt) compares x and 0 and returns lt, eq, or gt.  This allows
 three-way branching on the sign of a long value, typically the result of a
-comparison function T_cmp */
+comparison function. */
 value fexl_order(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return f;

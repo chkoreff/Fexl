@@ -33,7 +33,7 @@ struct str *get_str(value f)
 	return (struct str *)f->R;
 	}
 
-/* (concat x y) is the concanation of strings x and y. */
+/* (concat x y) is the concatenation of strings x and y. */
 value fexl_concat(value f)
 	{
 	if (!f->L || !f->L->L) return f;
