@@ -38,9 +38,7 @@ value type_query(value f, value g)
 	{
 	if (!f->L) return collect(f,g);
 	value x = eval(f->R);
-	hold(g);
-	value z = g->T(g,x);
-	drop(g);
+	value z = combine(g,x);
 	drop(x);
 	return z;
 	}
