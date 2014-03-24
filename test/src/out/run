@@ -85,6 +85,12 @@ ping!
 ping!
 = {x}
 
+: eval (C (I S))
+= (C (I S))
+
+: eval ((? ((I I) (I S))) C)
+= (C S)
+
 : eval ...
 = C
 
@@ -164,6 +170,13 @@ And the world is mine to win. ...
 "}} {"~(2) ~(1) "hello"(1)(2)"}} {"
 "}} {abcd}} {ef}} {47.806}} {99}} {-22}} {{{a} {{b} {c}}} {{{{d} {e}} {{f} {g}}} {h}}}}
   line 59
+
+: parse file in/a2
+= {{{{{{{{{{{{((((I L) R) S) (C I)) {y}} S} S} ((S I) I)} {C {y}}} S} {"
+"}} (((S S) I) ((L R) ((S I) I)))} {"
+"}} ((L R) ((S I) I))} {"
+"}} I}
+  line 46
 
 : parse repeat 'a' 60
 = {aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa}

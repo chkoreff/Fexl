@@ -133,6 +133,9 @@ void test_all_eval(void)
 	test_eval(A(A(ping,ping),x),1);
 	}
 
+	test_eval(A(C,A(I,S)),1);
+	test_eval(A(A(query,A(A(I,I),A(I,S))),C),1);
+
 	{
 	value f = C;
 	for (int i = 0; i < 24; i++)
@@ -340,6 +343,7 @@ void test_parse_repeat(int ch, int max)
 void test_all_parse()
 	{
 	test_parse_file("in/a1");
+	test_parse_file("in/a2");
 
 	test_parse_repeat('a',60);
 	test_parse_repeat('a',1);

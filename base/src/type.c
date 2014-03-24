@@ -33,12 +33,25 @@ value type_Y(value f, value g)
 	return combine(g,A(f,g));
 	}
 
+/* (query x y) = y x, except x is evaluated first. */
+value type_query(value f, value g)
+	{
+	if (!f->L) return collect(f,g);
+	value x = eval(f->R);
+	hold(g);
+	value z = g->T(g,x);
+	drop(g);
+	drop(x);
+	return z;
+	}
+
 value C;
 value I;
 value S;
 value L;
 value R;
 value Y;
+value query;
 
 void beg_base(void)
 	{
@@ -48,6 +61,7 @@ void beg_base(void)
 	L = Q(type_L);
 	R = Q(type_R);
 	Y = Q(type_Y);
+	query = Q(type_query);
 
 	hold(C);
 	hold(I);
@@ -55,6 +69,7 @@ void beg_base(void)
 	hold(L);
 	hold(R);
 	hold(Y);
+	hold(query);
 	}
 
 void end_base(void)
@@ -65,4 +80,5 @@ void end_base(void)
 	drop(L);
 	drop(R);
 	drop(Y);
+	drop(query);
 	}

@@ -12,6 +12,8 @@ int show_atom_base(value f)
 		printf("L");
 	else if (f->T == type_Y)
 		printf("Y");
+	else if (f->T == type_query)
+		printf("?");
 	else if (f->T == type_concat)
 		printf("concat");
 	else if (f->T == type_str)

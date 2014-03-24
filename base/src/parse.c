@@ -9,8 +9,8 @@ terms  => term terms
 terms  => ; exp
 
 term   => ( exp )
-term   => [ terms ]
-term   => { exp }  # TODO
+term   => [ terms ] # TODO
+term   => { exp }   # TODO
 term   => sym
 
 def    => empty
@@ -223,6 +223,7 @@ static value parse_symbol(int allow_eq)
 	}
 
 static value parse_exp(void);
+
 static value parse_term(void)
 	{
 	int first_line = line;
@@ -242,18 +243,110 @@ static value parse_term(void)
 	return exp;
 	}
 
+/*
+Parse a lambda form following the initial '\' character.
+
+An ordinary lambda symbol is terminated by white space or '=', for example:
+
+  \x=4
+  \y = 5
+
+If you want a lambda symbol to contain '=', you must use white space after the
+initial '\'.  This tells the parser that the lambda symbol is terminated by
+white space only, and not '='.  For example:
+
+  \ =   = num_eq
+  \ ==  = num_eq
+  \ !=  = num_ne
+  \ <   = num_lt
+  \ <=  = num_le
+  \ >   = num_gt
+  \ >=  = num_ge
+*/
+static value parse_lambda(long first_line)
+	{
+	int allow_eq = at_white();
+	skip_white();
+
+	/* Parse the symbol (function parameter). */
+	value sym = parse_symbol(allow_eq);
+	if (sym == 0)
+		syntax_error("Missing lambda symbol", first_line);
+
+	skip_filler();
+
+	first_line = line;
+
+	/* Count any '=' signs, up to 2. */
+	int count_eq = 0;
+	while (ch == '=' && count_eq < 2)
+		{
+		count_eq++;
+		skip();
+		}
+
+	/* Parse the definition of the symbol if we saw an '=' char. */
+	value def = 0;
+	if (count_eq)
+		{
+		skip_filler();
+		def = parse_term();
+		if (def == 0)
+			syntax_error("Missing definition", first_line);
+		}
+
+	/* Parse the body of the function. */
+	value body = lam(sym,parse_exp());
+
+	/* Produce the result based on the kind of definition used, if any. */
+	value result;
+	if (count_eq == 0)
+		/* no definition */
+		result = body;
+	else if (count_eq == 1)
+		{
+		/* = normal definition */
+		if (body == I)
+			result = def;
+		else if (body->L == C)
+			{
+			result = body->R;
+			/*TODO verify this can't cause a ref issue.  I'm pretty sure we'll
+			always hold result before calling V again.  We could make a copy
+			of body->R just to be safe. */
+			hold(body);
+			drop(body);
+			hold(def);
+			drop(def);
+			}
+		else
+			result = app(body,def);
+		}
+	else
+		/* == eager definition */
+		result = app(app(query,def),body);
+
+	return result;
+	}
+
 /* Parse the next factor of an expression.  Return 0 if no factor found. */
 static value parse_factor(void)
 	{
 	skip_filler();
 	if (ch == -1)
 		return 0;
-	/*TODO*/
-	#if 0
 	else if (ch == '\\')
 		{
+		int first_line = line;
+		skip();
+		if (ch == '\\')
+			{
+			ch = -1; /* Two backslashes simulates end of file. */
+			return 0;
+			}
+		else
+			return parse_lambda(first_line);
 		}
-	#endif
 	else if (ch == ';')
 		{
 		skip();
@@ -299,12 +392,6 @@ value parse(int _get(void), int *_line, const char *_label)
 	label = save_label;
 	line = save_line;
 	ch = save_ch;
-
-	if (0)
-	{
-	printf("HEY!\n"); /*TODO*/
-	show(exp);
-	}
 
 	return exp;
 	}

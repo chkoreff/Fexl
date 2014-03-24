@@ -1,0 +1,45 @@
+#
+
+(\x x)
+(\x\y\z x z y)
+(\x\y\z x (y z))
+(\x\y\z x z (y z))
+(\x)
+(\x=y x)
+
+
+(
+\I=(\x x)
+\S=(\x\y\z x z (y z))
+S
+)
+
+(
+\S=(\x\y\z x z (y z))
+S
+)
+
+(\x x x)
+(\x y)
+
+(\x\y\z x z; y z)
+
+"
+"
+(
+\Q=(\x\y x (y y))
+\f Q f (Q f)
+)
+
+"
+"
+(
+\q=(\x\y x (y y))
+q
+)
+
+"
+"
+(
+\q=(\x\y x (y y))
+)

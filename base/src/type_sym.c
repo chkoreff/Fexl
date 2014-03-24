@@ -68,7 +68,7 @@ static value fuse(value f, value g)
 
 /* Abstract the symbol from the body, returning a form which is a function of
 that symbol, and no longer contains that symbol. */
-value abstract(value sym, value body)
+static value abstract(value sym, value body)
 	{
 	if (body->T != type_sym)
 		return A(C,body);
