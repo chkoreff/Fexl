@@ -1,6 +1,6 @@
 struct sym
 	{
-	struct str *name;
+	value name;
 	int line; /* negative if the name is quoted */
 	};
 
@@ -11,3 +11,4 @@ extern value Qsym0(const char *name, int line);
 extern int sym_eq(struct sym *x, struct sym *y);
 extern value app(value f, value g);
 extern value lam(value sym, value body);
+extern value resolve(value f, value context(value));

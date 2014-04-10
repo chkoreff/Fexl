@@ -22,9 +22,9 @@ int show_atom_base(value f)
 		{
 		struct sym *sym = atom_sym(f);
 		if (sym->line >= 0)
-			printf("{%s}",sym->name->data);
+			printf("{%s}",atom_str(sym->name)->data);
 		else
-			printf("{\"%s\"}",sym->name->data);
+			printf("{\"%s\"}",atom_str(sym->name)->data);
 		}
 	else
 		return 0;

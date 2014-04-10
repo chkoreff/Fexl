@@ -38,7 +38,10 @@ run()
 	if [ $code -ne 0 ]; then exit $code; fi
 	}
 
-compile="gcc -c -Wall -Werror -std=c99 -pedantic -Wunused-parameter -O3"
+# The -fdata-sections and -ffunction-sections allow the linker to prune any
+# unused data or functions with -Wl,--gc-sections below.
+compile="gcc -c -Wall -Werror -std=c99 -pedantic -Wunused-parameter \
+-fdata-sections -ffunction-sections -O3"
 
 make_obj()
 	{
@@ -99,8 +102,7 @@ make_bin()
 
 	trace Link $name
 	mkdir -p ../bin
-	# LATER -Wl,--gc-sections
-	run gcc -s $objects -o ../bin/$name
+	run gcc -s -Wl,--gc-sections $objects -o ../bin/$name
 	}
 
 # Remove a directory without displaying an error message if it doesn't exist or

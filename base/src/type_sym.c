@@ -2,7 +2,7 @@ value type_sym(value f, value g)
 	{
 	if (g) return collect(f,g);
 	struct sym *sym = atom_sym(f);
-	str_free(sym->name);
+	drop(sym->name);
 	free_memory(sym,sizeof(struct sym));
 	return 0;
 	}
@@ -15,7 +15,8 @@ struct sym *atom_sym(value f)
 value Qsym(struct str *name, int line)
 	{
 	struct sym *sym = new_memory(sizeof(struct sym));
-	sym->name = name;
+	sym->name = Qstr(name);
+	hold(sym->name);
 	sym->line = line;
 	return atom(type_sym,sym);
 	}
@@ -32,7 +33,8 @@ static int same_sign(int x, int y)
 
 int sym_eq(struct sym *x, struct sym *y)
 	{
-	return same_sign(x->line,y->line) && str_eq(x->name,y->name);
+	return same_sign(x->line,y->line)
+		&& str_eq(atom_str(x->name),atom_str(y->name));
 	}
 
 /* Apply f to g, where either can be a symbolic form. */
@@ -98,4 +100,27 @@ value lam(value sym, value body)
 	drop(sym);
 	drop(body);
 	return f;
+	}
+
+/* Return the last symbol in the value, if any, in right to left order. */
+static value last_sym(value f)
+	{
+	if (f->T != type_sym)
+		return 0;
+
+	if (f->L == 0)
+		return f;
+
+	value x = last_sym(f->R);
+	if (x) return x;
+	return last_sym(f->L);
+	}
+
+value resolve(value f, value context(value))
+	{
+	value x = last_sym(f);
+	if (x == 0) return f;
+	value g = resolve(lam(x,f),context);
+	value def = context(x);
+	return app(g,def);
 	}

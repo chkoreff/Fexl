@@ -403,6 +403,41 @@ void test_all_buf(void)
 	test_buf(2600000);
 	}
 
+value context(value x)
+	{
+	struct sym *sym = atom_sym(x);
+	if (sym->line < 0)
+		return sym->name; /* literal string */
+
+	const char *name = atom_str(sym->name)->data;
+	if (strcmp(name,"ping") == 0)
+		return ping;
+
+	printf("  Undefined symbol %s on line %d\n", name, sym->line);
+	return x;
+	}
+
+void test_resolve(value f)
+	{
+	hold(f);
+	printf(": resolve ");show(f);nl();
+	value g = resolve(f,context);
+	hold(g);
+	if (g->T == type_sym)
+		printf("  The form has undefined symbols.\n");
+	printf("= ");show(g);nl();
+	#if 0
+	/* resolve is a fixpoint */
+	value h = resolve(g,context);
+	hold(h);
+	printf("= ");show(h);nl();
+	drop(h);
+	#endif
+	nl();
+	drop(f);
+	drop(g);
+	}
+
 void run_tests(void)
 	{
 	test_math();
@@ -411,6 +446,12 @@ void run_tests(void)
 	test_all_lam();
 	test_all_parse();
 	test_all_buf();
+
+	test_resolve(app(x,y));
+	test_resolve(app(y,x));
+	test_resolve(app(Qsym0("x",-1),Qsym0("y",-2)));
+	test_resolve(Qsym0("ping",2));
+	test_resolve(app(Qsym0("ping",2),Qsym0("ping",4)));
 	}
 
 int main(void)

@@ -204,3 +204,24 @@ And the world is mine to win. ...
 : Buffering 2600000 bytes
   length = 2600000
 
+: resolve {{x} {y}}
+  Undefined symbol x on line 1
+  Undefined symbol y on line 2
+  The form has undefined symbols.
+= {{I {x}} {y}}
+
+: resolve {{y} {x}}
+  Undefined symbol y on line 2
+  Undefined symbol x on line 1
+  The form has undefined symbols.
+= {{I {y}} {x}}
+
+: resolve {{"x"} {"y"}}
+= ((I "x") "y")
+
+: resolve {ping}
+= (I ping)
+
+: resolve {{ping} {ping}}
+= (((S I) I) ping)
+

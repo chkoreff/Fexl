@@ -9,5 +9,5 @@ common="$base/str $base/value $base/type $base/type_str $base/type_sym"
 make_obj show stdio $common
 
 modules="math rlimit $base/buf $base/memory $base/die $common $base/parse show"
-make_obj run stdio sys/resource $modules
+make_obj run stdio sys/resource $modules string
 make_bin run $modules

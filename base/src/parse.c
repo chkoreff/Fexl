@@ -175,7 +175,7 @@ static struct str *collect_string(const char *term_data, int term_len,
 		}
 
 	struct str *str = buf_finish(&buf);
-	if (str == 0) str = str_new_data0("");
+	if (str == 0) str = str_new_data("",0);
 	return str;
 	}
 
