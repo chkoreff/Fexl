@@ -1,3 +1,9 @@
+#include <assert.h>
+#include <buf.h>
+#include <memory.h>
+#include <str.h>
+#include <string.h>
+
 void buf_start(struct buf *buf)
 	{
 	buf->str = 0;

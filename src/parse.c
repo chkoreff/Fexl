@@ -1,3 +1,15 @@
+#include <buf.h>
+#include <ctype.h>
+#include <die.h>
+#include <str.h>
+
+#include <value.h>
+#include <parse.h>
+#include <type.h>
+#include <type_sym.h>
+
+#include <test/show.h>/*TODO */
+
 /*
 Grammar:
 [

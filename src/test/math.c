@@ -1,3 +1,7 @@
+#include <assert.h>
+#include <limits.h>
+#include <test/math.h>
+
 static int add_int(int x, int y)
 	{
 	return x + y;

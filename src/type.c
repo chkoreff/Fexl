@@ -1,3 +1,6 @@
+#include <value.h>
+#include <type.h>
+
 value type_C(value f, value g)
 	{
 	if (!f->L) return collect(f,g);

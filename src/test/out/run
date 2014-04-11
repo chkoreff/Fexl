@@ -148,7 +148,7 @@ ping!
 : lam {x} {{S {x}} {(L I) {x}}}
 = ((S S) (L I))
 
-: parse file in/a1
+: parse file test/in/a1
 = {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{x} {y}} {<=}} {abcdefghijklmnopqrstuvwxyz}} {a}} {"
 "}} {""}} {"a"}} {""}} {"a"}} {"a"}} {"hi"}} {x}} {"a"}} {"abcdABA"}} {"
 "}} {"AABABC"}} {ABCD}} {"
@@ -171,7 +171,7 @@ And the world is mine to win. ...
 "}} {abcd}} {ef}} {47.806}} {99}} {-22}} {{{a} {{b} {c}}} {{{{d} {e}} {{f} {g}}} {h}}}}
   line 59
 
-: parse file in/a2
+: parse file test/in/a2
 = {{{{{{{{{{{{((((I L) R) S) (C I)) {y}} S} S} ((S I) I)} {C {y}}} S} {"
 "}} (((S S) I) ((L R) ((S I) I)))} {"
 "}} ((L R) ((S I) I))} {"

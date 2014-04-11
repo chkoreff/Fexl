@@ -1,3 +1,8 @@
+#include <die.h>
+#include <memory.h>
+
+#include <value.h>
+
 /*
 In the value structure, the reference count N is a long int, which guarantees
 that it can also be used as a pointer to link unused values on the free list,

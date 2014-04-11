@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Remove a directory without displaying an error message if it doesn't exist or
+# is not empty.
+quiet_rmdir()
+	{
+	if [ -d $1 ]; then
+		rmdir --ignore-fail-on-non-empty $1
+	fi
+	}
+
+# Erase a directory and remove its parent if empty.
+erase()
+	{
+	local name="$1"
+	local parent=`dirname $name`
+	rm -rf $name
+	quiet_rmdir $parent
+	}
+
+erase ../obj
+erase ../bin
+erase ../cache

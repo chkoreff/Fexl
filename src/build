@@ -1,0 +1,157 @@
+#!/bin/sh
+
+[ "$verbose" = "" ] && verbose=1
+
+# stale $target $source1 ... $sourceN
+# Return true if $target does not exist or is older than any $source.
+stale()
+	{
+	local target="$1"; shift
+
+	if [ ! -e $target ]; then
+		true
+		return
+	fi
+
+	for source in "$@"; do
+		if [ $source -nt $target ]; then
+			true
+			return
+		fi
+	done
+
+	false
+	}
+
+trace()
+	{
+	if [ $verbose -lt 1 ]; then return; fi
+	echo $@
+	}
+
+# Run a system command and exit if unsuccessful.
+run()
+	{
+	if [ $verbose -gt 1 ]; then
+		trace $@
+	fi
+	$@
+	local code=$?
+	if [ $code -ne 0 ]; then exit $code; fi
+	}
+
+# The -fdata-sections and -ffunction-sections allow the linker to prune any
+# unused data or functions with -Wl,--gc-sections below.
+compile="gcc -c -Wall -Werror -std=c99 -pedantic -Wunused-parameter \
+-fdata-sections -ffunction-sections -O3"
+
+# Return the list of .h files that a .c file includes.
+related_h_files()
+	{
+	local file_c="$1"
+	local file_cache=../cache/h/$file_c
+	if [ ! -e $file_cache ]; then
+		mkdir -p `dirname $file_cache`
+		grep -e "^#include" $file_c |
+		sed "s/^#include *[<\"]\(.*\)[>\"].*$/\1/" >$file_cache
+	fi
+	cat $file_cache
+	}
+
+# Compile each "X.c" file into "../obj/X.o".
+make_all_obj()
+	{
+	local file_c
+	for file_c in `find . -name "*.c" | sort`; do
+		local file_o=../obj/${file_c%.c}.o
+		stale $file_o $file_c `related_h_files $file_c`
+		if [ $? -eq 0 ]; then
+			mkdir -p `dirname $file_o`
+			trace Compile $file_c
+			run $compile $file_c -I . -o $file_o
+		fi
+	done
+	}
+
+# Return the list of .c files that need to be linked with a given .c file.
+# This does a transitive closure of the .h dependencies.
+related_c_files()
+	{
+	local name="$1"
+	local file_cache=../cache/c/$name
+	if [ ! -e $file_cache ]; then
+		local queue="$name"
+		local list_file_c=""
+		while [ "$queue" != "" ]; do
+			local curr_file_c
+			for curr_file_c in $queue; do
+				list_file_c="$list_file_c $curr_file_c"
+				local new_queue=""
+				for file_h in `related_h_files $curr_file_c`; do
+					local other_file_c=${file_h%.h}.c
+					if [ -e $other_file_c ]; then
+						local found=0
+						local entry
+						for entry in $list_file_c; do
+							if [ "$entry" = "$other_file_c" ]; then
+								found=1
+								break
+							fi
+						done
+						if [ $found -eq 0 ]; then
+							new_queue="$new_queue $other_file_c"
+						fi
+					fi
+				done
+			done
+			queue=$new_queue
+		done
+		mkdir -p `dirname $file_cache`
+		echo $list_file_c >$file_cache
+	fi
+	cat $file_cache
+	}
+
+find_all_main()
+	{
+	local file_cache=../cache/main
+	if [ ! -e $file_cache ]; then
+		local file_c
+		local list
+		for file_c in `find . -name "*.c" | sort`; do
+			grep -q "^int main(" $file_c
+			if [ $? -eq 0 ]; then
+				list="$list $file_c"
+			fi
+		done
+		mkdir -p `dirname $file_cache`
+		echo $list >$file_cache
+	fi
+	cat $file_cache
+	}
+
+# Find any main programs and link them with the necessary .o files.
+make_all_bin()
+	{
+	local file_c
+	for file_c in `find_all_main`; do
+		# Map the .c files to .o files.
+		local objects=""
+		local other_file_c
+		for other_file_c in `related_c_files $file_c`; do
+			local file_o=../obj/${other_file_c%.c}.o
+			objects="$objects $file_o"
+		done
+
+		local file_e=../bin/${file_c%.c}
+		stale $file_e $objects
+		if [ $? -eq 0 ]; then
+			trace Link $file_c
+			mkdir -p `dirname $file_e`
+			run gcc -s -Wl,--gc-sections $objects -o $file_e
+		fi
+	done
+	}
+
+make_all_obj
+make_all_bin

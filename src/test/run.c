@@ -1,3 +1,19 @@
+#include <buf.h>
+#include <die.h>
+#include <stdio.h>
+#include <str.h>
+#include <string.h>
+#include <sys/resource.h>
+
+#include <value.h>
+#include <parse.h>
+#include <test/math.h>
+#include <test/rlimit.h>
+#include <test/show.h>
+#include <type.h>
+#include <type_str.h>
+#include <type_sym.h>
+
 /*LATER tests involving fork */
 #if 0
 string.h /* strlen */
@@ -342,8 +358,8 @@ void test_parse_repeat(int ch, int max)
 
 void test_all_parse()
 	{
-	test_parse_file("in/a1");
-	test_parse_file("in/a2");
+	test_parse_file("test/in/a1");
+	test_parse_file("test/in/a2");
 
 	test_parse_repeat('a',60);
 	test_parse_repeat('a',1);

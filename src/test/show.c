@@ -1,3 +1,12 @@
+#include <stdio.h>
+#include <str.h>
+
+#include <value.h>
+#include <test/show.h>
+#include <type.h>
+#include <type_str.h>
+#include <type_sym.h>
+
 int show_atom_base(value f)
 	{
 	if (f->T == type_C)

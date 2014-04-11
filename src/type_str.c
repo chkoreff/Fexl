@@ -1,3 +1,8 @@
+#include <str.h>
+
+#include <value.h>
+#include <type_str.h>
+
 value type_str(value f, value g)
 	{
 	if (g) bad_type();

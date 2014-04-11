@@ -1,4 +1,0 @@
-#!/bin/sh
-. ./config
-erase ../obj
-erase ../bin

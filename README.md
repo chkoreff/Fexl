@@ -4,18 +4,44 @@ fexl - Function EXpression Language
 Getting started
 ---------------
 
+Go into the source directory:
+
+	cd src
+
 To run the main test program:
 
-	(cd test/src && ./run)
+	test/run
 
 To compare the test output against the reference output:
 
-	(cd test/src && ./check)
+	test/check
 
-The "base/src" directory
-------------------------
+To build the code without doing anything else:
 
-This contains the essential code for any Fexl application.
+	./build
+
+To erase the build output files:
+
+	./clean
+
+To build quietly:
+
+	verbose=0 ./build
+
+To build loudly:
+
+	verbose=2 ./build
+
+To force a clean build:
+
+	./clean && ./build
+
+To source the handy shell aliases that I use for development:
+
+	. handy
+
+Guide to source code
+--------------------
 
 The `eval` routine is in value.c.
 
@@ -25,47 +51,7 @@ The memory.c file implements a disciplined approach to memory usage which
 verifies that there are no memory leaks during execution.  Also see `hold`
 and `drop` in value.c, which implement the reference counting mechanism.
 
-The scripts here are:
-
-	./build   # Build the code.
-	./erase   # Erase the build results.
-
-The "test/src" directory
-------------------------
-
-The run.c file is a test program for the base/src code.
-
-The scripts here are:
-
-	./build   # Build the code.
-	./erase   # Erase the build results.
-	./run     # Run the test program.
-	./check   # Compare the test against the reference "out/run"
-
-The "dist" directory
---------------------
-
-The scripts here are:
-
-	./build   # Create a distribution archive.
-	./erase   # Erase the archive.
-
-Development
------------
-
-To source the handy shell aliases that I use for development:
-
-	. handy
-
-I have also found certain short-cuts to be useful, for example:
-
-	./erase    # Erase all build results.
-	(cd test/src && ./run)
-	(cd test/src && ./check)
-	(cd base/src && ./build)
-	(cd base/src && ./erase)
-	(cd base/src && ./erase && ./build)
-	(cd base/src && ./erase && verbose=2 ./build)
+The test/run.c file is a test program for the basic Fexl code.
 
 Credits and Licenses
 --------------------

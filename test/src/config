@@ -1,3 +1,0 @@
-#!/bin/sh
-base=../../base
-. $base/src/config

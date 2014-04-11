@@ -1,3 +1,11 @@
+#include <memory.h>
+#include <str.h>
+
+#include <value.h>
+#include <type.h>
+#include <type_str.h>
+#include <type_sym.h>
+
 value type_sym(value f, value g)
 	{
 	if (g) return collect(f,g);

@@ -1,3 +1,8 @@
+#include <die.h>
+#include <stdio.h>
+#include <sys/resource.h>
+#include <test/rlimit.h>
+
 /*
 Set the soft limit for a resource, e.g.:
 

@@ -1,4 +1,0 @@
-#!/bin/sh
-(cd base/src && ./erase) || exit
-(cd test/src && ./erase) || exit
-(cd dist && ./erase) || exit
