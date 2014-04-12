@@ -91,6 +91,33 @@ ping!
 : eval ((? ((I I) (I S))) C)
 = (C S)
 
+: eval pair
+= pair
+
+: eval (pair {x})
+= (pair {x})
+
+: eval ((pair {x}) {y})
+= ((pair {x}) {y})
+
+: eval (((pair {x}) {y}) {G})
+= {{{G} {x}} {y}}
+
+: eval cons
+= cons
+
+: eval (cons {x})
+= (cons {x})
+
+: eval ((cons {x}) {y})
+= ((cons {x}) {y})
+
+: eval (((cons {x}) {y}) {z})
+= ((pair {x}) {y})
+
+: eval ((((cons {x}) {y}) {z}) {G})
+= {{{G} {x}} {y}}
+
 : eval ...
 = C
 
@@ -172,11 +199,12 @@ And the world is mine to win. ...
   line 59
 
 : parse file test/in/a2
-= {{{{{{{{{{{{((((I L) R) S) (C I)) {y}} S} S} ((S I) I)} {C {y}}} S} {"
+= {{{{{{{{{{{{{{((((I L) R) S) (C I)) {y}} S} S} ((S I) I)} {C {y}}} S} {"
 "}} (((S S) I) ((L R) ((S I) I)))} {"
 "}} ((L R) ((S I) I))} {"
-"}} I}
-  line 46
+"}} I} {"
+"}} {{cons {1}} {{cons {{cons {2}} {{cons {3}} C}}} {(cons C) {{cons {{cons {4}} C}} {{cons {"hi"}} {{{append} {x}} {y}}}}}}}}
+  line 50
 
 : parse repeat 'a' 60
 = {aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa}

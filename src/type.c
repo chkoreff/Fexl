@@ -46,6 +46,30 @@ value type_query(value f, value g)
 	return z;
 	}
 
+/* pair x y F = F x y */
+value type_pair(value f, value g)
+	{
+	if (!f->L || !f->L->L) return collect(f,g);
+	return A(A(g,f->L->R),f->R);
+	}
+
+/* (cons x y) F G = G x y */
+value type_cons(value f, value g)
+	{
+	if (!f->L || !f->L->L) return collect(f,g);
+	return pair(f->L->R,f->R);
+	}
+
+value pair(value x, value y)
+	{
+	return V(type_pair,V(type_pair,Qpair,x),y);
+	}
+
+value cons(value x, value y)
+	{
+	return V(type_cons,V(type_cons,Qcons,x),y);
+	}
+
 value C;
 value I;
 value S;
@@ -53,6 +77,8 @@ value L;
 value R;
 value Y;
 value query;
+value Qpair;
+value Qcons;
 
 void beg_base(void)
 	{
@@ -63,6 +89,8 @@ void beg_base(void)
 	R = Q(type_R);
 	Y = Q(type_Y);
 	query = Q(type_query);
+	Qpair = Q(type_pair);
+	Qcons = Q(type_cons);
 
 	hold(C);
 	hold(I);
@@ -71,6 +99,8 @@ void beg_base(void)
 	hold(R);
 	hold(Y);
 	hold(query);
+	hold(Qpair);
+	hold(Qcons);
 	}
 
 void end_base(void)
@@ -82,4 +112,6 @@ void end_base(void)
 	drop(R);
 	drop(Y);
 	drop(query);
+	drop(Qpair);
+	drop(Qcons);
 	}

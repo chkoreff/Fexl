@@ -8,8 +8,6 @@
 #include <type.h>
 #include <type_sym.h>
 
-#include <test/show.h>/*TODO */
-
 /*
 Grammar:
 [
@@ -21,7 +19,7 @@ terms  => term terms
 terms  => ; exp
 
 term   => ( exp )
-term   => [ terms ] # TODO
+term   => [ terms ]
 term   => { exp }   # TODO
 term   => sym
 
@@ -234,7 +232,21 @@ static value parse_symbol(int allow_eq)
 		return parse_name(allow_eq);
 	}
 
+static value parse_term(void);
 static value parse_exp(void);
+
+static value parse_list(void)
+	{
+	skip_filler();
+	if (ch == ';')
+		{
+		skip();
+		return parse_exp();
+		}
+
+	value x = parse_term();
+	return x == 0 ? C : app(app(Qcons,x),parse_list());
+	}
 
 static value parse_term(void)
 	{
@@ -247,6 +259,14 @@ static value parse_term(void)
 		exp = parse_exp();
 		if (ch != ')')
 			syntax_error("Unclosed parenthesis", first_line);
+		skip();
+		}
+	else if (ch == '[') /* list */
+		{
+		skip();
+		exp = parse_list();
+		if (ch != ']')
+			syntax_error("Unclosed bracket", first_line);
 		skip();
 		}
 	else
@@ -323,9 +343,6 @@ static value parse_lambda(long first_line)
 		else if (body->L == C)
 			{
 			result = body->R;
-			/*TODO verify this can't cause a ref issue.  I'm pretty sure we'll
-			always hold result before calling V again.  We could make a copy
-			of body->R just to be safe. */
 			hold(body);
 			drop(body);
 			hold(def);

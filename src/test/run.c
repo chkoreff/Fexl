@@ -152,6 +152,16 @@ void test_all_eval(void)
 	test_eval(A(C,A(I,S)),1);
 	test_eval(A(A(query,A(A(I,I),A(I,S))),C),1);
 
+	test_eval(Qpair,1);
+	test_eval(A(Qpair,x),1);
+	test_eval(A(A(Qpair,x),y),1);
+	test_eval(A(A(A(Qpair,x),y),Qsym0("G",0)),1);
+	test_eval(Qcons,1);
+	test_eval(A(Qcons,x),1);
+	test_eval(A(A(Qcons,x),y),1);
+	test_eval(A(A(A(Qcons,x),y),z),1);
+	test_eval(A(A(A(A(Qcons,x),y),z),Qsym0("G",0)),1);
+
 	{
 	value f = C;
 	for (int i = 0; i < 24; i++)

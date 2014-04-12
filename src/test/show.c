@@ -25,6 +25,10 @@ int show_atom_base(value f)
 		printf("?");
 	else if (f->T == type_concat)
 		printf("concat");
+	else if (f->T == type_pair)
+		printf("pair");
+	else if (f->T == type_cons)
+		printf("cons");
 	else if (f->T == type_str)
 		printf("\"%s\"",atom_str(f)->data);
 	else if (f->T == type_sym)
