@@ -1,4 +1,5 @@
 #!/bin/sh
+# NOTE: This script cannot handle spaces in file names.
 
 [ "$verbose" = "" ] && verbose=1
 
@@ -40,118 +41,116 @@ run()
 	if [ $code -ne 0 ]; then exit $code; fi
 	}
 
-# The -fdata-sections and -ffunction-sections allow the linker to prune any
-# unused data or functions with -Wl,--gc-sections below.
+# Erase a file if it exists and remove any empty parent directories.
+erase()
+	{
+	local name="$1"
+	rm -f $name
+	while [ true ]; do
+		name=`dirname $name`
+		if [ $name = . ]; then break; fi
+		if [ -d $name ]; then
+			rmdir --ignore-fail-on-non-empty $name
+		fi
+	done
+	}
+
+# We compile with -fdata-sections and -ffunction-sections so the linker can
+# prune any unused data or functions with -Wl,--gc-sections.
 compile="gcc -c -Wall -Werror -std=c99 -pedantic -Wunused-parameter \
 -fdata-sections -ffunction-sections -O3"
 
-# Return the list of .h files that a .c file includes.
-related_h_files()
-	{
-	local file_c="$1"
-	local file_cache=../cache/h/$file_c
-	if [ ! -e $file_cache ]; then
+link="gcc -s -Wl,--gc-sections"
+
+# Establish .h dependencies for all .c files.
+for file_c in `find . -name "*.c" | sort`; do
+	file_c=${file_c#./}
+	file_cache=../cache/h/$file_c
+	stale $file_cache $file_c
+	if [ $? -eq 0 ]; then
 		mkdir -p `dirname $file_cache`
 		grep -e "^#include" $file_c |
 		sed "s/^#include *[<\"]\(.*\)[>\"].*$/\1/" >$file_cache
 	fi
-	cat $file_cache
-	}
+done
 
-# Compile each "X.c" file into "../obj/X.o".
-make_all_obj()
-	{
-	local file_c
-	for file_c in `find . -name "*.c" | sort`; do
-		local file_o=../obj/${file_c%.c}.o
-		stale $file_o $file_c `related_h_files $file_c`
+# See if any .c files have disappeared since the last run.
+for file_dep in `find ../cache/h -name "*.c" 2>/dev/null | sort`; do
+	file_c=${file_dep#../cache/h/}
+	if [ ! -e $file_c ]; then
+		base=${file_c%.c}
+		erase $file_dep
+		erase ../obj/$base.o
+		erase ../bin/$base
+		erase ../cache/o/$file_c
+	fi
+done
+
+# List of updated .c files that are main programs.
+list_main=""
+
+# Compile any .c files that are out of date.
+for file_c in `find . -name "*.c" | sort`; do
+	file_c=${file_c#./}
+	file_o=../obj/${file_c%.c}.o
+	stale $file_o $file_c `cat ../cache/h/$file_c`
+	if [ $? -eq 0 ]; then
+		mkdir -p `dirname $file_o`
+		trace Compile $file_c
+		run $compile $file_c -I . -o $file_o
+		erase ../cache/o/$file_c
+		grep -q "^int main(" $file_c
 		if [ $? -eq 0 ]; then
-			mkdir -p `dirname $file_o`
-			trace Compile $file_c
-			run $compile $file_c -I . -o $file_o
+			list_main="$list_main $file_c"
 		fi
-	done
-	}
+	fi
+done
 
-# Return the list of .c files that need to be linked with a given .c file.
-# This does a transitive closure of the .h dependencies.
-related_c_files()
-	{
-	local name="$1"
-	local file_cache=../cache/c/$name
-	if [ ! -e $file_cache ]; then
-		local queue="$name"
-		local list_file_c=""
-		while [ "$queue" != "" ]; do
-			local curr_file_c
-			for curr_file_c in $queue; do
-				list_file_c="$list_file_c $curr_file_c"
-				local new_queue=""
-				for file_h in `related_h_files $curr_file_c`; do
-					local other_file_c=${file_h%.h}.c
-					if [ -e $other_file_c ]; then
-						local found=0
-						local entry
-						for entry in $list_file_c; do
-							if [ "$entry" = "$other_file_c" ]; then
-								found=1
-								break
-							fi
-						done
-						if [ $found -eq 0 ]; then
-							new_queue="$new_queue $other_file_c"
+# Update the list of .o files that need to be linked with any updated main
+# programs.  This does a transitive closure of the .h dependencies.
+for file_main in $list_main; do
+	list_file_c=$file_main
+	queue=$file_main
+	while [ "$queue" != "" ]; do
+		new_queue=""
+		for file_c in $queue; do
+			for file_h in `cat ../cache/h/$file_c`; do
+				other_file_c=${file_h%.h}.c
+				if [ -e $other_file_c ]; then
+					found=0
+					for entry in $list_file_c; do
+						if [ "$entry" = "$other_file_c" ]; then
+							found=1
+							break
 						fi
+					done
+					if [ $found -eq 0 ]; then
+						list_file_c="$list_file_c $other_file_c"
+						new_queue="$new_queue $other_file_c"
 					fi
-				done
+				fi
 			done
-			queue=$new_queue
 		done
-		mkdir -p `dirname $file_cache`
-		echo $list_file_c >$file_cache
-	fi
-	cat $file_cache
-	}
-
-find_all_main()
-	{
-	local file_cache=../cache/main
-	if [ ! -e $file_cache ]; then
-		local file_c
-		local list
-		for file_c in `find . -name "*.c" | sort`; do
-			grep -q "^int main(" $file_c
-			if [ $? -eq 0 ]; then
-				list="$list $file_c"
-			fi
-		done
-		mkdir -p `dirname $file_cache`
-		echo $list >$file_cache
-	fi
-	cat $file_cache
-	}
-
-# Find any main programs and link them with the necessary .o files.
-make_all_bin()
-	{
-	local file_c
-	for file_c in `find_all_main`; do
-		# Map the .c files to .o files.
-		local objects=""
-		local other_file_c
-		for other_file_c in `related_c_files $file_c`; do
-			local file_o=../obj/${other_file_c%.c}.o
-			objects="$objects $file_o"
-		done
-
-		local file_e=../bin/${file_c%.c}
-		stale $file_e $objects
-		if [ $? -eq 0 ]; then
-			trace Link $file_c
-			mkdir -p `dirname $file_e`
-			run gcc -s -Wl,--gc-sections $objects -o $file_e
-		fi
+		queue=$new_queue
 	done
-	}
+	file_cache=../cache/o/$file_main
+	mkdir -p `dirname $file_cache`
+	objects=""
+	for file_c in $list_file_c; do
+		objects="$objects ../obj/${file_c%.c}.o"
+	done
+	echo $objects >$file_cache
+done
 
-make_all_obj
-make_all_bin
+# Link any main programs that are out of date.
+for file_cache in `find ../cache/o -name "*.c" 2>/dev/null | sort`; do
+	file_main=${file_cache#../cache/o/}
+	objects=`cat $file_cache`
+	file_e=../bin/${file_main%.c}
+	stale $file_e $objects
+	if [ $? -eq 0 ]; then
+		trace Link $file_main
+		mkdir -p `dirname $file_e`
+		run $link $objects -o $file_e
+	fi
+done
