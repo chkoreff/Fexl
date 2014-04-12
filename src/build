@@ -62,10 +62,22 @@ compile="gcc -c -Wall -Werror -std=c99 -pedantic -Wunused-parameter \
 
 link="gcc -s -Wl,--gc-sections"
 
+# NOTE: include and find_module can be customized in "options".
+include="-I ."
+
+find_module()
+	{
+	return
+	}
+
+if [ -e options ]; then
+	. ./options
+fi
+
 # Establish .h dependencies for all .c files.
 for file_c in `find . -name "*.c" | sort`; do
 	file_c=${file_c#./}
-	file_cache=../cache/h/$file_c
+	file_cache=../cache/h/${file_c%.c}
 	stale $file_cache $file_c
 	if [ $? -eq 0 ]; then
 		mkdir -p `dirname $file_cache`
@@ -75,81 +87,93 @@ for file_c in `find . -name "*.c" | sort`; do
 done
 
 # See if any .c files have disappeared since the last run.
-for file_dep in `find ../cache/h -name "*.c" 2>/dev/null | sort`; do
-	file_c=${file_dep#../cache/h/}
+for file_dep in `find ../cache/h -type f 2>/dev/null | sort`; do
+	module=${file_dep#../cache/h/}
+	file_c=$module.c
 	if [ ! -e $file_c ]; then
-		base=${file_c%.c}
 		erase $file_dep
-		erase ../obj/$base.o
-		erase ../bin/$base
-		erase ../cache/o/$file_c
+		erase ../obj/$module.o
+		erase ../bin/$module
+		erase ../cache/o/$module
 	fi
 done
 
-# List of updated .c files that are main programs.
+# List of updated modules that are main programs.
 list_main=""
 
 # Compile any .c files that are out of date.
 for file_c in `find . -name "*.c" | sort`; do
 	file_c=${file_c#./}
-	file_o=../obj/${file_c%.c}.o
-	stale $file_o $file_c `cat ../cache/h/$file_c`
+	module=${file_c%.c}
+	file_o=../obj/$module.o
+
+	stale $file_o $file_c `cat ../cache/h/$module`
 	if [ $? -eq 0 ]; then
 		mkdir -p `dirname $file_o`
-		trace Compile $file_c
-		run $compile $file_c -I . -o $file_o
+		trace Compile $module
+		run $compile $include $file_c -o $file_o
+
 		erase ../cache/o/$file_c
 		grep -q "^int main(" $file_c
 		if [ $? -eq 0 ]; then
-			list_main="$list_main $file_c"
+			module=${file_c%.c}
+			list_main="$list_main $module"
 		fi
 	fi
 done
 
 # Update the list of .o files that need to be linked with any updated main
 # programs.  This does a transitive closure of the .h dependencies.
-for file_main in $list_main; do
-	list_file_c=$file_main
-	queue=$file_main
+for main_module in $list_main; do
+	need_modules=$main_module
+	queue=$main_module
 	while [ "$queue" != "" ]; do
-		new_queue=""
-		for file_c in $queue; do
-			for file_h in `cat ../cache/h/$file_c`; do
-				other_file_c=${file_h%.h}.c
-				if [ -e $other_file_c ]; then
-					found=0
-					for entry in $list_file_c; do
-						if [ "$entry" = "$other_file_c" ]; then
-							found=1
-							break
-						fi
-					done
-					if [ $found -eq 0 ]; then
-						list_file_c="$list_file_c $other_file_c"
-						new_queue="$new_queue $other_file_c"
+		next_queue=""
+		for next_module in $queue; do
+			file_c=$next_module.c
+			if [ ! -e $file_c ]; then continue; fi
+			for file_h in `cat ../cache/h/$next_module`; do
+				other_module=${file_h%.h}
+				found=0
+				for entry in $need_modules; do
+					if [ "$entry" = "$other_module" ]; then
+						found=1
+						break
 					fi
+				done
+				if [ $found -eq 0 ]; then
+					next_queue="$next_queue $other_module"
+					need_modules="$need_modules $other_module"
 				fi
 			done
 		done
-		queue=$new_queue
+		queue=$next_queue
 	done
-	file_cache=../cache/o/$file_main
+
+	file_cache=../cache/o/$main_module
 	mkdir -p `dirname $file_cache`
 	objects=""
-	for file_c in $list_file_c; do
-		objects="$objects ../obj/${file_c%.c}.o"
+	for other_module in $need_modules; do
+		file_o=../obj/$other_module.o
+		if [ ! -e $file_o ]; then
+			file_o=`find_module $other_module`
+		fi
+		if [ "$file_o" != "" ]; then
+			objects="$objects $file_o"
+		fi
 	done
 	echo $objects >$file_cache
 done
 
 # Link any main programs that are out of date.
-for file_cache in `find ../cache/o -name "*.c" 2>/dev/null | sort`; do
-	file_main=${file_cache#../cache/o/}
+for file_cache in `find ../cache/o -type f 2>/dev/null | sort`; do
+	module=${file_cache#../cache/o/}
+	file_e=../bin/$module
 	objects=`cat $file_cache`
-	file_e=../bin/${file_main%.c}
+
 	stale $file_e $objects
 	if [ $? -eq 0 ]; then
-		trace Link $file_main
+		trace Link $module
 		mkdir -p `dirname $file_e`
 		run $link $objects -o $file_e
 	fi
