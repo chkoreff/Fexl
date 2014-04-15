@@ -162,6 +162,12 @@ void test_all_eval(void)
 	test_eval(A(A(A(Qcons,x),y),z),1);
 	test_eval(A(A(A(A(Qcons,x),y),z),Qsym0("G",0)),1);
 
+	/* Test the combine routine to ensure that it holds the result before
+	dropping the operands.  We clear the free list first because a non-empty
+	free list can mask the issue. */
+	clear_free_list();
+	test_eval(A(A(A(S,I),I),I),1);
+
 	{
 	value f = C;
 	for (int i = 0; i < 24; i++)
@@ -445,22 +451,13 @@ value context(value x)
 
 void test_resolve(value f)
 	{
-	hold(f);
 	printf(": resolve ");show(f);nl();
 	value g = resolve(f,context);
 	hold(g);
 	if (g->T == type_sym)
 		printf("  The form has undefined symbols.\n");
 	printf("= ");show(g);nl();
-	#if 0
-	/* resolve is a fixpoint */
-	value h = resolve(g,context);
-	hold(h);
-	printf("= ");show(h);nl();
-	drop(h);
-	#endif
 	nl();
-	drop(f);
 	drop(g);
 	}
 
@@ -478,6 +475,7 @@ void run_tests(void)
 	test_resolve(app(Qsym0("x",-1),Qsym0("y",-2)));
 	test_resolve(Qsym0("ping",2));
 	test_resolve(app(Qsym0("ping",2),Qsym0("ping",4)));
+	test_resolve(app(Qsym0("ping",2),Qsym0("pingx",4)));
 	}
 
 int main(void)

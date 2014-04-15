@@ -154,8 +154,10 @@ value combine(value f, value g)
 	hold(f);
 	hold(g);
 	value h = f->T(f,g);
+	hold(h);
 	drop(f);
 	drop(g);
+	h->N--;
 	return h;
 	}
 

@@ -128,7 +128,10 @@ value resolve(value f, value context(value))
 	{
 	value x = last_sym(f);
 	if (x == 0) return f;
-	value g = resolve(lam(x,f),context);
+	hold(f);
+	value g = resolve(abstract(x,f),context);
 	value def = context(x);
-	return app(g,def);
+	value h = app(g,def);
+	drop(f);
+	return h;
 	}

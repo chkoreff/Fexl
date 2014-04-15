@@ -118,6 +118,9 @@ ping!
 : eval ((((cons {x}) {y}) {z}) {G})
 = {{{G} {x}} {y}}
 
+: eval (((S I) I) I)
+= I
+
 : eval ...
 = C
 
@@ -252,4 +255,9 @@ And the world is mine to win. ...
 
 : resolve {{ping} {ping}}
 = (((S I) I) ping)
+
+: resolve {{ping} {pingx}}
+  Undefined symbol pingx on line 4
+  The form has undefined symbols.
+= {(I ping) {pingx}}
 

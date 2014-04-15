@@ -48,10 +48,7 @@ erase()
 	rm -f $name
 	while [ true ]; do
 		name=`dirname $name`
-		if [ $name = . ]; then break; fi
-		if [ -d $name ]; then
-			rmdir --ignore-fail-on-non-empty $name
-		fi
+		rmdir 2>/dev/null $name || break
 	done
 	}
 
