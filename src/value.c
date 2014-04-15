@@ -94,7 +94,8 @@ value V(type T, value L, value R)
 		else if (f->R)
 			{
 			/* Clear atom. */
-			f->T(f,0);
+			f->N = 0;
+			f->T(f);
 			}
 		}
 	else
@@ -131,9 +132,12 @@ void *atom_data(value f, type t)
 	return f->R;
 	}
 
-static value type_A(value f, value g)
+static value type_A(value f)
 	{
-	return combine(f->L->T(f->L,f->R), g);
+	value g = eval(f->L);
+	value z = V(g->T, g, f->R);
+	drop(g);
+	return z;
 	}
 
 /* Apply f to g lazily. */
@@ -142,38 +146,18 @@ value A(value f, value g)
 	return V(type_A,f,g);
 	}
 
-/* Apply f to g lazily, but with the result the same type as f. */
-value collect(value f, value g)
-	{
-	return V(f->T,f,g);
-	}
-
-/* Apply f to g eagerly. */
-value combine(value f, value g)
-	{
-	hold(f);
-	hold(g);
-	value h = f->T(f,g);
-	hold(h);
-	drop(f);
-	drop(g);
-	h->N--;
-	return h;
-	}
-
 /* Evaluate the value, returning its normal form if possible within any limits
 on space and time. */
 value eval(value f)
 	{
-	hold(f);
-	while (f->T == type_A)
+	while (1)
 		{
-		value g = f->L->T(f->L,f->R);
-		hold(g);
+		hold(f);
+		value g = f->T(f);
+		if (g == f) return f;
 		drop(f);
 		f = g;
 		}
-	return f;
 	}
 
 void clear_free_list(void)

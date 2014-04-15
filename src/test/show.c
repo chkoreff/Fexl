@@ -2,15 +2,17 @@
 #include <str.h>
 
 #include <value.h>
-#include <base.h>
+#include <basic.h>
 #include <test/show.h>
 #include <type_str.h>
 #include <type_sym.h>
 
-int show_atom_base(value f)
+int show_atom_basic(value f)
 	{
 	if (f->T == type_C)
 		printf("C");
+	else if (f->T == type_F)
+		printf("F");
 	else if (f->T == type_I)
 		printf("I");
 	else if (f->T == type_S)

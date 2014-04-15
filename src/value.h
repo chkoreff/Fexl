@@ -1,5 +1,5 @@
 typedef struct value *value;
-typedef value (*type)(value,value);
+typedef value (*type)(value);
 
 struct value
 	{
@@ -17,8 +17,6 @@ extern value atom(type T, void *p);
 extern void bad_type(void);
 extern void *atom_data(value f, type t);
 extern value A(value f, value g);
-extern value collect(value f, value g);
-extern value combine(value f, value g);
 extern value eval(value f);
 extern void clear_free_list(void);
 extern void end_value(void);

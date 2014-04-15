@@ -4,7 +4,7 @@
 #include <str.h>
 
 #include <value.h>
-#include <base.h>
+#include <basic.h>
 #include <parse.h>
 #include <type_sym.h>
 

@@ -4,7 +4,7 @@ struct sym
 	int line; /* negative if the name is quoted */
 	};
 
-extern value type_sym(value f, value g);
+extern value type_sym(value f);
 extern struct sym *atom_sym(value f);
 extern value Qsym(struct str *name, int line);
 extern value Qsym0(const char *name, int line);

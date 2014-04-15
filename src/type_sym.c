@@ -2,17 +2,19 @@
 #include <str.h>
 
 #include <value.h>
-#include <base.h>
+#include <basic.h>
 #include <type_str.h>
 #include <type_sym.h>
 
-value type_sym(value f, value g)
+value type_sym(value f)
 	{
-	if (g) return collect(f,g);
-	struct sym *sym = atom_sym(f);
-	drop(sym->name);
-	free_memory(sym,sizeof(struct sym));
-	return 0;
+	if (!f->N)
+		{
+		struct sym *sym = atom_sym(f);
+		drop(sym->name);
+		free_memory(sym,sizeof(struct sym));
+		}
+	return f;
 	}
 
 struct sym *atom_sym(value f)

@@ -6,7 +6,7 @@
 #include <sys/resource.h>
 
 #include <value.h>
-#include <base.h>
+#include <basic.h>
 #include <parse.h>
 #include <test/math.h>
 #include <test/rlimit.h>
@@ -23,22 +23,16 @@ sys/wait.h /* wait */
 unistd.h /* fork */
 #endif
 
-value type_halt(value f, value g)
-	{
-	(void)g;
-	return f;
-	}
-
-value type_ping(value f, value g)
+value type_ping(value f)
 	{
 	(void)f;
 	printf("ping!\n");
-	return g;
+	return I;
 	}
 
 int show_atom_test(value f)
 	{
-	if (show_atom_base(f))
+	if (show_atom_basic(f))
 		;
 	else if (f->T == type_halt)
 		printf("halt");
@@ -138,7 +132,10 @@ void test_all_eval(void)
 	test_eval(A(A(C,Qstr0("x")),I),1);
 	test_eval(A(y,Qstr0("x")),1);
 	test_eval(A(A(x,I),C),1);
+	test_eval(Q(type_halt),1);
+	test_eval(A(Q(type_halt),C),1);
 	test_eval(A(A(Q(type_halt),C),I),1);
+	test_eval(A(A(Q(type_halt),A(C,C)),S),1);
 	test_eval(A(A(I,Q(type_halt)),C),1);
 
 	{
@@ -480,11 +477,11 @@ void run_tests(void)
 
 int main(void)
 	{
-	beg_base();
+	beg_basic();
 	beg_test();
 	run_tests();
 	end_test();
-	end_base();
+	end_basic();
 	end_value();
 	return 0;
 	}

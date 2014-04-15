@@ -3,11 +3,11 @@
 #include <value.h>
 #include <type_str.h>
 
-value type_str(value f, value g)
+value type_str(value f)
 	{
-	if (g) bad_type();
-	str_free(atom_str(f));
-	return 0;
+	/*TODO report bad_type if use as function? */
+	if (!f->N) str_free(atom_str(f));
+	return f;
 	}
 
 struct str *atom_str(value f)
@@ -26,11 +26,11 @@ value Qstr0(const char *data)
 	}
 
 /* (concat x y) is the concatenation of strings x and y. */
-value type_concat(value f, value g)
+value type_concat(value f)
 	{
-	if (!f->L) return collect(f,g);
-	value x = eval(f->R);
-	value y = eval(g);
+	if (!f->L || !f->L->L) return f;
+	value x = eval(f->L->R);
+	value y = eval(f->R);
 	value z = Qstr(str_concat(atom_str(x),atom_str(y)));
 	drop(x);
 	drop(y);

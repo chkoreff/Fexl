@@ -58,14 +58,24 @@
 : eval (({x} I) C)
 = {{{x} I} C}
 
-: eval ((halt C) I)
+: eval halt
 = halt
+
+: eval (halt C)
+= (halt C)
+
+: eval ((halt C) I)
+= ((halt C) I)
+
+: eval ((halt (C C)) S)
+= ((halt (C C)) S)
 
 : eval ((I halt) C)
-= halt
+= (halt C)
 
 : eval ping
-= ping
+ping!
+= I
 
 : eval (ping I)
 ping!
@@ -73,7 +83,8 @@ ping!
 
 : eval (ping ping)
 ping!
-= ping
+ping!
+= I
 
 : eval ((ping ping) I)
 ping!
@@ -113,7 +124,7 @@ ping!
 = ((cons {x}) {y})
 
 : eval (((cons {x}) {y}) {z})
-= ((pair {x}) {y})
+= (((cons {x}) {y}) {z})
 
 : eval ((((cons {x}) {y}) {z}) {G})
 = {{{G} {x}} {y}}
