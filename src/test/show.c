@@ -2,8 +2,8 @@
 #include <str.h>
 
 #include <value.h>
+#include <base.h>
 #include <test/show.h>
-#include <type.h>
 #include <type_str.h>
 #include <type_sym.h>
 

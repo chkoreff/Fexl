@@ -4,8 +4,8 @@
 #include <str.h>
 
 #include <value.h>
+#include <base.h>
 #include <parse.h>
-#include <type.h>
 #include <type_sym.h>
 
 /*

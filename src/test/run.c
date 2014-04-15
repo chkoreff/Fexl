@@ -6,11 +6,11 @@
 #include <sys/resource.h>
 
 #include <value.h>
+#include <base.h>
 #include <parse.h>
 #include <test/math.h>
 #include <test/rlimit.h>
 #include <test/show.h>
-#include <type.h>
 #include <type_str.h>
 #include <type_sym.h>
 

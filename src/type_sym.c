@@ -2,7 +2,7 @@
 #include <str.h>
 
 #include <value.h>
-#include <type.h>
+#include <base.h>
 #include <type_str.h>
 #include <type_sym.h>
 

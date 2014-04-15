@@ -1,5 +1,5 @@
 #include <value.h>
-#include <type.h>
+#include <base.h>
 
 value type_C(value f, value g)
 	{
