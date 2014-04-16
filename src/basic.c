@@ -8,14 +8,11 @@ value type_C(value f)
 	return f->L->R;
 	}
 
-/*TODO optimize some combinators by "looking ahead" so you don't have to create
-extra A-forms and run extra eval cycles. */
-
 /* S x y z = x z (y z) */
 value type_S(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return f;
-	return A(A(f->L->L->R,f->R),A(f->L->R,f->R));
+	return apply(apply(f->L->L->R,f->R),A(f->L->R,f->R));
 	}
 
 /* I x = x */
@@ -36,21 +33,21 @@ value type_F(value f)
 value type_R(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return f;
-	return A(f->L->L->R,A(f->L->R,f->R));
+	return apply(f->L->L->R,A(f->L->R,f->R));
 	}
 
 /* L x y z = x z y */
 value type_L(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return f;
-	return A(A(f->L->L->R,f->R),f->L->R);
+	return apply(apply(f->L->L->R,f->R),f->L->R);
 	}
 
 /* Y x = x (Y x) */
 value type_Y(value f)
 	{
 	if (!f->L) return f;
-	return A(f->R,f);
+	return apply(f->R,f);
 	}
 
 /* (later x) delays evaluation of x.  It is used to return a function which
@@ -67,7 +64,7 @@ value type_query(value f)
 	if (!f->L || !f->L->L) return f;
 	value x = eval(f->L->R);
 	value xp = (x->T == type_later && x->R) ? x->R : x;
-	value z = A(f->R,xp);
+	value z = apply(f->R,xp);
 	drop(x);
 	return z;
 	}
@@ -82,14 +79,14 @@ value type_halt(value f)
 value type_pair(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return f;
-	return A(A(f->R,f->L->L->R),f->L->R);
+	return apply(apply(f->R,f->L->L->R),f->L->R);
 	}
 
 /* (cons x y) F G = G x y */
 value type_cons(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return f;
-	return A(A(f->R,f->L->L->L->R),f->L->L->R);
+	return apply(apply(f->R,f->L->L->L->R),f->L->L->R);
 	}
 
 value pair(value x, value y)

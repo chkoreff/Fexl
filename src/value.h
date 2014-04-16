@@ -16,6 +16,8 @@ extern value Q(type T);
 extern value atom(type T, void *p);
 extern void bad_type(void);
 extern void *atom_data(value f, type t);
+extern value apply(value f, value x);
+extern value type_A(value f);
 extern value A(value f, value g);
 extern value eval(value f);
 extern void clear_free_list(void);

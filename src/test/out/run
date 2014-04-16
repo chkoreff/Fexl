@@ -213,10 +213,10 @@ And the world is mine to win. ...
   line 59
 
 : parse file test/in/a2
-= {{{{{{{{{{{{{{((((I L) R) S) (C I)) {y}} S} S} ((S I) I)} {C {y}}} S} {"
+= {{{{{{{{{{{{{{((((I L) R) S) (C I)) {y}} ((C S) I)} S} ((S I) I)} {C {y}}} S} {"
 "}} (((S S) I) ((L R) ((S I) I)))} {"
 "}} ((L R) ((S I) I))} {"
-"}} I} {"
+"}} ((C I) ((L R) ((S I) I)))} {"
 "}} {{cons {1}} {{cons {{cons {2}} {{cons {3}} C}}} {(cons C) {{cons {{cons {4}} C}} {{cons {"hi"}} {{{append} {x}} {y}}}}}}}}
   line 50
 

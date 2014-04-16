@@ -208,7 +208,7 @@ void test_all_eval(void)
 	*/
 	value y0 = A(A(L,R),A(A(S,I),I));
 	value Y = A(A(S,y0),y0);
-	test_eval(A(Y,I),1); /* Segmentation fault */
+	test_eval(A(Y,I),1); /* Eventually runs out of memory. */
 	}
 
 	if (0)
@@ -220,12 +220,6 @@ void test_all_eval(void)
 	value Y = A(A(S,y0),y0);
 	value f = A(Y,I);
 	test_eval(f,1); /* Your program ran out of memory. */
-	}
-
-	if (0)
-	{
-	/* Test using a data type incorrectly. */
-	test_eval(A(Qstr0("x"),I),1);
 	}
 	}
 

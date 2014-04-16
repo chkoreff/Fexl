@@ -5,7 +5,6 @@
 
 value type_str(value f)
 	{
-	/*TODO report bad_type if use as function? */
 	if (!f->N) str_free(atom_str(f));
 	return f;
 	}

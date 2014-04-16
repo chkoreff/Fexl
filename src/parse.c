@@ -340,14 +340,6 @@ static value parse_lambda(long first_line)
 		/* = normal definition */
 		if (body == I)
 			result = def;
-		else if (body->L == C)
-			{
-			result = body->R;
-			hold(body);
-			drop(body);
-			hold(def);
-			drop(def);
-			}
 		else
 			result = app(body,def);
 		}

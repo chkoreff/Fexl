@@ -132,18 +132,24 @@ void *atom_data(value f, type t)
 	return f->R;
 	}
 
-static value type_A(value f)
+/* Apply f to x eagerly. */
+value apply(value f, value x)
 	{
-	value g = eval(f->L);
-	value z = V(g->T, g, f->R);
-	drop(g);
-	return z;
+	f = eval(f);
+	value g = V(f->T,f,x);
+	drop(f);
+	return g;
 	}
 
-/* Apply f to g lazily. */
-value A(value f, value g)
+value type_A(value f)
 	{
-	return V(type_A,f,g);
+	return apply(f->L,f->R);
+	}
+
+/* Apply f to x lazily. */
+value A(value f, value x)
+	{
+	return V(type_A,f,x);
 	}
 
 /* Evaluate the value, returning its normal form if possible within any limits
