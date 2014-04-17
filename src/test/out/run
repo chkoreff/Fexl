@@ -291,9 +291,14 @@ long_sub
 long_mul
 long_div
 order
+file:0
+file:1
+file:2
+3.14159265358979
+-2.06
 ===
 source_label = test/in/a1
-source_line = 196
+source_line = 221
 ===
 Hello world.
 x = 42
@@ -390,6 +395,18 @@ S
 ((I S) C)
 (((((L ((R R) R)) (L I)) I) S) C)
 (((R I) S) C)
+===
+argc = 2
+argv 0 = ../bin/fexl
+argv 1 = test/in/a1
+argv 2 = 
+base_path = /home/patrick/project/fexl/
+===
+var:C
+(I var:12.6)
+12.6
+(I var:17.6)
+x = 17.6
 ] exit 0
 [
 Undefined symbol aa on line 1

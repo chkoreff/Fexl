@@ -6,9 +6,7 @@ extern value type_getchar(value f);
 extern value type_fputc(value f);
 extern value type_fgetc(value f);
 extern value type_fwrite(value f);
-#if 0
-extern value type_fopen(value f); /*TODO*/
-#endif
+extern value type_fopen(value f);
 extern value type_readlink(value f);
 extern void print(value f);
 extern void nl(void);

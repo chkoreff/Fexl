@@ -4,14 +4,17 @@
 #include <define.h>
 #include <die.h>
 #include <fexl.h>
+#include <file.h>
 #include <show.h>
 #include <str.h>
 #include <string.h>
+#include <system.h>
 #include <type_double.h>
 #include <type_file.h>
 #include <type_long.h>
 #include <type_str.h>
 #include <type_sym.h>
+#include <type_var.h>
 
 static const char *curr_name;
 
@@ -40,8 +43,6 @@ static value define_name(const char *name)
 	double num;
 	if (string_double(name,&num)) return Qdouble(num);
 	}
-
-	/* TODO arg and env stuff */
 
 	if (match("say")) return Q(type_say);
 	if (match("print")) return Q(type_print);
@@ -74,6 +75,19 @@ static value define_name(const char *name)
 		if (match("long_char")) return Q(type_long_char);
 		return 0;
 		}
+
+	if (starts("double_"))
+		{
+		if (match("double_add")) return Q(type_double_add);
+		if (match("double_sub")) return Q(type_double_sub);
+		if (match("double_mul")) return Q(type_double_mul);
+		if (match("double_div")) return Q(type_double_div);
+		if (match("double_cmp")) return Q(type_double_cmp);
+		if (match("double_string")) return Q(type_double_string);
+		if (match("double_long")) return Q(type_double_long);
+		return 0;
+		}
+
 	if (match("order")) return Q(type_order);
 	if (match("show")) return Q(type_show);
 	if (match("source_label")) return Qstr0(source_label);
@@ -85,13 +99,23 @@ static value define_name(const char *name)
 	if (match("L")) return L;
 	if (match("Y")) return Q(type_Y);
 
-	#if 0
-	/*TODO*/
 	if (match("yes")) return Q(type_yes);
 	if (match("no")) return C;
 	if (match("pi")) return Qdouble(3.14159265358979);
-	#endif
 
+	if (match("new")) return Q(type_new);
+	if (match("set")) return Q(type_set);
+	if (match("get")) return Q(type_get);
+
+	if (match("argc")) return Qlong(argc);
+	if (match("argv")) return Q(type_argv);
+	/* TODO env */
+
+	if (match("stdin")) return Qfile(stdin);
+	if (match("stdout")) return Qfile(stdout);
+	if (match("stderr")) return Qfile(stderr);
+
+	if (match("base_path")) return Qstr(base_path());
 	return 0;
 	}
 

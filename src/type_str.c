@@ -1,5 +1,6 @@
 #include <value.h>
 #include <assert.h>
+#include <basic.h>
 #include <str.h>
 #include <type_double.h>
 #include <type_long.h>
@@ -87,32 +88,28 @@ value type_string_common(value f)
 	}
 
 /* (string_long x) converts string x to a possible long value. */
-#if 0
 value type_string_long(value f)
 	{
 	if (!f->L) return f;
 	value x = eval(f->R);
 	long num;
 	int ok = string_long(get_str(x)->data,&num);
-	value result = maybe(ok ? Qlong(num) : 0); /*TODO*/
+	value result = maybe(ok ? Qlong(num) : 0);
 	drop(x);
 	return result;
 	}
-#endif
 
 /* (string_double x) converts string x to a possible double value. */
-#if 0
 value type_string_double(value f)
 	{
 	if (!f->L) return f;
 	value x = eval(f->R);
 	double num;
 	int ok = string_double(get_str(x)->data,&num);
-	value result = maybe(ok ? Qdouble(num) : 0); /*TODO*/
+	value result = maybe(ok ? Qdouble(num) : 0);
 	drop(x);
 	return result;
 	}
-#endif
 
 /* (string_slice str pos len)  Consistent with "substr" in Perl. */
 value type_string_slice(value f)

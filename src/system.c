@@ -7,10 +7,6 @@
 #include <type_long.h>
 #include <type_str.h>
 
-#if 0
-value const_fexl_argc(void) { return Qlong(argc); } /*TODO*/
-#endif
-
 value type_argv(value f)
 	{
 	if (!f->L) return f;

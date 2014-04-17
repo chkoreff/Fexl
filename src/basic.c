@@ -89,14 +89,12 @@ value type_cons(value f)
 	return apply(apply(f->R,f->L->L->L->R),f->L->L->R);
 	}
 
-#if 0
 /* (yes x F G) = (G x) */
-value type_yes(value f) /*TODO*/
+value type_yes(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return f;
 	return A(f->R,f->L->L->R);
 	}
-#endif
 
 value pair(value x, value y)
 	{
@@ -108,6 +106,11 @@ value cons(value x, value y)
 	return V(type_cons,V(type_cons,Qcons,x),y);
 	}
 
+value maybe(value x)
+	{
+	return x ? V(type_yes,yes,x) : C;
+	}
+
 value C;
 value S;
 value I;
@@ -117,6 +120,7 @@ value Y;
 value query;
 value Qpair;
 value Qcons;
+value yes;
 
 void beg_basic(void)
 	{
@@ -129,6 +133,7 @@ void beg_basic(void)
 	query = Q(type_query);
 	Qpair = Q(type_pair);
 	Qcons = Q(type_cons);
+	yes = Q(type_yes);
 
 	hold(C);
 	hold(S);
@@ -139,6 +144,7 @@ void beg_basic(void)
 	hold(query);
 	hold(Qpair);
 	hold(Qcons);
+	hold(yes);
 	}
 
 void end_basic(void)
@@ -152,4 +158,5 @@ void end_basic(void)
 	drop(query);
 	drop(Qpair);
 	drop(Qcons);
+	drop(yes);
 	}

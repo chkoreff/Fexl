@@ -7,9 +7,7 @@ extern value type_string_at(value f);
 extern value type_string_cmp(value f);
 extern value type_string_len(value f);
 extern value type_string_common(value f);
-#if 0
-extern value type_string_long(value f); /*TODO*/
+extern value type_string_long(value f);
 extern value type_string_double(value f);
-#endif
 extern value type_string_slice(value f);
 extern value type_string_index(value f);

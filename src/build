@@ -52,10 +52,16 @@ erase()
 	done
 	}
 
-# Compile with -fdata-sections and -ffunction-sections so the linker can prune
-# any unused data or functions with -Wl,--gc-sections.
-# I no longer compile with -std=c99, because on Debian that causes "readlink"
-# not to show up in unistd.h.
+# We compile with -O3 because that enables -finline-functions.  You can see
+# that by running "gcc -c -Q -O3 --help=optimizers".
+#
+# We compile with -fdata-sections and -ffunction-sections so the linker can
+# prune any unused data or functions with -Wl,--gc-sections.
+#
+# NOTE: We no longer use either the -std=c99 or -ansi option because that makes
+# the fdopen function inaccessible in stdio.h, and makes readlink inaccessible
+# in unistd.h (on Debian anyway).
+
 compile="gcc -c -Wall -Werror -Wunused-parameter \
 -fdata-sections -ffunction-sections -O3"
 

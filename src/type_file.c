@@ -7,6 +7,7 @@
 #include <type_long.h>
 #include <type_file.h>
 #include <type_str.h>
+#include <type_var.h>
 
 value type_file(value f)
 	{
@@ -46,10 +47,6 @@ value type_getchar(value f)
 	(void)f;
 	return Qlong(getchar());
 	}
-
-value const_stdin(void)  { return Qfile(stdin); } /*TODO*/
-value const_stdout(void) { return Qfile(stdout); }
-value const_stderr(void) { return Qfile(stderr); }
 
 /* (fputc file ch) Write character to the file. */
 value type_fputc(value f)
@@ -97,7 +94,6 @@ value type_fwrite(value f)
 	}
 
 /* (fopen path mode) Open a file and return no or (yes fh). */
-#if 0
 value type_fopen(value f)
 	{
 	if (!f->L || !f->L->L) return f;
@@ -108,13 +104,12 @@ value type_fopen(value f)
 	struct str *mode = get_str(y);
 
 	FILE *fh = fopen(path->data, mode->data);
-	value result = maybe(fh ? Qfile(fh) : 0); /*TODO*/
+	value result = maybe(fh ? Qfile(fh) : 0);
 
 	drop(x);
 	drop(y);
 	return result;
 	}
-#endif
 
 value type_readlink(value f)
 	{
@@ -125,9 +120,7 @@ value type_readlink(value f)
 	return y;
 	}
 
-value const_base_path(void) { return Qstr(base_path()); } /*TODO*/
-
-/* I removed the tail recursion in the cases for fexl_item and type_var. */
+/* I removed the tail recursion in the cases for type_item and type_var. */
 void print(value f)
 	{
 	while (1)
@@ -140,7 +133,7 @@ void print(value f)
 			}
 		else if (f->T == type_long)
 			printf("%ld", get_long(f));
-		else if (f->T == type_double) /*TODO*/
+		else if (f->T == type_double)
 			printf("%.15g", get_double(f));
 		else if (f->T == type_cons)
 			{
@@ -152,14 +145,12 @@ void print(value f)
 			}
 		else if (f->T == type_C)
 			;
-		#if 0
-		else if (f->T == type_var) /*TODO */
+		else if (f->T == type_var)
 			{
 			drop(f);
 			f = eval(f->R);
 			continue;
 			}
-		#endif
 		else
 			bad_type();
 
@@ -176,7 +167,7 @@ void nl(void)
 value type_nl(value f)
 	{
 	(void)f;
-	putchar('\n');
+	nl();
 	return I;
 	}
 

@@ -8,6 +8,7 @@
 #include <type_long.h>
 #include <type_str.h>
 #include <type_sym.h>
+#include <type_var.h>
 
 /* LATER: meta-quote strings or symbols with embedded quotes. */
 
@@ -61,8 +62,15 @@ int show_atom_default(value f)
 		printf("\"%s\"",get_str(f)->data);
 	else if (f->T == type_long)
 		printf("%ld",get_long(f));
-	else if (f->T == type_double) /*TODO*/
+	else if (f->T == type_double)
 		printf("%.15g",get_double(f));
+	else if (f->T == type_file)
+		printf("file:%d", fileno(get_file(f)));
+	else if (f->T == type_var)
+		{
+		printf("var:");
+		show(f->R);
+		}
 	else if (f->T == type_sym)
 		{
 		struct sym *sym = get_sym(f);

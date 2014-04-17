@@ -114,4 +114,5 @@ The "test" directory contains the Fexl test suite.
 
 License
 -------
-This code is copyright 2011 by Patrick Chkoreff.  See the LICENSE file.
+This code is copyright 2011 by Patrick Chkoreff (pc@fexl.com).
+See the LICENSE file for details.

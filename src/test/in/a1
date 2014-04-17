@@ -1,7 +1,7 @@
 #
 \: = (\x show x nl)
 
-say "==="
+say "===" # TODO if this goes in the parens we see (I say)
 (
 : C
 : S
@@ -26,6 +26,11 @@ say "==="
 : long_mul
 : long_div
 : order
+: stdin
+: stdout
+: stderr
+: pi
+: -2.06
 )
 
 \NL="
@@ -192,6 +197,26 @@ say "==="
 : (S C)
 : (I (C S))
 : (I (S C))
+
+say "==="
+say ["argc = " argc]
+say ["argv 0 = " (argv 0)]
+say ["argv 1 = " (argv 1)]
+say ["argv 2 = " (argv 2)]
+
+say ["base_path = " base_path]
+
+say "==="
+\x==new
+: x
+set x 12.6
+: x
+\v==(get x)
+: v
+set x (double_add (get x) 5.0)
+: x
+
+say ["x = " x]
 
 \\
 Extra stuff not parsed.
