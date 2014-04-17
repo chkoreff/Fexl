@@ -52,9 +52,11 @@ erase()
 	done
 	}
 
-# We compile with -fdata-sections and -ffunction-sections so the linker can
-# prune any unused data or functions with -Wl,--gc-sections.
-compile="gcc -c -Wall -Werror -std=c99 -pedantic -Wunused-parameter \
+# Compile with -fdata-sections and -ffunction-sections so the linker can prune
+# any unused data or functions with -Wl,--gc-sections.
+# I no longer compile with -std=c99, because on Debian that causes "readlink"
+# not to show up in unistd.h.
+compile="gcc -c -Wall -Werror -Wunused-parameter \
 -fdata-sections -ffunction-sections -O3"
 
 link="gcc -s -Wl,--gc-sections"

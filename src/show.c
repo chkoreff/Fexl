@@ -1,9 +1,10 @@
 #include <value.h>
 #include <basic.h>
-#include <output.h>
 #include <stdio.h>
 #include <str.h>
 #include <show.h>
+#include <type_double.h>
+#include <type_file.h>
 #include <type_long.h>
 #include <type_str.h>
 #include <type_sym.h>
@@ -60,6 +61,8 @@ int show_atom_default(value f)
 		printf("\"%s\"",get_str(f)->data);
 	else if (f->T == type_long)
 		printf("%ld",get_long(f));
+	else if (f->T == type_double) /*TODO*/
+		printf("%.15g",get_double(f));
 	else if (f->T == type_sym)
 		{
 		struct sym *sym = get_sym(f);

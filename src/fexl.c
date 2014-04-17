@@ -16,6 +16,7 @@ FILE *source_fh;
 const char *source_label;
 int source_line;
 
+/*TODO make a parse_file routine */
 static int get_ch(void)
 	{
 	return fgetc(source_fh);

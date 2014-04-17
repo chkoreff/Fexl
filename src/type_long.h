@@ -9,4 +9,5 @@ extern value type_long_div(value f);
 extern value type_long_cmp(value f);
 extern value type_long_string(value f);
 extern value type_order(value f);
+extern value type_long_double(value f);
 extern value type_long_char(value f);

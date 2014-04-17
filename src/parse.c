@@ -169,7 +169,8 @@ static struct str *collect_string(const char *term_data, int term_len,
 		else if (match_pos > 0)
 			{
 			/* Buffer the ones matched so far and start over. */
-			for (int i = 0; i < match_pos; i++)
+			int i;
+			for (i = 0; i < match_pos; i++)
 				buf_add(&buf, term_data[i]);
 
 			match_pos = 0;

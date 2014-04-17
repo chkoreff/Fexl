@@ -2,12 +2,12 @@
 #include <basic.h>
 #include <buf.h>
 #include <die.h>
-#include <output.h>
 #include <show.h>
 #include <stdio.h>
 #include <str.h>
 #include <string.h>
 #include <test/math.h>
+#include <type_file.h>
 #include <type_str.h>
 #include <type_sym.h>
 
@@ -105,7 +105,8 @@ void test_all_eval(void)
 
 	{
 	value f = A(A(Q(type_concat),Qstr0("x")),Qstr0("y"));
-	for (int i = 0; i < 5; i++)
+	int i;
+	for (i = 0; i < 5; i++)
 		f = A(A(Q(type_concat),f),f);
 	test_eval(f,0);
 	}
@@ -144,14 +145,16 @@ void test_all_eval(void)
 
 	{
 	value f = C;
-	for (int i = 0; i < 24; i++)
+	int i;
+	for (i = 0; i < 24; i++)
 		f = A(f,f);
 	test_eval(f,0);
 	}
 
 	{
 	value f = C;
-	for (int i = 0; i < 33; i++)
+	int i;
+	for (i = 0; i < 33; i++)
 		f = A(f,C);
 	test_eval(f,0);
 	}
@@ -159,7 +162,8 @@ void test_all_eval(void)
 	{
 	/* This combinatorial explosion is quadratic but runs fast. */
 	value f = I;
-	for (int i = 0; i < 22; i++)
+	int i;
+	for (i = 0; i < 22; i++)
 		f = A(f,f);
 	test_eval(f,0);
 	}
@@ -207,7 +211,7 @@ void test_all_str(void)
 	test_binary_str_eq(str_new_data("h\000i",3),str_new_data("h\000i",3));
 	test_binary_str_eq(str_new_data("h\000i",3),str_new_data("h\000j",3));
 
-	/*LATER test str_common, str_index, etc.*/
+	/*TODO test str_common, str_index, etc.*/
 	{
 	test_str_concat("","");
 	test_str_concat("a","b");
@@ -246,7 +250,8 @@ void test_buf(int max)
 	struct buf buf;
 	buf_start(&buf);
 
-	for (int len = 0; len < max; len++)
+	int len;
+	for (len = 0; len < max; len++)
 		{
 		char ch = 'a' + (len % 26);
 		buf_add(&buf,ch);

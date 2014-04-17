@@ -76,7 +76,7 @@ int str_eq(struct str *x, struct str *y)
 /* Return the number of starting bytes the strings have in common. */
 int str_common(struct str *x, struct str *y)
 	{
-	/*LATER return x->len if x == y */
+	/*TODO return x->len if x == y */
 	int min_len = x->len < y->len ? x->len : y->len;
 
 	const char *xd = x->data;

@@ -1,6 +1,7 @@
 #include <value.h>
 #include <stdlib.h> /* strtol */
 #include <str.h>
+#include <type_double.h>
 #include <type_long.h>
 #include <type_str.h>
 
@@ -82,9 +83,7 @@ value type_order(value f)
 	return g;
 	}
 
-/*TODO*/
-#if 0
-value type_long_double(value f)
+value type_long_double(value f) /*TODO*/
 	{
 	if (!f->L) return f;
 	value x = eval(f->R);
@@ -92,7 +91,6 @@ value type_long_double(value f)
 	drop(x);
 	return y;
 	}
-#endif
 
 /* Convert long to char (string of length 1). */
 value type_long_char(value f)

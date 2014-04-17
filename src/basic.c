@@ -89,6 +89,15 @@ value type_cons(value f)
 	return apply(apply(f->R,f->L->L->L->R),f->L->L->R);
 	}
 
+#if 0
+/* (yes x F G) = (G x) */
+value type_yes(value f) /*TODO*/
+	{
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
+	return A(f->R,f->L->L->R);
+	}
+#endif
+
 value pair(value x, value y)
 	{
 	return V(type_pair,V(type_pair,Qpair,x),y);

@@ -4,10 +4,11 @@
 #include <define.h>
 #include <die.h>
 #include <fexl.h>
-#include <output.h>
 #include <show.h>
 #include <str.h>
 #include <string.h>
+#include <type_double.h>
+#include <type_file.h>
 #include <type_long.h>
 #include <type_str.h>
 #include <type_sym.h>
@@ -34,13 +35,11 @@ static value define_name(const char *name)
 	if (string_long(name,&num)) return Qlong(num);
 	}
 
-    /* Floating point number (double) */ /*TODO*/
-	#if 0
+    /* Floating point number (double) */
 	{
 	double num;
 	if (string_double(name,&num)) return Qdouble(num);
 	}
-	#endif
 
 	/* TODO arg and env stuff */
 
@@ -85,6 +84,13 @@ static value define_name(const char *name)
 	if (match("R")) return R;
 	if (match("L")) return L;
 	if (match("Y")) return Q(type_Y);
+
+	#if 0
+	/*TODO*/
+	if (match("yes")) return Q(type_yes);
+	if (match("no")) return C;
+	if (match("pi")) return Qdouble(3.14159265358979);
+	#endif
 
 	return 0;
 	}
