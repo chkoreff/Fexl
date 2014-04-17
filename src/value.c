@@ -1,6 +1,5 @@
 #include <die.h>
 #include <memory.h>
-
 #include <value.h>
 
 /*
@@ -114,19 +113,13 @@ value Q(type T)
 	return V(T,0,0);
 	}
 
-/* Create a new atom with the given type and data pointer. */
-value atom(type T, void *p)
-	{
-	return V(T,0,(value)p);
-	}
-
 void bad_type(void)
 	{
 	die("You used a data type incorrectly.");
 	}
 
 /* Return the data pointer of an atom of type t. */
-void *atom_data(value f, type t)
+void *get_data(value f, type t)
 	{
 	if (f->L != 0 || f->T != t) bad_type();
 	return f->R;

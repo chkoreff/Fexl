@@ -1,2 +1,203 @@
 #!/bin/sh
-verbose=0 ./build && ../bin/test/run
+verbose=0 ./build
+
+echo "["
+../bin/test/internal
+echo "]"
+
+# Empty program
+echo "["
+(
+echo -n "" | ../bin/fexl
+) 2>&1
+echo "] exit $?"
+
+# Unclosed string
+echo "["
+(
+cat <<'EOM' | ../bin/fexl
+
+"x
+EOM
+) 2>&1
+echo "] exit $?"
+
+# Unclosed string
+echo "["
+(
+cat <<'EOM' | ../bin/fexl
+~| x
+EOM
+) 2>&1
+echo "] exit $?"
+
+# Incomplete string terminator
+echo "["
+(
+echo -n "~ABCD" | ../bin/fexl
+) 2>&1
+echo "] exit $?"
+
+# Unclosed parentheses
+echo "["
+(
+cat <<'EOM' | ../bin/fexl
+((x y)
+EOM
+) 2>&1
+echo "] exit $?"
+
+# Unclosed bracket
+echo "["
+(
+cat <<'EOM' | ../bin/fexl
+say
+[
+["x" "y"] [2 3]
+EOM
+) 2>&1
+echo "] exit $?"
+
+# Unclosed brace
+echo "["
+(
+cat <<'EOM' | ../bin/fexl
+# stuff
+{x
+y
+EOM
+) 2>&1
+echo "] exit $?"
+
+# Missing lambda symbol
+echo "["
+(
+cat <<'EOM' | ../bin/fexl
+\
+EOM
+) 2>&1
+echo "] exit $?"
+
+# Missing lambda symbol
+echo "["
+(
+cat <<'EOM' | ../bin/fexl
+\=(x y)
+EOM
+) 2>&1
+echo "] exit $?"
+
+# Missing definition
+echo "["
+(
+cat <<'EOM' | ../bin/fexl
+\x=(+ 2 3)
+\y=
+\z=(- 7 8)
+EOM
+) 2>&1
+echo "] exit $?"
+
+# Extraneous input
+echo "["
+(
+cat <<'EOM' | ../bin/fexl
+\x=(+ 2 3)
+say (* x x)
+
+)
+EOM
+) 2>&1
+echo "] exit $?"
+
+# Say "25"
+echo "["
+(
+cat <<'EOM' | ../bin/fexl
+\x=(+ 2 3)
+say (* x x)
+\\
+Extra stuff down here not parsed.
+EOM
+) 2>&1
+echo "] exit $?"
+
+# Run a file.
+echo "["
+(
+../bin/fexl test/in/a1
+) 2>&1
+echo "] exit $?"
+
+# undefined symbol
+echo "["
+(
+cat <<'EOM' | ../bin/fexl
+aa bb
+c
+EOM
+) 2>&1
+echo "] exit $?"
+
+# out of stack
+echo "["
+(
+ulimit -t 2
+ulimit -v 20000
+head -c 60000000 /dev/zero | tr "\000" '(' | ../bin/fexl
+) 2>&1
+echo "] exit $?"
+
+# out of memory
+echo "["
+(
+ulimit -t 2
+ulimit -v 20000
+head -c 60000000 /dev/zero | tr "\000" a | ../bin/fexl
+) 2>&1
+echo "] exit $?"
+
+# out of time
+echo "["
+(
+ulimit -t 1
+ulimit -v 20000
+head -c 300000000 /dev/zero | tr "\000" ' ' | ../bin/fexl
+) 2>&1
+echo "] exit $?"
+
+# out of time
+echo "["
+(
+ulimit -t 1
+ulimit -v 20000
+cat <<'EOM' | ../bin/fexl
+\inf=(@\inf inf)
+inf
+EOM
+) 2>&1
+echo "] exit $?"
+
+# out of stack
+echo "["
+(
+ulimit -t 1
+ulimit -v 200000
+cat <<'EOM' | ../bin/fexl
+@ @
+EOM
+) 2>&1
+echo "] exit $?"
+
+# Very slowly runs out of memory, so we limit time instead.
+echo "["
+(
+ulimit -t 1
+ulimit -v 20000
+cat <<'EOM' | ../bin/fexl
+\y0=(L R (S I I))
+\Y=(S y0 y0)
+Y I
+EOM
+) 2>&1
+echo "] exit $?"

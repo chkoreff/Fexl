@@ -1,11 +1,10 @@
+#include <value.h>
+#include <basic.h>
 #include <buf.h>
 #include <ctype.h>
 #include <die.h>
-#include <str.h>
-
-#include <value.h>
-#include <basic.h>
 #include <parse.h>
+#include <str.h>
 #include <type_sym.h>
 
 /*
@@ -20,7 +19,7 @@ terms  => ; exp
 
 term   => ( exp )
 term   => [ terms ]
-term   => { exp }   # TODO
+term   => { exp }
 term   => sym
 
 def    => empty
@@ -267,6 +266,14 @@ static value parse_term(void)
 		exp = parse_list();
 		if (ch != ']')
 			syntax_error("Unclosed bracket", first_line);
+		skip();
+		}
+	else if (ch == '{') /* symbolic form */
+		{
+		skip();
+		exp = A(I,parse_exp());
+		if (ch != '}')
+			syntax_error("Unclosed brace", first_line);
 		skip();
 		}
 	else

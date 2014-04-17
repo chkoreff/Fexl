@@ -1,53 +1,15 @@
+#include <value.h>
+#include <basic.h>
 #include <buf.h>
 #include <die.h>
+#include <output.h>
+#include <show.h>
 #include <stdio.h>
 #include <str.h>
 #include <string.h>
-#include <sys/resource.h>
-
-#include <value.h>
-#include <basic.h>
-#include <parse.h>
 #include <test/math.h>
-#include <test/rlimit.h>
-#include <test/show.h>
 #include <type_str.h>
 #include <type_sym.h>
-
-/*LATER tests involving fork */
-#if 0
-string.h /* strlen */
-stdlib.h /* exit */
-sys/types.h /* pid_t */
-sys/wait.h /* wait */
-unistd.h /* fork */
-#endif
-
-value type_ping(value f)
-	{
-	(void)f;
-	printf("ping!\n");
-	return I;
-	}
-
-int show_atom_test(value f)
-	{
-	if (show_atom_basic(f))
-		;
-	else if (f->T == type_halt)
-		printf("halt");
-	else if (f->T == type_ping)
-		printf("ping");
-	else
-		return 0;
-
-	return 1;
-	}
-
-void show(value f)
-	{
-	show_value(f, show_atom_test);
-	}
 
 void test_eval(value f, int full)
 	{
@@ -74,6 +36,25 @@ void test_lam(value sym, value body)
 	drop(f);
 	}
 
+value type_ping(value f)
+	{
+	(void)f;
+	printf("ping!\n");
+	return I;
+	}
+
+int show_atom_test(value f)
+	{
+	if (show_atom_default(f))
+		;
+	else if (f->T == type_ping)
+		printf("ping");
+	else
+		return 0;
+
+	return 1;
+	}
+
 value x;
 value y;
 value z;
@@ -89,6 +70,7 @@ void beg_test(void)
 	hold(y);
 	hold(z);
 	hold(ping);
+	show_atom = show_atom_test;
 	}
 
 void end_test(void)
@@ -158,11 +140,6 @@ void test_all_eval(void)
 	test_eval(A(A(Qcons,x),y),1);
 	test_eval(A(A(A(Qcons,x),y),z),1);
 	test_eval(A(A(A(A(Qcons,x),y),z),Qsym0("G",0)),1);
-
-	/* Test the combine routine to ensure that it holds the result before
-	dropping the operands.  We clear the free list first because a non-empty
-	free list can mask the issue. */
-	clear_free_list();
 	test_eval(A(A(A(S,I),I),I),1);
 
 	{
@@ -185,41 +162,6 @@ void test_all_eval(void)
 	for (int i = 0; i < 22; i++)
 		f = A(f,f);
 	test_eval(f,0);
-	}
-
-	if (0)
-	{
-	set_limit(RLIMIT_CPU, 2);
-	/* Runs in constant space. */
-	test_eval(A(Y,I),1); /* CPU time limit exceeded */
-	}
-
-	if (0)
-	{
-	test_eval(A(Y,Y),1); /* Segmentation fault */
-	}
-
-	if (0)
-	{
-	/*
-	: \x\y x (y y)
-	= \x R x (S I I)
-	= L R (S I I)
-	*/
-	value y0 = A(A(L,R),A(A(S,I),I));
-	value Y = A(A(S,y0),y0);
-	test_eval(A(Y,I),1); /* Eventually runs out of memory. */
-	}
-
-	if (0)
-	{
-	set_limit(RLIMIT_CPU, 5);
-	set_limit(RLIMIT_AS, 4000000);
-	value I = A(A(S,C),C);
-	value y0 = A(A(S,A(A(S,A(C,S)),C)),A(C,A(A(S,I),I)));
-	value Y = A(A(S,y0),y0);
-	value f = A(Y,I);
-	test_eval(f,1); /* Your program ran out of memory. */
 	}
 	}
 
@@ -298,102 +240,6 @@ void test_all_lam(void)
 	test_lam(x,lam(y,app(app(x,y),app(y,x))));
 	}
 
-/*** Here are some different types of streams for testing. */
-
-FILE *curr_fh = 0;
-int get_file_ch(void)
-	{
-	return fgetc(curr_fh);
-	}
-
-const char *curr_data = 0;
-int curr_pos = 0;
-int curr_max = 0;
-
-/*TODO not used, perhaps go ahead and make a parse string version */
-int get_str_ch(void)
-	{
-	if (curr_pos >= curr_max)
-		return -1;
-	return curr_data[curr_pos++];
-	}
-
-int repeat_ch = 'a';
-int get_test_ch(void)
-	{
-	if (curr_pos >= curr_max)
-		return -1;
-	curr_pos++;
-	return repeat_ch;
-	}
-
-/***/
-
-void show_parse(int get(void), const char *label)
-	{
-	int line = 1;
-	value f = parse(get,&line,label);
-	hold(f);
-	printf("= ");show(f);nl();
-	printf("  line %d\n", line);
-	nl();
-	drop(f);
-	}
-
-void test_parse_file(const char *name)
-	{
-	/* LATER test with stdio */
-	curr_fh = name[0] ? fopen(name,"r") : stdin;
-	if (curr_fh == 0) die("Could not open file %s", name);
-
-	printf(": parse file %s\n", name);
-	show_parse(get_file_ch,name);
-
-	if (curr_fh != stdin)
-		fclose(curr_fh);
-	}
-
-void test_parse_repeat(int ch, int max)
-	{
-	curr_pos = 0;
-	curr_max = max;
-	repeat_ch = ch;
-
-	printf(": parse repeat '%c' %d\n", repeat_ch, curr_max);
-	show_parse(get_test_ch,"test");
-	}
-
-void test_all_parse()
-	{
-	test_parse_file("test/in/a1");
-	test_parse_file("test/in/a2");
-
-	test_parse_repeat('a',60);
-	test_parse_repeat('a',1);
-	test_parse_repeat('a',0);
-
-	/* LATER Test these pathological cases with fork.  Use -1 for no limit. */
-	if (0)
-	{
-	set_limit(RLIMIT_CPU, 2);
-	set_limit(RLIMIT_AS, 2000000);
-	test_parse_repeat('a',600000);
-	}
-	if (0)
-	{
-	set_limit(RLIMIT_CPU, 1);
-	set_limit(RLIMIT_AS, 2000000);
-	test_parse_repeat(' ',300000000);
-	}
-	if (0)
-	{
-	set_limit(RLIMIT_CPU, 1);
-	set_limit(RLIMIT_AS, 2000000);
-	test_parse_repeat('(',300000000);
-	}
-
-	}
-
 void test_buf(int max)
 	{
 	printf(": Buffering %d bytes\n", max);
@@ -428,11 +274,11 @@ void test_all_buf(void)
 
 value context(value x)
 	{
-	struct sym *sym = atom_sym(x);
+	struct sym *sym = get_sym(x);
 	if (sym->line < 0)
 		return sym->name; /* literal string */
 
-	const char *name = atom_str(sym->name)->data;
+	const char *name = get_str(sym->name)->data;
 	if (strcmp(name,"ping") == 0)
 		return ping;
 
@@ -452,21 +298,24 @@ void test_resolve(value f)
 	drop(g);
 	}
 
-void run_tests(void)
+void test_all_resolve(void)
 	{
-	test_math();
-	test_all_str();
-	test_all_eval();
-	test_all_lam();
-	test_all_parse();
-	test_all_buf();
-
 	test_resolve(app(x,y));
 	test_resolve(app(y,x));
 	test_resolve(app(Qsym0("x",-1),Qsym0("y",-2)));
 	test_resolve(Qsym0("ping",2));
 	test_resolve(app(Qsym0("ping",2),Qsym0("ping",4)));
 	test_resolve(app(Qsym0("ping",2),Qsym0("pingx",4)));
+	}
+
+void run_tests(void)
+	{
+	test_math();
+	test_all_str();
+	test_all_eval();
+	test_all_lam();
+	test_all_buf();
+	test_all_resolve();
 	}
 
 int main(void)

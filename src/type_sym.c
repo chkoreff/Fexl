@@ -1,8 +1,7 @@
-#include <memory.h>
-#include <str.h>
-
 #include <value.h>
 #include <basic.h>
+#include <memory.h>
+#include <str.h>
 #include <type_str.h>
 #include <type_sym.h>
 
@@ -10,16 +9,16 @@ value type_sym(value f)
 	{
 	if (!f->N)
 		{
-		struct sym *sym = atom_sym(f);
+		struct sym *sym = get_sym(f);
 		drop(sym->name);
 		free_memory(sym,sizeof(struct sym));
 		}
 	return f;
 	}
 
-struct sym *atom_sym(value f)
+struct sym *get_sym(value f)
 	{
-	return (struct sym *)atom_data(f,type_sym);
+	return (struct sym *)get_data(f,type_sym);
 	}
 
 value Qsym(struct str *name, int line)
@@ -28,7 +27,7 @@ value Qsym(struct str *name, int line)
 	sym->name = Qstr(name);
 	hold(sym->name);
 	sym->line = line;
-	return atom(type_sym,sym);
+	return V(type_sym,0,(value)sym);
 	}
 
 value Qsym0(const char *name, int line)
@@ -44,7 +43,7 @@ static int same_sign(int x, int y)
 int sym_eq(struct sym *x, struct sym *y)
 	{
 	return same_sign(x->line,y->line)
-		&& str_eq(atom_str(x->name),atom_str(y->name));
+		&& str_eq(get_str(x->name),get_str(y->name));
 	}
 
 /* Apply f to g, where either can be a symbolic form. */
@@ -86,7 +85,7 @@ static value abstract(value sym, value body)
 		return A(C,body);
 	else if (body->L == 0)
 		{
-		if (sym_eq(atom_sym(sym),atom_sym(body)))
+		if (sym_eq(get_sym(sym),get_sym(body)))
 			return I;  /* (\x x) = I */
 		else
 			return app(C,body);

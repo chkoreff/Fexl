@@ -1,3 +1,4 @@
+[
 : str_eq "hi" "hi" = 1
 : str_eq "hi" "bye" = 0
 : str_eq "hi" "hi" = 1
@@ -34,8 +35,8 @@
 : eval (((S C) C) C)
 = C
 
-: eval (((S C) S) Y)
-= Y
+: eval (((S C) S) @)
+= @
 
 : eval (((S C) "hi") {x})
 = {x}
@@ -189,49 +190,6 @@ ping!
 : lam {x} {{S {x}} {(L I) {x}}}
 = ((S S) (L I))
 
-: parse file test/in/a1
-= {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{x} {y}} {<=}} {abcdefghijklmnopqrstuvwxyz}} {a}} {"
-"}} {""}} {"a"}} {""}} {"a"}} {"a"}} {"hi"}} {x}} {"a"}} {"abcdABA"}} {"
-"}} {"AABABC"}} {ABCD}} {"
-"}} {""Ain't nothin' simple when you're doin' it for real." (Gus Baird)"}} {"
-"}} {"My fathers sleep on the sunrise plains,
-And each one sleeps alone.
-Their trails may dim to the grass and rains,
-For I choose to make my own.
-I lay proud claim to their blood and name,
-But I lean on no dead kin;
-My name is mine, for the praise or scorn,
-And the world began when I was born
-And the world is mine to win. ...
-
-  (Badger Clark, "The Westerner")
-"}} {"hello"}} {"
-"}} {""hello""}} {"
-"}} {"~(1) "hello"(1)"}} {"
-"}} {"~(2) ~(1) "hello"(1)(2)"}} {"
-"}} {abcd}} {ef}} {47.806}} {99}} {-22}} {{{a} {{b} {c}}} {{{{d} {e}} {{f} {g}}} {h}}}}
-  line 59
-
-: parse file test/in/a2
-= {{{{{{{{{{{{{{((((I L) R) S) (C I)) {y}} ((C S) I)} S} ((S I) I)} {C {y}}} S} {"
-"}} (((S S) I) ((L R) ((S I) I)))} {"
-"}} ((L R) ((S I) I))} {"
-"}} ((C I) ((L R) ((S I) I)))} {"
-"}} {{cons {1}} {{cons {{cons {2}} {{cons {3}} C}}} {(cons C) {{cons {{cons {4}} C}} {{cons {"hi"}} {{{append} {x}} {y}}}}}}}}
-  line 50
-
-: parse repeat 'a' 60
-= {aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa}
-  line 1
-
-: parse repeat 'a' 1
-= {a}
-  line 1
-
-: parse repeat 'a' 0
-= I
-  line 1
-
 : Buffering 0 bytes
   null
 
@@ -272,3 +230,187 @@ And the world is mine to win. ...
   The form has undefined symbols.
 = {(I ping) {pingx}}
 
+]
+[
+] exit 0
+[
+Unclosed string on line 2
+] exit 1
+[
+Unclosed string on line 1
+] exit 1
+[
+Incomplete string terminator on line 1
+] exit 1
+[
+Unclosed parenthesis on line 1
+] exit 1
+[
+Unclosed bracket on line 2
+] exit 1
+[
+Unclosed brace on line 2
+] exit 1
+[
+Missing lambda symbol on line 1
+] exit 1
+[
+Missing lambda symbol on line 1
+] exit 1
+[
+Missing definition on line 2
+] exit 1
+[
+Extraneous input on line 4
+] exit 1
+[
+25
+] exit 0
+[
+===
+C
+S
+I
+F
+C
+R
+L
+@
+@
+later
+?
+halt
+pair
+cons
+show
+nl
+print
+say
+long_add
+long_sub
+long_mul
+long_div
+order
+===
+source_label = test/in/a1
+source_line = 196
+===
+Hello world.
+x = 42
+47
+37
+210
+8
+0
+-1
+0
+1
+47
+37
+210
+8
+0
+285
+lt
+eq
+gt
+Aa
+Hello world.
+===
+ping!
+ping!
+ping!
+ping!
+===
+ping!
+ping!
+ping!
+===
+xyzxyz!
+===
+"Ain't nothin' simple when you're doin' it for real." (Gus Baird)
+
+"My fathers sleep on the sunrise plains,
+And each one sleeps alone.
+Their trails may dim to the grass and rains,
+For I choose to make my own.
+I lay proud claim to their blood and name,
+But I lean on no dead kin;
+My name is mine, for the praise or scorn,
+And the world began when I was born
+And the world is mine to win. ..."
+
+  (Badger Clark, "The Westerner")
+
+===
+hello
+"hello"
+~(1) "hello"(1)
+~(2) ~(1) "hello"(1)(2)
+===
+C
+I
+L
+R
+S
+
+R
+S
+
+(C I)
+"y"
+((C S) I)
+S
+((S I) I)
+(C "y")
+(((S S) I) ((L R) ((S I) I)))
+((L R) ((S I) I))
+((C I) ((L R) ((S I) I)))
+===
+(I {"x"})
+(I {x})
+(I {{x} {y}})
+(I {{{{x} {y}} {<=}} {abcdefghijklmnopqrstuvwxyz}})
+(I {{cons {1}} {{cons {{cons {2}} {{cons {3}} C}}} {(cons C) {{cons {{cons {4}} C}} {{cons {"hi"}} {{{append} {x}} {y}}}}}}})
+(I {{{{{{abcd} {ef}} {47.806}} {99}} {-22}} {{{a} {{b} {c}}} {{{{d} {e}} {{f} {g}}} {h}}}})
+(I {"
+"})
+(I {""})
+(I {"a"})
+(I {"a"})
+(I {""})
+(I {"a"})
+(I {{"hi"} {x}})
+(I {"a"})
+(I {"abcdABA"})
+(I {{"AABABC"} {ABCD}})
+===
+(((S I) I) ((I say) "ping!"))
+(S C)
+((I S) C)
+(((((L ((R R) R)) (L I)) I) S) C)
+(((R I) S) C)
+] exit 0
+[
+Undefined symbol aa on line 1
+Undefined symbol bb on line 1
+Undefined symbol c on line 2
+] exit 1
+[
+Segmentation fault
+] exit 139
+[
+Your program ran out of memory.
+] exit 1
+[
+Killed
+] exit 137
+[
+Killed
+] exit 137
+[
+Segmentation fault
+] exit 139
+[
+Killed
+] exit 137

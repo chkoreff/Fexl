@@ -5,7 +5,7 @@ struct sym
 	};
 
 extern value type_sym(value f);
-extern struct sym *atom_sym(value f);
+extern struct sym *get_sym(value f);
 extern value Qsym(struct str *name, int line);
 extern value Qsym0(const char *name, int line);
 extern int sym_eq(struct sym *x, struct sym *y);

@@ -1,33 +1,100 @@
 #
+\: = (\x show x nl)
 
-x y <=
-abcdefghijklmnopqrstuvwxyz
-a
-"
+say "==="
+(
+: C
+: S
+: I
+: F
+: T
+: R
+: L
+: @
+: Y
+: later
+: ?
+: halt
+: pair
+: cons
+: show
+: nl
+: print
+: say
+: long_add
+: long_sub
+: long_mul
+: long_div
+: order
+)
+
+\NL="
 "
 
-""
-"a"
+say "==="
+say ["source_label = " source_label]
+say ["source_line = " source_line]
 
-~" "
-~" a"
-~| a|
-"hi"x
-~EOM aEOM
-~ABC abcdABAABC
-"
-"
-~ABCD AABABCABCDABCD
+(
+say "==="
+\x=42
+say ["Hello world." NL "x = " x]
+say (long_add x 5)
+say (long_sub x 5)
+say (long_mul x 5)
+say (long_div x 5)
+say (long_div x 0)
+say (long_cmp 2 3)
+say (long_cmp 2 2)
+say (long_cmp 3 2)
 
-"
-"
+say (+ x 5)
+say (- x 5)
+say (* x 5)
+say (/ x 5)
+say (/ x 0)
 
-~| "Ain't nothin' simple when you're doin' it for real." (Gus Baird)|
-"
-"
+say (long_string 285)
+say (order -5 "lt" "eq" "gt")
+say (order 0 "lt" "eq" "gt")
+say (order 1 "lt" "eq" "gt")
 
-~@
-My fathers sleep on the sunrise plains,
+say [(long_char 65) (long_char 97)]
+
+\who="world"
+print "Hello "
+print [who"."]
+print NL
+)
+
+say "==="
+# Test deferred evaluation with "later".
+
+\ping=(say "ping!")
+
+\g==
+	(
+	\f=(ping ping)
+	later (f f)
+	)
+g
+
+say "==="
+# Test eager evaluation.
+\f==(ping ping ping)
+
+
+say "==="
+\append=(@\append\xs\ys xs ys \x\xs cons x; append xs ys)
+\list=(append ["x" "y"] ["z"])
+\list=(append list; append list; ["!"])
+say list
+
+say "==="
+say ~| "Ain't nothin' simple when you're doin' it for real." (Gus Baird)|
+nl
+say ~@
+"My fathers sleep on the sunrise plains,
 And each one sleeps alone.
 Their trails may dim to the grass and rains,
 For I choose to make my own.
@@ -35,24 +102,96 @@ I lay proud claim to their blood and name,
 But I lean on no dead kin;
 My name is mine, for the praise or scorn,
 And the world began when I was born
-And the world is mine to win. ...
+And the world is mine to win. ..."
 
   (Badger Clark, "The Westerner")
 @
 
+say "==="
 # Multiple layers of quotation.
+say "hello"
+say ~(1) "hello"(1)
+say ~(2) ~(1) "hello"(1)(2)
+say ~(3) ~(2) ~(1) "hello"(1)(2)(3)
 
-"hello"
-"
-"
-~(1) "hello"(1)
-"
-"
-~(2) ~(1) "hello"(1)(2)
-"
-"
-~(3) ~(2) ~(1) "hello"(1)(2)(3)
-"
-"
+say "==="
+: (\x\y x)
+: (\x x)
+: (\x\y\z x z y)
+: (\x\y\z x (y z))
+: (\x\y\z x z (y z))
+nl
+: (\x\y\z x; y z)
+: (\x\y\z x z; y z)
+nl
+: (\x)
+: (\x="y" x)
+: (
+\I=(\x x)
+\S=(\x\y\z x z (y z))
+S
+)
+: (
+\S=(\x\y\z x z (y z))
+S
+)
+: (\x x x)
+: (\x "y")
+: (
+\Q=(\x\y x (y y))
+\f Q f (Q f)
+)
+: (
+\q=(\x\y x (y y))
+q
+)
+: (
+\q=(\x\y x (y y))
+)
+
+say "==="
+# Show symbolic forms.
+
+: {"x"}
+: {x}
+: {x y}
+: {
+x y <=
+abcdefghijklmnopqrstuvwxyz
+}
+: {[1 [2 3] [] [4] "hi"; append x y]}
+:
+{
 abcd ef 47.806 99 -22
 (a (b c); d e (f g) h)
+}
+: {"
+"}
+: {""}
+: {"a"}
+: {~" a"}
+: {~" "}
+
+: {~| a|}
+: {"hi"x}
+: {~EOM aEOM}
+
+# Tricky string terminators here
+: {~ABC abcdABAABC}
+: {~ABCD AABABCABCDABCD}
+
+say "==="
+# Show some applicative forms.
+
+: (ping ping)
+
+# TODO If you pound out any of these forms, it causes large differences in
+# how the others are displayed.
+
+: (S C)
+: (S C)
+: (I (C S))
+: (I (S C))
+
+\\
+Extra stuff not parsed.
