@@ -1,7 +1,7 @@
 #
 \: = (\x show x nl)
 
-say "===" # TODO if this goes in the parens we see (I say)
+say "===" # TODO if this goes inside the parens we see (I say)
 (
 : C
 : S
@@ -31,6 +31,7 @@ say "===" # TODO if this goes in the parens we see (I say)
 : stderr
 : pi
 : -2.06
+: setrlimit
 )
 
 \NL="
@@ -217,6 +218,24 @@ set x (double_add (get x) 5.0)
 : x
 
 say ["x = " x]
+
+say "==="
+say ["RLIMIT_AS = " RLIMIT_AS]
+say ["RLIMIT_CORE = " RLIMIT_CORE]
+say ["RLIMIT_CPU = " RLIMIT_CPU]
+say ["RLIMIT_DATA = " RLIMIT_DATA]
+say ["RLIMIT_FSIZE = " RLIMIT_FSIZE]
+say ["RLIMIT_LOCKS = " RLIMIT_LOCKS]
+say ["RLIMIT_MEMLOCK = " RLIMIT_MEMLOCK]
+say ["RLIMIT_MSGQUEUE = " RLIMIT_MSGQUEUE]
+say ["RLIMIT_NICE = " RLIMIT_NICE]
+say ["RLIMIT_NOFILE = " RLIMIT_NOFILE]
+say ["RLIMIT_NPROC = " RLIMIT_NPROC]
+say ["RLIMIT_RSS = " RLIMIT_RSS]
+say ["RLIMIT_RTPRIO = " RLIMIT_RTPRIO]
+say ["RLIMIT_RTTIME = " RLIMIT_RTTIME]
+say ["RLIMIT_SIGPENDING = " RLIMIT_SIGPENDING]
+say ["RLIMIT_STACK = " RLIMIT_STACK]
 
 \\
 Extra stuff not parsed.

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <str.h>
 #include <show.h>
+#include <system.h>
 #include <type_double.h>
 #include <type_file.h>
 #include <type_long.h>
@@ -79,6 +80,8 @@ int show_atom_default(value f)
 		else
 			printf("{\"%s\"}",get_str(sym->name)->data);
 		}
+	else if (f->T == type_setrlimit)
+		printf("setrlimit");
 	else
 		return 0;
 

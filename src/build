@@ -104,7 +104,7 @@ for file_dep in `find ../cache/h -type f 2>/dev/null | sort`; do
 done
 
 # List of updated modules that are main programs.
-list_main=""
+update_main=""
 
 # Compile any .c files that are out of date.
 for file_c in `find . -name "*.c" | sort`; do
@@ -118,18 +118,33 @@ for file_c in `find . -name "*.c" | sort`; do
 		trace Compile $module
 		run $compile $include $file_c -o $file_o
 
-		erase ../cache/o/$file_c
+		erase ../cache/o/$module
 		grep -q "^int main(" $file_c
 		if [ $? -eq 0 ]; then
 			module=${file_c%.c}
-			list_main="$list_main $module"
+			update_main="$update_main $module"
 		fi
 	fi
 done
 
+# Update any main caches that are out of date with respect to their .o files.
+for file_cache in `find ../cache/o -type f 2>/dev/null | sort`; do
+	module=${file_cache#../cache/o/}
+	objects=`cat $file_cache`
+
+	for object in $objects; do
+		stale $file_cache $object
+		if [ $? -eq 0 ]; then
+			erase ../cache/o/$module
+			update_main="$update_main $module"
+			break
+		fi
+	done
+done
+
 # Update the list of .o files that need to be linked with any updated main
 # programs.  This does a transitive closure of the .h dependencies.
-for main_module in $list_main; do
+for main_module in $update_main; do
 	need_modules=$main_module
 	queue=$main_module
 	while [ "$queue" != "" ]; do

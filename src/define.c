@@ -3,11 +3,11 @@
 #include <basic.h>
 #include <define.h>
 #include <die.h>
-#include <fexl.h>
 #include <file.h>
 #include <show.h>
 #include <str.h>
 #include <string.h>
+#include <sys/resource.h>
 #include <system.h>
 #include <type_double.h>
 #include <type_file.h>
@@ -16,19 +16,64 @@
 #include <type_sym.h>
 #include <type_var.h>
 
-static const char *curr_name;
+const char *curr_name;
 
-static int match(const char *name)
+int match(const char *other)
 	{
-	return strcmp(curr_name,name) == 0;
+	return strcmp(curr_name,other) == 0;
 	}
 
-static int starts(const char *prefix)
+int starts(const char *prefix)
 	{
 	return strncmp(curr_name,prefix,strlen(prefix)) == 0;
 	}
 
-static value define_name(const char *name)
+value define_long(void)
+	{
+	if (match("long_add")) return Q(type_long_add);
+	if (match("long_sub")) return Q(type_long_sub);
+	if (match("long_mul")) return Q(type_long_mul);
+	if (match("long_div")) return Q(type_long_div);
+	if (match("long_cmp")) return Q(type_long_cmp);
+	if (match("long_string")) return Q(type_long_string);
+	if (match("long_char")) return Q(type_long_char);
+	return 0;
+	}
+
+value define_double(void)
+	{
+	if (match("double_add")) return Q(type_double_add);
+	if (match("double_sub")) return Q(type_double_sub);
+	if (match("double_mul")) return Q(type_double_mul);
+	if (match("double_div")) return Q(type_double_div);
+	if (match("double_cmp")) return Q(type_double_cmp);
+	if (match("double_string")) return Q(type_double_string);
+	if (match("double_long")) return Q(type_double_long);
+	return 0;
+	}
+
+value define_RLIMIT(void)
+	{
+	if (match("RLIMIT_AS")) return Qlong(RLIMIT_AS);
+	if (match("RLIMIT_CORE")) return Qlong(RLIMIT_CORE);
+	if (match("RLIMIT_CPU")) return Qlong(RLIMIT_CPU);
+	if (match("RLIMIT_DATA")) return Qlong(RLIMIT_DATA);
+	if (match("RLIMIT_FSIZE")) return Qlong(RLIMIT_FSIZE);
+	if (match("RLIMIT_LOCKS")) return Qlong(RLIMIT_LOCKS);
+	if (match("RLIMIT_MEMLOCK")) return Qlong(RLIMIT_MEMLOCK);
+	if (match("RLIMIT_MSGQUEUE")) return Qlong(RLIMIT_MSGQUEUE);
+	if (match("RLIMIT_NICE")) return Qlong(RLIMIT_NICE);
+	if (match("RLIMIT_NOFILE")) return Qlong(RLIMIT_NOFILE);
+	if (match("RLIMIT_NPROC")) return Qlong(RLIMIT_NPROC);
+	if (match("RLIMIT_RSS")) return Qlong(RLIMIT_RSS);
+	if (match("RLIMIT_RTPRIO")) return Qlong(RLIMIT_RTPRIO);
+	if (match("RLIMIT_RTTIME")) return Qlong(RLIMIT_RTTIME);
+	if (match("RLIMIT_SIGPENDING")) return Qlong(RLIMIT_SIGPENDING);
+	if (match("RLIMIT_STACK")) return Qlong(RLIMIT_STACK);
+	return 0;
+	}
+
+value define_name(const char *name)
 	{
 	curr_name = name;
 
@@ -64,29 +109,8 @@ static value define_name(const char *name)
 	if (match("?")) return query;
 	if (match("halt")) return Q(type_halt);
 
-	if (starts("long_"))
-		{
-		if (match("long_add")) return Q(type_long_add);
-		if (match("long_sub")) return Q(type_long_sub);
-		if (match("long_mul")) return Q(type_long_mul);
-		if (match("long_div")) return Q(type_long_div);
-		if (match("long_cmp")) return Q(type_long_cmp);
-		if (match("long_string")) return Q(type_long_string);
-		if (match("long_char")) return Q(type_long_char);
-		return 0;
-		}
-
-	if (starts("double_"))
-		{
-		if (match("double_add")) return Q(type_double_add);
-		if (match("double_sub")) return Q(type_double_sub);
-		if (match("double_mul")) return Q(type_double_mul);
-		if (match("double_div")) return Q(type_double_div);
-		if (match("double_cmp")) return Q(type_double_cmp);
-		if (match("double_string")) return Q(type_double_string);
-		if (match("double_long")) return Q(type_double_long);
-		return 0;
-		}
+	if (starts("long_")) return define_long();
+	if (starts("double_")) return define_double();
 
 	if (match("order")) return Q(type_order);
 	if (match("show")) return Q(type_show);
@@ -116,6 +140,9 @@ static value define_name(const char *name)
 	if (match("stderr")) return Qfile(stderr);
 
 	if (match("base_path")) return Qstr(base_path());
+
+	if (match("setrlimit")) return Q(type_setrlimit);
+	if (starts("RLIMIT_")) return define_RLIMIT();
 	return 0;
 	}
 

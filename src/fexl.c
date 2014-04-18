@@ -3,18 +3,10 @@
 #include <basic.h>
 #include <define.h>
 #include <die.h>
-#include <fexl.h>
 #include <parse.h>
 #include <str.h>
+#include <system.h>
 #include <type_sym.h>
-
-int argc;
-char **argv;
-char **envp;
-
-FILE *source_fh;
-const char *source_label;
-int source_line;
 
 /*TODO make a parse_file routine */
 static int get_ch(void)

@@ -296,9 +296,10 @@ file:1
 file:2
 3.14159265358979
 -2.06
+setrlimit
 ===
 source_label = test/in/a1
-source_line = 221
+source_line = 240
 ===
 Hello world.
 x = 42
@@ -407,6 +408,23 @@ var:C
 12.6
 (I var:17.6)
 x = 17.6
+===
+RLIMIT_AS = 9
+RLIMIT_CORE = 4
+RLIMIT_CPU = 0
+RLIMIT_DATA = 2
+RLIMIT_FSIZE = 1
+RLIMIT_LOCKS = 10
+RLIMIT_MEMLOCK = 8
+RLIMIT_MSGQUEUE = 12
+RLIMIT_NICE = 13
+RLIMIT_NOFILE = 7
+RLIMIT_NPROC = 6
+RLIMIT_RSS = 5
+RLIMIT_RTPRIO = 14
+RLIMIT_RTTIME = 15
+RLIMIT_SIGPENDING = 11
+RLIMIT_STACK = 3
 ] exit 0
 [
 Undefined symbol aa on line 1
