@@ -52,32 +52,35 @@ erase()
 	done
 	}
 
-# We compile with -O3 because that enables -finline-functions.  You can see
-# that by running "gcc -c -Q -O3 --help=optimizers".
+# I compile with -O3 because that enables -finline-functions.  You can see that
+# by running "gcc -c -Q -O3 --help=optimizers".
 #
-# We compile with -fdata-sections and -ffunction-sections so the linker can
+# I compile with -fdata-sections and -ffunction-sections so the linker can
 # prune any unused data or functions with -Wl,--gc-sections.
 #
-# NOTE: We no longer use either the -std=c99 or -ansi option because that makes
-# the fdopen function inaccessible in stdio.h, and makes readlink inaccessible
-# in unistd.h (on Debian anyway).
+# I use -std=c99 instead of -ansi because I want (1) mixed declarations and
+# code, and (2) flexible array members (e.g. for string structure).
+#
+# I compile with -Wconversion to catch possible errors with different size
+# integer types.
 
-compile="gcc -c -Wall -Werror -Wunused-parameter \
+compile="gcc -c -Wall -Werror -Wunused-parameter -Wconversion \
+-std=c99 -pedantic \
 -fdata-sections -ffunction-sections -O3"
 
 link="gcc -s -Wl,--gc-sections"
 
-# NOTE: include and find_module can be customized in "options".
 include="-I ."
 
+# This defines the linkage for special include files.
 find_module()
 	{
+	local module="$1"
+	case $module in
+		math) echo -lm
+	esac
 	return
 	}
-
-if [ -e options ]; then
-	. ./options
-fi
 
 # Establish .h dependencies for all .c files.
 for file_c in `find . -name "*.c" | sort`; do

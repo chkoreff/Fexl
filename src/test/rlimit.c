@@ -1,5 +1,5 @@
 #include <die.h>
-#include <stdio.h>
+#include <stdio.h> /* perror */
 #include <sys/resource.h>
 #include <test/rlimit.h>
 
@@ -22,7 +22,7 @@ void set_limit(int resource, rlim_t limit)
 	if (status != 0)
 		{
 		perror("getrlimit");
-		die(0);
+		die("");
 		}
 
 	rlim.rlim_cur = limit;
@@ -30,8 +30,8 @@ void set_limit(int resource, rlim_t limit)
 	if (status != 0)
 		{
 		perror("setrlimit");
-		die(0);
+		die("");
 		}
 	}
 
-/*TODO unlimit (restore to hard limit) */
+/*LATER unlimit (restore to hard limit) */

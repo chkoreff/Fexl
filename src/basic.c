@@ -1,53 +1,56 @@
 #include <value.h>
+
 #include <basic.h>
 
 /* C x y = x */
 value type_C(value f)
 	{
-	if (!f->L || !f->L->L) return f;
-	return f->L->R;
+	if (!f->L || !f->L->L) return 0;
+	return hold(f->L->R);
 	}
 
 /* S x y z = x z (y z) */
 value type_S(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return f;
-	return apply(apply(f->L->L->R,f->R),A(f->L->R,f->R));
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	return apply(
+		apply(hold(f->L->L->R),hold(f->R)),
+		A(hold(f->L->R),hold(f->R)));
 	}
 
 /* I x = x */
 value type_I(value f)
 	{
-	if (!f->L) return f;
-	return f->R;
+	if (!f->L) return 0;
+	return hold(f->R);
 	}
 
 /* F x = I. In other words, F x y = y. */
 value type_F(value f)
 	{
-	if (!f->L) return f;
-	return I;
+	if (!f->L) return 0;
+	return hold(I);
 	}
 
 /* R x y z = x (y z) */
 value type_R(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return f;
-	return apply(f->L->L->R,A(f->L->R,f->R));
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	return apply(hold(f->L->L->R),A(hold(f->L->R),hold(f->R)));
 	}
 
 /* L x y z = x z y */
 value type_L(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return f;
-	return apply(apply(f->L->L->R,f->R),f->L->R);
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	return apply(apply(hold(f->L->L->R),hold(f->R)),hold(f->L->R));
 	}
 
 /* Y x = x (Y x) */
 value type_Y(value f)
 	{
-	if (!f->L) return f;
-	return apply(f->R,f);
+	if (!f->L) return 0;
+	return apply(hold(f->R),hold(f));
 	}
 
 /* (later x) delays evaluation of x.  It is used to return a function which
@@ -55,60 +58,31 @@ should be evaluated later.  The query function recognizes the (later x) form
 and peels off the outer "later" layer. */
 value type_later(value f)
 	{
-	return f;
+	(void)f;
+	return 0;
 	}
 
 /* (query x y) = y x, except x is evaluated first. */
 value type_query(value f)
 	{
-	if (!f->L || !f->L->L) return f;
-	value x = eval(f->L->R);
+	if (!f->L || !f->L->L) return 0;
+	value x = arg(f->L->R);
 	value xp = (x->T == type_later && x->R) ? x->R : x;
-	value z = apply(f->R,xp);
+	value z = apply(hold(f->R),hold(xp));
 	drop(x);
 	return z;
-	}
-
-/* halt just absorbs any arguments without doing anything. */
-value type_halt(value f)
-	{
-	return f;
-	}
-
-/* pair x y F = F x y */
-value type_pair(value f)
-	{
-	if (!f->L || !f->L->L || !f->L->L->L) return f;
-	return apply(apply(f->R,f->L->L->R),f->L->R);
 	}
 
 /* (cons x y) F G = G x y */
 value type_cons(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return f;
-	return apply(apply(f->R,f->L->L->L->R),f->L->L->R);
+	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
+	return apply(apply(hold(f->R),hold(f->L->L->L->R)),hold(f->L->L->R));
 	}
 
-/* (yes x F G) = (G x) */
-value type_yes(value f)
+value Qboolean(int x)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return f;
-	return A(f->R,f->L->L->R);
-	}
-
-value pair(value x, value y)
-	{
-	return V(type_pair,V(type_pair,Qpair,x),y);
-	}
-
-value cons(value x, value y)
-	{
-	return V(type_cons,V(type_cons,Qcons,x),y);
-	}
-
-value maybe(value x)
-	{
-	return x ? V(type_yes,yes,x) : C;
+	return hold(x ? C : F);
 	}
 
 value C;
@@ -117,10 +91,9 @@ value I;
 value R;
 value L;
 value Y;
+value F;
 value query;
-value Qpair;
 value Qcons;
-value yes;
 
 void beg_basic(void)
 	{
@@ -130,21 +103,9 @@ void beg_basic(void)
 	R = Q(type_R);
 	L = Q(type_L);
 	Y = Q(type_Y);
+	F = Q(type_F);
 	query = Q(type_query);
-	Qpair = Q(type_pair);
 	Qcons = Q(type_cons);
-	yes = Q(type_yes);
-
-	hold(C);
-	hold(S);
-	hold(I);
-	hold(R);
-	hold(L);
-	hold(Y);
-	hold(query);
-	hold(Qpair);
-	hold(Qcons);
-	hold(yes);
 	}
 
 void end_basic(void)
@@ -155,8 +116,7 @@ void end_basic(void)
 	drop(R);
 	drop(L);
 	drop(Y);
+	drop(F);
 	drop(query);
-	drop(Qpair);
 	drop(Qcons);
-	drop(yes);
 	}

@@ -1,54 +1,71 @@
 #!/bin/sh
-verbose=0 ./build
+verbose=0 ./build || exit
 
-echo "["
+beg_test()
+	{
+	echo "["
+	}
+
+end_test()
+	{
+	local code=$?
+	local status
+	if [ $code -eq 0 ]; then
+		status=good
+	else
+		status=bad
+	fi
+	echo "] $status"
+	}
+
+beg_test
 ../bin/test/internal
-echo "]"
+end_test
 
 # Empty program
-echo "["
+beg_test
 (
 echo -n "" | ../bin/fexl
 ) 2>&1
-echo "] exit $?"
+end_test
 
 # Unclosed string
-echo "["
+beg_test
 (
 cat <<'EOM' | ../bin/fexl
 
 "x
 EOM
 ) 2>&1
-echo "] exit $?"
+end_test
 
 # Unclosed string
-echo "["
+beg_test
 (
 cat <<'EOM' | ../bin/fexl
 ~| x
 EOM
 ) 2>&1
-echo "] exit $?"
+end_test
 
 # Incomplete string terminator
-echo "["
+beg_test
 (
 echo -n "~ABCD" | ../bin/fexl
 ) 2>&1
-echo "] exit $?"
+end_test
 
 # Unclosed parentheses
-echo "["
+beg_test
 (
 cat <<'EOM' | ../bin/fexl
 ((x y)
 EOM
 ) 2>&1
-echo "] exit $?"
+end_test
 
 # Unclosed bracket
-echo "["
+beg_test
 (
 cat <<'EOM' | ../bin/fexl
 say
@@ -56,10 +73,10 @@ say
 ["x" "y"] [2 3]
 EOM
 ) 2>&1
-echo "] exit $?"
+end_test
 
 # Unclosed brace
-echo "["
+beg_test
 (
 cat <<'EOM' | ../bin/fexl
 # stuff
@@ -67,28 +84,28 @@ cat <<'EOM' | ../bin/fexl
 y
 EOM
 ) 2>&1
-echo "] exit $?"
+end_test
 
 # Missing lambda symbol
-echo "["
+beg_test
 (
 cat <<'EOM' | ../bin/fexl
 \
 EOM
 ) 2>&1
-echo "] exit $?"
+end_test
 
 # Missing lambda symbol
-echo "["
+beg_test
 (
 cat <<'EOM' | ../bin/fexl
 \=(x y)
 EOM
 ) 2>&1
-echo "] exit $?"
+end_test
 
 # Missing definition
-echo "["
+beg_test
 (
 cat <<'EOM' | ../bin/fexl
 \x=(+ 2 3)
@@ -96,10 +113,10 @@ cat <<'EOM' | ../bin/fexl
 \z=(- 7 8)
 EOM
 ) 2>&1
-echo "] exit $?"
+end_test
 
 # Extraneous input
-echo "["
+beg_test
 (
 cat <<'EOM' | ../bin/fexl
 \x=(+ 2 3)
@@ -108,10 +125,10 @@ say (* x x)
 )
 EOM
 ) 2>&1
-echo "] exit $?"
+end_test
 
 # Say "25"
-echo "["
+beg_test
 (
 cat <<'EOM' | ../bin/fexl
 \x=(+ 2 3)
@@ -120,54 +137,66 @@ say (* x x)
 Extra stuff down here not parsed.
 EOM
 ) 2>&1
-echo "] exit $?"
+end_test
 
-# Run a file.
-echo "["
+beg_test
 (
 ../bin/fexl test/in/a1
 ) 2>&1
-echo "] exit $?"
+end_test
+
+beg_test
+cat <<'EOM' | ../bin/fexl test/in/a2
+Hixåabc
+dü≠m
+EOM
+end_test
+
+beg_test
+(
+../bin/fexl test/in/utf8
+) 2>&1
+end_test
 
 # undefined symbol
-echo "["
+beg_test
 (
 cat <<'EOM' | ../bin/fexl
 aa bb
 c
 EOM
 ) 2>&1
-echo "] exit $?"
+end_test
 
 # out of stack
-echo "["
+beg_test
 (
 ulimit -t 2
 ulimit -v 20000
 head -c 60000000 /dev/zero | tr "\000" '(' | ../bin/fexl
 ) 2>&1
-echo "] exit $?"
+end_test
 
 # out of memory
-echo "["
+beg_test
 (
 ulimit -t 2
 ulimit -v 20000
 head -c 60000000 /dev/zero | tr "\000" a | ../bin/fexl
 ) 2>&1
-echo "] exit $?"
+end_test
 
 # out of time
-echo "["
+beg_test
 (
 ulimit -t 1
 ulimit -v 20000
 head -c 300000000 /dev/zero | tr "\000" ' ' | ../bin/fexl
 ) 2>&1
-echo "] exit $?"
+end_test
 
 # out of time
-echo "["
+beg_test
 (
 ulimit -t 1
 ulimit -v 20000
@@ -176,10 +205,10 @@ cat <<'EOM' | ../bin/fexl
 inf
 EOM
 ) 2>&1
-echo "] exit $?"
+end_test
 
 # out of stack
-echo "["
+beg_test
 (
 ulimit -t 1
 ulimit -v 200000
@@ -187,17 +216,21 @@ cat <<'EOM' | ../bin/fexl
 @ @
 EOM
 ) 2>&1
-echo "] exit $?"
+end_test
 
 # Very slowly runs out of memory, so we limit time instead.
-echo "["
+beg_test
 (
 ulimit -t 1
 ulimit -v 20000
 cat <<'EOM' | ../bin/fexl
+\I=(\x x)
+\S=(\x\y\z x z; y z)
+\L=(\x\y\z x z y)
+\R=(\x\y\z x; y z)
 \y0=(L R (S I I))
 \Y=(S y0 y0)
 Y I
 EOM
 ) 2>&1
-echo "] exit $?"
+end_test

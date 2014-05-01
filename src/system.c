@@ -1,65 +1,78 @@
 #include <value.h>
-#include <stdio.h>
+
+#include <die.h>
 #include <basic.h>
-#include <stdlib.h>
-#include <sys/resource.h>
+#include <output.h>
+#include <parse.h>
+#include <stdio.h> /* fgetc fopen */
+#include <str.h>
 #include <system.h>
-#include <type_long.h>
 #include <type_str.h>
+#include <type_sym.h>
 
-int argc;
-char **argv;
-char **envp;
+const char *source_label; /* current name of source */
+unsigned long source_line; /* current line number */
 
-FILE *source_fh;
-const char *source_label;
-int source_line;
+static FILE *source_fh;
 
-value type_argv(value f)
+static int get_ch(void)
 	{
-	if (!f->L) return f;
-	value x = eval(f->R);
-	long i = get_long(x);
-	value z = Qstr0(i >= 0 && i < argc ? argv[i] : "");
-	drop(x);
-	return z;
+	return fgetc(source_fh);
 	}
 
-/*TODO env*/
-
-value type_exit(value f)
+value parse_file(const char *name)
 	{
-	if (!f->L) return f;
-	value x = eval(f->R);
-	long status = get_long(x);
-	drop(x);
-	exit(status);
-	return I;
+	source_label = name;
+	source_fh = source_label[0] ? fopen(source_label,"r") : stdin;
+	if (source_fh == 0)
+		{
+		beg_error();
+		put("Could not open file ");put(source_label);nl();
+		die("");
+		}
+
+	source_line = 1;
+	read_ch = get_ch;
+	return parse();
 	}
 
-/* (setrlimit resource soft hard) = status */
-value type_setrlimit(value f) /*TODO test*/
+value resolve_file(const char *name, value context(value))
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
-
-	value x = eval(f->L->L->R);
-	value y = eval(f->L->R);
-	value z = eval(f->R);
-
-	long resource = get_long(x);
-	struct rlimit rlim;
-	rlim.rlim_cur = get_long(y);
-	rlim.rlim_max = get_long(z);
-
-	int status = setrlimit(resource, &rlim);
-
-	drop(x);
-	drop(y);
-	drop(z);
-	return Qlong(status);
+	value f = resolve(parse_file(name),context);
+	if (f->T == type_sym)
+		die(""); /* Die if we saw any undefined symbols. */
+	return f;
 	}
 
-/*LATER more functions
-getenv
-setenv
-*/
+static void put_loc(unsigned long line)
+	{
+	put(" on line "); put_ulong(line);
+	if (source_label[0])
+		{
+		put(" of ");put(source_label);
+		}
+	nl();
+	}
+
+void syntax_error(const char *msg, unsigned long line)
+	{
+	beg_error();
+	put(msg); put_loc(line);
+	die("");
+	}
+
+void undefined_symbol(const char *name, unsigned long line)
+	{
+	target old = beg_error();
+	put("Undefined symbol "); put(name); put_loc(line);
+	end_error(old);
+	}
+
+value type_die(value f)
+	{
+	if (!f->L) return 0;
+	value x = arg(f->R);
+	die(get_str(x)->data);
+	drop(x);
+	return hold(I);
+	}

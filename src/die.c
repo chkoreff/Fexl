@@ -1,22 +1,14 @@
+#include <output.h>
+
 #include <die.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.h> /* exit */
 
-void warn(const char *format, ...)
+void die(const char *msg)
 	{
-	fflush(stdout);
-
-	if (format == 0) return;
-	va_list ap;
-	va_start(ap, format);
-	vfprintf(stderr, format, ap);
-	va_end(ap);
-	fputc('\n', stderr);
-	}
-
-void die(const char *format, ...)
-	{
-	warn(format);
+	beg_error();
+	if (msg[0])
+		{
+		put(msg);nl();
+		}
 	exit(1);
 	}

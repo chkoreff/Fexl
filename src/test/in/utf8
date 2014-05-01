@@ -1,0 +1,30 @@
+#
+
+# LATER: convert string to list of chars:
+# string_chars    # individual bytes
+# string_wchars   # UTF-8 multibyte sequences
+
+\test_utf =
+(
+say "== test_utf"
+
+\f = "hej
+åabcüdef
+ghij
+üä
+1≠0
+"
+
+\åabcüdef = "hej åabcüdef"
+\ghij = "hej ghij"
+\üä = "hej üä"
+\1≠0 = "hej 1≠0"
+
+say ["f = " f]
+say ["åabcüdef = " åabcüdef]
+say ["ghij = " ghij]
+say [ "üä = " üä]
+say ["1≠0 = " 1≠0]
+)
+
+test_utf

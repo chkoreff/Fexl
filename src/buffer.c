@@ -1,29 +1,32 @@
-#include <assert.h>
-#include <buf.h>
-#include <memory.h>
 #include <str.h>
+
+#include <buffer.h>
+#include <die.h>
+#include <limits.h>
+#include <memory.h>
 #include <string.h>
 
-void buf_start(struct buf *buf)
+void buf_start(buffer *buf)
 	{
 	buf->str = 0;
 	buf->pos = 0;
 	buf->next = 0;
 	}
 
-void buf_add(struct buf *buf, char ch)
+void buf_add(buffer *buf, char ch)
 	{
-	const int first = 8;
-	const int max = 1048576;
+	const unsigned long first = 8;
+	const unsigned long max = 1048576;
 
 	if (buf->str == 0)
 		buf->str = str_new(first);
 	else if (buf->pos == buf->str->len)
 		{
-		int size = 2 * buf->pos;
+		/* Safe because ULONG_MAX is guaranteed at least 2^32-1. */
+		unsigned long size = 2 * buf->pos;
 		if (size > max) size = max;
 
-		struct buf *new = new_memory(sizeof(struct buf));
+		buffer *new = new_memory(sizeof(buffer));
 		new->pos = 0; /* not used */
 		new->str = buf->str;
 		new->next = buf->next;
@@ -33,31 +36,31 @@ void buf_add(struct buf *buf, char ch)
 		buf->next = new;
 		}
 
-	assert(buf->pos < buf->str->len);
+	if (buf->pos >= buf->str->len) die("buf_add");
 	buf->str->data[buf->pos++] = ch;
 	}
 
 /* Clear the buffer and return its contents in a string, or 0 if empty. */
-struct str *buf_finish(struct buf *buf)
+string buf_finish(buffer *buf)
 	{
 	if (buf->str == 0)
 		return 0;
 
-	struct buf *list = buf->next;
+	buffer *list = buf->next;
 
 	/* Calculate total length. */
-	int len = buf->pos;
+	unsigned long len = buf->pos;
 	while (list)
 		{
+		if (list->str->len > ULONG_MAX - len) die("buf_finish");
 		len += list->str->len;
-		assert(len > 0);
 		list = list->next;
 		}
 
 	/* Copy chunks into result string. */
-	struct str *result = str_new(len);
+	string result = str_new(len);
 
-	int offset = len - buf->pos;
+	unsigned long offset = len - buf->pos;
 	memcpy(result->data + offset, buf->str->data, buf->pos);
 	str_free(buf->str);
 
@@ -68,9 +71,9 @@ struct str *buf_finish(struct buf *buf)
 		offset -= buf->str->len;
 		memcpy(result->data + offset, buf->str->data, buf->str->len);
 		str_free(buf->str);
-		struct buf *old = list;
+		buffer *old = list;
 		list = list->next;
-		free_memory(old, sizeof(struct buf));
+		free_memory(old, sizeof(buffer));
 		}
 
 	result->data[len] = '\000'; /* Add trailing NUL byte. */

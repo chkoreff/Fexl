@@ -1,39 +1,4 @@
 #
-\: = (\x show x nl)
-
-say "===" # TODO if this goes inside the parens we see (I say)
-(
-: C
-: S
-: I
-: F
-: T
-: R
-: L
-: @
-: Y
-: later
-: ?
-: halt
-: pair
-: cons
-: show
-: nl
-: print
-: say
-: long_add
-: long_sub
-: long_mul
-: long_div
-: order
-: stdin
-: stdout
-: stderr
-: pi
-: -2.06
-: setrlimit
-)
-
 \NL="
 "
 
@@ -45,36 +10,70 @@ say ["source_line = " source_line]
 say "==="
 \x=42
 say ["Hello world." NL "x = " x]
-say (long_add x 5)
-say (long_sub x 5)
-say (long_mul x 5)
-say (long_div x 5)
-say (long_div x 0)
-say (long_cmp 2 3)
-say (long_cmp 2 2)
-say (long_cmp 3 2)
-
 say (+ x 5)
 say (- x 5)
 say (* x 5)
 say (/ x 5)
 say (/ x 0)
 
-say (long_string 285)
-say (order -5 "lt" "eq" "gt")
-say (order 0 "lt" "eq" "gt")
-say (order 1 "lt" "eq" "gt")
+say "==="
+say (< 2 3 "T" "F")
+say (= 2 2 "T" "F")
+say (> 3 2 "T" "F")
+say (>= 3 4 "T" "F")
+say (>= 3 3 "T" "F")
+say (>= 3 2 "T" "F")
+say (= "x" "y" "T" "F")
+say (= "x" "x" "T" "F")
+say (< "x" "y" "T" "F")
+say (< "x" "x" "T" "F")
+say (< "y" "x" "T" "F")
+say (< "y" "" "T" "F")
+say (< "" "" "T" "F")
+say (< "" "x" "T" "F")
+say (<= "" "x" "T" "F")
+say (<= "x" "x" "T" "F")
+say (<= "x" "w" "T" "F")
+say (!= "x" "x" "T" "F")
+say (!= "x" "y" "T" "F")
+say (>= "x" "x" "T" "F")
+say (>= "x" "y" "T" "F")
+say (>= "x" "w" "T" "F")
+say (> "x" "x" "T" "F")
+say (> "x" "y" "T" "F")
+say (> "x" "w" "T" "F")
 
-say [(long_char 65) (long_char 97)]
+say "==="
+say (+ -9.77 4.8)
+say (- 211034.117654902 231.197659)
+say (* 1.85 2.63)
+say (round0; * 1.85 2.63)
+say (/ 130.08 2.63)
+say (/ (* 2 (+ (- 100000000000.00 0.01) 0.02)) 2)
+
+say (285)
+
+say ["A""a"]
+
+say (. "" "")
+say (. "" "a")
+say (. "a" "b")
+say (. "a" "")
+say (. "abcde" "fgh")
+
+say (length "")
+say (length "a")
+say (length "abc")
+say (length (. "ab" "c"))
 
 \who="world"
-print "Hello "
-print [who"."]
-print NL
+put "Hello "
+put [who"."]
+put NL
 )
 
 say "==="
-# Test deferred evaluation with "later".
+# Testing deferred evaluation with "later".
 
 \ping=(say "ping!")
 
@@ -121,121 +120,62 @@ say ~(2) ~(1) "hello"(1)(2)
 say ~(3) ~(2) ~(1) "hello"(1)(2)(3)
 
 say "==="
-: (\x\y x)
-: (\x x)
-: (\x\y\z x z y)
-: (\x\y\z x (y z))
-: (\x\y\z x z (y z))
-nl
-: (\x\y\z x; y z)
-: (\x\y\z x z; y z)
-nl
-: (\x)
-: (\x="y" x)
-: (
-\I=(\x x)
-\S=(\x\y\z x z (y z))
-S
-)
-: (
-\S=(\x\y\z x z (y z))
-S
-)
-: (\x x x)
-: (\x "y")
-: (
-\Q=(\x\y x (y y))
-\f Q f (Q f)
-)
-: (
-\q=(\x\y x (y y))
-q
-)
-: (
-\q=(\x\y x (y y))
-)
+(\x\y\z x; y z) ping say "hi"
+(\x\y\z x z; y z) put say "zzz"
+(\x) die say "q237"
+say (\x="y" x)
+say ""
+say "aa"
+put"
+"
+say "bb"
+say ~" a"
+say ~" "
+say ~"
+"
 
-say "==="
-# Show symbolic forms.
-
-: {"x"}
-: {x}
-: {x y}
-: {
-x y <=
-abcdefghijklmnopqrstuvwxyz
-}
-: {[1 [2 3] [] [4] "hi"; append x y]}
-:
-{
-abcd ef 47.806 99 -22
-(a (b c); d e (f g) h)
-}
-: {"
-"}
-: {""}
-: {"a"}
-: {~" a"}
-: {~" "}
-
-: {~| a|}
-: {"hi"x}
-: {~EOM aEOM}
+say ~| a|
+(\x="!" say ["hi"x])
+say ~EOM aEOM
 
 # Tricky string terminators here
-: {~ABC abcdABAABC}
-: {~ABCD AABABCABCDABCD}
+say ~ABC abcdABAABC
+say [~ABCD AABABCABCD"ABCD"]
 
 say "==="
-# Show some applicative forms.
-
-: (ping ping)
-
-# TODO If you pound out any of these forms, it causes large differences in
-# how the others are displayed.
-
-: (S C)
-: (S C)
-: (I (C S))
-: (I (S C))
-
-say "==="
-say ["argc = " argc]
-say ["argv 0 = " (argv 0)]
-say ["argv 1 = " (argv 1)]
-say ["argv 2 = " (argv 2)]
-
-say ["base_path = " base_path]
-
-say "==="
-\x==new
-: x
-set x 12.6
-: x
-\v==(get x)
-: v
-set x (double_add (get x) 5.0)
-: x
-
+\x==var_new
+var_put x 12.6
+say x
+\v==(var_get x)
+say v
+var_put x (+ (var_get x) 5.0)
 say ["x = " x]
 
 say "==="
-say ["RLIMIT_AS = " RLIMIT_AS]
-say ["RLIMIT_CORE = " RLIMIT_CORE]
-say ["RLIMIT_CPU = " RLIMIT_CPU]
-say ["RLIMIT_DATA = " RLIMIT_DATA]
-say ["RLIMIT_FSIZE = " RLIMIT_FSIZE]
-say ["RLIMIT_LOCKS = " RLIMIT_LOCKS]
-say ["RLIMIT_MEMLOCK = " RLIMIT_MEMLOCK]
-say ["RLIMIT_MSGQUEUE = " RLIMIT_MSGQUEUE]
-say ["RLIMIT_NICE = " RLIMIT_NICE]
-say ["RLIMIT_NOFILE = " RLIMIT_NOFILE]
-say ["RLIMIT_NPROC = " RLIMIT_NPROC]
-say ["RLIMIT_RSS = " RLIMIT_RSS]
-say ["RLIMIT_RTPRIO = " RLIMIT_RTPRIO]
-say ["RLIMIT_RTTIME = " RLIMIT_RTTIME]
-say ["RLIMIT_SIGPENDING = " RLIMIT_SIGPENDING]
-say ["RLIMIT_STACK = " RLIMIT_STACK]
+\x="1234567890123456"
+# Now make a string with length 16*(2^21) = 33,554,432 bytes.
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+say ["length is " (length x)]
 
 \\
 Extra stuff not parsed.

@@ -1,0 +1,5 @@
+@\loop
+\ch==get
+= ch "" ();
+say [~| ch = "| ch ~| "|]
+loop

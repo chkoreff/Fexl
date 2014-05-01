@@ -1,13 +1,13 @@
 struct sym
 	{
+	int quoted;
 	value name;
-	int line; /* negative if the name is quoted */
+	unsigned long line;
 	};
 
 extern value type_sym(value f);
 extern struct sym *get_sym(value f);
-extern value Qsym(struct str *name, int line);
-extern value Qsym0(const char *name, int line);
+extern value Qsym(int quoted, string name, unsigned long line);
 extern int sym_eq(struct sym *x, struct sym *y);
 extern value app(value f, value g);
 extern value lam(value sym, value body);

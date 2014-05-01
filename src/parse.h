@@ -1,1 +1,2 @@
-extern value parse(int get(void), int *line, const char *label);
+extern int (*read_ch)(void);
+extern value parse(void);

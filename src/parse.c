@@ -1,10 +1,13 @@
+#include <str.h>
 #include <value.h>
+
 #include <basic.h>
-#include <buf.h>
+#include <buffer.h>
 #include <ctype.h>
 #include <die.h>
+#include <limits.h>
 #include <parse.h>
-#include <str.h>
+#include <system.h>
 #include <type_sym.h>
 
 /*
@@ -52,18 +55,20 @@ RLIMIT_AS, and also RLIMIT_DATA for good measure, to limit the total amount of
 memory.
 */
 
-/* The get function reads the next character.  It can be set to read from any
-source such as a file or a string. */
-static int (*get)(void);
+/* The read_ch function reads the next character.  It can be set to read from
+any source such as a file or a string. */
+int (*read_ch)(void);
 
-static int ch;            /* current character */
-static int line;          /* current line number */
-static const char *label; /* current name of source */
+static int ch; /* current character */
 
 static void skip(void)
 	{
-	ch = get();
-	if (ch == '\n') line++;
+	ch = read_ch();
+	if (ch == '\n')
+		{
+		if (source_line == ULONG_MAX) die("skip");
+		source_line++;
+		}
 	}
 
 static void skip_line(void)
@@ -109,13 +114,6 @@ static void skip_filler(void)
 		}
 	}
 
-static void syntax_error(const char *msg, int line)
-	{
-	die("%s on line %ld%s%s", msg, line,
-		label[0] ? " of " : "",
-		label);
-	}
-
 /*
 A name may contain just about anything, except for white space (including NUL)
 and a few other special characters.  This is the simplest possible rule that
@@ -123,8 +121,8 @@ can work.
 */
 static value parse_name(int allow_eq)
 	{
-	int first_line = line;
-	struct buf buf;
+	unsigned long first_line = source_line;
+	buffer buf;
 	buf_start(&buf);
 
 	while (1)
@@ -141,20 +139,22 @@ static value parse_name(int allow_eq)
 			|| (ch == '=' && !allow_eq)
 			|| ch == -1)
 			break;
-		buf_add(&buf,ch);
+		buf_add(&buf,(char)ch);
 		skip();
 		}
 
-	struct str *name = buf_finish(&buf);
-	return name ? Qsym(name,first_line) : 0;
+	string name = buf_finish(&buf);
+	return name ? Qsym(0,name,first_line) : 0;
 	}
 
-static struct str *collect_string(const char *term_data, int term_len,
-	int first_line)
+static string collect_string(
+	const char *term_data,
+	unsigned long term_len,
+	unsigned long first_line)
 	{
-	struct buf buf;
+	buffer buf;
 	buf_start(&buf);
-	int match_pos = 0;
+	unsigned long match_pos = 0;
 
 	while (1)
 		{
@@ -169,7 +169,7 @@ static struct str *collect_string(const char *term_data, int term_len,
 		else if (match_pos > 0)
 			{
 			/* Buffer the ones matched so far and start over. */
-			int i;
+			unsigned long i;
 			for (i = 0; i < match_pos; i++)
 				buf_add(&buf, term_data[i]);
 
@@ -179,29 +179,29 @@ static struct str *collect_string(const char *term_data, int term_len,
 			syntax_error("Unclosed string", first_line);
 		else
 			{
-			buf_add(&buf,ch);
+			buf_add(&buf,(char)ch);
 			skip();
 			}
 		}
 
-	struct str *str = buf_finish(&buf);
+	string str = buf_finish(&buf);
 	if (str == 0) str = str_new_data("",0);
 	return str;
 	}
 
 static value parse_simple_string(void)
 	{
-	int first_line = line;
+	unsigned long first_line = source_line;
 	skip();
-	struct str *str = collect_string("\"", 1, first_line);
-	return Qsym(str,-first_line);
+	string str = collect_string("\"", 1, first_line);
+	return Qsym(1,str,first_line);
 	}
 
 static value parse_complex_string(void)
 	{
-	int first_line = line;
+	unsigned long first_line = source_line;
 
-	struct buf buf;
+	buffer buf;
 	buf_start(&buf);
 
 	while (1)
@@ -209,17 +209,17 @@ static value parse_complex_string(void)
 		skip();
 		if (ch == -1 || isspace(ch))
 			break;
-		buf_add(&buf,ch);
+		buf_add(&buf,(char)ch);
 		}
 
-	struct str *term = buf_finish(&buf);
+	string term = buf_finish(&buf);
 	if (ch == -1 || term == 0)
 		syntax_error("Incomplete string terminator", first_line);
 
 	skip();
-	struct str *str = collect_string(term->data, term->len, first_line);
+	string str = collect_string(term->data, term->len, first_line);
 	str_free(term);
-	return Qsym(str,-first_line);
+	return Qsym(1,str,first_line);
 	}
 
 static value parse_symbol(int allow_eq)
@@ -245,12 +245,13 @@ static value parse_list(void)
 		}
 
 	value x = parse_term();
-	return x == 0 ? C : app(app(Qcons,x),parse_list());
+	if (x == 0) return hold(C);
+	return app(app(hold(Qcons),x),parse_list());
 	}
 
 static value parse_term(void)
 	{
-	int first_line = line;
+	unsigned long first_line = source_line;
 	value exp;
 
 	if (ch == '(') /* parenthesized expression */
@@ -272,7 +273,7 @@ static value parse_term(void)
 	else if (ch == '{') /* symbolic form */
 		{
 		skip();
-		exp = A(I,parse_exp());
+		exp = A(hold(I),parse_exp());
 		if (ch != '}')
 			syntax_error("Unclosed brace", first_line);
 		skip();
@@ -303,7 +304,7 @@ white space only, and not '='.  For example:
   \ >   = num_gt
   \ >=  = num_ge
 */
-static value parse_lambda(long first_line)
+static value parse_lambda(unsigned long first_line)
 	{
 	int allow_eq = at_white();
 	skip_white();
@@ -315,10 +316,10 @@ static value parse_lambda(long first_line)
 
 	skip_filler();
 
-	first_line = line;
+	first_line = source_line;
 
 	/* Count any '=' signs, up to 2. */
-	int count_eq = 0;
+	unsigned short count_eq = 0;
 	while (ch == '=' && count_eq < 2)
 		{
 		count_eq++;
@@ -342,19 +343,21 @@ static value parse_lambda(long first_line)
 	value result;
 	if (count_eq == 0)
 		/* no definition */
-		result = body;
+		result = hold(body);
 	else if (count_eq == 1)
 		{
 		/* = normal definition */
 		if (body == I)
-			result = def;
+			result = hold(def);
 		else
-			result = app(body,def);
+			result = app(hold(body),hold(def));
 		}
 	else
 		/* == eager definition */
-		result = app(app(query,def),body);
+		result = app(app(hold(query),hold(def)),hold(body));
 
+	if (def) drop(def);
+	drop(body);
 	return result;
 	}
 
@@ -366,7 +369,7 @@ static value parse_factor(void)
 		return 0;
 	else if (ch == '\\')
 		{
-		int first_line = line;
+		unsigned long first_line = source_line;
 		skip();
 		if (ch == '\\')
 			{
@@ -394,33 +397,20 @@ static value parse_exp(void)
 		if (val == 0) break;
 		exp = (exp == 0) ? val : app(exp,val);
 		}
-	if (exp == 0) exp = I;
+	if (exp == 0) return hold(I);
 	return exp;
 	}
 
-value parse(int _get(void), int *_line, const char *_label)
+value parse(void)
 	{
-	/* Save and restore so it's re-entrant. */
-	int (*save_get)(void) = get;
+	/* Save and restore so read_ch can potentially call parse via eval. */
 	int save_ch = ch;
-	int save_line = line;
-	const char *save_label = label;
-
-	get = _get;
 	ch = 0;
-	line = *_line;
-	label = _label;
 
 	value exp = parse_exp();
 	if (ch != -1)
-		syntax_error("Extraneous input", line);
+		syntax_error("Extraneous input", source_line);
 
-	*_line = line;
-
-	get = save_get;
-	label = save_label;
-	line = save_line;
 	ch = save_ch;
-
 	return exp;
 	}

@@ -14,6 +14,21 @@
 : concat "abc" "d" = "abcd"
 : concat "abc" "" = "abc"
 : concat "" "def" = "def"
+: eval I
+= I
+
+: eval {C {y}}
+= {C {y}}
+
+: eval L
+= L
+
+: eval R
+= R
+
+: eval S
+= S
+
 : eval ((C {x}) {y})
 = {x}
 
@@ -59,40 +74,34 @@
 : eval (({x} I) C)
 = {{{x} I} C}
 
-: eval halt
-= halt
+: eval ("x" C)
+= ("x" C)
 
-: eval (halt C)
-= (halt C)
+: eval (("x" C) I)
+= (("x" C) I)
 
-: eval ((halt C) I)
-= ((halt C) I)
+: eval ((I "x") C)
+= ("x" C)
 
-: eval ((halt (C C)) S)
-= ((halt (C C)) S)
-
-: eval ((I halt) C)
-= (halt C)
-
-: eval ping
+: eval (say "ping!")
 ping!
 = I
 
-: eval (ping I)
+: eval ((say "ping!") I)
 ping!
 = I
 
-: eval (ping ping)
+: eval ((say "ping!") (say "ping!"))
 ping!
 ping!
 = I
 
-: eval ((ping ping) I)
+: eval (((say "ping!") (say "ping!")) I)
 ping!
 ping!
 = I
 
-: eval ((ping ping) {x})
+: eval (((say "ping!") (say "ping!")) {x})
 ping!
 ping!
 = {x}
@@ -102,18 +111,6 @@ ping!
 
 : eval ((? ((I I) (I S))) C)
 = (C S)
-
-: eval pair
-= pair
-
-: eval (pair {x})
-= (pair {x})
-
-: eval ((pair {x}) {y})
-= ((pair {x}) {y})
-
-: eval (((pair {x}) {y}) {G})
-= {{{G} {x}} {y}}
 
 : eval cons
 = cons
@@ -204,123 +201,98 @@ ping!
 : Buffering 2600000 bytes
   length = 2600000
 
-: resolve {{x} {y}}
-  Undefined symbol x on line 1
-  Undefined symbol y on line 2
-  The form has undefined symbols.
-= {{I {x}} {y}}
-
-: resolve {{y} {x}}
-  Undefined symbol y on line 2
-  Undefined symbol x on line 1
-  The form has undefined symbols.
-= {{I {y}} {x}}
-
-: resolve {{"x"} {"y"}}
-= ((I "x") "y")
-
-: resolve {ping}
-= (I ping)
-
-: resolve {{ping} {ping}}
-= (((S I) I) ping)
-
-: resolve {{ping} {pingx}}
-  Undefined symbol pingx on line 4
-  The form has undefined symbols.
-= {(I ping) {pingx}}
-
-]
+] good
 [
-] exit 0
+] good
 [
 Unclosed string on line 2
-] exit 1
+] bad
 [
 Unclosed string on line 1
-] exit 1
+] bad
 [
 Incomplete string terminator on line 1
-] exit 1
+] bad
 [
 Unclosed parenthesis on line 1
-] exit 1
+] bad
 [
 Unclosed bracket on line 2
-] exit 1
+] bad
 [
 Unclosed brace on line 2
-] exit 1
+] bad
 [
 Missing lambda symbol on line 1
-] exit 1
+] bad
 [
 Missing lambda symbol on line 1
-] exit 1
+] bad
 [
 Missing definition on line 2
-] exit 1
+] bad
 [
 Extraneous input on line 4
-] exit 1
+] bad
 [
 25
-] exit 0
+] good
 [
 ===
-C
-S
-I
-F
-C
-R
-L
-@
-@
-later
-?
-halt
-pair
-cons
-show
-nl
-print
-say
-long_add
-long_sub
-long_mul
-long_div
-order
-file:0
-file:1
-file:2
-3.14159265358979
--2.06
-setrlimit
-===
 source_label = test/in/a1
-source_line = 240
+source_line = 180
 ===
 Hello world.
 x = 42
 47
 37
 210
-8
-0
--1
+8.4
+inf
+===
+T
+T
+T
+F
+T
+T
+F
+T
+T
+F
+F
+F
+F
+T
+T
+T
+F
+F
+T
+T
+F
+T
+F
+F
+T
+===
+-4.97
+210802.919995902
+4.8655
+5
+49.4600760456274
+100000000000.01
+285
+Aa
+
+a
+ab
+a
+abcdefgh
 0
 1
-47
-37
-210
-8
-0
-285
-lt
-eq
-gt
-Aa
+3
+3
 Hello world.
 ===
 ping!
@@ -354,98 +326,80 @@ hello
 ~(1) "hello"(1)
 ~(2) ~(1) "hello"(1)(2)
 ===
-C
-I
-L
-R
-S
+ping!
+hi
+zzzzzz
+q237
+y
 
-R
-S
+aa
 
-(C I)
-"y"
-((C S) I)
-S
-((S I) I)
-(C "y")
-(((S S) I) ((L R) ((S I) I)))
-((L R) ((S I) I))
-((C I) ((L R) ((S I) I)))
+bb
+a
+
+
+a
+hi!
+a
+abcdABA
+AABABCABCD
 ===
-(I {"x"})
-(I {x})
-(I {{x} {y}})
-(I {{{{x} {y}} {<=}} {abcdefghijklmnopqrstuvwxyz}})
-(I {{cons {1}} {{cons {{cons {2}} {{cons {3}} C}}} {(cons C) {{cons {{cons {4}} C}} {{cons {"hi"}} {{{append} {x}} {y}}}}}}})
-(I {{{{{{abcd} {ef}} {47.806}} {99}} {-22}} {{{a} {{b} {c}}} {{{{d} {e}} {{f} {g}}} {h}}}})
-(I {"
-"})
-(I {""})
-(I {"a"})
-(I {"a"})
-(I {""})
-(I {"a"})
-(I {{"hi"} {x}})
-(I {"a"})
-(I {"abcdABA"})
-(I {{"AABABC"} {ABCD}})
-===
-(((S I) I) ((I say) "ping!"))
-(S C)
-((I S) C)
-(((((L ((R R) R)) (L I)) I) S) C)
-(((R I) S) C)
-===
-argc = 2
-argv 0 = ../bin/fexl
-argv 1 = test/in/a1
-argv 2 = 
-base_path = /home/patrick/project/fexl/
-===
-var:C
-(I var:12.6)
 12.6
-(I var:17.6)
+12.6
 x = 17.6
 ===
-RLIMIT_AS = 9
-RLIMIT_CORE = 4
-RLIMIT_CPU = 0
-RLIMIT_DATA = 2
-RLIMIT_FSIZE = 1
-RLIMIT_LOCKS = 10
-RLIMIT_MEMLOCK = 8
-RLIMIT_MSGQUEUE = 12
-RLIMIT_NICE = 13
-RLIMIT_NOFILE = 7
-RLIMIT_NPROC = 6
-RLIMIT_RSS = 5
-RLIMIT_RTPRIO = 14
-RLIMIT_RTTIME = 15
-RLIMIT_SIGPENDING = 11
-RLIMIT_STACK = 3
-] exit 0
+length is 33554432
+] good
+[
+ch = "H"
+ch = "i"
+ch = "x"
+ch = "å"
+ch = "a"
+ch = "b"
+ch = "c"
+ch = "
+"
+ch = "d"
+ch = "ü"
+ch = "≠"
+ch = "m"
+ch = "
+"
+] good
+[
+== test_utf
+f = hej
+åabcüdef
+ghij
+üä
+1≠0
+
+åabcüdef = hej åabcüdef
+ghij = hej ghij
+üä = hej üä
+1≠0 = hej 1≠0
+] good
 [
 Undefined symbol aa on line 1
 Undefined symbol bb on line 1
 Undefined symbol c on line 2
-] exit 1
+] bad
 [
 Segmentation fault
-] exit 139
+] bad
 [
 Your program ran out of memory.
-] exit 1
+] bad
 [
 Killed
-] exit 137
+] bad
 [
 Killed
-] exit 137
+] bad
 [
 Segmentation fault
-] exit 139
+] bad
 [
 Killed
-] exit 137
+] bad

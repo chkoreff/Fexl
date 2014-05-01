@@ -1,30 +1,9 @@
 fexl - Function EXpression Language
 ===================================
 
-[Fexl](http://fexl.com) is the simplest and most powerful language I've been
-able to devise.  You can do low-level system programming in it, but you can
-also create secure "sandboxes" to allow restricted high-level scripting.
-
-The interpreter creates an initial value which represents your entire program.
-It then evaluates that value, reducing it one step at a time until it finally
-reaches a value that is identical to the previous one.  Each step may possibly
-create side effects -- after all, the entire purpose of a computer program is
-to create side effects.
-
-A *value* is either an atom or a pair.  An *atom* represents either a built-in
-function (with a pointer to a C function), or a piece of data (e.g. long,
-double, string, file, etc.)  A *pair* represents the functional application of
-a value on the left side to a value on the right side.
-
-The initial value is fully resolved and contains no symbols, so the interpreter
-does not have to do any symbol lookups or bindings during evaluation.
-
-This gives you all the low and high level programming features you can imagine,
-everything from bashing bits on the bare metal, all the way up to the cool
-stratosphere of closures, high-order functions, and lazy evaluation.  All this,
-with a very small language grammar.  My goal is to create a language with the
-highest conceivable level of simplicity, power, efficiency, flexibility,
-reliability, and security.
+[Fexl](http://fexl.com) is a simple but powerful scripting language.  It allows
+you to manipulate numbers, strings, streams, and functions easily and reliably,
+all within a secure "sandbox".
 
 Getting started
 ---------------
@@ -111,6 +90,22 @@ verifies that there are no memory leaks during execution.  Also see `hold`
 and `drop` in value.c, which implement the reference counting mechanism.
 
 The "test" directory contains the Fexl test suite.
+
+Technical Details
+-----------------
+
+The interpreter creates an initial value which represents your entire program.
+It then evaluates that value, reducing it one step at a time until it finally
+reaches a 0 value.  Each step may possibly create side effects -- after all,
+the entire purpose of a computer program is to create side effects.
+
+A *value* is either an atom or a pair.  An *atom* represents either a built-in
+function (with a pointer to a C function), or a piece of data (e.g. long,
+double, string, file, etc.)  A *pair* represents the functional application of
+a value on the left side to a value on the right side.
+
+The initial value is fully resolved and contains no symbols, so the interpreter
+does not have to do any symbol lookups or bindings during evaluation.
 
 License
 -------
