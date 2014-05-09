@@ -4,7 +4,6 @@
 #include <die.h>
 #include <math.h> /* round */
 #include <memory.h>
-#include <stdio.h> /* snprintf */
 #include <stdlib.h> /* strtod */
 
 void num_free(number x)
@@ -60,7 +59,5 @@ int num_cmp(number x, number y)
 10. */
 void put_num(number x)
 	{
-	char buf[100]; /* Being careful here. */
-	snprintf(buf, sizeof(buf), "%.15g", *x);
-	put(buf);
+	put_double(*x);
 	}

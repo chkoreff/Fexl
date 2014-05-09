@@ -58,3 +58,16 @@ void put_ulong(unsigned long x)
 	snprintf(buf, sizeof(buf), "%lu", x);
 	put(buf);
 	}
+
+/* We show 15 digits because that's what Perl does. */
+
+/* https://en.wikipedia.org/wiki/Double-precision_floating-point_format */
+/* LATER use limits to determine precision for machine */
+/* LATER problem is, DECIMAL_DIG (in float.h) is only guaranteed to be at least
+10. */
+void put_double(double x)
+	{
+	char buf[100]; /* Being careful here. */
+	snprintf(buf, sizeof(buf), "%.15g", x);
+	put(buf);
+	}

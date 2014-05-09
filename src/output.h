@@ -8,3 +8,4 @@ extern void put(const char *data);
 extern void nl(void);
 extern void put_long(long x);
 extern void put_ulong(unsigned long x);
+extern void put_double(double x);
