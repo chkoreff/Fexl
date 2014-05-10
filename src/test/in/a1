@@ -153,8 +153,7 @@ say ["x = " x]
 
 say "==="
 \x="1234567890123456"
-# Now make a string with length 16*(2^21) = 33,554,432 bytes.
-\x=(. x x)
+# Now make a string with length 16*(2^20) = 16,777,216 bytes.
 \x=(. x x)
 \x=(. x x)
 \x=(. x x)

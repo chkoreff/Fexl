@@ -240,7 +240,7 @@ Extraneous input on line 4
 [
 ===
 source_label = test/in/a1
-source_line = 180
+source_line = 179
 ===
 Hello world.
 x = 42
@@ -348,7 +348,7 @@ AABABCABCD
 12.6
 x = 17.6
 ===
-length is 33554432
+length is 16777216
 ] good
 [
 ch = "H"
@@ -384,22 +384,4 @@ ghij = hej ghij
 Undefined symbol aa on line 1
 Undefined symbol bb on line 1
 Undefined symbol c on line 2
-] bad
-[
-Segmentation fault
-] bad
-[
-Your program ran out of memory.
-] bad
-[
-Killed
-] bad
-[
-Killed
-] bad
-[
-Segmentation fault
-] bad
-[
-Killed
 ] bad

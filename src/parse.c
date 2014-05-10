@@ -39,20 +39,6 @@ string => complex_string
 The Fexl parser reads an expression from the input until it reaches -1 (end of
 file) or the special token "\\".  The \\ token stops the parser immediately, as
 if it had reached end of file.
-
-If you're parsing a possibly malicious script, you should use setrlimit to
-impose limits not only on stack depth, but also on total memory usage and CPU
-time.
-
-For example, if you parse an infinite stream of '(' characters, you'll see a
-segmentation fault due to stack overflow.  That happens due to the default
-limits on stack size, without any intervention.  But if you parse an infinite
-stream of ' ' characters, it will run forever unless you impose limits on CPU
-time with RLIMIT_CPU.  If you parse an infinite stream of 'a' characters, it
-will use an unbounded amount of memory which could slow your machine to a crawl
-until it finally reaches the very large default limits.  So you should set
-RLIMIT_AS, and also RLIMIT_DATA for good measure, to limit the total amount of
-memory.
 */
 
 /* The read_ch function reads the next character.  It can be set to read from
