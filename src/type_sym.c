@@ -103,24 +103,22 @@ value lam(value sym, value body)
 /* Return the last symbol in the value, if any, in right to left order. */
 static value last_sym(value f)
 	{
+	value sym;
 	if (f->T != type_sym) return 0;
 	if (f->L == 0) return f;
-	{
-	value x = last_sym(f->R);
-	if (x) return x;
+	sym = last_sym(f->R);
+	if (sym) return sym;
 	return last_sym(f->L);
-	}
 	}
 
 value resolve(value f, value context(value))
 	{
-	value x = last_sym(f);
-	if (x == 0) return f;
-	{
-	value g = resolve(abstract(x,f),context);
-	value def = context(x);
+	value sym = last_sym(f);
+	value g, def;
+	if (sym == 0) return f;
+	g = resolve(abstract(sym,f),context);
+	def = context(sym);
 	g = app(g,def);
 	drop(f);
 	return g;
-	}
 	}

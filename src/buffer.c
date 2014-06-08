@@ -69,15 +69,13 @@ string buf_finish(buffer *buf)
 	list = buf->next;
 	while (list)
 		{
+		buffer *old = list;
 		buf->str = list->str;
 		offset -= buf->str->len;
 		memcpy(result->data + offset, buf->str->data, buf->str->len);
 		str_free(buf->str);
-		{
-		buffer *old = list;
 		list = list->next;
 		free_memory(old, sizeof(buffer));
-		}
 		}
 	}
 

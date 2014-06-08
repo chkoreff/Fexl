@@ -109,8 +109,9 @@ static value parse_name(int allow_eq)
 	{
 	unsigned long first_line = source_line;
 	buffer buf;
-	buf_start(&buf);
+	string name;
 
+	buf_start(&buf);
 	while (1)
 		{
 		if (at_white()
@@ -129,10 +130,8 @@ static value parse_name(int allow_eq)
 		skip();
 		}
 
-	{
-	string name = buf_finish(&buf);
+	name = buf_finish(&buf);
 	return name ? Qsym(0,name,first_line) : 0;
-	}
 	}
 
 static string collect_string(
@@ -142,8 +141,9 @@ static string collect_string(
 	{
 	unsigned long match_pos = 0;
 	buffer buf;
-	buf_start(&buf);
+	string str;
 
+	buf_start(&buf);
 	while (1)
 		{
 		if (match_pos >= term_len)
@@ -172,30 +172,28 @@ static string collect_string(
 			}
 		}
 
-	{
-	string str = buf_finish(&buf);
+	str = buf_finish(&buf);
 	if (str == 0) str = str_new_data("",0);
 	return str;
-	}
 	}
 
 static value parse_simple_string(void)
 	{
 	unsigned long first_line = source_line;
+	string str;
 	skip();
-	{
-	string str = collect_string("\"", 1, first_line);
+	str = collect_string("\"", 1, first_line);
 	return Qsym(1,str,first_line);
-	}
 	}
 
 static value parse_complex_string(void)
 	{
 	unsigned long first_line = source_line;
-
 	buffer buf;
-	buf_start(&buf);
+	string term;
+	string str;
 
+	buf_start(&buf);
 	while (1)
 		{
 		skip();
@@ -204,18 +202,14 @@ static value parse_complex_string(void)
 		buf_add(&buf,(char)ch);
 		}
 
-	{
-	string term = buf_finish(&buf);
+	term = buf_finish(&buf);
 	if (ch == -1 || term == 0)
 		syntax_error("Incomplete string terminator", first_line);
 
 	skip();
-	{
-	string str = collect_string(term->data, term->len, first_line);
+	str = collect_string(term->data, term->len, first_line);
 	str_free(term);
 	return Qsym(1,str,first_line);
-	}
-	}
 	}
 
 static value parse_symbol(int allow_eq)
@@ -233,6 +227,8 @@ static value parse_exp(void);
 
 static value parse_list(void)
 	{
+	value term;
+
 	skip_filler();
 	if (ch == ';')
 		{
@@ -240,11 +236,9 @@ static value parse_list(void)
 		return parse_exp();
 		}
 
-	{
-	value x = parse_term();
-	if (x == 0) return hold(C);
-	return app(app(hold(Qcons),x),parse_list());
-	}
+	term = parse_term();
+	if (term == 0) return hold(C);
+	return app(app(hold(Qcons),term),parse_list());
 	}
 
 static value parse_term(void)

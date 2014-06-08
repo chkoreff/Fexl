@@ -83,16 +83,17 @@ static value define_name(const char *name)
 value define_sym(value x)
 	{
 	struct sym *sym = get_sym(x);
+	const char *name;
+	value def;
+
 	if (sym->quoted)
 		return hold(sym->name); /* literal string */
 
-	{
-	const char *name = get_str(sym->name)->data;
+	name = get_str(sym->name)->data;
 
-	value def = define_name(name);
+	def = define_name(name);
 	if (def) return def;
 
 	undefined_symbol(name, sym->line);
 	return hold(x);
-	}
 	}

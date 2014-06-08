@@ -33,10 +33,8 @@ value type_str_num(value f)
 	if (!f->L) return 0;
 	x = arg(f->R);
 	n = str_num(get_str(x)->data);
-	/*TODO I guess defaulting to 0 is ok, but we might want a test for
-	validity. */
 	if (n == 0)
-		n = num_new_double(0);
+		n = num_new_double(0); /*TODO return undef */
 
 	y = Qnum(n);
 	drop(x);

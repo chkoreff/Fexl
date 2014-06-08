@@ -43,19 +43,17 @@ value type_concat(value f)
 value type_length(value f)
 	{
 	value x, y;
+	unsigned long len;
 	if (!f->L) return 0;
 	x = arg(f->R);
-	{
-	unsigned long len = get_str(x)->len;
+	len = get_str(x)->len;
 	y = Qnum_ulong(len);
-	}
 	drop(x);
 	return y;
 	}
 
-/*TODO 20140607 this is not aware of UTF-8.  For that, we should probably use
-an "utf8_chars" function which splits a string into a list of logical
-characters. */
+/* (slice str pos len) returns the len bytes of str starting at pos, or 0 bytes
+if pos or len exceeds the bounds of str. */
 value type_slice(value f)
 	{
 	value x, y, z, result;

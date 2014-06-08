@@ -30,34 +30,29 @@ that we will never get to see any Unicode character definitions beyond that.)
 
 string get_stdin(void)
 	{
+	char buf[6];
+	int mask = 0x80;
+	unsigned width = 1;
+
 	int ch = getchar();
 	if (ch == EOF) return str_new_data("",0);
-
-	{
-	int mask = 0x80;
-	char buf[6];
 
 	buf[0] = (char)ch;
 	if ((ch & mask) == 0)
 		return str_new_data(buf,1);
 
 	/* Read another byte for each high bit after the first one. */
-	{
-	unsigned width = 1;
 	while (1)
 		{
+		int next_ch;
 		mask >>= 1;
 		if ((ch & mask) == 0) break;
-		{
-		int next_ch = getchar();
+		next_ch = getchar();
 		if (next_ch == EOF) break;
 		buf[width++] = (char)next_ch;
-		}
 		if (width >= sizeof(buf)) break;
 		}
 	return str_new_data(buf,width);
-	}
-	}
 	}
 
 /* Read data from the current source. */
