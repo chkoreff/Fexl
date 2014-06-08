@@ -48,3 +48,37 @@ value type_length(value f)
 	drop(x);
 	return z;
 	}
+
+/*TODO 20140607 this is not aware of UTF-8.  For that, we should probably use
+an "utf8_chars" function which splits a string into a list of logical
+characters. */
+value type_slice(value f)
+	{
+	value x, y, z, result;
+	string str;
+	long pos, len;
+
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	x = arg(f->L->L->R);
+	y = arg(f->L->R);
+	z = arg(f->R);
+	str = get_str(x);
+	pos = (long)*get_num(y);
+	len = (long)*get_num(z);
+
+	if (pos < 0 || len < 0
+		|| pos >= str->len
+		|| len > str->len
+		|| pos > str->len - len
+		)
+		{
+		pos = 0;
+		len = 0;
+		}
+
+	result = Qstr(str_new_data(str->data + pos,len));
+	drop(x);
+	drop(y);
+	drop(z);
+	return result;
+	}

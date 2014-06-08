@@ -42,7 +42,10 @@ number num_add(number x, number y) { return num_new_double(*x + *y); }
 number num_sub(number x, number y) { return num_new_double(*x - *y); }
 number num_mul(number x, number y) { return num_new_double(*x * *y); }
 number num_div(number x, number y) { return num_new_double(*x / *y); }
+number num_pow(number x, number y) { return num_new_double(pow(*x,*y)); }
 number num_round(number x) { return num_new_double(round(*x)); }
+number num_trunc(number x) { return num_new_double(trunc(*x)); }
+number num_abs(number x) { return num_new_double(fabs(*x)); }
 
 int num_cmp(number x, number y)
 	{

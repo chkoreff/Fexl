@@ -13,3 +13,4 @@ extern void str_free(string x);
 extern string str_concat(string x, string y);
 extern int str_cmp(string x, string y);
 extern int str_eq(string x, string y);
+extern void put_str(string x);

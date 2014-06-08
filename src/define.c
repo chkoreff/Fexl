@@ -8,6 +8,7 @@
 #include <string.h>
 #include <system.h>
 #include <type_cmp.h>
+#include <type_convert.h>
 #include <type_file.h>
 #include <type_math.h>
 #include <type_num.h>
@@ -46,6 +47,7 @@ static value define_name(const char *name)
 	if (match("-")) return Q(type_sub);
 	if (match("*")) return Q(type_mul);
 	if (match("/")) return Q(type_div);
+	if (match("^")) return Q(type_pow);
 	if (match(".")) return Q(type_concat);
 
 	if (match("<")) return Q(type_lt);
@@ -56,10 +58,16 @@ static value define_name(const char *name)
 	if (match(">")) return Q(type_gt);
 
 	if (match("length")) return Q(type_length);
+	if (match("slice")) return Q(type_slice);
+
+	if (match("num_str")) return Q(type_num_str);
+	if (match("str_num")) return Q(type_str_num);
 
 	if (match("?")) return hold(query);
 
-	if (match("round0")) return Q(type_round0);
+	if (match("round")) return Q(type_round);
+	if (match("trunc")) return Q(type_trunc);
+	if (match("abs")) return Q(type_abs);
 
 	if (match("source_label")) return Qstr0(source_label);
 	if (match("source_line")) return Qnum_ulong(source_line);

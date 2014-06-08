@@ -1,6 +1,7 @@
 #include <die.h>
 #include <limits.h>
 #include <memory.h>
+#include <output.h>
 #include <str.h>
 #include <string.h>
 
@@ -66,4 +67,10 @@ int str_eq(string x, string y)
 	if (x == y) return 1;
 	if (x->len != y->len) return 0;
 	return memcmp(x->data, y->data, x->len) == 0;
+	}
+
+/*TODO*/
+void put_str(string x)
+	{
+	putd(x->data,x->len);
 	}
