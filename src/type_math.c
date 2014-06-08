@@ -16,10 +16,11 @@ static value op_num(value f, number op(number))
 
 static value op_num_num(value f, number op(number,number))
 	{
+	value x, y, z;
 	if (!f->L || !f->L->L) return 0;
-	value x = arg(f->L->R);
-	value y = arg(f->R);
-	value z = Qnum(op(get_num(x),get_num(y)));
+	x = arg(f->L->R);
+	y = arg(f->R);
+	z = Qnum(op(get_num(x),get_num(y)));
 	drop(x);
 	drop(y);
 	return z;

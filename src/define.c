@@ -86,6 +86,7 @@ value define_sym(value x)
 	if (sym->quoted)
 		return hold(sym->name); /* literal string */
 
+	{
 	const char *name = get_str(sym->name)->data;
 
 	value def = define_name(name);
@@ -93,4 +94,5 @@ value define_sym(value x)
 
 	undefined_symbol(name, sym->line);
 	return hold(x);
+	}
 	}

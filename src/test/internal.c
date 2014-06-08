@@ -15,6 +15,7 @@
 
 void test_eval(value f, int full)
 	{
+	value g;
 	put(": eval ");
 	if (full)
 		show(f);
@@ -22,7 +23,7 @@ void test_eval(value f, int full)
 		put("...");
 	nl();
 
-	value g = eval(f);
+	g = eval(f);
 	put("= ");show(g);nl();
 	nl();
 	drop(g);
@@ -30,8 +31,9 @@ void test_eval(value f, int full)
 
 void test_lam(value sym, value body)
 	{
+	value f;
 	put(": lam ");show(sym);put(" ");show(body);nl();
-	value f = lam(sym,body);
+	f = lam(sym,body);
 	put("= ");show(f);nl();
 	nl();
 	drop(f);
@@ -247,17 +249,19 @@ void test_all_lam(void)
 
 void test_buf(unsigned long max)
 	{
-	put(": Buffering ");put_ulong(max);put(" bytes");nl();
 	buffer buf;
+	unsigned long len;
+	string x;
+
+	put(": Buffering ");put_ulong(max);put(" bytes");nl();
 	buf_start(&buf);
 
-	unsigned long len;
 	for (len = 0; len < max; len++)
 		{
 		char ch = (char)('a' + (len % 26));
 		buf_add(&buf,ch);
 		}
-	string x = buf_finish(&buf);
+	x = buf_finish(&buf);
 	if (x == 0)
 		put("  null\n");
 	else

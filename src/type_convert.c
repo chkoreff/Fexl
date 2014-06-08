@@ -3,6 +3,7 @@
 #include <num.h>
 #include <stdio.h> /* snprintf */
 #include <str.h>
+#include <sys_stdio.h>
 #include <type_convert.h>
 #include <type_num.h>
 #include <type_str.h>

@@ -2,9 +2,9 @@
 #include <output.h>
 
 #include <die.h>
-#include <math.h> /* round */
 #include <memory.h>
 #include <stdlib.h> /* strtod */
+#include <sys_math.h>
 
 void num_free(number x)
 	{
@@ -17,10 +17,12 @@ representation on any machine. */
 number str_num(const char *name)
 	{
 	if (*name == 0) return 0;
+	{
 	char *end;
 	double val = strtod(name, &end);
 	if (*end != '\0') return 0;
 	return num_new_double(val);
+	}
 	}
 
 number num_new_double(double val)

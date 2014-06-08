@@ -29,10 +29,11 @@ value Qstr0(const char *data)
 /* (. x y) is the concatenation of strings x and y. */
 value type_concat(value f)
 	{
+	value x, y, z;
 	if (!f->L || !f->L->L) return 0;
-	value x = arg(f->L->R);
-	value y = arg(f->R);
-	value z = Qstr(str_concat(get_str(x),get_str(y)));
+	x = arg(f->L->R);
+	y = arg(f->R);
+	z = Qstr(str_concat(get_str(x),get_str(y)));
 	drop(x);
 	drop(y);
 	return z;
@@ -41,12 +42,15 @@ value type_concat(value f)
 /* (length x) is the length of string x */
 value type_length(value f)
 	{
+	value x, y;
 	if (!f->L) return 0;
-	value x = arg(f->R);
+	x = arg(f->R);
+	{
 	unsigned long len = get_str(x)->len;
-	value z = Qnum_ulong(len);
+	y = Qnum_ulong(len);
+	}
 	drop(x);
-	return z;
+	return y;
 	}
 
 /*TODO 20140607 this is not aware of UTF-8.  For that, we should probably use

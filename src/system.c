@@ -70,8 +70,9 @@ void undefined_symbol(const char *name, unsigned long line)
 
 value type_die(value f)
 	{
+	value x;
 	if (!f->L) return 0;
-	value x = arg(f->R);
+	x = arg(f->R);
 	die(get_str(x)->data);
 	drop(x);
 	return hold(I);

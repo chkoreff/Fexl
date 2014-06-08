@@ -3,7 +3,7 @@ typedef struct string *string;
 struct string
 	{
 	unsigned long len;
-	char data[];
+	char data[1];
 	};
 
 extern string str_new(unsigned long len);

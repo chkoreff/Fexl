@@ -13,8 +13,9 @@ easier to call system functions that expect it.
 /* Create a string capable of holding len bytes plus trailing NUL. */
 string str_new(unsigned long len)
 	{
-	if (len > ULONG_MAX - sizeof(struct string) - 1) die("str_new");
-	string x = new_memory(sizeof(struct string) + len + 1);
+	string x;
+	if (len > ULONG_MAX - sizeof(struct string)) die("str_new");
+	x = new_memory(sizeof(struct string) + len);
 	x->len = len;
 	return x;
 	}
@@ -34,7 +35,7 @@ string str_new_data0(const char *data)
 
 void str_free(string x)
 	{
-	free_memory(x, sizeof(struct string) + x->len + 1);
+	free_memory(x, sizeof(struct string) + x->len);
 	}
 
 /* Concatenate x and y. */
@@ -51,9 +52,11 @@ string str_concat(string x, string y)
 positive if x > y. */
 int str_cmp(string x, string y)
 	{
+	unsigned long min_len;
+	int cmp;
 	if (x == y) return 0;
-	unsigned long min_len = x->len < y->len ? x->len : y->len;
-	int cmp = memcmp(x->data, y->data, min_len);
+	min_len = x->len < y->len ? x->len : y->len;
+	cmp = memcmp(x->data, y->data, min_len);
 
 	if (cmp == 0 && x->len != y->len)
 		cmp = x->len < y->len ? -1 : 1;
@@ -69,7 +72,7 @@ int str_eq(string x, string y)
 	return memcmp(x->data, y->data, x->len) == 0;
 	}
 
-/*TODO*/
+/*TODO not yet used */
 void put_str(string x)
 	{
 	putd(x->data,x->len);

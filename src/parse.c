@@ -129,8 +129,10 @@ static value parse_name(int allow_eq)
 		skip();
 		}
 
+	{
 	string name = buf_finish(&buf);
 	return name ? Qsym(0,name,first_line) : 0;
+	}
 	}
 
 static string collect_string(
@@ -138,9 +140,9 @@ static string collect_string(
 	unsigned long term_len,
 	unsigned long first_line)
 	{
+	unsigned long match_pos = 0;
 	buffer buf;
 	buf_start(&buf);
-	unsigned long match_pos = 0;
 
 	while (1)
 		{
@@ -170,17 +172,21 @@ static string collect_string(
 			}
 		}
 
+	{
 	string str = buf_finish(&buf);
 	if (str == 0) str = str_new_data("",0);
 	return str;
+	}
 	}
 
 static value parse_simple_string(void)
 	{
 	unsigned long first_line = source_line;
 	skip();
+	{
 	string str = collect_string("\"", 1, first_line);
 	return Qsym(1,str,first_line);
+	}
 	}
 
 static value parse_complex_string(void)
@@ -198,14 +204,18 @@ static value parse_complex_string(void)
 		buf_add(&buf,(char)ch);
 		}
 
+	{
 	string term = buf_finish(&buf);
 	if (ch == -1 || term == 0)
 		syntax_error("Incomplete string terminator", first_line);
 
 	skip();
+	{
 	string str = collect_string(term->data, term->len, first_line);
 	str_free(term);
 	return Qsym(1,str,first_line);
+	}
+	}
 	}
 
 static value parse_symbol(int allow_eq)
@@ -230,9 +240,11 @@ static value parse_list(void)
 		return parse_exp();
 		}
 
+	{
 	value x = parse_term();
 	if (x == 0) return hold(C);
 	return app(app(hold(Qcons),x),parse_list());
+	}
 	}
 
 static value parse_term(void)
@@ -292,11 +304,17 @@ white space only, and not '='.  For example:
 */
 static value parse_lambda(unsigned long first_line)
 	{
+	value sym;
+	unsigned short count_eq = 0;
+	value def = 0;
+	value body;
+	value result;
+
 	int allow_eq = at_white();
 	skip_white();
 
 	/* Parse the symbol (function parameter). */
-	value sym = parse_symbol(allow_eq);
+	sym = parse_symbol(allow_eq);
 	if (sym == 0)
 		syntax_error("Missing lambda symbol", first_line);
 
@@ -305,7 +323,6 @@ static value parse_lambda(unsigned long first_line)
 	first_line = source_line;
 
 	/* Count any '=' signs, up to 2. */
-	unsigned short count_eq = 0;
 	while (ch == '=' && count_eq < 2)
 		{
 		count_eq++;
@@ -313,7 +330,6 @@ static value parse_lambda(unsigned long first_line)
 		}
 
 	/* Parse the definition of the symbol if we saw an '=' char. */
-	value def = 0;
 	if (count_eq)
 		{
 		skip_filler();
@@ -323,10 +339,9 @@ static value parse_lambda(unsigned long first_line)
 		}
 
 	/* Parse the body of the function. */
-	value body = lam(sym,parse_exp());
+	body = lam(sym,parse_exp());
 
 	/* Produce the result based on the kind of definition used, if any. */
-	value result;
 	if (count_eq == 0)
 		/* no definition */
 		result = hold(body);
@@ -389,11 +404,13 @@ static value parse_exp(void)
 
 value parse(void)
 	{
+	value exp;
+
 	/* Save and restore so read_ch can potentially call parse via eval. */
 	int save_ch = ch;
 	ch = 0;
 
-	value exp = parse_exp();
+	exp = parse_exp();
 	if (ch != -1)
 		syntax_error("Extraneous input", source_line);
 

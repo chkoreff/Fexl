@@ -105,18 +105,22 @@ static value last_sym(value f)
 	{
 	if (f->T != type_sym) return 0;
 	if (f->L == 0) return f;
+	{
 	value x = last_sym(f->R);
 	if (x) return x;
 	return last_sym(f->L);
+	}
 	}
 
 value resolve(value f, value context(value))
 	{
 	value x = last_sym(f);
 	if (x == 0) return f;
+	{
 	value g = resolve(abstract(x,f),context);
 	value def = context(x);
 	g = app(g,def);
 	drop(f);
 	return g;
+	}
 	}

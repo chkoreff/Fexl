@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <sys_stdio.h>
 #include <output.h>
 
 static void put_fh(FILE *fh, const char *data, unsigned long len)

@@ -23,10 +23,10 @@ void buf_add(buffer *buf, char ch)
 	else if (buf->pos == buf->str->len)
 		{
 		/* Safe because ULONG_MAX is guaranteed at least 2^32-1. */
+		buffer *new;
 		unsigned long size = 2 * buf->pos;
 		if (size > max) size = max;
-
-		buffer *new = new_memory(sizeof(buffer));
+		new = new_memory(sizeof(buffer));
 		new->pos = 0; /* not used */
 		new->str = buf->str;
 		new->next = buf->next;
@@ -43,13 +43,14 @@ void buf_add(buffer *buf, char ch)
 /* Clear the buffer and return its contents in a string, or 0 if empty. */
 string buf_finish(buffer *buf)
 	{
+	buffer *list = buf->next;
+	unsigned long len = buf->pos;
+	string result;
+
 	if (buf->str == 0)
 		return 0;
 
-	buffer *list = buf->next;
-
 	/* Calculate total length. */
-	unsigned long len = buf->pos;
 	while (list)
 		{
 		if (list->str->len > ULONG_MAX - len) die("buf_finish");
@@ -58,8 +59,9 @@ string buf_finish(buffer *buf)
 		}
 
 	/* Copy chunks into result string. */
-	string result = str_new(len);
+	result = str_new(len);
 
+	{
 	unsigned long offset = len - buf->pos;
 	memcpy(result->data + offset, buf->str->data, buf->pos);
 	str_free(buf->str);
@@ -71,10 +73,13 @@ string buf_finish(buffer *buf)
 		offset -= buf->str->len;
 		memcpy(result->data + offset, buf->str->data, buf->str->len);
 		str_free(buf->str);
+		{
 		buffer *old = list;
 		list = list->next;
 		free_memory(old, sizeof(buffer));
 		}
+		}
+	}
 
 	result->data[len] = '\000'; /* Add trailing NUL byte. */
 	return result;

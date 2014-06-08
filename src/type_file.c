@@ -26,9 +26,10 @@ static void putv(value f)
 			put_num(get_num(f));
 		else if (f->T == type_cons)
 			{
+			value g;
 			if (!f->L || !f->L->L) bad_type();
 			putv(arg(f->L->R));
-			value g = arg(f->R);
+			g = arg(f->R);
 			drop(f);
 			f = g;
 			continue;

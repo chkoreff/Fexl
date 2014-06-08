@@ -65,10 +65,11 @@ value type_later(value f)
 /* (query x y) = y x, except x is evaluated first. */
 value type_query(value f)
 	{
+	value x, xp, z;
 	if (!f->L || !f->L->L) return 0;
-	value x = arg(f->L->R);
-	value xp = (x->T == type_later && x->R) ? x->R : x;
-	value z = apply(hold(f->R),hold(xp));
+	x = arg(f->L->R);
+	xp = (x->T == type_later && x->R) ? x->R : x;
+	z = apply(hold(f->R),hold(xp));
 	drop(x);
 	return z;
 	}

@@ -1,4 +1,5 @@
 #include <num.h>
+#include <stddef.h> /* size_t */
 
 #include <value.h>
 #include <basic.h>
@@ -6,6 +7,7 @@
 #include <type_cmp.h>
 #include <type_num.h>
 #include <type_str.h>
+#include <sys_stdio.h>
 
 static int cmp(value x, value y)
 	{
@@ -22,10 +24,11 @@ static int cmp(value x, value y)
 
 static value op_cmp(value f, int op(value,value))
 	{
+	value x, y, z;
 	if (!f->L || !f->L->L) return 0;
-	value x = arg(f->L->R);
-	value y = arg(f->R);
-	value z = Qboolean(op(x,y));
+	x = arg(f->L->R);
+	y = arg(f->R);
+	z = Qboolean(op(x,y));
 	drop(x);
 	drop(y);
 	return z;
