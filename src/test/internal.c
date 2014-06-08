@@ -4,7 +4,6 @@
 #include <basic.h>
 #include <buffer.h>
 #include <die.h>
-#include <memory.h>
 #include <output.h>
 #include <string.h>
 #include <test/show.h>
@@ -303,6 +302,6 @@ int main(void)
 	run_tests();
 	end_test();
 	end_basic();
-	end_memory();
+	end_value();
 	return 0;
 	}

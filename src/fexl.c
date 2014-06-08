@@ -2,17 +2,14 @@
 
 #include <basic.h>
 #include <define.h>
-#include <memory.h>
 #include <system.h>
 
 int main(int argc, char *argv[])
 	{
-	beg_basic();
-	{
 	const char *name = argc > 1 ? argv[1] : "";
+	beg_basic();
 	drop(eval(resolve_file(name,define_sym)));
-	}
 	end_basic();
-	end_memory();
+	end_value();
 	return 0;
 	}

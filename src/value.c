@@ -16,6 +16,24 @@ If L == 0, the value is an atom, and R points to the atom data, if any.
 If L != 0, then R != 0, and the value represents the application of L to R.
 */
 
+static value free_list = 0;
+
+static void clear_free_list(void)
+	{
+	while (free_list)
+		{
+		value f = free_list;
+		free_list = f->L;
+		free_memory(f, sizeof(struct value));
+		}
+	}
+
+void end_value(void)
+	{
+	clear_free_list();
+	end_memory();
+	}
+
 /* Free the value so it can be reused. */
 static void recycle(value f)
 	{
@@ -29,7 +47,8 @@ static void recycle(value f)
 		/* Clear atom. */
 		f->T(f);
 
-	free_memory(f, sizeof(struct value));
+	f->L = free_list;
+	free_list = f;
 	}
 
 /* Increment the reference count. */
@@ -50,7 +69,12 @@ void drop(value f)
 /* Return a value of type T with the given left and right side. */
 value V(type T, value L, value R)
 	{
-	value f = (value)new_memory(sizeof (struct value));
+	value f = free_list;
+	if (f)
+		free_list = f->L;
+	else
+		f = (value)new_memory(sizeof (struct value));
+
 	f->N = 1;
 	f->T = T;
 	f->L = L;
