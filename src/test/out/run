@@ -385,3 +385,12 @@ Undefined symbol aa on line 1
 Undefined symbol bb on line 1
 Undefined symbol c on line 2
 ] bad
+[
+You used a data type incorrectly.
+] bad
+[
+You used a data type incorrectly.
+] bad
+[
+You used a data type incorrectly.
+] bad

@@ -27,7 +27,7 @@ static void putv(value f)
 		else if (f->T == type_cons)
 			{
 			value g;
-			if (!f->L || !f->L->L) bad_type();
+			if (!f->L || !f->L->L || f->L->L->L) bad_type();
 			putv(arg(f->L->R));
 			g = arg(f->R);
 			drop(f);
@@ -35,10 +35,14 @@ static void putv(value f)
 			continue;
 			}
 		else if (f->T == type_C)
-			;
+			{
+			if (f->L) bad_type();
+			}
 		else if (f->T == type_var)
 			{
-			value g = arg(f->R);
+			value g;
+			if (f->L) bad_type();
+			g = arg(f->R);
 			drop(f);
 			f = g;
 			continue;
