@@ -34,10 +34,8 @@ void show_atom(value f)
 		put("L");
 	else if (f->T == type_Y)
 		put("@");
-	else if (f->T == type_later)
-		put("later");
 	else if (f->T == type_query)
-		put("?");
+		put("query");
 	else if (f->T == type_cons)
 		put("cons");
 	else if (f->T == type_say)

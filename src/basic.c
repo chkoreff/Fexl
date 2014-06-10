@@ -53,25 +53,11 @@ value type_Y(value f)
 	return apply(hold(f->R),hold(f));
 	}
 
-/* (later x) delays evaluation of x.  It is used to return a function which
-should be evaluated later.  The query function recognizes the (later x) form
-and peels off the outer "later" layer. */
-value type_later(value f)
-	{
-	(void)f;
-	return 0;
-	}
-
 /* (query x y) = y x, except x is evaluated first. */
 value type_query(value f)
 	{
-	value x, xp, z;
 	if (!f->L || !f->L->L) return 0;
-	x = arg(f->L->R);
-	xp = (x->T == type_later && x->R) ? x->R : x;
-	z = apply(hold(f->R),hold(xp));
-	drop(x);
-	return z;
+	return apply(hold(f->R),arg(f->L->R));
 	}
 
 /* (cons x y) F G = G x y */
@@ -94,7 +80,7 @@ value L;
 value Y;
 value F;
 value query;
-value Qcons;
+value cons;
 
 void beg_basic(void)
 	{
@@ -106,7 +92,7 @@ void beg_basic(void)
 	Y = Q(type_Y);
 	F = Q(type_F);
 	query = Q(type_query);
-	Qcons = Q(type_cons);
+	cons = Q(type_cons);
 	}
 
 void end_basic(void)
@@ -119,5 +105,5 @@ void end_basic(void)
 	drop(Y);
 	drop(F);
 	drop(query);
-	drop(Qcons);
+	drop(cons);
 	}

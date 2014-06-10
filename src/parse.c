@@ -27,7 +27,7 @@ term   => sym
 
 def    => empty
 def    => = term
-def    => == term
+def    => = \ term
 
 sym    => name
 sym    => string
@@ -238,7 +238,7 @@ static value parse_list(void)
 
 	term = parse_term();
 	if (term == 0) return hold(C);
-	return app(app(hold(Qcons),term),parse_list());
+	return app(app(hold(cons),term),parse_list());
 	}
 
 static value parse_term(void)
@@ -288,19 +288,19 @@ If you want a lambda symbol to contain '=', you must use white space after the
 initial '\'.  This tells the parser that the lambda symbol is terminated by
 white space only, and not '='.  For example:
 
-  \ =   = num_eq
-  \ ==  = num_eq
-  \ !=  = num_ne
-  \ <   = num_lt
-  \ <=  = num_le
-  \ >   = num_gt
-  \ >=  = num_ge
+  \ =   = eq
+  \ ==  = eq
+  \ !=  = ne
+  \ <   = lt
+  \ <=  = le
+  \ >   = gt
+  \ >=  = ge
 */
 static value parse_lambda(unsigned long first_line)
 	{
 	value sym;
-	unsigned short count_eq = 0;
 	value def = 0;
+	int lazy = 0;
 	value body;
 	value result;
 
@@ -313,20 +313,20 @@ static value parse_lambda(unsigned long first_line)
 		syntax_error("Missing lambda symbol", first_line);
 
 	skip_filler();
-
 	first_line = source_line;
 
-	/* Count any '=' signs, up to 2. */
-	while (ch == '=' && count_eq < 2)
+	/* Parse the definition of the symbol if we see an '=' char. */
+	if (ch == '=')
 		{
-		count_eq++;
 		skip();
-		}
-
-	/* Parse the definition of the symbol if we saw an '=' char. */
-	if (count_eq)
-		{
 		skip_filler();
+		if (ch == '\\')
+			{
+			lazy = 1;
+			skip();
+			skip_filler();
+			}
+
 		def = parse_term();
 		if (def == 0)
 			syntax_error("Missing definition", first_line);
@@ -336,19 +336,11 @@ static value parse_lambda(unsigned long first_line)
 	body = lam(sym,parse_exp());
 
 	/* Produce the result based on the kind of definition used, if any. */
-	if (count_eq == 0)
-		/* no definition */
+	if (def == 0)
 		result = hold(body);
-	else if (count_eq == 1)
-		{
-		/* = normal definition */
-		if (body == I)
-			result = hold(def);
-		else
-			result = app(hold(body),hold(def));
-		}
+	else if (lazy)
+		result = app(hold(body),hold(def));
 	else
-		/* == eager definition */
 		result = app(app(hold(query),hold(def)),hold(body));
 
 	if (def) drop(def);

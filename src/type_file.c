@@ -10,8 +10,6 @@
 #include <type_str.h>
 #include <type_var.h>
 
-/*LATER Fexl function "with" to use a different put & get and then restore. */
-
 /* I removed the tail recursion in the cases for type_cons and type_var. */
 static void putv(value f)
 	{

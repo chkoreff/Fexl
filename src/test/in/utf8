@@ -25,6 +25,11 @@ say ["åabcüdef = " åabcüdef]
 say ["ghij = " ghij]
 say [ "üä = " üä]
 say ["1≠0 = " 1≠0]
+
+\"vegetable"="grönsak"
+\"dessert"="efterrätt"
+say ["vegetable " "vegetable"]
+say ["dessert " "dessert"]
 )
 
 test_utf

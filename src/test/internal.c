@@ -121,14 +121,11 @@ void test_all_eval(void)
 	}
 
 	test_eval(A(hold(C),A(hold(I),hold(S))),1);
-	test_eval(A(A(hold(query),A(A(hold(I),hold(I)),
-		A(hold(I),hold(S)))),hold(C)),1);
-
-	test_eval(hold(Qcons),1);
-	test_eval(A(hold(Qcons),hold(x)),1);
-	test_eval(A(A(hold(Qcons),hold(x)),hold(y)),1);
-	test_eval(A(A(A(hold(Qcons),hold(x)),hold(y)),hold(z)),1);
-	test_eval(A(A(A(A(hold(Qcons),hold(x)),hold(y)),hold(z)),Qsym0(0,"G")),1);
+	test_eval(hold(cons),1);
+	test_eval(A(hold(cons),hold(x)),1);
+	test_eval(A(A(hold(cons),hold(x)),hold(y)),1);
+	test_eval(A(A(A(hold(cons),hold(x)),hold(y)),hold(z)),1);
+	test_eval(A(A(A(A(hold(cons),hold(x)),hold(y)),hold(z)),Qsym0(0,"G")),1);
 	test_eval(A(A(A(hold(S),hold(I)),hold(I)),hold(I)),1);
 
 	{

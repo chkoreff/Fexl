@@ -190,7 +190,7 @@ end_test
 beg_test
 (
 cat <<'EOM' | ../bin/fexl
-\x==var_new
+\x=var_new
 var_put x ["a" "b"]
 say (x 42)
 EOM

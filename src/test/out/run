@@ -109,9 +109,6 @@ ping!
 : eval (C (I S))
 = (C (I S))
 
-: eval ((? ((I I) (I S))) C)
-= (C S)
-
 : eval cons
 = cons
 
@@ -229,7 +226,7 @@ Missing lambda symbol on line 1
 Missing lambda symbol on line 1
 ] bad
 [
-Missing definition on line 2
+Undefined symbol z= on line 3
 ] bad
 [
 Extraneous input on line 4
@@ -240,7 +237,7 @@ Extraneous input on line 4
 [
 ===
 source_label = test/in/a1
-source_line = 179
+source_line = 194
 ===
 Hello world.
 x = 42
@@ -299,6 +296,10 @@ ping!
 ping!
 ping!
 ping!
+ping!
+ping!
+ping!
+ping!
 ===
 ping!
 ping!
@@ -348,6 +349,12 @@ AABABCABCD
 12.6
 x = 17.6
 ===
+line 1
+line 2
+Hello world!
+Hello world!
+Hello world!
+===
 length is 16777216
 ] good
 [
@@ -379,6 +386,8 @@ ghij
 ghij = hej ghij
 üä = hej üä
 1≠0 = hej 1≠0
+vegetable grönsak
+dessert efterrätt
 ] good
 [
 Undefined symbol aa on line 1

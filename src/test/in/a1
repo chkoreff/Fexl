@@ -73,20 +73,21 @@ put NL
 )
 
 say "==="
-# Testing deferred evaluation with "later".
+# Test deferred evaluation.
 
-\ping=(say "ping!")
+\ping= \(say "ping!")
 
-\g==
-	(
-	\f=(ping ping)
-	later (f f)
+\g=
+	\(
+	\f=\(ping ping)
+	\f=\(f f)
+	f
 	)
-g
+g g
 
 say "==="
 # Test eager evaluation.
-\f==(ping ping ping)
+\f=(ping ping ping)
 
 
 say "==="
@@ -143,13 +144,27 @@ say ~ABC abcdABAABC
 say [~ABCD AABABCABCD"ABCD"]
 
 say "==="
-\x==var_new
+\x=var_new
 var_put x 12.6
 say x
-\v==(var_get x)
+\v=(var_get x)
 say v
 var_put x (+ (var_get x) 5.0)
 say ["x = " x]
+
+say "==="
+# Test some funky syntax cases.
+\ =:= =say
+
+=:= "line 1"
+=:= "line 2"
+
+\Talk= \ (say "Hello world!")
+\talk=\Talk
+\ talk = \ talk
+talk
+talk
+talk
 
 say "==="
 \x="1234567890123456"
