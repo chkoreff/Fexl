@@ -75,12 +75,12 @@ put NL
 say "==="
 # Test deferred evaluation.
 
-\ping= \(say "ping!")
+\ping== (say "ping!")
 
-\g=
-	\(
-	\f=\(ping ping)
-	\f=\(f f)
+\g==
+	(
+	\f==(ping ping)
+	\f==(f f)
 	f
 	)
 g g
@@ -159,9 +159,9 @@ say "==="
 =:= "line 1"
 =:= "line 2"
 
-\Talk= \ (say "Hello world!")
-\talk=\Talk
-\ talk = \ talk
+\Talk== (say "Hello world!")
+\talk==Talk
+\ talk == talk
 talk
 talk
 talk

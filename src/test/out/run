@@ -226,7 +226,7 @@ Missing lambda symbol on line 1
 Missing lambda symbol on line 1
 ] bad
 [
-Undefined symbol z= on line 3
+Missing definition on line 2
 ] bad
 [
 Extraneous input on line 4

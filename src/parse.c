@@ -27,7 +27,7 @@ term   => sym
 
 def    => empty
 def    => = term
-def    => = \ term
+def    => == term
 
 sym    => name
 sym    => string
@@ -319,13 +319,12 @@ static value parse_lambda(unsigned long first_line)
 	if (ch == '=')
 		{
 		skip();
-		skip_filler();
-		if (ch == '\\')
+		if (ch == '=')
 			{
 			lazy = 1;
 			skip();
-			skip_filler();
 			}
+		skip_filler();
 
 		def = parse_term();
 		if (def == 0)
