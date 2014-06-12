@@ -22,7 +22,7 @@ terms  => ; exp
 
 term   => ( exp )
 term   => [ terms ]
-term   => { exp }
+term   => { terms }
 term   => sym
 
 def    => empty
