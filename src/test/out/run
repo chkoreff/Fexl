@@ -237,7 +237,7 @@ Extraneous input on line 4
 [
 ===
 source_label = test/in/a1
-source_line = 194
+source_line = 201
 ===
 Hello world.
 x = 42
@@ -356,6 +356,11 @@ Hello world!
 Hello world!
 ===
 length is 16777216
+===
+0
+1 x
+2 x y
+3 x y zz
 ] good
 [
 ch = "H"

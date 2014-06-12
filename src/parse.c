@@ -241,6 +241,19 @@ static value parse_list(void)
 	return app(app(hold(cons),term),parse_list());
 	}
 
+static value parse_tuple(void)
+	{
+	value exp = hold(I);
+	while (1)
+		{
+		value val = parse_term();
+		skip_filler();
+		if (val == 0) break;
+		exp = app(app(hold(L),exp),val);
+		}
+	return exp;
+	}
+
 static value parse_term(void)
 	{
 	unsigned long first_line = source_line;
@@ -262,10 +275,10 @@ static value parse_term(void)
 			syntax_error("Unclosed bracket", first_line);
 		skip();
 		}
-	else if (ch == '{') /* symbolic form */
+	else if (ch == '{') /* tuple */
 		{
 		skip();
-		exp = A(hold(I),parse_exp());
+		exp = parse_tuple();
 		if (ch != '}')
 			syntax_error("Unclosed brace", first_line);
 		skip();
