@@ -2,6 +2,32 @@
 \NL="
 "
 
+# (append xs ys) is the list consisting of list xs followed by list ys.
+\append=(@\append\xs\ys xs ys \x\xs [x;append xs ys])
+
+# (filter f xs) is the list of items x in xs for which (f x) is true.
+\filter=(@\filter\f\xs xs [] \x\xs f x (cons x) (); filter f xs)
+
+# Sort the list xs with the ordering functions lt and gt.
+\sort_with =
+	(@\sort_with\lt\gt\xs
+	xs [] \x\xs 
+	\sort==(sort_with lt gt)
+	\lo=(sort; filter (gt x) xs)
+	\hi=(sort; filter (lt x) xs)
+	append lo; [x; hi]
+	)
+
+# Normal sort with the predefined ordering functions.
+\sort=(sort_with <= >)
+
+# Insert a separator between the elements of a list.
+\join=
+	(@\join\sep\xs
+	xs [] \x\xs
+	xs [x] \_\_ [x sep; join sep xs]
+	)
+
 say "==="
 say ["source_label = " source_label]
 say ["source_line = " source_line]
@@ -91,7 +117,6 @@ say "==="
 
 
 say "==="
-\append=(@\append\xs\ys xs ys \x\xs cons x; append xs ys)
 \list=(append ["x" "y"] ["z"])
 \list=(append list; append list; ["!"])
 say list
@@ -197,6 +222,18 @@ say ({} ["0"])
 say ({"x"} \x ["1" " " x])
 say ({"x" "y"} \x\y ["2" " " x " " y])
 say ({"x" "y" ["z""z"]} \x\y\z ["3" " " x " " y " " z])
+
+say "==="
+# Test sorting.
+\show=(\list say (join " " list))
+\list=["bread" "toothpaste" "bananas" "apples" "bananas"]
+show list
+show (sort list) # normal
+nl
+show (sort_with <= > list) # forward (same as normal)
+show (sort_with > <= list) # reverse
+show (sort_with < > list) # forward unique
+show (sort_with > < list) # reverse unique
 
 \\
 Extra stuff not parsed.
