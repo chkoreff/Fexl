@@ -1,13 +1,13 @@
 #include <value.h>
 
-#include <die.h>
 #include <basic.h>
+#include <die.h>
+#include <input.h>
 #include <output.h>
 #include <parse.h>
+#include <source.h>
 #include <stdio.h> /* fgetc fopen */
 #include <str.h>
-#include <system.h>
-#include <type_str.h>
 #include <type_sym.h>
 
 const char *source_label; /* current name of source */
@@ -22,26 +22,31 @@ static int get_ch(void)
 
 value parse_file(const char *name)
 	{
+	input save_getd = getd;
+	value exp;
+
 	source_label = name;
 	source_fh = source_label[0] ? fopen(source_label,"r") : stdin;
 	if (source_fh == 0)
 		{
-		beg_error();
+		putd = putd_err;
 		put("Could not open file ");put(source_label);nl();
 		die("");
 		}
 
 	source_line = 1;
-	read_ch = get_ch;
-	return parse();
+	getd = get_ch;
+	exp = parse();
+	getd = save_getd;
+	return exp;
 	}
 
 value resolve_file(const char *name, value context(value))
 	{
-	value f = resolve(parse_file(name),context);
-	if (f->T == type_sym)
+	value exp = resolve(parse_file(name),context);
+	if (exp->T == type_sym)
 		die(""); /* Die if we saw any undefined symbols. */
-	return f;
+	return exp;
 	}
 
 static void put_loc(unsigned long line)
@@ -56,24 +61,14 @@ static void put_loc(unsigned long line)
 
 void syntax_error(const char *msg, unsigned long line)
 	{
-	beg_error();
+	putd = putd_err;
 	put(msg); put_loc(line);
 	die("");
 	}
 
 void undefined_symbol(const char *name, unsigned long line)
 	{
-	target old = beg_error();
+	output save_putd = putd;
 	put("Undefined symbol "); put(name); put_loc(line);
-	end_error(old);
-	}
-
-value type_die(value f)
-	{
-	value x;
-	if (!f->L) return 0;
-	x = arg(f->R);
-	die(get_str(x)->data);
-	drop(x);
-	return hold(I);
+	putd = save_putd;
 	}

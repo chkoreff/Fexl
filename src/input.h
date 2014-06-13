@@ -1,2 +1,2 @@
-extern string get_stdin(void);
-extern string (*getd)(void);
+typedef int (*input)(void);
+extern input getd; /* current input function */

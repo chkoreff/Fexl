@@ -49,7 +49,7 @@ void end_memory(void)
 	{
 	if (total_blocks != 0 || total_bytes != 0)
 		{
-		beg_error();
+		putd = putd_err;
 		put("Memory leak!\n");
 		put("The system did not free precisely the memory it allocated.\n");
 		put("  total_blocks = "); put_ulong(total_blocks); nl();

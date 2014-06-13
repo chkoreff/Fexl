@@ -5,9 +5,10 @@
 #include <buffer.h>
 #include <ctype.h>
 #include <die.h>
+#include <input.h>
 #include <limits.h>
 #include <parse.h>
-#include <system.h>
+#include <source.h>
 #include <type_sym.h>
 
 /*
@@ -41,15 +42,11 @@ file) or the special token "\\".  The \\ token stops the parser immediately, as
 if it had reached end of file.
 */
 
-/* The read_ch function reads the next character.  It can be set to read from
-any source such as a file or a string. */
-int (*read_ch)(void);
-
 static int ch; /* current character */
 
 static void skip(void)
 	{
-	ch = read_ch();
+	ch = getd();
 	if (ch == '\n')
 		{
 		if (source_line == ULONG_MAX) die("skip");
@@ -404,7 +401,7 @@ value parse(void)
 	{
 	value exp;
 
-	/* Save and restore so read_ch can potentially call parse via eval. */
+	/* Save and restore so getd can potentially call parse via eval. */
 	int save_ch = ch;
 	ch = 0;
 

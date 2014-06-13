@@ -4,16 +4,18 @@
 #include <define.h>
 #include <die.h>
 #include <num.h>
+#include <source.h>
 #include <str.h>
 #include <string.h>
-#include <system.h>
 #include <type_cmp.h>
 #include <type_convert.h>
-#include <type_file.h>
+#include <type_input.h>
 #include <type_math.h>
 #include <type_num.h>
+#include <type_output.h>
 #include <type_str.h>
 #include <type_sym.h>
+#include <type_sys.h>
 #include <type_var.h>
 
 static const char *curr_name;

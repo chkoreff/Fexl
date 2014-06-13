@@ -237,7 +237,7 @@ Extraneous input on line 4
 [
 ===
 source_label = test/in/a1
-source_line = 238
+source_line = 247
 ===
 Hello world.
 x = 42
@@ -369,6 +369,13 @@ apples bananas bananas bread toothpaste
 toothpaste bread bananas bananas apples
 apples bananas bread toothpaste
 toothpaste bread bananas apples
+===
+42
+
+-7.8
+
+0
+-0
 ] good
 [
 ch = "H"
@@ -415,4 +422,7 @@ You used a data type incorrectly.
 ] bad
 [
 You used a data type incorrectly.
+] bad
+[
+error 23!!
 ] bad

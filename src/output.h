@@ -1,8 +1,8 @@
-typedef void (*target)(const char *data, unsigned long len);
+extern void putd_out(const char *data, unsigned long len);
+extern void putd_err(const char *data, unsigned long len);
 
-extern target beg_error(void);
-extern void end_error(target old);
-extern target putd;
+typedef void (*output)(const char *data, unsigned long len);
+extern output putd; /* current output function */
 
 extern void put(const char *data);
 extern void nl(void);

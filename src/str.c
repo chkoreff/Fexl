@@ -72,7 +72,6 @@ int str_eq(string x, string y)
 	return memcmp(x->data, y->data, x->len) == 0;
 	}
 
-/*TODO not yet used */
 void put_str(string x)
 	{
 	putd(x->data,x->len);

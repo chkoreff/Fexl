@@ -12,7 +12,7 @@
 \sort_with =
 	(@\sort_with\lt\gt\xs
 	xs [] \x\xs 
-	\sort==(sort_with lt gt)
+	\sort=(sort_with lt gt)
 	\lo=(sort; filter (gt x) xs)
 	\hi=(sort; filter (lt x) xs)
 	append lo; [x; hi]
@@ -234,6 +234,15 @@ show (sort_with <= > list) # forward (same as normal)
 show (sort_with > <= list) # reverse
 show (sort_with < > list) # forward unique
 show (sort_with > < list) # reverse unique
+
+say "==="
+# Test str_num directly.
+say (str_num "42")
+say (str_num "42x") # invalid returns []
+say (str_num "-7.8")
+say (str_num "")
+say (str_num "0")
+say (str_num "-0")
 
 \\
 Extra stuff not parsed.

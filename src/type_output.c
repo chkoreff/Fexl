@@ -2,11 +2,10 @@
 #include <value.h>
 
 #include <basic.h>
-#include <input.h>
 #include <num.h>
 #include <output.h>
-#include <type_file.h>
 #include <type_num.h>
+#include <type_output.h>
 #include <type_str.h>
 #include <type_var.h>
 
@@ -16,10 +15,7 @@ static void putv(value f)
 	while (1)
 		{
 		if (f->T == type_str)
-			{
-			string str = get_str(f);
-			putd(str->data, str->len);
-			}
+			put_str(get_str(f));
 		else if (f->T == type_num)
 			put_num(get_num(f));
 		else if (f->T == type_cons)
@@ -51,12 +47,6 @@ static void putv(value f)
 		drop(f);
 		break;
 		}
-	}
-
-value type_get(value f)
-	{
-	(void)f;
-	return Qstr(getd());
 	}
 
 value type_put(value f)

@@ -5,9 +5,9 @@
 
 void die(const char *msg)
 	{
-	beg_error();
 	if (msg[0])
 		{
+		putd = putd_err;
 		put(msg);nl();
 		}
 	exit(1);

@@ -7,7 +7,6 @@
 #include <type_cmp.h>
 #include <type_num.h>
 #include <type_str.h>
-#include <sys_stdio.h>
 
 static int cmp(value x, value y)
 	{

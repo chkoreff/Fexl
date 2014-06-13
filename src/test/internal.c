@@ -7,8 +7,8 @@
 #include <output.h>
 #include <string.h>
 #include <test/show.h>
-#include <type_file.h>
 #include <type_math.h>
+#include <type_output.h>
 #include <type_str.h>
 #include <type_sym.h>
 

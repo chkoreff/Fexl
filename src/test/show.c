@@ -5,8 +5,8 @@
 #include <output.h>
 #include <str.h>
 #include <test/show.h>
-#include <type_file.h>
 #include <type_num.h>
+#include <type_output.h>
 #include <type_str.h>
 #include <type_sym.h>
 #include <type_var.h>

@@ -196,3 +196,12 @@ say (x 42)
 EOM
 ) 2>&1
 end_test
+
+# die with structured error message
+beg_test
+(
+cat <<'EOM' | ../bin/fexl
+die ["error " (+ 20 3) (. "!" "!")]
+EOM
+) 2>&1
+end_test

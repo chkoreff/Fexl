@@ -61,19 +61,9 @@ compile="gcc -c -Wall -Werror -Wunused-parameter \
 -ansi -pedantic \
 -fdata-sections -ffunction-sections -Os"
 
-link="gcc -s -Wl,--gc-sections"
+link="gcc -s -Wl,--gc-sections -lm"
 
 include="-I ."
-
-# This defines the linkage for special include files.
-find_module()
-	{
-	local module="$1"
-	case $module in
-		sys_math) echo -lm ;;
-	esac
-	return
-	}
 
 # Establish .h dependencies for all .c files.
 for file_c in `find . -name "*.c" | sort`; do
@@ -171,10 +161,7 @@ for main_module in $update_main; do
 	objects=""
 	for other_module in $need_modules; do
 		file_o=../obj/$other_module.o
-		if [ ! -e $file_o ]; then
-			file_o=`find_module $other_module`
-		fi
-		if [ "$file_o" != "" ]; then
+		if [ -e $file_o ]; then
 			objects="$objects $file_o"
 		fi
 	done
