@@ -27,6 +27,16 @@ There is no "installation" as such.  You just put the Fexl code anywhere you
 like, build it, and run it from there.  There is no script to copy it to /usr
 or anything like that.
 
+My approach is to create a ~/bin/fexl script which does this:
+
+	exec ~/project/fexl/bin/fexl "$@"
+
+So the "fexl" script in my search path runs the real executable right where I
+built it, setting argv[0] to its full path name, allowing it to resolve the
+names of any files it might need that come bundled with the distribution.  That
+way I don't have to rely on non-portable features like "/proc/self/exe" to
+locate the executable.
+
 Helpful Shortcuts
 -----------------
 
