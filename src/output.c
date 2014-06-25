@@ -31,9 +31,11 @@ void put(const char *data)
 	putd(data, strlen(data));
 	}
 
-void nl(void)
+void put_ch(char ch)
 	{
-	putd("\n",1);
+	char buf[1];
+	buf[0] = ch;
+	putd(buf,1);
 	}
 
 void put_long(long x)
@@ -49,4 +51,9 @@ void put_ulong(unsigned long x)
 void put_double(double x)
 	{
 	put(format_double(x));
+	}
+
+void nl(void)
+	{
+	putd("\n",1);
 	}

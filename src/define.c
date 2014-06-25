@@ -16,7 +16,6 @@
 #include <type_str.h>
 #include <type_sym.h>
 #include <type_sys.h>
-#include <type_var.h>
 
 static const char *curr_name;
 
@@ -42,7 +41,6 @@ static value define_name(const char *name)
 	if (match("@")) return Q(type_Y);
 	if (match("T")) return hold(C);
 	if (match("F")) return Q(type_F);
-	if (match("cons")) return hold(cons);
 
 	if (match("+")) return Q(type_add);
 	if (match("-")) return Q(type_sub);
@@ -51,12 +49,12 @@ static value define_name(const char *name)
 	if (match("^")) return Q(type_pow);
 	if (match(".")) return Q(type_concat);
 
-	if (match("<")) return Q(type_lt);
-	if (match("<=")) return Q(type_le);
-	if (match("=")) return Q(type_eq);
-	if (match("!=")) return Q(type_ne);
-	if (match(">=")) return Q(type_ge);
-	if (match(">")) return Q(type_gt);
+	if (match("lt")) return Q(type_lt);
+	if (match("le")) return Q(type_le);
+	if (match("eq")) return Q(type_eq);
+	if (match("ne")) return Q(type_ne);
+	if (match("ge")) return Q(type_ge);
+	if (match("gt")) return Q(type_gt);
 
 	if (match("length")) return Q(type_length);
 	if (match("slice")) return Q(type_slice);
@@ -67,13 +65,6 @@ static value define_name(const char *name)
 	if (match("round")) return Q(type_round);
 	if (match("trunc")) return Q(type_trunc);
 	if (match("abs")) return Q(type_abs);
-
-	if (match("source_label")) return Qstr0(source_label);
-	if (match("source_line")) return Qnum_ulong(source_line);
-
-	if (match("var_new")) return Q(type_var_new);
-	if (match("var_put")) return Q(type_var_put);
-	if (match("var_get")) return Q(type_var_get);
 
 	if (match("die")) return Q(type_die);
 	return 0;

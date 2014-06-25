@@ -8,17 +8,23 @@ all within a secure "sandbox".
 Getting started
 ---------------
 
-First, get the code and go into the source code directory:
+Go into the source code directory:
 
 	cd src
 
-Now build the code:
+Build the code:
 
 	./build
 
-Run the hello program to see a simple example:
+Test the validity of the code:
 
-	../bin/fexl hello.fxl
+	test/check
+
+That runs the test/run script and compares its output with the reference output
+in test/run.out.  If everything works as expected, you should see no output.
+If you do see some output, it is likely due to a small incompatibility in
+floating point arithmetic on your machine.  However, I have tried to make even
+that as portable as possible.
 
 Installation
 ------------
@@ -37,54 +43,16 @@ names of any files it might need that come bundled with the distribution.  That
 way I don't have to rely on non-portable features like "/proc/self/exe" to
 locate the executable.
 
-Helpful Shortcuts
------------------
-
-During development I like to use scripts that automatically do a build for me.
-For example, you could run the hello program like this:
-
-	./fexl hello.fxl
-
-The "fexl" script automatically does a quiet build before running ../bin/fexl.
-That way I can change the C code and not have to think about doing the build.
+Other
+-----
 
 To erase the build output files:
 
 	./clean
 
-Normally you won't have to bother with that because the build script behaves
-quite intelligently, but it's good to have.
-
-To build quietly:
-
-	verbose=0 ./build
-
-To build loudly:
-
-	verbose=2 ./build
-
-To force a clean build:
-
-	./clean && ./build
-
 To source the handy shell aliases that I use for development:
 
 	. handy
-
-Test Suite
-----------
-
-Fexl includes a very detailed test suite which includes tests for normal
-behavior, syntax errors, undefined symbols, and even pathological run-time
-behavior such as exceeding limits on time, memory, and stack.
-
-To run the main test program:
-
-	test/run
-
-To compare the test output against the reference output:
-
-	test/check
 
 Guide to source code
 --------------------

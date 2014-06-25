@@ -54,6 +54,7 @@ value type_length(value f)
 
 /* (slice str pos len) returns the len bytes of str starting at pos, or 0 bytes
 if pos or len exceeds the bounds of str. */
+/*LATER possibly undef on out of bounds */
 value type_slice(value f)
 	{
 	value x, y, z, result;

@@ -1,0 +1,204 @@
+[
+] good
+[
+Unclosed string on line 2
+] bad
+[
+Unclosed string on line 1
+] bad
+[
+Incomplete string terminator on line 1
+] bad
+[
+Unclosed parenthesis on line 1
+] bad
+[
+Missing symbol after '\' on line 1
+] bad
+[
+Missing symbol after '\' on line 1
+] bad
+[
+Missing definition on line 2
+] bad
+[
+Missing symbol declaration before '=' on line 3
+] bad
+[
+Extraneous input on line 4
+] bad
+[
+25
+] good
+[
+===
+Hello world.
+x = 42
+47
+37
+210
+8.4
+inf
+===
+T
+T
+T
+F
+T
+T
+F
+T
+T
+F
+F
+F
+F
+T
+T
+T
+F
+F
+T
+T
+F
+T
+F
+F
+T
+===
+-4.97
+210802.919995902
+4.8655
+5
+49.4600760456274
+100000000000.01
+285
+125867
+7
+-7
+8
+-8
+7
+-7
+7
+-7
+10000
+3.00000000000001
+
+a
+ab
+a
+abcdefgh
+0
+1
+3
+3
+Hello world.
+===
+ping!
+ping!
+ping!
+ping!
+ping!
+ping!
+ping!
+ping!
+===
+ping!
+ping!
+ping!
+===
+"Ain't nothin' simple when you're doin' it for real." (Gus Baird)
+
+"My fathers sleep on the sunrise plains,
+And each one sleeps alone.
+Their trails may dim to the grass and rains,
+For I choose to make my own.
+I lay proud claim to their blood and name,
+But I lean on no dead kin;
+My name is mine, for the praise or scorn,
+And the world began when I was born
+And the world is mine to win. ..."
+
+  (Badger Clark, "The Westerner")
+
+===
+hello
+"hello"
+~(1) "hello"(1)
+~(2) ~(1) "hello"(1)(2)
+===
+ping!
+hi
+zzzzzz
+q237
+y
+
+aa
+
+bb
+a
+
+
+a
+hi!
+a
+abcdABA
+AABABCABCD
+===
+Hello world!
+Hello world!
+Hello world!
+===
+length is 16777216
+===
+42
+-7.8
+0
+-0
+43.8
+===
+[]
+[bc]
+[abc]
+[]
+[c]
+[]
+] good
+[
+ch = "H"
+ch = "i"
+ch = "x"
+ch = "å"
+ch = "a"
+ch = "b"
+ch = "c"
+ch = "
+"
+ch = "d"
+ch = "ü"
+ch = "≠"
+ch = "m"
+ch = "
+"
+] good
+[
+== test_utf
+f = hej
+åabcüdef
+ghij
+üä
+1≠0
+
+åabcüdef = hej åabcüdef
+ghij = hej ghij
+üä = hej üä
+1≠0 = hej 1≠0
+vegetable grönsak
+dessert efterrätt
+] good
+[
+Undefined symbol aa on line 1
+Undefined symbol bb on line 1
+Undefined symbol c on line 2
+] bad

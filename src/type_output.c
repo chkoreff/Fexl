@@ -7,46 +7,17 @@
 #include <type_num.h>
 #include <type_output.h>
 #include <type_str.h>
-#include <type_var.h>
 
-/* I removed the tail recursion in the cases for type_cons and type_var. */
 static void putv(value f)
 	{
-	while (1)
-		{
-		if (f->T == type_str)
-			put_str(get_str(f));
-		else if (f->T == type_num)
-			put_num(get_num(f));
-		else if (f->T == type_cons)
-			{
-			value g;
-			if (!f->L || !f->L->L || f->L->L->L) bad_type();
-			putv(arg(f->L->R));
-			g = arg(f->R);
-			drop(f);
-			f = g;
-			continue;
-			}
-		else if (f->T == type_C)
-			{
-			if (f->L) bad_type();
-			}
-		else if (f->T == type_var)
-			{
-			value g;
-			if (f->L) bad_type();
-			g = arg(f->R);
-			drop(f);
-			f = g;
-			continue;
-			}
-		else
-			bad_type();
+	if (f->T == type_str)
+		put_str(get_str(f));
+	else if (f->T == type_num)
+		put_num(get_num(f));
+	else
+		bad_type();
 
-		drop(f);
-		break;
-		}
+	drop(f);
 	}
 
 value type_put(value f)

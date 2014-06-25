@@ -1,183 +1,65 @@
 #!/bin/sh
-# NOTE: This script cannot handle spaces in file names.
-
-[ "$verbose" = "" ] && verbose=1
-
-# stale $target $source1 ... $sourceN
-# Return true if $target does not exist or is older than any $source.
-stale()
-	{
-	local target="$1"; shift
-
-	if [ ! -e $target ]; then
-		true
-		return
-	fi
-
-	for source in "$@"; do
-		if [ $source -nt $target ]; then
-			true
-			return
-		fi
-	done
-
-	false
-	}
-
-trace()
-	{
-	if [ $verbose -lt 1 ]; then return; fi
-	echo $@
-	}
 
 # Run a system command and exit if unsuccessful.
 run()
 	{
-	if [ $verbose -gt 1 ]; then
-		trace $@
-	fi
+	#echo $@  # enable for trace
 	$@
 	local code=$?
 	if [ $code -ne 0 ]; then exit $code; fi
 	}
 
-# Erase a file if it exists and remove any empty parent directories.
-erase()
+cmd_compile="gcc -c -Wall -Werror -Wunused-parameter -ansi -pedantic -O3 -I ."
+cmd_link="gcc -s -lm"
+
+compile()
 	{
 	local name="$1"
-	rm -f $name
-	while [ true ]; do
-		name=`dirname $name`
-		rmdir 2>/dev/null $name || break
-	done
+	local file_o=../obj/$name.o
+	objects="$objects $file_o"
+	run $cmd_compile $name.c -o $file_o
 	}
 
-# I compile with -Os to optimize for size.
-#
-# I compile with -fdata-sections and -ffunction-sections so the linker can
-# prune any unused data or functions with -Wl,--gc-sections.
+link()
+	{
+	local name="$1"
+	shift
+	run $cmd_link $@ -o ../bin/$name
+	}
 
-compile="gcc -c -Wall -Werror -Wunused-parameter \
--ansi -pedantic \
--fdata-sections -ffunction-sections -Os"
+./clean
 
-link="gcc -s -Wl,--gc-sections -lm"
+mkdir -p ../obj
+mkdir -p ../bin
 
-include="-I ."
+objects=""
+compile basic
+compile buffer
+compile die
+compile format
+compile input
+compile memory
+compile num
+compile output
+compile parse
+compile source
+compile str
+compile type_cmp
+compile type_convert
+compile type_input
+compile type_math
+compile type_num
+compile type_output
+compile type_str
+compile type_sym
+compile type_sys
+compile value
 
-# Establish .h dependencies for all .c files.
-for file_c in `find . -name "*.c" | sort`; do
-	file_c=${file_c#./}
-	file_cache=../cache/h/${file_c%.c}
-	stale $file_cache $file_c
-	if [ $? -eq 0 ]; then
-		mkdir -p `dirname $file_cache`
-		grep -e "^#include" $file_c |
-		sed "s/^#include *[<\"]\(.*\)[>\"].*$/\1/" >$file_cache
-	fi
-done
+# LATER make a library
+common=$objects
 
-# See if any .c files have disappeared since the last run.
-for file_dep in `find ../cache/h -type f 2>/dev/null | sort`; do
-	module=${file_dep#../cache/h/}
-	file_c=$module.c
-	if [ ! -e $file_c ]; then
-		erase $file_dep
-		erase ../obj/$module.o
-		erase ../bin/$module
-		erase ../cache/o/$module
-	fi
-done
+objects=""
+compile define
+compile fexl
 
-# List of updated modules that are main programs.
-update_main=""
-
-# Compile any .c files that are out of date.
-for file_c in `find . -name "*.c" | sort`; do
-	file_c=${file_c#./}
-	module=${file_c%.c}
-	file_o=../obj/$module.o
-
-	stale $file_o $file_c `cat ../cache/h/$module`
-	if [ $? -eq 0 ]; then
-		mkdir -p `dirname $file_o`
-		trace Compile $module
-		run $compile $include $file_c -o $file_o
-
-		erase ../cache/o/$module
-		grep -q "^int main(" $file_c
-		if [ $? -eq 0 ]; then
-			module=${file_c%.c}
-			update_main="$update_main $module"
-		fi
-	fi
-done
-
-# Update any main caches that are out of date with respect to their .o files.
-for file_cache in `find ../cache/o -type f 2>/dev/null | sort`; do
-	module=${file_cache#../cache/o/}
-	objects=`cat $file_cache`
-
-	for object in $objects; do
-		stale $file_cache $object
-		if [ $? -eq 0 ]; then
-			erase ../cache/o/$module
-			update_main="$update_main $module"
-			break
-		fi
-	done
-done
-
-# Update the list of .o files that need to be linked with any updated main
-# programs.  This does a transitive closure of the .h dependencies.
-for main_module in $update_main; do
-	need_modules=$main_module
-	queue=$main_module
-	while [ "$queue" != "" ]; do
-		next_queue=""
-		for next_module in $queue; do
-			file_c=$next_module.c
-			if [ ! -e $file_c ]; then continue; fi
-			for file_h in `cat ../cache/h/$next_module`; do
-				other_module=${file_h%.h}
-				found=0
-				for entry in $need_modules; do
-					if [ "$entry" = "$other_module" ]; then
-						found=1
-						break
-					fi
-				done
-				if [ $found -eq 0 ]; then
-					next_queue="$next_queue $other_module"
-					need_modules="$need_modules $other_module"
-				fi
-			done
-		done
-		queue=$next_queue
-	done
-
-	file_cache=../cache/o/$main_module
-	mkdir -p `dirname $file_cache`
-	objects=""
-	for other_module in $need_modules; do
-		file_o=../obj/$other_module.o
-		if [ -e $file_o ]; then
-			objects="$objects $file_o"
-		fi
-	done
-	echo $objects >$file_cache
-done
-
-# Link any main programs that are out of date.
-for file_cache in `find ../cache/o -type f 2>/dev/null | sort`; do
-	module=${file_cache#../cache/o/}
-	file_e=../bin/$module
-	objects=`cat $file_cache`
-
-	stale $file_e $objects
-	if [ $? -eq 0 ]; then
-		trace Link $module
-		mkdir -p `dirname $file_e`
-		run $link $objects -o $file_e
-	fi
-done
+link fexl $common $objects

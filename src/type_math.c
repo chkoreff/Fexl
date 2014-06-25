@@ -26,6 +26,7 @@ static value op_num_num(value f, number op(number,number))
 	return z;
 	}
 
+/*LATER log*/
 value type_add(value f) { return op_num_num(f,num_add); }
 value type_sub(value f) { return op_num_num(f,num_sub); }
 value type_mul(value f) { return op_num_num(f,num_mul); }

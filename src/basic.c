@@ -60,13 +60,6 @@ value type_query(value f)
 	return apply(hold(f->R),arg(f->L->R));
 	}
 
-/* (cons x y) F G = G x y */
-value type_cons(value f)
-	{
-	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
-	return apply(apply(hold(f->R),hold(f->L->L->L->R)),hold(f->L->L->R));
-	}
-
 value Qboolean(int x)
 	{
 	return hold(x ? C : F);
@@ -80,7 +73,6 @@ value L;
 value Y;
 value F;
 value query;
-value cons;
 
 void beg_basic(void)
 	{
@@ -92,7 +84,6 @@ void beg_basic(void)
 	Y = Q(type_Y);
 	F = Q(type_F);
 	query = Q(type_query);
-	cons = Q(type_cons);
 	}
 
 void end_basic(void)
@@ -105,5 +96,4 @@ void end_basic(void)
 	drop(Y);
 	drop(F);
 	drop(query);
-	drop(cons);
 	}

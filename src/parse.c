@@ -14,16 +14,12 @@
 /*
 Grammar:
 [
-exp    => terms
+exp    => empty
 exp    => \ sym def exp
-
-terms  => empty
-terms  => term terms
-terms  => ; exp
+exp    => ; exp
+exp    => term exp
 
 term   => ( exp )
-term   => [ terms ]
-term   => { terms }
 term   => sym
 
 def    => empty
@@ -102,7 +98,7 @@ A name may contain just about anything, except for white space (including NUL)
 and a few other special characters.  This is the simplest possible rule that
 can work.
 */
-static value parse_name(int allow_eq)
+static value parse_name()
 	{
 	unsigned long first_line = source_line;
 	buffer buf;
@@ -114,13 +110,11 @@ static value parse_name(int allow_eq)
 		if (at_white()
 			|| ch == '\\'
 			|| ch == '(' || ch == ')'
-			|| ch == '[' || ch == ']'
-			|| ch == '{' || ch == '}'
 			|| ch == ';'
 			|| ch == '"'
 			|| ch == '~'
 			|| ch == '#'
-			|| (ch == '=' && !allow_eq)
+			|| ch == '='
 			|| ch == -1)
 			break;
 		buf_add(&buf,(char)ch);
@@ -209,47 +203,17 @@ static value parse_complex_string(void)
 	return Qsym(1,str,first_line);
 	}
 
-static value parse_symbol(int allow_eq)
+static value parse_symbol()
 	{
 	if (ch == '"')
 		return parse_simple_string();
 	else if (ch == '~')
 		return parse_complex_string();
 	else
-		return parse_name(allow_eq);
+		return parse_name();
 	}
 
-static value parse_term(void);
 static value parse_exp(void);
-
-static value parse_list(void)
-	{
-	value term;
-
-	skip_filler();
-	if (ch == ';')
-		{
-		skip();
-		return parse_exp();
-		}
-
-	term = parse_term();
-	if (term == 0) return hold(C);
-	return app(app(hold(cons),term),parse_list());
-	}
-
-static value parse_tuple(void)
-	{
-	value exp = hold(I);
-	while (1)
-		{
-		value val = parse_term();
-		skip_filler();
-		if (val == 0) break;
-		exp = app(app(hold(L),exp),val);
-		}
-	return exp;
-	}
 
 static value parse_term(void)
 	{
@@ -264,48 +228,13 @@ static value parse_term(void)
 			syntax_error("Unclosed parenthesis", first_line);
 		skip();
 		}
-	else if (ch == '[') /* list */
-		{
-		skip();
-		exp = parse_list();
-		if (ch != ']')
-			syntax_error("Unclosed bracket", first_line);
-		skip();
-		}
-	else if (ch == '{') /* tuple */
-		{
-		skip();
-		exp = parse_tuple();
-		if (ch != '}')
-			syntax_error("Unclosed brace", first_line);
-		skip();
-		}
 	else
-		exp = parse_symbol(1);
+		exp = parse_symbol();
 
 	return exp;
 	}
 
-/*
-Parse a lambda form following the initial '\' character.
-
-An ordinary lambda symbol is terminated by white space or '=', for example:
-
-  \x=4
-  \y = 5
-
-If you want a lambda symbol to contain '=', you must use white space after the
-initial '\'.  This tells the parser that the lambda symbol is terminated by
-white space only, and not '='.  For example:
-
-  \ =   = eq
-  \ ==  = eq
-  \ !=  = ne
-  \ <   = lt
-  \ <=  = le
-  \ >   = gt
-  \ >=  = ge
-*/
+/* Parse a lambda form following the initial '\' character. */
 static value parse_lambda(unsigned long first_line)
 	{
 	value sym;
@@ -314,13 +243,12 @@ static value parse_lambda(unsigned long first_line)
 	value body;
 	value result;
 
-	int allow_eq = at_white();
 	skip_white();
 
 	/* Parse the symbol (function parameter). */
-	sym = parse_symbol(allow_eq);
+	sym = parse_symbol();
 	if (sym == 0)
-		syntax_error("Missing lambda symbol", first_line);
+		syntax_error("Missing symbol after '\\'", first_line);
 
 	skip_filler();
 	first_line = source_line;
@@ -381,7 +309,12 @@ static value parse_factor(void)
 		return parse_exp();
 		}
 	else
-		return parse_term();
+		{
+		value term = parse_term();
+		if (ch == '=')
+			syntax_error("Missing symbol declaration before '='", source_line);
+		return term;
+		}
 	}
 
 static value parse_exp(void)
@@ -389,9 +322,9 @@ static value parse_exp(void)
 	value exp = 0;
 	while (1)
 		{
-		value val = parse_factor();
-		if (val == 0) break;
-		exp = (exp == 0) ? val : app(exp,val);
+		value factor = parse_factor();
+		if (factor == 0) break;
+		exp = (exp == 0) ? factor : app(exp,factor);
 		}
 	if (exp == 0) return hold(I);
 	return exp;
