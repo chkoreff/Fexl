@@ -1,7 +1,6 @@
-#include <str.h>
 #include <value.h>
-
 #include <input.h>
+#include <str.h>
 #include <type_input.h>
 #include <type_str.h>
 
@@ -55,8 +54,7 @@ static string get_utf8(void)
 	return str_new_data(buf,width);
 	}
 
-value type_get(value f)
+void type_get(value f)
 	{
-	(void)f;
-	return Qstr(get_utf8());
+	replace_A(f, hold(f->R), Qstr(get_utf8()));
 	}

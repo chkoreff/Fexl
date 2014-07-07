@@ -52,16 +52,18 @@ string str_concat(string x, string y)
 positive if x > y. */
 int str_cmp(string x, string y)
 	{
-	unsigned long min_len;
-	int cmp;
-	if (x == y) return 0;
-	min_len = x->len < y->len ? x->len : y->len;
-	cmp = memcmp(x->data, y->data, min_len);
+	if (x == y)
+		return 0;
+	else
+		{
+		unsigned long min_len = x->len < y->len ? x->len : y->len;
+		int cmp = memcmp(x->data, y->data, min_len);
 
-	if (cmp == 0 && x->len != y->len)
-		cmp = x->len < y->len ? -1 : 1;
+		if (cmp == 0 && x->len != y->len)
+			cmp = x->len < y->len ? -1 : 1;
 
-	return cmp;
+		return cmp;
+		}
 	}
 
 /* Return true if the strings are equal. */

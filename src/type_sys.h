@@ -1,1 +1,1 @@
-extern value type_die(value f);
+extern void type_die(value f);

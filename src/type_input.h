@@ -1,1 +1,1 @@
-extern value type_get(value f);
+extern void type_get(value f);

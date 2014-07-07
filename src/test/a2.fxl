@@ -1,6 +1,6 @@
 \QU=~| "|
 @\loop
-\ch=get
+get \ch
 eq ch "" ();
 put "ch = ";
 put QU; put ch; put QU;

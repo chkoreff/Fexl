@@ -1,9 +1,8 @@
-#include <num.h>
-#include <output.h>
-
 #include <die.h>
 #include <format.h>
 #include <memory.h>
+#include <num.h>
+#include <output.h>
 #include <stdlib.h> /* strtod */
 
 /* NOTE: On some machines, when compiling in -ansi mode, I can't simply include

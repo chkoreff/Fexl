@@ -73,9 +73,11 @@ Technical Details
 -----------------
 
 The interpreter creates an initial value which represents your entire program.
-It then evaluates that value, reducing it one step at a time until it finally
-reaches a 0 value.  Each step may possibly create side effects -- after all,
-the entire purpose of a computer program is to create side effects.
+It then evaluates that value, reducing it one step at a time until it reaches a
+final value.  Each step may possibly create side effects -- after all, the
+entire purpose of a computer program is to create side effects.  However, the
+purely functional aspect of Fexl allows you to isolate those side effects as
+far as you like.
 
 A *value* is either an atom or a pair.  An *atom* represents either a built-in
 function (with a pointer to a C function), or a piece of data (e.g. long,

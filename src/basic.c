@@ -1,89 +1,87 @@
 #include <value.h>
-
 #include <basic.h>
 
 /* C x y = x */
-value type_C(value f)
+void type_C(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
-	return hold(f->L->R);
+	if (f->L->L)
+		replace(f,f->L->R);
 	}
 
 /* S x y z = x z (y z) */
-value type_S(value f)
+void type_S(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
-	return apply(
-		apply(hold(f->L->L->R),hold(f->R)),
-		A(hold(f->L->R),hold(f->R)));
+	if (f->L->L && f->L->L->L)
+		replace_A(f,
+			A(hold(f->L->L->R),hold(f->R)),
+			A(hold(f->L->R),hold(f->R)));
 	}
 
 /* I x = x */
-value type_I(value f)
+void type_I(value f)
 	{
-	if (!f->L) return 0;
-	return hold(f->R);
+	replace(f,f->R);
 	}
 
 /* F x = I. In other words, F x y = y. */
-value type_F(value f)
+void type_F(value f)
 	{
-	if (!f->L) return 0;
-	return hold(I);
+	replace(f,I);
 	}
 
 /* R x y z = x (y z) */
-value type_R(value f)
+void type_R(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
-	return apply(hold(f->L->L->R),A(hold(f->L->R),hold(f->R)));
+	if (f->L->L && f->L->L->L)
+		replace_A(f, hold(f->L->L->R), A(hold(f->L->R),hold(f->R)));
 	}
 
 /* L x y z = x z y */
-value type_L(value f)
+void type_L(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
-	return apply(apply(hold(f->L->L->R),hold(f->R)),hold(f->L->R));
+	if (f->L->L && f->L->L->L)
+		replace_A(f, A(hold(f->L->L->R),hold(f->R)), hold(f->L->R));
 	}
 
 /* Y x = x (Y x) */
-value type_Y(value f)
+void type_Y(value f)
 	{
-	if (!f->L) return 0;
-	return apply(hold(f->R),hold(f));
+	replace_A(f, hold(f->R), A(hold(f->L),hold(f->R)));
 	}
 
-/* (query x y) = y x, except x is evaluated first. */
-value type_query(value f)
+/* void x = void */
+void type_void(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
-	return apply(hold(f->R),arg(f->L->R));
+	replace_void(f);
 	}
 
-value Qboolean(int x)
+void replace_void(value f)
 	{
-	return hold(x ? C : F);
+	replace_V(f,type_void,0,0);
+	}
+
+void replace_boolean(value f, int x)
+	{
+	replace_V(f,(x ? type_C : type_F),0,0);
 	}
 
 value C;
 value S;
 value I;
+value F;
 value R;
 value L;
 value Y;
-value F;
-value query;
 
 void beg_basic(void)
 	{
 	C = Q(type_C);
 	S = Q(type_S);
 	I = Q(type_I);
+	F = Q(type_F);
 	R = Q(type_R);
 	L = Q(type_L);
 	Y = Q(type_Y);
-	F = Q(type_F);
-	query = Q(type_query);
 	}
 
 void end_basic(void)
@@ -91,9 +89,8 @@ void end_basic(void)
 	drop(C);
 	drop(S);
 	drop(I);
+	drop(F);
 	drop(R);
 	drop(L);
 	drop(Y);
-	drop(F);
-	drop(query);
 	}

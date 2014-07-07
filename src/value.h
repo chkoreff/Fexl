@@ -1,5 +1,5 @@
 typedef struct value *value;
-typedef value (*type)(value);
+typedef void (*type)(value);
 
 struct value
 	{
@@ -13,12 +13,12 @@ extern void end_value(void);
 extern value hold(value f);
 extern void drop(value f);
 extern value V(type T, value L, value R);
-extern value D(type T, void *p);
 extern value Q(type T);
-extern void bad_type(void);
-extern void *get_data(value f, type t);
-extern value apply(value f, value x);
-extern value type_A(value f);
+extern value D(type T, type free, value p);
 extern value A(value f, value x);
+extern value get_D(value f, type t);
+extern void replace_V(value f, type T, value L, value R);
+extern void replace_D(value f, type T, type free, value p);
+extern void replace(value f, value g);
+extern void replace_A(value f, value L, value R);
 extern value eval(value f);
-extern value arg(value f);

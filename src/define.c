@@ -1,5 +1,4 @@
 #include <value.h>
-
 #include <basic.h>
 #include <define.h>
 #include <die.h>
@@ -66,6 +65,7 @@ static value define_name(const char *name)
 	if (match("trunc")) return Q(type_trunc);
 	if (match("abs")) return Q(type_abs);
 
+	if (match("void")) return Q(type_void);
 	if (match("die")) return Q(type_die);
 	return 0;
 	}

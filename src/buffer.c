@@ -1,5 +1,4 @@
 #include <str.h>
-
 #include <buffer.h>
 #include <die.h>
 #include <limits.h>

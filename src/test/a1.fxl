@@ -77,22 +77,16 @@ put who; put "."; nl;
 )
 
 say "==="
-# Test deferred evaluation.
+\ping=(say "ping!")
 
-\ping== (say "ping!")
+\f=ping
+\f=(\next f; f; next)
+\f=(\next f; f; next)
 
-\g==
-	(
-	\f==(ping ping)
-	\f==(f f)
-	f
-	)
-g g
+f; f;
 
 say "==="
-# Test eager evaluation.
-\f=(ping ping ping)
-
+(ping ping ping)
 
 say "==="
 say ~| "Ain't nothin' simple when you're doin' it for real." (Gus Baird)|
@@ -121,7 +115,6 @@ say ~(3) ~(2) ~(1) "hello"(1)(2)(3)
 say "==="
 (\x\y\z x; y z) ping say "hi"
 (\x\y\z x z; y z) put say "zzz"
-(\x) die say "q237"
 say (\x="y" x)
 say ""
 say "aa"
@@ -142,9 +135,9 @@ say ~ABC abcdABAABC
 put ~ABCD AABABCABCD; put "ABCD"; nl;
 
 say "==="
-\Talk== (say "Hello world!")
-\talk==Talk
-\ talk == talk
+\Talk= (say "Hello world!")
+\talk=Talk
+\ talk = talk
 talk
 talk
 talk

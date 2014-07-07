@@ -1,5 +1,3 @@
-#include <die.h>
-#include <limits.h>
 #include <memory.h>
 #include <value.h>
 
@@ -43,9 +41,13 @@ static void recycle(value f)
 		drop(f->L);
 		drop(f->R);
 		}
-	else if (f->R)
+	else if (f->R && --f->R->N == 0)
+		{
 		/* Clear atom. */
-		f->T(f);
+		f->R->T(f->R->R);
+		f->R->R = 0;
+		recycle(f->R);
+		}
 
 	f->L = free_list;
 	free_list = f;
@@ -54,7 +56,6 @@ static void recycle(value f)
 /* Increment the reference count. */
 value hold(value f)
 	{
-	if (f->N == ULONG_MAX) die("hold");
 	f->N++;
 	return f;
 	}
@@ -62,7 +63,6 @@ value hold(value f)
 /* Decrement the reference count and recycle if it drops to zero. */
 void drop(value f)
 	{
-	if (f->N == 0) die("drop");
 	if (--f->N == 0) recycle(f);
 	}
 
@@ -82,63 +82,68 @@ value V(type T, value L, value R)
 	return f;
 	}
 
-/* Return a data value with the given pointer. */
-value D(type T, void *p)
-	{
-	return V(T,0,p);
-	}
-
 /* Create a combinator of type T.  Shorthand for "quote". */
 value Q(type T)
 	{
-	return D(T,0);
+	return V(T,0,0);
 	}
 
-void bad_type(void)
+/* Create a data item of type T, with the given free function and value. */
+value D(type T, type free, value p)
 	{
-	die("You used a data type incorrectly.");
+	return V(T,0,V(free,0,p));
+	}
+
+/* Apply f to x. */
+value A(value f, value x)
+	{
+	return V(0,f,x);
 	}
 
 /* Return the data pointer of an atom of type t. */
-void *get_data(value f, type t)
+value get_D(value f, type t)
 	{
-	if (f->L != 0 || f->T != t) bad_type();
-	return f->R;
+	if (f->T == t && f->L == 0)
+		return f->R->R;
+	else
+		return 0;
 	}
 
-/* Apply f to x eagerly. */
-value apply(value f, value x)
+/* Replace f with V(T,L,R). */
+void replace_V(value f, type T, value L, value R)
 	{
-	f = eval(f);
-	return V(f->T,f,x);
+	drop(f->L);
+	drop(f->R);
+	f->T = T;
+	f->L = L;
+	f->R = R;
 	}
 
-value type_A(value f)
+/* Replace f with a data item. */
+void replace_D(value f, type T, type free, value p)
 	{
-	return apply(hold(f->L),hold(f->R));
+	replace_V(f,T,0,V(free,0,p));
 	}
 
-/* Apply f to x lazily. */
-value A(value f, value x)
+/* Replace f with g. */
+void replace(value f, value g)
 	{
-	return V(type_A,f,x);
+	if (g->L) hold(g->L);
+	if (g->R) hold(g->R);
+	replace_V(f,g->T,g->L,g->R);
 	}
 
-/* Evaluate the value, returning its normal form if possible within any limits
-on space and time. */
+/* Replace f with A(L,R). */
+void replace_A(value f, value L, value R)
+	{
+	replace_V(f,0,L,R);
+	}
+
+/* Reduce the value to its normal form if possible within any limits on space
+and time. */
 value eval(value f)
 	{
-	while (1)
-		{
-		value g = f->T(f);
-		if (g == 0) return f;
-		drop(f);
-		f = g;
-		}
-	}
-
-/* Evaluate an argument inside a form. */
-value arg(value f)
-	{
-	return eval(hold(f));
+	while (f->T == 0)
+		(f->T = eval(f->L)->T)(f);
+	return f;
 	}

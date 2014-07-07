@@ -1,8 +1,7 @@
-#include <output.h>
-
 #include <die.h>
 #include <limits.h>
 #include <memory.h>
+#include <output.h>
 #include <stdlib.h> /* malloc free */
 
 /*

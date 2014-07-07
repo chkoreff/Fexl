@@ -131,7 +131,6 @@ hello
 ping!
 hi
 zzzzzz
-q237
 y
 
 aa
@@ -201,4 +200,7 @@ dessert efterrätt
 Undefined symbol aa on line 1
 Undefined symbol bb on line 1
 Undefined symbol c on line 2
+] bad
+[
+oops
 ] bad

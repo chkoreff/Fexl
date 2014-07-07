@@ -152,3 +152,12 @@ c
 EOM
 ) 2>&1
 end_test
+
+# die function
+beg_test
+(
+cat <<'EOM' | ../bin/fexl
+die "oops"
+EOM
+) 2>&1
+end_test

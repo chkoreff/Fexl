@@ -1,87 +1,81 @@
 #include <value.h>
-
+#include <basic.h>
 #include <num.h>
 #include <str.h>
 #include <type_num.h>
 #include <type_str.h>
 
-value type_str(value f)
+void type_str(value f)
 	{
-	if (!f->N) str_free((string)f->R);
-	return 0;
-	}
-
-string get_str(value f)
-	{
-	return (string)get_data(f,type_str);
+	replace_void(f);
 	}
 
 value Qstr(string p)
 	{
-	return D(type_str,p);
+	return D(type_str,(type)str_free,(value)p);
 	}
 
-value Qstr0(const char *data)
+string get_str(value f)
 	{
-	return Qstr(str_new_data0(data));
+	return (string)get_D(f,type_str);
+	}
+
+void replace_str(value f, string x)
+	{
+	replace_D(f,type_str,(type)str_free,(value)x);
 	}
 
 /* (. x y) is the concatenation of strings x and y. */
-value type_concat(value f)
+void type_concat(value f)
 	{
-	value x, y, z;
-	if (!f->L || !f->L->L) return 0;
-	x = arg(f->L->R);
-	y = arg(f->R);
-	z = Qstr(str_concat(get_str(x),get_str(y)));
-	drop(x);
-	drop(y);
-	return z;
+	if (f->L->L)
+		{
+		string x = get_str(eval(f->L->R));
+		string y = get_str(eval(f->R));
+		if (x == 0 || y == 0)
+			replace_void(f);
+		else
+			replace_str(f,str_concat(x,y));
+		}
 	}
 
 /* (length x) is the length of string x */
-value type_length(value f)
+void type_length(value f)
 	{
-	value x, y;
-	unsigned long len;
-	if (!f->L) return 0;
-	x = arg(f->R);
-	len = get_str(x)->len;
-	y = Qnum_ulong(len);
-	drop(x);
-	return y;
+	string x = get_str(eval(f->R));
+	if (x == 0)
+		replace_void(f);
+	else
+		replace_num(f,num_new_ulong(x->len));
 	}
 
 /* (slice str pos len) returns the len bytes of str starting at pos, or 0 bytes
 if pos or len exceeds the bounds of str. */
-/*LATER possibly undef on out of bounds */
-value type_slice(value f)
+void type_slice(value f)
 	{
-	value x, y, z, result;
-	string str;
-	long pos, len;
-
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
-	x = arg(f->L->L->R);
-	y = arg(f->L->R);
-	z = arg(f->R);
-	str = get_str(x);
-	pos = (long)*get_num(y);
-	len = (long)*get_num(z);
-
-	if (pos < 0 || len < 0
-		|| pos >= str->len
-		|| len > str->len
-		|| pos > str->len - len
-		)
+	if (f->L->L && f->L->L->L)
 		{
-		pos = 0;
-		len = 0;
-		}
+		string str = get_str(eval(f->L->L->R));
+		number y = get_num(eval(f->L->R));
+		number z = get_num(eval(f->R));
+		if (str == 0 || y == 0 || z == 0)
+			replace_void(f);
+		else
+			{
+			long pos = (long)*y;
+			long len = (long)*z;
 
-	result = Qstr(str_new_data(str->data + pos,len));
-	drop(x);
-	drop(y);
-	drop(z);
-	return result;
+			if (pos < 0 || len < 0
+				|| pos >= str->len
+				|| len > str->len
+				|| pos > str->len - len
+				)
+				{
+				pos = 0;
+				len = 0;
+				}
+
+			replace_str(f,str_new_data(str->data + pos,len));
+			}
+		}
 	}

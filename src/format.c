@@ -1,6 +1,5 @@
-#include <num.h>
-
 #include <format.h>
+#include <num.h>
 #include <stddef.h> /* size_t */
 
 /* NOTE: On some machines, when compiling in -ansi mode, I can't simply include

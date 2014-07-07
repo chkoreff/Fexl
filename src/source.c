@@ -1,5 +1,4 @@
 #include <value.h>
-
 #include <basic.h>
 #include <die.h>
 #include <input.h>

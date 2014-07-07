@@ -1,37 +1,37 @@
 #include <value.h>
-
+#include <basic.h>
 #include <num.h>
 #include <type_math.h>
 #include <type_num.h>
 
-static value op_num(value f, number op(number))
+static void op_num(value f, number op(number))
 	{
-	value x, y;
-	if (!f->L) return 0;
-	x = arg(f->R);
-	y = Qnum(op(get_num(x)));
-	drop(x);
-	return y;
+	number x = get_num(eval(f->R));
+	if (x == 0)
+		replace_void(f);
+	else
+		replace_num(f,op(x));
 	}
 
-static value op_num_num(value f, number op(number,number))
+static void op_num_num(value f, number op(number,number))
 	{
-	value x, y, z;
-	if (!f->L || !f->L->L) return 0;
-	x = arg(f->L->R);
-	y = arg(f->R);
-	z = Qnum(op(get_num(x),get_num(y)));
-	drop(x);
-	drop(y);
-	return z;
+	if (f->L->L)
+		{
+		number x = get_num(eval(f->L->R));
+		number y = get_num(eval(f->R));
+		if (x == 0 || y == 0)
+			replace_void(f);
+		else
+			replace_num(f,op(x,y));
+		}
 	}
 
 /*LATER log*/
-value type_add(value f) { return op_num_num(f,num_add); }
-value type_sub(value f) { return op_num_num(f,num_sub); }
-value type_mul(value f) { return op_num_num(f,num_mul); }
-value type_div(value f) { return op_num_num(f,num_div); }
-value type_pow(value f) { return op_num_num(f,num_pow); }
-value type_round(value f) { return op_num(f,num_round); }
-value type_trunc(value f) { return op_num(f,num_trunc); }
-value type_abs(value f) { return op_num(f,num_abs); }
+void type_add(value f) { op_num_num(f,num_add); }
+void type_sub(value f) { op_num_num(f,num_sub); }
+void type_mul(value f) { op_num_num(f,num_mul); }
+void type_div(value f) { op_num_num(f,num_div); }
+void type_pow(value f) { op_num_num(f,num_pow); }
+void type_round(value f) { op_num(f,num_round); }
+void type_trunc(value f) { op_num(f,num_trunc); }
+void type_abs(value f) { op_num(f,num_abs); }

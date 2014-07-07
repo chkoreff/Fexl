@@ -1,42 +1,53 @@
-#include <str.h>
 #include <value.h>
-
 #include <basic.h>
 #include <num.h>
 #include <output.h>
+#include <str.h>
 #include <type_num.h>
-#include <type_output.h>
 #include <type_str.h>
+#include <type_output.h>
 
-static void putv(value f)
+int putv(value x)
 	{
-	if (f->T == type_str)
-		put_str(get_str(f));
-	else if (f->T == type_num)
-		put_num(get_num(f));
+	if (x->T == type_str)
+		put_str(get_str(x));
+	else if (x->T == type_num)
+		put_num(get_num(x));
+	else if (x->T == type_void)
+		;
 	else
-		bad_type();
+		return 0;
 
-	drop(f);
+	return 1;
 	}
 
-value type_put(value f)
+void type_put(value f)
 	{
-	if (!f->L) return 0;
-	putv(arg(f->R));
-	return hold(I);
+	if (f->L->L)
+		{
+		if (putv(eval(f->L->R)))
+			replace(f,f->R);
+		else
+			replace_void(f);
+		}
 	}
 
-value type_nl(value f)
+void type_nl(value f)
 	{
-	(void)f;
 	nl();
-	return hold(I);
+	replace(f,f->R);
 	}
 
-value type_say(value f)
+void type_say(value f)
 	{
-	if (!f->L) return 0;
-	putv(arg(f->R)); nl();
-	return hold(I);
+	if (f->L->L)
+		{
+		if (putv(eval(f->L->R)))
+			{
+			nl();
+			replace(f,f->R);
+			}
+		else
+			replace_void(f);
+		}
 	}

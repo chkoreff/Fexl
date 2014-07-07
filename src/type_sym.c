@@ -1,25 +1,19 @@
 #include <value.h>
-
 #include <basic.h>
 #include <memory.h>
 #include <str.h>
 #include <type_str.h>
 #include <type_sym.h>
 
-value type_sym(value f)
+void sym_free(struct sym *sym)
 	{
-	if (!f->N)
-		{
-		struct sym *sym = get_sym(f);
-		drop(sym->name);
-		free_memory(sym,sizeof(struct sym));
-		}
-	return 0;
+	drop(sym->name);
+	free_memory(sym,sizeof(struct sym));
 	}
 
-struct sym *get_sym(value f)
+void type_sym(value f)
 	{
-	return (struct sym *)get_data(f,type_sym);
+	(void)f;
 	}
 
 value Qsym(int quoted, string name, unsigned long line)
@@ -28,7 +22,12 @@ value Qsym(int quoted, string name, unsigned long line)
 	sym->quoted = quoted ? 1 : 0;
 	sym->name = Qstr(name);
 	sym->line = line;
-	return D(type_sym,sym);
+	return D(type_sym,(type)sym_free,(value)sym);
+	}
+
+struct sym *get_sym(value f)
+	{
+	return (struct sym *)f->R->R;
 	}
 
 int sym_eq(struct sym *x, struct sym *y)

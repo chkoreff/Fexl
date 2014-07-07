@@ -1,12 +1,9 @@
 #include <str.h>
 #include <value.h>
-
 #include <basic.h>
 #include <buffer.h>
 #include <ctype.h>
-#include <die.h>
 #include <input.h>
-#include <limits.h>
 #include <parse.h>
 #include <source.h>
 #include <type_sym.h>
@@ -24,7 +21,6 @@ term   => sym
 
 def    => empty
 def    => = term
-def    => == term
 
 sym    => name
 sym    => string
@@ -44,10 +40,7 @@ static void skip(void)
 	{
 	ch = getd();
 	if (ch == '\n')
-		{
-		if (source_line == ULONG_MAX) die("skip");
 		source_line++;
-		}
 	}
 
 static void skip_line(void)
@@ -239,7 +232,6 @@ static value parse_lambda(unsigned long first_line)
 	{
 	value sym;
 	value def = 0;
-	int lazy = 0;
 	value body;
 	value result;
 
@@ -257,11 +249,6 @@ static value parse_lambda(unsigned long first_line)
 	if (ch == '=')
 		{
 		skip();
-		if (ch == '=')
-			{
-			lazy = 1;
-			skip();
-			}
 		skip_filler();
 
 		def = parse_term();
@@ -274,14 +261,10 @@ static value parse_lambda(unsigned long first_line)
 
 	/* Produce the result based on the kind of definition used, if any. */
 	if (def == 0)
-		result = hold(body);
-	else if (lazy)
-		result = app(hold(body),hold(def));
+		result = body;
 	else
-		result = app(app(hold(query),hold(def)),hold(body));
+		result = app(body,def);
 
-	if (def) drop(def);
-	drop(body);
 	return result;
 	}
 
@@ -326,7 +309,7 @@ static value parse_exp(void)
 		if (factor == 0) break;
 		exp = (exp == 0) ? factor : app(exp,factor);
 		}
-	if (exp == 0) return hold(I);
+	if (exp == 0) exp = hold(I);
 	return exp;
 	}
 
