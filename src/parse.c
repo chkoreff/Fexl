@@ -233,7 +233,6 @@ static value parse_lambda(unsigned long first_line)
 	value sym;
 	value def = 0;
 	value body;
-	value result;
 
 	skip_white();
 
@@ -258,14 +257,8 @@ static value parse_lambda(unsigned long first_line)
 
 	/* Parse the body of the function. */
 	body = lam(sym,parse_exp());
-
-	/* Produce the result based on the kind of definition used, if any. */
-	if (def == 0)
-		result = body;
-	else
-		result = app(body,def);
-
-	return result;
+	/* Return the body applied to the definition, if any. */
+	return def == 0 ? body : app(body,def);
 	}
 
 /* Parse the next factor of an expression.  Return 0 if no factor found. */
