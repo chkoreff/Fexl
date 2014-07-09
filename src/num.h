@@ -11,6 +11,7 @@ extern number num_pow(number x, number y);
 extern number num_round(number x);
 extern number num_trunc(number x);
 extern number num_abs(number x);
+extern number num_sqrt(number x);
 extern int num_cmp(number x, number y);
 extern void put_num(number x);
 extern const char *format_num(number x);

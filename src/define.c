@@ -64,6 +64,7 @@ static value define_name(const char *name)
 	if (match("round")) return Q(type_round);
 	if (match("trunc")) return Q(type_trunc);
 	if (match("abs")) return Q(type_abs);
+	if (match("sqrt")) return Q(type_sqrt);
 
 	if (match("void")) return Q(type_void);
 	if (match("die")) return Q(type_die);

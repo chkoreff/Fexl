@@ -6,3 +6,4 @@ extern void type_pow(value f);
 extern void type_round(value f);
 extern void type_trunc(value f);
 extern void type_abs(value f);
+extern void type_sqrt(value f);

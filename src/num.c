@@ -11,6 +11,7 @@ else as returning type int.  So instead I do my own declarations. */
 extern double round(double);
 extern double trunc(double);
 extern double fabs(double);
+extern double sqrt(double);
 extern double pow(double,double);
 
 void num_free(number x)
@@ -54,6 +55,7 @@ number num_pow(number x, number y) { return num_new_double(pow(*x,*y)); }
 number num_round(number x) { return num_new_double(round(*x)); }
 number num_trunc(number x) { return num_new_double(trunc(*x)); }
 number num_abs(number x) { return num_new_double(fabs(*x)); }
+number num_sqrt(number x) { return num_new_double(sqrt(*x)); }
 
 int num_cmp(number x, number y)
 	{
