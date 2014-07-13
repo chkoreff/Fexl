@@ -1,3 +1,4 @@
+#include <die.h>
 #include <memory.h>
 #include <value.h>
 
@@ -63,6 +64,7 @@ value hold(value f)
 /* Decrement the reference count and recycle if it drops to zero. */
 void drop(value f)
 	{
+	if (f->N == 0) die("drop");
 	if (--f->N == 0) recycle(f);
 	}
 
@@ -141,9 +143,31 @@ void replace_A(value f, value L, value R)
 
 /* Reduce the value to its normal form if possible within any limits on space
 and time. */
+
+unsigned long cur_depth = 0;
+unsigned long max_depth = 100000;
+
+unsigned long cur_steps = 0;
+unsigned long max_steps = 100000000;
+
+void out_of_stack(void)
+	{
+	die("out of stack");
+	}
+
+void out_of_time(void)
+	{
+	die("out of time");
+	}
+
 value eval(value f)
 	{
+	if (++cur_depth > max_depth) out_of_stack();
 	while (f->T == 0)
+		{
+		if (++cur_steps > max_steps) out_of_time();
 		(f->T = eval(f->L)->T)(f);
+		}
+	cur_depth--;
 	return f;
 	}

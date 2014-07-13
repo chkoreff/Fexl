@@ -1,7 +1,6 @@
 #include <str.h>
 #include <buffer.h>
 #include <die.h>
-#include <limits.h>
 #include <memory.h>
 #include <string.h>
 
@@ -52,7 +51,6 @@ string buf_finish(buffer *buf)
 	/* Calculate total length. */
 	while (list)
 		{
-		if (list->str->len > ULONG_MAX - len) die("buf_finish");
 		len += list->str->len;
 		list = list->next;
 		}

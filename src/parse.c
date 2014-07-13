@@ -38,6 +38,7 @@ static int ch; /* current character */
 
 static void skip(void)
 	{
+	if (++cur_steps > max_steps) out_of_time();
 	ch = getd();
 	if (ch == '\n')
 		source_line++;
@@ -296,6 +297,7 @@ static value parse_factor(void)
 static value parse_exp(void)
 	{
 	value exp = 0;
+	if (++cur_depth > max_depth) out_of_stack();
 	while (1)
 		{
 		value factor = parse_factor();
@@ -303,6 +305,7 @@ static value parse_exp(void)
 		exp = (exp == 0) ? factor : app(exp,factor);
 		}
 	if (exp == 0) exp = hold(I);
+	cur_depth--;
 	return exp;
 	}
 

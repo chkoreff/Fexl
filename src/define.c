@@ -39,7 +39,7 @@ static value define_name(const char *name)
 	if (match("nl")) return Q(type_nl);
 	if (match("@")) return Q(type_Y);
 	if (match("T")) return hold(C);
-	if (match("F")) return Q(type_F);
+	if (match("F")) return hold(F);
 
 	if (match("+")) return Q(type_add);
 	if (match("-")) return Q(type_sub);
@@ -68,6 +68,8 @@ static value define_name(const char *name)
 
 	if (match("void")) return Q(type_void);
 	if (match("die")) return Q(type_die);
+
+	if (match("eval")) return Q(type_eval);
 	return 0;
 	}
 

@@ -11,13 +11,13 @@ static void put_fh(FILE *fh, const char *data, unsigned long len)
 	}
 
 /* Put data to stdout. */
-void putd_out(const char *data, unsigned long len)
+static void putd_out(const char *data, unsigned long len)
 	{
 	put_fh(stdout,data,len);
 	}
 
 /* Put data to stderr. */
-void putd_err(const char *data, unsigned long len)
+static void putd_err(const char *data, unsigned long len)
 	{
 	put_fh(stderr,data,len);
 	}
@@ -55,4 +55,10 @@ void put_double(double x)
 void nl(void)
 	{
 	putd("\n",1);
+	}
+
+void put_to_error(void)
+	{
+	fflush(stdout);
+	putd = putd_err;
 	}

@@ -6,7 +6,7 @@ void die(const char *msg)
 	{
 	if (msg[0])
 		{
-		putd = putd_err;
+		put_to_error();
 		put(msg);nl();
 		}
 	exit(1);

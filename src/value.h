@@ -21,4 +21,14 @@ extern void replace_V(value f, type T, value L, value R);
 extern void replace_D(value f, type T, type free, value p);
 extern void replace(value f, value g);
 extern void replace_A(value f, value L, value R);
+
+extern unsigned long cur_depth;
+extern unsigned long max_depth;
+
+extern unsigned long cur_steps;
+extern unsigned long max_steps;
+
+extern void out_of_stack(void);
+extern void out_of_time(void);
+
 extern value eval(value f);

@@ -28,7 +28,7 @@ value parse_file(const char *name)
 	source_fh = source_label[0] ? fopen(source_label,"r") : stdin;
 	if (source_fh == 0)
 		{
-		putd = putd_err;
+		put_to_error();
 		put("Could not open file ");put(source_label);nl();
 		die("");
 		}
@@ -60,7 +60,7 @@ static void put_loc(unsigned long line)
 
 void syntax_error(const char *msg, unsigned long line)
 	{
-	putd = putd_err;
+	put_to_error();
 	put(msg); put_loc(line);
 	die("");
 	}

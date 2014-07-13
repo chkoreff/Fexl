@@ -143,6 +143,12 @@ beg_test
 ) 2>&1
 end_test
 
+beg_test
+(
+../bin/fexl test/a3.fxl
+) 2>&1
+end_test
+
 # undefined symbol
 beg_test
 (

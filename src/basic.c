@@ -5,7 +5,7 @@
 void type_C(value f)
 	{
 	if (f->L->L)
-		replace(f,f->L->R);
+		replace(f,eval(f->L->R));
 	}
 
 /* S x y z = x z (y z) */
@@ -20,7 +20,7 @@ void type_S(value f)
 /* I x = x */
 void type_I(value f)
 	{
-	replace(f,f->R);
+	replace(f,eval(f->R));
 	}
 
 /* F x = I. In other words, F x y = y. */

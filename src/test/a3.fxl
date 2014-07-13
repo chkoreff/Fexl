@@ -1,0 +1,15 @@
+#
+\module=(eval "test/a3_help.fxl")
+
+# Note that the module is only evaluated once, even though we call it 3 times.
+module \talk
+module \talk
+module \talk
+
+# Now we run the talk function 4 times.
+talk
+talk
+talk
+talk
+
+say "Bye"
