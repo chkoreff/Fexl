@@ -150,15 +150,8 @@ unsigned long max_depth = 100000;
 unsigned long cur_steps = 0;
 unsigned long max_steps = 100000000;
 
-void out_of_stack(void)
-	{
-	die("out of stack");
-	}
-
-void out_of_time(void)
-	{
-	die("out of time");
-	}
+void out_of_stack(void) { die("out of stack"); }
+void out_of_time(void) { die("out of time"); }
 
 value eval(value f)
 	{

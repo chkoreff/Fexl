@@ -1,6 +1,5 @@
 #include <format.h>
 #include <stdio.h>
-#include <str.h>
 #include <string.h>
 #include <output.h>
 
