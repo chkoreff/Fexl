@@ -17,6 +17,7 @@ compile()
 	local name="$1"
 	local file_o=../obj/$name.o
 	objects="$objects $file_o"
+	mkdir -p `dirname $file_o`
 	run $cmd_compile $name.c -o $file_o
 	}
 
@@ -24,41 +25,49 @@ link()
 	{
 	local name="$1"
 	shift
-	run $cmd_link $@ -o ../bin/$name
+	local file_e=../bin/$name
+	mkdir -p `dirname $file_e`
+	run $cmd_link $@ -o $file_e
 	}
 
 ./clean
 
-mkdir -p ../obj
-mkdir -p ../bin
-
-objects=""
-
 # Core modules
+objects=""
 compile basic
-compile buffer
+#compile buffer
 compile die
 compile format
-compile input
+#compile input
 compile memory
 compile num
 compile output
-compile parse
-compile source
+#compile parse
+#compile source
 compile str
 compile type_cmp
 compile type_convert
-compile type_input
+#compile type_input
 compile type_math
 compile type_num
-compile type_output
+#compile type_output
 compile type_str
-compile type_sym
-compile type_sys
+#compile type_sym
+#compile type_sys
 compile value
+lib_fexl=$objects
 
-# Executable
-compile define
+# Test modules
+objects=""
+compile test/show
+lib_test=$objects
+
+objects=""
+#compile define
 compile fexl
+# TODO
+#link fexl $objects $lib_fexl
 
-link fexl $objects
+objects=""
+compile test/run
+link test/run $objects $lib_fexl $lib_test

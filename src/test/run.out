@@ -1,214 +1,228 @@
-[
-] good
-[
-Unclosed string on line 2
-] bad
-[
-Unclosed string on line 1
-] bad
-[
-Incomplete string terminator on line 1
-] bad
-[
-Unclosed parenthesis on line 1
-] bad
-[
-Missing symbol after '\' on line 1
-] bad
-[
-Missing symbol after '\' on line 1
-] bad
-[
-Missing definition on line 2
-] bad
-[
-Missing symbol declaration before '=' on line 3
-] bad
-[
-Extraneous input on line 4
-] bad
-[
-25
-] good
-[
-===
-Hello world.
-x = 42
-47
-37
-210
-8.4
-inf
-===
-T
-T
-T
-F
-T
-T
-F
-T
-T
-F
-F
-F
-F
-T
-T
-T
-F
-F
-T
-T
-F
-T
-F
-F
-T
-===
--4.97
-210802.919995902
-4.8655
-5
-49.4600760456274
-100000000000.01
-285
-125867
-7
--7
-8
--8
-7
--7
-7
--7
-10000
-3.00000000000001
+beg f = ((C S) C)
+end f = ((C S) C)
+end g = S
 
-a
-ab
-a
-abcdefgh
-0
-1
-3
-3
-Hello world.
-===
-ping!
-ping!
-ping!
-ping!
-ping!
-ping!
-ping!
-ping!
-===
-ping!
-ping!
-ping!
-===
-"Ain't nothin' simple when you're doin' it for real." (Gus Baird)
+beg f = C
+end f = C
+end g = C
 
-"My fathers sleep on the sunrise plains,
-And each one sleeps alone.
-Their trails may dim to the grass and rains,
-For I choose to make my own.
-I lay proud claim to their blood and name,
-But I lean on no dead kin;
-My name is mine, for the praise or scorn,
-And the world began when I was born
-And the world is mine to win. ..."
+beg f = (C C)
+end f = (C C)
+end g = (C C)
 
-  (Badger Clark, "The Westerner")
+beg f = ((C C) C)
+end f = ((C C) C)
+end g = C
 
-===
-hello
-"hello"
-~(1) "hello"(1)
-~(2) ~(1) "hello"(1)(2)
-===
+beg f = (((C C) C) ((C C) C))
+end f = (C ((C C) C))
+end g = (C ((C C) C))
+
+beg f = (((S C) S) (C C))
+end f = (((S C) S) (J (C C)))
+end g = (C C)
+
+beg f = ((C ((C C) C)) C)
+end f = ((C ((C C) C)) C)
+end g = C
+
+beg f = (((S C) S) (((S C) S) (((S C) S) (((S C) S) ((C (S C)) C)))))
+end f = (((S C) S) (J (S C)))
+end g = (S C)
+
+beg f = ((((C C) (C C)) ((C C) (C C))) (((C C) (C C)) ((C C) (C C))))
+end f = ((C ((C C) (C C))) (C ((C C) (C C))))
+end g = C
+
+beg f = (((((S S) S) S) C) C)
+end f = (((S (J C)) ((S (J S)) (J C))) (J C))
+end g = C
+
+beg f = (((S I) I) C)
+end f = (((S I) I) (J C))
+end g = (C (I (J C)))
+
+beg f = (((S ((S C) C)) ((C C) C)) ((C S) C))
+end f = (((S ((S C) C)) ((C C) C)) (J S))
+end g = (S (((C C) C) (J S)))
+
+beg f = ping
+end f = ping
+end g = ping
+
+beg f = (I ping)
+end f = (I ping)
+end g = ping
+
+beg f = C
+end f = C
+end g = C
+
+beg f = (C C)
+end f = (C C)
+end g = (C C)
+
+beg f = ((C C) C)
+end f = ((C C) C)
+end g = C
+
+beg f = ((C S) C)
+end f = ((C S) C)
+end g = S
+
+beg f = (((R ((R ((R ((L I) I)) ((S R) I))) ((S R) I))) ((S R) ((S R) I))) ping)
 ping!
-hi
-zzzzzz
-y
+ping!
+ping!
+ping!
+ping!
+ping!
+ping!
+ping!
+ping!
+ping!
+ping!
+ping!
+end f = (((R ((R ((R ((L I) I)) ((S R) I))) ((S R) I))) ((S R) ((S R) I))) ping)
+end g = I
 
-aa
+beg f = @
+end f = @
+end g = @
 
-bb
-a
+beg f = (@ C)
+end f = (@ C)
+end g = (C (@ C))
 
+beg f = (@ I)
+end f = (@ I)
+end g = (I (@ I))
 
-a
-hi!
-a
-abcdABA
-AABABCABCD
-===
-Hello world!
-Hello world!
-Hello world!
-===
-length is 16777216
-===
-42
--7.8
-0
--0
-43.8
-===
-[]
-[bc]
-[abc]
-[]
-[c]
-[]
-] good
-[
-ch = "H"
-ch = "i"
-ch = "x"
-ch = "å"
-ch = "a"
-ch = "b"
-ch = "c"
-ch = "
-"
-ch = "d"
-ch = "ü"
-ch = "≠"
-ch = "m"
-ch = "
-"
-] good
-[
-== test_utf
-f = hej
-åabcüdef
-ghij
-üä
-1≠0
+beg f = (@ @)
+end f = (@ @)
+end g = ((@ (@ @)) (@ (@ @)))
 
-åabcüdef = hej åabcüdef
-ghij = hej ghij
-üä = hej üä
-1≠0 = hej 1≠0
-vegetable grönsak
-dessert efterrätt
-] good
-[
-Reading a3_help
-Hello
-Hello
-Hello
-Hello
-Bye
-] good
-[
-Undefined symbol aa on line 1
-Undefined symbol bb on line 1
-Undefined symbol c on line 2
-] bad
-[
-oops
-] bad
+beg f = (((@ S) S) S)
+end f = (((S (@ S)) S) (J S))
+end g = (((S (@ S)) S) (J S))
+
+beg f = "abc"
+end f = "abc"
+end g = "abc"
+
+beg f = (I "abc")
+end f = (I "abc")
+end g = "abc"
+
+beg f = ("abc" "de")
+end f = ("abc" "de")
+end g = ("abc" "de")
+
+beg f = ((concat "abc") "de")
+end f = ((concat "abc") "de")
+end g = "abcde"
+
+beg f = ((I (I "abc")) "de")
+end f = ("abc" "de")
+end g = ("abc" "de")
+
+beg f = ((concat (I "abc")) "de")
+end f = ((concat "abc") "de")
+end g = "abcde"
+
+beg f = ((concat (C "abc")) "de")
+end f = ((concat (C "abc")) "de")
+end g = ((concat (C "abc")) "de")
+
+beg f = ((concat ((I I) "abc")) ((concat "") "de"))
+end f = ((concat "abc") "de")
+end g = "abcde"
+
+beg f = 3.14159265979265
+end f = 3.14159265979265
+end g = 3.14159265979265
+
+beg f = 42
+end f = 42
+end g = 42
+
+beg f = (length "12345")
+end f = (length "12345")
+end g = 5
+
+beg f = (length ((concat (I "abc")) ((concat "") "d")))
+end f = (length "abcd")
+end g = 4
+
+beg f = (((slice ((C ((concat "abcd") "efghi")) S)) 2) 5)
+end f = (((slice "abcdefghi") 2) 5)
+end g = "cdefg"
+
+beg f = ((+ -14.87) 482.73)
+end f = ((+ -14.87) 482.73)
+end g = 467.86
+
+beg f = ((/ ((+ 1) (sqrt 5))) 2)
+end f = ((/ 3.23606797749979) 2)
+end g = 1.61803398874989
+
+beg f = ((C "yes") "no")
+end f = ((C "yes") "no")
+end g = "yes"
+
+beg f = ((F "yes") "no")
+end f = (I "no")
+end g = "no"
+
+beg f = ((ge (I 5.9)) 5.8)
+end f = ((ge 5.9) 5.8)
+end g = C
+
+beg f = ((lt 5.9) (I 5.8))
+end f = ((lt 5.9) 5.8)
+end g = F
+
+beg f = ((ge (I "ab")) "a")
+end f = ((ge "ab") "a")
+end g = C
+
+beg f = ((lt (I "ab")) (I "a"))
+end f = ((lt "ab") "a")
+end g = F
+
+beg f = ((eq (I "x")) "x")
+end f = ((eq "x") "x")
+end g = C
+
+beg f = ((eq (I -7.2)) -7.2)
+end f = ((eq -7.2) -7.2)
+end g = C
+
+beg f = ((lt (I 5.9)) (I "ab"))
+end f = ((lt 5.9) "ab")
+end g = ((lt 5.9) "ab")
+
+beg f = ((lt (I "ab")) (I 5.9))
+end f = ((lt "ab") 5.9)
+end g = ((lt "ab") 5.9)
+
+beg f = ((eq (I S)) (I S))
+end f = ((eq S) (I S))
+end g = ((eq S) (I S))
+
+beg f = (num_str ((/ ((+ 1) (sqrt 5))) 2))
+end f = (num_str 1.61803398874989)
+end g = "1.61803398874989"
+
+beg f = (str_num ((concat "+") ((concat "1.") "61803398874989")))
+end f = (str_num "+1.61803398874989")
+end g = 1.61803398874989
+
+beg f = (str_num (I 5.8))
+end f = (str_num 5.8)
+end g = (str_num 5.8)
+
+beg f = (str_num (I S))
+end f = (str_num S)
+end g = (str_num S)
+

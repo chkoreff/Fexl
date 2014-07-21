@@ -1,1 +1,0 @@
-extern value parse(void);

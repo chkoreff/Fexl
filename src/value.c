@@ -13,18 +13,24 @@ This routine also serves to clear an atom whose reference count drops to 0.
 The L and R fields are the left and right components of the value.
 If L == 0, the value is an atom, and R points to the atom data, if any.
 If L != 0, then R != 0, and the value represents the application of L to R.
+
+The N field also serves to link values on the free list.  It is not strictly
+portable to store a pointer in an unsigned long field, but people have relied
+on that for decades, and it works on every machine I use.
+
+I considered using the uintptr_t type mentioned in the C Reference Standard,
+but that type is designated as "optional" and thus not strictly portable.
+
+A union would do the trick, but the ISO C90 standard does not support unnamed
+unions, and using a named union is more pain that it's worth.
 */
 
 static value free_list = 0;
 
-static void clear_free_list(void)
+void clear_free_list(void)
 	{
 	while (free_list)
-		{
-		value f = free_list;
-		free_list = f->L;
-		free_memory(f, sizeof(struct value));
-		}
+		free_memory(Q(0), sizeof(struct value), 4);
 	}
 
 void end_value(void)
@@ -33,54 +39,63 @@ void end_value(void)
 	end_memory();
 	}
 
-/* Free the value so it can be reused. */
-static void recycle(value f)
-	{
-	if (f->L)
-		{
-		/* Clear pair. */
-		drop(f->L);
-		drop(f->R);
-		}
-	else if (f->R && --f->R->N == 0)
-		{
-		/* Clear atom. */
-		f->R->T(f->R->R);
-		f->R->R = 0;
-		recycle(f->R);
-		}
-
-	f->L = free_list;
-	free_list = f;
-	}
-
 /* Increment the reference count. */
 value hold(value f)
 	{
-	f->N++;
+	if (f) f->N++;
 	return f;
 	}
 
 /* Decrement the reference count and recycle if it drops to zero. */
 void drop(value f)
 	{
-	if (f->N == 0) die("drop");
-	if (--f->N == 0) recycle(f);
+	if (!f) return;
+	if (f->N == 0) die("DROP");
+	if (--f->N > 0) return;
+
+	f->N = (unsigned long)free_list;
+	free_list = f;
 	}
 
 /* Return a value of type T with the given left and right side. */
-value V(type T, value L, value R)
+static value V(type T, value L, value R)
 	{
-	value f = free_list;
-	if (f)
-		free_list = f->L;
+	value f;
+	if (free_list)
+		{
+		f = free_list;
+		free_list = (value)f->N;
+		if (f->L)
+			{
+			/* Clear pair. */
+			drop(f->L);
+			drop(f->R);
+			}
+		else
+			{
+			/* Clear atom. */
+			f->N = 0;
+			f->T(f);
+			}
+		}
 	else
-		f = (value)new_memory(sizeof (struct value));
+		{
+		f = (value)new_memory(sizeof(struct value), 4);
+		if (!f) return 0;
+		}
 
-	f->N = 1;
+	f->N = 0;
 	f->T = T;
 	f->L = L;
 	f->R = R;
+	return f;
+	}
+
+static value type_A(value f)
+	{
+	value x = arg(&f->L);
+	if (!x) return 0;
+	f->T = x->T;
 	return f;
 	}
 
@@ -90,77 +105,61 @@ value Q(type T)
 	return V(T,0,0);
 	}
 
-/* Create a data item of type T, with the given free function and value. */
-value D(type T, type free, value p)
+/* Create an atom of type T and data x.  The caller should free x if the result
+is 0. */
+value D(type T, void *x)
 	{
-	return V(T,0,V(free,0,p));
+	return V(T,0,x);
 	}
 
-/* Apply f to x. */
-value A(value f, value x)
+/* Apply x to y. */
+value A(value x, value y)
 	{
-	return V(0,f,x);
+	hold(x);
+	hold(y);
+	{
+	value f = (x && y) ?  V(type_A,x,y) : 0;
+	if (!f)
+		{
+		drop(x);
+		drop(y);
+		}
+	return f;
+	}
 	}
 
-/* Return the data pointer of an atom of type t. */
-value get_D(value f, type t)
+/* Evaluate an argument in place. */
+value arg(value *f)
 	{
-	if (f->T == t && f->L == 0)
-		return f->R->R;
-	else
-		return 0;
+	value x = eval(*f);
+	if (!x) return 0;
+	*f = x;
+	return x;
 	}
 
-/* Replace f with V(T,L,R). */
-void replace_V(value f, type T, value L, value R)
+/* If x is an atom of type t, return the atom data, otherwise return 0. */
+void *atom(type t, value x)
 	{
-	drop(f->L);
-	drop(f->R);
-	f->T = T;
-	f->L = L;
-	f->R = R;
+	return (x && x->T == t && x->L == 0) ? x->R : 0;
 	}
 
-/* Replace f with a data item. */
-void replace_D(value f, type T, type free, value p)
-	{
-	replace_V(f,T,0,V(free,0,p));
-	}
+/* Reduce the value to its normal form if possible within current limits. */
 
-/* Replace f with g. */
-void replace(value f, value g)
-	{
-	if (g->L) hold(g->L);
-	if (g->R) hold(g->R);
-	replace_V(f,g->T,g->L,g->R);
-	}
-
-/* Replace f with A(L,R). */
-void replace_A(value f, value L, value R)
-	{
-	replace_V(f,0,L,R);
-	}
-
-/* Reduce the value to its normal form if possible within any limits on space
-and time. */
-
-unsigned long cur_depth = 0;
-unsigned long max_depth = 100000;
-
-unsigned long cur_steps = 0;
-unsigned long max_steps = 100000000;
-
-void out_of_stack(void) { die("out of stack"); }
-void out_of_time(void) { die("out of time"); }
+unsigned long remain_depth = 50000;
+unsigned long remain_steps = 100000000;
 
 value eval(value f)
 	{
-	if (++cur_depth > max_depth) out_of_stack();
-	while (f->T == 0)
+	if (remain_depth > 0) remain_depth--; else return f;
+	while (1)
 		{
-		if (++cur_steps > max_steps) out_of_time();
-		(f->T = eval(f->L)->T)(f);
+		value g = f ? f->T(f) : 0;
+		if (g == 0) break;
+		hold(g);
+		drop(f);
+		f = g;
+		if (remain_steps > 0) remain_steps--; else break;
 		}
-	cur_depth--;
+	remain_depth++;
 	return f;
 	}

@@ -7,54 +7,60 @@
 Track the amount of memory used so we can detect memory leaks.  Normally this
 is impossible but we check it anyway in case of software error.
 */
+unsigned long cur_blocks = 0;
+unsigned long cur_bytes = 0;
 
-static unsigned long total_blocks = 0;
-static unsigned long total_bytes = 0;
+unsigned long max_words = 8000000;
+unsigned long cur_words = 0;
 
-unsigned long max_bytes = 100000000;
-
-/* Return a new unused span of memory, or die if not possible. */
-void *new_memory(unsigned long num_bytes)
+/* Return a new span of memory of the given size, or 0 if not possible. */
+void *new_memory(unsigned long num_bytes, unsigned long num_words)
 	{
-	void *data = 0;
-	if (num_bytes > 0 && num_bytes <= max_bytes - total_bytes)
-		{
-		data = malloc(num_bytes);
-		total_blocks++;
-		total_bytes += num_bytes;
-		}
+	if (cur_words + num_words > max_words) return 0;
+	if (num_bytes == 0) return 0;
 
-	if (data == 0)
-		die("out of memory");
-
+	{
+	void *data = malloc(num_bytes);
+	if (!data) return 0;
+	cur_blocks++;
+	cur_bytes += num_bytes;
+	cur_words += num_words;
 	return data;
 	}
+	}
 
-/* Free a previously allocated span of memory of the given size. */
-void free_memory(void *data, unsigned long num_bytes)
+/*
+Free a previously allocated span of memory of size num_bytes, with a logical
+cost of num_words.  The cost is a portable measure of memory usage that is
+independent of machine word size.  Here is the recommended cost schedule:
+
+	unsigned long   1
+	pointer         1
+	double          1
+	N bytes         (N >> 3)
+*/
+void free_memory(void *data, unsigned long num_bytes, unsigned long num_words)
 	{
-	if (!data)
-		die("The system tried to free a null pointer.");
-
-	if (total_blocks == 0 || total_bytes < num_bytes)
-		die("The system tried to free more memory than it allocated.");
+	if (!data) die("NFREE");
+	if (cur_blocks == 0 || cur_bytes < num_bytes || cur_words < num_words)
+		die("XFREE");
 
 	free(data);
-
-	total_blocks--;
-	total_bytes -= num_bytes;
+	cur_blocks--;
+	cur_bytes -= num_bytes;
+	cur_words -= num_words;
 	}
 
 /* Detect any final memory leak, which should never happen. */
 void end_memory(void)
 	{
-	if (total_blocks != 0 || total_bytes != 0)
+	if (cur_blocks || cur_bytes || cur_words)
 		{
 		put_to_error();
-		put("Memory leak!\n");
-		put("The system did not free precisely the memory it allocated.\n");
-		put("  total_blocks = "); put_ulong(total_blocks); nl();
-		put("  total_bytes  = "); put_ulong(total_bytes); nl();
+		put("LEAK");
+		put(" ");put_ulong(cur_blocks);
+		put(" ");put_ulong(cur_bytes);
+		put(" ");put_ulong(cur_words);
 		die("");
 		}
 	}

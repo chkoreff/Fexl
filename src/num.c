@@ -1,4 +1,3 @@
-#include <die.h>
 #include <format.h>
 #include <memory.h>
 #include <num.h>
@@ -16,7 +15,7 @@ extern double pow(double,double);
 
 void num_free(number x)
 	{
-	free_memory(x, sizeof(double));
+	free_memory(x, sizeof(double), 1);
 	}
 
 /* Convert string to number if possible. */
@@ -34,17 +33,15 @@ number str_num(const char *name)
 
 number num_new_double(double val)
 	{
-	number p = new_memory(sizeof(double));
+	number p = new_memory(sizeof(double), 1);
+	if (!p) return 0;
 	*p = val;
 	return p;
 	}
 
 number num_new_ulong(unsigned long val)
 	{
-	double x = (double)val;
-	/* Verify that we can convert x back to same val. */
-	if (val != (long)x) die("num_new_long");
-	return num_new_double(x);
+	return num_new_double((double)val);
 	}
 
 number num_add(number x, number y) { return num_new_double(*x + *y); }

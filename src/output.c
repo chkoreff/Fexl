@@ -3,7 +3,7 @@
 #include <string.h>
 #include <output.h>
 
-static void put_fh(FILE *fh, const char *data, unsigned long len)
+static void write_data(FILE *fh, const char *data, unsigned long len)
 	{
 	size_t count = fwrite(data, 1, len, fh);
 	(void)count;  /* Ignore the return count. */
@@ -12,13 +12,13 @@ static void put_fh(FILE *fh, const char *data, unsigned long len)
 /* Put data to stdout. */
 static void putd_out(const char *data, unsigned long len)
 	{
-	put_fh(stdout,data,len);
+	write_data(stdout,data,len);
 	}
 
 /* Put data to stderr. */
 static void putd_err(const char *data, unsigned long len)
 	{
-	put_fh(stderr,data,len);
+	write_data(stderr,data,len);
 	}
 
 /* Initially we put data to stdout. */

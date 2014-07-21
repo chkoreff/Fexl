@@ -1,8 +1,0 @@
-\QU=~| "|
-@\loop
-get \ch
-eq ch "" ();
-put "ch = ";
-put QU; put ch; put QU;
-nl;
-loop

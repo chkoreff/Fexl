@@ -1,4 +1,0 @@
-#
-say "Reading a3_help";
-\talk=(say "Hello")
-\: : talk
