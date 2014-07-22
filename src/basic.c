@@ -19,6 +19,7 @@ value type_S(value f)
 		{
 		z = A(J,z);
 		if (!z) return 0;
+		z->T = type_J;
 		drop(f->R);
 		f->R = hold(z);
 		}

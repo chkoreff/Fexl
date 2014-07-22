@@ -60,10 +60,9 @@ void drop(value f)
 /* Return a value of type T with the given left and right side. */
 static value V(type T, value L, value R)
 	{
-	value f;
-	if (free_list)
+	value f = free_list;
+	if (f)
 		{
-		f = free_list;
 		free_list = (value)f->N;
 		if (f->L)
 			{

@@ -9,6 +9,7 @@
 #include <type_math.h>
 #include <type_num.h>
 #include <type_str.h>
+#include <type_sym.h>
 
 void (*show_other)(value f) = 0;
 
@@ -21,11 +22,11 @@ static void do_show(value f)
 		put_ch('?');
 	else if (f->L)
 		{
-		put_ch('(');
+		put_ch(f->T == type_sym ? '{' : '(');
 		do_show(f->L);
 		put_ch(' ');
 		do_show(f->R);
-		put_ch(')');
+		put_ch(f->T == type_sym ? '}' : ')');
 		}
 	else if (f->T == type_C) put_ch('C');
 	else if (f->T == type_S) put_ch('S');
@@ -40,6 +41,15 @@ static void do_show(value f)
 		put_ch('"');
 		put_str((string)f->R);
 		put_ch('"');
+		}
+	else if (f->T == type_sym)
+		{
+		struct sym *sym = (struct sym *)f->R;
+		put_ch('{');
+		if (sym->quoted) put_ch('"');
+		put_str((string)sym->name->R);
+		if (sym->quoted) put_ch('"');
+		put_ch('}');
 		}
 	else if (f->T == type_num) put_num((number)f->R);
 	else if (f->T == type_concat) put("concat");

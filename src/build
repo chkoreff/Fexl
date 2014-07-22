@@ -52,7 +52,7 @@ compile type_math
 compile type_num
 #compile type_output
 compile type_str
-#compile type_sym
+compile type_sym
 #compile type_sys
 compile value
 lib_fexl=$objects

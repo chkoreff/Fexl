@@ -10,6 +10,7 @@
 #include <type_math.h>
 #include <type_num.h>
 #include <type_str.h>
+#include <type_sym.h>
 
 /*
 TODO is_num is_str yes
@@ -26,14 +27,24 @@ is_str x (\x yes x) no  # is_str is built-in
 is_def x (\x yes x) no  # Here is_def is an arbitrary context.
 */
 
-static value Qstr0(const char *p)
+static value Mstr(const char *p)
 	{
 	return Qstr(str_new_data0(p));
 	}
 
-static value Qnum_double(double x)
+static value Mnum(double x)
 	{
 	return Qnum(num_new_double(x));
+	}
+
+static value Msym(const char *x)
+	{
+	return Qsym(0,Mstr(x),1);
+	}
+
+static value Mquo(const char *x)
+	{
+	return Qsym(1,Mstr(x),1);
 	}
 
 static value type_ping(value f)
@@ -45,8 +56,8 @@ static value type_ping(value f)
 
 static void test_eval(value f)
 	{
-	put("beg f = ");show(f);nl();
 	hold(f);
+	put("beg f = ");show(f);nl();
 	{
 	value g = eval(hold(f));
 	put("end f = ");show(f);nl();
@@ -157,69 +168,95 @@ static void run_test_suite(void)
 	limit_test_eval(A(A(A(Y,S),S),S), 1000000, 60);
 
 	{
-	test_eval(Qstr0("abc"));
-	test_eval(A(I,Qstr0("abc")));
-	test_eval(A(Qstr0("abc"),Qstr0("de")));
-	test_eval(A(A(Q(type_concat),Qstr0("abc")),Qstr0("de")));
-	test_eval(A(A(I,A(I,Qstr0("abc"))),Qstr0("de")));
-	test_eval(A(A(Q(type_concat),A(I,Qstr0("abc"))),Qstr0("de")));
-	test_eval(A(A(Q(type_concat),A(C,Qstr0("abc"))),Qstr0("de")));
+	test_eval(Mstr("abc"));
+	test_eval(A(I,Mstr("abc")));
+	test_eval(A(Mstr("abc"),Mstr("de")));
+	test_eval(A(A(Q(type_concat),Mstr("abc")),Mstr("de")));
+	test_eval(A(A(I,A(I,Mstr("abc"))),Mstr("de")));
+	test_eval(A(A(Q(type_concat),A(I,Mstr("abc"))),Mstr("de")));
+	test_eval(A(A(Q(type_concat),A(C,Mstr("abc"))),Mstr("de")));
 	test_eval(A(
 		A(Q(type_concat),
-		A(A(I,I),Qstr0("abc"))),
-		A(A(Q(type_concat),Qstr0("")),Qstr0("de"))
+		A(A(I,I),Mstr("abc"))),
+		A(A(Q(type_concat),Mstr("")),Mstr("de"))
 		));
 	}
 
 	{
-	test_eval(Qnum_double(3.14159265979265));
+	test_eval(Mnum(3.14159265979265));
 	test_eval(Qnum_ulong(42));
-	test_eval(A(Q(type_length),Qstr0("12345")));
+	test_eval(A(Q(type_length),Mstr("12345")));
 	test_eval(A(Q(type_length),
-		A(A(Q(type_concat),A(I,Qstr0("abc"))),
-			A(A(Q(type_concat),Qstr0("")),Qstr0("d")))));
+		A(A(Q(type_concat),A(I,Mstr("abc"))),
+			A(A(Q(type_concat),Mstr("")),Mstr("d")))));
 	test_eval(A(A(A(Q(type_slice),
 		A(A(C,
-			A(A(Q(type_concat),Qstr0("abcd")),Qstr0("efghi"))
+			A(A(Q(type_concat),Mstr("abcd")),Mstr("efghi"))
 			),S)),
 		Qnum_ulong(2)),Qnum_ulong(5)));
 	}
 
-	test_eval(A(A(Q(type_add),Qnum_double(-14.87)),Qnum_double(482.73)));
+	test_eval(A(A(Q(type_add),Mnum(-14.87)),Mnum(482.73)));
 	test_eval(
 		A(A(Q(type_div),
-		A(A(Q(type_add),Qnum_double(1)),A(Q(type_sqrt),Qnum_double(5)))),
-		Qnum_double(2)));
+		A(A(Q(type_add),Mnum(1)),A(Q(type_sqrt),Mnum(5)))),
+		Mnum(2)));
 
 	{
-	test_eval(A(A(C,Qstr0("yes")),Qstr0("no")));
-	test_eval(A(A(F,Qstr0("yes")),Qstr0("no")));
-	test_eval(A(A(Q(type_ge),A(I,Qnum_double(5.9))),Qnum_double(5.8)));
-	test_eval(A(A(Q(type_lt),Qnum_double(5.9)),A(I,Qnum_double(5.8))));
-	test_eval(A(A(Q(type_ge),A(I,Qstr0("ab"))),Qstr0("a")));
-	test_eval(A(A(Q(type_lt),A(I,Qstr0("ab"))),A(I,Qstr0("a"))));
-	test_eval(A(A(Q(type_eq),A(I,Qstr0("x"))),Qstr0("x")));
-	test_eval(A(A(Q(type_eq),A(I,Qnum_double(-7.2))),Qnum_double(-7.2)));
+	test_eval(A(A(C,Mstr("yes")),Mstr("no")));
+	test_eval(A(A(F,Mstr("yes")),Mstr("no")));
+	test_eval(A(A(Q(type_ge),A(I,Mnum(5.9))),Mnum(5.8)));
+	test_eval(A(A(Q(type_lt),Mnum(5.9)),A(I,Mnum(5.8))));
+	test_eval(A(A(Q(type_ge),A(I,Mstr("ab"))),Mstr("a")));
+	test_eval(A(A(Q(type_lt),A(I,Mstr("ab"))),A(I,Mstr("a"))));
+	test_eval(A(A(Q(type_eq),A(I,Mstr("x"))),Mstr("x")));
+	test_eval(A(A(Q(type_eq),A(I,Mnum(-7.2))),Mnum(-7.2)));
 	test_eval(A(A(Q(type_lt),
-		A(I,Qnum_double(5.9))),A(I,Qstr0("ab"))));
+		A(I,Mnum(5.9))),A(I,Mstr("ab"))));
 	test_eval(A(A(Q(type_lt),
-		A(I,Qstr0("ab"))),A(I,Qnum_double(5.9))));
+		A(I,Mstr("ab"))),A(I,Mnum(5.9))));
 	test_eval(A(A(Q(type_eq),A(I,S)),A(I,S)));
 	}
 
 	{
 	test_eval(A(Q(type_num_str),
 		A(A(Q(type_div),
-		A(A(Q(type_add),Qnum_double(1)),A(Q(type_sqrt),Qnum_double(5)))),
-		Qnum_double(2))));
+		A(A(Q(type_add),Mnum(1)),A(Q(type_sqrt),Mnum(5)))),
+		Mnum(2))));
 
 	test_eval(A(Q(type_str_num),A(A(Q(type_concat),
-		Qstr0("+")),
-		A(A(Q(type_concat),Qstr0("1.")),Qstr0("61803398874989"))
+		Mstr("+")),
+		A(A(Q(type_concat),Mstr("1.")),Mstr("61803398874989"))
 		)));
-	test_eval(A(Q(type_str_num),A(I,Qnum_double(5.8))));
+	test_eval(A(Q(type_str_num),A(I,Mnum(5.8))));
 	test_eval(A(Q(type_str_num),A(I,S)));
 	}
+
+	/* Verify that J operators don't pile up. */
+	test_eval(A(A(A(S,A(A(S,Mstr("x0")),Mstr("x1"))),Mstr("y")),Mstr("z")));
+
+	test_eval(Msym("x"));
+	test_eval(Mquo("x"));
+	test_eval(A(Msym("x"),Mquo("x")));
+	test_eval(A(Mquo("x"),Msym("x")));
+	test_eval(A(I,app(app(app(I,I),Msym("x")),app(C,Msym("y")))));
+
+	test_eval(lam(Msym("x"),Msym("x")));
+	test_eval(lam(Msym("y"),Msym("x")));
+	test_eval(lam(Msym("x"),app(Msym("x"),Msym("y"))));
+	test_eval(lam(Msym("y"),app(Msym("x"),Msym("y"))));
+	test_eval(lam(Msym("x"),app(Msym("y"),Msym("y"))));
+	test_eval(lam(Msym("x"),app(Msym("y"),app(Msym("x"),Msym("x")))));
+	test_eval(lam(Msym("x"),app(app(Msym("x"),Msym("x")),Msym("y"))));
+	test_eval(lam(Msym("x"),
+		app(
+		app(Msym("x"),app(Msym("x"),Mquo("abc"))),
+		app(app(Msym("y"),Msym("x")),Msym("x"))
+		)));
+	
+	test_eval(lam(0,0));
+	test_eval(lam(0,Msym("x")));
+	test_eval(lam(Msym("x"),0));
 	}
 
 int main(int argc, char *argv[])

@@ -226,3 +226,71 @@ beg f = (str_num (I S))
 end f = (str_num S)
 end g = (str_num S)
 
+beg f = (((S ((S "x0") "x1")) "y") "z")
+end f = (((S ((S "x0") "x1")) "y") (J "z"))
+end g = ((("x0" (J "z")) ("x1" (J "z"))) ("y" (J "z")))
+
+beg f = {x}
+end f = {x}
+end g = {x}
+
+beg f = {"x"}
+end f = {"x"}
+end g = {"x"}
+
+beg f = ({x} {"x"})
+end f = {{x} {"x"}}
+end g = {{x} {"x"}}
+
+beg f = ({"x"} {x})
+end f = {{"x"} {x}}
+end g = {{"x"} {x}}
+
+beg f = (I {{(I I) {x}} {C {y}}})
+end f = (I {{(I I) {x}} {C {y}}})
+end g = {{(I I) {x}} {C {y}}}
+
+beg f = I
+end f = I
+end g = I
+
+beg f = {C {x}}
+end f = {C {x}}
+end g = {C {x}}
+
+beg f = {(L I) {y}}
+end f = {(L I) {y}}
+end g = {(L I) {y}}
+
+beg f = {x}
+end f = {x}
+end g = {x}
+
+beg f = {C {{y} {y}}}
+end f = {C {{y} {y}}}
+end g = {C {{y} {y}}}
+
+beg f = {{R {y}} ((S I) I)}
+end f = {{R {y}} ((S I) I)}
+end g = {{R {y}} ((S I) I)}
+
+beg f = {(L ((S I) I)) {y}}
+end f = {(L ((S I) I)) {y}}
+end g = {(L ((S I) I)) {y}}
+
+beg f = {{S {(S I) {(L I) {"abc"}}}} {{S {y}} I}}
+end f = {{S {(S I) {(L I) {"abc"}}}} {{S {y}} I}}
+end g = {{S {(S I) {(L I) {"abc"}}}} {{S {y}} I}}
+
+beg f = ?
+end f = ?
+end g = ?
+
+beg f = ?
+end f = ?
+end g = ?
+
+beg f = ?
+end f = ?
+end g = ?
+

@@ -13,7 +13,16 @@ unsigned long cur_bytes = 0;
 unsigned long max_words = 8000000;
 unsigned long cur_words = 0;
 
-/* Return a new span of memory of the given size, or 0 if not possible. */
+/*
+Return a new span of memory of size num_bytes and cost num_words, or 0 if not
+possible.  The cost is a portable measure of memory usage that is independent
+of machine word size.  Here is the recommended cost schedule:
+
+	unsigned long   1
+	pointer         1
+	double          1
+	N bytes         (N >> 3)
+*/
 void *new_memory(unsigned long num_bytes, unsigned long num_words)
 	{
 	if (cur_words + num_words > max_words) return 0;
@@ -29,16 +38,7 @@ void *new_memory(unsigned long num_bytes, unsigned long num_words)
 	}
 	}
 
-/*
-Free a previously allocated span of memory of size num_bytes, with a logical
-cost of num_words.  The cost is a portable measure of memory usage that is
-independent of machine word size.  Here is the recommended cost schedule:
-
-	unsigned long   1
-	pointer         1
-	double          1
-	N bytes         (N >> 3)
-*/
+/* Free a previously allocated span of memory. */
 void free_memory(void *data, unsigned long num_bytes, unsigned long num_words)
 	{
 	if (!data) die("NFREE");
