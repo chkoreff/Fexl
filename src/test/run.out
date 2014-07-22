@@ -138,9 +138,9 @@ beg f = ((concat ((I I) "abc")) ((concat "") "de"))
 end f = ((concat "abc") "de")
 end g = "abcde"
 
-beg f = 3.14159265979265
-end f = 3.14159265979265
-end g = 3.14159265979265
+beg f = 3.14159265358979
+end f = 3.14159265358979
+end g = 3.14159265358979
 
 beg f = 42
 end f = 42
@@ -293,4 +293,55 @@ end g = ?
 beg f = ?
 end f = ?
 end g = ?
+
+beg f = put
+end f = put
+end g = put
+
+beg f = (put (I "XYZ"))
+end f = (put (I "XYZ"))
+end g = (put (I "XYZ"))
+
+beg f = ((put (I "XYZ")) {next})
+XYZend f = ((put "XYZ") {next})
+end g = {next}
+
+beg f = ((put (I 3.14159265358979)) {next})
+3.14159265358979end f = ((put 3.14159265358979) {next})
+end g = {next}
+
+beg f = ((put (C I)) {next})
+end f = ((put (C I)) {next})
+end g = ((put (C I)) {next})
+
+beg f = nl
+end f = nl
+end g = nl
+
+beg f = (nl {next})
+
+end f = (nl {next})
+end g = {next}
+
+beg f = say
+end f = say
+end g = say
+
+beg f = (say (I "XYZ"))
+end f = (say (I "XYZ"))
+end g = (say (I "XYZ"))
+
+beg f = ((say (I "XYZ")) {next})
+XYZ
+end f = ((say "XYZ") {next})
+end g = {next}
+
+beg f = ((say (I 3.14159265358979)) {next})
+3.14159265358979
+end f = ((say 3.14159265358979) {next})
+end g = {next}
+
+beg f = ((say (C I)) {next})
+end f = ((say (C I)) {next})
+end g = ((say (C I)) {next})
 

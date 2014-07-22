@@ -8,6 +8,7 @@
 #include <type_convert.h>
 #include <type_math.h>
 #include <type_num.h>
+#include <type_output.h>
 #include <type_str.h>
 #include <type_sym.h>
 
@@ -63,6 +64,9 @@ static void do_show(value f)
 	else if (f->T == type_sqrt) put("sqrt");
 	else if (f->T == type_num_str) put("num_str");
 	else if (f->T == type_str_num) put("str_num");
+	else if (f->T == type_put) put("put");
+	else if (f->T == type_nl) put("nl");
+	else if (f->T == type_say) put("say");
 	else if (show_other) show_other(f);
 	else put_ch('?');
 

@@ -9,6 +9,7 @@
 #include <type_convert.h>
 #include <type_math.h>
 #include <type_num.h>
+#include <type_output.h>
 #include <type_str.h>
 #include <type_sym.h>
 
@@ -183,7 +184,7 @@ static void run_test_suite(void)
 	}
 
 	{
-	test_eval(Mnum(3.14159265979265));
+	test_eval(Mnum(3.14159265358979));
 	test_eval(Qnum_ulong(42));
 	test_eval(A(Q(type_length),Mstr("12345")));
 	test_eval(A(Q(type_length),
@@ -235,6 +236,7 @@ static void run_test_suite(void)
 	/* Verify that J operators don't pile up. */
 	test_eval(A(A(A(S,A(A(S,Mstr("x0")),Mstr("x1"))),Mstr("y")),Mstr("z")));
 
+	{
 	test_eval(Msym("x"));
 	test_eval(Mquo("x"));
 	test_eval(A(Msym("x"),Mquo("x")));
@@ -257,6 +259,22 @@ static void run_test_suite(void)
 	test_eval(lam(0,0));
 	test_eval(lam(0,Msym("x")));
 	test_eval(lam(Msym("x"),0));
+	}
+
+	{
+	test_eval(Q(type_put));
+	test_eval(A(Q(type_put),A(I,Mstr("XYZ"))));
+	test_eval(A(A(Q(type_put),A(I,Mstr("XYZ"))),Msym("next")));
+	test_eval(A(A(Q(type_put),A(I,Mnum(3.14159265358979))),Msym("next")));
+	test_eval(A(A(Q(type_put),A(C,I)),Msym("next")));
+	test_eval(Q(type_nl));
+	test_eval(A(Q(type_nl),Msym("next")));
+	test_eval(Q(type_say));
+	test_eval(A(Q(type_say),A(I,Mstr("XYZ"))));
+	test_eval(A(A(Q(type_say),A(I,Mstr("XYZ"))),Msym("next")));
+	test_eval(A(A(Q(type_say),A(I,Mnum(3.14159265358979))),Msym("next")));
+	test_eval(A(A(Q(type_say),A(C,I)),Msym("next")));
+	}
 	}
 
 int main(int argc, char *argv[])
