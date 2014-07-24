@@ -35,14 +35,15 @@ link()
 # Core modules
 objects=""
 compile basic
-#compile buffer
+compile buffer
 compile die
 compile format
-#compile input
+compile input
 compile memory
 compile num
 compile output
-#compile parse
+compile parse
+compile parse_string
 #compile source
 compile str
 compile type_cmp

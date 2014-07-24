@@ -1,4 +1,5 @@
-struct sym
+typedef struct symbol *symbol;
+struct symbol
 	{
 	short quoted;
 	value name;

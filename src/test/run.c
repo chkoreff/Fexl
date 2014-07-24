@@ -1,9 +1,10 @@
+#include <str.h>
 #include <value.h>
 #include <basic.h>
 #include <memory.h>
 #include <num.h>
 #include <output.h>
-#include <str.h>
+#include <parse_string.h>
 #include <test/show.h>
 #include <type_cmp.h>
 #include <type_convert.h>
@@ -48,13 +49,6 @@ static value Mquo(const char *x)
 	return Qsym(1,Mstr(x),1);
 	}
 
-static value type_ping(value f)
-	{
-	if (!f->L) return 0;
-	put("ping!");nl();
-	return f->R;
-	}
-
 static void test_eval(value f)
 	{
 	hold(f);
@@ -67,12 +61,6 @@ static void test_eval(value f)
 	}
 	drop(f);
 	nl();
-	}
-
-static void show_test_atom(value f)
-	{
-	if (f->T == type_ping) put("ping");
-	else put_ch('_');
 	}
 
 static void limit_test_eval(value f,
@@ -92,10 +80,13 @@ static void limit_test_eval(value f,
 	max_words = save_max_words;
 	}
 
+static value ping(void)
+	{
+	return A(Q(type_say),Mstr("ping!"));
+	}
+
 static void run_test_suite(void)
 	{
-	show_other = show_test_atom;
-
 	test_eval(A(A(C,S),C));
 	test_eval(C);
 	test_eval(A(C,C));
@@ -136,8 +127,8 @@ static void run_test_suite(void)
 	test_eval(A(A(A(S,A(A(S,C),C)),
 		A(A(C,C),C)),A(A(C,S),C)));
 
-	test_eval(Q(type_ping));
-	test_eval(A(I,Q(type_ping)));
+	test_eval(ping());
+	test_eval(A(I,ping()));
 	test_eval(C);
 	test_eval(A(C,C));
 	test_eval(A(A(C,C),C));
@@ -158,7 +149,7 @@ static void run_test_suite(void)
 	test_eval(A(A(A(R,A(A(R,A(A(R,A(A(L,I),
 		I)),A(A(S,R),I))),A(A(S,R),
 		I))),A(A(S,R),A(A(S,R),I))),
-		Q(type_ping)));
+		ping()));
 	}
 
 	test_eval(Y);
@@ -255,7 +246,7 @@ static void run_test_suite(void)
 		app(Msym("x"),app(Msym("x"),Mquo("abc"))),
 		app(app(Msym("y"),Msym("x")),Msym("x"))
 		)));
-	
+
 	test_eval(lam(0,0));
 	test_eval(lam(0,Msym("x")));
 	test_eval(lam(Msym("x"),0));
@@ -274,6 +265,13 @@ static void run_test_suite(void)
 	test_eval(A(A(Q(type_say),A(I,Mstr("XYZ"))),Msym("next")));
 	test_eval(A(A(Q(type_say),A(I,Mnum(3.14159265358979))),Msym("next")));
 	test_eval(A(A(Q(type_say),A(C,I)),Msym("next")));
+	}
+
+	{
+	test_eval(A(Q(type_parse_string),Mstr("")));
+	test_eval(A(Q(type_parse_string),Mstr(" \t\nx y")));
+	test_eval(A(Q(type_parse_string),Mstr("ab cd e")));
+	test_eval(A(Q(type_parse_string),Mstr("abcdefghi;")));
 	}
 	}
 

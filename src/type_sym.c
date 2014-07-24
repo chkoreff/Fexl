@@ -5,15 +5,15 @@
 #include <type_str.h>
 #include <type_sym.h>
 
-static void sym_free(struct sym *sym)
+static void sym_free(symbol sym)
 	{
 	drop(sym->name);
-	free_memory(sym,sizeof(struct sym),3);
+	free_memory(sym,sizeof(struct symbol),3);
 	}
 
 value type_sym(value f)
 	{
-	if (f->N == 0) sym_free((struct sym *)f->R);
+	if (f->N == 0) sym_free((symbol)f->R);
 	return 0;
 	}
 
@@ -23,7 +23,7 @@ value Qsym(short quoted, value name, unsigned long line)
 	hold(name);
 
 	{
-	struct sym *sym = new_memory(sizeof(struct sym),3);
+	symbol sym = new_memory(sizeof(struct symbol),3);
 	if (!sym)
 		{
 		drop(name);
@@ -76,7 +76,7 @@ static value fuse(value f, value g)
 		return app(app(S,f),g);
 	}
 
-static int sym_eq(struct sym *x, struct sym *y)
+static int sym_eq(symbol x, symbol y)
 	{
 	return x->quoted == y->quoted
 		&& str_eq((string)x->name->R,(string)y->name->R);
@@ -90,7 +90,7 @@ static value abstract(value sym, value body)
 		return A(C,body);
 	else if (body->L == 0)
 		{
-		if (sym_eq((struct sym *)sym->R, (struct sym *)body->R))
+		if (sym_eq((symbol)sym->R, (symbol)body->R))
 			return I;  /* (\x x) = I */
 		else
 			return app(C,body);

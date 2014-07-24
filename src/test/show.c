@@ -1,8 +1,9 @@
+#include <str.h>
 #include <value.h>
 #include <basic.h>
 #include <num.h>
 #include <output.h>
-#include <str.h>
+#include <parse_string.h>
 #include <test/show.h>
 #include <type_cmp.h>
 #include <type_convert.h>
@@ -11,8 +12,6 @@
 #include <type_output.h>
 #include <type_str.h>
 #include <type_sym.h>
-
-void (*show_other)(value f) = 0;
 
 static void do_show(value f)
 	{
@@ -45,7 +44,7 @@ static void do_show(value f)
 		}
 	else if (f->T == type_sym)
 		{
-		struct sym *sym = (struct sym *)f->R;
+		symbol sym = (symbol)f->R;
 		put_ch('{');
 		if (sym->quoted) put_ch('"');
 		put_str((string)sym->name->R);
@@ -67,7 +66,7 @@ static void do_show(value f)
 	else if (f->T == type_put) put("put");
 	else if (f->T == type_nl) put("nl");
 	else if (f->T == type_say) put("say");
-	else if (show_other) show_other(f);
+	else if (f->T == type_parse_string) put("parse_string");
 	else put_ch('?');
 
 	remain_depth++;

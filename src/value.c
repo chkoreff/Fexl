@@ -30,7 +30,7 @@ static value free_list = 0;
 void clear_free_list(void)
 	{
 	while (free_list)
-		free_memory(Q(0), sizeof(struct value), 4);
+		free_memory(Q(0),sizeof(struct value),4);
 	}
 
 void end_value(void)
@@ -79,7 +79,7 @@ static value V(type T, value L, value R)
 		}
 	else
 		{
-		f = (value)new_memory(sizeof(struct value), 4);
+		f = (value)new_memory(sizeof(struct value),4);
 		if (!f) return 0;
 		}
 

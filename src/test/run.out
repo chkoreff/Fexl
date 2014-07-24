@@ -46,13 +46,13 @@ beg f = (((S ((S C) C)) ((C C) C)) ((C S) C))
 end f = (((S ((S C) C)) ((C C) C)) (J S))
 end g = (S (((C C) C) (J S)))
 
-beg f = ping
-end f = ping
-end g = ping
+beg f = (say "ping!")
+end f = (say "ping!")
+end g = (say "ping!")
 
-beg f = (I ping)
-end f = (I ping)
-end g = ping
+beg f = (I (say "ping!"))
+end f = (I (say "ping!"))
+end g = (say "ping!")
 
 beg f = C
 end f = C
@@ -70,7 +70,7 @@ beg f = ((C S) C)
 end f = ((C S) C)
 end g = S
 
-beg f = (((R ((R ((R ((L I) I)) ((S R) I))) ((S R) I))) ((S R) ((S R) I))) ping)
+beg f = (((R ((R ((R ((L I) I)) ((S R) I))) ((S R) I))) ((S R) ((S R) I))) (say "ping!"))
 ping!
 ping!
 ping!
@@ -83,7 +83,7 @@ ping!
 ping!
 ping!
 ping!
-end f = (((R ((R ((R ((L I) I)) ((S R) I))) ((S R) I))) ((S R) ((S R) I))) ping)
+end f = (((R ((R ((R ((L I) I)) ((S R) I))) ((S R) I))) ((S R) ((S R) I))) (say "ping!"))
 end g = I
 
 beg f = @
@@ -344,4 +344,22 @@ end g = {next}
 beg f = ((say (C I)) {next})
 end f = ((say (C I)) {next})
 end g = ((say (C I)) {next})
+
+beg f = (parse_string "")
+end f = (parse_string "")
+end g = I
+
+beg f = (parse_string " 	
+x y")
+end f = (parse_string " 	
+x y")
+end g = {{x} {y}}
+
+beg f = (parse_string "ab cd e")
+end f = (parse_string "ab cd e")
+end g = {{{ab} {cd}} {e}}
+
+beg f = (parse_string "abcdefghi;")
+end f = (parse_string "abcdefghi;")
+end g = {abcdefghi}
 
