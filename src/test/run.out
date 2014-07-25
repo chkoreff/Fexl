@@ -347,19 +347,90 @@ end g = ((say (C I)) {next})
 
 beg f = (parse_string "")
 end f = (parse_string "")
-end g = I
+end g = ((L ((L ((L I) I)) "")) 0)
 
 beg f = (parse_string " 	
 x y")
 end f = (parse_string " 	
 x y")
-end g = {{x} {y}}
+end g = ((L ((L ((L I) {{x} {y}})) "")) 2)
 
 beg f = (parse_string "ab cd e")
 end f = (parse_string "ab cd e")
-end g = {{{ab} {cd}} {e}}
+end g = ((L ((L ((L I) {{{ab} {cd}} {e}})) "")) 1)
 
 beg f = (parse_string "abcdefghi;")
 end f = (parse_string "abcdefghi;")
-end g = {abcdefghi}
+end g = ((L ((L ((L I) {abcdefghi})) "")) 1)
+
+beg f = (parse_string """")
+end f = (parse_string """")
+end g = ((L ((L ((L I) {""})) "")) 1)
+
+beg f = (parse_string ""a"")
+end f = (parse_string ""a"")
+end g = ((L ((L ((L I) {"a"})) "")) 1)
+
+beg f = (parse_string ""abc
+defg"")
+end f = (parse_string ""abc
+defg"")
+end g = ((L ((L ((L I) {"abc
+defg"})) "")) 1)
+
+beg f = (parse_string """)
+end f = (parse_string """)
+end g = ((L ((L ((L I) F)) "Unclosed string")) 1)
+
+beg f = (parse_string "
+"a
+b
+")
+end f = (parse_string "
+"a
+b
+")
+end g = ((L ((L ((L I) F)) "Unclosed string")) 2)
+
+beg f = (parse_string "~| |")
+end f = (parse_string "~| |")
+end g = ((L ((L ((L I) {""})) "")) 1)
+
+beg f = (parse_string "~| a|")
+end f = (parse_string "~| a|")
+end g = ((L ((L ((L I) {"a"})) "")) 1)
+
+beg f = (parse_string "~| a")
+end f = (parse_string "~| a")
+end g = ((L ((L ((L I) F)) "Unclosed string")) 1)
+
+beg f = (parse_string "~END aEND")
+end f = (parse_string "~END aEND")
+end g = ((L ((L ((L I) {"a"})) "")) 1)
+
+beg f = (parse_string "
+
+~END
+abcEN")
+end f = (parse_string "
+
+~END
+abcEN")
+end g = ((L ((L ((L I) F)) "Unclosed string")) 3)
+
+beg f = (parse_string "~")
+end f = (parse_string "~")
+end g = ((L ((L ((L I) F)) "Incomplete string terminator")) 1)
+
+beg f = (parse_string "~EN")
+end f = (parse_string "~EN")
+end g = ((L ((L ((L I) F)) "Incomplete string terminator")) 1)
+
+beg f = (parse_string "~ABC abcdABAABC")
+end f = (parse_string "~ABC abcdABAABC")
+end g = ((L ((L ((L I) {"abcdABA"})) "")) 1)
+
+beg f = (parse_string "~ABCD AABABCABCD")
+end f = (parse_string "~ABCD AABABCABCD")
+end g = ((L ((L ((L I) {"AABABC"})) "")) 1)
 

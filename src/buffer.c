@@ -3,7 +3,7 @@
 #include <memory.h>
 #include <string.h> /* memcpy */
 
-static void buf_free(buffer buf)
+void buf_free(buffer buf)
 	{
 	while (buf)
 		{

@@ -41,12 +41,12 @@ static value Mnum(double x)
 
 static value Msym(const char *x)
 	{
-	return Qsym(0,Mstr(x),1);
+	return Qsym(0,str_new_data0(x),1);
 	}
 
 static value Mquo(const char *x)
 	{
-	return Qsym(1,Mstr(x),1);
+	return Qsym(1,str_new_data0(x),1);
 	}
 
 static void test_eval(value f)
@@ -272,6 +272,23 @@ static void run_test_suite(void)
 	test_eval(A(Q(type_parse_string),Mstr(" \t\nx y")));
 	test_eval(A(Q(type_parse_string),Mstr("ab cd e")));
 	test_eval(A(Q(type_parse_string),Mstr("abcdefghi;")));
+	}
+
+	{
+	test_eval(A(Q(type_parse_string),Mstr("\"\"")));
+	test_eval(A(Q(type_parse_string),Mstr("\"a\"")));
+	test_eval(A(Q(type_parse_string),Mstr("\"abc\ndefg\"")));
+	test_eval(A(Q(type_parse_string),Mstr("\"")));
+	test_eval(A(Q(type_parse_string),Mstr("\n\"a\nb\n")));
+	test_eval(A(Q(type_parse_string),Mstr("~| |")));
+	test_eval(A(Q(type_parse_string),Mstr("~| a|")));
+	test_eval(A(Q(type_parse_string),Mstr("~| a")));
+	test_eval(A(Q(type_parse_string),Mstr("~END aEND")));
+	test_eval(A(Q(type_parse_string),Mstr("\n\n~END\nabcEN")));
+	test_eval(A(Q(type_parse_string),Mstr("~")));
+	test_eval(A(Q(type_parse_string),Mstr("~EN")));
+	test_eval(A(Q(type_parse_string),Mstr("~ABC abcdABAABC")));
+	test_eval(A(Q(type_parse_string),Mstr("~ABCD AABABCABCD")));
 	}
 	}
 

@@ -17,21 +17,19 @@ value type_sym(value f)
 	return 0;
 	}
 
-value Qsym(short quoted, value name, unsigned long line)
+value Qsym(short quoted, string name, unsigned long line)
 	{
 	if (!name) return 0;
-	hold(name);
-
 	{
 	symbol sym = new_memory(sizeof(struct symbol),3);
 	if (!sym)
 		{
-		drop(name);
+		str_free(name);
 		return 0;
 		}
 
 	sym->quoted = quoted ? 1 : 0;
-	sym->name = name;
+	sym->name = hold(Qstr(name));
 	sym->line = line;
 
 	{
