@@ -13,7 +13,7 @@ static int get(void)
 	return pos < source->len ? source->data[pos++] : -1;
 	}
 
-value parse_string(string x)
+static value parse_string(string x)
 	{
 	const string save_source = source;
 	const unsigned long save_pos = pos;

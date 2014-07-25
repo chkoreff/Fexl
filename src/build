@@ -43,6 +43,7 @@ compile memory
 compile num
 compile output
 compile parse
+compile parse_file
 compile parse_string
 #compile source
 compile str

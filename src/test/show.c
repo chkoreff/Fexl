@@ -3,6 +3,7 @@
 #include <basic.h>
 #include <num.h>
 #include <output.h>
+#include <parse_file.h>
 #include <parse_string.h>
 #include <test/show.h>
 #include <type_cmp.h>
@@ -66,6 +67,7 @@ static void do_show(value f)
 	else if (f->T == type_put) put("put");
 	else if (f->T == type_nl) put("nl");
 	else if (f->T == type_say) put("say");
+	else if (f->T == type_parse_file) put("parse_file");
 	else if (f->T == type_parse_string) put("parse_string");
 	else put_ch('?');
 

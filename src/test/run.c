@@ -4,6 +4,7 @@
 #include <memory.h>
 #include <num.h>
 #include <output.h>
+#include <parse_file.h>
 #include <parse_string.h>
 #include <test/show.h>
 #include <type_cmp.h>
@@ -85,9 +86,19 @@ static value ping(void)
 	return A(Q(type_say),Mstr("ping!"));
 	}
 
+static void test_parse(type t, const char *source)
+	{
+	test_eval(A(Q(t),Mstr(source)));
+	}
+
 static void test_parse_string(const char *source)
 	{
-	test_eval(A(Q(type_parse_string),Mstr(source)));
+	test_parse(type_parse_string,source);
+	}
+
+static void test_parse_file(const char *source)
+	{
+	test_parse(type_parse_file,source);
 	}
 
 static void run_test_suite(void)
@@ -326,7 +337,11 @@ static void run_test_suite(void)
 	test_parse_string("(ab cd e)\n)");
 	}
 
-	/*TODO parse_file */
+	{
+	test_parse_file("missing.fxl");
+	test_parse_file("test/a2.fxl");
+	test_parse_file("test/utf8.fxl");
+	}
 	}
 
 int main(int argc, char *argv[])

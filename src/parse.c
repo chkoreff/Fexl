@@ -357,7 +357,15 @@ static value parse_exp(void)
 /* Parse an expression and return (\: : exp error_code error_line). */
 static value parse_form(void)
 	{
-	value exp = parse_exp();
+	value exp;
+	if (getd)
+		exp = parse_exp();
+	else
+		{
+		syntax_error("Missing file", source_line);
+		exp = 0;
+		}
+
 	if (ch != -1 && exp)
 		{
 		syntax_error("Extraneous input", source_line);

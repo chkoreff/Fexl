@@ -544,3 +544,15 @@ end f = (parse_string "(ab cd e)
 )")
 end g = ((L ((L ((L I) F)) "Extraneous input")) 2)
 
+beg f = (parse_file "missing.fxl")
+end f = (parse_file "missing.fxl")
+end g = ((L ((L ((L I) F)) "Missing file")) 1)
+
+beg f = (parse_file "test/a2.fxl")
+end f = (parse_file "test/a2.fxl")
+end g = ((L ((L ((L I) {{{R {@}} {{R {R {get}}} {{R {R {S {{L {{L {eq}} {""}}} I}}}} {{R {R {R {{put} {"ch = "}}}}} {{S {(R R) {(R R) {put}}}} {{R {R {L {put}}}} {{L {(R R) {put}}} {nl}}}}}}}} {"""}})) "")) 0)
+
+beg f = (parse_file "test/utf8.fxl")
+end f = (parse_file "test/utf8.fxl")
+end g = ((L ((L ((L I) {I {{{say} {"== test_utf"}} {{{L {{L {(R L) {{L {(R L) {(R (R L)) {{L {(R L) {(R (R L)) {(R (R (R L))) {{R {R {R {R {R {{put} {"f = "}}}}}}} {{L {(R R) {(R R) {(R R) {(R R) {{L {{L {say}} {put}}} {"åabcüdef = "}}}}}}} {{L {(R R) {(R R) {(R R) {say}}}}} {{R {R {R {{put} {"ghij = "}}}}} {{L {(R R) {(R R) {say}}}} {{R {R {{put} {"üä = "}}}} {{L {(R R) {say}}} {{R {{put} {"1≠0 = "}}} {{L {say}} {{{L {{R {R {{put} {"vegetable "}}}} {{L {(R R) {say}}} {{R {{put} {"dessert "}}} {{L {say}} I}}}}} {"efterrätt"}} {"grönsak"}}}}}}}}}}}}}}} _}}}} _}}} _}} _} _}}})) _)) _)
+
