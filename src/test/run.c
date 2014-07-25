@@ -85,6 +85,11 @@ static value ping(void)
 	return A(Q(type_say),Mstr("ping!"));
 	}
 
+static void test_parse_string(const char *source)
+	{
+	test_eval(A(Q(type_parse_string),Mstr(source)));
+	}
+
 static void run_test_suite(void)
 	{
 	test_eval(A(A(C,S),C));
@@ -268,58 +273,60 @@ static void run_test_suite(void)
 	}
 
 	{
-	test_eval(A(Q(type_parse_string),Mstr("")));
-	test_eval(A(Q(type_parse_string),Mstr(" \t\nx y")));
-	test_eval(A(Q(type_parse_string),Mstr("ab cd e")));
-	test_eval(A(Q(type_parse_string),Mstr("abcdefghi;")));
+	test_parse_string("");
+	test_parse_string(" \t\nx y");
+	test_parse_string("ab cd e");
+	test_parse_string("abcdefghi;");
 	}
 
 	{
-	test_eval(A(Q(type_parse_string),Mstr("\"\"")));
-	test_eval(A(Q(type_parse_string),Mstr("\"a\"")));
-	test_eval(A(Q(type_parse_string),Mstr("\"abc\ndefg\"")));
-	test_eval(A(Q(type_parse_string),Mstr("\"")));
-	test_eval(A(Q(type_parse_string),Mstr("\n\"a\nb\n")));
-	test_eval(A(Q(type_parse_string),Mstr("~| |")));
-	test_eval(A(Q(type_parse_string),Mstr("~| a|")));
-	test_eval(A(Q(type_parse_string),Mstr("~| a")));
-	test_eval(A(Q(type_parse_string),Mstr("~END aEND")));
-	test_eval(A(Q(type_parse_string),Mstr("\n\n~END\nabcEN")));
-	test_eval(A(Q(type_parse_string),Mstr("~")));
-	test_eval(A(Q(type_parse_string),Mstr("~EN")));
-	test_eval(A(Q(type_parse_string),Mstr("~ABC abcdABAABC")));
-	test_eval(A(Q(type_parse_string),Mstr("~ABCD AABABCABCD")));
+	test_parse_string("\"\"");
+	test_parse_string("\"a\"");
+	test_parse_string("\"abc\ndefg\"");
+	test_parse_string("\"");
+	test_parse_string("\n\"a\nb\n");
+	test_parse_string("~| |");
+	test_parse_string("~| a|");
+	test_parse_string("~| a");
+	test_parse_string("~END aEND");
+	test_parse_string("\n\n~END\nabcEN");
+	test_parse_string("~");
+	test_parse_string("~EN");
+	test_parse_string("~ABC abcdABAABC");
+	test_parse_string("~ABCD AABABCABCD");
 	}
 
 	{
-	test_eval(A(Q(type_parse_string),Mstr(" = y")));
-	test_eval(A(Q(type_parse_string),Mstr("ab cd e;")));
-	test_eval(A(Q(type_parse_string),Mstr("ab cd e;f g")));
-	test_eval(A(Q(type_parse_string),Mstr("ab cd e;f g ; hi j;")));
-	test_eval(A(Q(type_parse_string),Mstr("ab cd e\\\\fg h")));
-	test_eval(A(Q(type_parse_string),Mstr("ab cd e\\x")));
-	test_eval(A(Q(type_parse_string),Mstr("ab cd e\\")));
-	test_eval(A(Q(type_parse_string),Mstr("\\x=")));
-	test_eval(A(Q(type_parse_string),Mstr("\\x=4")));
-	test_eval(A(Q(type_parse_string),Mstr("\\x\\y\\z x z; y z")));
-	test_eval(A(Q(type_parse_string),Mstr("\\x\\y\\z x; y z")));
-	test_eval(A(Q(type_parse_string),Mstr("\\x\\y\\z x z y")));
-	test_eval(A(Q(type_parse_string),Mstr("\\x x")));
-	test_eval(A(Q(type_parse_string),Mstr("\\x\\y x")));
-	test_eval(A(Q(type_parse_string),Mstr("\\x x x")));
+	test_parse_string(" = y");
+	test_parse_string("ab cd e;");
+	test_parse_string("ab cd e;f g");
+	test_parse_string("ab cd e;f g ; hi j;");
+	test_parse_string("ab cd e\\\\fg h");
+	test_parse_string("ab cd e\\x");
+	test_parse_string("ab cd e\\");
+	test_parse_string("\\x=");
+	test_parse_string("\\x=4");
+	test_parse_string("\\x\\y\\z x z; y z");
+	test_parse_string("\\x\\y\\z x; y z");
+	test_parse_string("\\x\\y\\z x z y");
+	test_parse_string("\\x x");
+	test_parse_string("\\x\\y x");
+	test_parse_string("\\x x x");
 
-	test_eval(A(Q(type_parse_string),Mstr("\\x=y x")));
-	test_eval(A(Q(type_parse_string),Mstr("\\x=y y")));
+	test_parse_string("\\x=y x");
+	test_parse_string("\\x=y y");
 
-	test_eval(A(Q(type_parse_string),Mstr("\\y\\x=y x x")));
-	test_eval(A(Q(type_parse_string),Mstr("\\y\\x=y y y")));
+	test_parse_string("\\y\\x=y x x");
+	test_parse_string("\\y\\x=y y y");
 
-	test_eval(A(Q(type_parse_string),Mstr("()")));
-	test_eval(A(Q(type_parse_string),Mstr("(\na\n(b")));
-	test_eval(A(Q(type_parse_string),Mstr("(\na\n(b)")));
-	test_eval(A(Q(type_parse_string),Mstr("(\na\n(b))")));
-	test_eval(A(Q(type_parse_string),Mstr("(ab cd e)\n)")));
+	test_parse_string("()");
+	test_parse_string("(\na\n(b");
+	test_parse_string("(\na\n(b)");
+	test_parse_string("(\na\n(b))");
+	test_parse_string("(ab cd e)\n)");
 	}
+
+	/*TODO parse_file */
 	}
 
 int main(int argc, char *argv[])

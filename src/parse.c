@@ -299,8 +299,8 @@ static value parse_lambda(unsigned long first_line)
 	}
 	}
 
-/* Parse the next factor of an expression.  Return F if no factor found, or
-0 on error. */
+/* Parse the next factor of an expression.  Return F if no factor found, or 0
+on error. */
 static value parse_factor(void)
 	{
 	skip_filler();
