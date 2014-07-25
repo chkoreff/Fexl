@@ -290,6 +290,36 @@ static void run_test_suite(void)
 	test_eval(A(Q(type_parse_string),Mstr("~ABC abcdABAABC")));
 	test_eval(A(Q(type_parse_string),Mstr("~ABCD AABABCABCD")));
 	}
+
+	{
+	test_eval(A(Q(type_parse_string),Mstr(" = y")));
+	test_eval(A(Q(type_parse_string),Mstr("ab cd e;")));
+	test_eval(A(Q(type_parse_string),Mstr("ab cd e;f g")));
+	test_eval(A(Q(type_parse_string),Mstr("ab cd e;f g ; hi j;")));
+	test_eval(A(Q(type_parse_string),Mstr("ab cd e\\\\fg h")));
+	test_eval(A(Q(type_parse_string),Mstr("ab cd e\\x")));
+	test_eval(A(Q(type_parse_string),Mstr("ab cd e\\")));
+	test_eval(A(Q(type_parse_string),Mstr("\\x=")));
+	test_eval(A(Q(type_parse_string),Mstr("\\x=4")));
+	test_eval(A(Q(type_parse_string),Mstr("\\x\\y\\z x z; y z")));
+	test_eval(A(Q(type_parse_string),Mstr("\\x\\y\\z x; y z")));
+	test_eval(A(Q(type_parse_string),Mstr("\\x\\y\\z x z y")));
+	test_eval(A(Q(type_parse_string),Mstr("\\x x")));
+	test_eval(A(Q(type_parse_string),Mstr("\\x\\y x")));
+	test_eval(A(Q(type_parse_string),Mstr("\\x x x")));
+
+	test_eval(A(Q(type_parse_string),Mstr("\\x=y x")));
+	test_eval(A(Q(type_parse_string),Mstr("\\x=y y")));
+
+	test_eval(A(Q(type_parse_string),Mstr("\\y\\x=y x x")));
+	test_eval(A(Q(type_parse_string),Mstr("\\y\\x=y y y")));
+
+	test_eval(A(Q(type_parse_string),Mstr("()")));
+	test_eval(A(Q(type_parse_string),Mstr("(\na\n(b")));
+	test_eval(A(Q(type_parse_string),Mstr("(\na\n(b)")));
+	test_eval(A(Q(type_parse_string),Mstr("(\na\n(b))")));
+	test_eval(A(Q(type_parse_string),Mstr("(ab cd e)\n)")));
+	}
 	}
 
 int main(int argc, char *argv[])

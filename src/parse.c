@@ -38,8 +38,8 @@ if it had reached end of file.
 
 static int ch; /* current character */
 static unsigned long source_line;  /* current line number */
-static unsigned long first_line; /* first line of a construct */
 static const char *error_code;
+static unsigned long error_line;
 
 static void skip(void)
 	{
@@ -92,6 +92,12 @@ static void skip_filler(void)
 		}
 	}
 
+static void syntax_error(const char *code, unsigned long line)
+	{
+	error_code = code;
+	error_line = line;
+	}
+
 /*
 Parse a name, returning a symbol if we saw one, F if we didn't, or 0 if we ran
 out of memory.
@@ -102,7 +108,7 @@ and a few other special characters.  This is the simplest rule that can work.
 static value parse_name(void)
 	{
 	buffer buf = 0;
-	first_line = source_line;
+	unsigned long first_line = source_line;
 
 	while (1)
 		{
@@ -126,7 +132,11 @@ static value parse_name(void)
 	return Qsym(0, buf_finish(buf), first_line);
 	}
 
-static string collect_string(const char *end_data, unsigned long end_len)
+static string collect_string(
+	const char *end_data,
+	unsigned long end_len,
+	unsigned long first_line
+	)
 	{
 	unsigned long match_pos = 0;
 	buffer buf = 0;
@@ -155,7 +165,7 @@ static string collect_string(const char *end_data, unsigned long end_len)
 			}
 		else if (ch == -1)
 			{
-			error_code = "Unclosed string";
+			syntax_error("Unclosed string", first_line);
 			buf_free(buf);
 			return 0;
 			}
@@ -172,15 +182,15 @@ static string collect_string(const char *end_data, unsigned long end_len)
 
 static value parse_quote_string(void)
 	{
-	first_line = source_line;
+	unsigned long first_line = source_line;
 	skip();
-	return Qsym(1, collect_string("\"",1), first_line);
+	return Qsym(1, collect_string("\"",1,first_line), first_line);
 	}
 
 static value parse_tilde_string(void)
 	{
 	buffer buf = 0;
-	first_line = source_line;
+	unsigned long first_line = source_line;
 
 	while (1)
 		{
@@ -193,18 +203,18 @@ static value parse_tilde_string(void)
 
 	if (ch == -1)
 		{
-		error_code = "Incomplete string terminator";
+		syntax_error("Incomplete string terminator", first_line);
 		buf_free(buf);
 		return 0;
 		}
 
+	skip();
+
 	{
 	string end = buf_finish(buf);
 	if (!end) return 0;
-
-	skip();
 	{
-	string content = collect_string(end->data, end->len);
+	string content = collect_string(end->data, end->len, first_line);
 	str_free(end);
 	return Qsym(1,content,first_line);
 	}
@@ -221,20 +231,108 @@ static value parse_symbol(void)
 		return parse_name();
 	}
 
+static value parse_exp(void);
+
 static value parse_term()
 	{
-	return parse_symbol();
+	unsigned long first_line = source_line;
+	value exp;
+
+	if (ch == '(') /* parenthesized expression */
+		{
+		skip();
+		exp = parse_exp();
+		if (!exp) return 0;
+		if (ch != ')')
+			{
+			syntax_error("Unclosed parenthesis", first_line);
+			return A(0,exp);
+			}
+		skip();
+		}
+	else
+		exp = parse_symbol();
+
+	return exp;
+	}
+
+/* Parse a lambda form following the initial '\' character. */
+static value parse_lambda(unsigned long first_line)
+	{
+	skip_white();
+	{
+	/* Parse the symbol (function parameter). */
+	value sym = parse_symbol();
+	if (sym == F)
+		{
+		syntax_error("Missing symbol after '\\'", first_line);
+		return 0;
+		}
+
+	skip_filler();
+	first_line = source_line;
+
+	{
+	/* Parse the definition of the symbol if we see an '=' char. */
+	value def = F;
+	if (ch == '=')
+		{
+		skip();
+		skip_filler();
+
+		def = parse_term();
+		if (def == F)
+			{
+			syntax_error("Missing definition", first_line);
+			sym = A(0,sym);
+			return 0;
+			}
+		}
+
+	{
+	/* Parse the body of the function. */
+	value body = lam(sym,parse_exp());
+	/* Return the body applied to the definition, if any. */
+	return def == F ? body : app(body,def);
+	}
+	}
+	}
 	}
 
 /* Parse the next factor of an expression.  Return F if no factor found, or
-0 if out of memory. */
+0 on error. */
 static value parse_factor(void)
 	{
 	skip_filler();
 	if (ch == -1)
 		return F;
+	else if (ch == '\\')
+		{
+		unsigned long first_line = source_line;
+		skip();
+		if (ch == '\\')
+			{
+			ch = -1; /* Two backslashes simulates end of file. */
+			return F;
+			}
+		else
+			return parse_lambda(first_line);
+		}
+	else if (ch == ';')
+		{
+		skip();
+		return parse_exp();
+		}
 	else
-		return parse_term();
+		{
+		value term = parse_term();
+		if (ch == '=')
+			{
+			syntax_error("Missing symbol declaration before '='", source_line);
+			term = A(0,term);
+			}
+		return term;
+		}
 	}
 
 static value parse_exp(void)
@@ -246,12 +344,7 @@ static value parse_exp(void)
 		value factor = parse_factor();
 		if (!factor)
 			{
-			if (exp != I)
-				{
-				hold(exp);
-				drop(exp);
-				}
-			exp = 0;
+			exp = A(0,exp);
 			break;
 			}
 		if (factor == F) break;
@@ -261,13 +354,19 @@ static value parse_exp(void)
 	return exp;
 	}
 
-/* Parse an expression and return (\: : exp error_code first_line). */
+/* Parse an expression and return (\: : exp error_code error_line). */
 static value parse_form(void)
 	{
 	value exp = parse_exp();
+	if (ch != -1 && exp)
+		{
+		syntax_error("Extraneous input", source_line);
+		exp = A(0,exp);
+		}
+
 	exp = A(A(L,I),exp ? exp : F);
 	exp = A(A(L,exp),Qstr(str_new_data0(error_code ? error_code : "")));
-	exp = A(A(L,exp),Qnum_ulong(first_line));
+	exp = A(A(L,exp),Qnum_ulong(error_line));
 	return exp;
 	}
 
@@ -276,8 +375,8 @@ value parse(input get)
 	const input save_getd = getd;
 	const int save_ch = ch;
 	const unsigned long save_source_line = source_line;
-	const unsigned long save_first_line = first_line;
 	const char *const save_error_code = error_code;
+	const unsigned long save_error_line = error_line;
 	value exp;
 
 	getd = get;
@@ -289,8 +388,8 @@ value parse(input get)
 	getd = save_getd;
 	ch = save_ch;
 	source_line = save_source_line;
-	first_line = save_first_line;
 	error_code = save_error_code;
+	error_line = save_error_line;
 
 	return exp;
 	}
