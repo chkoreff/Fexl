@@ -1,7 +1,9 @@
 #include <value.h>
 #include <basic.h>
 #include <memory.h>
+#include <num.h>
 #include <str.h>
+#include <type_num.h>
 #include <type_str.h>
 #include <type_sym.h>
 
@@ -82,13 +84,13 @@ static int sym_eq(symbol x, symbol y)
 
 /* Abstract the symbol from the body, returning a form which is a function of
 that symbol, and no longer contains that symbol. */
-static value abstract(value sym, value body)
+static value abstract(symbol sym, value body)
 	{
 	if (body->T != type_sym)
 		return A(C,body);
 	else if (body->L == 0)
 		{
-		if (sym_eq((symbol)sym->R, (symbol)body->R))
+		if (sym_eq(sym, (symbol)body->R))
 			return I;  /* (\x x) = I */
 		else
 			return app(C,body);
@@ -109,9 +111,71 @@ value lam(value sym, value body)
 	hold(sym);
 	hold(body);
 	{
-	value f = (sym && body) ? abstract(sym,body) : 0;
+	value f = (sym && body) ? abstract((symbol)sym->R,body) : 0;
 	drop(sym);
 	drop(body);
 	return f;
 	}
+	}
+
+/* Return the last symbol in the value, if any, in right to left order. */
+static symbol last_sym(value f)
+	{
+	if (f->T != type_sym) return 0;
+	if (f->L == 0) return (symbol)f->R;
+	{
+	symbol sym = last_sym(f->R);
+	if (sym) return sym;
+	return last_sym(f->L);
+	}
+	}
+
+/*
+Extract all symbols from a symbolic form, returning a pure function which can
+be used to resolve symbol definitions easily.
+
+For example, consider this source text:
+
+	say "hello"
+	say something
+
+The resulting form is:
+
+\form=
+	(\sym\exp
+	sym F "something" 1 ;
+	sym F "say" 2 ;
+	sym C "hello" 1 ;
+	exp (\something\say\"hello" say "hello" say something)
+	)
+
+Each symbol is of the form (sym quoted name line).  The <quoted> flag is C if
+the symbol is a string, or F it it's a name.  The <name> is the string name of
+the symbol.  The <line> is the line number on which the last occurrence of the
+symbol appears.
+
+Note that the form above is a completely specified function with no unresolved
+names.  Although it is shown in lambda notation above, in reality it would be
+completely reduced to combinator form, i.e.:
+
+	((S ((R R) ((L ((L ((L I) F)) "something")) 2)))
+	((S ((R R) ((L ((L ((L I) F)) "say")) 2)))
+	((S ((R R) ((L ((L ((L I) C)) "hello")) 1)))
+	(C ((L I) ((L ((R S) (L I))) I))))))
+*/
+value extract_syms(value f)
+	{
+	symbol sym = last_sym(f);
+	if (sym)
+		{
+		value g = hold(abstract(sym,f));
+		value h = extract_syms(g);
+		drop(g);
+
+		return A(A(S,A(A(R,R),A(A(L,A(A(L,A(A(L,I),
+			Qboolean(sym->quoted))),sym->name)),Qnum_ulong(sym->line)))),
+			h);
+		}
+	else
+		return A(C,A(A(L,I),f));
 	}

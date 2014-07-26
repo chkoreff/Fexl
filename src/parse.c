@@ -354,7 +354,11 @@ static value parse_exp(void)
 	return exp;
 	}
 
-/* Parse an expression and return (\: : exp error_code error_line). */
+/*
+(parse_form ok err) =
+	(ok form)       # if ok
+	(err msg line)  # if syntax error
+*/
 static value parse_form(void)
 	{
 	value exp;
@@ -372,9 +376,20 @@ static value parse_form(void)
 		exp = A(0,exp);
 		}
 
-	exp = A(A(L,I),exp ? exp : F);
-	exp = A(A(L,exp),Qstr(str_new_data0(error_code ? error_code : "")));
-	exp = A(A(L,exp),Qnum_ulong(error_line));
+	if (exp)
+		{
+		value form = extract_syms(hold(exp));
+		drop(exp);
+		exp = A(A(R,C),A(A(L,I),form));
+		}
+	else
+		{
+		if (!error_code) error_code = "";
+		exp = A(C,A(A(L,A(A(L,I),
+			Qstr(str_new_data0(error_code)))),
+			Qnum_ulong(error_line)));
+		}
+
 	return exp;
 	}
 

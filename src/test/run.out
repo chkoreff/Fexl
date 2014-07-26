@@ -347,40 +347,40 @@ end g = ((say (C I)) {next})
 
 beg f = (parse_string "")
 end f = (parse_string "")
-end g = ((L ((L ((L I) I)) "")) 0)
+end g = ((R C) ((L I) (C ((L I) I))))
 
 beg f = (parse_string " 	
 x y")
 end f = (parse_string " 	
 x y")
-end g = ((L ((L ((L I) {{x} {y}})) "")) 0)
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) F)) "y")) 2))) ((S ((R R) ((L ((L ((L I) F)) "x")) 2))) (C ((L I) I))))))
 
 beg f = (parse_string "ab cd e")
 end f = (parse_string "ab cd e")
-end g = ((L ((L ((L I) {{{ab} {cd}} {e}})) "")) 0)
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) F)) "e")) 1))) ((S ((R R) ((L ((L ((L I) F)) "cd")) 1))) ((S ((R R) ((L ((L ((L I) F)) "ab")) 1))) (C ((L I) I)))))))
 
 beg f = (parse_string "abcdefghi;")
 end f = (parse_string "abcdefghi;")
-end g = ((L ((L ((L I) {{abcdefghi} I})) "")) 0)
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) F)) "abcdefghi")) 1))) (C ((L I) ((L I) I))))))
 
 beg f = (parse_string """")
 end f = (parse_string """")
-end g = ((L ((L ((L I) {""})) "")) 0)
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) C)) "")) 1))) (C ((L I) I)))))
 
 beg f = (parse_string ""a"")
 end f = (parse_string ""a"")
-end g = ((L ((L ((L I) {"a"})) "")) 0)
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) C)) "a")) 1))) (C ((L I) I)))))
 
 beg f = (parse_string ""abc
 defg"")
 end f = (parse_string ""abc
 defg"")
-end g = ((L ((L ((L I) {"abc
-defg"})) "")) 0)
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) C)) "abc
+defg")) 1))) (C ((L I) I)))))
 
 beg f = (parse_string """)
 end f = (parse_string """)
-end g = ((L ((L ((L I) F)) "Unclosed string")) 1)
+end g = (C ((L ((L I) "Unclosed string")) 1))
 
 beg f = (parse_string "
 "a
@@ -390,23 +390,23 @@ end f = (parse_string "
 "a
 b
 ")
-end g = ((L ((L ((L I) F)) "Unclosed string")) 2)
+end g = (C ((L ((L I) "Unclosed string")) 2))
 
 beg f = (parse_string "~| |")
 end f = (parse_string "~| |")
-end g = ((L ((L ((L I) {""})) "")) 0)
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) C)) "")) 1))) (C ((L I) I)))))
 
 beg f = (parse_string "~| a|")
 end f = (parse_string "~| a|")
-end g = ((L ((L ((L I) {"a"})) "")) 0)
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) C)) "a")) 1))) (C ((L I) I)))))
 
 beg f = (parse_string "~| a")
 end f = (parse_string "~| a")
-end g = ((L ((L ((L I) F)) "Unclosed string")) 1)
+end g = (C ((L ((L I) "Unclosed string")) 1))
 
 beg f = (parse_string "~END aEND")
 end f = (parse_string "~END aEND")
-end g = ((L ((L ((L I) {"a"})) "")) 0)
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) C)) "a")) 1))) (C ((L I) I)))))
 
 beg f = (parse_string "
 
@@ -416,103 +416,103 @@ end f = (parse_string "
 
 ~END
 abcEN")
-end g = ((L ((L ((L I) F)) "Unclosed string")) 3)
+end g = (C ((L ((L I) "Unclosed string")) 3))
 
 beg f = (parse_string "~")
 end f = (parse_string "~")
-end g = ((L ((L ((L I) F)) "Incomplete string terminator")) 1)
+end g = (C ((L ((L I) "Incomplete string terminator")) 1))
 
 beg f = (parse_string "~EN")
 end f = (parse_string "~EN")
-end g = ((L ((L ((L I) F)) "Incomplete string terminator")) 1)
+end g = (C ((L ((L I) "Incomplete string terminator")) 1))
 
 beg f = (parse_string "~ABC abcdABAABC")
 end f = (parse_string "~ABC abcdABAABC")
-end g = ((L ((L ((L I) {"abcdABA"})) "")) 0)
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) C)) "abcdABA")) 1))) (C ((L I) I)))))
 
 beg f = (parse_string "~ABCD AABABCABCD")
 end f = (parse_string "~ABCD AABABCABCD")
-end g = ((L ((L ((L I) {"AABABC"})) "")) 0)
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) C)) "AABABC")) 1))) (C ((L I) I)))))
 
 beg f = (parse_string " = y")
 end f = (parse_string " = y")
-end g = ((L ((L ((L I) F)) "Missing symbol declaration before '='")) 1)
+end g = (C ((L ((L I) "Missing symbol declaration before '='")) 1))
 
 beg f = (parse_string "ab cd e;")
 end f = (parse_string "ab cd e;")
-end g = ((L ((L ((L I) {{{{ab} {cd}} {e}} I})) "")) 0)
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) F)) "e")) 1))) ((S ((R R) ((L ((L ((L I) F)) "cd")) 1))) ((S ((R R) ((L ((L ((L I) F)) "ab")) 1))) (C ((L I) ((L ((R L) (R L))) I))))))))
 
 beg f = (parse_string "ab cd e;f g")
 end f = (parse_string "ab cd e;f g")
-end g = ((L ((L ((L I) {{{{ab} {cd}} {e}} {{f} {g}}})) "")) 0)
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) F)) "g")) 1))) ((S ((R R) ((L ((L ((L I) F)) "f")) 1))) ((S ((R R) ((L ((L ((L I) F)) "e")) 1))) ((S ((R R) ((L ((L ((L I) F)) "cd")) 1))) ((S ((R R) ((L ((L ((L I) F)) "ab")) 1))) (C ((L I) (R (R R)))))))))))
 
 beg f = (parse_string "ab cd e;f g ; hi j;")
 end f = (parse_string "ab cd e;f g ; hi j;")
-end g = ((L ((L ((L I) {{{{ab} {cd}} {e}} {{{f} {g}} {{{hi} {j}} I}}})) "")) 0)
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) F)) "j")) 1))) ((S ((R R) ((L ((L ((L I) F)) "hi")) 1))) ((S ((R R) ((L ((L ((L I) F)) "g")) 1))) ((S ((R R) ((L ((L ((L I) F)) "f")) 1))) ((S ((R R) ((L ((L ((L I) F)) "e")) 1))) ((S ((R R) ((L ((L ((L I) F)) "cd")) 1))) ((S ((R R) ((L ((L ((L I) F)) "ab")) 1))) (C ((L I) ((L ((R L) ((R (R L)) ((R (R (R R))) ((R (R (R R))) ((R (R (R R))) (R (R R)))))))) ((L (_ _)) _)))))))))))))
 
 beg f = (parse_string "ab cd e\\fg h")
 end f = (parse_string "ab cd e\\fg h")
-end g = ((L ((L ((L I) {{{ab} {cd}} {e}})) "")) 0)
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) F)) "e")) 1))) ((S ((R R) ((L ((L ((L I) F)) "cd")) 1))) ((S ((R R) ((L ((L ((L I) F)) "ab")) 1))) (C ((L I) I)))))))
 
 beg f = (parse_string "ab cd e\x")
 end f = (parse_string "ab cd e\x")
-end g = ((L ((L ((L I) {{{{ab} {cd}} {e}} (C I)})) "")) 0)
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) F)) "e")) 1))) ((S ((R R) ((L ((L ((L I) F)) "cd")) 1))) ((S ((R R) ((L ((L ((L I) F)) "ab")) 1))) (C ((L I) ((L ((R L) (R L))) (C I)))))))))
 
 beg f = (parse_string "ab cd e\")
 end f = (parse_string "ab cd e\")
-end g = ((L ((L ((L I) F)) "Missing symbol after '\'")) 1)
+end g = (C ((L ((L I) "Missing symbol after '\'")) 1))
 
 beg f = (parse_string "\x=")
 end f = (parse_string "\x=")
-end g = ((L ((L ((L I) F)) "Missing definition")) 1)
+end g = (C ((L ((L I) "Missing definition")) 1))
 
 beg f = (parse_string "\x=4")
 end f = (parse_string "\x=4")
-end g = ((L ((L ((L I) {(C I) {4}})) "")) 0)
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) F)) "4")) 1))) (C ((L I) (C I))))))
 
 beg f = (parse_string "\x\y\z x z; y z")
 end f = (parse_string "\x\y\z x z; y z")
-end g = ((L ((L ((L I) S)) "")) 0)
+end g = ((R C) ((L I) (C ((L I) S))))
 
 beg f = (parse_string "\x\y\z x; y z")
 end f = (parse_string "\x\y\z x; y z")
-end g = ((L ((L ((L I) R)) "")) 0)
+end g = ((R C) ((L I) (C ((L I) R))))
 
 beg f = (parse_string "\x\y\z x z y")
 end f = (parse_string "\x\y\z x z y")
-end g = ((L ((L ((L I) L)) "")) 0)
+end g = ((R C) ((L I) (C ((L I) L))))
 
 beg f = (parse_string "\x x")
 end f = (parse_string "\x x")
-end g = ((L ((L ((L I) I)) "")) 0)
+end g = ((R C) ((L I) (C ((L I) I))))
 
 beg f = (parse_string "\x\y x")
 end f = (parse_string "\x\y x")
-end g = ((L ((L ((L I) C)) "")) 0)
+end g = ((R C) ((L I) (C ((L I) C))))
 
 beg f = (parse_string "\x x x")
 end f = (parse_string "\x x x")
-end g = ((L ((L ((L I) ((S I) I))) "")) 0)
+end g = ((R C) ((L I) (C ((L I) ((S I) I)))))
 
 beg f = (parse_string "\x=y x")
 end f = (parse_string "\x=y x")
-end g = ((L ((L ((L I) {I {y}})) "")) 0)
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) F)) "y")) 1))) (C ((L I) I)))))
 
 beg f = (parse_string "\x=y y")
 end f = (parse_string "\x=y y")
-end g = ((L ((L ((L I) {{C {y}} {y}})) "")) 0)
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) F)) "y")) 1))) (C ((L I) ((S C) I))))))
 
 beg f = (parse_string "\y\x=y x x")
 end f = (parse_string "\y\x=y x x")
-end g = ((L ((L ((L I) ((S I) I))) "")) 0)
+end g = ((R C) ((L I) (C ((L I) ((S I) I)))))
 
 beg f = (parse_string "\y\x=y y y")
 end f = (parse_string "\y\x=y y y")
-end g = ((L ((L ((L I) ((S ((R C) ((S I) I))) I))) "")) 0)
+end g = ((R C) ((L I) (C ((L I) ((S ((R C) ((S I) I))) I)))))
 
 beg f = (parse_string "()")
 end f = (parse_string "()")
-end g = ((L ((L ((L I) I)) "")) 0)
+end g = ((R C) ((L I) (C ((L I) I))))
 
 beg f = (parse_string "(
 a
@@ -520,7 +520,7 @@ a
 end f = (parse_string "(
 a
 (b")
-end g = ((L ((L ((L I) F)) "Unclosed parenthesis")) 3)
+end g = (C ((L ((L I) "Unclosed parenthesis")) 3))
 
 beg f = (parse_string "(
 a
@@ -528,7 +528,7 @@ a
 end f = (parse_string "(
 a
 (b)")
-end g = ((L ((L ((L I) F)) "Unclosed parenthesis")) 1)
+end g = (C ((L ((L I) "Unclosed parenthesis")) 1))
 
 beg f = (parse_string "(
 a
@@ -536,23 +536,36 @@ a
 end f = (parse_string "(
 a
 (b))")
-end g = ((L ((L ((L I) {{a} {b}})) "")) 0)
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) F)) "b")) 3))) ((S ((R R) ((L ((L ((L I) F)) "a")) 2))) (C ((L I) I))))))
 
 beg f = (parse_string "(ab cd e)
 )")
 end f = (parse_string "(ab cd e)
 )")
-end g = ((L ((L ((L I) F)) "Extraneous input")) 2)
+end g = (C ((L ((L I) "Extraneous input")) 2))
 
 beg f = (parse_file "missing.fxl")
 end f = (parse_file "missing.fxl")
-end g = ((L ((L ((L I) F)) "Missing file")) 1)
+end g = (C ((L ((L I) "Missing file")) 1))
 
 beg f = (parse_file "test/a2.fxl")
 end f = (parse_file "test/a2.fxl")
-end g = ((L ((L ((L I) {{{R {@}} {{R {R {get}}} {{R {R {S {{L {{L {eq}} {""}}} I}}}} {{R {R {R {{put} {"ch = "}}}}} {{S {(R R) {(R R) {put}}}} {{R {R {L {put}}}} {{L {(R R) {put}}} {nl}}}}}}}} {"""}})) "")) 0)
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) C)) """)) 1))) ((S ((R R) ((L ((L ((L I) F)) "nl")) 7))) ((S ((R R) ((L ((L ((L I) F)) "put")) 6))) ((S ((R R) ((L ((L ((L I) C)) "ch = ")) 5))) ((S ((R R) ((L ((L ((L I) C)) "")) 4))) ((S ((R R) ((L ((L ((L I) F)) "eq")) 4))) ((S ((R R) ((L ((L ((L I) F)) "get")) 3))) ((S ((R R) ((L ((L ((L I) F)) "@")) 2))) (C ((L I) ((L ((R R) ((R R) ((R R) ((R R) ((R R) ((R _) _))))))) _)))))))))))))
 
 beg f = (parse_file "test/utf8.fxl")
 end f = (parse_file "test/utf8.fxl")
-end g = ((L ((L ((L I) {I {{{say} {"== test_utf"}} {{{L {{L {(R L) {{L {(R L) {(R (R L)) {{L {(R L) {(R (R L)) {(R (R (R L))) {{R {R {R {R {R {{put} {"f = "}}}}}}} {{L {(R R) {(R R) {(R R) {(R R) {{L {{L {say}} {put}}} {"åabcüdef = "}}}}}}} {{L {(R R) {(R R) {(R R) {say}}}}} {{R {R {R {{put} {"ghij = "}}}}} {{L {(R R) {(R R) {say}}}} {{R {R {{put} {"üä = "}}}} {{L {(R R) {say}}} {{R {{put} {"1≠0 = "}}} {{L {say}} {{{L {{R {R {{put} {"vegetable "}}}} {{L {(R R) {say}}} {{R {{put} {"dessert "}}} {{L {say}} I}}}}} {"efterrätt"}} {"grönsak"}}}}}}}}}}}}}}} _}}}} _}}} _}} _} _}}})) _)) _)
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) C)) "hej
+åabcüdef
+ghij
+üä
+1≠0
+")) 11))) ((S ((R R) ((L ((L ((L I) C)) "hej åabcüdef")) 18))) ((S ((R R) ((L ((L ((L I) C)) "hej ghij")) 19))) ((S ((R R) ((L ((L ((L I) C)) "hej üä")) 20))) ((S ((R R) ((L ((L ((L I) C)) "hej 1≠0")) 21))) ((S ((R R) ((L ((L ((L I) C)) "grönsak")) 29))) ((S ((R R) ((L ((L ((L I) C)) "efterrätt")) 30))) ((S ((R R) ((L ((L ((L I) F)) "say")) 32))) ((S ((R R) ((L ((L ((L I) C)) "dessert ")) 32))) ((S ((R R) ((L ((_ _) _)) _))) _))))))))))))
+
+beg f = (parse_string "say "hello"
+say something
+")
+end f = (parse_string "say "hello"
+say something
+")
+end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) F)) "something")) 2))) ((S ((R R) ((L ((L ((L I) F)) "say")) 2))) ((S ((R R) ((L ((L ((L I) C)) "hello")) 1))) (C ((L I) ((L ((R S) (L I))) I))))))))
 

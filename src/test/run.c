@@ -341,6 +341,7 @@ static void run_test_suite(void)
 	test_parse_file("missing.fxl");
 	test_parse_file("test/a2.fxl");
 	test_parse_file("test/utf8.fxl");
+	test_parse_string("say \"hello\"\nsay something\n");
 	}
 	}
 
