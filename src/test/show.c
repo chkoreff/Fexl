@@ -7,7 +7,6 @@
 #include <parse_string.h>
 #include <test/show.h>
 #include <type_cmp.h>
-#include <type_convert.h>
 #include <type_math.h>
 #include <type_num.h>
 #include <type_output.h>
@@ -57,6 +56,7 @@ static void do_show(value f)
 	else if (f->T == type_length) put("length");
 	else if (f->T == type_slice) put("slice");
 	else if (f->T == type_add) put("+");
+	else if (f->T == type_mul) put("*");
 	else if (f->T == type_div) put("/");
 	else if (f->T == type_lt) put("lt");
 	else if (f->T == type_eq) put("eq");
@@ -64,6 +64,8 @@ static void do_show(value f)
 	else if (f->T == type_sqrt) put("sqrt");
 	else if (f->T == type_num_str) put("num_str");
 	else if (f->T == type_str_num) put("str_num");
+	else if (f->T == type_is_str) put("is_str");
+	else if (f->T == type_is_num) put("is_num");
 	else if (f->T == type_put) put("put");
 	else if (f->T == type_nl) put("nl");
 	else if (f->T == type_say) put("say");

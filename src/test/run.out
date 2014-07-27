@@ -569,3 +569,47 @@ say something
 ")
 end g = ((R C) ((L I) ((S ((R R) ((L ((L ((L I) F)) "something")) 2))) ((S ((R R) ((L ((L ((L I) F)) "say")) 2))) ((S ((R R) ((L ((L ((L I) C)) "hello")) 1))) (C ((L I) ((L ((R S) (L I))) I))))))))
 
+beg f = (is_str I)
+end f = (is_str I)
+end g = F
+
+beg f = (is_str 4)
+end f = (is_str 4)
+end g = F
+
+beg f = (is_str "x")
+end f = (is_str "x")
+end g = C
+
+beg f = (is_str ((concat "x") "y"))
+end f = (is_str "xy")
+end g = C
+
+beg f = (is_num "x")
+end f = (is_num "x")
+end g = F
+
+beg f = (is_num 4.2)
+end f = (is_num 4.2)
+end g = C
+
+beg f = (is_num ((* 3.9) 4.2))
+end f = (is_num 16.38)
+end g = C
+
+beg f = (is_num (str_num "4.87"))
+end f = (is_num 4.87)
+end g = C
+
+beg f = (is_num (str_num "  4.87"))
+end f = (is_num 4.87)
+end g = C
+
+beg f = (is_num (str_num " 4.87 "))
+end f = (is_num (str_num " 4.87 "))
+end g = F
+
+beg f = (is_num (str_num "4.87x"))
+end f = (is_num (str_num "4.87x"))
+end g = F
+

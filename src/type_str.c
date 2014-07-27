@@ -1,4 +1,5 @@
 #include <value.h>
+#include <basic.h>
 #include <num.h>
 #include <str.h>
 #include <type_num.h>
@@ -69,5 +70,24 @@ value type_slice(value f)
 
 	return Qstr(str_new_data(x->data + pos,len));
 	}
+	}
+	}
+
+value type_str_num(value f)
+	{
+	if (!f->L) return 0;
+	{
+	string x = atom(type_str,arg(&f->R));
+	if (!x) return 0;
+	return Qnum(str_num(x->data));
+	}
+	}
+
+value type_is_str(value f)
+	{
+	if (!f->L) return 0;
+	{
+	string x = atom(type_str,arg(&f->R));
+	return x ? C : F;
 	}
 	}

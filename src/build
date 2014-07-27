@@ -48,7 +48,6 @@ compile parse_string
 #compile source
 compile str
 compile type_cmp
-compile type_convert
 #compile type_input
 compile type_math
 compile type_num

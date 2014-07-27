@@ -8,27 +8,11 @@
 #include <parse_string.h>
 #include <test/show.h>
 #include <type_cmp.h>
-#include <type_convert.h>
 #include <type_math.h>
 #include <type_num.h>
 #include <type_output.h>
 #include <type_str.h>
 #include <type_sym.h>
-
-/*
-TODO is_num is_str yes
-
-\yes=(\x \yes\no yes x)
-\yes=(R (R C) (L I))
-
-\no=(\yes\no no)
-\no=(C I)
-\no=F  # Don't need a separate operator for this.
-
-is_num x (\x yes x) no  # is_num is built-in
-is_str x (\x yes x) no  # is_str is built-in
-is_def x (\x yes x) no  # Here is_def is an arbitrary context.
-*/
 
 static value Mstr(const char *p)
 	{
@@ -343,12 +327,29 @@ static void run_test_suite(void)
 	test_parse_file("test/utf8.fxl");
 	test_parse_string("say \"hello\"\nsay something\n");
 	}
+
+	{
+	test_eval(A(Q(type_is_str),I));
+	test_eval(A(Q(type_is_str),Mnum(4)));
+	test_eval(A(Q(type_is_str),Mstr("x")));
+	test_eval(A(Q(type_is_str),A(A(Q(type_concat),Mstr("x")),Mstr("y"))));
 	}
 
-int main(int argc, char *argv[])
 	{
-	(void)argc;
-	(void)argv;
+	test_eval(A(Q(type_is_num),Mstr("x")));
+	test_eval(A(Q(type_is_num),Mnum(4.2)));
+	test_eval(A(Q(type_is_num),A(A(Q(type_mul),Mnum(3.9)),Mnum(4.2))));
+	test_eval(A(Q(type_is_num),A(Q(type_str_num),Mstr("4.87"))));
+	/* The str_num function allows leading white space, but forbids any
+	trailing invalid chars.  This reflects how strtod works. */
+	test_eval(A(Q(type_is_num),A(Q(type_str_num),Mstr("  4.87"))));
+	test_eval(A(Q(type_is_num),A(Q(type_str_num),Mstr(" 4.87 "))));
+	test_eval(A(Q(type_is_num),A(Q(type_str_num),Mstr("4.87x"))));
+	}
+	}
+
+int main(void)
+	{
 	beg_basic();
 	run_test_suite();
 	end_basic();
