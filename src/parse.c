@@ -236,24 +236,23 @@ static value parse_exp(void);
 static value parse_term()
 	{
 	unsigned long first_line = source_line;
-	value exp;
-
 	if (ch == '(') /* parenthesized expression */
 		{
+		value exp;
 		skip();
 		exp = parse_exp();
 		if (!exp) return 0;
 		if (ch != ')')
 			{
+			drop(exp);
 			syntax_error("Unclosed parenthesis", first_line);
-			return A(0,exp);
+			return 0;
 			}
 		skip();
+		return exp;
 		}
 	else
-		exp = parse_symbol();
-
-	return exp;
+		return hold(parse_symbol());
 	}
 
 /* Parse a lambda form following the initial '\' character. */
@@ -262,9 +261,10 @@ static value parse_lambda(unsigned long first_line)
 	skip_white();
 	{
 	/* Parse the symbol (function parameter). */
-	value sym = parse_symbol();
+	value sym = hold(parse_symbol());
 	if (sym == F)
 		{
+		drop(sym);
 		syntax_error("Missing symbol after '\\'", first_line);
 		return 0;
 		}
@@ -283,17 +283,22 @@ static value parse_lambda(unsigned long first_line)
 		def = parse_term();
 		if (def == F)
 			{
+			drop(def);
 			syntax_error("Missing definition", first_line);
-			sym = A(0,sym);
+			drop(sym);
 			return 0;
 			}
 		}
 
 	{
-	/* Parse the body of the function. */
-	value body = lam(sym,parse_exp());
-	/* Return the body applied to the definition, if any. */
-	return def == F ? body : app(body,def);
+	/* Parse the body of the function and apply the definition if any. */
+	value exp = lam(sym,parse_exp());
+	if (def != F)
+		{
+		exp = app(exp,def);
+		drop(def);
+		}
+	return hold(exp);
 	}
 	}
 	}
@@ -305,7 +310,7 @@ static value parse_factor(void)
 	{
 	skip_filler();
 	if (ch == -1)
-		return F;
+		return hold(F);
 	else if (ch == '\\')
 		{
 		unsigned long first_line = source_line;
@@ -313,7 +318,7 @@ static value parse_factor(void)
 		if (ch == '\\')
 			{
 			ch = -1; /* Two backslashes simulates end of file. */
-			return F;
+			return hold(F);
 			}
 		else
 			return parse_lambda(first_line);
@@ -325,30 +330,42 @@ static value parse_factor(void)
 		}
 	else
 		{
-		value term = parse_term();
+		value factor = parse_term();
 		if (ch == '=')
 			{
 			syntax_error("Missing symbol declaration before '='", source_line);
-			term = A(0,term);
+			if (factor) drop(factor);
+			return 0;
 			}
-		return term;
+		return factor;
 		}
 	}
 
 static value parse_exp(void)
 	{
-	value exp = I;
+	value exp = hold(I);
 	if (remain_depth > 0) remain_depth--; else return 0;
 	while (1)
 		{
 		value factor = parse_factor();
-		if (!factor)
+		if (factor == F)
 			{
-			exp = A(0,exp);
+			drop(factor);
 			break;
 			}
-		if (factor == F) break;
-		exp = (exp == I) ? factor : app(exp,factor);
+		if (!factor)
+			{
+			drop(exp);
+			exp = 0;
+			break;
+			}
+
+		{
+		value new = hold((exp == I) ? factor : app(exp,factor));
+		drop(factor);
+		drop(exp);
+		exp = new;
+		}
 		}
 	remain_depth++;
 	return exp;
@@ -372,13 +389,14 @@ static value parse_form(void)
 
 	if (ch != -1 && exp)
 		{
+		drop(exp);
 		syntax_error("Extraneous input", source_line);
-		exp = A(0,exp);
+		exp = 0;
 		}
 
 	if (exp)
 		{
-		value form = extract_syms(hold(exp));
+		value form = extract_syms(exp);
 		drop(exp);
 		exp = A(A(R,C),A(A(L,I),form));
 		}

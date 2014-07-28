@@ -108,14 +108,10 @@ static value abstract(symbol sym, value body)
 
 value lam(value sym, value body)
 	{
-	hold(sym);
-	hold(body);
-	{
 	value f = (sym && body) ? abstract((symbol)sym->R,body) : 0;
 	drop(sym);
 	drop(body);
 	return f;
-	}
 	}
 
 /* Return the last symbol in the value, if any, in right to left order. */
@@ -143,7 +139,7 @@ The resulting form is:
 
 \form=
 	(\sym\exp
-	sym F "something" 1 ;
+	sym F "something" 2 ;
 	sym F "say" 2 ;
 	sym C "hello" 1 ;
 	exp (\something\say\"hello" say "hello" say something)

@@ -34,6 +34,11 @@ static value Mquo(const char *x)
 	return Qsym(1,str_new_data0(x),1);
 	}
 
+static value Lam(value sym, value body)
+	{
+	return lam(hold(sym),hold(body));
+	}
+
 static void test_eval(value f)
 	{
 	hold(f);
@@ -234,22 +239,22 @@ static void run_test_suite(void)
 	test_eval(A(Mquo("x"),Msym("x")));
 	test_eval(A(I,app(app(app(I,I),Msym("x")),app(C,Msym("y")))));
 
-	test_eval(lam(Msym("x"),Msym("x")));
-	test_eval(lam(Msym("y"),Msym("x")));
-	test_eval(lam(Msym("x"),app(Msym("x"),Msym("y"))));
-	test_eval(lam(Msym("y"),app(Msym("x"),Msym("y"))));
-	test_eval(lam(Msym("x"),app(Msym("y"),Msym("y"))));
-	test_eval(lam(Msym("x"),app(Msym("y"),app(Msym("x"),Msym("x")))));
-	test_eval(lam(Msym("x"),app(app(Msym("x"),Msym("x")),Msym("y"))));
-	test_eval(lam(Msym("x"),
+	test_eval(Lam(Msym("x"),Msym("x")));
+	test_eval(Lam(Msym("y"),Msym("x")));
+	test_eval(Lam(Msym("x"),app(Msym("x"),Msym("y"))));
+	test_eval(Lam(Msym("y"),app(Msym("x"),Msym("y"))));
+	test_eval(Lam(Msym("x"),app(Msym("y"),Msym("y"))));
+	test_eval(Lam(Msym("x"),app(Msym("y"),app(Msym("x"),Msym("x")))));
+	test_eval(Lam(Msym("x"),app(app(Msym("x"),Msym("x")),Msym("y"))));
+	test_eval(Lam(Msym("x"),
 		app(
 		app(Msym("x"),app(Msym("x"),Mquo("abc"))),
 		app(app(Msym("y"),Msym("x")),Msym("x"))
 		)));
 
-	test_eval(lam(0,0));
-	test_eval(lam(0,Msym("x")));
-	test_eval(lam(Msym("x"),0));
+	test_eval(Lam(0,0));
+	test_eval(Lam(0,Msym("x")));
+	test_eval(Lam(Msym("x"),0));
 	}
 
 	{
