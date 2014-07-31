@@ -45,8 +45,8 @@ value type_length(value f)
 	}
 	}
 
-/* (slice str pos len) returns the len bytes of str starting at pos, or 0 bytes
-if pos or len exceeds the bounds of str. */
+/* (slice str pos len) returns the len bytes of str starting at pos, or bad if
+pos or len exceeds the bounds of str. */
 value type_slice(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
@@ -55,20 +55,16 @@ value type_slice(value f)
 	number y = atom(type_num,arg(&f->L->R));
 	number z = atom(type_num,arg(&f->R));
 	if (!x || !y || !z) return bad;
+	if (*y < 0 || *z < 0) return bad;
 	{
-	/*TODO review signed vs. unsigned here  (-Wextra complains)*/
-	long pos = (long)*y;
-	long len = (long)*z;
+	unsigned long pos = (unsigned long)*y;
+	unsigned long len = (unsigned long)*z;
 
-	if (pos < 0 || len < 0
-		|| pos >= x->len
+	if (pos >= x->len
 		|| len > x->len
 		|| pos > x->len - len
 		)
-		{
-		pos = 0;
-		len = 0;
-		}
+		return bad;
 
 	return Qstr(str_new_data(x->data + pos,len));
 	}

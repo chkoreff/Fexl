@@ -124,7 +124,7 @@ static value parse_name(void)
 			|| ch == -1)
 			break;
 
-		buf = buf_add(buf,ch);
+		buf = buf_add(buf,(char)ch);
 		if (!buf) return 0;
 		skip();
 		}

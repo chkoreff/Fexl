@@ -669,3 +669,23 @@ beg f = (is_bad (str_num "-4.6x"))
 end f = (is_bad bad)
 end g = C
 
+beg f = (((slice "abcd") 2) 3)
+end f = (((slice "abcd") 2) 3)
+end g = bad
+
+beg f = (((slice "abcd") 2) 2)
+end f = (((slice "abcd") 2) 2)
+end g = "cd"
+
+beg f = (((slice "abcd") 2) 0)
+end f = (((slice "abcd") 2) 0)
+end g = ""
+
+beg f = (((slice "abcd") -2) 3)
+end f = (((slice "abcd") -2) 3)
+end g = bad
+
+beg f = (((slice "abcd") 2) -3)
+end f = (((slice "abcd") 2) -3)
+end g = bad
+

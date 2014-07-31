@@ -370,6 +370,13 @@ static void run_test_suite(void)
 	test_eval(A(Q(type_is_bad),A(Q(type_str_num),Mstr("-4.6"))));
 	test_eval(A(Q(type_is_bad),A(Q(type_str_num),Mstr("-4.6x"))));
 	}
+	{
+	test_eval(A(A(A(Q(type_slice),Mstr("abcd")),Mnum(2)),Mnum(3)));
+	test_eval(A(A(A(Q(type_slice),Mstr("abcd")),Mnum(2)),Mnum(2)));
+	test_eval(A(A(A(Q(type_slice),Mstr("abcd")),Mnum(2)),Mnum(0)));
+	test_eval(A(A(A(Q(type_slice),Mstr("abcd")),Mnum(-2)),Mnum(3)));
+	test_eval(A(A(A(Q(type_slice),Mstr("abcd")),Mnum(2)),Mnum(-3)));
+	}
 	}
 
 int main(void)
