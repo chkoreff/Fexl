@@ -56,6 +56,7 @@ value type_slice(value f)
 	number z = atom(type_num,arg(&f->R));
 	if (!x || !y || !z) return bad;
 	{
+	/*TODO review signed vs. unsigned here  (-Wextra complains)*/
 	long pos = (long)*y;
 	long len = (long)*z;
 
@@ -93,5 +94,5 @@ value type_str_num(value f)
 value type_is_str(value f)
 	{
 	if (!f->L) return 0;
-	return Qboolean((int)atom(type_str,arg(&f->R)));
+	return Qboolean(atom(type_str,arg(&f->R)) ? 1 : 0);
 	}

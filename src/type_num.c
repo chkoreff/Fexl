@@ -40,5 +40,5 @@ value type_num_str(value f)
 value type_is_num(value f)
 	{
 	if (!f->L) return 0;
-	return Qboolean((int)atom(type_num,arg(&f->R)));
+	return Qboolean(atom(type_num,arg(&f->R)) ? 1 : 0);
 	}
