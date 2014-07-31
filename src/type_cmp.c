@@ -17,7 +17,7 @@ static value op_cmp(value f, int op(int))
 	if (x)
 		{
 		number y = atom(type_num,arg(&f->R));
-		if (!y) return 0;
+		if (!y) return bad;
 		return Qboolean(op(num_cmp(x,y)));
 		}
 	}
@@ -27,12 +27,12 @@ static value op_cmp(value f, int op(int))
 	if (x)
 		{
 		string y = atom(type_str,arg(&f->R));
-		if (!y) return 0;
+		if (!y) return bad;
 		return Qboolean(op(str_cmp(x,y)));
 		}
 	}
 
-	return 0;
+	return bad;
 	}
 	}
 

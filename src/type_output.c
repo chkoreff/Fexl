@@ -1,4 +1,5 @@
 #include <value.h>
+#include <basic.h>
 #include <num.h>
 #include <output.h>
 #include <str.h>
@@ -30,7 +31,7 @@ value type_put(value f)
 		}
 	}
 
-	return 0;
+	return bad;
 	}
 	}
 
@@ -44,6 +45,6 @@ value type_nl(value f)
 value type_say(value f)
 	{
 	value g = type_put(f);
-	if (g) nl();
+	if (g && g != bad) nl();
 	return g;
 	}

@@ -25,7 +25,7 @@ of machine word size.  Here is the recommended cost schedule:
 */
 void *new_memory(unsigned long num_bytes, unsigned long num_words)
 	{
-	if (cur_words + num_words > max_words) return 0;
+	if (num_words > max_words - cur_words) return 0;
 	if (num_bytes == 0) return 0;
 
 	{

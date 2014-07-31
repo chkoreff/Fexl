@@ -1,6 +1,5 @@
 typedef double *number;
 extern void num_free(number x);
-extern number str_num(const char *name);
 extern number num_new_double(double val);
 extern number num_new_ulong(unsigned long val);
 extern number num_add(number x, number y);
@@ -14,4 +13,3 @@ extern number num_abs(number x);
 extern number num_sqrt(number x);
 extern int num_cmp(number x, number y);
 extern void put_num(number x);
-extern const char *format_num(number x);

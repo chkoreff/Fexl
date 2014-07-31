@@ -1,4 +1,5 @@
 #include <value.h>
+#include <basic.h>
 #include <num.h>
 #include <type_math.h>
 #include <type_num.h>
@@ -8,7 +9,7 @@ static value op_num(value f, number op(number))
 	if (!f->L) return 0;
 	{
 	number x = atom(type_num,arg(&f->R));
-	if (!x) return 0;
+	if (!x) return bad;
 	return Qnum(op(x));
 	}
 	}
@@ -19,7 +20,7 @@ static value op_num_num(value f, number op(number,number))
 	{
 	number x = atom(type_num,arg(&f->L->R));
 	number y = atom(type_num,arg(&f->R));
-	if (!x || !y) return 0;
+	if (!x || !y) return bad;
 	return Qnum(op(x,y));
 	}
 	}

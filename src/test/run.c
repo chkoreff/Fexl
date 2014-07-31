@@ -160,8 +160,8 @@ static void run_test_suite(void)
 	test_eval(Y);
 	test_eval(A(Y,C));
 
-	limit_test_eval(A(Y,I), 10000, 1000);
-	limit_test_eval(A(Y,Y), 1000000, 50);
+	limit_test_eval(A(Y,I), 6000, 1000);
+	limit_test_eval(A(Y,Y), 1000000, 54);
 	limit_test_eval(A(A(A(Y,S),S),S), 1000000, 60);
 
 	{
@@ -230,7 +230,7 @@ static void run_test_suite(void)
 	}
 
 	/* Verify that J operators don't pile up. */
-	test_eval(A(A(A(S,A(A(S,Mstr("x0")),Mstr("x1"))),Mstr("y")),Mstr("z")));
+	test_eval(A(A(A(S,A(A(S,A(C,C)),S)),Mstr("y")),Mstr("z")));
 
 	{
 	test_eval(Msym("x"));
@@ -350,6 +350,25 @@ static void run_test_suite(void)
 	test_eval(A(Q(type_is_num),A(Q(type_str_num),Mstr("  4.87"))));
 	test_eval(A(Q(type_is_num),A(Q(type_str_num),Mstr(" 4.87 "))));
 	test_eval(A(Q(type_is_num),A(Q(type_str_num),Mstr("4.87x"))));
+	}
+
+	{
+	test_eval(A(Q(type_num_str),Mnum(5.8)));
+	test_eval(A(Q(type_num_str),Mstr("abc")));
+	test_eval(A(Q(type_sqrt),Mnum(9)));
+	test_eval(A(Q(type_sqrt),Mstr("abc")));
+	test_eval(A(A(A(Q(type_add),Mstr("x")),A(I,Mnum(3))),Mnum(4)));
+	test_eval(A(Q(type_length),Mstr("abc")));
+	test_eval(A(Q(type_length),C));
+	}
+	{
+	test_eval(A(Q(type_is_bad),I));
+	test_eval(A(Q(type_is_bad),Mnum(3)));
+	test_eval(A(Q(type_is_bad),bad));
+	test_eval(A(Q(type_is_num),A(Q(type_str_num),Mstr("-4.6"))));
+	test_eval(A(Q(type_is_num),A(Q(type_str_num),Mstr("-4.6x"))));
+	test_eval(A(Q(type_is_bad),A(Q(type_str_num),Mstr("-4.6"))));
+	test_eval(A(Q(type_is_bad),A(Q(type_str_num),Mstr("-4.6x"))));
 	}
 	}
 

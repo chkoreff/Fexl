@@ -70,6 +70,21 @@ value type_Y(value f)
 	return A(f->R,f);
 	}
 
+/* (bad x) = bad */
+value type_bad(value f)
+	{
+	return f->L ? bad : 0;
+	}
+
+value type_is_bad(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(&f->R);
+	return Qboolean(x && x->T == type_bad && x->L == 0);
+	}
+	}
+
 value Qboolean(int x)
 	{
 	return x ? C : F;
@@ -83,6 +98,7 @@ value F;
 value R;
 value L;
 value Y;
+value bad;
 
 void beg_basic(void)
 	{
@@ -94,6 +110,7 @@ void beg_basic(void)
 	R = hold(Q(type_R));
 	L = hold(Q(type_L));
 	Y = hold(Q(type_Y));
+	bad = hold(Q(type_bad));
 	}
 
 void end_basic(void)
@@ -106,4 +123,5 @@ void end_basic(void)
 	drop(R);
 	drop(L);
 	drop(Y);
+	drop(bad);
 	}

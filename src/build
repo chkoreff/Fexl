@@ -36,6 +36,7 @@ link()
 objects=""
 compile basic
 compile buffer
+compile convert
 compile die
 compile format
 compile input
@@ -45,7 +46,6 @@ compile output
 compile parse
 compile parse_file
 compile parse_string
-#compile source
 compile str
 compile type_cmp
 #compile type_input
@@ -54,7 +54,6 @@ compile type_num
 compile type_output
 compile type_str
 compile type_sym
-#compile type_sys
 compile value
 lib_fexl=$objects
 
@@ -64,7 +63,6 @@ compile test/show
 lib_test=$objects
 
 objects=""
-#compile define
 compile fexl
 link fexl $objects $lib_fexl
 

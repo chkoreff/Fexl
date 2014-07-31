@@ -1,4 +1,3 @@
-#include <limits.h>
 #include <memory.h>
 #include <output.h>
 #include <str.h>
@@ -12,9 +11,7 @@ easier to call system functions that expect it.
 /* Create a string capable of holding len bytes plus trailing NUL. */
 string str_new(unsigned long len)
 	{
-	string x;
-	if (len > ULONG_MAX - sizeof(struct string)) return 0;
-	x = new_memory(sizeof(unsigned long) + 1 + len, 1 + (len >> 3));
+	string x = new_memory(sizeof(unsigned long) + 1 + len, 1 + (len >> 3));
 	if (!x) return 0;
 	x->len = len;
 	return x;

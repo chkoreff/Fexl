@@ -1,14 +1,15 @@
-#include <value.h>
-#include <basic.h>
 #include <num.h>
 #include <str.h>
+#include <value.h>
+#include <basic.h>
+#include <convert.h>
 #include <type_num.h>
 #include <type_str.h>
 
 value type_str(value f)
 	{
 	if (f->N == 0) str_free((string)f->R);
-	return 0;
+	return type_bad(f);
 	}
 
 value Qstr(string x)
@@ -28,7 +29,7 @@ value type_concat(value f)
 	{
 	string x = atom(type_str,arg(&f->L->R));
 	string y = atom(type_str,arg(&f->R));
-	if (!x || !y) return 0;
+	if (!x || !y) return bad;
 	return Qstr(str_concat(x,y));
 	}
 	}
@@ -39,7 +40,7 @@ value type_length(value f)
 	if (!f->L) return 0;
 	{
 	string x = atom(type_str,arg(&f->R));
-	if (!x) return 0;
+	if (!x) return bad;
 	return Qnum(num_new_ulong(x->len));
 	}
 	}
@@ -53,7 +54,7 @@ value type_slice(value f)
 	string x = atom(type_str,arg(&f->L->L->R));
 	number y = atom(type_num,arg(&f->L->R));
 	number z = atom(type_num,arg(&f->R));
-	if (!x || !y || !z) return 0;
+	if (!x || !y || !z) return bad;
 	{
 	long pos = (long)*y;
 	long len = (long)*z;
@@ -73,21 +74,24 @@ value type_slice(value f)
 	}
 	}
 
+/* Convert string to number if possible. */
 value type_str_num(value f)
 	{
 	if (!f->L) return 0;
 	{
 	string x = atom(type_str,arg(&f->R));
-	if (!x) return 0;
-	return Qnum(str_num(x->data));
+	if (!x) return bad;
+	{
+	int ok;
+	number num = str0_num(x->data,&ok);
+	if (!ok) return bad;
+	return Qnum(num);
+	}
 	}
 	}
 
 value type_is_str(value f)
 	{
 	if (!f->L) return 0;
-	{
-	string x = atom(type_str,arg(&f->R));
-	return x ? C : F;
-	}
+	return Qboolean((int)atom(type_str,arg(&f->R)));
 	}

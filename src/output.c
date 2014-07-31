@@ -1,6 +1,6 @@
 #include <format.h>
 #include <stdio.h>
-#include <string.h>
+#include <string.h> /* strlen */
 #include <output.h>
 
 static void write_data(FILE *fh, const char *data, unsigned long len)

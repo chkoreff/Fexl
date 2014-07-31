@@ -70,7 +70,7 @@ static value V(type T, value L, value R)
 			drop(f->L);
 			drop(f->R);
 			}
-		else
+		else if (f->R)
 			{
 			/* Clear atom. */
 			f->N = 0;
@@ -149,15 +149,21 @@ unsigned long remain_steps = 100000000;
 
 value eval(value f)
 	{
-	if (remain_depth > 0) remain_depth--; else return f;
-	while (1)
+	if (!f || !remain_depth) return f;
+	remain_depth--;
+	while (remain_steps)
 		{
-		value g = f ? f->T(f) : 0;
+		remain_steps--;
+		{
+		value g = f->T(f);
 		if (g == 0) break;
-		hold(g);
-		drop(f);
-		f = g;
-		if (remain_steps > 0) remain_steps--; else break;
+		if (g != f)
+			{
+			hold(g);
+			drop(f);
+			f = g;
+			}
+		}
 		}
 	remain_depth++;
 	return f;

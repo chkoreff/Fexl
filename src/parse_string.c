@@ -1,4 +1,5 @@
 #include <value.h>
+#include <basic.h>
 #include <input.h>
 #include <str.h>
 #include <parse.h>
@@ -22,7 +23,7 @@ static value parse_string(string x)
 	source = x;
 	pos = 0;
 
-	f = parse(get);
+	f = embed_parse(get);
 
 	source = save_source;
 	pos = save_pos;
@@ -34,7 +35,7 @@ value type_parse_string(value f)
 	if (!f->L) return 0;
 	{
 	string x = atom(type_str,arg(&f->R));
-	if (!x) return 0;
+	if (!x) return bad;
 	return parse_string(x);
 	}
 	}

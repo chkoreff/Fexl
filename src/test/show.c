@@ -51,6 +51,7 @@ static void do_show(value f)
 		if (sym->quoted) put_ch('"');
 		put_ch('}');
 		}
+	else if (f->T == type_bad) put("bad");
 	else if (f->T == type_num) put_num((number)f->R);
 	else if (f->T == type_concat) put("concat");
 	else if (f->T == type_length) put("length");
@@ -66,12 +67,13 @@ static void do_show(value f)
 	else if (f->T == type_str_num) put("str_num");
 	else if (f->T == type_is_str) put("is_str");
 	else if (f->T == type_is_num) put("is_num");
+	else if (f->T == type_is_bad) put("is_bad");
 	else if (f->T == type_put) put("put");
 	else if (f->T == type_nl) put("nl");
 	else if (f->T == type_say) put("say");
 	else if (f->T == type_parse_file) put("parse_file");
 	else if (f->T == type_parse_string) put("parse_string");
-	else put_ch('?');
+	else put_ch('_');
 
 	remain_depth++;
 	}
@@ -81,7 +83,7 @@ void show(value f)
 	unsigned long save_remain_depth = remain_depth;
 	unsigned long save_remain_steps = remain_steps;
 	remain_depth = 50;
-	remain_steps = 200;
+	remain_steps = 300;
 	do_show(f);
 	remain_depth = save_remain_depth;
 	remain_steps = save_remain_steps;

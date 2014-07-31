@@ -38,8 +38,9 @@ if it had reached end of file.
 
 static int ch; /* current character */
 static unsigned long source_line;  /* current line number */
-static const char *error_code;
-static unsigned long error_line;
+
+const char *error_code;
+unsigned long error_line;
 
 static void skip(void)
 	{
@@ -371,66 +372,67 @@ static value parse_exp(void)
 	return exp;
 	}
 
-/*
-(parse_form ok err) =
-	(ok form)       # if ok
-	(err msg line)  # if syntax error
-*/
-static value parse_form(void)
+value parse_source(input get)
 	{
-	value exp;
-	if (getd)
-		exp = parse_exp();
-	else
-		{
-		syntax_error("Missing file", source_line);
-		exp = 0;
-		}
-
-	if (ch != -1 && exp)
-		{
-		drop(exp);
-		syntax_error("Extraneous input", source_line);
-		exp = 0;
-		}
-
-	if (exp)
-		{
-		value form = extract_syms(exp);
-		drop(exp);
-		exp = A(A(R,C),A(A(L,I),form));
-		}
-	else
-		{
-		if (!error_code) error_code = "";
-		exp = A(C,A(A(L,A(A(L,I),
-			Qstr(str_new_data0(error_code)))),
-			Qnum_ulong(error_line)));
-		}
-
-	return exp;
-	}
-
-value parse(input get)
-	{
-	const input save_getd = getd;
-	const int save_ch = ch;
-	const unsigned long save_source_line = source_line;
-	const char *const save_error_code = error_code;
-	const unsigned long save_error_line = error_line;
-	value exp;
-
 	getd = get;
 	ch = 0;
 	source_line = 1;
 
-	exp = parse_form();
+	if (getd)
+		{
+		value exp = parse_exp();
+		if (ch != -1 && exp)
+			{
+			drop(exp);
+			syntax_error("Extraneous input", source_line);
+			exp = 0;
+			}
+		return exp;
+		}
+	else
+		{
+		/*TODO unify with new_parse_file */
+		syntax_error("Could not open the input file", source_line);
+		return 0;
+		}
+	}
+
+/*TODO type_parse should do the save/resore of ch, source_line etc. */
+
+/*
+(embed_parse ok err) =
+	(ok form)       # if ok
+	(err msg line)  # if syntax error
+*/
+value embed_parse(input get)
+	{
+	const input save_getd = getd;
+	const int save_ch = ch;
+	const unsigned long save_source_line = source_line;
+	value result;
+
+	error_code = 0;
+	error_line = 0;
+
+	{
+	value exp = parse_source(get);
+	if (exp)
+		{
+		result = A(A(R,C),A(A(L,I),exp));
+		drop(exp);
+		}
+	else
+		{
+		if (!error_code) error_code = "";
+		result = A(C,A(A(L,A(A(L,I),
+			Qstr(str_new_data0(error_code)))),
+			Qnum_ulong(error_line)));
+		}
+	}
 
 	getd = save_getd;
 	ch = save_ch;
 	source_line = save_source_line;
-	error_code = save_error_code;
-	error_line = save_error_line;
 
-	return exp;
+	return result;
 	}
