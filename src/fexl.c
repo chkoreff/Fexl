@@ -59,7 +59,7 @@ static void report_error(void)
 
 static value read_program(const char *name)
 	{
-	value exp = new_parse_file(name);
+	value exp = parse_file(name);
 	if (exp)
 		{
 		value g = A(resolve(exp,context),I);

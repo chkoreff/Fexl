@@ -14,17 +14,18 @@ static int get(void)
 	return pos < source->len ? source->data[pos++] : -1;
 	}
 
-static value parse_string(string x)
+static input open_string(string x)
+	{
+	source = x;
+	pos = 0;
+	return get;
+	}
+
+static value embed_parse_string(string x)
 	{
 	const string save_source = source;
 	const unsigned long save_pos = pos;
-	value f;
-
-	source = x;
-	pos = 0;
-
-	f = embed_parse(get);
-
+	value f = embed_parse(open_string(x));
 	source = save_source;
 	pos = save_pos;
 	return f;
@@ -36,6 +37,6 @@ value type_parse_string(value f)
 	{
 	string x = atom(type_str,arg(&f->R));
 	if (!x) return bad;
-	return parse_string(x);
+	return embed_parse_string(x);
 	}
 	}

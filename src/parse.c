@@ -391,13 +391,10 @@ value parse_source(input get)
 		}
 	else
 		{
-		/*TODO unify with new_parse_file */
 		syntax_error("Could not open the input file", source_line);
 		return 0;
 		}
 	}
-
-/*TODO type_parse should do the save/resore of ch, source_line etc. */
 
 /*
 (embed_parse ok err) =
