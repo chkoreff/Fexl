@@ -246,3 +246,5 @@ say "]"
 
 div
 eval_file "test/utf8.fxl"
+div
+eval_file "test/beer.fxl"
