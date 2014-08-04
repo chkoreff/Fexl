@@ -27,7 +27,7 @@ unions, and using a named union is more pain that it's worth.
 
 static value free_list = 0;
 
-void clear_free_list(void)
+static void clear_free_list(void)
 	{
 	while (free_list)
 		free_memory(Q(0),sizeof(struct value),4);
@@ -83,18 +83,10 @@ static value V(type T, value L, value R)
 		if (!f) return 0;
 		}
 
-	f->N = 0;
+	f->N = 1;
 	f->T = T;
 	f->L = L;
 	f->R = R;
-	return f;
-	}
-
-static value type_A(value f)
-	{
-	value x = arg(&f->L);
-	if (!x) return 0;
-	f->T = x->T;
 	return f;
 	}
 
@@ -111,11 +103,25 @@ value D(type T, void *x)
 	return V(T,0,x);
 	}
 
+/* Evaluate x and apply the result to y. */
+value apply(value x, value y)
+	{
+	value f = (y && (x = eval(x))) ? V(x->T,x,y) : 0;
+	if (!f)
+		{
+		drop(x);
+		drop(y);
+		}
+	return f;
+	}
+
+static value type_A(value f)
+	{
+	return apply(hold(f->L),hold(f->R));
+	}
+
 /* Apply x to y. */
 value A(value x, value y)
-	{
-	hold(x);
-	hold(y);
 	{
 	value f = (x && y) ?  V(type_A,x,y) : 0;
 	if (!f)
@@ -125,21 +131,11 @@ value A(value x, value y)
 		}
 	return f;
 	}
-	}
 
-/* Evaluate an argument in place. */
-value arg(value *f)
+/* Return true if x is an atom of type t. */
+int is_atom(type t, value x)
 	{
-	value x = eval(*f);
-	if (!x) return 0;
-	*f = x;
-	return x;
-	}
-
-/* If x is an atom of type t, return the atom data, otherwise return 0. */
-void *atom(type t, value x)
-	{
-	return (x && x->T == t && x->L == 0) ? x->R : 0;
+	return x && x->T == t && x->L == 0;
 	}
 
 /* Reduce the value to its normal form if possible within current limits. */
@@ -149,21 +145,28 @@ unsigned long remain_steps = 100000000;
 
 value eval(value f)
 	{
-	if (!f || !remain_depth) return f;
-	remain_depth--;
-	while (remain_steps)
+	if (!remain_depth || !f)
 		{
-		remain_steps--;
-		{
-		value g = f->T(f);
-		if (g == 0) break;
-		if (g != f)
-			{
-			hold(g);
-			drop(f);
-			f = g;
-			}
+		drop(f);
+		return 0;
 		}
+	remain_depth--;
+	while (f)
+		{
+		value g;
+		if (remain_steps)
+			{
+			remain_steps--;
+			g = f->T(f);
+			}
+		else
+			g = 0;
+
+		if (g == f)
+			break;
+
+		drop(f);
+		f = g;
 		}
 	remain_depth++;
 	return f;

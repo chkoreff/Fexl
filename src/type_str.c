@@ -25,23 +25,34 @@ value Qstr(string x)
 /* (. x y) is the concatenation of strings x and y. */
 value type_concat(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (!f->L || !f->L->L) return f;
 	{
-	string x = atom(type_str,arg(&f->L->R));
-	string y = atom(type_str,arg(&f->R));
-	if (!x || !y) return bad;
-	return Qstr(str_concat(x,y));
+	value x = eval(hold(f->L->R));
+	value y = eval(hold(f->R));
+	value g;
+	if (is_atom(type_str,x) && is_atom(type_str,y))
+		g = Qstr(str_concat((string)x->R,(string)y->R));
+	else
+		g = hold(bad);
+	drop(x);
+	drop(y);
+	return g;
 	}
 	}
 
 /* (length x) is the length of string x */
 value type_length(value f)
 	{
-	if (!f->L) return 0;
+	if (!f->L) return f;
 	{
-	string x = atom(type_str,arg(&f->R));
-	if (!x) return bad;
-	return Qnum(num_new_ulong(x->len));
+	value x = eval(hold(f->R));
+	value g;
+	if (is_atom(type_str,x))
+		g = Qnum(num_new_ulong(((string)x->R)->len));
+	else
+		g = hold(bad);
+	drop(x);
+	return g;
 	}
 	}
 
@@ -49,46 +60,55 @@ value type_length(value f)
 pos or len exceeds the bounds of str. */
 value type_slice(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
 	{
-	string x = atom(type_str,arg(&f->L->L->R));
-	number y = atom(type_num,arg(&f->L->R));
-	number z = atom(type_num,arg(&f->R));
-	if (!x || !y || !z) return bad;
-	if (*y < 0 || *z < 0) return bad;
-	{
-	unsigned long pos = (unsigned long)*y;
-	unsigned long len = (unsigned long)*z;
-
-	if (pos >= x->len
-		|| len > x->len
-		|| pos > x->len - len
-		)
-		return bad;
-
-	return Qstr(str_new_data(x->data + pos,len));
-	}
+	value x = eval(hold(f->L->L->R));
+	value y = eval(hold(f->L->R));
+	value z = eval(hold(f->R));
+	value g = F;
+	if (is_atom(type_str,x) && is_atom(type_num,y) && is_atom(type_num,z))
+		{
+		double yn = *((number)y->R);
+		double zn = *((number)z->R);
+		if (yn >= 0 && zn >= 0)
+			{
+			string xs = (string)x->R;
+			unsigned long pos = (unsigned long)yn;
+			unsigned long len = (unsigned long)zn;
+			if (pos < xs->len
+				&& len <= xs->len
+				&& pos <= xs->len - len)
+				g = Qstr(str_new_data(xs->data + pos,len));
+			}
+		}
+	if (g == F) g = hold(bad);
+	drop(x);
+	drop(y);
+	drop(z);
+	return g;
 	}
 	}
 
 /* Convert string to number if possible. */
 value type_str_num(value f)
 	{
-	if (!f->L) return 0;
+	if (!f->L) return f;
 	{
-	string x = atom(type_str,arg(&f->R));
-	if (!x) return bad;
-	{
-	int ok;
-	number num = str0_num(x->data,&ok);
-	if (!ok) return bad;
-	return Qnum(num);
-	}
+	value x = eval(hold(f->R));
+	value g = F;
+	if (is_atom(type_str,x))
+		{
+		int ok;
+		number num = str0_num(((string)x->R)->data,&ok);
+		if (ok) g = Qnum(num);
+		}
+	if (g == F) g = hold(bad);
+	drop(x);
+	return g;
 	}
 	}
 
 value type_is_str(value f)
 	{
-	if (!f->L) return 0;
-	return Qboolean(atom(type_str,arg(&f->R)) ? 1 : 0);
+	return Qis_type(type_str,f);
 	}

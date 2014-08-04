@@ -6,22 +6,33 @@
 
 static value op_num(value f, number op(number))
 	{
-	if (!f->L) return 0;
+	if (!f->L) return f;
 	{
-	number x = atom(type_num,arg(&f->R));
-	if (!x) return bad;
-	return Qnum(op(x));
+	value x = eval(hold(f->R));
+	value g;
+	if (is_atom(type_num,x))
+		g = Qnum(op((number)x->R));
+	else
+		g = hold(bad);
+	drop(x);
+	return g;
 	}
 	}
 
 static value op_num_num(value f, number op(number,number))
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (!f->L || !f->L->L) return f;
 	{
-	number x = atom(type_num,arg(&f->L->R));
-	number y = atom(type_num,arg(&f->R));
-	if (!x || !y) return bad;
-	return Qnum(op(x,y));
+	value x = eval(hold(f->L->R));
+	value y = eval(hold(f->R));
+	value g;
+	if (is_atom(type_num,x) && is_atom(type_num,y))
+		g = Qnum(op((number)x->R,(number)y->R));
+	else
+		g = hold(bad);
+	drop(x);
+	drop(y);
+	return g;
 	}
 	}
 

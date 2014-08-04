@@ -29,16 +29,20 @@ value Qnum_ulong(unsigned long val)
 
 value type_num_str(value f)
 	{
-	if (!f->L) return 0;
+	if (!f->L) return f;
 	{
-	number x = atom(type_num,arg(&f->R));
-	if (!x) return bad;
-	return Qstr(num_str(x));
+	value x = eval(hold(f->R));
+	value g;
+	if (is_atom(type_num,x))
+		g = Qstr(num_str((number)x->R));
+	else
+		g = hold(bad);
+	drop(x);
+	return g;
 	}
 	}
 
 value type_is_num(value f)
 	{
-	if (!f->L) return 0;
-	return Qboolean(atom(type_num,arg(&f->R)) ? 1 : 0);
+	return Qis_type(type_num,f);
 	}

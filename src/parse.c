@@ -44,7 +44,7 @@ unsigned long error_line;
 
 static void skip(void)
 	{
-	if (remain_steps > 0) remain_steps--; else { ch = -1; return; }
+	if (remain_steps) remain_steps--; else { ch = -1; return; }
 	ch = getd();
 	if (ch == '\n')
 		source_line++;
@@ -253,7 +253,7 @@ static value parse_term()
 		return exp;
 		}
 	else
-		return hold(parse_symbol());
+		return parse_symbol();
 	}
 
 /* Parse a lambda form following the initial '\' character. */
@@ -262,10 +262,9 @@ static value parse_lambda(unsigned long first_line)
 	skip_white();
 	{
 	/* Parse the symbol (function parameter). */
-	value sym = hold(parse_symbol());
+	value sym = parse_symbol();
 	if (sym == F)
 		{
-		drop(sym);
 		syntax_error("Missing symbol after '\\'", first_line);
 		return 0;
 		}
@@ -275,16 +274,21 @@ static value parse_lambda(unsigned long first_line)
 
 	{
 	/* Parse the definition of the symbol if we see an '=' char. */
+	unsigned short count_eq = 0;
 	value def = F;
 	if (ch == '=')
 		{
+		count_eq++;
 		skip();
+		if (ch == '=')
+			{
+			count_eq++;
+			skip();
+			}
 		skip_filler();
-
 		def = parse_term();
 		if (def == F)
 			{
-			drop(def);
 			syntax_error("Missing definition", first_line);
 			drop(sym);
 			return 0;
@@ -293,13 +297,13 @@ static value parse_lambda(unsigned long first_line)
 
 	{
 	/* Parse the body of the function and apply the definition if any. */
-	value exp = lam(sym,parse_exp());
-	if (def != F)
-		{
-		exp = app(exp,def);
-		drop(def);
-		}
-	return hold(exp);
+	value body = lam(sym,parse_exp());
+	if (count_eq == 0)
+		return body; /* no def */
+	else if (count_eq == 1)
+		return app(app(hold(Qeval),def),body); /* eager */
+	else
+		return app(body,def); /* lazy */
 	}
 	}
 	}
@@ -311,7 +315,7 @@ static value parse_factor(void)
 	{
 	skip_filler();
 	if (ch == -1)
-		return hold(F);
+		return F;
 	else if (ch == '\\')
 		{
 		unsigned long first_line = source_line;
@@ -319,7 +323,7 @@ static value parse_factor(void)
 		if (ch == '\\')
 			{
 			ch = -1; /* Two backslashes simulates end of file. */
-			return hold(F);
+			return F;
 			}
 		else
 			return parse_lambda(first_line);
@@ -335,7 +339,7 @@ static value parse_factor(void)
 		if (ch == '=')
 			{
 			syntax_error("Missing symbol declaration before '='", source_line);
-			if (factor) drop(factor);
+			if (factor != F) drop(factor);
 			return 0;
 			}
 		return factor;
@@ -345,36 +349,21 @@ static value parse_factor(void)
 static value parse_exp(void)
 	{
 	value exp = hold(I);
-	if (remain_depth > 0) remain_depth--; else return 0;
+	if (remain_depth) remain_depth--; else return 0;
 	while (1)
 		{
 		value factor = parse_factor();
-		if (factor == F)
-			{
-			drop(factor);
-			break;
-			}
-		if (!factor)
-			{
-			drop(exp);
-			exp = 0;
-			break;
-			}
-
-		{
-		value new = hold((exp == I) ? factor : app(exp,factor));
-		drop(factor);
-		drop(exp);
-		exp = new;
-		}
+		if (factor == F) break;
+		exp = app(exp,factor);
+		if (!exp) break;
 		}
 	remain_depth++;
 	return exp;
 	}
 
-value parse_source(input get)
+/* Parse the source stream. */
+value parse_source()
 	{
-	getd = get;
 	ch = 0;
 	source_line = 1;
 
@@ -401,35 +390,30 @@ value parse_source(input get)
 	(ok form)       # if ok
 	(err msg line)  # if syntax error
 */
-value embed_parse(input get)
+value embed_parse(value ok, value err)
 	{
-	const input save_getd = getd;
+	value result;
 	const int save_ch = ch;
 	const unsigned long save_source_line = source_line;
-	value result;
-
-	error_code = 0;
-	error_line = 0;
-
 	{
-	value exp = parse_source(get);
+	value exp = parse_source();
 	if (exp)
 		{
-		result = A(A(R,C),A(A(L,I),exp));
-		drop(exp);
+		result = A(ok,exp);
+		drop(err);
 		}
 	else
 		{
 		if (!error_code) error_code = "";
-		result = A(C,A(A(L,A(A(L,I),
-			Qstr(str_new_data0(error_code)))),
-			Qnum_ulong(error_line)));
+		result = A(A(err,Qstr(str_new_data0(error_code))),
+			Qnum_ulong(error_line));
+		drop(ok);
 		}
+	/* Clear error so main doesn't report it. */
+	error_code = 0;
+	error_line = 0;
 	}
-
-	getd = save_getd;
 	ch = save_ch;
 	source_line = save_source_line;
-
 	return result;
 	}

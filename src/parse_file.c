@@ -14,31 +14,36 @@ static int get(void)
 	return fgetc(source);
 	}
 
-static input open_file(const char *name)
+void get_from_file(const char *name)
 	{
 	source = name[0] ? fopen(name,"r") : stdin;
-	return source ? get : 0;
+	getd = source ? get : 0;
 	}
 
-value parse_file(const char *name)
-	{
-	return parse_source(open_file(name));
-	}
-
-static value embed_parse_file(const char *name)
-	{
-	FILE *save_source = source;
-	value f = embed_parse(open_file(name));
-	source = save_source;
-	return f;
-	}
-
+/*TODO replace this once we have get_from_file, get_from_string, and
+get_from_input */
+/* parse_file name ok err */
 value type_parse_file(value f)
 	{
-	if (!f->L) return 0;
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
 	{
-	string x = atom(type_str,arg(&f->R));
-	if (!x) return bad;
-	return embed_parse_file(x->data);
+	value x = eval(hold(f->L->L->R));
+	value g;
+	if (is_atom(type_str,x))
+		{
+		FILE *save_source = source;
+		const input save_getd = getd;
+
+		string name = (string)x->R;
+		get_from_file(name->data);
+		g = embed_parse(hold(f->L->R),hold(f->R));
+
+		source = save_source;
+		getd = save_getd;
+		}
+	else
+		g = hold(bad);
+	drop(x);
+	return g;
 	}
 	}

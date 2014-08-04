@@ -1,691 +1,244 @@
-beg f = ((C S) C)
-end f = ((C S) C)
-end g = S
-
-beg f = C
-end f = C
-end g = C
-
-beg f = (C C)
-end f = (C C)
-end g = (C C)
-
-beg f = ((C C) C)
-end f = ((C C) C)
-end g = C
-
-beg f = (((C C) C) ((C C) C))
-end f = (C ((C C) C))
-end g = (C ((C C) C))
-
-beg f = (((S C) S) (C C))
-end f = (((S C) S) (J (C C)))
-end g = (C C)
-
-beg f = ((C ((C C) C)) C)
-end f = ((C ((C C) C)) C)
-end g = C
-
-beg f = (((S C) S) (((S C) S) (((S C) S) (((S C) S) ((C (S C)) C)))))
-end f = (((S C) S) (J (S C)))
-end g = (S C)
-
-beg f = ((((C C) (C C)) ((C C) (C C))) (((C C) (C C)) ((C C) (C C))))
-end f = ((C ((C C) (C C))) (C ((C C) (C C))))
-end g = C
-
-beg f = (((((S S) S) S) C) C)
-end f = (((S (J C)) ((S (J S)) (J C))) (J C))
-end g = C
-
-beg f = (((S I) I) C)
-end f = (((S I) I) (J C))
-end g = (C (I (J C)))
-
-beg f = (((S ((S C) C)) ((C C) C)) ((C S) C))
-end f = (((S ((S C) C)) ((C C) C)) (J S))
-end g = (S (((C C) C) (J S)))
-
-beg f = (say "ping!")
-end f = (say "ping!")
-end g = (say "ping!")
-
-beg f = (I (say "ping!"))
-end f = (I (say "ping!"))
-end g = (say "ping!")
-
-beg f = C
-end f = C
-end g = C
-
-beg f = (C C)
-end f = (C C)
-end g = (C C)
-
-beg f = ((C C) C)
-end f = ((C C) C)
-end g = C
-
-beg f = ((C S) C)
-end f = ((C S) C)
-end g = S
-
-beg f = (((R ((R ((R ((L I) I)) ((S R) I))) ((S R) I))) ((S R) ((S R) I))) (say "ping!"))
-ping!
-ping!
-ping!
-ping!
-ping!
-ping!
-ping!
-ping!
-ping!
-ping!
-ping!
-ping!
-end f = (((R ((R ((R ((L I) I)) ((S R) I))) ((S R) I))) ((S R) ((S R) I))) (say "ping!"))
-end g = I
-
-beg f = @
-end f = @
-end g = @
-
-beg f = (@ C)
-end f = (@ C)
-end g = (C (@ C))
-
-beg f = (@ I)
-end f = (@ I)
-end g = (I (@ I))
-
-beg f = (@ @)
-end f = (@ @)
-end g = ((@ (@ @)) (@ (@ @)))
-
-beg f = (((@ S) S) S)
-end f = (((S (@ S)) S) (J S))
-end g = (((S (@ S)) S) (J S))
-
-beg f = "abc"
-end f = "abc"
-end g = "abc"
-
-beg f = (I "abc")
-end f = (I "abc")
-end g = "abc"
-
-beg f = ("abc" "de")
-end f = ("abc" "de")
-end g = bad
-
-beg f = ((concat "abc") "de")
-end f = ((concat "abc") "de")
-end g = "abcde"
-
-beg f = ((I (I "abc")) "de")
-end f = ("abc" "de")
-end g = bad
-
-beg f = ((concat (I "abc")) "de")
-end f = ((concat "abc") "de")
-end g = "abcde"
-
-beg f = ((concat (C "abc")) "de")
-end f = ((concat (C "abc")) "de")
-end g = bad
-
-beg f = ((concat ((I I) "abc")) ((concat "") "de"))
-end f = ((concat "abc") "de")
-end g = "abcde"
-
-beg f = 3.14159265358979
-end f = 3.14159265358979
-end g = 3.14159265358979
-
-beg f = 42
-end f = 42
-end g = 42
-
-beg f = (length "12345")
-end f = (length "12345")
-end g = 5
-
-beg f = (length ((concat (I "abc")) ((concat "") "d")))
-end f = (length "abcd")
-end g = 4
-
-beg f = (((slice ((C ((concat "abcd") "efghi")) S)) 2) 5)
-end f = (((slice "abcdefghi") 2) 5)
-end g = "cdefg"
-
-beg f = ((+ -14.87) 482.73)
-end f = ((+ -14.87) 482.73)
-end g = 467.86
-
-beg f = ((/ ((+ 1) (sqrt 5))) 2)
-end f = ((/ 3.23606797749979) 2)
-end g = 1.61803398874989
-
-beg f = ((C "yes") "no")
-end f = ((C "yes") "no")
-end g = "yes"
-
-beg f = ((F "yes") "no")
-end f = (I "no")
-end g = "no"
-
-beg f = ((ge (I 5.9)) 5.8)
-end f = ((ge 5.9) 5.8)
-end g = C
-
-beg f = ((lt 5.9) (I 5.8))
-end f = ((lt 5.9) 5.8)
-end g = F
-
-beg f = ((ge (I "ab")) "a")
-end f = ((ge "ab") "a")
-end g = C
-
-beg f = ((lt (I "ab")) (I "a"))
-end f = ((lt "ab") "a")
-end g = F
-
-beg f = ((eq (I "x")) "x")
-end f = ((eq "x") "x")
-end g = C
-
-beg f = ((eq (I -7.2)) -7.2)
-end f = ((eq -7.2) -7.2)
-end g = C
-
-beg f = ((lt (I 5.9)) (I "ab"))
-end f = ((lt 5.9) "ab")
-end g = bad
-
-beg f = ((lt (I "ab")) (I 5.9))
-end f = ((lt "ab") 5.9)
-end g = bad
-
-beg f = ((eq (I S)) (I S))
-end f = ((eq S) (I S))
-end g = bad
-
-beg f = (num_str ((/ ((+ 1) (sqrt 5))) 2))
-end f = (num_str 1.61803398874989)
-end g = "1.61803398874989"
-
-beg f = (str_num ((concat "+") ((concat "1.") "61803398874989")))
-end f = (str_num "+1.61803398874989")
-end g = 1.61803398874989
-
-beg f = (str_num (I 5.8))
-end f = (str_num 5.8)
-end g = bad
-
-beg f = (str_num (I S))
-end f = (str_num S)
-end g = bad
-
-beg f = (((S ((S (C C)) S)) "y") "z")
-end f = (((S ((S (C C)) S)) "y") (J "z"))
-end g = (S (J "z"))
-
-beg f = {x}
-end f = {x}
-end g = {x}
-
-beg f = {"x"}
-end f = {"x"}
-end g = {"x"}
-
-beg f = ({x} {"x"})
-end f = {{x} {"x"}}
-end g = {{x} {"x"}}
-
-beg f = ({"x"} {x})
-end f = {{"x"} {x}}
-end g = {{"x"} {x}}
-
-beg f = (I {{(I I) {x}} {C {y}}})
-end f = (I {{(I I) {x}} {C {y}}})
-end g = {{(I I) {x}} {C {y}}}
-
-beg f = I
-end f = I
-end g = I
-
-beg f = {C {x}}
-end f = {C {x}}
-end g = {C {x}}
-
-beg f = {(L I) {y}}
-end f = {(L I) {y}}
-end g = {(L I) {y}}
-
-beg f = {x}
-end f = {x}
-end g = {x}
-
-beg f = {C {{y} {y}}}
-end f = {C {{y} {y}}}
-end g = {C {{y} {y}}}
-
-beg f = {{R {y}} ((S I) I)}
-end f = {{R {y}} ((S I) I)}
-end g = {{R {y}} ((S I) I)}
-
-beg f = {(L ((S I) I)) {y}}
-end f = {(L ((S I) I)) {y}}
-end g = {(L ((S I) I)) {y}}
-
-beg f = {{S {(S I) {(L I) {"abc"}}}} {{S {y}} I}}
-end f = {{S {(S I) {(L I) {"abc"}}}} {{S {y}} I}}
-end g = {{S {(S I) {(L I) {"abc"}}}} {{S {y}} I}}
-
-beg f = ?
-end f = ?
-end g = ?
-
-beg f = ?
-end f = ?
-end g = ?
-
-beg f = ?
-end f = ?
-end g = ?
-
-beg f = put
-end f = put
-end g = put
-
-beg f = (put (I "XYZ"))
-end f = (put (I "XYZ"))
-end g = (put (I "XYZ"))
-
-beg f = ((put (I "XYZ")) {next})
-XYZend f = ((put "XYZ") {next})
-end g = {next}
-
-beg f = ((put (I 3.14159265358979)) {next})
-3.14159265358979end f = ((put 3.14159265358979) {next})
-end g = {next}
-
-beg f = ((put (C I)) {next})
-end f = ((put (C I)) {next})
-end g = bad
-
-beg f = nl
-end f = nl
-end g = nl
-
-beg f = (nl {next})
-
-end f = (nl {next})
-end g = {next}
-
-beg f = say
-end f = say
-end g = say
-
-beg f = (say (I "XYZ"))
-end f = (say (I "XYZ"))
-end g = (say (I "XYZ"))
-
-beg f = ((say (I "XYZ")) {next})
-XYZ
-end f = ((say "XYZ") {next})
-end g = {next}
-
-beg f = ((say (I 3.14159265358979)) {next})
+==
+ping
+==
+ping
+==
+ping
+ping
+ping
+ping
+ping
+ping
+ping
+ping
+ping
+ping
+ping
+ping
+==
+abc
+abc
+:bad
+abcde
+:bad
+abcde
+:bad
+abcde
 3.14159265358979
-end f = ((say 3.14159265358979) {next})
-end g = {next}
+42
+5
+4
+cdefg
+467.86
+1.61803398874989
+T
+F
+T
+F
+T
+T
+:bad
+:bad
+:bad
+==
+str 1.61803398874989
+num 1.61803398874989
+bad
+other
+bad
+bad
+str 5.8
+bad
+num 3
+bad
+bad
+num 3
+bad
+==
+T
+F
+F
+T
+==
+F
+F
+T
+T
+F
+F
+T
+==
+:bad
+cd
 
-beg f = ((say (C I)) {next})
-end f = ((say (C I)) {next})
-end g = bad
+:bad
+:bad
+==
+F
+F
+T
+T
+F
+T
+T
+T
+T
+F
+F
+abcdABA
+AABABC
+==
+parse []
+ok
 
-beg f = (parse_string "")
-end f = (parse_string "")
-end g = ((R C) ((L I) I))
+parse [
+x y]
+ok
 
-beg f = (parse_string " 	
-x y")
-end f = (parse_string " 	
-x y")
-end g = ((R C) ((L I) {{x} {y}}))
+parse [ab cd e]
+ok
 
-beg f = (parse_string "ab cd e")
-end f = (parse_string "ab cd e")
-end g = ((R C) ((L I) {{{ab} {cd}} {e}}))
+parse [abcdefghi;]
+ok
 
-beg f = (parse_string "abcdefghi;")
-end f = (parse_string "abcdefghi;")
-end g = ((R C) ((L I) {{abcdefghi} I}))
+parse [""]
+ok
 
-beg f = (parse_string """")
-end f = (parse_string """")
-end g = ((R C) ((L I) {""}))
+parse ["a"]
+ok
 
-beg f = (parse_string ""a"")
-end f = (parse_string ""a"")
-end g = ((R C) ((L I) {"a"}))
+parse ["abc
+defg"]
+ok
 
-beg f = (parse_string ""abc
-defg"")
-end f = (parse_string ""abc
-defg"")
-end g = ((R C) ((L I) {"abc
-defg"}))
+parse ["]
+err Unclosed string on line 1
 
-beg f = (parse_string """)
-end f = (parse_string """)
-end g = (C ((L ((L I) "Unclosed string")) 1))
-
-beg f = (parse_string "
+parse [
 "a
 b
-")
-end f = (parse_string "
-"a
-b
-")
-end g = (C ((L ((L I) "Unclosed string")) 2))
+]
+err Unclosed string on line 2
 
-beg f = (parse_string "~| |")
-end f = (parse_string "~| |")
-end g = ((R C) ((L I) {""}))
+parse [~| |]
+ok
 
-beg f = (parse_string "~| a|")
-end f = (parse_string "~| a|")
-end g = ((R C) ((L I) {"a"}))
+parse [~| a|]
+ok
 
-beg f = (parse_string "~| a")
-end f = (parse_string "~| a")
-end g = (C ((L ((L I) "Unclosed string")) 1))
+parse [~| a]
+err Unclosed string on line 1
 
-beg f = (parse_string "~END aEND")
-end f = (parse_string "~END aEND")
-end g = ((R C) ((L I) {"a"}))
+parse [~END aEND]
+ok
 
-beg f = (parse_string "
-
+parse [
 ~END
-abcEN")
-end f = (parse_string "
+abcEN]
+err Unclosed string on line 2
 
-~END
-abcEN")
-end g = (C ((L ((L I) "Unclosed string")) 3))
+parse [~]
+err Incomplete string terminator on line 1
 
-beg f = (parse_string "~")
-end f = (parse_string "~")
-end g = (C ((L ((L I) "Incomplete string terminator")) 1))
+parse [~EN]
+err Incomplete string terminator on line 1
 
-beg f = (parse_string "~EN")
-end f = (parse_string "~EN")
-end g = (C ((L ((L I) "Incomplete string terminator")) 1))
+parse [~ABC abcdABAABC]
+ok
 
-beg f = (parse_string "~ABC abcdABAABC")
-end f = (parse_string "~ABC abcdABAABC")
-end g = ((R C) ((L I) {"abcdABA"}))
+parse [~ABCD AABABCABCD]
+ok
 
-beg f = (parse_string "~ABCD AABABCABCD")
-end f = (parse_string "~ABCD AABABCABCD")
-end g = ((R C) ((L I) {"AABABC"}))
+parse [ = y]
+err Missing symbol declaration before '=' on line 1
 
-beg f = (parse_string " = y")
-end f = (parse_string " = y")
-end g = (C ((L ((L I) "Missing symbol declaration before '='")) 1))
+parse [ab cd e;]
+ok
 
-beg f = (parse_string "ab cd e;")
-end f = (parse_string "ab cd e;")
-end g = ((R C) ((L I) {{{{ab} {cd}} {e}} I}))
+parse [ab cd e;f g]
+ok
 
-beg f = (parse_string "ab cd e;f g")
-end f = (parse_string "ab cd e;f g")
-end g = ((R C) ((L I) {{{{ab} {cd}} {e}} {{f} {g}}}))
+parse [ab cd e;f g ; hi j;]
+ok
 
-beg f = (parse_string "ab cd e;f g ; hi j;")
-end f = (parse_string "ab cd e;f g ; hi j;")
-end g = ((R C) ((L I) {{{{ab} {cd}} {e}} {{{f} {g}} {{{hi} {j}} I}}}))
+parse [ab cd e\\fg h]
+ok
 
-beg f = (parse_string "ab cd e\\fg h")
-end f = (parse_string "ab cd e\\fg h")
-end g = ((R C) ((L I) {{{ab} {cd}} {e}}))
+parse [ab cd e\x]
+ok
 
-beg f = (parse_string "ab cd e\x")
-end f = (parse_string "ab cd e\x")
-end g = ((R C) ((L I) {{{{ab} {cd}} {e}} (C I)}))
+parse [ab cd e\]
+err Missing symbol after '\' on line 1
 
-beg f = (parse_string "ab cd e\")
-end f = (parse_string "ab cd e\")
-end g = (C ((L ((L I) "Missing symbol after '\'")) 1))
+parse [\x=]
+err Missing definition on line 1
 
-beg f = (parse_string "\x=")
-end f = (parse_string "\x=")
-end g = (C ((L ((L I) "Missing definition")) 1))
+parse [\x=4]
+ok
 
-beg f = (parse_string "\x=4")
-end f = (parse_string "\x=4")
-end g = ((R C) ((L I) {(C I) {4}}))
+parse [\x\y\z x z; y z]
+ok
 
-beg f = (parse_string "\x\y\z x z; y z")
-end f = (parse_string "\x\y\z x z; y z")
-end g = ((R C) ((L I) S))
+parse [\x\y\z x; y z]
+ok
 
-beg f = (parse_string "\x\y\z x; y z")
-end f = (parse_string "\x\y\z x; y z")
-end g = ((R C) ((L I) R))
+parse [\x\y\z x z y]
+ok
 
-beg f = (parse_string "\x\y\z x z y")
-end f = (parse_string "\x\y\z x z y")
-end g = ((R C) ((L I) L))
+parse [\x x]
+ok
 
-beg f = (parse_string "\x x")
-end f = (parse_string "\x x")
-end g = ((R C) ((L I) I))
+parse [\x\y x]
+ok
 
-beg f = (parse_string "\x\y x")
-end f = (parse_string "\x\y x")
-end g = ((R C) ((L I) C))
+parse [\x x x]
+ok
 
-beg f = (parse_string "\x x x")
-end f = (parse_string "\x x x")
-end g = ((R C) ((L I) ((S I) I)))
+parse [\x=y x]
+ok
 
-beg f = (parse_string "\x=y x")
-end f = (parse_string "\x=y x")
-end g = ((R C) ((L I) {I {y}}))
+parse [\x=y y]
+ok
 
-beg f = (parse_string "\x=y y")
-end f = (parse_string "\x=y y")
-end g = ((R C) ((L I) {{C {y}} {y}}))
+parse [\y\x=y x x]
+ok
 
-beg f = (parse_string "\y\x=y x x")
-end f = (parse_string "\y\x=y x x")
-end g = ((R C) ((L I) ((S I) I)))
+parse [\y\x=y y y]
+ok
 
-beg f = (parse_string "\y\x=y y y")
-end f = (parse_string "\y\x=y y y")
-end g = ((R C) ((L I) ((S ((R C) ((S I) I))) I)))
+parse [()]
+ok
 
-beg f = (parse_string "()")
-end f = (parse_string "()")
-end g = ((R C) ((L I) I))
-
-beg f = (parse_string "(
+parse [(
 a
-(b")
-end f = (parse_string "(
+(b]
+err Unclosed parenthesis on line 3
+
+parse [(
 a
-(b")
-end g = (C ((L ((L I) "Unclosed parenthesis")) 3))
+(b)]
+err Unclosed parenthesis on line 1
 
-beg f = (parse_string "(
+parse [(
 a
-(b)")
-end f = (parse_string "(
-a
-(b)")
-end g = (C ((L ((L I) "Unclosed parenthesis")) 1))
+(b))]
+ok
 
-beg f = (parse_string "(
-a
-(b))")
-end f = (parse_string "(
-a
-(b))")
-end g = ((R C) ((L I) {{a} {b}}))
+parse [(ab cd e)
+)]
+err Extraneous input on line 2
 
-beg f = (parse_string "(ab cd e)
-)")
-end f = (parse_string "(ab cd e)
-)")
-end g = (C ((L ((L I) "Extraneous input")) 2))
-
-beg f = (parse_file "missing.fxl")
-end f = (parse_file "missing.fxl")
-end g = (C ((L ((L I) "Could not open the input file")) 1))
-
-beg f = (parse_file "test/a2.fxl")
-end f = (parse_file "test/a2.fxl")
-end g = ((R C) ((L I) {{{R {@}} {{R {R {get}}} {{R {R {S {{L {{L {eq}} {""}}} I}}}} {{R {R {R {{put} {"ch = "}}}}} {{S {(R R) {(R R) {put}}}} {{R {R {L {put}}}} {{L {(R R) {put}}} {nl}}}}}}}} {"""}}))
-
-beg f = (parse_file "test/utf8.fxl")
-end f = (parse_file "test/utf8.fxl")
-end g = ((R C) ((L I) {I {{{say} {"== test_utf"}} {{{L {{L {(R L) {{L {(R L) {(R (R L)) {{L {(R L) {(R (R L)) {(R (R (R L))) {{R {R {R {R {R {{put} {"f = "}}}}}}} {{L {(R R) {(R R) {(R R) {(R R) {{L {{L {say}} {put}}} {"åabcüdef = "}}}}}}} {{L {(R R) {(R R) {(R R) {say}}}}} {{R {R {R {{put} {"ghij = "}}}}} {{L {(R R) {(R R) {say}}}} {{R {R {{put} {"üä = "}}}} {{L {(R R) {say}}} {{R {{put} {"1≠0 = "}}} {{L {say}} {{{L {{R {R {{put} {"vegetable "}}}} {{L {(R R) {say}}} {{R {{put} {"dessert "}}} {{L {say}} I}}}}} {"efterrätt"}} {"grönsak"}}}}}}}}}}}}}}} {"hej 1≠0"}}}}} {"hej üä"}}}} {"hej ghij"}}} {"hej åabcüdef"}} {"hej
-åabcüdef
-ghij
-üä
-1≠0
-"}}}}))
-
-beg f = (parse_string "say "hello"
+parse [say "hello"
 say something
-")
-end f = (parse_string "say "hello"
-say something
-")
-end g = ((R C) ((L I) {{{{say} {"hello"}} {say}} {something}}))
+]
+ok
 
-beg f = (is_str I)
-end f = (is_str I)
-end g = F
+parse missing.fxl
+err Could not open the input file on line 1
 
-beg f = (is_str 4)
-end f = (is_str 4)
-end g = F
+parse test/a2.fxl
+ok
 
-beg f = (is_str "x")
-end f = (is_str "x")
-end g = C
-
-beg f = (is_str ((concat "x") "y"))
-end f = (is_str "xy")
-end g = C
-
-beg f = (is_num "x")
-end f = (is_num "x")
-end g = F
-
-beg f = (is_num 4.2)
-end f = (is_num 4.2)
-end g = C
-
-beg f = (is_num ((* 3.9) 4.2))
-end f = (is_num 16.38)
-end g = C
-
-beg f = (is_num (str_num "4.87"))
-end f = (is_num 4.87)
-end g = C
-
-beg f = (is_num (str_num "  4.87"))
-end f = (is_num 4.87)
-end g = C
-
-beg f = (is_num (str_num " 4.87 "))
-end f = (is_num bad)
-end g = F
-
-beg f = (is_num (str_num "4.87x"))
-end f = (is_num bad)
-end g = F
-
-beg f = (num_str 5.8)
-end f = (num_str 5.8)
-end g = "5.8"
-
-beg f = (num_str "abc")
-end f = (num_str "abc")
-end g = bad
-
-beg f = (sqrt 9)
-end f = (sqrt 9)
-end g = 3
-
-beg f = (sqrt "abc")
-end f = (sqrt "abc")
-end g = bad
-
-beg f = (((+ "x") (I 3)) 4)
-end f = (bad 4)
-end g = bad
-
-beg f = (length "abc")
-end f = (length "abc")
-end g = 3
-
-beg f = (length C)
-end f = (length C)
-end g = bad
-
-beg f = (is_bad I)
-end f = (is_bad I)
-end g = F
-
-beg f = (is_bad 3)
-end f = (is_bad 3)
-end g = F
-
-beg f = (is_bad bad)
-end f = (is_bad bad)
-end g = C
-
-beg f = (is_num (str_num "-4.6"))
-end f = (is_num -4.6)
-end g = C
-
-beg f = (is_num (str_num "-4.6x"))
-end f = (is_num bad)
-end g = F
-
-beg f = (is_bad (str_num "-4.6"))
-end f = (is_bad -4.6)
-end g = F
-
-beg f = (is_bad (str_num "-4.6x"))
-end f = (is_bad bad)
-end g = C
-
-beg f = (((slice "abcd") 2) 3)
-end f = (((slice "abcd") 2) 3)
-end g = bad
-
-beg f = (((slice "abcd") 2) 2)
-end f = (((slice "abcd") 2) 2)
-end g = "cd"
-
-beg f = (((slice "abcd") 2) 0)
-end f = (((slice "abcd") 2) 0)
-end g = ""
-
-beg f = (((slice "abcd") -2) 3)
-end f = (((slice "abcd") -2) 3)
-end g = bad
-
-beg f = (((slice "abcd") 2) -3)
-end f = (((slice "abcd") 2) -3)
-end g = bad
+parse test/utf8.fxl
+ok
 

@@ -1,2 +1,2 @@
 #!/bin/sh
-test/run | diff - test/run.out
+./build && test/run | diff - test/run.out

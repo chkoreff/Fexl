@@ -15,8 +15,13 @@
 
 static void do_show(value f)
 	{
-	if (remain_steps > 0) remain_steps--; else { put_ch('_'); return; }
-	if (remain_depth > 0) remain_depth--; else { put_ch('_'); return; }
+	if (!remain_steps || !remain_depth)
+		{
+		put("...");
+		return;
+		}
+	remain_steps--;
+	remain_depth--;
 
 	if (!f)
 		put_ch('?');
@@ -31,11 +36,11 @@ static void do_show(value f)
 	else if (f->T == type_C) put_ch('C');
 	else if (f->T == type_S) put_ch('S');
 	else if (f->T == type_I) put_ch('I');
-	else if (f->T == type_J) put_ch('J');
 	else if (f->T == type_F) put_ch('F');
 	else if (f->T == type_R) put_ch('R');
 	else if (f->T == type_L) put_ch('L');
 	else if (f->T == type_Y) put_ch('@');
+	else if (f->T == type_eval) put_ch('!');
 	else if (f->T == type_str)
 		{
 		put_ch('"');

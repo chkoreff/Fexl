@@ -9,42 +9,53 @@
 
 value type_put(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (!f->L) return f;
 	{
-	value xv = arg(&f->L->R);
-
-	{
-	string x = atom(type_str,xv);
-	if (x)
+	value x = eval(hold(f->R));
+	value g;
+	if (is_atom(type_str,x))
 		{
-		put_str(x);
-		return f->R;
+		put_str((string)x->R);
+		g = hold(I);
 		}
-	}
-
-	{
-	number x = atom(type_num,xv);
-	if (x)
+	else if (is_atom(type_num,x))
 		{
-		put_num(x);
-		return f->R;
+		put_num((number)x->R);
+		g = hold(I);
 		}
-	}
+	else if (!x)
+		g = 0;
+	else
+		g = hold(bad);
 
-	return bad;
+	drop(x);
+	return g;
 	}
 	}
 
 value type_nl(value f)
 	{
-	if (!f->L) return 0;
+	(void)f;
 	nl();
-	return f->R;
+	return hold(I);
 	}
 
 value type_say(value f)
 	{
 	value g = type_put(f);
-	if (g && g != bad) nl();
+	if (g == I) nl();
 	return g;
+	}
+
+value type_put_to_error(value f)
+	{
+	if (!f->L) return f;
+	{
+	output save_putd = putd;
+	value g;
+	put_to_error();
+	g = eval(hold(f->R));
+	putd = save_putd;
+	return g;
+	}
 	}

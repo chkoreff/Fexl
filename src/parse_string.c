@@ -21,22 +21,29 @@ static input open_string(string x)
 	return get;
 	}
 
-static value embed_parse_string(string x)
-	{
-	const string save_source = source;
-	const unsigned long save_pos = pos;
-	value f = embed_parse(open_string(x));
-	source = save_source;
-	pos = save_pos;
-	return f;
-	}
-
+/* parse_string str ok err */
 value type_parse_string(value f)
 	{
-	if (!f->L) return 0;
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
 	{
-	string x = atom(type_str,arg(&f->R));
-	if (!x) return bad;
-	return embed_parse_string(x);
+	value x = eval(hold(f->L->L->R));
+	value g;
+	if (is_atom(type_str,x))
+		{
+		const string save_source = source;
+		const input save_getd = getd;
+		const unsigned long save_pos = pos;
+
+		getd = open_string((string)x->R);
+		g = embed_parse(hold(f->L->R),hold(f->R));
+
+		source = save_source;
+		pos = save_pos;
+		getd = save_getd;
+		}
+	else
+		g = hold(bad);
+	drop(x);
+	return g;
 	}
 	}

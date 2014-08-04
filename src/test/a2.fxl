@@ -1,8 +1,11 @@
-\QU=~| "|
+say "Hello."
+say "Type some lines of input and I'll echo them back."
+say "Press Ctrl-D to stop."
+(
 @\loop
 get \ch
 eq ch "" ();
-put "ch = ";
-put QU; put ch; put QU;
-nl;
+put ch
 loop
+)
+say "Good bye."

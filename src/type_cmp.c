@@ -8,31 +8,20 @@
 
 static value op_cmp(value f, int op(int))
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (!f->L || !f->L->L) return f;
 	{
-	value xv = arg(&f->L->R);
-
-	{
-	number x = atom(type_num,xv);
-	if (x)
-		{
-		number y = atom(type_num,arg(&f->R));
-		if (!y) return bad;
-		return Qboolean(op(num_cmp(x,y)));
-		}
-	}
-
-	{
-	string x = atom(type_str,xv);
-	if (x)
-		{
-		string y = atom(type_str,arg(&f->R));
-		if (!y) return bad;
-		return Qboolean(op(str_cmp(x,y)));
-		}
-	}
-
-	return bad;
+	value x = eval(hold(f->L->R));
+	value y = eval(hold(f->R));
+	value g;
+	if (is_atom(type_num,x) && is_atom(type_num,y))
+		g = Qboolean(op(num_cmp((number)x->R,(number)y->R)));
+	else if (is_atom(type_str,x) && is_atom(type_str,y))
+		g = Qboolean(op(str_cmp((string)x->R,(string)y->R)));
+	else
+		g = hold(bad);
+	drop(x);
+	drop(y);
+	return g;
 	}
 	}
 

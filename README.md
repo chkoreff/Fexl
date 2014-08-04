@@ -12,11 +12,7 @@ Go into the source code directory:
 
 	cd src
 
-Build the code:
-
-	./build
-
-Test the validity of the code:
+Build the code and test its validity:
 
 	test/check
 
@@ -43,12 +39,28 @@ names of any files it might need that come bundled with the distribution.  That
 way I don't have to rely on non-portable features like "/proc/self/exe" to
 locate the executable.
 
-Other
------
+Development Tools
+-----------------
+
+To build the code:
+
+	./build
 
 To erase the build output files:
 
 	./clean
+
+To build the code and run a fexl program:
+
+	./fexl [FILE]
+
+To build the code and see the test output:
+
+	test/run
+
+To build the code and check the test output:
+
+	test/check
 
 To source the handy shell aliases that I use for development:
 

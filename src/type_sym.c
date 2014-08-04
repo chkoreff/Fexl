@@ -16,7 +16,7 @@ static void sym_free(symbol sym)
 value type_sym(value f)
 	{
 	if (f->N == 0) sym_free((symbol)f->R);
-	return 0;
+	return f;
 	}
 
 value Qsym(short quoted, string name, unsigned long line)
@@ -31,7 +31,7 @@ value Qsym(short quoted, string name, unsigned long line)
 		}
 
 	sym->quoted = quoted ? 1 : 0;
-	sym->name = hold(Qstr(name));
+	sym->name = Qstr(name);
 	sym->line = line;
 
 	{
@@ -45,11 +45,20 @@ value Qsym(short quoted, string name, unsigned long line)
 /* Apply f to g, where either can be a symbolic form. */
 value app(value f, value g)
 	{
-	value v = A(f,g);
-	if (!v) return 0;
-	if (f->T == type_sym || g->T == type_sym)
-		v->T = type_sym;
-	return v;
+	/*LATER possibly more optimization rules */
+	if (f == I)
+		{
+		drop(f);
+		return g;
+		}
+	else
+		{
+		value v = A(f,g);
+		if (!v) return 0;
+		if (f->T == type_sym || g->T == type_sym)
+			v->T = type_sym;
+		return v;
+		}
 	}
 
 /* Return (S f g), optimizing if possible. */
@@ -59,21 +68,21 @@ static value fuse(value f, value g)
 		{
 		if (g == I)
 			/* S (C x) I = x */
-			return f->R;
+			return hold(f->R);
 		else if (g->L == C)
 			/* S (C x) (C y) = C (x y) */
-			return app(C,app(f->R,g->R));
+			return app(hold(C),app(hold(f->R),hold(g->R)));
 		else
 			{
 			/* S (C x) y = R x y */
-			return app(app(R,f->R),g);
+			return app(app(hold(R),hold(f->R)),hold(g));
 			}
 		}
 	else if (g->L == C)
 		/* S x (C y) = L x y */
-		return app(app(L,f),g->R);
+		return app(app(hold(L),hold(f)),hold(g->R));
 	else
-		return app(app(S,f),g);
+		return app(app(hold(S),hold(f)),hold(g));
 	}
 
 static int sym_eq(symbol x, symbol y)
@@ -87,18 +96,18 @@ that symbol, and no longer contains that symbol. */
 static value abstract(value sym, value body)
 	{
 	if (body->T != type_sym)
-		return A(C,body);
+		return A(hold(C),hold(body));
 	else if (body->L == 0)
 		{
 		if (sym_eq((symbol)sym->R, (symbol)body->R))
-			return I;  /* (\x x) = I */
+			return hold(I);  /* (\x x) = I */
 		else
-			return app(C,body);
+			return app(hold(C),hold(body));
 		}
 	else
 		{
-		value f = hold(abstract(sym,body->L));
-		value g = hold(abstract(sym,body->R));
+		value f = abstract(sym,body->L);
+		value g = abstract(sym,body->R);
 		value h = (f && g) ? fuse(f,g) : 0;
 		drop(f);
 		drop(g);
@@ -125,6 +134,24 @@ static value last_sym(value f)
 	return last_sym(f->L);
 	}
 
+/*TODO Provide ability to resolve symbols from within a fexl program. */
+
+static value define(
+	value x,
+	value context(const char *name, unsigned long line)
+	)
+	{
+	symbol sym = (symbol)x->R;
+	if (sym->quoted)
+		return hold(sym->name);
+	else
+		{
+		string str = (string)sym->name->R;
+		value def = context(str->data,sym->line);
+		return def ? def : hold(x);
+		}
+	}
+
 value resolve(
 	value f,
 	value context(const char *name, unsigned long line)
@@ -133,29 +160,11 @@ value resolve(
 	value x = last_sym(f);
 	if (x)
 		{
-		value g = hold(abstract(x,f));
-		value h = hold(resolve(g,context));
-		value def;
-		{
-		symbol sym = x ? (symbol)x->R : 0;
-		if (sym->quoted)
-			def = sym->name;
-		else
-			{
-			symbol sym = x ? (symbol)x->R : 0;
-			string str = (string)sym->name->R;
-			const char *name = str->data;
-			def = context(name,sym->line);
-			/*TODO figure out partial resolution within fexl code */
-			if (!def) def = x;
-			}
-		}
-		{
-		value result = app(h,def);
-		drop(h);
-		drop(g);
-		return result;
-		}
+		value g = resolve(abstract(x,f),context);
+		value y = define(x,context);
+		value h = app(g,y);
+		drop(f);
+		return h;
 		}
 	else
 		return f;
