@@ -38,6 +38,8 @@ value type_get_from_file(value f) /*TODO*/
 	return f;
 	}
 
+extern value type_eval_file(value f);
+
 static value context(const char *name, unsigned long line)
 	{
 	{
@@ -86,6 +88,7 @@ static value context(const char *name, unsigned long line)
 	if (match("gt")) return Q(type_gt);
 	if (match("parse_string")) return Q(type_parse_string);
 	if (match("parse_file")) return Q(type_parse_file);
+	if (match("eval_file")) return Q(type_eval_file);
 
 	put_to_error();
 	exit_code = 1;
@@ -134,6 +137,29 @@ static value read_program(const char *name)
 		return 0;
 		}
 	}
+
+value type_eval_file(value f)
+	{
+	if (!f->L) return f;
+	{
+	value g = 0;
+	value x = eval(hold(f->R));
+	if (is_atom(type_str,x))
+		{
+		const char *name = ((string)x->R)->data;
+		g = eval(read_program(name));
+		}
+	else if (x)
+		g = hold(bad);
+
+	drop(x);
+	return g;
+	}
+	}
+
+/*TODO Perhaps a "catch" function to evaluate something and see if it's zero,
+instead of propagating "bad".  Then have a run_error to specify out of space/
+time. */
 
 int main(int argc, char *argv[])
 	{
