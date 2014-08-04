@@ -12,7 +12,7 @@ value type_put(value f)
 	if (!f->L) return f;
 	{
 	value x = eval(hold(f->R));
-	value g;
+	value g = 0;
 	if (is_atom(type_str,x))
 		{
 		put_str((string)x->R);
@@ -23,11 +23,6 @@ value type_put(value f)
 		put_num((number)x->R);
 		g = hold(I);
 		}
-	else if (!x)
-		g = 0;
-	else
-		g = hold(bad);
-
 	drop(x);
 	return g;
 	}

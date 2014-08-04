@@ -17,8 +17,6 @@
 #include <type_str.h>
 #include <type_sym.h>
 
-int exit_code = 0;
-
 static void put_loc(unsigned long line)
 	{
 	if (line) { put(" on line "); put_ulong(line); }
@@ -65,10 +63,8 @@ static value context(const char *name, unsigned long line)
 	if (match("slice")) return Q(type_slice);
 	if (match("is_num")) return Q(type_is_num);
 	if (match("is_str")) return Q(type_is_str);
-	if (match("is_bad")) return Q(type_is_bad);
 	if (match("str_num")) return Q(type_str_num);
 	if (match("num_str")) return Q(type_num_str);
-	if (match("bad")) return hold(bad);
 	if (match(".")) return Q(type_concat);
 	if (match("length")) return Q(type_length);
 	if (match("T")) return hold(C);
@@ -76,6 +72,7 @@ static value context(const char *name, unsigned long line)
 	if (match("I")) return hold(I);
 	if (match("later")) return Q(type_later);
 	if (match("once")) return Q(type_once);
+	if (match("catch")) return Q(type_catch);
 	/*TODO get_from_file */
 	/*TODO get_from_input */
 	/*TODO get_from_string */
@@ -91,17 +88,9 @@ static value context(const char *name, unsigned long line)
 	if (match("eval_file")) return Q(type_eval_file);
 
 	put_to_error();
-	exit_code = 1;
-	put("Undefined symbol "); put(name); put_loc(line);
+	error_code = "Undefined symbol ";
+	put(error_code); put(name); put_loc(line);
 	return 0;
-	}
-
-static void report_error(void)
-	{
-	if (!error_code) return;
-	put_to_error();
-	put(error_code); put_loc(error_line);
-	exit_code = 1;
 	}
 
 /*TODO note that this works and is cool:
@@ -133,7 +122,11 @@ static value read_program(const char *name)
 		return resolve(exp,context);
 	else
 		{
-		report_error();
+		if (error_code)
+			{
+			put_to_error();
+			put(error_code); put_loc(error_line);
+			}
 		return 0;
 		}
 	}
@@ -149,17 +142,10 @@ value type_eval_file(value f)
 		const char *name = ((string)x->R)->data;
 		g = eval(read_program(name));
 		}
-	else if (x)
-		g = hold(bad);
-
 	drop(x);
 	return g;
 	}
 	}
-
-/*TODO Perhaps a "catch" function to evaluate something and see if it's zero,
-instead of propagating "bad".  Then have a run_error to specify out of space/
-time. */
 
 int main(int argc, char *argv[])
 	{
@@ -167,17 +153,15 @@ int main(int argc, char *argv[])
 	{
 	const char *name = argc > 1 ? argv[1] : "";
 	value f = eval(read_program(name));
-	if (exit_code == 0)
+	if (!f && !error_code)
 		{
-		if (f == 0)
-			error_code = "The program used too much space or time.";
-		else if (f == bad)
-			error_code = "The program used a data type incorrectly.";
-		report_error();
+		error_code = "The program used a data type incorrectly.";
+		put_to_error();
+		put(error_code); nl();
 		}
 	drop(f);
 	}
 	end_basic();
 	end_value();
-	return exit_code;
+	return (error_code ? 1 : 0);
 	}

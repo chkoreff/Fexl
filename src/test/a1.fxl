@@ -1,16 +1,18 @@
 #
-\show=(\x say; is_bad x ":bad" x)
+\show=(\x catch x say; say ":bad")
 \bool=(\x x "T" "F")
 
 \div=(later; say "==")
 
 \show_data=
 (\x
-\x=x
-is_str x (put "str " put x nl);
-is_num x (put "num " put x nl);
-is_bad x (say "bad");
-say "other"
+catch x
+	(\x
+	is_str x (put "str " put x nl);
+	is_num x (put "num " put x nl);
+	say "other"
+	)
+	(say "bad")
 )
 
 (
@@ -66,7 +68,6 @@ div
 
 show_data (num_str; / (+ 1 (sqrt 5)) 2)
 show_data (str_num; . "+"; . "1." "61803398874989")
-show_data bad
 show_data (I I)
 show_data (str_num (I 5.8))
 show_data (str_num (I T))
@@ -81,17 +82,8 @@ show_data (length F)
 div
 show (bool; is_num; str_num "-4.6")
 show (bool; is_num; str_num "-4.6x")
-show (bool; is_bad; str_num "-4.6")
-show (bool; is_bad; str_num "-4.6x")
-
-div
-show (bool; is_bad I)
-show (bool; is_bad 3)
-show (bool; is_bad bad)
-show (bool; is_num; str_num "-4.6")
-show (bool; is_num; str_num "-4.6x")
-show (bool; is_bad; str_num "-4.6")
-show (bool; is_bad; str_num "-4.6x")
+show (bool; catch (str_num "-4.6") (\_ T) F)
+show (bool; catch (str_num "-4.6x") (\_ T) F)
 
 div
 show (slice "abcd" 2 3)

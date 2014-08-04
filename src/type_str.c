@@ -9,7 +9,8 @@
 value type_str(value f)
 	{
 	if (f->N == 0) str_free((string)f->R);
-	return type_bad(f);
+	if (!f->L) return f;
+	return 0;
 	}
 
 value Qstr(string x)
@@ -29,11 +30,9 @@ value type_concat(value f)
 	{
 	value x = eval(hold(f->L->R));
 	value y = eval(hold(f->R));
-	value g;
+	value g = 0;
 	if (is_atom(type_str,x) && is_atom(type_str,y))
 		g = Qstr(str_concat((string)x->R,(string)y->R));
-	else
-		g = hold(bad);
 	drop(x);
 	drop(y);
 	return g;
@@ -46,17 +45,15 @@ value type_length(value f)
 	if (!f->L) return f;
 	{
 	value x = eval(hold(f->R));
-	value g;
+	value g = 0;
 	if (is_atom(type_str,x))
 		g = Qnum(num_new_ulong(((string)x->R)->len));
-	else
-		g = hold(bad);
 	drop(x);
 	return g;
 	}
 	}
 
-/* (slice str pos len) returns the len bytes of str starting at pos, or bad if
+/* (slice str pos len) returns the len bytes of str starting at pos, or 0 if
 pos or len exceeds the bounds of str. */
 value type_slice(value f)
 	{
@@ -65,7 +62,7 @@ value type_slice(value f)
 	value x = eval(hold(f->L->L->R));
 	value y = eval(hold(f->L->R));
 	value z = eval(hold(f->R));
-	value g = F;
+	value g = 0;
 	if (is_atom(type_str,x) && is_atom(type_num,y) && is_atom(type_num,z))
 		{
 		double yn = *((number)y->R);
@@ -81,7 +78,6 @@ value type_slice(value f)
 				g = Qstr(str_new_data(xs->data + pos,len));
 			}
 		}
-	if (g == F) g = hold(bad);
 	drop(x);
 	drop(y);
 	drop(z);
@@ -95,14 +91,13 @@ value type_str_num(value f)
 	if (!f->L) return f;
 	{
 	value x = eval(hold(f->R));
-	value g = F;
+	value g = 0;
 	if (is_atom(type_str,x))
 		{
 		int ok;
 		number num = str0_num(((string)x->R)->data,&ok);
 		if (ok) g = Qnum(num);
 		}
-	if (g == F) g = hold(bad);
 	drop(x);
 	return g;
 	}

@@ -25,8 +25,12 @@ of machine word size.  Here is the recommended cost schedule:
 */
 void *new_memory(unsigned long num_bytes, unsigned long num_words)
 	{
-	if (num_words > max_words - cur_words) return 0;
-	if (num_bytes == 0) return 0;
+	if (num_bytes == 0) die("NEW0");
+	if (num_words > max_words - cur_words)
+		{
+		out_of_memory();
+		return 0;
+		}
 
 	{
 	void *data = malloc(num_bytes);

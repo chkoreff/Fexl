@@ -17,6 +17,7 @@ extern value D(type T, void *x);
 extern value apply(value x, value y);
 extern value A(value x, value y);
 extern int is_atom(type t, value x);
+extern void out_of_time(void);
 extern unsigned long remain_depth;
 extern unsigned long remain_steps;
 extern value eval(value f);

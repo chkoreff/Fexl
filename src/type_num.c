@@ -9,7 +9,8 @@
 value type_num(value f)
 	{
 	if (f->N == 0) num_free((number)f->R);
-	return type_bad(f);
+	if (!f->L) return f;
+	return 0;
 	}
 
 value Qnum(number x)
@@ -32,11 +33,9 @@ value type_num_str(value f)
 	if (!f->L) return f;
 	{
 	value x = eval(hold(f->R));
-	value g;
+	value g = 0;
 	if (is_atom(type_num,x))
 		g = Qstr(num_str((number)x->R));
-	else
-		g = hold(bad);
 	drop(x);
 	return g;
 	}

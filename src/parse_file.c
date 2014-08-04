@@ -28,7 +28,7 @@ value type_parse_file(value f)
 	if (!f->L || !f->L->L || !f->L->L->L) return f;
 	{
 	value x = eval(hold(f->L->L->R));
-	value g;
+	value g = 0;
 	if (is_atom(type_str,x))
 		{
 		FILE *save_source = source;
@@ -41,8 +41,6 @@ value type_parse_file(value f)
 		source = save_source;
 		getd = save_getd;
 		}
-	else
-		g = hold(bad);
 	drop(x);
 	return g;
 	}

@@ -43,7 +43,6 @@ T
 ==
 str 1.61803398874989
 num 1.61803398874989
-bad
 other
 bad
 bad
@@ -57,16 +56,8 @@ bad
 ==
 T
 F
-F
-T
-==
-F
-F
-T
 T
 F
-F
-T
 ==
 :bad
 cd

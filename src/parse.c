@@ -3,6 +3,7 @@
 #include <basic.h>
 #include <buffer.h>
 #include <ctype.h>
+#include <die.h>
 #include <input.h>
 #include <num.h>
 #include <parse.h>
@@ -38,13 +39,18 @@ if it had reached end of file.
 
 static int ch; /* current character */
 static unsigned long source_line;  /* current line number */
-
-const char *error_code;
 unsigned long error_line;
 
 static void skip(void)
 	{
-	if (remain_steps) remain_steps--; else { ch = -1; return; }
+	if (remain_steps)
+		remain_steps--;
+	else
+		{
+		ch = -1;
+		out_of_time();
+		return;
+		}
 	ch = getd();
 	if (ch == '\n')
 		source_line++;
@@ -340,7 +346,14 @@ static value parse_factor(void)
 static value parse_exp(void)
 	{
 	value exp = hold(I);
-	if (remain_depth) remain_depth--; else return 0;
+	if (!remain_depth)
+		{
+		out_of_memory();
+		drop(exp);
+		return 0;
+		}
+
+	remain_depth--;
 	while (1)
 		{
 		value factor = parse_factor();
@@ -361,11 +374,16 @@ value parse_source()
 	if (getd)
 		{
 		value exp = parse_exp();
-		if (ch != -1 && exp)
+		if (exp)
 			{
-			drop(exp);
-			syntax_error("Extraneous input", source_line);
-			exp = 0;
+			if (ch != -1)
+				syntax_error("Extraneous input", source_line);
+
+			if (error_code)
+				{
+				drop(exp);
+				exp = 0;
+				}
 			}
 		return exp;
 		}

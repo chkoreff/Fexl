@@ -138,6 +138,11 @@ int is_atom(type t, value x)
 	return x && x->T == t && x->L == 0;
 	}
 
+void out_of_time(void)
+	{
+	error_code = "The program ran too long.";
+	}
+
 /* Reduce the value to its normal form if possible within current limits. */
 
 unsigned long remain_depth = 50000;
@@ -145,8 +150,10 @@ unsigned long remain_steps = 100000000;
 
 value eval(value f)
 	{
-	if (!remain_depth || !f)
+	if (!f) return 0;
+	if (!remain_depth)
 		{
+		out_of_memory();
 		drop(f);
 		return 0;
 		}
@@ -160,7 +167,10 @@ value eval(value f)
 			g = f->T(f);
 			}
 		else
+			{
+			out_of_time();
 			g = 0;
+			}
 
 		if (g == f)
 			break;

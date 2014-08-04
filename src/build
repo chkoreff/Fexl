@@ -91,3 +91,6 @@ lib_fexl=$objects
 objects=""
 compile fexl
 link fexl $objects $lib_fexl
+
+# Only used for development but we make sure it compiles anyway.
+compile test/show

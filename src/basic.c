@@ -93,11 +93,22 @@ value type_once(value f)
 	return f;
 	}
 
-/* (bad x) = bad */
-value type_bad(value f)
+/* (catch x ok err) = (ok x) if x evaluates successfully, otherwise err. */
+value type_catch(value f)
 	{
-	if (!f->L) return f;
-	return hold(bad);
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
+	{
+	value g = 0;
+	value x = eval(hold(f->L->L->R));
+	if (x)
+		g = apply(hold(f->L->R),x);
+	else
+		{
+		g = hold(f->R);
+		drop(x);
+		}
+	return g;
+	}
 	}
 
 value Qboolean(int x)
@@ -116,11 +127,6 @@ value Qis_type(type t, value f)
 	}
 	}
 
-value type_is_bad(value f)
-	{
-	return Qis_type(type_bad,f);
-	}
-
 value C;
 value S;
 value I;
@@ -129,7 +135,6 @@ value R;
 value L;
 value Y;
 value Qeval;
-value bad;
 
 void beg_basic(void)
 	{
@@ -141,7 +146,6 @@ void beg_basic(void)
 	L = Q(type_L);
 	Y = Q(type_Y);
 	Qeval = Q(type_eval);
-	bad = Q(type_bad);
 	}
 
 void end_basic(void)
@@ -154,5 +158,4 @@ void end_basic(void)
 	drop(L);
 	drop(Y);
 	drop(Qeval);
-	drop(bad);
 	}
