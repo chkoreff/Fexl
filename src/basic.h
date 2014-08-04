@@ -6,6 +6,8 @@ extern value type_R(value f);
 extern value type_L(value f);
 extern value type_Y(value f);
 extern value type_eval(value f);
+extern value type_later(value f);
+extern value type_once(value f);
 extern value type_bad(value f);
 extern value Qboolean(int x);
 extern value Qis_type(type t, value f);

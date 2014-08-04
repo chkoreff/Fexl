@@ -56,6 +56,6 @@ static string get_utf8(void)
 
 value type_get(value f)
 	{
-	if (!f->L) return f;
-	return A(hold(f->R),Qstr(get_utf8()));
+	(void)f;
+	return Qstr(get_utf8());
 	}

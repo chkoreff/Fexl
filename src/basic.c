@@ -23,6 +23,18 @@ value type_I(value f)
 	return hold(f->R);
 	}
 
+/* (J x) = x, except that x is evaluated and replaced on the right side. */
+value type_J(value f)
+	{
+	if (!f->L) return f;
+	{
+	value x = eval(hold(f->R));
+	drop(f->R);
+	f->R = hold(x);
+	return x;
+	}
+	}
+
 /* F x = I. In other words, F x y = y. */
 value type_F(value f)
 	{
@@ -59,6 +71,26 @@ value type_eval(value f)
 	value x = eval(hold(f->L->R));
 	return apply(hold(f->R),x);
 	}
+	}
+
+/* (later x) = x, except that x is evaluated only if it's called later. */
+value type_later(value f)
+	{
+	if (!f->L) return f;
+	drop(f->L);
+	f->L = hold(I);
+	f->T = type_I;
+	return f;
+	}
+
+/* (once x) = x, except that x is evaluated only once. */
+value type_once(value f)
+	{
+	if (!f->L) return f;
+	drop(f->L);
+	f->L = Q(type_J);
+	f->T = type_J;
+	return f;
 	}
 
 /* (bad x) = bad */

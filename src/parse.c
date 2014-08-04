@@ -274,17 +274,10 @@ static value parse_lambda(unsigned long first_line)
 
 	{
 	/* Parse the definition of the symbol if we see an '=' char. */
-	unsigned short count_eq = 0;
 	value def = F;
 	if (ch == '=')
 		{
-		count_eq++;
 		skip();
-		if (ch == '=')
-			{
-			count_eq++;
-			skip();
-			}
 		skip_filler();
 		def = parse_term();
 		if (def == F)
@@ -298,12 +291,10 @@ static value parse_lambda(unsigned long first_line)
 	{
 	/* Parse the body of the function and apply the definition if any. */
 	value body = lam(sym,parse_exp());
-	if (count_eq == 0)
-		return body; /* no def */
-	else if (count_eq == 1)
-		return app(app(hold(Qeval),def),body); /* eager */
+	if (def == F)
+		return body;
 	else
-		return app(body,def); /* lazy */
+		return app(app(hold(Qeval),def),body);
 	}
 	}
 	}

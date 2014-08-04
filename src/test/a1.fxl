@@ -2,7 +2,7 @@
 \show=(\x say; is_bad x ":bad" x)
 \bool=(\x x "T" "F")
 
-\div==(say "==")
+\div=(later; say "==")
 
 \show_data=
 (\x
@@ -14,17 +14,17 @@ say "other"
 )
 
 (
-\ping==(say "ping")
+\ping=(later; say "ping")
 div
 ping
 div
 I ping
 
 div
-\talk==ping
-\talk==(talk talk talk)
-\talk==(talk talk)
-\talk==(talk talk)
+\talk=(later; ping)
+\talk=(later; talk talk talk)
+\talk=(later; talk talk)
+\talk=(later; talk talk)
 talk
 )
 
@@ -228,5 +228,54 @@ nl
 
 try "missing.fxl"
 try "test/a2.fxl"
-try "test/utf8.fxl"
+)
+
+# Test delayed and single evaluation.
+div
+\x=
+	(
+	once;
+	put "(CALC)"
+	* 5 6
+	)
+
+\show_x=
+	(
+	later;
+	put "x = " say x
+	)
+
+say "["
+show_x
+show_x
+show_x
+show_x
+say "]"
+
+# We can handle UTF-8 characters.
+(
+div
+
+\f = "hej
+åabcüdef
+ghij
+üä
+1≠0
+"
+
+\åabcüdef = "hej åabcüdef"
+\ghij = "hej ghij"
+\üä = "hej üä"
+\1≠0 = "hej 1≠0"
+
+put "f = "; say f
+put "åabcüdef = "; say åabcüdef ;
+put "ghij = "; say ghij ;
+put "üä = "; say  üä ;
+put "1≠0 = "; say 1≠0 ;
+
+\"vegetable"="grönsak"
+\"dessert"="efterrätt"
+put "vegetable "; say "vegetable";
+put "dessert "; say "dessert";
 )

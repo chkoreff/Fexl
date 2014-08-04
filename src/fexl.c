@@ -72,6 +72,8 @@ static value context(const char *name, unsigned long line)
 	if (match("T")) return hold(C);
 	if (match("F")) return hold(F);
 	if (match("I")) return hold(I);
+	if (match("later")) return Q(type_later);
+	if (match("once")) return Q(type_once);
 	/*TODO get_from_file */
 	/*TODO get_from_input */
 	/*TODO get_from_string */
