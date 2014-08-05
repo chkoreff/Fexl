@@ -99,6 +99,13 @@ a value on the left side to a value on the right side.
 The initial value is fully resolved and contains no symbols, so the interpreter
 does not have to do any symbol lookups or bindings during evaluation.
 
+Credits
+-------
+
+"On the Building Blocks of Mathematical Logic", Moses Schönfinkel, 1924
+
+"Typed Representation of Objects by Functions", Jørgen Steensgaard-Madsen, 1989
+
 License
 -------
 This code is copyright 2011 by Patrick Chkoreff (pc@fexl.com).

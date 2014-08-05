@@ -59,3 +59,16 @@ value type_get(value f)
 	(void)f;
 	return Qstr(get_utf8());
 	}
+
+/* TODO get_from_file get_from_input get_from_string get_from_source */
+
+/*TODO note that this works and is cool:
+~END
+get \ch
+put "ch = " put ch nl
+\\X
+END
+
+Using get_from_source, we can make a version of that which reads *only* from
+the source file, whether it's stdin or not.
+*/

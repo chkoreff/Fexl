@@ -30,15 +30,8 @@ static int match(const char *other)
 	return strcmp(curr_name,other) == 0;
 	}
 
-value type_get_from_file(value f) /*TODO*/
-	{
-	if (!f->L || !f->L->L) return f;
-	return f;
-	}
-
 extern value type_eval_file(value f);
 
-/* TODO get_from_file get_from_input get_from_string get_from_source */
 static value context(const char *name, unsigned long line)
 	{
 	{
@@ -62,7 +55,6 @@ static value context(const char *name, unsigned long line)
 	if (match("F")) return hold(F);
 	if (match("ge")) return Q(type_ge);
 	if (match("get")) return Q(type_get);
-	if (match("get_from_file")) return Q(type_get_from_file);
 	if (match("gt")) return Q(type_gt);
 	if (match("I")) return hold(I);
 	if (match("is_num")) return Q(type_is_num);
@@ -94,24 +86,13 @@ static value context(const char *name, unsigned long line)
 	return 0;
 	}
 
-/*TODO note that this works and is cool:
-~END
-get \ch
-put "ch = " put ch nl
-\\X
-END
-
-Can we make a version of that which reads *only* from the source file, whether
-it's stdin or not?
-*/
-
 static value parse_file(const char *name)
 	{
 	value exp;
 	input save_getd = getd;
 	get_from_file(name);
 	exp = parse_source();
-	/*TODO we might want to keep a handle to the tail of the source file. */
+	/*TODO we'll want to keep a handle to the tail of the source file. */
 	getd = save_getd;
 	return exp;
 	}
