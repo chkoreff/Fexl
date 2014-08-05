@@ -248,3 +248,43 @@ div
 eval_file "test/utf8.fxl"
 div
 eval_file "test/beer.fxl"
+div
+
+\for=
+	(\x\y\f
+	\x=(round x)
+	\y=(round y)
+	\d=(le x y 1 -1)
+	(@\loop\x
+	f x
+	eq x y ();
+	\x=(+ x d)
+	loop x
+	)
+	x
+	)
+
+\fib=
+	(
+	(@\loop\x\y\n
+	le n 0 x;
+	\z=(+ x y)
+	\n=(- n 1)
+	loop y z n
+	)
+	0 1
+	)
+
+\try=
+	(\x\y
+	for x y \n
+	put "fib " put n put " = " say (fib n)
+	)
+
+try 0 8
+say "=="
+try 8 0
+say "=="
+try 30 30
+say "=="
+try 11.2 20.5

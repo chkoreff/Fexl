@@ -43,5 +43,5 @@ value type_num_str(value f)
 
 value type_is_num(value f)
 	{
-	return Qis_type(type_num,f);
+	return Qis_atom(type_num,f);
 	}

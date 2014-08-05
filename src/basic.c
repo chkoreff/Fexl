@@ -116,7 +116,7 @@ value Qboolean(int x)
 	return hold(x ? C : F);
 	}
 
-value Qis_type(type t, value f)
+value Qis_atom(type t, value f)
 	{
 	if (!f->L) return f;
 	{

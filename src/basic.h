@@ -10,7 +10,7 @@ extern value type_later(value f);
 extern value type_once(value f);
 extern value type_catch(value f);
 extern value Qboolean(int x);
-extern value Qis_type(type t, value f);
+extern value Qis_atom(type t, value f);
 extern value C;
 extern value S;
 extern value I;

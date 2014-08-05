@@ -38,6 +38,7 @@ value type_get_from_file(value f) /*TODO*/
 
 extern value type_eval_file(value f);
 
+/* TODO get_from_file get_from_input get_from_string get_from_source */
 static value context(const char *name, unsigned long line)
 	{
 	{
@@ -47,45 +48,45 @@ static value context(const char *name, unsigned long line)
 	}
 
 	curr_name = name;
-	if (match("say")) return Q(type_say);
-	if (match("put")) return Q(type_put);
-	if (match("nl")) return Q(type_nl);
-	if (match("@")) return hold(Y);
-	if (match("+")) return Q(type_add);
+
 	if (match("-")) return Q(type_sub);
-	if (match("*")) return Q(type_mul);
 	if (match("/")) return Q(type_div);
-	if (match("sqrt")) return Q(type_sqrt);
-	if (match("get")) return Q(type_get);
+	if (match(".")) return Q(type_concat);
+	if (match("@")) return hold(Y);
+	if (match("*")) return Q(type_mul);
+	if (match("+")) return Q(type_add);
+	if (match("abs")) return Q(type_abs);
+	if (match("catch")) return Q(type_catch);
 	if (match("eq")) return Q(type_eq);
-	if (match("put_to_error")) return Q(type_put_to_error);
+	if (match("eval_file")) return Q(type_eval_file);
+	if (match("F")) return hold(F);
+	if (match("ge")) return Q(type_ge);
+	if (match("get")) return Q(type_get);
 	if (match("get_from_file")) return Q(type_get_from_file);
-	if (match("slice")) return Q(type_slice);
+	if (match("gt")) return Q(type_gt);
+	if (match("I")) return hold(I);
 	if (match("is_num")) return Q(type_is_num);
 	if (match("is_str")) return Q(type_is_str);
-	if (match("str_num")) return Q(type_str_num);
-	if (match("num_str")) return Q(type_num_str);
-	if (match(".")) return Q(type_concat);
-	if (match("length")) return Q(type_length);
-	if (match("T")) return hold(C);
-	if (match("F")) return hold(F);
-	if (match("I")) return hold(I);
 	if (match("later")) return Q(type_later);
-	if (match("once")) return Q(type_once);
-	if (match("catch")) return Q(type_catch);
-	/*TODO get_from_file */
-	/*TODO get_from_input */
-	/*TODO get_from_string */
-	/*TODO get_from_source */
-	if (match("lt")) return Q(type_lt);
 	if (match("le")) return Q(type_le);
-	if (match("eq")) return Q(type_eq);
+	if (match("length")) return Q(type_length);
+	if (match("lt")) return Q(type_lt);
 	if (match("ne")) return Q(type_ne);
-	if (match("ge")) return Q(type_ge);
-	if (match("gt")) return Q(type_gt);
-	if (match("parse_string")) return Q(type_parse_string);
+	if (match("nl")) return Q(type_nl);
+	if (match("num_str")) return Q(type_num_str);
+	if (match("once")) return Q(type_once);
 	if (match("parse_file")) return Q(type_parse_file);
-	if (match("eval_file")) return Q(type_eval_file);
+	if (match("parse_string")) return Q(type_parse_string);
+	if (match("pow")) return Q(type_pow);
+	if (match("put")) return Q(type_put);
+	if (match("put_to_error")) return Q(type_put_to_error);
+	if (match("round")) return Q(type_round);
+	if (match("say")) return Q(type_say);
+	if (match("slice")) return Q(type_slice);
+	if (match("sqrt")) return Q(type_sqrt);
+	if (match("str_num")) return Q(type_str_num);
+	if (match("T")) return hold(C);
+	if (match("trunc")) return Q(type_trunc);
 
 	put_to_error();
 	error_code = "Undefined symbol ";
@@ -153,9 +154,10 @@ int main(int argc, char *argv[])
 	{
 	const char *name = argc > 1 ? argv[1] : "";
 	value f = eval(read_program(name));
-	if (!f && !error_code)
+	if (!f && !error_line)
 		{
-		error_code = "The program used a data type incorrectly.";
+		if (!error_code)
+			error_code = "The program used a data type incorrectly.";
 		put_to_error();
 		put(error_code); nl();
 		}

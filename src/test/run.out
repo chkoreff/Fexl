@@ -266,3 +266,37 @@ Take one down, pass it around
 Take one down, pass it around
 0 bottles of beer on the wall
 
+==
+fib 0 = 0
+fib 1 = 1
+fib 2 = 1
+fib 3 = 2
+fib 4 = 3
+fib 5 = 5
+fib 6 = 8
+fib 7 = 13
+fib 8 = 21
+==
+fib 8 = 21
+fib 7 = 13
+fib 6 = 8
+fib 5 = 5
+fib 4 = 3
+fib 3 = 2
+fib 2 = 1
+fib 1 = 1
+fib 0 = 0
+==
+fib 30 = 832040
+==
+fib 11 = 89
+fib 12 = 144
+fib 13 = 233
+fib 14 = 377
+fib 15 = 610
+fib 16 = 987
+fib 17 = 1597
+fib 18 = 2584
+fib 19 = 4181
+fib 20 = 6765
+fib 21 = 10946

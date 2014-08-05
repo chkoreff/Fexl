@@ -105,5 +105,5 @@ value type_str_num(value f)
 
 value type_is_str(value f)
 	{
-	return Qis_type(type_str,f);
+	return Qis_atom(type_str,f);
 	}
