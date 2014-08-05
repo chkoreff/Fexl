@@ -53,6 +53,12 @@ bad
 bad
 num 3
 bad
+num 42
+bad
+num -7.8
+num 0
+num -0
+num 43.8
 ==
 T
 F
@@ -63,6 +69,12 @@ F
 cd
 
 :bad
+:bad
+:bad
+bc
+abc
+:bad
+c
 :bad
 ==
 F
@@ -78,6 +90,26 @@ F
 F
 abcdABA
 AABABC
+==
+hello
+"hello"
+~(1) "hello"(1)
+~(2) ~(1) "hello"(1)(2)
+==
+"Ain't nothin' simple when you're doin' it for real." (Gus Baird)
+
+"My fathers sleep on the sunrise plains,
+And each one sleeps alone.
+Their trails may dim to the grass and rains,
+For I choose to make my own.
+I lay proud claim to their blood and name,
+But I lean on no dead kin;
+My name is mine, for the praise or scorn,
+And the world began when I was born
+And the world is mine to win. ..."
+
+  (Badger Clark, "The Westerner")
+
 ==
 parse []
 ok
@@ -300,3 +332,67 @@ fib 18 = 2584
 fib 19 = 4181
 fib 20 = 6765
 fib 21 = 10946
+==
+length is 16777216
+==
+Hello world.
+x = 42
+47
+37
+210
+8.4
+inf
+==
+T
+T
+T
+F
+T
+T
+F
+T
+T
+F
+F
+F
+F
+T
+T
+T
+F
+F
+T
+T
+F
+T
+F
+F
+T
+==
+-4.97
+210802.919995902
+4.8655
+5
+49.4600760456274
+100000000000.01
+285
+125867
+7
+-7
+8
+-8
+7
+-7
+7
+-7
+10000
+3.00000000000001
+
+a
+ab
+a
+abcdefgh
+0
+1
+3
+3

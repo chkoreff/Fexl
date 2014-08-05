@@ -33,6 +33,11 @@ static void clear_free_list(void)
 		free_memory(Q(0),sizeof(struct value),4);
 	}
 
+void beg_value(void)
+	{
+	emergency = clear_free_list;
+	}
+
 void end_value(void)
 	{
 	clear_free_list();

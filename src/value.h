@@ -9,6 +9,7 @@ struct value
 	value R;
 	};
 
+extern void beg_value(void);
 extern void end_value(void);
 extern value hold(value f);
 extern void drop(value f);

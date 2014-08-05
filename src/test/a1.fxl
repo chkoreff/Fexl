@@ -78,6 +78,12 @@ show_data (sqrt "abc")
 show_data (+ "x" (I 3) 4)
 show_data (length "abc")
 show_data (length F)
+show_data (str_num "42")
+show_data (str_num "42x")
+show_data (str_num "-7.8")
+show_data (str_num "0")
+show_data (str_num "-0")
+show_data (+ (str_num "1"); str_num; num_str; str_num "42.8")
 
 div
 show (bool; is_num; str_num "-4.6")
@@ -91,6 +97,12 @@ show (slice "abcd" 2 2)
 show (slice "abcd" 2 0)
 show (slice "abcd" -2 3)
 show (slice "abcd" 2 -3)
+show (slice "" 1 2)
+show (slice "abc" 1 2)
+show (slice "abc" 0 3)
+show (slice "abc" 0 4)
+show (slice "abc" 2 1)
+show (slice "abc" -1 2)
 
 div
 #show (length I)
@@ -114,7 +126,30 @@ say ~ABC abcdABAABC
 say ~ABCD AABABCABCD
 
 div
+# Multiple layers of quotation.
+say "hello"
+say ~(1) "hello"(1)
+say ~(2) ~(1) "hello"(1)(2)
+say ~(3) ~(2) ~(1) "hello"(1)(2)(3)
 
+div
+say ~| "Ain't nothin' simple when you're doin' it for real." (Gus Baird)|
+nl
+say ~@
+"My fathers sleep on the sunrise plains,
+And each one sleeps alone.
+Their trails may dim to the grass and rains,
+For I choose to make my own.
+I lay proud claim to their blood and name,
+But I lean on no dead kin;
+My name is mine, for the praise or scorn,
+And the world began when I was born
+And the world is mine to win. ..."
+
+  (Badger Clark, "The Westerner")
+@
+
+div
 # Test parse_string.
 (
 \try=
@@ -282,9 +317,107 @@ div
 	)
 
 try 0 8
-say "=="
+div
 try 8 0
-say "=="
+div
 try 30 30
-say "=="
+div
 try 11.2 20.5
+
+div
+(
+\x="1234567890123456"
+# Now make a string with length 16*(2^20) = 16,777,216 bytes.
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+put "length is " put (length x) nl
+)
+
+div
+\x=42
+say "Hello world."
+put "x = "; put x; nl;
+say (+ x 5)
+say (- x 5)
+say (* x 5)
+say (/ x 5)
+say (/ x 0)
+
+div
+say (lt 2 3 "T" "F")
+say (eq 2 2 "T" "F")
+say (gt 3 2 "T" "F")
+say (ge 3 4 "T" "F")
+say (ge 3 3 "T" "F")
+say (ge 3 2 "T" "F")
+say (eq "x" "y" "T" "F")
+say (eq "x" "x" "T" "F")
+say (lt "x" "y" "T" "F")
+say (lt "x" "x" "T" "F")
+say (lt "y" "x" "T" "F")
+say (lt "y" "" "T" "F")
+say (lt "" "" "T" "F")
+say (lt "" "x" "T" "F")
+say (le "" "x" "T" "F")
+say (le "x" "x" "T" "F")
+say (le "x" "w" "T" "F")
+say (ne "x" "x" "T" "F")
+say (ne "x" "y" "T" "F")
+say (ge "x" "x" "T" "F")
+say (ge "x" "y" "T" "F")
+say (ge "x" "w" "T" "F")
+say (gt "x" "x" "T" "F")
+say (gt "x" "y" "T" "F")
+say (gt "x" "w" "T" "F")
+
+div
+say (+ -9.77 4.8)
+say (- 211034.117654902 231.197659)
+say (* 1.85 2.63)
+say (round; * 1.85 2.63)
+say (/ 130.08 2.63)
+say (/ (* 2 (+ (- 100000000000.00 0.01) 0.02)) 2)
+say (285)
+say (round 125867.2)
+say (round 7.2)
+say (round -7.2)
+say (round 7.8)
+say (round -7.8)
+say (trunc 7.2)
+say (trunc -7.2)
+say (trunc 7.8)
+say (trunc -7.8)
+say (^ 10 4)
+say (^ 2.71828182845905 1.09861228866811)  # (^ e (ln 3))
+
+say (. "" "")
+say (. "" "a")
+say (. "a" "b")
+say (. "a" "")
+say (. "abcde" "fgh")
+
+say (length "")
+say (length "a")
+say (length "abc")
+say (length (. "ab" "c"))
+
+\\
+Extra stuff not parsed.

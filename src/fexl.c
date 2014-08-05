@@ -42,6 +42,7 @@ static value context(const char *name, unsigned long line)
 
 	curr_name = name;
 
+	if (match("^")) return Q(type_pow);
 	if (match("-")) return Q(type_sub);
 	if (match("/")) return Q(type_div);
 	if (match(".")) return Q(type_concat);
@@ -69,7 +70,6 @@ static value context(const char *name, unsigned long line)
 	if (match("once")) return Q(type_once);
 	if (match("parse_file")) return Q(type_parse_file);
 	if (match("parse_string")) return Q(type_parse_string);
-	if (match("pow")) return Q(type_pow);
 	if (match("put")) return Q(type_put);
 	if (match("put_to_error")) return Q(type_put_to_error);
 	if (match("round")) return Q(type_round);
@@ -131,6 +131,7 @@ value type_eval_file(value f)
 
 int main(int argc, char *argv[])
 	{
+	beg_value();
 	beg_basic();
 	{
 	const char *name = argc > 1 ? argv[1] : "";

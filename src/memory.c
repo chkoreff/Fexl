@@ -13,6 +13,8 @@ unsigned long cur_bytes = 0;
 unsigned long max_words = 8000000;
 unsigned long cur_words = 0;
 
+void (*emergency)(void);
+
 /*
 Return a new span of memory of size num_bytes and cost num_words, or 0 if not
 possible.  The cost is a portable measure of memory usage that is independent
@@ -28,8 +30,12 @@ void *new_memory(unsigned long num_bytes, unsigned long num_words)
 	if (num_bytes == 0) die("NEW0");
 	if (num_words > max_words - cur_words)
 		{
-		out_of_memory();
-		return 0;
+		if (emergency) emergency();
+		if (num_words > max_words - cur_words)
+			{
+			out_of_memory();
+			return 0;
+			}
 		}
 
 	{
