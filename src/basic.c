@@ -23,18 +23,6 @@ value type_I(value f)
 	return hold(f->R);
 	}
 
-/* (J x) = x, except that x is evaluated and replaced on the right side. */
-value type_J(value f)
-	{
-	if (!f->L) return f;
-	{
-	value x = eval(hold(f->R));
-	drop(f->R);
-	f->R = hold(x);
-	return x;
-	}
-	}
-
 /* F x = I. In other words, F x y = y. */
 value type_F(value f)
 	{
@@ -63,6 +51,27 @@ value type_Y(value f)
 	return apply(hold(f->R),hold(f));
 	}
 
+/* (pair x y A) = (A x y) */
+value type_pair(value f)
+	{
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
+	return apply(apply(hold(f->R),hold(f->L->L->R)),hold(f->L->R));
+	}
+
+/* (cons x y A) = (pair x y) */
+value type_cons(value f)
+	{
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
+	return A(A(Q(type_pair),hold(f->L->L->R)),hold(f->L->R));
+	}
+
+/* Yields a type error. */
+value type_bad(value f)
+	{
+	(void)f;
+	return 0;
+	}
+
 /* (eval x y) = (y x), except x is evalated first. */
 value type_eval(value f)
 	{
@@ -79,17 +88,7 @@ value type_later(value f)
 	if (!f->L) return f;
 	drop(f->L);
 	f->L = hold(I);
-	f->T = type_I;
-	return f;
-	}
-
-/* (once x) = x, except that x is evaluated only once. */
-value type_once(value f)
-	{
-	if (!f->L) return f;
-	drop(f->L);
-	f->L = Q(type_J);
-	f->T = type_J;
+	f->T = type_A;
 	return f;
 	}
 

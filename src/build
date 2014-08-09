@@ -82,6 +82,7 @@ compile type_input
 compile type_math
 compile type_num
 compile type_output
+compile type_rand
 compile type_str
 compile type_sym
 compile value

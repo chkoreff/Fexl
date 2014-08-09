@@ -7,6 +7,8 @@
 #include <str.h>
 #include <type_str.h>
 
+/*LATER A "cd" function which temporarily changes directory, then back. */
+
 static FILE *source;
 
 static int get(void)
@@ -20,7 +22,7 @@ void get_from_file(const char *name)
 	getd = source ? get : 0;
 	}
 
-/*TODO replace this once we have get_from_file, get_from_string, and
+/*LATER replace this once we have get_from_file, get_from_string, and
 get_from_input */
 /* parse_file name ok err */
 value type_parse_file(value f)

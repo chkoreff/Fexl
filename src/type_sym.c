@@ -134,7 +134,7 @@ static value last_sym(value f)
 	return last_sym(f->L);
 	}
 
-/*TODO Provide ability to resolve symbols from within a fexl program. */
+/*LATER Provide ability to resolve symbols from within a fexl program. */
 
 static value define(
 	value x,

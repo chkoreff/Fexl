@@ -14,6 +14,7 @@
 #include <type_math.h>
 #include <type_num.h>
 #include <type_output.h>
+#include <type_rand.h>
 #include <type_str.h>
 #include <type_sym.h>
 
@@ -50,7 +51,10 @@ static value context(const char *name, unsigned long line)
 	if (match("*")) return Q(type_mul);
 	if (match("+")) return Q(type_add);
 	if (match("abs")) return Q(type_abs);
+	if (match("bad")) return Q(type_bad);
 	if (match("catch")) return Q(type_catch);
+	if (match("cons")) return Q(type_cons);
+	if (match("cos")) return Q(type_cos);
 	if (match("eq")) return Q(type_eq);
 	if (match("eval_file")) return Q(type_eval_file);
 	if (match("F")) return hold(F);
@@ -63,17 +67,21 @@ static value context(const char *name, unsigned long line)
 	if (match("later")) return Q(type_later);
 	if (match("le")) return Q(type_le);
 	if (match("length")) return Q(type_length);
+	if (match("log")) return Q(type_log);
 	if (match("lt")) return Q(type_lt);
 	if (match("ne")) return Q(type_ne);
 	if (match("nl")) return Q(type_nl);
+	if (match("null")) return hold(C);
 	if (match("num_str")) return Q(type_num_str);
-	if (match("once")) return Q(type_once);
 	if (match("parse_file")) return Q(type_parse_file);
 	if (match("parse_string")) return Q(type_parse_string);
 	if (match("put")) return Q(type_put);
 	if (match("put_to_error")) return Q(type_put_to_error);
+	if (match("rand")) return Q(type_rand);
 	if (match("round")) return Q(type_round);
 	if (match("say")) return Q(type_say);
+	if (match("seed_rand")) return Q(type_seed_rand);
+	if (match("sin")) return Q(type_sin);
 	if (match("slice")) return Q(type_slice);
 	if (match("sqrt")) return Q(type_sqrt);
 	if (match("str_num")) return Q(type_str_num);
@@ -92,7 +100,7 @@ static value parse_file(const char *name)
 	input save_getd = getd;
 	get_from_file(name);
 	exp = parse_source();
-	/*TODO we'll want to keep a handle to the tail of the source file. */
+	/*LATER we'll want to keep a handle to the tail of the source file. */
 	getd = save_getd;
 	return exp;
 	}

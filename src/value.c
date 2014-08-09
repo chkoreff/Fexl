@@ -120,7 +120,7 @@ value apply(value x, value y)
 	return f;
 	}
 
-static value type_A(value f)
+value type_A(value f)
 	{
 	return apply(hold(f->L),hold(f->R));
 	}
@@ -152,6 +152,11 @@ void out_of_time(void)
 
 unsigned long remain_depth = 50000;
 unsigned long remain_steps = 100000000;
+
+/*LATER possibly return f instead of 0 on out_of_memory or out_of_time.  That
+could allow you to re-enter the computation later, so you could push values
+along with a small number of steps each time and thus do two or more
+evaluations concurrently. */
 
 value eval(value f)
 	{

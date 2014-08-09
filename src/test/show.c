@@ -42,7 +42,7 @@ static void do_show(value f)
 	else if (f->T == type_Y) put_ch('@');
 	else if (f->T == type_eval) put_ch('!');
 	else if (f->T == type_later) put("later");
-	else if (f->T == type_once) put("once");
+	else if (f->T == type_cons) put("cons");
 	else if (f->T == type_str)
 		{
 		put_ch('"');

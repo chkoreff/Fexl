@@ -1,0 +1,285 @@
+#
+
+\append=(@\append\xs\ys xs ys \x\xs cons x; append xs ys)
+\fold=(@\fold\fn\z\xs xs z \x\xs \z=(fn z x) fold fn z xs)
+\map=(@\map\f\xs xs null \x\xs cons (f x) (map f xs))
+\do=(@\do\xs\fn xs () \x\xs fn x; do xs fn)
+
+\list_sum=(fold + 0)
+\list_length=(fold (\n\_ + 1 n) 0)
+
+# Return the first n items of a list.
+\first=
+	(@\first\n\xs
+	le n 0 null;
+	xs null \x\xs
+	\n=(- n 1)
+	\xs=(first n xs)
+	cons x xs
+	)
+
+\pi=3.14159265358979
+\tau=(* 2 pi)
+
+# Normal distribution with mean 0 and standard deviation 1.
+\rand_normal=
+	(
+	later;
+	\r1=rand
+	\r2=rand
+	\x=(* (sqrt; * -2 (log r1)) (cos; * tau r2))
+	x
+	)
+
+\show_statistics=
+(
+\fund_list_ror
+\benchmark_list_ror
+
+# Repeat string x n times
+\repeat =
+	(@\repeat\x\n
+	le n 0 "";
+	\n=(- n 1)
+	. x (repeat x n)
+	)
+
+# Split string x into groups of three with the given separator.
+\split3 =
+	(@\split3\sep\x
+	\len=(length x)
+	le len 3 x
+	\pos=(- len 3)
+	\prefix=(slice x 0 pos)
+	\suffix=(slice x pos 3)
+	. (split3 sep prefix) (. sep suffix)
+	)
+
+# Format number x to n decimal places, with an optional separator for the
+# integer part.
+\format =
+	(\n\sep\x
+	# Get the list of all digits without the decimal point.
+	\factor=(^ 10 n)
+	\digits=(num_str; round; * factor (abs x))
+
+	# Pad 0s on the front as needed.
+	\pad=(repeat "0" (+ 1 (- n (length digits))))
+	\digits=(. pad digits)
+
+	# Extract integer and fractional part.
+	\pos=(- (length digits) n)
+	\xi=(slice digits 0 pos)
+	\xf=(slice digits pos n)
+
+	# Insert separator if desired.
+	\xi=(eq sep "" xi (split3 sep xi))
+
+	# Put a "." in front of any fractional part.
+	\xf=(eq xf "" "" (. "." xf))
+	# Determine the sign of result.
+	\sign=(lt x 0 "-" "")
+
+	\result=(. sign; . xi xf)
+	result
+	)
+
+\list_sub=
+	(@\list_sub\xs\ys
+	xs null \x\xs
+	ys null \y\ys
+	\z=(- x y)
+	cons z; list_sub xs ys
+	)
+
+\list_mean=(\xs / (list_sum xs) (list_length xs))
+
+\list_variance=
+	(\list
+	\mean=(list_mean list)
+	\diff=(map (\val - val mean) list)
+	\square_diff=(map (\val * val val) diff)
+	list_mean square_diff
+	)
+
+\list_stddev=(\list sqrt; list_variance list)
+
+# http://en.wikipedia.org/wiki/Sharpe_Ratio
+# original source http://web.stanford.edu/~wfsharpe/art/sr/sr.htm
+\list_sharpe=
+	(\list
+	\mean=(list_mean list)
+	\stddev=(list_stddev list)
+	/ mean stddev
+	)
+
+##
+
+\excess_list_ror=(list_sub fund_list_ror benchmark_list_ror)
+
+# Average Fund vs. Risk-Free Return
+\fund_mean=(list_mean fund_list_ror)
+
+# Standard Deviation of Fund vs. Risk-Free Return
+\fund_stddev=(list_stddev fund_list_ror)
+
+# Sharpe Ratio of Fund vs. Risk-Free Return
+\fund_sharpe=(list_sharpe fund_list_ror)
+
+# Standard Deviation of Fund vs. Benchmark Return
+\excess_stddev=(list_stddev excess_list_ror)
+
+# Modigliani risk-adjusted performance
+\relative_stddev=(/ excess_stddev fund_stddev)
+
+# LATER add the mean "risk-free" rate of return, which we're saying is 0 now.
+\fund_m2=(* fund_sharpe excess_stddev)
+
+# Sharpe Ratio of Fund vs. Benchmark Return
+\excess_sharpe=(list_sharpe excess_list_ror)
+
+\put_sharpe=(\sharpe put (format 4 "" sharpe))
+\put_ror=(\ror put (format 4 "" ror) put "%")
+\p=(later; say "<p>")
+
+(
+say "Average Fund vs. Risk-Free Return"
+put_ror fund_mean nl
+
+say "Standard Deviation of Fund vs. Risk-Free Return"
+put_ror fund_stddev nl
+
+say "Sharpe Ratio of Fund vs. Risk-Free Return"
+put_sharpe fund_sharpe nl
+
+say "Standard Deviation of Fund vs. Benchmark Return"
+put_ror excess_stddev nl
+
+say "Relative Standard Deviation"
+put_sharpe relative_stddev nl
+
+say "Modigliani risk-adjusted performance"
+put_ror fund_m2 nl
+
+say "Sharpe Ratio of Fund vs. Benchmark"
+put_sharpe excess_sharpe nl
+
+)
+)
+
+# Make a random Rate of Return function with given mean and stddev.
+\make_rand_ror=
+	(\pct_mean\pct_stddev
+	\mean=(/ pct_mean 100)
+	\stddev=(/ pct_stddev 100)
+
+	later;
+	\x=rand_normal
+	\factor=(+ (+ 1 mean) (* stddev x))
+	\ror=(* 100 (- factor 1))
+	ror
+	)
+
+# Return data for 200810 - 201407
+
+# S&P 500
+\benchmark_list_ror=
+(
+cons -16.5237724084178 ;
+cons -6.9561157796452 ;
+cons 0.978424485700002 ;
+cons -8.2111801242236 ;
+cons -10.7457030721342 ;
+cons 8.339651250948 ;
+cons 9.923023093072 ;
+cons 5.85688820982899 ;
+cons -0.0721674284340001 ;
+cons 7.462686567164 ;
+cons 3.69623655914 ;
+cons 3.54288183192899 ;
+cons -1.919465887753 ;
+cons 6.15826419910701 ;
+cons 1.903616872057 ;
+cons -3.6279618523252 ;
+cons 3.12181187512801 ;
+cons 6.08428967154699 ;
+cons 1.548074232957 ;
+cons -7.9437964918725 ;
+cons -5.1775738228252 ;
+cons 6.82798527091 ;
+cons -4.5006893834942 ;
+cons 8.961534495205 ;
+cons 3.823585084232 ;
+cons 0 ;
+cons 6.68185961713801 ;
+cons 2.332735196104 ;
+cons 3.473613894456 ;
+cons 0.00806972240199322 ;
+cons 2.896796578714 ;
+cons -1.1213927227102 ;
+cons -1.6892695693552 ;
+cons -2.000645369474 ;
+cons -5.4988475469213 ;
+cons -6.9425087108014 ;
+cons 10.923897781522 ;
+cons -0.4135021097046 ;
+cons 1.050758410304 ;
+cons 4.63731656184501 ;
+cons 4.33563071005001 ;
+cons 3.218373146939 ;
+cons -0.669742521208505 ;
+cons -6.0008990110878 ;
+cons 4.056746632661 ;
+cons 1.17953431372499 ;
+cons 2.50567751703299 ;
+cons 2.54043275976701 ;
+cons -1.8221101908534 ;
+cons 0.564847417839998 ;
+cons 0.897220803850995 ;
+cons 5.118565644881 ;
+cons 1.27235213204999 ;
+cons 3.796264855688 ;
+cons 1.92358021460399 ;
+cons 2.36230581589401 ;
+cons -1.33575818387059 ;
+cons 5.167482361914 ;
+cons -2.9977033724163 ;
+cons 3.16510903426801 ;
+cons 4.626162580022 ;
+cons 2.966982221196 ;
+cons 2.58997645476 ;
+cons -3.5245901639344 ;
+cons 4.55395072217499 ;
+cons 0.828863968796001 ;
+cons 0.693101225016002 ;
+cons 2.321114134785 ;
+cons 2.06508135168999 ;
+cons 0.827713059473001 ;
+null
+)
+
+\rand_ror=(make_rand_ror 1.4 6.0)
+\list_rand_ror=(later; @\loop \x=rand_ror cons x; loop)
+
+seed_rand 0.1964
+\len=(list_length benchmark_list_ror)
+\fund_list_ror=(first len list_rand_ror)
+
+\show_returns=
+	(
+	\xs\ys
+	say "Returns (Fund vs. Benchmark)"
+	say "["
+	(
+	@\loop\xs\ys
+	xs () \x\xs
+	ys () \y\ys
+	put x put " " put y nl
+	loop xs ys
+	) xs ys
+	say "]"
+	)
+show_returns fund_list_ror benchmark_list_ror
+show_statistics
+	fund_list_ror
+	benchmark_list_ror

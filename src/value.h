@@ -16,6 +16,7 @@ extern void drop(value f);
 extern value Q(type T);
 extern value D(type T, void *x);
 extern value apply(value x, value y);
+extern value type_A(value f);
 extern value A(value x, value y);
 extern int is_atom(type t, value x);
 extern void out_of_time(void);

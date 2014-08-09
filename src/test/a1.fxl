@@ -45,6 +45,7 @@ show (I (I "abc") "de")
 show (. (I "abc") "de")
 show (. ((\x\y x) "abc") "de")
 show (. (I I "abc") (. "" "de"))
+show bad
 
 show 3.14159265358979
 show 42
@@ -259,15 +260,10 @@ try "test/a2.fxl"
 
 # Test delayed and single evaluation.
 div
-\x=
-	(
-	once;
-	put "(CALC)"
-	* 5 6
-	)
-
 \show_x=
 	(
+	say "(CALC)"
+	\x=(* 5 6)
 	later;
 	put "x = " say x
 	)
@@ -418,6 +414,47 @@ say (length "")
 say (length "a")
 say (length "abc")
 say (length (. "ab" "c"))
+
+div
+# Do fn for each item in list xs.
+\do=(@\do\xs\fn xs () \x\xs fn x; do xs fn)
+# Return the first n items of a list.
+\first=
+	(@\first\n\xs
+	le n 0 null;
+	xs null \x\xs
+	\n=(- n 1)
+	\xs=(first n xs)
+	cons x xs
+	)
+
+\show_list=(\xs say "[" do xs say say "]")
+
+# Testing with some "later" sprinkled in to ensure that type_later sets the
+# value type to type_A, not type_I.
+show_list (later null)
+show_list (cons 1; cons 2; null)
+show_list (cons 1; cons 2; later null)
+
+# Test rand.
+
+# An infinite list of pseudo-random numbers.
+\list_rand=(later; @\loop \x=rand cons x; loop)
+
+\demo_rand=
+	(
+	later;
+	div
+	\list=(first 5 list_rand)
+	show_list list
+	show_list list
+	)
+seed_rand 0.1964
+demo_rand
+demo_rand
+
+div
+eval_file "test/stats.fxl"
 
 \\
 Extra stuff not parsed.

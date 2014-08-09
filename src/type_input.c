@@ -60,9 +60,9 @@ value type_get(value f)
 	return Qstr(get_utf8());
 	}
 
-/* TODO get_from_file get_from_input get_from_string get_from_source */
+/* LATER get_from_file get_from_input get_from_string get_from_source */
 
-/*TODO note that this works and is cool:
+/*LATER note that this works and is cool:
 ~END
 get \ch
 put "ch = " put ch nl
