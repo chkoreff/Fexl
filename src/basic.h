@@ -20,5 +20,6 @@ extern value R;
 extern value L;
 extern value Y;
 extern value Qeval;
+extern value Qcons;
 extern void beg_basic(void);
 extern void end_basic(void);

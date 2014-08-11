@@ -15,12 +15,17 @@
 Grammar:
 [
 exp    => empty
-exp    => \ sym def exp
-exp    => ; exp
 exp    => term exp
+exp    => ; exp
+exp    => \ sym def exp
 
 term   => ( exp )
+term   => [ list ]
 term   => sym
+
+list   => empty
+list   => term list
+list   => ; exp
 
 def    => empty
 def    => = term
@@ -122,6 +127,7 @@ static value parse_name(void)
 		if (at_white()
 			|| ch == '\\'
 			|| ch == '(' || ch == ')'
+			|| ch == '[' || ch == ']'
 			|| ch == ';'
 			|| ch == '"'
 			|| ch == '~'
@@ -238,9 +244,24 @@ static value parse_symbol(void)
 		return parse_name();
 	}
 
+static value parse_term(void);
 static value parse_exp(void);
 
-static value parse_term()
+static value parse_list(void)
+	{
+	value term;
+	skip_filler();
+	if (ch == ';')
+		{
+		skip();
+		return parse_exp();
+		}
+	term = parse_term();
+	if (term == F) return hold(C);
+	return app(app(hold(Qcons),term),parse_list());
+	}
+
+static value parse_term(void)
 	{
 	unsigned long first_line = source_line;
 	if (ch == '(') /* parenthesized expression */
@@ -253,6 +274,21 @@ static value parse_term()
 			{
 			drop(exp);
 			syntax_error("Unclosed parenthesis", first_line);
+			return 0;
+			}
+		skip();
+		return exp;
+		}
+	else if (ch == '[') /* list */
+		{
+		value exp;
+		skip();
+		exp = parse_list();
+		if (!exp) return 0;
+		if (ch != ']')
+			{
+			drop(exp);
+			syntax_error("Unclosed bracket", first_line);
 			return 0;
 			}
 		skip();
@@ -366,7 +402,7 @@ static value parse_exp(void)
 	}
 
 /* Parse the source stream. */
-value parse_source()
+value parse_source(void)
 	{
 	ch = 0;
 	source_line = 1;

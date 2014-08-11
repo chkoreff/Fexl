@@ -421,11 +421,11 @@ div
 # Return the first n items of a list.
 \first=
 	(@\first\n\xs
-	le n 0 null;
-	xs null \x\xs
+	le n 0 [];
+	xs [] \x\xs
 	\n=(- n 1)
 	\xs=(first n xs)
-	cons x xs
+	[x;xs]
 	)
 
 \show_list=(\xs say "[" do xs say say "]")
@@ -433,13 +433,13 @@ div
 # Testing with some "later" sprinkled in to ensure that type_later sets the
 # value type to type_A, not type_I.
 show_list (later null)
-show_list (cons 1; cons 2; null)
+show_list [1 2]
 show_list (cons 1; cons 2; later null)
 
 # Test rand.
 
 # An infinite list of pseudo-random numbers.
-\list_rand=(later; @\loop \x=rand cons x; loop)
+\list_rand=(later; @\loop \x=rand [x;loop])
 
 \demo_rand=
 	(

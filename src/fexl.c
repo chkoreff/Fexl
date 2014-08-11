@@ -53,7 +53,7 @@ static value context(const char *name, unsigned long line)
 	if (match("abs")) return Q(type_abs);
 	if (match("bad")) return Q(type_bad);
 	if (match("catch")) return Q(type_catch);
-	if (match("cons")) return Q(type_cons);
+	if (match("cons")) return hold(Qcons);
 	if (match("cos")) return Q(type_cos);
 	if (match("eq")) return Q(type_eq);
 	if (match("eval_file")) return Q(type_eval_file);

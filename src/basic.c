@@ -134,6 +134,7 @@ value R;
 value L;
 value Y;
 value Qeval;
+value Qcons;
 
 void beg_basic(void)
 	{
@@ -145,6 +146,7 @@ void beg_basic(void)
 	L = Q(type_L);
 	Y = Q(type_Y);
 	Qeval = Q(type_eval);
+	Qcons = Q(type_cons);
 	}
 
 void end_basic(void)
@@ -157,4 +159,5 @@ void end_basic(void)
 	drop(L);
 	drop(Y);
 	drop(Qeval);
+	drop(Qcons);
 	}
