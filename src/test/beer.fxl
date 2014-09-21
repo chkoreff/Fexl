@@ -3,8 +3,8 @@
 \sing_count=(\n put n put " " put "bottle" put (suffix n) put " of beer")
 \sing_line1=(\n sing_count n put " on the wall" nl)
 \sing_line2=(\n sing_count n nl)
-\sing=
-	(@\loop\n
+\sing==
+	(\n
 	le n 0 ();
 	sing_line1 n
 	sing_line2 n
@@ -12,6 +12,6 @@
 	\n=(- n 1)
 	sing_line1 n
 	nl
-	loop n
+	sing n
 	)
 sing 3

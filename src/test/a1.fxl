@@ -417,10 +417,10 @@ say (length (. "ab" "c"))
 
 div
 # Do fn for each item in list xs.
-\do=(@\do\xs\fn xs () \x\xs fn x; do xs fn)
+\do==(\xs\fn xs () \x\xs fn x; do xs fn)
 # Return the first n items of a list.
-\first=
-	(@\first\n\xs
+\first==
+	(\n\xs
 	le n 0 [];
 	xs [] \x\xs
 	\n=(- n 1)

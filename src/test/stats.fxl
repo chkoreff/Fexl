@@ -1,16 +1,16 @@
 #
 
-\append=(@\append\xs\ys xs ys \x\xs [x; append xs ys])
-\fold=(@\fold\fn\z\xs xs z \x\xs \z=(fn z x) fold fn z xs)
-\map=(@\map\f\xs xs [] \x\xs [(f x); map f xs])
-\do=(@\do\xs\fn xs () \x\xs fn x; do xs fn)
+\append==(\xs\ys xs ys \x\xs [x; append xs ys])
+\fold==(\fn\z\xs xs z \x\xs \z=(fn z x) fold fn z xs)
+\map==(\f\xs xs [] \x\xs [(f x); map f xs])
+\do==(\xs\fn xs () \x\xs fn x; do xs fn)
 
 \list_sum=(fold + 0)
 \list_length=(fold (\n\_ + 1 n) 0)
 
 # Return the first n items of a list.
-\first=
-	(@\first\n\xs
+\first==
+	(\n\xs
 	le n 0 [];
 	xs [] \x\xs
 	\n=(- n 1)
@@ -37,16 +37,16 @@
 \benchmark_list_ror
 
 # Repeat string x n times
-\repeat =
-	(@\repeat\x\n
+\repeat ==
+	(\x\n
 	le n 0 "";
 	\n=(- n 1)
 	. x (repeat x n)
 	)
 
 # Split string x into groups of three with the given separator.
-\split3 =
-	(@\split3\sep\x
+\split3 ==
+	(\sep\x
 	\len=(length x)
 	le len 3 x
 	\pos=(- len 3)
@@ -84,8 +84,8 @@
 	result
 	)
 
-\list_sub=
-	(@\list_sub\xs\ys
+\list_sub==
+	(\xs\ys
 	xs [] \x\xs
 	ys [] \y\ys
 	\z=(- x y)

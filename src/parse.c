@@ -317,9 +317,15 @@ static value parse_lambda(unsigned long first_line)
 	{
 	/* Parse the definition of the symbol if we see an '=' char. */
 	value def = F;
+	char is_recursive = 0;
 	if (ch == '=')
 		{
 		skip();
+		if (ch == '=')
+			{
+			is_recursive = 1;
+			skip();
+			}
 		skip_filler();
 		def = parse_term();
 		if (def == F)
@@ -329,6 +335,9 @@ static value parse_lambda(unsigned long first_line)
 			return 0;
 			}
 		}
+
+	if (is_recursive)
+		def = app(hold(Y),lam(hold(sym),def));
 
 	{
 	/* Parse the body of the function and apply the definition if any. */
