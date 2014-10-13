@@ -214,7 +214,7 @@ static value parse_tilde_string(void)
 		if (!buf) return 0;
 		}
 
-	if (ch == -1)
+	if (ch == -1 || buf == 0)
 		{
 		syntax_error("Incomplete string terminator", first_line);
 		buf_free(buf);

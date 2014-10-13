@@ -194,6 +194,7 @@ try ~@
 abcEN@
 
 try "~"
+try "~ "
 try "~EN"
 
 try "~ABC abcdABAABC"

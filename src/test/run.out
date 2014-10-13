@@ -164,6 +164,9 @@ err Unclosed string on line 2
 parse [~]
 err Incomplete string terminator on line 1
 
+parse [~ ]
+err Incomplete string terminator on line 1
+
 parse [~EN]
 err Incomplete string terminator on line 1
 
