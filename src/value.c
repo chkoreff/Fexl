@@ -22,7 +22,7 @@ I considered using the uintptr_t type mentioned in the C Reference Standard,
 but that type is designated as "optional" and thus not strictly portable.
 
 A union would do the trick, but the ISO C90 standard does not support unnamed
-unions, and using a named union is more pain that it's worth.
+unions, and using a named union is more pain than it's worth.
 */
 
 static value free_list = 0;
@@ -152,11 +152,6 @@ void out_of_time(void)
 
 unsigned long remain_depth = 50000;
 unsigned long remain_steps = 100000000;
-
-/*LATER possibly return f instead of 0 on out_of_memory or out_of_time.  That
-could allow you to re-enter the computation later, so you could push values
-along with a small number of steps each time and thus do two or more
-evaluations concurrently. */
 
 value eval(value f)
 	{
