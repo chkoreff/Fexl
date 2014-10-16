@@ -5,21 +5,22 @@
 #include <type_num.h>
 #include <type_rand.h>
 
-/* Seed rand with an arbitrary number. */
+/* Seed rand with an arbitrary number between 0 and 1. */
 value type_seed_rand(value f)
 	{
 	if (!f->L) return f;
 	{
 	value x = eval(hold(f->R));
-	value g = 0;
-	if (is_atom(type_num,x))
+	if (x->T == type_num)
 		{
 		double seed = *((number)x->R) * (double)RAND_MAX;
 		srand(seed);
-		g = hold(I);
+		f = hold(I);
 		}
+	else
+		f = Q(type_void);
 	drop(x);
-	return g;
+	return f;
 	}
 	}
 

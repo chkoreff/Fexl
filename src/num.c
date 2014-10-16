@@ -14,13 +14,12 @@ extern double pow(double,double);
 
 void num_free(number x)
 	{
-	free_memory(x,sizeof(double),1);
+	free_memory(x,sizeof(double));
 	}
 
 number num_new_double(double val)
 	{
-	number p = new_memory(sizeof(double),1);
-	if (!p) return 0;
+	number p = new_memory(sizeof(double));
 	*p = val;
 	return p;
 	}

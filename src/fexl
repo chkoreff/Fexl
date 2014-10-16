@@ -1,2 +1,11 @@
 #!/bin/sh
-./build && ../bin/fexl "$@"
+./build || exit
+
+# Limit stack and virtual memory in 1K blocks.
+ulimit -Ss 10000
+ulimit -Sv 200000
+
+# Limit CPU time in seconds.
+ulimit -St 5
+
+../bin/fexl "$@"

@@ -1,2 +1,138 @@
 #!/bin/sh
-./fexl test/a1.fxl
+./build || exit
+
+echo "== run_file test/a1.fxl"
+../bin/fexl test/a1.fxl
+echo "exit $?"
+
+echo "== run_file test/a2.fxl"
+(
+cat <<"EOF"
+abc
+defg
+
+hij
+EOF
+) \
+| ../bin/fexl test/a2.fxl
+echo "exit $?"
+
+echo "== test stderr"
+(
+cat <<"EOF"
+say "hello"
+put_to_error
+	(
+	\x=(+ 4 3)
+	say "This goes to stderr."
+	put "x = " put x nl
+	)
+say "bye"
+EOF
+) \
+| ../bin/fexl 2>&1 >/dev/null
+echo "exit $?"
+
+echo "== test parse errors"
+
+run_text()
+	{
+	echo "run_text [$text]"
+	echo -n "$text" | ../bin/fexl 2>&1
+	echo "exit $?"
+	}
+
+text="\""
+run_text
+
+text="
+\"a
+b"
+run_text
+
+text="~| a"
+run_text
+
+text="
+
+~END
+abcEN"
+run_text
+
+text="~"
+run_text
+
+text="~
+"
+run_text
+
+text="~EN"
+run_text
+
+text=" = y"
+run_text
+
+text="ab cd e\\"
+run_text
+
+text="\\x="
+run_text
+
+text="(
+a
+(b"
+run_text
+
+text="(
+a
+(b)"
+run_text
+
+text="(ab cd e)
+)"
+run_text
+
+text="x
+y
+	(z z y)
+"
+run_text
+
+echo "== test missing file"
+../bin/fexl 2>&1 missing.fxl
+echo "exit $?"
+
+# Here we test setting ulimit to terminate misbehaving programs promptly.
+test_misbehavior=false
+# To enable the test, unpound the next line.
+#test_misbehavior=true
+
+if $test_misbehavior; then
+
+echo "== test limit time"
+(
+ulimit -St 1
+text="@ I"
+run_text
+# CPU time limit exceeded
+) 2>&1
+
+echo "== test limit stack"
+(
+ulimit -Ss 1000
+text="@ @"
+run_text
+# Stack overflow (Segmentation fault)
+) 2>&1
+
+echo "== test limit memory"
+(
+ulimit -Sv 200000
+text="\S=(\x\y\z x z; y z) @ S S S"
+run_text
+# The program ran out of memory.
+) 2>&1
+
+fi
+
+exit 0

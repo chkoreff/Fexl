@@ -3,8 +3,6 @@
 #include <basic.h>
 #include <num.h>
 #include <output.h>
-#include <parse_file.h>
-#include <parse_string.h>
 #include <test/show.h>
 #include <type_cmp.h>
 #include <type_math.h>
@@ -13,29 +11,20 @@
 #include <type_str.h>
 #include <type_sym.h>
 
-static void do_show(value f)
+void show(value f)
 	{
-	if (!remain_steps || !remain_depth)
-		{
-		put("...");
-		return;
-		}
-	remain_steps--;
-	remain_depth--;
-
-	if (!f)
-		put_ch('?');
-	else if (f->L)
+	if (f->L)
 		{
 		put_ch(f->T == type_sym ? '{' : '(');
-		do_show(f->L);
+		show(f->L);
 		put_ch(' ');
-		do_show(f->R);
+		show(f->R);
 		put_ch(f->T == type_sym ? '}' : ')');
 		}
 	else if (f->T == type_C) put_ch('C');
 	else if (f->T == type_S) put_ch('S');
 	else if (f->T == type_I) put_ch('I');
+	else if (f->T == type_T) put_ch('T');
 	else if (f->T == type_F) put_ch('F');
 	else if (f->T == type_R) put_ch('R');
 	else if (f->T == type_L) put_ch('L');
@@ -76,20 +65,5 @@ static void do_show(value f)
 	else if (f->T == type_put) put("put");
 	else if (f->T == type_nl) put("nl");
 	else if (f->T == type_say) put("say");
-	else if (f->T == type_parse_file) put("parse_file");
-	else if (f->T == type_parse_string) put("parse_string");
 	else put_ch('_');
-
-	remain_depth++;
-	}
-
-void show(value f)
-	{
-	unsigned long save_remain_depth = remain_depth;
-	unsigned long save_remain_steps = remain_steps;
-	remain_depth = 50;
-	remain_steps = 300;
-	do_show(f);
-	remain_depth = save_remain_depth;
-	remain_steps = save_remain_steps;
 	}

@@ -64,7 +64,7 @@ value type_get(value f)
 
 /*LATER note that this works and is cool:
 ~END
-get \ch
+\ch=get
 put "ch = " put ch nl
 \\X
 END

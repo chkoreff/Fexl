@@ -10,17 +10,12 @@ value type_str(value f)
 	{
 	if (f->N == 0) str_free((string)f->R);
 	if (!f->L) return f;
-	return 0;
+	return Q(type_void);
 	}
 
 value Qstr(string x)
 	{
-	if (!x) return 0;
-	{
-	value f = D(type_str,x);
-	if (!f) str_free(x);
-	return f;
-	}
+	return D(type_str,x);
 	}
 
 /* (. x y) is the concatenation of strings x and y. */
@@ -30,12 +25,13 @@ value type_concat(value f)
 	{
 	value x = eval(hold(f->L->R));
 	value y = eval(hold(f->R));
-	value g = 0;
-	if (is_atom(type_str,x) && is_atom(type_str,y))
-		g = Qstr(str_concat((string)x->R,(string)y->R));
+	if (x->T == type_str && y->T == type_str)
+		f = Qstr(str_concat((string)x->R,(string)y->R));
+	else
+		f = Q(type_void);
 	drop(x);
 	drop(y);
-	return g;
+	return f;
 	}
 	}
 
@@ -45,15 +41,18 @@ value type_length(value f)
 	if (!f->L) return f;
 	{
 	value x = eval(hold(f->R));
-	value g = 0;
-	if (is_atom(type_str,x))
-		g = Qnum(num_new_ulong(((string)x->R)->len));
+	if (x->T == type_str)
+		f = Qnum(num_new_ulong(((string)x->R)->len));
+	else
+		f = Q(type_void);
 	drop(x);
-	return g;
+	return f;
 	}
 	}
 
-/* (slice str pos len) returns the len bytes of str starting at pos, or 0 if
+/* LATER str_find */
+
+/* (slice str pos len) returns the len bytes of str starting at pos, or void if
 pos or len exceeds the bounds of str. */
 value type_slice(value f)
 	{
@@ -62,8 +61,8 @@ value type_slice(value f)
 	value x = eval(hold(f->L->L->R));
 	value y = eval(hold(f->L->R));
 	value z = eval(hold(f->R));
-	value g = 0;
-	if (is_atom(type_str,x) && is_atom(type_num,y) && is_atom(type_num,z))
+	f = 0;
+	if (x->T == type_str && y->T == type_num && z->T == type_num)
 		{
 		double yn = *((number)y->R);
 		double zn = *((number)z->R);
@@ -75,13 +74,14 @@ value type_slice(value f)
 			if (pos < xs->len
 				&& len <= xs->len
 				&& pos <= xs->len - len)
-				g = Qstr(str_new_data(xs->data + pos,len));
+				f = Qstr(str_new_data(xs->data + pos,len));
 			}
 		}
 	drop(x);
 	drop(y);
 	drop(z);
-	return g;
+	if (!f) f = Q(type_void);
+	return f;
 	}
 	}
 
@@ -91,15 +91,16 @@ value type_str_num(value f)
 	if (!f->L) return f;
 	{
 	value x = eval(hold(f->R));
-	value g = 0;
-	if (is_atom(type_str,x))
+	f = 0;
+	if (x->T == type_str)
 		{
-		int ok;
-		number num = str0_num(((string)x->R)->data,&ok);
-		if (ok) g = Qnum(num);
+		number n = str0_num(((string)x->R)->data);
+		if (n)
+			f = Qnum(n);
 		}
 	drop(x);
-	return g;
+	if (!f) f = Q(type_void);
+	return f;
 	}
 	}
 

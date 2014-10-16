@@ -66,17 +66,19 @@ link()
 objects=""
 compile basic
 compile buffer
+compile context
 compile convert
 compile die
+compile file_input
 compile format
 compile input
 compile memory
 compile num
 compile output
 compile parse
-compile parse_file
-compile parse_string
+compile source
 compile str
+compile str_input
 compile type_cmp
 compile type_input
 compile type_math

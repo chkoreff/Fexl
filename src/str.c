@@ -11,8 +11,7 @@ easier to call system functions that expect it.
 /* Create a string capable of holding len bytes plus trailing NUL. */
 string str_new(unsigned long len)
 	{
-	string x = new_memory(sizeof(unsigned long) + 1 + len, 1 + (len >> 3));
-	if (!x) return 0;
+	string x = new_memory(sizeof(unsigned long) + 1 + len);
 	x->len = len;
 	return x;
 	}
@@ -20,7 +19,6 @@ string str_new(unsigned long len)
 string str_new_data(const char *data, unsigned long len)
 	{
 	string x = str_new(len);
-	if (!x) return 0;
 	memcpy(x->data, data, len);
 	x->data[len] = '\000';
 	return x;
@@ -33,14 +31,13 @@ string str_new_data0(const char *data)
 
 void str_free(string x)
 	{
-	free_memory(x, sizeof(unsigned long) + 1 + x->len, 1 + (x->len >> 3));
+	free_memory(x, sizeof(unsigned long) + 1 + x->len);
 	}
 
 /* Concatenate x and y. */
 string str_concat(string x, string y)
 	{
 	string z = str_new(x->len + y->len);
-	if (!z) return 0;
 	memcpy(z->data, x->data, x->len);
 	memcpy(z->data + x->len, y->data, y->len);
 	z->data[z->len] = '\000'; /* add trailing NUL byte */

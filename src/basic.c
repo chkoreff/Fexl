@@ -23,7 +23,16 @@ value type_I(value f)
 	return hold(f->R);
 	}
 
-/* F x = I. In other words, F x y = y. */
+/* Boolean types:
+(T x y) = x
+(F x y) = y
+*/
+
+value type_T(value f)
+	{
+	return type_C(f);
+	}
+
 value type_F(value f)
 	{
 	if (!f->L) return f;
@@ -58,6 +67,8 @@ value type_pair(value f)
 	return apply(apply(hold(f->R),hold(f->L->L->R)),hold(f->L->R));
 	}
 
+/*LATER distinguish between C and null */
+
 /* (cons x y A) = (pair x y) */
 value type_cons(value f)
 	{
@@ -65,12 +76,19 @@ value type_cons(value f)
 	return A(A(Q(type_pair),hold(f->L->L->R)),hold(f->L->R));
 	}
 
-/* Yields a type error. */
-value type_bad(value f)
+/* (void x) = void */
+value type_void(value f)
 	{
-	(void)f;
-	return 0;
+	if (!f->L) return f;
+	return hold(f->L);
 	}
+
+value type_is_void(value f)
+	{
+	return Qis_atom(type_void,f);
+	}
+
+/* LATER is_good */
 
 /* (eval x y) = (y x), except x is evalated first. */
 value type_eval(value f)
@@ -92,43 +110,29 @@ value type_later(value f)
 	return f;
 	}
 
-/* (catch x ok err) = (ok x) if x evaluates successfully, otherwise err. */
-value type_catch(value f)
+value type_is_bool(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return f;
-	{
-	value g = 0;
-	value x = eval(hold(f->L->L->R));
-	if (x)
-		g = apply(hold(f->L->R),x);
-	else
-		{
-		g = hold(f->R);
-		drop(x);
-		}
-	return g;
-	}
+	if (!f->L) return f;
+	return Qboolean(f->R->T == type_T || f->R->T == type_F);
 	}
 
 value Qboolean(int x)
 	{
-	return hold(x ? C : F);
+	return hold(x ? T : F);
 	}
 
 value Qis_atom(type t, value f)
 	{
 	if (!f->L) return f;
-	{
-	value x = eval(hold(f->R));
-	value g = Qboolean(is_atom(t,x));
-	drop(x);
-	return g;
+	return Qboolean(f->R->T == t);
 	}
-	}
+
+/* LATER is_list */
 
 value C;
 value S;
 value I;
+value T;
 value F;
 value R;
 value L;
@@ -141,6 +145,7 @@ void beg_basic(void)
 	C = Q(type_C);
 	S = Q(type_S);
 	I = Q(type_I);
+	T = Q(type_T);
 	F = Q(type_F);
 	R = Q(type_R);
 	L = Q(type_L);
@@ -154,6 +159,7 @@ void end_basic(void)
 	drop(C);
 	drop(S);
 	drop(I);
+	drop(T);
 	drop(F);
 	drop(R);
 	drop(L);

@@ -9,7 +9,7 @@ void buf_free(buffer buf)
 		{
 		buffer next = buf->next;
 		str_free(buf->str);
-		free_memory(buf,sizeof(struct buffer),3);
+		free_memory(buf,sizeof(struct buffer));
 		buf = next;
 		}
 	}
@@ -17,15 +17,7 @@ void buf_free(buffer buf)
 static buffer buf_push(buffer buf, const unsigned long size)
 	{
 	string top = str_new(size);
-	buffer new = top ? new_memory(sizeof(struct buffer),3) : 0;
-
-	if (!new)
-		{
-		if (top) str_free(top);
-		if (buf) buf_free(buf);
-		return 0;
-		}
-
+	buffer new = new_memory(sizeof(struct buffer));
 	new->pos = 0;
 	new->str = top;
 	new->next = buf;
@@ -48,8 +40,6 @@ static string buf_string(buffer buf)
 	{
 	unsigned long offset = buf_length(buf);
 	string result = str_new(offset);
-	if (!result) return 0;
-
 	result->data[offset] = '\000'; /* Add trailing NUL byte. */
 
 	while (buf)
@@ -69,7 +59,6 @@ buffer buf_add(buffer buf, char ch)
 		unsigned long size = buf ? buf->pos : 16;
 		if (size < 1048576) size <<= 1;
 		buf = buf_push(buf,size);
-		if (!buf) return 0;
 		}
 
 	buf->str->data[buf->pos++] = ch;

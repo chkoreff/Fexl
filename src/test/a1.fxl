@@ -1,19 +1,15 @@
 #
-\show=(\x catch x say; say ":bad")
-\bool=(\x x "T" "F")
-
-\div=(later; say "==")
-
-\show_data=
-(\x
-catch x
+\show=
 	(\x
-	is_str x (put "str " put x nl);
-	is_num x (put "num " put x nl);
+	\x=x
+	is_str x (put "str " say x);
+	is_num x (put "num " say x);
+	is_bool x (put "bool " say x);
+	is_void x (say "void");
 	say "other"
 	)
-	(say "bad")
-)
+
+\div=(later; say "==")
 
 (
 \ping=(later; say "ping")
@@ -30,12 +26,6 @@ div
 talk
 )
 
-# LATER test eval with limits
-# limit (@ I) 6000 1000
-# limit (@ @) 1000000 54
-# limit (Y S S S) 1000000 60
-# limit (@ @) 4000000 4000000  # too deep on stack
-
 div
 show "abc"
 show (I "abc")
@@ -45,8 +35,7 @@ show (I (I "abc") "de")
 show (. (I "abc") "de")
 show (. ((\x\y x) "abc") "de")
 show (. (I I "abc") (. "" "de"))
-show bad
-
+show void
 show 3.14159265358979
 show 42
 show (length "12345")
@@ -56,41 +45,36 @@ show (slice (T (. "abcd" "efghi") I) 2 5)
 show (+ -14.87 482.73)
 show ((/ ((+ 1) (sqrt 5))) 2)
 
-show (bool; ge (I 5.9) 5.8)
-show (bool; lt 5.9 (I 5.8))
-show (bool; ge (I "ab") "a")
-show (bool; lt (I "ab") (I "a"))
-show (bool; eq (I "x") "x")
-show (bool; eq (I -7.2) -7.2)
-show (bool; lt (I 5.9) (I "ab"))
-show (bool; lt (I "ab") (I 5.9))
-show (bool; eq (I T) (I T))
+show (ge (I 5.9) 5.8)
+show (lt 5.9 (I 5.8))
+show (ge (I "ab") "a")
+show (lt (I "ab") (I "a"))
+show (eq (I "x") "x")
+show (eq (I -7.2) -7.2)
+show (lt (I 5.9) (I "ab"))
+show (lt (I "ab") (I 5.9))
+show (eq (I T) (I T))
 div
 
-show_data (num_str; / (+ 1 (sqrt 5)) 2)
-show_data (str_num; . "+"; . "1." "61803398874989")
-show_data (I I)
-show_data (str_num (I 5.8))
-show_data (str_num (I T))
-show_data (num_str 5.8)
-show_data (num_str "abc")
-show_data (sqrt 9)
-show_data (sqrt "abc")
-show_data (+ "x" (I 3) 4)
-show_data (length "abc")
-show_data (length F)
-show_data (str_num "42")
-show_data (str_num "42x")
-show_data (str_num "-7.8")
-show_data (str_num "0")
-show_data (str_num "-0")
-show_data (+ (str_num "1"); str_num; num_str; str_num "42.8")
-
-div
-show (bool; is_num; str_num "-4.6")
-show (bool; is_num; str_num "-4.6x")
-show (bool; catch (str_num "-4.6") (\_ T) F)
-show (bool; catch (str_num "-4.6x") (\_ T) F)
+show (num_str; / (+ 1 (sqrt 5)) 2)
+show (str_num; . "+"; . "1." "61803398874989")
+show (I I)
+show (str_num (I 5.8))
+show (str_num (I T))
+show (num_str 5.8)
+show (num_str "abc")
+show (sqrt 9)
+show (sqrt "abc")
+show (+ "x" (I 3) 4)
+show (sqrt "abc" 25)
+show (length "abc")
+show (length F)
+show (str_num "42")
+show (str_num "42x")
+show (str_num "-7.8")
+show (str_num "0")
+show (str_num "-0")
+show (+ (str_num "1"); str_num; num_str; str_num "42.8")
 
 div
 show (slice "abcd" 2 3)
@@ -105,35 +89,77 @@ show (slice "abc" 0 4)
 show (slice "abc" 2 1)
 show (slice "abc" -1 2)
 
+\val_is_num=(\x \x=x is_num x)
+\val_is_str=(\x \x=x is_str x)
+
 div
-#show (length I)
-show (bool; is_str I)
-show (bool; is_str 4)
-show (bool; is_str "x")
-show (bool; is_str; . "x" "y")
-show (bool; is_num "x")
-show (bool; is_num 4.2)
-show (bool; is_num (* 3.9 4.2))
-show (bool; is_num; str_num "4.87")
-show (bool; is_num; str_num "  4.87")
+show (is_str I)
+show (is_str 4)
+show (is_str "x")
+show (val_is_str; . "x" "y")
+show (is_num "x")
+show (is_num 4.2)
+show (val_is_num (* 3.9 4.2))
+show (val_is_num; str_num "4.87")
+show (val_is_num; str_num "  4.87")
 
 # The str_num function allows leading white space, but forbids any trailing
 # invalid chars, including white space.  This reflects how strtod works.
-show (bool; is_num; str_num " 4.87 ")
-show (bool; is_num; str_num "4.87x")
+show (val_is_num; str_num " 4.87 ")
+show (val_is_num; str_num "4.87x")
 
+show (val_is_num; str_num "-4.6")
+show (val_is_num; str_num "-4.6x")
+
+# Test some more good and void cases.
+div
+show void
+show (void 3)
+show (length 3)
+show (length "abc")
+show (length 3 "abc")
+show (eval_file 32)
+show (lt 3 4)
+show (lt 3 "4")
+show (lt 3 "4" "5")
+show (+ "x" 4)
+show (+ "x" 4 5)
+show (sqrt 16)
+show (sqrt "x")
+show (sqrt "x" 16)
+show 3
+show (3 "x")
+show (num_str 42)
+show (num_str "abc")
+show (num_str "abc" 42)
+show (is_void void)
+show "abc"
+show ("abc" "x")
+show (. "abc" "de")
+show (. 3 "de")
+show (. 3 "de" "fg")
+show (length "abc")
+show (length 27)
+show (length 27 "abc")
+show (slice "abcdefg" 3 2)
+show (slice "abcdefg" 3 5)
+show (slice "abcdefg" -3 5)
+show (slice "abcdefg" "3" 5)
+show (str_num "42")
+show (str_num "42x")
+show (str_num 42)
+
+div
 # Test some tricky string terminators.
 say ~ABC abcdABAABC
 say ~ABCD AABABCABCD
 
-div
 # Multiple layers of quotation.
 say "hello"
 say ~(1) "hello"(1)
 say ~(2) ~(1) "hello"(1)(2)
 say ~(3) ~(2) ~(1) "hello"(1)(2)(3)
 
-div
 say ~| "Ain't nothin' simple when you're doin' it for real." (Gus Baird)|
 nl
 say ~@
@@ -150,116 +176,7 @@ And the world is mine to win. ..."
   (Badger Clark, "The Westerner")
 @
 
-div
-# Test parse_string.
-(
-\try=
-(\x
-put "parse " put "[" put x put "]" nl
-parse_string x
-	(\form say "ok")
-	(\msg\line
-	put "err " put msg put " on line " say line
-	)
-nl
-)
-
-try ""
-try "
-x y"
-try "ab cd e"
-try "abcdefghi;"
-try ~| ""|
-try ~| "a"|
-try ~| "abc
-defg"|
-
-try ~|
-"|
-
-try ~|
-
-"a
-b
-|
-
-try ~END ~| |END
-try ~END ~| a|END
-try ~END ~| aEND
-try ~@ ~END aEND@
-
-try ~@
-
-~END
-abcEN@
-
-try "~"
-try "~ "
-try "~EN"
-
-try "~ABC abcdABAABC"
-try "~ABCD AABABCABCD"
-
-try " = y"
-try "ab cd e;"
-try "ab cd e;f g"
-try "ab cd e;f g ; hi j;"
-try "ab cd e\\fg h"
-try "ab cd e\x"
-try "ab cd e\"
-try "\x="
-try "\x=4"
-try "\x\y\z x z; y z"
-try "\x\y\z x; y z"
-try "\x\y\z x z y"
-try "\x x"
-try "\x\y x"
-try "\x x x"
-try "\x=y x"
-try "\x=y y"
-try "\y\x=y x x"
-try "\y\x=y y y"
-try "()"
-
-try "(
-a
-(b"
-
-try "(
-a
-(b)"
-
-try "(
-a
-(b))"
-
-try "(ab cd e)
-)"
-
-try ~@ say "hello"
-say something
-@
-
-)
-
-# Test parse_file.
-(
-\try=
-(\x
-put "parse " put x nl
-parse_file x
-	(\form say "ok")
-	(\msg\line
-	put "err " put msg put " on line " say line
-	)
-nl
-)
-
-try "missing.fxl"
-try "test/a2.fxl"
-)
-
-# Test delayed and single evaluation.
+# Test delayed evaluation.
 div
 \show_x=
 	(
@@ -277,11 +194,19 @@ show_x
 say "]"
 
 div
+eval_file "test/hello.fxl"
+div
 eval_file "test/utf8.fxl"
 div
 eval_file "test/beer.fxl"
-div
 
+div
+eval_str ~END
+\x=(+ 33 48)
+put "x = " say x
+END
+
+div
 \for=
 	(\x\y\f
 	\x=(round x)
@@ -429,7 +354,7 @@ div
 	[x;xs]
 	)
 
-\show_list=(\xs say "[" do xs say say "]")
+\show_list=(\xs say "[" (do xs say) say "]")
 
 # Testing with some "later" sprinkled in to ensure that type_later sets the
 # value type to type_A, not type_I.

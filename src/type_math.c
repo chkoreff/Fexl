@@ -9,11 +9,12 @@ static value op_num(value f, number op(number))
 	if (!f->L) return f;
 	{
 	value x = eval(hold(f->R));
-	value g = 0;
-	if (is_atom(type_num,x))
-		g = Qnum(op((number)x->R));
+	if (x->T == type_num)
+		f = Qnum(op((number)x->R));
+	else
+		f = Q(type_void);
 	drop(x);
-	return g;
+	return f;
 	}
 	}
 
@@ -23,12 +24,13 @@ static value op_num_num(value f, number op(number,number))
 	{
 	value x = eval(hold(f->L->R));
 	value y = eval(hold(f->R));
-	value g = 0;
-	if (is_atom(type_num,x) && is_atom(type_num,y))
-		g = Qnum(op((number)x->R,(number)y->R));
+	if (x->T == type_num && y->T == type_num)
+		f = Qnum(op((number)x->R,(number)y->R));
+	else
+		f = Q(type_void);
 	drop(x);
 	drop(y);
-	return g;
+	return f;
 	}
 	}
 

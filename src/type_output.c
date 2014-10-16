@@ -7,39 +7,39 @@
 #include <type_output.h>
 #include <type_str.h>
 
+/*LATER allow list value */
 value type_put(value f)
 	{
 	if (!f->L) return f;
 	{
 	value x = eval(hold(f->R));
-	value g = 0;
-	if (is_atom(type_str,x))
-		{
+	if (x->T == type_str)
 		put_str((string)x->R);
-		g = hold(I);
-		}
-	else if (is_atom(type_num,x))
-		{
+	else if (x->T == type_num)
 		put_num((number)x->R);
-		g = hold(I);
-		}
+	else if (x->T == type_T)
+		put_ch('T');
+	else if (x->T == type_F)
+		put_ch('F');
+
+	f = hold(I);
 	drop(x);
-	return g;
+	return f;
 	}
 	}
 
 value type_nl(value f)
 	{
-	(void)f;
 	nl();
-	return hold(I);
+	f = hold(I);
+	return f;
 	}
 
 value type_say(value f)
 	{
-	value g = type_put(f);
-	if (g == I) nl();
-	return g;
+	f = type_put(f);
+	if (f == I) nl();
+	return f;
 	}
 
 value type_put_to_error(value f)
@@ -47,10 +47,9 @@ value type_put_to_error(value f)
 	if (!f->L) return f;
 	{
 	output save_putd = putd;
-	value g;
 	put_to_error();
-	g = eval(hold(f->R));
+	f = eval(hold(f->R));
 	putd = save_putd;
-	return g;
+	return f;
 	}
 	}

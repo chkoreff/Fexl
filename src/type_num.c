@@ -10,17 +10,12 @@ value type_num(value f)
 	{
 	if (f->N == 0) num_free((number)f->R);
 	if (!f->L) return f;
-	return 0;
+	return Q(type_void);
 	}
 
 value Qnum(number x)
 	{
-	if (!x) return 0;
-	{
-	value f = D(type_num,x);
-	if (!f) num_free(x);
-	return f;
-	}
+	return D(type_num,x);
 	}
 
 value Qnum_ulong(unsigned long val)
@@ -33,11 +28,12 @@ value type_num_str(value f)
 	if (!f->L) return f;
 	{
 	value x = eval(hold(f->R));
-	value g = 0;
-	if (is_atom(type_num,x))
-		g = Qstr(num_str((number)x->R));
+	if (x->T == type_num)
+		f = Qstr(num_str((number)x->R));
+	else
+		f = Q(type_void);
 	drop(x);
-	return g;
+	return f;
 	}
 	}
 

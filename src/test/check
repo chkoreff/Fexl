@@ -1,2 +1,3 @@
 #!/bin/sh
-./build && test/run | diff - test/run.out
+./build || exit
+test/run | diff - test/run.out

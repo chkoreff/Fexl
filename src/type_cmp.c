@@ -12,14 +12,15 @@ static value op_cmp(value f, int op(int))
 	{
 	value x = eval(hold(f->L->R));
 	value y = eval(hold(f->R));
-	value g = 0;
-	if (is_atom(type_num,x) && is_atom(type_num,y))
-		g = Qboolean(op(num_cmp((number)x->R,(number)y->R)));
-	else if (is_atom(type_str,x) && is_atom(type_str,y))
-		g = Qboolean(op(str_cmp((string)x->R,(string)y->R)));
+	if (x->T == type_num && y->T == type_num)
+		f = Qboolean(op(num_cmp((number)x->R,(number)y->R)));
+	else if (x->T == type_str && y->T == type_str)
+		f = Qboolean(op(str_cmp((string)x->R,(string)y->R)));
+	else
+		f = Q(type_void);
 	drop(x);
 	drop(y);
-	return g;
+	return f;
 	}
 	}
 

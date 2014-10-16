@@ -1,3 +1,4 @@
+== run_file test/a1.fxl
 ==
 ping
 ==
@@ -16,87 +17,120 @@ ping
 ping
 ping
 ==
-abc
-abc
-:bad
-abcde
-:bad
-abcde
-:bad
-abcde
-:bad
-3.14159265358979
-42
-5
-4
-cdefg
-467.86
-1.61803398874989
-T
-F
-T
-F
-T
-T
-:bad
-:bad
-:bad
+str abc
+str abc
+void
+str abcde
+void
+str abcde
+void
+str abcde
+void
+num 3.14159265358979
+num 42
+num 5
+num 4
+str cdefg
+num 467.86
+num 1.61803398874989
+bool T
+bool F
+bool T
+bool F
+bool T
+bool T
+void
+void
+void
 ==
 str 1.61803398874989
 num 1.61803398874989
 other
-bad
-bad
+void
+void
 str 5.8
-bad
+void
 num 3
-bad
-bad
+void
+void
+void
 num 3
-bad
+void
 num 42
-bad
+void
 num -7.8
 num 0
 num -0
 num 43.8
 ==
-T
-F
-T
-F
+void
+str cd
+str 
+void
+void
+void
+str bc
+str abc
+void
+str c
+void
 ==
-:bad
-cd
-
-:bad
-:bad
-:bad
-bc
-abc
-:bad
-c
-:bad
+bool F
+bool F
+bool T
+bool T
+bool F
+bool T
+bool T
+bool T
+bool T
+bool F
+bool F
+bool T
+bool F
 ==
-F
-F
-T
-T
-F
-T
-T
-T
-T
-F
-F
+void
+void
+void
+num 3
+void
+void
+bool T
+void
+void
+void
+void
+num 4
+void
+void
+num 3
+void
+str 42
+void
+void
+bool T
+str abc
+void
+str abcde
+void
+void
+num 3
+void
+void
+str de
+void
+void
+void
+num 42
+void
+void
+==
 abcdABA
 AABABC
-==
 hello
 "hello"
 ~(1) "hello"(1)
 ~(2) ~(1) "hello"(1)(2)
-==
 "Ain't nothin' simple when you're doin' it for real." (Gus Baird)
 
 "My fathers sleep on the sunrise plains,
@@ -112,161 +146,6 @@ And the world is mine to win. ..."
   (Badger Clark, "The Westerner")
 
 ==
-parse []
-ok
-
-parse [
-x y]
-ok
-
-parse [ab cd e]
-ok
-
-parse [abcdefghi;]
-ok
-
-parse [""]
-ok
-
-parse ["a"]
-ok
-
-parse ["abc
-defg"]
-ok
-
-parse ["]
-err Unclosed string on line 1
-
-parse [
-"a
-b
-]
-err Unclosed string on line 2
-
-parse [~| |]
-ok
-
-parse [~| a|]
-ok
-
-parse [~| a]
-err Unclosed string on line 1
-
-parse [~END aEND]
-ok
-
-parse [
-~END
-abcEN]
-err Unclosed string on line 2
-
-parse [~]
-err Incomplete string terminator on line 1
-
-parse [~ ]
-err Incomplete string terminator on line 1
-
-parse [~EN]
-err Incomplete string terminator on line 1
-
-parse [~ABC abcdABAABC]
-ok
-
-parse [~ABCD AABABCABCD]
-ok
-
-parse [ = y]
-err Missing symbol declaration before '=' on line 1
-
-parse [ab cd e;]
-ok
-
-parse [ab cd e;f g]
-ok
-
-parse [ab cd e;f g ; hi j;]
-ok
-
-parse [ab cd e\\fg h]
-ok
-
-parse [ab cd e\x]
-ok
-
-parse [ab cd e\]
-err Missing symbol after '\' on line 1
-
-parse [\x=]
-err Missing definition on line 1
-
-parse [\x=4]
-ok
-
-parse [\x\y\z x z; y z]
-ok
-
-parse [\x\y\z x; y z]
-ok
-
-parse [\x\y\z x z y]
-ok
-
-parse [\x x]
-ok
-
-parse [\x\y x]
-ok
-
-parse [\x x x]
-ok
-
-parse [\x=y x]
-ok
-
-parse [\x=y y]
-ok
-
-parse [\y\x=y x x]
-ok
-
-parse [\y\x=y y y]
-ok
-
-parse [()]
-ok
-
-parse [(
-a
-(b]
-err Unclosed parenthesis on line 3
-
-parse [(
-a
-(b)]
-err Unclosed parenthesis on line 1
-
-parse [(
-a
-(b))]
-ok
-
-parse [(ab cd e)
-)]
-err Extraneous input on line 2
-
-parse [say "hello"
-say something
-]
-ok
-
-parse missing.fxl
-err Could not open the input file on line 1
-
-parse test/a2.fxl
-ok
-
-==
 (CALC)
 [
 x = 30
@@ -274,6 +153,8 @@ x = 30
 x = 30
 x = 30
 ]
+==
+Hello world!
 ==
 f = hej
 åabcüdef
@@ -304,6 +185,8 @@ Take one down, pass it around
 Take one down, pass it around
 0 bottles of beer on the wall
 
+==
+x = 81
 ==
 fib 0 = 0
 fib 1 = 1
@@ -531,3 +414,80 @@ Modigliani risk-adjusted performance
 1.7106%
 Sharpe Ratio of Fund vs. Benchmark
 0.0275
+exit 0
+== run_file test/a2.fxl
+Hello
+Type some lines of input and I'll echo them back.
+Press Ctrl-D to stop.
+abc
+defg
+
+hij
+Good bye.
+exit 0
+== test stderr
+This goes to stderr.
+x = 7
+exit 0
+== test parse errors
+run_text ["]
+Unclosed string on line 1
+exit 1
+run_text [
+"a
+b]
+Unclosed string on line 2
+exit 1
+run_text [~| a]
+Unclosed string on line 1
+exit 1
+run_text [
+
+~END
+abcEN]
+Unclosed string on line 3
+exit 1
+run_text [~]
+Incomplete string terminator on line 1
+exit 1
+run_text [~
+]
+Incomplete string terminator on line 1
+exit 1
+run_text [~EN]
+Incomplete string terminator on line 1
+exit 1
+run_text [ = y]
+Missing symbol declaration before '=' on line 1
+exit 1
+run_text [ab cd e\]
+Missing symbol after '\' on line 1
+exit 1
+run_text [\x=]
+Missing definition on line 1
+exit 1
+run_text [(
+a
+(b]
+Unclosed parenthesis on line 3
+exit 1
+run_text [(
+a
+(b)]
+Unclosed parenthesis on line 1
+exit 1
+run_text [(ab cd e)
+)]
+Extraneous input on line 2
+exit 1
+run_text [x
+y
+	(z z y)
+]
+Undefined symbol x on line 1
+Undefined symbol z on line 3
+Undefined symbol y on line 3
+exit 1
+== test missing file
+Could not open the input file on line 1
+exit 1
