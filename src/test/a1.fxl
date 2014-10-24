@@ -207,6 +207,14 @@ put "x = " say x
 END
 
 div
+# This demonstrates that (\x f x) is not strictly equivalent to f, when side
+# effects are taken into account.
+\say_x=(\x put "x = " say x)
+say_x 3
+say_x 4
+say_x 5
+
+div
 \for=
 	(\x\y\f
 	\x=(round x)
@@ -276,7 +284,7 @@ put "length is " put (length x) nl
 div
 \x=42
 say "Hello world."
-put "x = "; put x; nl;
+put "x = " put x nl
 say (+ x 5)
 say (- x 5)
 say (* x 5)

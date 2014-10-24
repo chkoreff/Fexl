@@ -8,14 +8,6 @@ value type_C(value f)
 	return hold(f->L->R);
 	}
 
-/* (S x y z) = ((x z) (y z)) */
-value type_S(value f)
-	{
-	if (!f->L || !f->L->L || !f->L->L->L) return f;
-	return apply(apply(hold(f->L->L->R),hold(f->R)),
-		A(hold(f->L->R),hold(f->R)));
-	}
-
 /* (I x) = x */
 value type_I(value f)
 	{
@@ -39,25 +31,29 @@ value type_F(value f)
 	return hold(I);
 	}
 
-/* (R x y z) = (x (y z)) */
-value type_R(value f)
-	{
-	if (!f->L || !f->L->L || !f->L->L->L) return f;
-	return apply(hold(f->L->L->R),A(hold(f->L->R),hold(f->R)));
-	}
-
-/* (L x y z) = ((x z) y) */
-value type_L(value f)
-	{
-	if (!f->L || !f->L->L || !f->L->L->L) return f;
-	return apply(apply(hold(f->L->L->R),hold(f->R)),hold(f->L->R));
-	}
-
 /* (Y x) = (x (Y x)) */
 value type_Y(value f)
 	{
 	if (!f->L) return f;
 	return apply(hold(f->R),hold(f));
+	}
+
+static value substitute(value p, value f, value x)
+	{
+	if (p->T == type_C)
+		return hold(f);
+	else if (p->T == type_I)
+		return hold(x);
+	else if (p->T == type_A)
+		return A(substitute(p->L,f->L,x),substitute(p->R,f->R,x));
+	else
+		return 0;
+	}
+
+value type_subst(value f)
+	{
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
+	return substitute(f->L->L->R,f->L->R,f->R);
 	}
 
 /* (pair x y A) = (A x y) */
@@ -130,26 +126,22 @@ value Qis_atom(type t, value f)
 /* LATER is_list */
 
 value C;
-value S;
 value I;
 value T;
 value F;
-value R;
-value L;
 value Y;
+value subst;
 value Qeval;
 value Qcons;
 
 void beg_basic(void)
 	{
 	C = Q(type_C);
-	S = Q(type_S);
 	I = Q(type_I);
 	T = Q(type_T);
 	F = Q(type_F);
-	R = Q(type_R);
-	L = Q(type_L);
 	Y = Q(type_Y);
+	subst = Q(type_subst);
 	Qeval = Q(type_eval);
 	Qcons = Q(type_cons);
 	}
@@ -157,13 +149,11 @@ void beg_basic(void)
 void end_basic(void)
 	{
 	drop(C);
-	drop(S);
 	drop(I);
 	drop(T);
 	drop(F);
-	drop(R);
-	drop(L);
 	drop(Y);
+	drop(subst);
 	drop(Qeval);
 	drop(Qcons);
 	}

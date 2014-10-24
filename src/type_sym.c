@@ -30,19 +30,10 @@ value Qsym(short quoted, string name, unsigned long line)
 /* Apply f to g, where either can be a symbolic form. */
 value app(value f, value g)
 	{
-	/*LATER possibly more optimization rules */
-	if (f == I)
-		{
-		drop(f);
-		return g;
-		}
-	else
-		{
-		value v = A(f,g);
-		if (f->T == type_sym || g->T == type_sym)
-			v->T = type_sym;
-		return v;
-		}
+	value v = A(f,g);
+	if (f->T == type_sym || g->T == type_sym)
+		v->T = type_sym;
+	return v;
 	}
 
 static int sym_eq(symbol x, symbol y)
@@ -51,44 +42,30 @@ static int sym_eq(symbol x, symbol y)
 		&& str_eq((string)x->name->R,(string)y->name->R);
 	}
 
+static value Qsubst(value p, value f)
+	{
+	return app(A(hold(subst),p),f);
+	}
+
 /* Abstract the symbol from the body, returning a form which is a function of
 that symbol, and no longer contains that symbol. */
 static value abstract(value sym, value body)
 	{
 	if (body->T != type_sym)
-		return A(hold(C),hold(body));  /* (\x f) = (C f) */
+		return Qsubst(hold(C),hold(body));
 	else if (body->L == 0)
 		{
 		if (sym_eq((symbol)sym->R, (symbol)body->R))
-			return hold(I);  /* (\x x) = I */
+			return Qsubst(hold(I),hold(I));
 		else
-			return app(hold(C),hold(body));  /* (\x y) = (C y) */
+			return Qsubst(hold(C),hold(body));
 		}
 	else
 		{
 		value f = abstract(sym,body->L);
 		value g = abstract(sym,body->R);
-
-		value h;
-		/* Set the result h = (S f g), optimizing if possible. */
-		if (f->L == C)
-			{
-			if (g == I)
-				/* S (C x) I = x */
-				h = hold(f->R);
-			else if (g->L == C)
-				/* S (C x) (C y) = C (x y) */
-				h = app(hold(C),app(hold(f->R),hold(g->R)));
-			else
-				/* S (C x) y = R x y */
-				h = app(app(hold(R),hold(f->R)),hold(g));
-			}
-		else if (g->L == C)
-			/* S x (C y) = L x y */
-			h = app(app(hold(L),hold(f)),hold(g->R));
-		else
-			h = app(app(hold(S),hold(f)),hold(g));
-
+		value h = Qsubst(A(hold(f->L->R),hold(g->L->R)),
+			app(hold(f->R),hold(g->R)));
 		drop(f);
 		drop(g);
 		return h;

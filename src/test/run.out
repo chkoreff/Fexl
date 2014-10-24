@@ -188,6 +188,10 @@ Take one down, pass it around
 ==
 x = 81
 ==
+x = 3
+x = 4
+x = 5
+==
 fib 0 = 0
 fib 1 = 1
 fib 2 = 1

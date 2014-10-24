@@ -332,13 +332,17 @@ static value parse_factor(void)
 
 static value parse_exp(void)
 	{
-	value exp = hold(I);
+	value exp = 0;
 	while (1)
 		{
 		value factor = parse_factor();
 		if (factor == 0) break;
-		exp = app(exp,factor);
+		if (exp == 0)
+			exp = factor;
+		else
+			exp = app(exp,factor);
 		}
+	if (exp == 0) exp = hold(I);
 	return exp;
 	}
 

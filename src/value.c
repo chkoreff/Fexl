@@ -94,7 +94,7 @@ value Q(type T)
 	return V(T,0,0);
 	}
 
-/* Create an atom of type T and data x. */
+/* Create an atom of type T with data x. */
 value D(type T, void *x)
 	{
 	return V(T,0,x);

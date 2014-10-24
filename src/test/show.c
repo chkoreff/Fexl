@@ -22,12 +22,9 @@ void show(value f)
 		put_ch(f->T == type_sym ? '}' : ')');
 		}
 	else if (f->T == type_C) put_ch('C');
-	else if (f->T == type_S) put_ch('S');
 	else if (f->T == type_I) put_ch('I');
 	else if (f->T == type_T) put_ch('T');
 	else if (f->T == type_F) put_ch('F');
-	else if (f->T == type_R) put_ch('R');
-	else if (f->T == type_L) put_ch('L');
 	else if (f->T == type_Y) put_ch('@');
 	else if (f->T == type_eval) put_ch('!');
 	else if (f->T == type_later) put("later");
@@ -51,6 +48,8 @@ void show(value f)
 	else if (f->T == type_concat) put("concat");
 	else if (f->T == type_length) put("length");
 	else if (f->T == type_slice) put("slice");
+	else if (f->T == type_subst) put("subst");
+	else if (f->T == type_void) put("void");
 	else if (f->T == type_add) put("+");
 	else if (f->T == type_mul) put("*");
 	else if (f->T == type_div) put("/");
