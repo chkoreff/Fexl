@@ -38,22 +38,6 @@ value type_Y(value f)
 	return apply(hold(f->R),hold(f));
 	}
 
-static value substitute(value p, value f, value x)
-	{
-	if (p->T == type_C)
-		return hold(f);
-	else if (p->T == type_I)
-		return hold(x);
-	else
-		return A(substitute(p->L,f->L,x),substitute(p->R,f->R,x));
-	}
-
-value type_subst(value f)
-	{
-	if (!f->L || !f->L->L || !f->L->L->L) return f;
-	return substitute(f->L->L->R,f->L->R,f->R);
-	}
-
 /* (pair x y A) = (A x y) */
 value type_pair(value f)
 	{
@@ -67,7 +51,7 @@ value type_pair(value f)
 value type_cons(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return f;
-	return A(A(Q(type_pair),hold(f->L->L->R)),hold(f->L->R));
+	return V(type_pair,A(hold(I),hold(f->L->L->R)),hold(f->L->R));
 	}
 
 /* (void x) = void */
@@ -128,7 +112,6 @@ value I;
 value T;
 value F;
 value Y;
-value subst;
 value Qeval;
 value Qcons;
 
@@ -139,7 +122,6 @@ void beg_basic(void)
 	T = Q(type_T);
 	F = Q(type_F);
 	Y = Q(type_Y);
-	subst = Q(type_subst);
 	Qeval = Q(type_eval);
 	Qcons = Q(type_cons);
 	}
@@ -151,7 +133,6 @@ void end_basic(void)
 	drop(T);
 	drop(F);
 	drop(Y);
-	drop(subst);
 	drop(Qeval);
 	drop(Qcons);
 	}

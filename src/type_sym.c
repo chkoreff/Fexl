@@ -30,10 +30,8 @@ value Qsym(short quoted, string name, unsigned long line)
 /* Apply f to g, where either can be a symbolic form. */
 value app(value f, value g)
 	{
-	value v = A(f,g);
-	if (f->T == type_sym || g->T == type_sym)
-		v->T = type_sym;
-	return v;
+	type t = (f->T == type_sym || g->T == type_sym) ? type_sym : type_A;
+	return V(t,f,g);
 	}
 
 static int sym_eq(symbol x, symbol y)
@@ -54,9 +52,25 @@ static value combine_patterns(value p, value q)
 		return A(p,q);
 	}
 
+static value substitute(value p, value f, value x)
+	{
+	if (p->T == type_C)
+		return hold(f);
+	else if (p->T == type_I)
+		return hold(x);
+	else
+		return A(substitute(p->L,f->L,x),substitute(p->R,f->R,x));
+	}
+
+value type_subst(value f)
+	{
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
+	return substitute(f->L->L->R,f->L->R,f->R);
+	}
+
 static value Qsubst(value p, value f)
 	{
-	return app(A(hold(subst),p),f);
+	return app(V(type_subst,hold(I),p),f);
 	}
 
 /* Abstract the symbol from the body, returning a form which is a function of
