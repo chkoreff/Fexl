@@ -44,10 +44,8 @@ static value substitute(value p, value f, value x)
 		return hold(f);
 	else if (p->T == type_I)
 		return hold(x);
-	else if (p->T == type_A)
-		return A(substitute(p->L,f->L,x),substitute(p->R,f->R,x));
 	else
-		return 0;
+		return A(substitute(p->L,f->L,x),substitute(p->R,f->R,x));
 	}
 
 value type_subst(value f)

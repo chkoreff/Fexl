@@ -42,6 +42,18 @@ static int sym_eq(symbol x, symbol y)
 		&& str_eq((string)x->name->R,(string)y->name->R);
 	}
 
+static value combine_patterns(value p, value q)
+	{
+	if (p->T == type_C && q->T == type_C)
+		{
+		drop(p);
+		drop(q);
+		return hold(C);
+		}
+	else
+		return A(p,q);
+	}
+
 static value Qsubst(value p, value f)
 	{
 	return app(A(hold(subst),p),f);
@@ -64,7 +76,7 @@ static value abstract(value sym, value body)
 		{
 		value f = abstract(sym,body->L);
 		value g = abstract(sym,body->R);
-		value h = Qsubst(A(hold(f->L->R),hold(g->L->R)),
+		value h = Qsubst(combine_patterns(hold(f->L->R),hold(g->L->R)),
 			app(hold(f->R),hold(g->R)));
 		drop(f);
 		drop(g);
