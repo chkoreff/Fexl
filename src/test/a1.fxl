@@ -215,29 +215,33 @@ say_x 4
 say_x 5
 
 div
+
 \for=
 	(\x\y\f
 	\x=(round x)
 	\y=(round y)
 	\d=(le x y 1 -1)
-	(@\loop\x
-	f x
-	eq x y ();
-	\x=(+ x d)
+	\loop==
+		(\x
+		f x
+		eq x y ();
+		\x=(+ x d)
+		loop x
+		)
 	loop x
 	)
-	x
-	)
 
+# (fib n) returns the nth Fibonacci number starting at 0. */
 \fib=
 	(
-	(@\loop\x\y\n
-	le n 0 x;
-	\z=(+ x y)
-	\n=(- n 1)
-	loop y z n
-	)
-	0 1
+	\fib==
+		(\x\y\n
+		le n 0 x;
+		\z=(+ x y)
+		\n=(- n 1)
+		fib y z n
+		)
+	fib 0 1
 	)
 
 \try=

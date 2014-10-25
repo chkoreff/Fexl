@@ -52,20 +52,24 @@ static value combine_patterns(value p, value q)
 		return A(p,q);
 	}
 
-static value substitute(value p, value f, value x)
+static value x;
+static value substitute(value p, value f)
 	{
 	if (p->T == type_C)
 		return hold(f);
 	else if (p->T == type_I)
 		return hold(x);
+	else if (p->L->T == type_C)
+		return A(hold(f->L),substitute(p->R,f->R));
 	else
-		return A(substitute(p->L,f->L,x),substitute(p->R,f->R,x));
+		return A(substitute(p->L,f->L),substitute(p->R,f->R));
 	}
 
 value type_subst(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return f;
-	return substitute(f->L->L->R,f->L->R,f->R);
+	x = f->R;
+	return substitute(f->L->L->R,f->L->R);
 	}
 
 static value Qsubst(value p, value f)
