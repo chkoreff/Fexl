@@ -493,5 +493,5 @@ Undefined symbol z on line 3
 Undefined symbol y on line 3
 exit 1
 == test missing file
-Could not open the input file on line 1
+Could not open the input file on line 1 of missing.fxl
 exit 1

@@ -10,12 +10,15 @@
 #include <str_input.h>
 #include <type_str.h>
 
+static const char *source_label;
+
 static void put_loc(unsigned long line)
 	{
-	/*LATER what about including current source name?, e.g.:
-	eval_file file_with_errors
-	*/
 	put(" on line "); put_ulong(line);
+	if (source_label)
+		{
+		put(" of ");put(source_label);
+		}
 	nl();
 	}
 
@@ -36,11 +39,14 @@ value eval_file(const char *name)
 	{
 	value exp;
 	input save_getd = getd;
+	const char *save_source_label = source_label;
 
 	get_from_file(name);
+	source_label = name;
 	exp = get_function();
 
 	getd = save_getd;
+	source_label = save_source_label;
 	return eval(exp);
 	}
 
