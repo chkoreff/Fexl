@@ -1,4 +1,4 @@
-== run_file test/a1.fxl
+====
 ==
 ping
 ==
@@ -457,7 +457,7 @@ Bye
 Hello 9
 Bye
 exit 0
-== run_file test/a2.fxl
+====
 Hello
 Type some lines of input and I'll echo them back.
 Press Ctrl-D to stop.
@@ -467,82 +467,61 @@ defg
 hij
 Good bye.
 exit 0
-== test stderr
+====
 This goes to stderr.
 x = 7
 exit 0
-== test parse errors
-run_text ["]
+====
 Unclosed string on line 1
 exit 1
-run_text [
-"a
-b]
+====
 Unclosed string on line 2
 exit 1
-run_text [~| a]
+====
 Unclosed string on line 1
 exit 1
-run_text [
-
-~END
-abcEN]
+====
 Unclosed string on line 3
 exit 1
-run_text [~]
+====
 Incomplete string terminator on line 1
 exit 1
-run_text [~
-]
+====
 Incomplete string terminator on line 1
 exit 1
-run_text [~EN]
+====
 Incomplete string terminator on line 1
 exit 1
-run_text [ = y]
+====
 Missing symbol declaration before '=' on line 1
 exit 1
-run_text [ab cd e\]
+====
 Missing symbol after '\' on line 1
 exit 1
-run_text [\x=]
+====
 Missing definition on line 1
 exit 1
-run_text [(
-a
-(b]
+====
 Unclosed parenthesis on line 3
 exit 1
-run_text [(
-a
-(b)]
+====
 Unclosed parenthesis on line 1
 exit 1
-run_text [(ab cd e)
-)]
+====
 Extraneous input on line 2
 exit 1
-run_text [x
-y
-	(z z y)
-]
+====
 Undefined symbol x on line 1
 Undefined symbol z on line 3
 Undefined symbol y on line 3
 exit 1
-run_text [{
-{ab
-cd {} e
-]
+====
 Unclosed brace on line 2
 exit 1
-run_text [\form={a b
-c}
-resolve form (\x eq x "b" [(say "b")] [])
-]
+====
 Undefined symbol a on line 1
 Undefined symbol c on line 2
 exit 1
-== test missing file
+====
 Could not open the input file on line 1 of missing.fxl
 exit 1

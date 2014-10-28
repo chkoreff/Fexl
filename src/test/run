@@ -1,11 +1,18 @@
 #!/bin/sh
 ./build || exit
 
-echo "== run_file test/a1.fxl"
+run_fexl()
+	{
+	echo "===="
+	../bin/fexl 2>&1 >/dev/null
+	echo "exit $?"
+	}
+
+echo "===="
 ../bin/fexl test/a1.fxl
 echo "exit $?"
 
-echo "== run_file test/a2.fxl"
+echo "===="
 (
 cat <<"EOF"
 abc
@@ -13,11 +20,9 @@ defg
 
 hij
 EOF
-) \
-| ../bin/fexl test/a2.fxl
+) | ../bin/fexl test/a2.fxl
 echo "exit $?"
 
-echo "== test stderr"
 (
 cat <<"EOF"
 say "hello"
@@ -29,89 +34,65 @@ put_to_error
 	)
 say "bye"
 EOF
-) \
-| ../bin/fexl 2>&1 >/dev/null
-echo "exit $?"
+) | run_fexl
 
-echo "== test parse errors"
+echo -n "\"" | run_fexl
 
-run_text()
-	{
-	echo "run_text [$text]"
-	echo -n "$text" | ../bin/fexl 2>&1
-	echo "exit $?"
-	}
+echo -n '
+"a
+b' | run_fexl
 
-text="\""
-run_text
+echo -n "~| a" | run_fexl
 
-text="
-\"a
-b"
-run_text
-
-text="~| a"
-run_text
-
-text="
+echo -n "
 
 ~END
-abcEN"
-run_text
+abcEN" | run_fexl
 
-text="~"
-run_text
 
-text="~
-"
-run_text
+echo -n "~" | run_fexl
 
-text="~EN"
-run_text
+echo -n "~
+" | run_fexl
 
-text=" = y"
-run_text
+echo -n "~EN" | run_fexl
 
-text="ab cd e\\"
-run_text
+echo -n " = y" | run_fexl
 
-text="\\x="
-run_text
+echo -n "ab cd e\\" | run_fexl
 
-text="(
+echo -n "\\x=" | run_fexl
+
+echo -n "(
 a
-(b"
-run_text
+(b" | run_fexl
 
-text="(
+echo -n "(
 a
-(b)"
-run_text
+(b)" | run_fexl
 
-text="(ab cd e)
-)"
-run_text
+echo -n "(ab cd e)
+)" | run_fexl
 
-text="x
+echo -n "x
 y
 	(z z y)
-"
-run_text
+" | run_fexl
 
-text="{
+echo -n "{
 {ab
 cd {} e
-"
-run_text
+" | run_fexl
 
-# Test undefined symbols in a dynamic context.
-text='\\form={a b
+(
+cat <<"EOF"
+\form={a b
 c}
-resolve form (\\x eq x "b" [(say "b")] [])
-'
-run_text
+resolve form (\x eq x "b" [(say "b")] [])
+EOF
+) | run_fexl
 
-echo "== test missing file"
+echo "===="
 ../bin/fexl 2>&1 missing.fxl
 echo "exit $?"
 
@@ -122,27 +103,21 @@ test_misbehavior=false
 
 if $test_misbehavior; then
 
-echo "== test limit time"
 (
 ulimit -St 1
-text="@ I"
-run_text
+echo -n "@ I" | run_fexl
 # CPU time limit exceeded
 ) 2>&1
 
-echo "== test limit stack"
 (
 ulimit -Ss 1000
-text="@ @"
-run_text
+echo -n "@ @" | run_fexl
 # Stack overflow (Segmentation fault)
 ) 2>&1
 
-echo "== test limit memory"
 (
 ulimit -Sv 200000
-text="\S=(\x\y\z x z; y z) @ S S S"
-run_text
+echo -n "\S=(\x\y\z x z; y z) @ S S S" | run_fexl
 # The program ran out of memory.
 ) 2>&1
 
