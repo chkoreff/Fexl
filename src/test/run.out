@@ -425,6 +425,37 @@ T
 Fred says a
 Wilma says b
 Goodbye
+==
+T
+T
+F
+F
+T
+T
+==
+
+
+a
+ab
+ab3
+ab1.5
+x = 3388
+x = 3388, y = 3630
+
+a
+T
+F
+TTFTFF
+
+
+Hello 9
+Bye
+Hello 9
+Bye
+Hello 9
+Bye
+Hello 9
+Bye
 exit 0
 == run_file test/a2.fxl
 Hello

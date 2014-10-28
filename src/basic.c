@@ -22,7 +22,9 @@ value type_I(value f)
 
 value type_T(value f)
 	{
-	return type_C(f);
+	if (!f->L) return f;
+	f->T = type_C;
+	return f;
 	}
 
 value type_F(value f)

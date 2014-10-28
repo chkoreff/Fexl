@@ -66,6 +66,14 @@ To source the handy shell aliases that I use for development:
 
 	. handy
 
+To time the test output:
+
+	test/checkt
+
+To time a long series of calculations and output:
+
+	test/fib
+
 Guide to source code
 --------------------
 
