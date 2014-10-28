@@ -38,20 +38,13 @@ value type_Y(value f)
 	return apply(hold(f->R),hold(f));
 	}
 
-/* (pair x y A) = (A x y) */
-value type_pair(value f)
-	{
-	if (!f->L || !f->L->L || !f->L->L->L) return f;
-	return apply(apply(hold(f->R),hold(f->L->L->R)),hold(f->L->R));
-	}
-
 /*LATER distinguish between C and null */
 
-/* (cons x y A) = (pair x y) */
+/* (cons x y A B) = (B x y) */
 value type_cons(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return f;
-	return V(type_pair,A(hold(I),hold(f->L->L->R)),hold(f->L->R));
+	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return f;
+	return apply(apply(hold(f->R),hold(f->L->L->L->R)),hold(f->L->L->R));
 	}
 
 /* (void x) = void */

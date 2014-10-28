@@ -46,10 +46,10 @@ value type_put_to_error(value f)
 	{
 	if (!f->L) return f;
 	{
-	output save_putd = putd;
+	output save = putd;
 	put_to_error();
 	f = eval(hold(f->R));
-	putd = save_putd;
+	putd = save;
 	return f;
 	}
 	}

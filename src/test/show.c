@@ -48,7 +48,6 @@ void show(value f)
 	else if (f->T == type_concat) put("concat");
 	else if (f->T == type_length) put("length");
 	else if (f->T == type_slice) put("slice");
-	else if (f->T == type_subst) put("subst");
 	else if (f->T == type_void) put("void");
 	else if (f->T == type_add) put("+");
 	else if (f->T == type_mul) put("*");

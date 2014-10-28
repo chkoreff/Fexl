@@ -23,6 +23,13 @@ value Qnum_ulong(unsigned long val)
 	return Qnum(num_new_ulong(val));
 	}
 
+value Qnum_str0(const char *name)
+	{
+	number n = str0_num(name);
+	if (n) return Qnum(n);
+	return 0;
+	}
+
 value type_num_str(value f)
 	{
 	if (!f->L) return f;

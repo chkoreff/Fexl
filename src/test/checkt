@@ -1,0 +1,5 @@
+#!/bin/sh
+./build || exit
+# We must run in bash here to get the right version of "time".
+bash -c "time test/run | diff - test/run.out"
+ls -l ../bin/fexl

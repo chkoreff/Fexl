@@ -2,9 +2,13 @@
 #include <str.h>
 #include <value.h>
 #include <basic.h>
-#include <context.h>
 #include <convert.h>
+#include <file_input.h>
+#include <input.h>
+#include <parse.h>
 #include <source.h>
+#include <standard.h>
+#include <str_input.h>
 #include <string.h> /* strcmp */
 #include <type_cmp.h>
 #include <type_input.h>
@@ -24,11 +28,14 @@ static int match(const char *other)
 	return strcmp(curr_name,other) == 0;
 	}
 
-static value define_name(const char *name)
+static value type_eval_file(value f);
+static value type_eval_str(value f);
+
+static value standard_name(const char *name)
 	{
 	{
-	number n = str0_num(name);
-	if (n) return Qnum(n);
+	value def = Qnum_str0(name);
+	if (def) return def;
 	}
 
 	curr_name = name;
@@ -81,21 +88,103 @@ static value define_name(const char *name)
 	return 0;
 	}
 
-value current_context(value x)
+value standard_context(value x)
 	{
-	symbol sym = (symbol)x->R;
-	if (sym->quoted)
-		return hold(sym->name);
+	const char *name = ((string)x->R)->data;
+	return standard_name(name);
+	}
 
+static value parse_standard(const char *label)
 	{
-	string str = (string)sym->name->R;
-	const char *name = str->data;
+	value exp;
+	const char *save = source_label;
+	source_label = label;
+	exp = resolve(parse_source(),standard_context);
+	source_label = save;
+	return exp;
+	}
 
-	value def = define_name(name);
-	if (def)
-		return def;
+value eval_file(const char *name)
+	{
+	value exp;
+	input save = getd;
 
-	undefined_symbol(name,sym->line);
-	return hold(x);
+	get_from_file(name);
+	exp = parse_standard(name);
+
+	getd = save;
+	return eval(exp);
+	}
+
+static value eval_str(string x)
+	{
+	value exp;
+	input save = getd;
+
+	get_from_string(x);
+	exp = parse_standard(0);
+
+	getd = save;
+	return eval(exp);
+	}
+
+static value type_eval_file(value f)
+	{
+	if (!f->L) return f;
+	{
+	value x = eval(hold(f->R));
+	if (x->T == type_str)
+		{
+		const char *name = ((string)x->R)->data;
+		f = eval_file(name);
+		}
+	else
+		f = Q(type_void);
+	drop(x);
+	return f;
 	}
 	}
+
+static value type_eval_str(value f)
+	{
+	if (!f->L) return f;
+	{
+	value x = eval(hold(f->R));
+	if (x->T == type_str)
+		f = eval_str((string)x->R);
+	else
+		f = Q(type_void);
+	drop(x);
+	return f;
+	}
+	}
+
+/*
+# LATER get_from_file
+# LATER get_from_string
+# LATER get_from_input
+# LATER get_from_source
+# LATER parse
+*/
+
+/*LATER eval any input stream (file, string, etc.) */
+/*LATER use arbitrary context, not just the standard one */
+
+/*LATER after we do parse in fexl, we'll no longer need eval_file
+and eval_str defined in C.  We can define those in fexl easily.
+
+\eval_file=
+	(\name
+	get_from_file name ;
+	\source_name=name
+	parse source_name
+	)
+
+\eval_str=
+	(\text
+	get_from_string text ;
+	\source_name=""
+	parse source_name
+	)
+*/
+

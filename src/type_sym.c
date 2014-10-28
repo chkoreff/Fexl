@@ -1,8 +1,10 @@
+#include <str.h>
 #include <value.h>
 #include <basic.h>
-#include <context.h>
+#include <die.h>
 #include <memory.h>
-#include <str.h>
+#include <output.h>
+#include <source.h>
 #include <type_str.h>
 #include <type_sym.h>
 
@@ -21,7 +23,7 @@ value type_sym(value f)
 value Qsym(short quoted, string name, unsigned long line)
 	{
 	symbol sym = new_memory(sizeof(struct symbol));
-	sym->quoted = quoted ? 1 : 0;
+	sym->quoted = quoted;
 	sym->name = Qstr(name);
 	sym->line = line;
 	return D(type_sym,sym);
@@ -65,7 +67,7 @@ static value substitute(value p, value f)
 		return A(substitute(p->L,f->L),substitute(p->R,f->R));
 	}
 
-value type_subst(value f)
+static value type_subst(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return f;
 	x = f->R;
@@ -121,17 +123,44 @@ static value last_sym(value f)
 	return last_sym(f->L);
 	}
 
-value resolve(value f)
+static void undefined_symbol(const char *name, unsigned long line)
 	{
-	value x = last_sym(f);
-	if (x)
-		{
-		value g = resolve(abstract(x,f));
-		value y = current_context(x);
-		value h = app(g,y);
-		drop(f);
-		return h;
-		}
+	put_to_error();
+	put("Undefined symbol "); put(name); put_error_location(line);
+	}
+
+static value do_resolve(value exp, value context(value))
+	{
+	value x = last_sym(exp);
+	if (!x) return exp;
+	{
+	value fun = do_resolve(abstract(x,exp),context);
+	symbol sym = (symbol)x->R;
+
+	value def;
+	if (sym->quoted)
+		def = hold(sym->name);
 	else
-		return f;
+		{
+		def = context(sym->name);
+		if (!def)
+			{
+			const char *name = ((string)sym->name->R)->data;
+			undefined_symbol(name,sym->line);
+			def = hold(x);
+			}
+		}
+
+	fun = app(fun,def);
+	drop(exp);
+	return fun;
+	}
+	}
+
+value resolve(value exp, value context(value))
+	{
+	exp = do_resolve(exp,context);
+	if (exp->T == type_sym)
+		die(0); /* The expression had undefined symbols. */
+	return exp;
 	}

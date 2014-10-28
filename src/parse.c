@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include <die.h>
 #include <input.h>
+#include <output.h>
 #include <parse.h>
 #include <source.h>
 #include <type_sym.h>
@@ -42,6 +43,13 @@ if it had reached end of file.
 
 static int ch; /* current character */
 static unsigned long source_line;  /* current line number */
+
+static void syntax_error(const char *code, unsigned long line)
+	{
+	put_to_error();
+	put(code); put_error_location(line);
+	die(0);
+	}
 
 static void skip(void)
 	{
@@ -223,22 +231,19 @@ static value parse_list(void)
 	return app(app(hold(Qcons),term),parse_list());
 	}
 
-static value parse_sub_exp(unsigned long first_line)
-	{
-	value exp;
-	skip();
-	exp = parse_exp();
-	if (ch != ')')
-		syntax_error("Unclosed parenthesis", first_line);
-	skip();
-	return exp;
-	}
-
 static value parse_term(void)
 	{
 	unsigned long first_line = source_line;
 	if (ch == '(') /* parenthesized expression */
-		return parse_sub_exp(first_line);
+		{
+		value exp;
+		skip();
+		exp = parse_exp();
+		if (ch != ')')
+			syntax_error("Unclosed parenthesis", first_line);
+		skip();
+		return exp;
+		}
 	else if (ch == '[') /* list */
 		{
 		value exp;
@@ -347,7 +352,7 @@ static value parse_exp(void)
 	}
 
 /* Parse the source stream. */
-static value parse_source(void)
+value parse_source(void)
 	{
 	ch = 0;
 	source_line = 1;
@@ -361,13 +366,4 @@ static value parse_source(void)
 		syntax_error("Extraneous input", source_line);
 	return exp;
 	}
-	}
-
-value get_function(void)
-	{
-	value exp = parse_source();
-	exp = resolve(exp);
-	if (exp->T == type_sym)
-		die(0); /* The expression had undefined symbols. */
-	return exp;
 	}
