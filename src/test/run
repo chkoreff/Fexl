@@ -104,19 +104,22 @@ test_misbehavior=false
 if $test_misbehavior; then
 
 (
+ulimit -Sc 0
 ulimit -St 1
 echo -n "@ I" | run_fexl
 # CPU time limit exceeded
 ) 2>&1
 
 (
+ulimit -Sc 0
 ulimit -Ss 1000
 echo -n "@ @" | run_fexl
 # Stack overflow (Segmentation fault)
 ) 2>&1
 
 (
-ulimit -Sv 200000
+ulimit -Sc 0
+ulimit -Sv 100000
 echo -n "\S=(\x\y\z x z; y z) @ S S S" | run_fexl
 # The program ran out of memory.
 ) 2>&1

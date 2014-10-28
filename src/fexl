@@ -1,9 +1,12 @@
 #!/bin/sh
 ./build || exit
 
+# Disable core dump.
+ulimit -Sc 0
+
 # Limit stack and virtual memory in 1K blocks.
 ulimit -Ss 10000
-ulimit -Sv 200000
+ulimit -Sv 100000
 
 # Limit CPU time in seconds.
 ulimit -St 5
