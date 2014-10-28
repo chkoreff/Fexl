@@ -123,6 +123,19 @@ static value last_sym(value f)
 	return last_sym(f->L);
 	}
 
+value type_form(value f)
+	{
+	if (f->N == 0) drop(f->R);
+	if (!f->L) return f;
+	return Q(type_void);
+	}
+
+value Qform(value exp)
+	{
+	value label = Qstr(str_new_data0(source_label ? source_label : ""));
+	return V(type_form,0,A(label,exp));
+	}
+
 static void undefined_symbol(const char *name, unsigned long line)
 	{
 	put_to_error();

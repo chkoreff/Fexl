@@ -16,6 +16,7 @@
 #include <type_num.h>
 #include <type_output.h>
 #include <type_rand.h>
+#include <type_resolve.h>
 #include <type_str.h>
 #include <type_sym.h>
 
@@ -28,6 +29,7 @@ static int match(const char *other)
 	return strcmp(curr_name,other) == 0;
 	}
 
+static value type_standard(value f);
 static value type_eval_file(value f);
 static value type_eval_str(value f);
 
@@ -75,12 +77,14 @@ static value standard_name(const char *name)
 	if (match("put")) return Q(type_put);
 	if (match("put_to_error")) return Q(type_put_to_error);
 	if (match("rand")) return Q(type_rand);
+	if (match("resolve")) return Q(type_resolve);
 	if (match("round")) return Q(type_round);
 	if (match("say")) return Q(type_say);
 	if (match("seed_rand")) return Q(type_seed_rand);
 	if (match("sin")) return Q(type_sin);
 	if (match("slice")) return Q(type_slice);
 	if (match("sqrt")) return Q(type_sqrt);
+	if (match("standard")) return Q(type_standard);
 	if (match("str_num")) return Q(type_str_num);
 	if (match("T")) return hold(T);
 	if (match("trunc")) return Q(type_trunc);
@@ -92,6 +96,26 @@ value standard_context(value x)
 	{
 	const char *name = ((string)x->R)->data;
 	return standard_name(name);
+	}
+
+static value type_standard(value f)
+	{
+	if (!f->L) return f;
+	{
+	value x = eval(hold(f->R));
+	if (x->T == type_str)
+		{
+		value def = standard_context(x);
+		if (def)
+			f = A(A(hold(Qcons),def),hold(C));
+		else
+			f = hold(C);
+		}
+	else
+		f = Q(type_void);
+	drop(x);
+	return f;
+	}
 	}
 
 static value parse_standard(const char *label)

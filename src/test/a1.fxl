@@ -394,5 +394,8 @@ demo_rand
 div
 eval_file "test/stats.fxl"
 
+div
+eval_file "test/resolve.fxl"
+
 \\
 Extra stuff not parsed.

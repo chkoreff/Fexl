@@ -98,6 +98,19 @@ y
 "
 run_text
 
+text="{
+{ab
+cd {} e
+"
+run_text
+
+# Test undefined symbols in a dynamic context.
+text='\\form={a b
+c}
+resolve form (\\x eq x "b" [(say "b")] [])
+'
+run_text
+
 echo "== test missing file"
 ../bin/fexl 2>&1 missing.fxl
 echo "exit $?"

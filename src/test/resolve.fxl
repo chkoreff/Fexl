@@ -1,0 +1,25 @@
+# Define an enhanced context which includes all the standard symbols along with
+# a few new ones.
+\context=
+(
+\x
+\speaker=(\name \x put name put " says " say x)
+eq x "fred" [(speaker "Fred")];
+eq x "wilma" [(speaker "Wilma")];
+eq x "goodbye" [(say "Goodbye")];
+standard x
+)
+
+# Now define an unresolved form.
+\form=
+{
+say "Hi"
+say (+ 32 (* 5 5))
+say (is_void void)
+fred "a"
+wilma "b"
+goodbye
+}
+
+# Resolve the form in the enhanced context.
+resolve form context

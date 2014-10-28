@@ -118,6 +118,7 @@ static value parse_name(void)
 			|| ch == '\\'
 			|| ch == '(' || ch == ')'
 			|| ch == '[' || ch == ']'
+			|| ch == '{' || ch == '}'
 			|| ch == ';'
 			|| ch == '"'
 			|| ch == '~'
@@ -253,6 +254,16 @@ static value parse_term(void)
 			syntax_error("Unclosed bracket", first_line);
 		skip();
 		return exp;
+		}
+	else if (ch == '{') /* unresolved form */
+		{
+		value exp;
+		skip();
+		exp = parse_exp();
+		if (ch != '}')
+			syntax_error("Unclosed brace", first_line);
+		skip();
+		return Qform(exp);
 		}
 	else
 		return parse_symbol();

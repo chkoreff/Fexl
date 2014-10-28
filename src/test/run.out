@@ -418,6 +418,13 @@ Modigliani risk-adjusted performance
 1.7106%
 Sharpe Ratio of Fund vs. Benchmark
 0.0275
+==
+Hi
+57
+T
+Fred says a
+Wilma says b
+Goodbye
 exit 0
 == run_file test/a2.fxl
 Hello
@@ -491,6 +498,19 @@ y
 Undefined symbol x on line 1
 Undefined symbol z on line 3
 Undefined symbol y on line 3
+exit 1
+run_text [{
+{ab
+cd {} e
+]
+Unclosed brace on line 2
+exit 1
+run_text [\form={a b
+c}
+resolve form (\x eq x "b" [(say "b")] [])
+]
+Undefined symbol a on line 1
+Undefined symbol c on line 2
 exit 1
 == test missing file
 Could not open the input file on line 1 of missing.fxl
