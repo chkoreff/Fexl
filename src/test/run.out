@@ -461,10 +461,34 @@ exit 0
 Hello
 Type some lines of input and I'll echo them back.
 Press Ctrl-D to stop.
-abc
-defg
-
-hij
+ch = 'a'
+ch = 'b'
+ch = 'c'
+ch = '
+'
+ch = 'd'
+ch = 'e'
+ch = 'f'
+ch = 'g'
+ch = '
+'
+ch = '
+'
+ch = 'h'
+ch = 'i'
+ch = 'j'
+ch = '
+'
+ch = 'å'
+ch = 'a'
+ch = 'b'
+ch = 'c'
+ch = 'ü'
+ch = 'd'
+ch = 'e'
+ch = 'f'
+ch = '
+'
 Good bye.
 exit 0
 ====

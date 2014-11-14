@@ -231,17 +231,17 @@ div
 	loop x
 	)
 
-# (fib n) returns the nth Fibonacci number starting at 0. */
+# (fib n) returns the nth Fibonacci number starting at 0.
 \fib=
 	(
-	\fib==
+	\loop==
 		(\x\y\n
 		le n 0 x;
 		\z=(+ x y)
 		\n=(- n 1)
-		fib y z n
+		loop y z n
 		)
-	fib 0 1
+	loop 0 1
 	)
 
 \try=

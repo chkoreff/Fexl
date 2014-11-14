@@ -6,7 +6,7 @@ say "Press Ctrl-D to stop."
 @\loop
 \ch=get
 eq ch "" ();
-put ch
+say ["ch = '" ch "'"]
 loop
 )
 say "Good bye."
