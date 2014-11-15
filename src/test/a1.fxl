@@ -216,7 +216,7 @@ say_x 5
 
 div
 
-\for=
+\do_range=
 	(\x\y\f
 	\x=(round x)
 	\y=(round y)
@@ -246,7 +246,7 @@ div
 
 \try=
 	(\x\y
-	for x y \n
+	do_range x y \n
 	put "fib " put n put " = " say (fib n)
 	)
 
