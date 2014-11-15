@@ -3,8 +3,10 @@
 #include <value.h>
 #include <basic.h>
 #include <convert.h>
+#include <die.h>
 #include <file_input.h>
 #include <input.h>
+#include <output.h>
 #include <parse.h>
 #include <source.h>
 #include <standard.h>
@@ -16,7 +18,6 @@
 #include <type_num.h>
 #include <type_output.h>
 #include <type_rand.h>
-#include <type_resolve.h>
 #include <type_str.h>
 #include <type_sym.h>
 
@@ -77,7 +78,6 @@ static value standard_name(const char *name)
 	if (match("put")) return Q(type_put);
 	if (match("put_to_error")) return Q(type_put_to_error);
 	if (match("rand")) return Q(type_rand);
-	if (match("resolve")) return Q(type_resolve);
 	if (match("round")) return Q(type_round);
 	if (match("say")) return Q(type_say);
 	if (match("seed_rand")) return Q(type_seed_rand);
@@ -134,6 +134,12 @@ value eval_file(const char *name)
 	input save = getd;
 
 	get_from_file(name);
+	if (!getd)
+		{
+		put_to_error();
+		put("Could not open source file ");put(name);nl();
+		die(0);
+		}
 	exp = parse_standard(name);
 
 	getd = save;

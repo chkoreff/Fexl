@@ -67,6 +67,7 @@ static value substitute(value p, value f)
 		return A(substitute(p->L,f->L),substitute(p->R,f->R));
 	}
 
+/* (subst pattern form arg) */
 static value type_subst(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return f;
@@ -121,19 +122,6 @@ static value last_sym(value f)
 	sym = last_sym(f->R);
 	if (sym) return sym;
 	return last_sym(f->L);
-	}
-
-value type_form(value f)
-	{
-	if (f->N == 0) drop(f->R);
-	if (!f->L) return f;
-	return Q(type_void);
-	}
-
-value Qform(value exp)
-	{
-	value label = Qstr(str_new_data0(source_label ? source_label : ""));
-	return V(type_form,0,A(label,exp));
 	}
 
 static void undefined_symbol(const char *name, unsigned long line)

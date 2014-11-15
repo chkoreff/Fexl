@@ -87,9 +87,8 @@ cd {} e
 
 (
 cat <<"EOF"
-\form={a b
-c}
-resolve form (\x eq x "b" [(say "b")] [])
+{\x eq x "b" [(say "b")] []} a b
+c
 EOF
 ) | run_fexl
 

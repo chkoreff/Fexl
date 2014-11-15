@@ -547,5 +547,5 @@ Undefined symbol a on line 1
 Undefined symbol c on line 2
 exit 1
 ====
-Could not open the input file on line 1 of missing.fxl
+Could not open source file missing.fxl
 exit 1

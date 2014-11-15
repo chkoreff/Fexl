@@ -35,29 +35,22 @@ static value dynamic_context(value x)
 	}
 	}
 
-/* (resolve form context) */
+/* (resolve label form context) */
 value type_resolve(value f)
 	{
-	if (!f->L || !f->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L) return f;
 	{
-	value form = eval(hold(f->L->R));
-	if (form->T == type_form)
-		{
-		value save = context_function;
-		context_function = f->R;
+	const char *save_source_label = source_label;
+	value save_context_function = context_function;
 
-		{
-		const char *save = source_label;
-		source_label = ((string)form->R->L->R)->data;
-		f = resolve(hold(form->R->R),dynamic_context);
-		source_label = save;
-		}
+	value label = f->L->L->R;
+	source_label = ((string)label->R)->data;
+	context_function = f->R;
 
-		context_function = save;
-		}
-	else
-		f = Q(type_void);
-	drop(form);
+	f = resolve(hold(f->L->R),dynamic_context);
+
+	source_label = save_source_label;
+	context_function = save_context_function;
 	return f;
 	}
 	}

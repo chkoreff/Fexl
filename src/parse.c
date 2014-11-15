@@ -8,6 +8,8 @@
 #include <output.h>
 #include <parse.h>
 #include <source.h>
+#include <type_resolve.h>
+#include <type_str.h>
 #include <type_sym.h>
 
 /*
@@ -16,7 +18,10 @@ Grammar:
 exp    => empty
 exp    => term exp
 exp    => ; exp
-exp    => \ sym def exp
+exp    => \ sym exp
+exp    => \ sym = term exp
+exp    => \ sym == term exp
+exp    => { exp } exp
 
 term   => ( exp )
 term   => [ list ]
@@ -25,9 +30,6 @@ term   => sym
 list   => empty
 list   => term list
 list   => ; exp
-
-def    => empty
-def    => = term
 
 sym    => name
 sym    => string
@@ -101,8 +103,7 @@ static void skip_filler(void)
 		}
 	}
 
-/*
-Parse a name, or return 0 if we don't see one.
+/* Parse a name, or return 0 if we don't see one.
 
 A name may contain just about anything, except for white space (including NUL)
 and a few other special characters.  This is the simplest rule that can work.
@@ -135,6 +136,7 @@ static value parse_name(void)
 	return Qsym(0, buf_finish(buf), first_line);
 	}
 
+/* Collect a string up to an ending terminator. */
 static string collect_string(
 	const char *end_data,
 	unsigned long end_len,
@@ -255,16 +257,6 @@ static value parse_term(void)
 		skip();
 		return exp;
 		}
-	else if (ch == '{') /* unresolved form */
-		{
-		value exp;
-		skip();
-		exp = parse_exp();
-		if (ch != '}')
-			syntax_error("Unclosed brace", first_line);
-		skip();
-		return Qform(exp);
-		}
 	else
 		return parse_symbol();
 	}
@@ -272,21 +264,19 @@ static value parse_term(void)
 /* Parse a lambda form following the initial '\' character. */
 static value parse_lambda(unsigned long first_line)
 	{
-	skip_white();
+	value sym, def=0, exp;
+	char is_recursive = 0;
 
-	{
 	/* Parse the symbol (function parameter). */
-	value sym = parse_symbol();
+	skip_white();
+	sym = parse_symbol();
 	if (sym == 0)
 		syntax_error("Missing symbol after '\\'", first_line);
 
 	skip_filler();
 	first_line = source_line;
 
-	{
 	/* Parse the definition of the symbol if we see an '=' char. */
-	value def = 0;
-	char is_recursive = 0;
 	if (ch == '=')
 		{
 		skip();
@@ -303,15 +293,11 @@ static value parse_lambda(unsigned long first_line)
 	if (is_recursive)
 		def = app(hold(Y),lam(hold(sym),def));
 
-	{
 	/* Parse the body of the function and apply the definition if any. */
-	value exp = lam(sym,parse_exp());
+	exp = lam(sym,parse_exp());
 	if (def)
 		exp = app(app(hold(Qeval),def),exp);
 	return exp;
-	}
-	}
-	}
 	}
 
 /* Parse the next factor of an expression.  Return 0 if no factor found. */
@@ -336,6 +322,22 @@ static value parse_factor(void)
 		{
 		skip();
 		return parse_exp();
+		}
+	else if (ch == '{')
+		{
+		/* Resolve in a context. */
+		unsigned long first_line = source_line;
+		value context, form, label;
+
+		skip();
+		context = parse_exp();
+		if (ch != '}')
+			syntax_error("Unclosed brace", first_line);
+
+		skip();
+		form = parse_exp();
+		label = Qstr(str_new_data0(source_label ? source_label : ""));
+		return app(A(A(Q(type_resolve),label),form),context);
 		}
 	else
 		{
@@ -365,16 +367,13 @@ static value parse_exp(void)
 /* Parse the source stream. */
 value parse_source(void)
 	{
+	value exp;
+
 	ch = 0;
 	source_line = 1;
 
-	if (!getd)
-		syntax_error("Could not open the input file", source_line);
-
-	{
-	value exp = parse_exp();
+	exp = parse_exp();
 	if (ch != -1)
 		syntax_error("Extraneous input", source_line);
 	return exp;
-	}
 	}
