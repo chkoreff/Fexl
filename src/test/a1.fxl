@@ -193,6 +193,31 @@ show_x
 show_x
 say "]"
 
+# Test single evaluation.
+(
+\x=(once; put "(CALC)" (+ 2 (* 7 6))) # ok
+
+\make_square=
+	(\x
+	once;
+	put ["square " x "="]
+	* x x
+	)
+
+div
+
+say (* x x)
+say (+ x x)
+
+\s4=(make_square 4)
+\s7=(make_square 7)
+
+say s4
+say s7
+say s4
+say s7
+)
+
 div
 eval_file "test/hello.fxl"
 div
@@ -404,6 +429,30 @@ div
 \x=(F 1) say (is_bool x)
 \x=(T 1 2) say (is_num x)
 \x=(F 1 2) say (is_num x)
+
+div
+say (is_list [])
+say (is_list ["a"])
+say (is_list ["a" 3])
+say (is_list [1])
+say (is_list [1;2])
+say (is_list null)
+say (is_list (cons 1 []))
+div
+say (is_list (null 1))
+say (is_list cons)
+say (is_list (cons 1))
+
+div
+say (is_good 2)
+say (is_good (say "hi"))
+say (is_good [])
+say (is_good void)
+div
+say (is_void 2)
+say (is_void (say "hi"))
+say (is_void [])
+say (is_void void)
 
 div
 \append==(\xs\ys xs ys \x\xs [x; append xs ys])

@@ -23,11 +23,11 @@
 
 /*LATER A "cd" function which temporarily changes directory, then back. */
 
-static const char *curr_name;
+static const char *cur_name;
 
 static int match(const char *other)
 	{
-	return strcmp(curr_name,other) == 0;
+	return strcmp(cur_name,other) == 0;
 	}
 
 static value type_standard(value f);
@@ -41,7 +41,7 @@ static value standard_name(const char *name)
 	if (def) return def;
 	}
 
-	curr_name = name;
+	cur_name = name;
 
 	if (match("^")) return Q(type_pow);
 	if (match("-")) return Q(type_sub);
@@ -52,7 +52,7 @@ static value standard_name(const char *name)
 	if (match("+")) return Q(type_add);
 	if (match("abs")) return Q(type_abs);
 	if (match("void")) return Q(type_void);
-	if (match("cons")) return hold(Qcons);
+	if (match("cons")) return hold(cons);
 	if (match("cos")) return Q(type_cos);
 	if (match("eq")) return Q(type_eq);
 	if (match("eval_file")) return Q(type_eval_file);
@@ -62,10 +62,12 @@ static value standard_name(const char *name)
 	if (match("get")) return Q(type_get);
 	if (match("gt")) return Q(type_gt);
 	if (match("I")) return hold(I);
-	if (match("is_void")) return Q(type_is_void);
+	if (match("is_bool")) return Q(type_is_bool);
+	if (match("is_good")) return Q(type_is_good);
+	if (match("is_list")) return Q(type_is_list);
 	if (match("is_num")) return Q(type_is_num);
 	if (match("is_str")) return Q(type_is_str);
-	if (match("is_bool")) return Q(type_is_bool);
+	if (match("is_void")) return Q(type_is_void);
 	if (match("later")) return Q(type_later);
 	if (match("le")) return Q(type_le);
 	if (match("length")) return Q(type_length);
@@ -73,8 +75,9 @@ static value standard_name(const char *name)
 	if (match("lt")) return Q(type_lt);
 	if (match("ne")) return Q(type_ne);
 	if (match("nl")) return Q(type_nl);
-	if (match("null")) return hold(C);
+	if (match("null")) return hold(null);
 	if (match("num_str")) return Q(type_num_str);
+	if (match("once")) return Q(type_once);
 	if (match("put")) return Q(type_put);
 	if (match("put_to_error")) return Q(type_put_to_error);
 	if (match("rand")) return Q(type_rand);
@@ -107,9 +110,9 @@ static value type_standard(value f)
 		{
 		value def = standard_context(x);
 		if (def)
-			f = A(A(hold(Qcons),def),hold(C));
+			f = A(A(hold(cons),def),hold(null));
 		else
-			f = hold(C);
+			f = hold(null);
 		}
 	else
 		f = Q(type_void);

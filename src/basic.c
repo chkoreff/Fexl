@@ -19,7 +19,6 @@ value type_I(value f)
 (T x y) = x
 (F x y) = y
 */
-
 value type_T(value f)
 	{
 	if (!f->L) return f;
@@ -40,13 +39,19 @@ value type_Y(value f)
 	return apply(hold(f->R),hold(f));
 	}
 
-/*LATER distinguish between C and null */
-
 /* (cons x y A B) = (B x y) */
 value type_cons(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return f;
 	return apply(apply(hold(f->R),hold(f->L->L->L->R)),hold(f->L->L->R));
+	}
+
+/* (null A B) = A */
+value type_null(value f)
+	{
+	if (!f->L) return f;
+	f->T = type_C;
+	return f;
 	}
 
 /* (void x) = void */
@@ -58,13 +63,17 @@ value type_void(value f)
 
 value type_is_void(value f)
 	{
-	return Qis_atom(type_void,f);
+	return is_type(f,type_void);
 	}
 
-/* LATER is_good */
+value type_is_good(value f)
+	{
+	if (!f->L) return f;
+	return Qboolean(f->R->T != type_void);
+	}
 
-/* (eval x y) = (y x), except x is evalated first. */
-value type_eval(value f)
+/* (eager x y) = (y x), with x evaluated first. */
+value type_eager(value f)
 	{
 	if (!f->L || !f->L->L) return f;
 	{
@@ -83,10 +92,42 @@ value type_later(value f)
 	return f;
 	}
 
+/* Used by type_once. */
+static value type_replace_right(value f)
+	{
+	value x = eval(f->R);
+	drop(f->L);
+	f->L = hold(I);
+	f->R = x;
+	f->T = type_A;
+	return hold(x);
+	}
+
+/* (once x) = x, but x is only evaluated once, on demand */
+value type_once(value f)
+	{
+	if (!f->L) return f;
+	f->T = type_replace_right;
+	return f;
+	}
+
 value type_is_bool(value f)
 	{
 	if (!f->L) return f;
-	return Qboolean(f->R->T == type_T || f->R->T == type_F);
+	{
+	value x = f->R;
+	return Qboolean(x->T == type_T || x->T == type_F);
+	}
+	}
+
+value type_is_list(value f)
+	{
+	if (!f->L) return f;
+	{
+	value x = f->R;
+	return Qboolean(x->T == type_null ||
+		(x->L && x->L->L && x->L->L->T == type_cons));
+	}
 	}
 
 value Qboolean(int x)
@@ -94,21 +135,20 @@ value Qboolean(int x)
 	return hold(x ? T : F);
 	}
 
-value Qis_atom(type t, value f)
+value is_type(value f, type t)
 	{
 	if (!f->L) return f;
 	return Qboolean(f->R->T == t);
 	}
-
-/* LATER is_list */
 
 value C;
 value I;
 value T;
 value F;
 value Y;
-value Qeval;
-value Qcons;
+value eager;
+value cons;
+value null;
 
 void beg_basic(void)
 	{
@@ -117,8 +157,9 @@ void beg_basic(void)
 	T = Q(type_T);
 	F = Q(type_F);
 	Y = Q(type_Y);
-	Qeval = Q(type_eval);
-	Qcons = Q(type_cons);
+	eager = Q(type_eager);
+	cons = Q(type_cons);
+	null = Q(type_null);
 	}
 
 void end_basic(void)
@@ -128,6 +169,7 @@ void end_basic(void)
 	drop(T);
 	drop(F);
 	drop(Y);
-	drop(Qeval);
-	drop(Qcons);
+	drop(eager);
+	drop(cons);
+	drop(null);
 	}

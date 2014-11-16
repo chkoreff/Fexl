@@ -50,10 +50,11 @@ value type_length(value f)
 	}
 	}
 
-/* LATER str_find */
+/* LATER str_find, a.k.a. index */
 
 /* (slice str pos len) returns the len bytes of str starting at pos, or void if
 pos or len exceeds the bounds of str. */
+/* LATER make it forgiving like Perl */
 value type_slice(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return f;
@@ -106,5 +107,5 @@ value type_str_num(value f)
 
 value type_is_str(value f)
 	{
-	return Qis_atom(type_str,f);
+	return is_type(f,type_str);
 	}

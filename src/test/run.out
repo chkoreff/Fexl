@@ -154,6 +154,13 @@ x = 30
 x = 30
 ]
 ==
+(CALC)1936
+88
+square 4=16
+square 7=49
+16
+49
+==
 Hello world!
 ==
 f = hej
@@ -431,6 +438,28 @@ T
 F
 F
 T
+T
+==
+T
+T
+T
+T
+T
+T
+T
+==
+F
+F
+F
+==
+T
+T
+T
+F
+==
+F
+F
+F
 T
 ==
 

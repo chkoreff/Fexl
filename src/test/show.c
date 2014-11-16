@@ -26,7 +26,7 @@ void show(value f)
 	else if (f->T == type_T) put_ch('T');
 	else if (f->T == type_F) put_ch('F');
 	else if (f->T == type_Y) put_ch('@');
-	else if (f->T == type_eval) put_ch('!');
+	else if (f->T == type_eager) put_ch('!');
 	else if (f->T == type_later) put("later");
 	else if (f->T == type_cons) put("cons");
 	else if (f->T == type_str)
@@ -63,5 +63,9 @@ void show(value f)
 	else if (f->T == type_put) put("put");
 	else if (f->T == type_nl) put("nl");
 	else if (f->T == type_say) put("say");
-	else put_ch('_');
+	else
+		{
+		put_ch('T');
+		put_ulong((unsigned long)f->T);
+		}
 	}

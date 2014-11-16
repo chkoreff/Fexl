@@ -49,12 +49,6 @@ int num_cmp(number x, number y)
 	return 0;
 	}
 
-/* We show 15 digits because that's what Perl does. */
-
-/* https://en.wikipedia.org/wiki/Double-precision_floating-point_format */
-/* LATER use limits to determine precision for machine */
-/* LATER problem is, DECIMAL_DIG (in float.h) is only guaranteed to be at least
-10. */
 void put_num(number x)
 	{
 	put_double(*x);

@@ -11,8 +11,8 @@ static value context_function;
 
 static value dynamic_context(value x)
 	{
-
 	{
+	/* Define numeric literals. */
 	const char *name = ((string)x->R)->data;
 	value def = Qnum_str0(name);
 	if (def) return def;
@@ -20,12 +20,11 @@ static value dynamic_context(value x)
 
 	{
 	/* Define other names using the given context. */
-	value token_cons = Q(type_cons);
 	value exp = eval(A(A(A(hold(context_function),hold(x)),
-		hold(C)),token_cons));
+		hold(null)),hold(cons)));
 
 	value def;
-	if (exp->L && exp->L->L == token_cons)
+	if (exp->L && exp->L->L == cons)
 		def = hold(exp->L->R);
 	else
 		def = 0;

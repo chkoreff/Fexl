@@ -230,8 +230,8 @@ static value parse_list(void)
 		return parse_exp();
 		}
 	term = parse_term();
-	if (term == 0) return hold(C);
-	return app(app(hold(Qcons),term),parse_list());
+	if (term == 0) return hold(null);
+	return app(app(hold(cons),term),parse_list());
 	}
 
 static value parse_term(void)
@@ -296,7 +296,7 @@ static value parse_lambda(unsigned long first_line)
 	/* Parse the body of the function and apply the definition if any. */
 	exp = lam(sym,parse_exp());
 	if (def)
-		exp = app(app(hold(Qeval),def),exp);
+		exp = app(app(hold(eager),def),exp);
 	return exp;
 	}
 
