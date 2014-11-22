@@ -9,18 +9,13 @@
 value type_num(value f)
 	{
 	if (f->N == 0) num_free((number)f->R);
-	if (!f->L) return f;
+	if (!f->L) return 0;
 	return Q(type_void);
 	}
 
 value Qnum(number x)
 	{
 	return D(type_num,x);
-	}
-
-value Qnum_ulong(unsigned long val)
-	{
-	return Qnum(num_new_ulong(val));
 	}
 
 value Qnum_str0(const char *name)
@@ -32,7 +27,7 @@ value Qnum_str0(const char *name)
 
 value type_num_str(value f)
 	{
-	if (!f->L) return f;
+	if (!f->L) return 0;
 	{
 	value x = eval(hold(f->R));
 	if (x->T == type_num)
@@ -46,5 +41,5 @@ value type_num_str(value f)
 
 value type_is_num(value f)
 	{
-	return is_type(f,type_num);
+	return op_is_type(f,type_num);
 	}

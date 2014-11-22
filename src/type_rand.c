@@ -8,7 +8,7 @@
 /* Seed rand with an arbitrary number between 0 and 1. */
 value type_seed_rand(value f)
 	{
-	if (!f->L) return f;
+	if (!f->L) return 0;
 	{
 	value x = eval(hold(f->R));
 	if (x->T == type_num)
@@ -24,10 +24,14 @@ value type_seed_rand(value f)
 	}
 	}
 
-/* Uniform distribution, 0 <= x <= 1 */
+/* (rand next) = (next num) where num is a weakly pseudo-random number with
+a uniform distribution over 0 <= x <= 1.
+*/
 value type_rand(value f)
 	{
+	if (!f->L) return 0;
+	{
 	double x = ((double)rand()) / ((double)RAND_MAX);
-	(void)f;
-	return Qnum(num_new_double(x));
+	return A(hold(f->R), Qnum(num_new_double(x)));
+	}
 	}

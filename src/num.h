@@ -11,6 +11,7 @@ extern number num_round(number x);
 extern number num_trunc(number x);
 extern number num_abs(number x);
 extern number num_sqrt(number x);
+extern number num_exp(number x);
 extern number num_log(number x);
 extern number num_sin(number x);
 extern number num_cos(number x);

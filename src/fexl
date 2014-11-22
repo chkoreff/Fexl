@@ -5,7 +5,7 @@
 ulimit -Sc 0
 
 # Limit stack and virtual memory in 1K blocks.
-ulimit -Ss 10000
+ulimit -Ss 20000
 ulimit -Sv 100000
 
 # Limit CPU time in seconds.

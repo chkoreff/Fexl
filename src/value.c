@@ -73,7 +73,7 @@ void drop(value f)
 	}
 
 /* Return a value of type T with the given left and right side. */
-value V(type T, value L, value R)
+static value V(type T, value L, value R)
 	{
 	value f = free_list;
 	if (f)
@@ -100,16 +100,11 @@ value D(type T, void *x)
 	return V(T,0,x);
 	}
 
-/* Evaluate x and apply the result to y. */
-value apply(value x, value y)
-	{
-	x = eval(x);
-	return V(x->T,x,y);
-	}
-
+/* The type for function application */
 value type_A(value f)
 	{
-	return apply(hold(f->L),hold(f->R));
+	value g = eval(hold(f->L));
+	return V(g->T,g,hold(f->R));
 	}
 
 /* Apply x to y. */
@@ -124,9 +119,8 @@ value eval(value f)
 	while (1)
 		{
 		value g = f->T(f);
-		if (g == f) break;
+		if (g == 0) return f;
 		drop(f);
 		f = g;
 		}
-	return f;
 	}

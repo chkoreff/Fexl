@@ -12,13 +12,13 @@ ghij
 \üä = "hej üä"
 \1≠0 = "hej 1≠0"
 
-put "f = "; say f
-put "åabcüdef = "; say åabcüdef ;
-put "ghij = "; say ghij ;
-put "üä = "; say  üä ;
-put "1≠0 = "; say 1≠0 ;
+put "f = " say f
+put "åabcüdef = " say åabcüdef
+put "ghij = " say ghij
+put "üä = " say  üä
+put "1≠0 = " say 1≠0
 
 \"vegetable"="grönsak"
 \"dessert"="efterrätt"
-put "vegetable "; say "vegetable";
-put "dessert "; say "dessert";
+put "vegetable " say "vegetable"
+put "dessert " say "dessert"

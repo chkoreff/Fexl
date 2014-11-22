@@ -7,6 +7,7 @@ extern value type_round(value f);
 extern value type_trunc(value f);
 extern value type_abs(value f);
 extern value type_sqrt(value f);
+extern value type_exp(value f);
 extern value type_log(value f);
 extern value type_sin(value f);
 extern value type_cos(value f);

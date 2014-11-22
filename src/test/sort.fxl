@@ -1,0 +1,107 @@
+# Here we defined a highly restricted context which provides a few functions
+# needed to test sorting.
+{
+\append==(\xs\ys xs ys \x\xs [x;append xs ys])
+
+\map==(\f\xs xs [] \x\xs [(f x); map f xs])
+
+# (filter f xs) is the list of items x in xs for which (f x) is true.
+\filter==(\f\xs xs [] \x\xs f x (cons x) (); filter f xs)
+
+# (tower n f x) is the result of applying f to x n times.
+\tower==
+	(\n\f\x
+	le n 0 x;
+	tower (- n 1) f (f x)
+	)
+
+# (unique xs) is the ordered list of unique elements in list xs.
+\unique==
+	(\xs
+	xs [] \x\xs
+	append (unique; filter (gt x) xs); # all the items less than x
+	cons x;                            # x itself
+	unique; filter (lt x) xs           # all the items greater than x
+	)
+
+# (sort xs) is the ordered list of all elements in list xs.
+\sort==
+	(\xs
+	xs [] \x\xs
+	append (sort; filter (gt x) xs);   # all the items less than x
+	cons x; append (filter (eq x) xs); # all the items equal to x
+	sort; filter (lt x) xs             # all the items greater than x
+	)
+
+\x
+eq x "append" [append];
+eq x "say" [say];
+eq x "sort" [sort];
+eq x "tower" [tower];
+eq x "unique" [unique];
+[]
+}
+
+# Here we test the sort.
+
+# A list of 30 random words from diceware.com.
+\list =
+	[
+	"when"
+	"scud"
+	"gibby"
+	"babel"
+	"skip"
+	"sham"
+	"rug"
+	"expel"
+	"grout"
+	"perky"
+	"jo"
+	"piece"
+	"ro"
+	"haw"
+	"revel"
+	"qqqq"
+	"bow"
+	"blotch"
+	"flam"
+	"than"
+	"subtly"
+	"jess"
+	"angie"
+	"dewar"
+	"polka"
+	"ur"
+	"eb"
+	"am"
+	"amra"
+	"crown"
+	]
+
+# (exp_list n xs) Make 2^N copies of list xs.
+\exp_list=(\n\xs tower n (\x append x x) xs)
+
+# Show all the entries of a list on separate lines.
+\show==(\xs xs () \x\xs say x show xs)
+# Wrap the show inside matching brackets.
+\show=(\xs say "[" show xs say "]")
+
+# Make two copies of the list and sort it.
+show (sort; exp_list 1 list)
+
+# Make 2^N copies of the list and show only the unique entries.
+(
+# NOTE: If you time these you'll see that the sort time is O(N).
+#\N=7  # 3840 words
+\N=9  # 15360 words
+
+#\N=10 # 30720 words
+#\N=11 # 61440 words
+#\N=12 # 122880 words
+#\N=13 # 245760 words
+#\N=14 # 491520 words
+#\N=15 # 983040 words
+
+show (unique; exp_list N list) # sort unique on 30*2^N words
+)

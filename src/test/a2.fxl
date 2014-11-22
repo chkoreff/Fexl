@@ -2,11 +2,12 @@
 say "Hello"
 say "Type some lines of input and I'll echo them back."
 say "Press Ctrl-D to stop."
-(
-@\loop
-\ch=get
-eq ch "" ();
-say ["ch = '" ch "'"]
-loop
-)
+\echo==
+	(
+	get \ch
+	is_void ch ();
+	say ["ch = '" ch "'"]
+	echo
+	)
+echo
 say "Good bye."

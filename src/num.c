@@ -1,4 +1,4 @@
-#include <math.h> /* log sin cos */
+#include <math.h> /* exp log sin cos */
 #include <memory.h>
 #include <num.h>
 #include <output.h>
@@ -38,6 +38,7 @@ number num_round(number x) { return num_new_double(round(*x)); }
 number num_trunc(number x) { return num_new_double(trunc(*x)); }
 number num_abs(number x) { return num_new_double(fabs(*x)); }
 number num_sqrt(number x) { return num_new_double(sqrt(*x)); }
+number num_exp(number x) { return num_new_double(exp(*x)); }
 number num_log(number x) { return num_new_double(log(*x)); }
 number num_sin(number x) { return num_new_double(sin(*x)); }
 number num_cos(number x) { return num_new_double(cos(*x)); }

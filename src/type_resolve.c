@@ -1,13 +1,13 @@
-#include <num.h>
-#include <str.h>
 #include <value.h>
 #include <basic.h>
+#include <num.h>
 #include <source.h>
+#include <str.h>
 #include <type_num.h>
 #include <type_resolve.h>
 #include <type_sym.h>
 
-static value context_function;
+static value context_value;
 
 static value dynamic_context(value x)
 	{
@@ -20,7 +20,7 @@ static value dynamic_context(value x)
 
 	{
 	/* Define other names using the given context. */
-	value exp = eval(A(A(A(hold(context_function),hold(x)),
+	value exp = eval(A(A(A(hold(context_value),hold(x)),
 		hold(null)),hold(cons)));
 
 	value def;
@@ -34,22 +34,32 @@ static value dynamic_context(value x)
 	}
 	}
 
+value resolve_in_context(value exp, value context)
+	{
+	value fun;
+	value save = context_value;
+
+	context_value = context;
+	fun = resolve(exp,dynamic_context);
+	drop(context);
+
+	context_value = save;
+	return fun;
+	}
+
 /* (resolve label form context) */
 value type_resolve(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 	{
-	const char *save_source_label = source_label;
-	value save_context_function = context_function;
+	const char *save = source_label;
 
 	value label = f->L->L->R;
 	source_label = ((string)label->R)->data;
-	context_function = f->R;
 
-	f = resolve(hold(f->L->R),dynamic_context);
+	f = resolve_in_context(hold(f->L->R), hold(f->R));
 
-	source_label = save_source_label;
-	context_function = save_context_function;
+	source_label = save;
 	return f;
 	}
 	}

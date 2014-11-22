@@ -162,7 +162,7 @@ say ~(3) ~(2) ~(1) "hello"(1)(2)(3)
 
 say ~| "Ain't nothin' simple when you're doin' it for real." (Gus Baird)|
 nl
-say ~@
+say ~~
 "My fathers sleep on the sunrise plains,
 And each one sleeps alone.
 Their trails may dim to the grass and rains,
@@ -174,7 +174,7 @@ And the world began when I was born
 And the world is mine to win. ..."
 
   (Badger Clark, "The Westerner")
-@
+~
 
 # Test delayed evaluation.
 div
@@ -366,6 +366,7 @@ say (trunc 7.8)
 say (trunc -7.8)
 say (^ 10 4)
 say (^ 2.71828182845905 1.09861228866811)  # (^ e (ln 3))
+say (exp; log 3) # more exact
 
 say (. "" "")
 say (. "" "a")
@@ -380,7 +381,8 @@ say (length (. "ab" "c"))
 
 div
 # Do fn for each item in list xs.
-\do==(\xs\fn xs () \x\xs fn x; do xs fn)
+\do==(\xs\fn xs () \x\xs fn x do xs fn)
+
 # Return the first n items of a list.
 \first==
 	(\n\xs
@@ -402,7 +404,7 @@ show_list (cons 1; cons 2; later null)
 # Test rand.
 
 # An infinite list of pseudo-random numbers.
-\list_rand=(later; @\loop \x=rand [x;loop])
+\list_rand=(later; @\loop rand \x [x;loop])
 
 \demo_rand=
 	(
@@ -488,6 +490,25 @@ say (F 1)
 \list=(append list list)
 put list
 )
+
+(
+# Test a function defined with UTF-8 characters.
+\åabcüdef=say
+åabcüdef "=="
+åabcüdef ["x = " (+ 2 3)]
+åabcüdef ["y = " (* 2 3)]
+)
+
+(
+# LATER: In the new version the embedded side effects will not repeat.
+div
+\talk=(later; say (^ (put "(L)" (+ 1 1)) (say "(R)" (- 8 5))))
+talk
+talk
+talk
+)
+
+eval_file "test/sort.fxl"
 
 \\
 Extra stuff not parsed.

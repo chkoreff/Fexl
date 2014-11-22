@@ -8,7 +8,7 @@
 
 static value op_cmp(value f, int op(int))
 	{
-	if (!f->L || !f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 	{
 	value x = eval(hold(f->L->R));
 	value y = eval(hold(f->R));

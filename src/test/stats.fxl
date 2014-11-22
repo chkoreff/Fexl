@@ -3,7 +3,7 @@
 \append==(\xs\ys xs ys \x\xs [x; append xs ys])
 \fold==(\fn\z\xs xs z \x\xs \z=(fn z x) fold fn z xs)
 \map==(\f\xs xs [] \x\xs [(f x); map f xs])
-\do==(\xs\fn xs () \x\xs fn x; do xs fn)
+\do==(\xs\fn xs () \x\xs fn x do xs fn)
 
 \list_sum=(fold + 0)
 \list_length=(fold (\n\_ + 1 n) 0)
@@ -23,12 +23,11 @@
 
 # Normal distribution with mean 0 and standard deviation 1.
 \rand_normal=
-	(
-	later;
-	\r1=rand
-	\r2=rand
+	(\next
+	rand \r1
+	rand \r2
 	\x=(* (sqrt; * -2 (log r1)) (cos; * tau r2))
-	x
+	next x
 	)
 
 \show_statistics=
@@ -37,7 +36,7 @@
 \benchmark_list_ror
 
 # Repeat string x n times
-\repeat ==
+\repeat==
 	(\x\n
 	le n 0 "";
 	\n=(- n 1)
@@ -45,7 +44,7 @@
 	)
 
 # Split string x into groups of three with the given separator.
-\split3 ==
+\split3==
 	(\sep\x
 	\len=(length x)
 	le len 3 x
@@ -57,7 +56,7 @@
 
 # Format number x to n decimal places, with an optional separator for the
 # integer part.
-\format =
+\format=
 	(\n\sep\x
 	# Get the list of all digits without the decimal point.
 	\factor=(^ 10 n)
@@ -172,12 +171,14 @@ put_sharpe excess_sharpe nl
 	(\pct_mean\pct_stddev
 	\mean=(/ pct_mean 100)
 	\stddev=(/ pct_stddev 100)
-
-	later;
-	\x=rand_normal
-	\factor=(+ (+ 1 mean) (* stddev x))
-	\ror=(* 100 (- factor 1))
-	ror
+	\rand_ror=
+		(\next
+		rand_normal \x
+		\factor=(+ (+ 1 mean) (* stddev x))
+		\ror=(* 100 (- factor 1))
+		next ror
+		)
+	\next next rand_ror
 	)
 
 # Return data for 200810 - 201407
@@ -257,8 +258,8 @@ put_sharpe excess_sharpe nl
 0.827713059473001
 ]
 
-\rand_ror=(make_rand_ror 1.4 6.0)
-\list_rand_ror=(later; @\loop \x=rand_ror [x;loop])
+make_rand_ror 1.4 6.0 \rand_ror
+\list_rand_ror=(later; @\loop rand_ror \x [x;loop])
 
 seed_rand 0.1964
 \len=(list_length benchmark_list_ror)
@@ -267,15 +268,16 @@ seed_rand 0.1964
 \show_returns=
 	(
 	\xs\ys
+	\show_lists==
+		(\xs\ys
+		xs () \x\xs
+		ys () \y\ys
+		put x put " " put y nl
+		show_lists xs ys
+		)
 	say "Returns (Fund vs. Benchmark)"
 	say "["
-	(
-	@\loop\xs\ys
-	xs () \x\xs
-	ys () \y\ys
-	put x put " " put y nl
-	loop xs ys
-	) xs ys
+	show_lists xs ys
 	say "]"
 	)
 show_returns fund_list_ror benchmark_list_ror

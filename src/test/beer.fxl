@@ -1,7 +1,7 @@
 #
 \suffix=(\n eq n 1 "" "s")
-\sing_count=(\n put n put " " put "bottle" put (suffix n) put " of beer")
-\sing_line1=(\n sing_count n put " on the wall" nl)
+\sing_count=(\n put [n " " "bottle" (suffix n) " of beer"])
+\sing_line1=(\n sing_count n say " on the wall")
 \sing_line2=(\n sing_count n nl)
 \sing==
 	(\n

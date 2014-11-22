@@ -9,7 +9,7 @@
 value type_str(value f)
 	{
 	if (f->N == 0) str_free((string)f->R);
-	if (!f->L) return f;
+	if (!f->L) return 0;
 	return Q(type_void);
 	}
 
@@ -21,7 +21,7 @@ value Qstr(string x)
 /* (. x y) is the concatenation of strings x and y. */
 value type_concat(value f)
 	{
-	if (!f->L || !f->L->L) return f;
+	if (!f->L || !f->L->L) return 0;
 	{
 	value x = eval(hold(f->L->R));
 	value y = eval(hold(f->R));
@@ -38,7 +38,7 @@ value type_concat(value f)
 /* (length x) is the length of string x */
 value type_length(value f)
 	{
-	if (!f->L) return f;
+	if (!f->L) return 0;
 	{
 	value x = eval(hold(f->R));
 	if (x->T == type_str)
@@ -57,7 +57,7 @@ pos or len exceeds the bounds of str. */
 /* LATER make it forgiving like Perl */
 value type_slice(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return f;
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 	{
 	value x = eval(hold(f->L->L->R));
 	value y = eval(hold(f->L->R));
@@ -89,7 +89,7 @@ value type_slice(value f)
 /* Convert string to number if possible. */
 value type_str_num(value f)
 	{
-	if (!f->L) return f;
+	if (!f->L) return 0;
 	{
 	value x = eval(hold(f->R));
 	f = 0;
@@ -107,5 +107,5 @@ value type_str_num(value f)
 
 value type_is_str(value f)
 	{
-	return is_type(f,type_str);
+	return op_is_type(f,type_str);
 	}

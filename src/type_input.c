@@ -1,4 +1,5 @@
 #include <value.h>
+#include <basic.h>
 #include <input.h>
 #include <str.h>
 #include <type_input.h>
@@ -34,7 +35,7 @@ static string get_utf8(void)
 	unsigned width = 1;
 
 	int ch = getd();
-	if (ch == -1) return str_new_data("",0);
+	if (ch == -1) return 0;
 
 	buf[0] = (char)ch;
 	if ((ch & mask) == 0)
@@ -54,10 +55,15 @@ static string get_utf8(void)
 	return str_new_data(buf,width);
 	}
 
+/* (get next) = (next ch), where ch is the next UTF-8 character from the input,
+or void if no more characters. */
 value type_get(value f)
 	{
-	(void)f;
-	return Qstr(get_utf8());
+	if (!f->L) return 0;
+	{
+	string ch = get_utf8();
+	return A(hold(f->R), ch ? Qstr(ch) : Q(type_void));
+	}
 	}
 
 /* LATER get_from_file get_from_input get_from_string get_from_source */
