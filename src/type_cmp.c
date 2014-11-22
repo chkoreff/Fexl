@@ -13,14 +13,14 @@ static value op_cmp(value f, int op(int))
 	value x = eval(hold(f->L->R));
 	value y = eval(hold(f->R));
 	if (x->T == type_num && y->T == type_num)
-		f = Qboolean(op(num_cmp((number)x->R,(number)y->R)));
+		replace_boolean(f, op(num_cmp((number)x->R->R,(number)y->R->R)));
 	else if (x->T == type_str && y->T == type_str)
-		f = Qboolean(op(str_cmp((string)x->R,(string)y->R)));
+		replace_boolean(f, op(str_cmp((string)x->R->R,(string)y->R->R)));
 	else
-		f = Q(type_void);
+		replace_void(f);
 	drop(x);
 	drop(y);
-	return f;
+	return 0;
 	}
 	}
 

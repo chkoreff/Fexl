@@ -8,14 +8,19 @@
 
 value type_str(value f)
 	{
-	if (f->N == 0) str_free((string)f->R);
 	if (!f->L) return 0;
-	return Q(type_void);
+	replace_void(f);
+	return 0;
 	}
 
 value Qstr(string x)
 	{
-	return D(type_str,x);
+	return D(type_str,x,(type)str_free);
+	}
+
+void replace_str(value f, string x)
+	{
+	replace_D(f,type_str,x,(type)str_free);
 	}
 
 /* (. x y) is the concatenation of strings x and y. */
@@ -26,12 +31,12 @@ value type_concat(value f)
 	value x = eval(hold(f->L->R));
 	value y = eval(hold(f->R));
 	if (x->T == type_str && y->T == type_str)
-		f = Qstr(str_concat((string)x->R,(string)y->R));
+		replace_str(f, str_concat((string)x->R->R,(string)y->R->R));
 	else
-		f = Q(type_void);
+		replace_void(f);
 	drop(x);
 	drop(y);
-	return f;
+	return 0;
 	}
 	}
 
@@ -42,11 +47,11 @@ value type_length(value f)
 	{
 	value x = eval(hold(f->R));
 	if (x->T == type_str)
-		f = Qnum(num_new_ulong(((string)x->R)->len));
+		replace_num(f, num_new_ulong(((string)x->R->R)->len));
 	else
-		f = Q(type_void);
+		replace_void(f);
 	drop(x);
-	return f;
+	return 0;
 	}
 	}
 
@@ -62,27 +67,32 @@ value type_slice(value f)
 	value x = eval(hold(f->L->L->R));
 	value y = eval(hold(f->L->R));
 	value z = eval(hold(f->R));
-	f = 0;
 	if (x->T == type_str && y->T == type_num && z->T == type_num)
 		{
-		double yn = *((number)y->R);
-		double zn = *((number)z->R);
+		double yn = *((number)y->R->R);
+		double zn = *((number)z->R->R);
 		if (yn >= 0 && zn >= 0)
 			{
-			string xs = (string)x->R;
+			string xs = (string)x->R->R;
 			unsigned long pos = (unsigned long)yn;
 			unsigned long len = (unsigned long)zn;
 			if (pos < xs->len
 				&& len <= xs->len
 				&& pos <= xs->len - len)
-				f = Qstr(str_new_data(xs->data + pos,len));
+				replace_str(f, str_new_data(xs->data + pos,len));
+			else
+				replace_void(f);
 			}
+		else
+			replace_void(f);
 		}
+	else
+		replace_void(f);
+
 	drop(x);
 	drop(y);
 	drop(z);
-	if (!f) f = Q(type_void);
-	return f;
+	return 0;
 	}
 	}
 
@@ -92,16 +102,18 @@ value type_str_num(value f)
 	if (!f->L) return 0;
 	{
 	value x = eval(hold(f->R));
-	f = 0;
 	if (x->T == type_str)
 		{
-		number n = str0_num(((string)x->R)->data);
+		number n = str0_num(((string)x->R->R)->data);
 		if (n)
-			f = Qnum(n);
+			replace_num(f,n);
+		else
+			replace_void(f);
 		}
+	else
+		replace_void(f);
 	drop(x);
-	if (!f) f = Q(type_void);
-	return f;
+	return 0;
 	}
 	}
 

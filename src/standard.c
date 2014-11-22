@@ -77,7 +77,6 @@ static value standard_name(const char *name)
 	if (match("is_num")) return Q(type_is_num);
 	if (match("is_str")) return Q(type_is_str);
 	if (match("is_void")) return Q(type_is_void);
-	if (match("later")) return Q(type_later);
 	if (match("le")) return Q(type_le);
 	if (match("length")) return Q(type_length);
 	if (match("log")) return Q(type_log);
@@ -106,7 +105,7 @@ static value standard_name(const char *name)
 
 static value standard_context(value x)
 	{
-	const char *name = ((string)x->R)->data;
+	const char *name = ((string)x->R->R)->data;
 	return standard_name(name);
 	}
 
@@ -119,12 +118,18 @@ static value type_standard(value f)
 		{
 		value def = standard_context(x);
 		if (def)
-			f = A(A(hold(cons),def),hold(null));
+			replace_A(f, A(hold(cons),def), hold(null));
 		else
-			f = hold(null);
+			{
+			replace_Q(f, type_null);
+			f = 0;
+			}
 		}
 	else
-		f = Q(type_void);
+		{
+		replace_void(f);
+		f = 0;
+		}
 	drop(x);
 	return f;
 	}
@@ -177,11 +182,16 @@ static value type_eval_file(value f)
 	value x = eval(hold(f->R));
 	if (x->T == type_str)
 		{
-		const char *name = ((string)x->R)->data;
-		f = eval_file(name);
+		const char *name = ((string)x->R->R)->data;
+		value g = eval_file(name);
+		drop(f);
+		f = g;
 		}
 	else
-		f = Q(type_void);
+		{
+		replace_void(f);
+		f = 0;
+		}
 	drop(x);
 	return f;
 	}
@@ -193,9 +203,16 @@ static value type_eval_str(value f)
 	{
 	value x = eval(hold(f->R));
 	if (x->T == type_str)
-		f = eval_str((string)x->R);
+		{
+		value g = eval_str((string)x->R->R);
+		drop(f);
+		f = g;
+		}
 	else
-		f = Q(type_void);
+		{
+		replace_void(f);
+		f = 0;
+		}
 	drop(x);
 	return f;
 	}

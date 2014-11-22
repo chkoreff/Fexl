@@ -1,6 +1,6 @@
 #
 
-\div=(later; say "==")
+\div=(say "==")
 
 \say_x=(\x put "x = " say x)
 say_x 3
@@ -16,8 +16,7 @@ say_x 5
 		(\x
 		f x
 		eq x y ();
-		\x=(+ x d)
-		loop x
+		loop (+ x d)
 		)
 	loop x
 	)
@@ -28,16 +27,13 @@ say_x 5
 	\loop==
 		(\x\y\n
 		le n 0 x;
-		\z=(+ x y)
-		\n=(- n 1)
-		loop y z n
+		loop y (+ x y) (- n 1)
 		)
 	loop 0 1
 	)
 
 \try_fib=
 (
-later;
 div
 
 \try=

@@ -146,8 +146,8 @@ And the world is mine to win. ..."
   (Badger Clark, "The Westerner")
 
 ==
-(CALC)
 [
+(CALC)
 x = 30
 x = 30
 x = 30
@@ -454,11 +454,13 @@ F
 F
 ==
 T
+hi
 T
 T
 F
 ==
 F
+hi
 F
 F
 T
@@ -492,9 +494,7 @@ y = 6
 ==
 (L)(R)
 8
-(L)(R)
 8
-(L)(R)
 8
 [
 am

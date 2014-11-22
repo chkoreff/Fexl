@@ -13,12 +13,16 @@ value type_seed_rand(value f)
 	value x = eval(hold(f->R));
 	if (x->T == type_num)
 		{
-		double seed = *((number)x->R) * (double)RAND_MAX;
+		double seed = *((number)x->R->R) * (double)RAND_MAX;
 		srand(seed);
+		drop(f);
 		f = hold(I);
 		}
 	else
-		f = Q(type_void);
+		{
+		replace_void(f);
+		f = 0;
+		}
 	drop(x);
 	return f;
 	}
@@ -32,6 +36,7 @@ value type_rand(value f)
 	if (!f->L) return 0;
 	{
 	double x = ((double)rand()) / ((double)RAND_MAX);
-	return A(hold(f->R), Qnum(num_new_double(x)));
+	replace_A(f, hold(f->R), Qnum(num_new_double(x)));
+	return f;
 	}
 	}

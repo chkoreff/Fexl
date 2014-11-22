@@ -1,7 +1,6 @@
 #
 \show=
 	(\x
-	\x=x
 	is_str x (put "str " say x);
 	is_num x (put "num " say x);
 	is_bool x (put "bool " say x);
@@ -9,20 +8,20 @@
 	say "other"
 	)
 
-\div=(later; say "==")
+\div=(say "==")
 
 (
-\ping=(later; say "ping")
+\ping=(say "ping")
 div
 ping
 div
 I ping
 
 div
-\talk=(later; ping)
-\talk=(later; talk talk talk)
-\talk=(later; talk talk)
-\talk=(later; talk talk)
+\talk=(ping)
+\talk=(talk talk talk)
+\talk=(talk talk)
+\talk=(talk talk)
 talk
 )
 
@@ -89,27 +88,24 @@ show (slice "abc" 0 4)
 show (slice "abc" 2 1)
 show (slice "abc" -1 2)
 
-\val_is_num=(\x \x=x is_num x)
-\val_is_str=(\x \x=x is_str x)
-
 div
 show (is_str I)
 show (is_str 4)
 show (is_str "x")
-show (val_is_str; . "x" "y")
+show (is_str; . "x" "y")
 show (is_num "x")
 show (is_num 4.2)
-show (val_is_num (* 3.9 4.2))
-show (val_is_num; str_num "4.87")
-show (val_is_num; str_num "  4.87")
+show (is_num (* 3.9 4.2))
+show (is_num; str_num "4.87")
+show (is_num; str_num "  4.87")
 
 # The str_num function allows leading white space, but forbids any trailing
 # invalid chars, including white space.  This reflects how strtod works.
-show (val_is_num; str_num " 4.87 ")
-show (val_is_num; str_num "4.87x")
+show (is_num; str_num " 4.87 ")
+show (is_num; str_num "4.87x")
 
-show (val_is_num; str_num "-4.6")
-show (val_is_num; str_num "-4.6x")
+show (is_num; str_num "-4.6")
+show (is_num; str_num "-4.6x")
 
 # Test some more good and void cases.
 div
@@ -176,13 +172,13 @@ And the world is mine to win. ..."
   (Badger Clark, "The Westerner")
 ~
 
-# Test delayed evaluation.
+# Test single evaluation.
+(
 div
 \show_x=
 	(
-	say "(CALC)"
+	once (say "(CALC)")
 	\x=(* 5 6)
-	later;
 	say ["x = " x]
 	)
 
@@ -193,14 +189,11 @@ show_x
 show_x
 say "]"
 
-# Test single evaluation.
 (
-\x=(once; put "(CALC)" (+ 2 (* 7 6))) # ok
-
+\x=(once (put "(CALC)") (+ 2 (* 7 6)))
 \make_square=
 	(\x
-	once;
-	put ["square " x "="]
+	once (put ["square " x "="])
 	* x x
 	)
 
@@ -216,6 +209,7 @@ say s4
 say s7
 say s4
 say s7
+)
 )
 
 div
@@ -388,35 +382,34 @@ div
 	(\n\xs
 	le n 0 [];
 	xs [] \x\xs
-	\n=(- n 1)
-	\xs=(first n xs)
-	[x;xs]
+	[x;first (- n 1) xs]
 	)
 
 \show_list=(\xs say "[" (do xs say) say "]")
 
-# Testing with some "later" sprinkled in to ensure that type_later sets the
-# value type to type_A, not type_I.
-show_list (later null)
+show_list (null)
 show_list [1 2]
-show_list (cons 1; cons 2; later null)
+show_list (cons 1; cons 2; null)
 
 # Test rand.
 
-# An infinite list of pseudo-random numbers.
-\list_rand=(later; @\loop rand \x [x;loop])
-
 \demo_rand=
-	(
-	later;
+	(\list\next
 	div
-	\list=(first 5 list_rand)
-	show_list list
-	show_list list
+	show_list (first 5 list)
+	show_list (first 5 list)
+	next
 	)
+
 seed_rand 0.1964
-demo_rand
-demo_rand
+(
+\list_rand==(rand \x [x;list_rand])
+demo_rand list_rand
+)
+(
+\list_rand==(rand \x [x;list_rand])
+demo_rand list_rand
+)
 
 div
 eval_file "test/stats.fxl"
@@ -483,7 +476,6 @@ say [T T F T F F]
 say (T 1)
 say (F 1)
 
-
 (
 \list=[(. "Hell" "o") " " (+ 4 5) NL "Bye" NL]
 \list=(append list list)
@@ -500,9 +492,9 @@ put list
 )
 
 (
-# LATER: In the new version the embedded side effects will not repeat.
+# Demonstrate that not all side effects repeat.
 div
-\talk=(later; say (^ (put "(L)" (+ 1 1)) (say "(R)" (- 8 5))))
+\talk=(say (^ (put "(L)" (+ 1 1)) (say "(R)" (- 8 5))))
 talk
 talk
 talk

@@ -39,8 +39,7 @@
 \repeat==
 	(\x\n
 	le n 0 "";
-	\n=(- n 1)
-	. x (repeat x n)
+	. x; repeat x (- n 1)
 	)
 
 # Split string x into groups of three with the given separator.
@@ -139,7 +138,7 @@
 
 \put_sharpe=(\sharpe put (format 4 "" sharpe))
 \put_ror=(\ror put (format 4 "" ror) put "%")
-\p=(later; say "<p>")
+\p=(say "<p>")
 
 (
 say "Average Fund vs. Risk-Free Return"
@@ -259,7 +258,7 @@ put_sharpe excess_sharpe nl
 ]
 
 make_rand_ror 1.4 6.0 \rand_ror
-\list_rand_ror=(later; @\loop rand_ror \x [x;loop])
+\list_rand_ror==(rand_ror \x [x;list_rand_ror])
 
 seed_rand 0.1964
 \len=(list_length benchmark_list_ror)

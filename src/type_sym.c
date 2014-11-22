@@ -16,7 +16,8 @@ static void sym_free(symbol sym)
 
 value type_sym(value f)
 	{
-	if (f->N == 0) sym_free((symbol)f->R);
+	if (!f->L) return 0;
+	replace_void(f);
 	return 0;
 	}
 
@@ -26,7 +27,7 @@ value Qsym(short quoted, string name, unsigned long line)
 	sym->quoted = quoted;
 	sym->name = Qstr(name);
 	sym->line = line;
-	return D(type_sym,sym);
+	return D(type_sym,sym,(type)sym_free);
 	}
 
 /* Apply f to g, where either can be a symbolic form. */
@@ -41,7 +42,7 @@ value app(value f, value g)
 static int sym_eq(symbol x, symbol y)
 	{
 	return x->quoted == y->quoted
-		&& str_eq((string)x->name->R,(string)y->name->R);
+		&& str_eq((string)x->name->R->R,(string)y->name->R->R);
 	}
 
 static value combine_patterns(value p, value q)
@@ -71,7 +72,7 @@ static value abstract(value sym, value body)
 		return Qsubst(hold(C),hold(body));
 	else if (body->L == 0)
 		{
-		if (sym_eq((symbol)sym->R, (symbol)body->R))
+		if (sym_eq((symbol)sym->R->R, (symbol)body->R->R))
 			return Qsubst(hold(I),hold(I));
 		else
 			return Qsubst(hold(C),hold(body));
@@ -125,7 +126,8 @@ value type_subst(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 	x = f->R;
-	return substitute(f->L->L->R,f->L->R);
+	replace(f,substitute(f->L->L->R,f->L->R));
+	return f;
 	}
 
 static void undefined_symbol(const char *name, unsigned long line)
@@ -140,7 +142,7 @@ static value do_resolve(value exp, value context(value))
 	if (!x) return exp;
 	{
 	value fun = do_resolve(abstract(x,exp),context);
-	symbol sym = (symbol)x->R;
+	symbol sym = (symbol)x->R->R;
 
 	value def;
 	if (sym->quoted)
@@ -150,7 +152,7 @@ static value do_resolve(value exp, value context(value))
 		def = context(sym->name);
 		if (!def)
 			{
-			const char *name = ((string)sym->name->R)->data;
+			const char *name = ((string)sym->name->R->R)->data;
 			undefined_symbol(name,sym->line);
 			def = hold(x);
 			}

@@ -20,19 +20,19 @@ void show(value f)
 		show(f->R);
 		put_ch(f->T == type_sym ? '}' : ')');
 		}
-	else if (f->T == type_num) put_num((number)f->R);
+	else if (f->T == type_num) put_num((number)f->R->R);
 	else if (f->T == type_str)
 		{
 		put_ch('"');
-		put_str((string)f->R);
+		put_str((string)f->R->R);
 		put_ch('"');
 		}
 	else if (f->T == type_sym)
 		{
-		symbol sym = (symbol)f->R;
+		symbol sym = (symbol)f->R->R;
 		put_ch('{');
 		if (sym->quoted) put_ch('"');
-		put_str((string)sym->name->R);
+		put_str((string)sym->name->R->R);
 		if (sym->quoted) put_ch('"');
 		put_ch('}');
 		}
@@ -54,7 +54,6 @@ void show(value f)
 	else if (f->T == type_say) put("say");
 	else if (f->T == type_put) put("put");
 	else if (f->T == type_nl) put("nl");
-	else if (f->T == type_later) put("later");
 	else
 		{
 		put_ch('T');

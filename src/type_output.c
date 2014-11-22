@@ -13,9 +13,9 @@ static void putv(value x)
 	while (1)
 		{
 		if (x->T == type_str)
-			put_str((string)x->R);
+			put_str((string)x->R->R);
 		else if (x->T == type_num)
-			put_num((number)x->R);
+			put_num((number)x->R->R);
 		else if (x->T == type_T)
 			put_ch('T');
 		else if (x->T == type_F)
@@ -41,13 +41,14 @@ value type_put(value f)
 	{
 	if (!f->L) return 0;
 	putv(f->R);
+	drop(f);
 	return hold(I);
 	}
 
 value type_nl(value f)
 	{
 	nl();
-	(void)f;
+	drop(f);
 	return hold(I);
 	}
 
@@ -67,6 +68,7 @@ value type_put_to_error(value f)
 	value g;
 	put_to_error();
 	g = eval(hold(f->R));
+	drop(f);
 	putd = save;
 	return g;
 	}

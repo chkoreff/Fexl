@@ -62,7 +62,8 @@ value type_get(value f)
 	if (!f->L) return 0;
 	{
 	string ch = get_utf8();
-	return A(hold(f->R), ch ? Qstr(ch) : Q(type_void));
+	replace_A(f, hold(f->R), ch ? Qstr(ch) : Q(type_void));
+	return f;
 	}
 	}
 

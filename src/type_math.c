@@ -10,11 +10,11 @@ static value op_num(value f, number op(number))
 	{
 	value x = eval(hold(f->R));
 	if (x->T == type_num)
-		f = Qnum(op((number)x->R));
+		replace_num(f, op((number)x->R->R));
 	else
-		f = Q(type_void);
+		replace_void(f);
 	drop(x);
-	return f;
+	return 0;
 	}
 	}
 
@@ -25,12 +25,12 @@ static value op_num_num(value f, number op(number,number))
 	value x = eval(hold(f->L->R));
 	value y = eval(hold(f->R));
 	if (x->T == type_num && y->T == type_num)
-		f = Qnum(op((number)x->R,(number)y->R));
+		replace_num(f, op((number)x->R->R,(number)y->R->R));
 	else
-		f = Q(type_void);
+		replace_void(f);
 	drop(x);
 	drop(y);
-	return f;
+	return 0;
 	}
 	}
 

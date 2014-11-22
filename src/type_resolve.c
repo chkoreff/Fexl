@@ -13,7 +13,7 @@ static value dynamic_context(value x)
 	{
 	{
 	/* Define numeric literals. */
-	const char *name = ((string)x->R)->data;
+	const char *name = ((string)x->R->R)->data;
 	value def = Qnum_str0(name);
 	if (def) return def;
 	}
@@ -55,9 +55,9 @@ value type_resolve(value f)
 	const char *save = source_label;
 
 	value label = f->L->L->R;
-	source_label = ((string)label->R)->data;
+	source_label = ((string)label->R->R)->data;
 
-	f = resolve_in_context(hold(f->L->R), hold(f->R));
+	replace(f, resolve_in_context(hold(f->L->R), hold(f->R)));
 
 	source_label = save;
 	return f;
