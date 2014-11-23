@@ -15,7 +15,6 @@ value type_seed_rand(value f)
 		{
 		double seed = *((number)x->R->R) * (double)RAND_MAX;
 		srand(seed);
-		drop(f);
 		f = hold(I);
 		}
 	else

@@ -110,18 +110,12 @@ value D(type T, void *data, type destroy)
 static value type_A(value f)
 	{
 	value g = eval(hold(f->L));
-	if (g == f->L)
-		{
-		drop(g);
-		f->T = f->L->T;
-		return f;
-		}
-	else
-		{
-		g = V(g->T,g,hold(f->R));
-		drop(f);
-		return g;
-		}
+	if (g != f->L)
+		return V(g->T,g,hold(f->R));
+
+	drop(g);
+	f->T = f->L->T;
+	return f;
 	}
 
 /* Apply x to y. */
@@ -186,6 +180,8 @@ value eval(value f)
 		{
 		value g = f->T(f);
 		if (g == 0) return f;
+		if (g == f) continue;
+		drop(f);
 		f = g;
 		}
 	}

@@ -183,9 +183,7 @@ static value type_eval_file(value f)
 	if (x->T == type_str)
 		{
 		const char *name = ((string)x->R->R)->data;
-		value g = eval_file(name);
-		drop(f);
-		f = g;
+		f = eval_file(name);
 		}
 	else
 		{
@@ -203,11 +201,7 @@ static value type_eval_str(value f)
 	{
 	value x = eval(hold(f->R));
 	if (x->T == type_str)
-		{
-		value g = eval_str((string)x->R->R);
-		drop(f);
-		f = g;
-		}
+		f = eval_str((string)x->R->R);
 	else
 		{
 		replace_void(f);

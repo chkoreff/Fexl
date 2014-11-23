@@ -41,14 +41,13 @@ value type_put(value f)
 	{
 	if (!f->L) return 0;
 	putv(f->R);
-	drop(f);
 	return hold(I);
 	}
 
 value type_nl(value f)
 	{
+	(void)f;
 	nl();
-	drop(f);
 	return hold(I);
 	}
 
@@ -65,11 +64,9 @@ value type_put_to_error(value f)
 	if (!f->L) return 0;
 	{
 	output save = putd;
-	value g;
 	put_to_error();
-	g = eval(hold(f->R));
-	drop(f);
+	f = eval(hold(f->R));
 	putd = save;
-	return g;
+	return f;
 	}
 	}
