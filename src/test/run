@@ -4,7 +4,7 @@
 run_fexl()
 	{
 	echo "===="
-	../bin/fexl 2>&1 >/dev/null
+	../bin/fexl 2>&1
 	echo "exit $?"
 	}
 
@@ -24,6 +24,8 @@ EOF
 ) | ../bin/fexl test/a2.fxl
 echo "exit $?"
 
+# Test sending output to stderr.
+echo "===="
 (
 cat <<"EOF"
 say "hello"
@@ -35,7 +37,19 @@ put_to_error
 	)
 say "bye"
 EOF
+) | ../bin/fexl 2>&1 >/dev/null
+echo "exit $?"
+
+# Test the "die" function.
+(
+cat <<"EOF"
+say "hi"
+die
+say "bye"
+EOF
 ) | run_fexl
+
+# Test some syntax errors.
 
 echo -n "\"" | run_fexl
 

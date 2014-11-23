@@ -630,6 +630,9 @@ This goes to stderr.
 x = 7
 exit 0
 ====
+hi
+exit 1
+====
 Unclosed string on line 1
 exit 1
 ====
