@@ -21,7 +21,7 @@ exp    => ; exp
 exp    => \ sym exp
 exp    => \ sym = term exp
 exp    => \ sym == term exp
-exp    => { exp } exp
+exp    => \ = term exp
 
 term   => ( exp )
 term   => [ list ]
@@ -269,6 +269,21 @@ static value parse_lambda(unsigned long first_line)
 
 	/* Parse the symbol (function parameter). */
 	skip_white();
+
+	if (ch == '=')
+		{
+		/* Resolve expression in a context. */
+		value context, label;
+		skip();
+		skip_white();
+		context = parse_term();
+		if (context == 0)
+			syntax_error("Missing context", first_line);
+		exp = parse_exp();
+		label = Qstr(str_new_data0(source_label ? source_label : ""));
+		return app(A(A(Q(type_resolve),label),exp),context);
+		}
+
 	sym = parse_symbol();
 	if (sym == 0)
 		syntax_error("Missing symbol after '\\'", first_line);
@@ -322,22 +337,6 @@ static value parse_factor(void)
 		{
 		skip();
 		return parse_exp();
-		}
-	else if (ch == '{')
-		{
-		/* Resolve in a context. */
-		unsigned long first_line = source_line;
-		value context, form, label;
-
-		skip();
-		context = parse_exp();
-		if (ch != '}')
-			syntax_error("Unclosed brace", first_line);
-
-		skip();
-		form = parse_exp();
-		label = Qstr(str_new_data0(source_label ? source_label : ""));
-		return app(A(A(Q(type_resolve),label),form),context);
 		}
 	else
 		{

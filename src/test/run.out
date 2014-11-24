@@ -677,7 +677,7 @@ Undefined symbol z on line 3
 Undefined symbol y on line 3
 exit 1
 ====
-Unclosed brace on line 2
+Missing context on line 1
 exit 1
 ====
 Undefined symbol a on line 1

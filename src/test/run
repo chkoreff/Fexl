@@ -94,14 +94,12 @@ y
 	(z z y)
 " | run_fexl
 
-echo -n "{
-{ab
-cd {} e
+echo -n "\=
 " | run_fexl
 
 (
 cat <<"EOF"
-{\x eq x "b" [(say "b")] []} a b
+\=(\x eq x "b" [(say "b")] []) a b
 c
 EOF
 ) | run_fexl

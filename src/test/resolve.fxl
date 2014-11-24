@@ -1,13 +1,14 @@
 # Define an enhanced context which includes all the standard symbols along with
 # a few new ones.
-{
+\=
+(
 \x
 \speaker=(\name \x put name put " says " say x)
 eq x "fred" [(speaker "Fred")];
 eq x "wilma" [(speaker "Wilma")];
 eq x "goodbye" [(say "Goodbye")];
 standard x
-}
+)
 
 # Now run this program in the context specified above.
 say "Hi"

@@ -1,6 +1,7 @@
 # Here we defined a highly restricted context which provides a few functions
 # needed to test sorting.
-{
+\=
+(
 \append==(\xs\ys xs ys \x\xs [x;append xs ys])
 
 \map==(\f\xs xs [] \x\xs [(f x); map f xs])
@@ -40,7 +41,7 @@ eq x "sort" [sort];
 eq x "tower" [tower];
 eq x "unique" [unique];
 []
-}
+)
 
 # Here we test the sort.
 
