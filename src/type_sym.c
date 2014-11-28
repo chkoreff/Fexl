@@ -57,7 +57,7 @@ static value combine_patterns(value p, value q)
 		return A(p,q);
 	}
 
-static value Qsubst(value p, value f)
+value Qsubst(value p, value f)
 	{
 	value g = A(hold(I),p);
 	g->T = type_subst;

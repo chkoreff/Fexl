@@ -466,6 +466,14 @@ F
 T
 ==
 
+x=3 
+x=3 y=4 
+x=ab y=cdefg z=65536 
+x=3 y=12 
+x=3 y=12 z=36 
+a=1 b=2 c=3 d=4 e=5 f=6 g=7 
+==
+
 
 a
 ab
@@ -667,6 +675,12 @@ Unclosed parenthesis on line 3
 exit 1
 ====
 Unclosed parenthesis on line 1
+exit 1
+====
+Unclosed bracket on line 3
+exit 1
+====
+Unclosed brace on line 3
 exit 1
 ====
 Extraneous input on line 2

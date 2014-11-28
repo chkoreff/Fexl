@@ -25,11 +25,15 @@ exp    => \ = term exp
 
 term   => ( exp )
 term   => [ list ]
+term   => { tuple }
 term   => sym
 
 list   => empty
 list   => term list
 list   => ; exp
+
+tuple  => empty
+tuple  => term tuple
 
 sym    => name
 sym    => string
@@ -234,6 +238,22 @@ static value parse_list(void)
 	return app(app(hold(cons),term),parse_list());
 	}
 
+static value parse_tuple(void)
+	{
+	value pattern = hold(I);
+	value form = hold(I);
+	while (1)
+		{
+		value term;
+		skip_filler();
+		term = parse_term();
+		if (term == 0) break;
+		pattern = A(pattern,hold(C));
+		form = app(form,term);
+		}
+	return Qsubst(pattern,form);
+	}
+
 static value parse_term(void)
 	{
 	unsigned long first_line = source_line;
@@ -254,6 +274,16 @@ static value parse_term(void)
 		exp = parse_list();
 		if (ch != ']')
 			syntax_error("Unclosed bracket", first_line);
+		skip();
+		return exp;
+		}
+	else if (ch == '{') /* tuple */
+		{
+		value exp;
+		skip();
+		exp = parse_tuple();
+		if (ch != '}')
+			syntax_error("Unclosed brace", first_line);
 		skip();
 		return exp;
 		}
