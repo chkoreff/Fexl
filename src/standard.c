@@ -109,6 +109,7 @@ static value standard_context(value x)
 	return standard_name(name);
 	}
 
+/* (standard x) = {def} if x is defined, or void if x is not defined. */
 static value type_standard(value f)
 	{
 	if (!f->L) return 0;
@@ -118,20 +119,14 @@ static value type_standard(value f)
 		{
 		value def = standard_context(x);
 		if (def)
-			replace_A(f, Q(type_single), def);
+			replace_single(f, def);
 		else
-			{
 			replace_void(f);
-			f = 0;
-			}
 		}
 	else
-		{
 		replace_void(f);
-		f = 0;
-		}
 	drop(x);
-	return f;
+	return 0;
 	}
 	}
 
