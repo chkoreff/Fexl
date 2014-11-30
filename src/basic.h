@@ -6,6 +6,7 @@ extern value type_Y(value f);
 extern value type_query(value f);
 extern value type_once(value f);
 extern value type_void(value f);
+extern value type_single(value f);
 extern value type_cons(value f);
 extern value type_null(value f);
 extern value type_is_void(value f);

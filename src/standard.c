@@ -118,10 +118,10 @@ static value type_standard(value f)
 		{
 		value def = standard_context(x);
 		if (def)
-			replace_A(f, A(hold(cons),def), hold(null));
+			replace_A(f, Q(type_single), def);
 		else
 			{
-			replace_Q(f, type_null);
+			replace_void(f);
 			f = 0;
 			}
 		}

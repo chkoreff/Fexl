@@ -70,6 +70,14 @@ value type_void(value f)
 	return 0;
 	}
 
+/* (single x p) = (p x) */
+value type_single(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	replace_A(f, hold(f->R), hold(f->L->R));
+	return f;
+	}
+
 /* (cons x y A B) = (B x y) */
 value type_cons(value f)
 	{

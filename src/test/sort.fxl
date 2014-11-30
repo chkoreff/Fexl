@@ -35,12 +35,12 @@
 	)
 
 \x
-eq x "append" [append];
-eq x "say" [say];
-eq x "sort" [sort];
-eq x "tower" [tower];
-eq x "unique" [unique];
-[]
+eq x "append" {append};
+eq x "say" {say};
+eq x "sort" {sort};
+eq x "tower" {tower};
+eq x "unique" {unique};
+void
 )
 
 # Here we test the sort.

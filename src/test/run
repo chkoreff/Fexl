@@ -107,7 +107,7 @@ echo -n "\=
 
 (
 cat <<"EOF"
-\=(\x eq x "b" [(say "b")] []) a b
+\=(\x eq x "b" {(say "b")} void) a b
 c
 EOF
 ) | run_fexl
