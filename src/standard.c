@@ -1,8 +1,9 @@
+#include <stdio.h>
+#include <input.h>
 #include <value.h>
 #include <basic.h>
 #include <die.h>
 #include <file_input.h>
-#include <input.h>
 #include <num.h>
 #include <output.h>
 #include <parse.h>
@@ -143,9 +144,9 @@ static value parse_standard(const char *label)
 value eval_file(const char *name)
 	{
 	value exp;
-	input save = getd;
+	struct file_input save;
 
-	get_from_file(name);
+	get_from_file(name,&save);
 	if (!getd)
 		{
 		put_to_error();
@@ -154,19 +155,19 @@ value eval_file(const char *name)
 		}
 	exp = parse_standard(name);
 
-	getd = save;
+	restore_file_input(&save);
 	return eval(exp);
 	}
 
 static value eval_str(string x)
 	{
 	value exp;
-	input save = getd;
+	struct str_input save;
 
-	get_from_string(x);
+	get_from_string(x,&save);
 	exp = parse_standard(0);
 
-	getd = save;
+	restore_str_input(&save);
 	return eval(exp);
 	}
 
