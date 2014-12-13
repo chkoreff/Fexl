@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <input.h>
+#include <stdio.h>
 #include <value.h>
 #include <basic.h>
 #include <die.h>
@@ -213,27 +213,5 @@ static value type_eval_str(value f)
 # LATER get_from_string
 # LATER get_from_input
 # LATER get_from_source
-# LATER parse
+# LATER get_function
 */
-
-/*LATER eval any input stream (file, string, etc.) */
-/*LATER use arbitrary context, not just the standard one */
-
-/*LATER after we do parse in fexl, we'll no longer need eval_file
-and eval_str defined in C.  We can define those in fexl easily.
-
-\eval_file=
-	(\name
-	get_from_file name ;
-	\source_name=name
-	parse source_name
-	)
-
-\eval_str=
-	(\text
-	get_from_string text ;
-	\source_name=""
-	parse source_name
-	)
-*/
-
