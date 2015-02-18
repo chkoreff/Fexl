@@ -18,7 +18,7 @@ put "ghij = " say ghij
 put "üä = " say  üä
 put "1≠0 = " say 1≠0
 
-\"vegetable"="grönsak"
-\"dessert"="efterrätt"
-put "vegetable " say "vegetable"
-put "dessert " say "dessert"
+\vegetable="grönsak"
+\dessert="efterrätt"
+put "vegetable " say vegetable
+put "dessert " say dessert

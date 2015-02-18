@@ -31,9 +31,7 @@ void show(value f)
 		{
 		symbol sym = (symbol)f->R->R;
 		put_ch('{');
-		if (sym->quoted) put_ch('"');
 		put_str((string)sym->name->R->R);
-		if (sym->quoted) put_ch('"');
 		put_ch('}');
 		}
 	else if (f->T == type_C) put_ch('C');

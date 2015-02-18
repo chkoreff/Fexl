@@ -137,7 +137,7 @@ static value parse_name(void)
 		}
 
 	if (!buf) return 0;
-	return Qsym(0, buf_finish(buf), first_line);
+	return Qsym(buf_finish(buf), first_line);
 	}
 
 /* Collect a string up to an ending terminator. */
@@ -182,7 +182,7 @@ static value parse_quote_string(void)
 	{
 	unsigned long first_line = source_line;
 	skip();
-	return Qsym(1, collect_string("\"",1,first_line), first_line);
+	return Qstr(collect_string("\"",1,first_line));
 	}
 
 static value parse_tilde_string(void)
@@ -207,7 +207,7 @@ static value parse_tilde_string(void)
 	string end = buf_finish(buf);
 	string content = collect_string(end->data, end->len, first_line);
 	str_free(end);
-	return Qsym(1,content,first_line);
+	return Qstr(content);
 	}
 	}
 
@@ -314,7 +314,7 @@ static value parse_lambda(unsigned long first_line)
 		return app(A(A(Q(type_resolve),label),exp),context);
 		}
 
-	sym = parse_symbol();
+	sym = parse_name();
 	if (sym == 0)
 		syntax_error("Missing symbol after '\\'", first_line);
 

@@ -21,10 +21,9 @@ value type_sym(value f)
 	return 0;
 	}
 
-value Qsym(short quoted, string name, unsigned long line)
+value Qsym(string name, unsigned long line)
 	{
 	symbol sym = new_memory(sizeof(struct symbol));
-	sym->quoted = quoted;
 	sym->name = Qstr(name);
 	sym->line = line;
 	return D(type_sym,sym,(type)sym_free);
@@ -41,8 +40,7 @@ value app(value f, value g)
 
 static int sym_eq(symbol x, symbol y)
 	{
-	return x->quoted == y->quoted
-		&& str_eq((string)x->name->R->R,(string)y->name->R->R);
+	return str_eq((string)x->name->R->R,(string)y->name->R->R);
 	}
 
 static value combine_patterns(value p, value q)
@@ -143,19 +141,12 @@ static value do_resolve(value exp, value context(value))
 	{
 	value fun = do_resolve(abstract(x,exp),context);
 	symbol sym = (symbol)x->R->R;
-
-	value def;
-	if (sym->quoted)
-		def = hold(sym->name);
-	else
+	value def = context(sym->name);
+	if (!def)
 		{
-		def = context(sym->name);
-		if (!def)
-			{
-			const char *name = ((string)sym->name->R->R)->data;
-			undefined_symbol(name,sym->line);
-			def = hold(x);
-			}
+		const char *name = ((string)sym->name->R->R)->data;
+		undefined_symbol(name,sym->line);
+		def = hold(x);
 		}
 
 	fun = app(fun,def);
