@@ -9,6 +9,6 @@ ulimit -Ss 20000
 ulimit -Sv 100000
 
 # Limit CPU time in seconds.
-ulimit -St 5
+ulimit -St 20
 
 ../bin/fexl "$@"

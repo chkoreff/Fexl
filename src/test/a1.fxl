@@ -1,9 +1,10 @@
 #
 \show=
 	(\x
-	is_str x (put "str " say x);
-	is_num x (put "num " say x);
-	is_bool x (put "bool " say x);
+	\type=(\t put [t " "] say x)
+	is_str x (type "str");
+	is_num x (type "num");
+	is_bool x (type "bool");
 	is_void x (say "void");
 	say "other"
 	)
@@ -534,6 +535,7 @@ talk
 )
 
 eval_file "test/sort.fxl"
+eval_file "test/mf.fxl"
 
 \\
 Extra stuff not parsed.

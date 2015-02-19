@@ -1,20 +1,12 @@
-# Here we defined a highly restricted context which provides a few functions
-# needed to test sorting.
+# Here we use a highly restricted context which provides only the few functions
+# we need to test sorting.  I don't have to do it this way, but I'm exercising
+# the context mechanism.
 \=
 (
 \append==(\xs\ys xs ys \x\xs [x;append xs ys])
 
-\map==(\f\xs xs [] \x\xs [(f x); map f xs])
-
 # (filter f xs) is the list of items x in xs for which (f x) is true.
 \filter==(\f\xs xs [] \x\xs f x (cons x) (); filter f xs)
-
-# (tower n f x) is the result of applying f to x n times.
-\tower==
-	(\n\f\x
-	le n 0 x;
-	tower (- n 1) f (f x)
-	)
 
 # (unique xs) is the ordered list of unique elements in list xs.
 \unique==
@@ -34,11 +26,22 @@
 	sort; filter (lt x) xs             # all the items greater than x
 	)
 
+# (tower n f x) is the result of applying f to x n times.
+\tower==
+	(\n\f\x
+	le n 0 x;
+	tower (- n 1) f (f x)
+	)
+
+# (do xs fn) Apply function fn to each item in list xs.
+\do==(\xs\fn xs () \x\xs fn x do xs fn)
+
 \x
 eq x "append" {append};
 eq x "say" {say};
 eq x "sort" {sort};
 eq x "tower" {tower};
+eq x "do" {do};
 eq x "unique" {unique};
 void
 )
@@ -80,11 +83,30 @@ void
 	"crown"
 	]
 
-# (exp_list n xs) Make 2^N copies of list xs.
+# The number of times to double the list for the unique sort.
+\N=
+	(
+	# NOTE: If you time these you'll see that the sort time is O(N).
+	#7  # 3840 words
+	#9  # 15360 words
+	#10 # 30720 words
+	11 # 61440 words
+	#12 # 122880 words
+	#13 # 245760 words
+	#14 # 491520 words
+
+	# To use 15 you need to raise the limits:
+	# ulimit -Ss 160000
+	# ulimit -Sv 800000
+	# ulimit -St 30
+	#15 # 983040 words
+	)
+
+# (exp_list n xs) Make 2^n copies of list xs.
 \exp_list=(\n\xs tower n (\x append x x) xs)
 
 # Show all the entries of a list on separate lines.
-\show==(\xs xs () \x\xs say x show xs)
+\show=(\xs do xs say)
 # Wrap the show inside matching brackets.
 \show=(\xs say "[" show xs say "]")
 
@@ -92,17 +114,4 @@ void
 show (sort; exp_list 1 list)
 
 # Make 2^N copies of the list and show only the unique entries.
-(
-# NOTE: If you time these you'll see that the sort time is O(N).
-#\N=7  # 3840 words
-\N=9  # 15360 words
-
-#\N=10 # 30720 words
-#\N=11 # 61440 words
-#\N=12 # 122880 words
-#\N=13 # 245760 words
-#\N=14 # 491520 words
-#\N=15 # 983040 words
-
-show (unique; exp_list N list) # sort unique on 30*2^N words
-)
+show (unique; exp_list N list)

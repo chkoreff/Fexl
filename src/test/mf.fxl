@@ -1,0 +1,53 @@
+# https://en.wikipedia.org/wiki/Hofstadter_sequence#Hofstadter_Female_and_Male_sequences
+
+\start=
+	(\base\other
+	@\this
+	\n
+	eq n 0 base;
+	\x=(this (- n 1))
+	\x=(other x)
+	- n x
+	)
+
+\create=
+	(\x
+	@\this
+	\other=(start (- 1 x) this)
+	start x other
+	)
+
+# LATER I wonder if producing the infinite list of male/female numbers might be
+# more efficient than calculating (male/female N) for each N.
+
+\female=(create 1)
+\male=(create 0)
+
+# Run function f for each value in the range x through y.
+\do_range=
+	(\x\y\f
+	\x=(round x)
+	\y=(round y)
+	\d=(le x y 1 -1)
+	\loop==
+		(\x
+		f x
+		eq x y ();
+		\x=(+ x d)
+		loop x
+		)
+	loop x
+	)
+
+\max=35
+
+\show_sequence=
+	(\label\f
+	say label
+	do_range 0 max (\n put (f n) put " ")
+	nl
+	)
+
+show_sequence "female" female
+show_sequence "male" male
+show_sequence "diff" (\n - (female n) (male n))
