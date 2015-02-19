@@ -1,6 +1,6 @@
 #
 
-\div=(say "==")
+\div=(later; say "==")
 
 \say_x=(\x put "x = " say x)
 say_x 3
@@ -36,6 +36,7 @@ say_x 5
 
 \try_fib=
 (
+later;
 div
 
 \try=

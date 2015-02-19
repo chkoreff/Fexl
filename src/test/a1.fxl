@@ -8,20 +8,20 @@
 	say "other"
 	)
 
-\div=(say "==")
+\div=(later; say "==")
 
 (
-\ping=(say "ping")
+\ping=(later; say "ping")
 div
 ping
 div
 I ping
 
 div
-\talk=(ping)
-\talk=(talk talk talk)
-\talk=(talk talk)
-\talk=(talk talk)
+\talk=(later; ping)
+\talk=(later; talk talk talk)
+\talk=(later; talk talk)
+\talk=(later; talk talk)
 talk
 )
 
@@ -177,6 +177,7 @@ And the world is mine to win. ..."
 div
 \show_x=
 	(
+	later;
 	once (say "(CALC)")
 	\x=(* 5 6)
 	say ["x = " x]
@@ -190,9 +191,11 @@ show_x
 say "]"
 
 (
-\x=(once (put "(CALC)") (+ 2 (* 7 6)))
+\x=(later; once (put "(CALC)") (+ 2 (* 7 6)))
+
 \make_square=
 	(\x
+	later;
 	once (put ["square " x "="])
 	* x x
 	)
@@ -201,7 +204,6 @@ div
 
 say (* x x)
 say (+ x x)
-
 \s4=(make_square 4)
 \s7=(make_square 7)
 
@@ -394,20 +396,20 @@ show_list (cons 1; cons 2; null)
 # Test rand.
 
 \demo_rand=
-	(\list\next
+	(\list
 	div
 	show_list (first 5 list)
 	show_list (first 5 list)
-	next
 	)
 
 seed_rand 0.1964
+
 (
-\list_rand==(rand \x [x;list_rand])
+\list_rand==(later; once; \x=rand [x;list_rand])
 demo_rand list_rand
 )
 (
-\list_rand==(rand \x [x;list_rand])
+\list_rand==(later; once; \x=rand [x;list_rand])
 demo_rand list_rand
 )
 
@@ -525,7 +527,7 @@ put list
 (
 # Demonstrate that not all side effects repeat.
 div
-\talk=(say (^ (put "(L)" (+ 1 1)) (say "(R)" (- 8 5))))
+\talk=(later; say (^ (put "(L)" (+ 1 1)) (say "(R)" (- 8 5))))
 talk
 talk
 talk

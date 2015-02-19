@@ -23,11 +23,11 @@
 
 # Normal distribution with mean 0 and standard deviation 1.
 \rand_normal=
-	(\next
-	rand \r1
-	rand \r2
-	\x=(* (sqrt; * -2 (log r1)) (cos; * tau r2))
-	next x
+	(
+	later;
+	\r1=rand
+	\r2=rand
+	* (sqrt; * -2 (log r1)) (cos; * tau r2)
 	)
 
 \show_statistics=
@@ -138,7 +138,7 @@
 
 \put_sharpe=(\sharpe put (format 4 "" sharpe))
 \put_ror=(\ror put (format 4 "" ror) put "%")
-\p=(say "<p>")
+\p=(later; say "<p>")
 
 (
 say "Average Fund vs. Risk-Free Return"
@@ -171,13 +171,14 @@ put_sharpe excess_sharpe nl
 	\mean=(/ pct_mean 100)
 	\stddev=(/ pct_stddev 100)
 	\rand_ror=
-		(\next
-		rand_normal \x
+		(
+		later;
+		\x=rand_normal
 		\factor=(+ (+ 1 mean) (* stddev x))
 		\ror=(* 100 (- factor 1))
-		next ror
+		ror
 		)
-	\next next rand_ror
+	later rand_ror
 	)
 
 # Return data for 200810 - 201407
@@ -257,8 +258,8 @@ put_sharpe excess_sharpe nl
 0.827713059473001
 ]
 
-make_rand_ror 1.4 6.0 \rand_ror
-\list_rand_ror==(rand_ror \x [x;list_rand_ror])
+\rand_ror=(make_rand_ror 1.4 6.0)
+\list_rand_ror==(later; once; \x=rand_ror [x;list_rand_ror])
 
 seed_rand 0.1964
 \len=(list_length benchmark_list_ror)

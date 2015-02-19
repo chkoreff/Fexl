@@ -55,13 +55,15 @@ static string get_utf8(void)
 	return str_new_data(buf,width);
 	}
 
-/* get = {ch}, where ch is the next UTF-8 character from the input, or void if
-no more characters. */
+/* get returns the next UTF-8 character from the input, or void if no more
+characters. */
 value type_get(value f)
+	{
 	{
 	string ch = get_utf8();
 	(void)f;
-	return A(Q(type_single), ch ? Qstr(ch) : Q(type_void));
+	return ch ? Qstr(ch) : Q(type_void);
+	}
 	}
 
 /* LATER get_from_file get_from_input get_from_string get_from_source */
@@ -69,7 +71,7 @@ value type_get(value f)
 /*LATER note that this works and is cool:
 ~END
 \ch=get
-put "ch = " put ch nl
+say ["ch = " ch]
 \\X
 END
 

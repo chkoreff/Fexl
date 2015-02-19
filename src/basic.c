@@ -49,8 +49,13 @@ value type_query(value f)
 	if (!f->L || !f->L->L) return 0;
 	{
 	value x = eval(hold(f->L->R));
-	replace_A(f, hold(f->R), x);
-	return f;
+	if (x == f->L->R)
+		{
+		replace_A(f, hold(f->R), x);
+		return f;
+		}
+	else
+		return A(hold(f->R), x);
 	}
 	}
 
@@ -59,6 +64,14 @@ value type_once(value f)
 	{
 	if (!f->L) return 0;
 	replace(f, eval(hold(f->R)));
+	return 0;
+	}
+
+/* (later x) = x, except that x is evaluated only it it's called later. */
+value type_later(value f)
+	{
+	if (!f->L) return 0;
+	replace(f,hold(f->R));
 	return 0;
 	}
 
@@ -165,6 +178,7 @@ value I;
 value Y;
 value cons;
 value null;
+value query;
 
 void beg_basic(void)
 	{
@@ -173,6 +187,7 @@ void beg_basic(void)
 	Y = Q(type_Y);
 	cons = Q(type_cons);
 	null = Q(type_null);
+	query = Q(type_query);
 	}
 
 void end_basic(void)
@@ -182,4 +197,5 @@ void end_basic(void)
 	drop(Y);
 	drop(cons);
 	drop(null);
+	drop(query);
 	}
