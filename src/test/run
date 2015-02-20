@@ -1,5 +1,6 @@
 #!/bin/sh
 ./build || exit
+ulimit -Ss 40000
 
 run_fexl()
 	{
