@@ -1,1 +1,1 @@
-extern value parse_source(void);
+extern value parse_source(const char *label);

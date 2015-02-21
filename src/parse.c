@@ -8,7 +8,6 @@
 #include <output.h>
 #include <parse.h>
 #include <source.h>
-#include <type_resolve.h>
 #include <type_str.h>
 #include <type_sym.h>
 
@@ -394,9 +393,11 @@ static value parse_exp(void)
 	}
 
 /* Parse the source stream. */
-value parse_source(void)
+value parse_source(const char *label)
 	{
 	value exp;
+	const char *save = source_label;
+	source_label = label;
 
 	ch = 0;
 	source_line = 1;
@@ -404,5 +405,7 @@ value parse_source(void)
 	exp = parse_exp();
 	if (ch != -1)
 		syntax_error("Extraneous input", source_line);
+
+	source_label = save;
 	return exp;
 	}

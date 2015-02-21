@@ -2,9 +2,11 @@
 #include <basic.h>
 #include <die.h>
 #include <memory.h>
+#include <num.h>
 #include <output.h>
 #include <source.h>
 #include <str.h>
+#include <type_num.h>
 #include <type_str.h>
 #include <type_sym.h>
 
@@ -134,14 +136,41 @@ static void undefined_symbol(const char *name, unsigned long line)
 	put("Undefined symbol "); put(name); put_error_location(line);
 	}
 
-static value do_resolve(value exp, value context(value))
+static value cur_context;
+
+static value dynamic_context(value x)
+	{
+	{
+	/* Define numeric literals. */
+	const char *name = ((string)x->R->R)->data;
+	value def = Qnum_str0(name);
+	if (def) return def;
+	}
+
+	{
+	/* Define other names using the given context. */
+	value single = Q(type_single);
+	value exp = eval(A(A(hold(cur_context),hold(x)),single));
+
+	value def;
+	if (exp->L == single)
+		def = hold(exp->R);
+	else
+		def = 0;
+
+	drop(exp);
+	return def;
+	}
+	}
+
+static value do_resolve(value exp)
 	{
 	value x = last_sym(exp);
 	if (!x) return exp;
 	{
-	value fun = do_resolve(abstract(x,exp),context);
+	value fun = do_resolve(abstract(x,exp));
 	symbol sym = (symbol)x->R->R;
-	value def = context(sym->name);
+	value def = dynamic_context(sym->name);
 	if (!def)
 		{
 		const char *name = ((string)sym->name->R->R)->data;
@@ -155,10 +184,33 @@ static value do_resolve(value exp, value context(value))
 	}
 	}
 
-value resolve(value exp, value context(value))
+static value resolve(value exp, value context)
 	{
-	exp = do_resolve(exp,context);
+	value save = cur_context;
+	cur_context = context;
+
+	exp = do_resolve(exp);
 	if (exp->T == type_sym)
 		die(0); /* The expression had undefined symbols. */
+
+	drop(context);
+	cur_context = save;
 	return exp;
+	}
+
+/* (resolve label form context) */
+value type_resolve(value f)
+	{
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	{
+	const char *save = source_label;
+
+	value label = f->L->L->R;
+	source_label = ((string)label->R->R)->data;
+
+	replace(f, resolve(hold(f->L->R), hold(f->R)));
+
+	source_label = save;
+	return f;
+	}
 	}

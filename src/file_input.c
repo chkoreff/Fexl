@@ -14,7 +14,7 @@ void get_from_file(const char *name, struct file_input *save)
 	save->getd = getd;
 	save->source = source;
 
-	source = name ? fopen(name,"r") : stdin;
+	source = name && name[0] ? fopen(name,"r") : stdin;
 	getd = source ? get : 0;
 	}
 

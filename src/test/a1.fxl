@@ -9,6 +9,9 @@
 	say "other"
 	)
 
+\eval_file=(\name get_function_from_file name standard)
+\eval_str=(\str get_function_from_string str standard)
+
 \div=(later; say "==")
 
 (

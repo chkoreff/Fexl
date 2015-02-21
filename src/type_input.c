@@ -65,16 +65,3 @@ value type_get(value f)
 	return ch ? Qstr(ch) : Q(type_void);
 	}
 	}
-
-/* LATER get_from_file get_from_input get_from_string get_from_source */
-
-/*LATER note that this works and is cool:
-~END
-\ch=get
-say ["ch = " ch]
-\\X
-END
-
-Using get_from_source, we can make a version of that which reads *only* from
-the source file, whether it's stdin or not.
-*/

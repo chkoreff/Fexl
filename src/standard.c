@@ -1,25 +1,20 @@
-#include <input.h>
-#include <stdio.h>
 #include <value.h>
 #include <basic.h>
 #include <die.h>
-#include <file_input.h>
+#include <input.h>
 #include <num.h>
-#include <output.h>
-#include <parse.h>
-#include <source.h>
 #include <standard.h>
 #include <str.h>
 #include <str_input.h>
 #include <string.h> /* strcmp */
 #include <type_cmp.h>
+#include <type_get_function.h>
 #include <type_input.h>
 #include <type_math.h>
 #include <type_num.h>
 #include <type_output.h>
 #include <type_rand.h>
 #include <type_str.h>
-#include <type_sym.h>
 
 /*LATER A "cd" function which temporarily changes directory, then back. */
 
@@ -31,8 +26,6 @@ static int match(const char *other)
 	}
 
 static value type_standard(value f);
-static value type_eval_file(value f);
-static value type_eval_str(value f);
 
 static value type_die(value f)
 	{
@@ -63,12 +56,14 @@ static value standard_name(const char *name)
 	if (match("cos")) return Q(type_cos);
 	if (match("die")) return Q(type_die);
 	if (match("eq")) return Q(type_eq);
-	if (match("eval_file")) return Q(type_eval_file);
-	if (match("eval_str")) return Q(type_eval_str);
 	if (match("exp")) return Q(type_exp);
 	if (match("F")) return Q(type_F);
 	if (match("ge")) return Q(type_ge);
 	if (match("get")) return Q(type_get);
+	if (match("get_function_from_file"))
+		return Q(type_get_function_from_file);
+	if (match("get_function_from_string"))
+		return Q(type_get_function_from_string);
 	if (match("gt")) return Q(type_gt);
 	if (match("I")) return hold(I);
 	if (match("is_bool")) return Q(type_is_bool);
@@ -131,87 +126,12 @@ static value type_standard(value f)
 	}
 	}
 
-static value parse_standard(const char *label)
-	{
-	value exp;
-	const char *save = source_label;
-	source_label = label;
-	exp = resolve(parse_source(),standard_context);
-	source_label = save;
-	return exp;
-	}
-
+/* Evaluate the named file in the standard context.  Use stdin if the name is
+null or empty. */
 value eval_file(const char *name)
 	{
-	value exp;
-	struct file_input save;
-
-	get_from_file(name,&save);
-	if (!getd)
-		{
-		put_to_error();
-		put("Could not open source file ");put(name);nl();
-		die(0);
-		}
-	exp = parse_standard(name);
-
-	restore_file_input(&save);
-	return eval(exp);
+	value label = Qstr(str_new_data0(name ? name : ""));
+	value form = A(Q(type_get_function_from_file),label);
+	value context = Q(type_standard);
+	return eval(A(form,context));
 	}
-
-static value eval_str(string x)
-	{
-	value exp;
-	struct str_input save;
-
-	get_from_string(x,&save);
-	exp = parse_standard(0);
-
-	restore_str_input(&save);
-	return eval(exp);
-	}
-
-static value type_eval_file(value f)
-	{
-	if (!f->L) return 0;
-	{
-	value x = eval(hold(f->R));
-	if (x->T == type_str)
-		{
-		const char *name = ((string)x->R->R)->data;
-		f = eval_file(name);
-		}
-	else
-		{
-		replace_void(f);
-		f = 0;
-		}
-	drop(x);
-	return f;
-	}
-	}
-
-static value type_eval_str(value f)
-	{
-	if (!f->L) return 0;
-	{
-	value x = eval(hold(f->R));
-	if (x->T == type_str)
-		f = eval_str((string)x->R->R);
-	else
-		{
-		replace_void(f);
-		f = 0;
-		}
-	drop(x);
-	return f;
-	}
-	}
-
-/*
-# LATER get_from_file
-# LATER get_from_string
-# LATER get_from_input
-# LATER get_from_source
-# LATER get_function
-*/
