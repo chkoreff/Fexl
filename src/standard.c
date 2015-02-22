@@ -51,7 +51,6 @@ static value standard_name(const char *name)
 	if (match("*")) return Q(type_mul);
 	if (match("+")) return Q(type_add);
 	if (match("abs")) return Q(type_abs);
-	if (match("void")) return Q(type_void);
 	if (match("cons")) return hold(cons);
 	if (match("cos")) return Q(type_cos);
 	if (match("die")) return Q(type_die);
@@ -95,6 +94,7 @@ static value standard_name(const char *name)
 	if (match("str_num")) return Q(type_str_num);
 	if (match("T")) return Q(type_T);
 	if (match("trunc")) return Q(type_trunc);
+	if (match("void")) return Q(type_void);
 
 	return 0;
 	}

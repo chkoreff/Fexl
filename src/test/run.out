@@ -465,6 +465,11 @@ F
 F
 T
 ==
+F
+F
+T
+T
+==
 
 x=3 
 x=3 y=4 
@@ -604,6 +609,27 @@ male
 0 0 1 2 2 3 4 4 5 6 6 7 7 8 9 9 10 11 11 12 12 13 14 14 15 16 16 17 17 18 19 19 20 20 21 22 
 diff
 1 1 1 0 1 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 
+[
+== resolve
+symbol fred
+symbol wilma
+symbol is_void
+symbol later
+symbol void
+symbol barney
+symbol say
+== run
+I am Fred.
+I am Wilma.
+test void: TTF
+I am Barney.
+]
+[
+Run in standard context.
+15
+Run in weird context.
+56
+]
 exit 0
 ====
 Hello

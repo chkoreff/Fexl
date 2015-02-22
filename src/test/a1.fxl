@@ -432,17 +432,20 @@ div
 \x=(F 1 2) say (is_num x)
 
 div
-say (is_list [])
-say (is_list ["a"])
-say (is_list ["a" 3])
-say (is_list [1])
-say (is_list [1;2])
-say (is_list null)
-say (is_list (cons 1 []))
+(
+\try=(\x \x=x say (is_list x))
+try []
+try ["a"]
+try ["a" 3]
+try [1]
+try [1;2]
+try null
+try (cons 1 [])
 div
-say (is_list (null 1))
-say (is_list cons)
-say (is_list (cons 1))
+try (null 1)
+try cons
+try (cons 1)
+)
 
 div
 say (is_good 2)
@@ -454,6 +457,14 @@ say (is_void 2)
 say (is_void (say "hi"))
 say (is_void [])
 say (is_void void)
+div
+(
+\x=(later; later; later; later void)
+say (is_void x) # F
+say (is_void x) # F
+say (is_void x) # T
+say (is_void x) # T
+)
 
 # Test tuples
 div
@@ -539,6 +550,70 @@ talk
 
 eval_file "test/sort.fxl"
 eval_file "test/mf.fxl"
+
+\test_context=
+(
+later;
+
+\case_1=
+	(
+	later;
+	say "["
+
+	\context=
+	(\x
+	say ["symbol " x]
+	eq x "fred" {(say "I am Fred.")};
+	eq x "wilma" {(say "I am Wilma.")};
+	eq x "barney" {(say "I am Barney.")};
+	eq x "is_void" {is_void};
+	eq x "say" {say};
+	eq x "void" {void};
+	eq x "later" {later};
+	void
+	)
+
+	say "== resolve"
+
+	\=context
+
+	say "== run"
+	fred
+	wilma
+	say
+	[
+	"test void: "
+	(is_void void)  # T
+	(is_void (later void))  # T
+	(is_void (later; later void))  # F
+	]
+	barney
+
+	say "]"
+	)
+
+\case_2=
+	(
+	later;
+
+	say "["
+	\form=(get_function_from_string "say (+ 7 8)")
+
+	say "Run in standard context."
+	form standard
+
+	say "Run in weird context."
+	\context=(\x eq x "say" {say}; eq x "+" {*}; void)
+	form context
+
+	say "]"
+	)
+
+case_1
+case_2
+)
+
+test_context
 
 \\
 Extra stuff not parsed.
