@@ -125,12 +125,12 @@ num 42
 void
 void
 ==
-abcdABA
-AABABC
+abcd~ABA
+AAB~ABC
 hello
 "hello"
-~(1) "hello"(1)
-~(2) ~(1) "hello"(1)(2)
+~(1) "hello"~(1)
+~(2) ~(1) "hello"~(1)~(2)
 "Ain't nothin' simple when you're doin' it for real." (Gus Baird)
 
 "My fathers sleep on the sunrise plains,
@@ -688,7 +688,7 @@ exit 1
 Incomplete string terminator on line 1
 exit 1
 ====
-Incomplete string terminator on line 1
+Unclosed string on line 1
 exit 1
 ====
 Incomplete string terminator on line 1

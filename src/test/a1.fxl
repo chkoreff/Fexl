@@ -151,18 +151,18 @@ show (str_num 42)
 
 div
 # Test some tricky string terminators.
-say ~ABC abcdABAABC
-say ~ABCD AABABCABCD
+say ~ABC abcd~ABA~ABC
+say ~ABCD AAB~ABC~ABCD
 
 # Multiple layers of quotation.
 say "hello"
-say ~(1) "hello"(1)
-say ~(2) ~(1) "hello"(1)(2)
-say ~(3) ~(2) ~(1) "hello"(1)(2)(3)
+say ~(1) "hello"~(1)
+say ~(2) ~(1) "hello"~(1)~(2)
+say ~(3) ~(2) ~(1) "hello"~(1)~(2)~(3)
 
-say ~| "Ain't nothin' simple when you're doin' it for real." (Gus Baird)|
+say ~ "Ain't nothin' simple when you're doin' it for real." (Gus Baird)~
 nl
-say ~~
+say ~
 "My fathers sleep on the sunrise plains,
 And each one sleeps alone.
 Their trails may dim to the grass and rains,
@@ -229,7 +229,7 @@ div
 eval_str ~END
 \x=(+ 33 48)
 say ["x = " x]
-END
+~END
 
 div
 # This demonstrates that (\x f x) is not strictly equivalent to f, when side

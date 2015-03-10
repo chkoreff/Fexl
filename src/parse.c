@@ -191,10 +191,10 @@ static value parse_tilde_string(void)
 
 	while (1)
 		{
-		skip();
 		if (ch == -1 || isspace(ch))
 			break;
 		buf = buf_add(buf,(char)ch);
+		skip();
 		}
 
 	if (ch == -1 || buf == 0)

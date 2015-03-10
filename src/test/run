@@ -63,7 +63,7 @@ echo -n "~| a" | run_fexl
 echo -n "
 
 ~END
-abcEN" | run_fexl
+abc~EN" | run_fexl
 
 
 echo -n "~" | run_fexl
