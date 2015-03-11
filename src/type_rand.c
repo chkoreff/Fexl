@@ -27,13 +27,13 @@ value type_seed_rand(value f)
 	}
 	}
 
-/* rand returns a weakly pseudo-random number with a uniform distribution over
-0 <= x <= 1. */
+/* rand = {x}, where x is a weakly pseudo-random number with a uniform
+distribution over 0 <= x <= 1. */
 value type_rand(value f)
 	{
 	(void)f;
 	{
 	double x = ((double)rand()) / ((double)RAND_MAX);
-	return Qnum(num_new_double(x));
+	return A(Q(type_single), Qnum(num_new_double(x)));
 	}
 	}

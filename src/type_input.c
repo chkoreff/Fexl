@@ -55,13 +55,13 @@ static string get_utf8(void)
 	return str_new_data(buf,width);
 	}
 
-/* get returns the next UTF-8 character from the input, or void if no more
-characters. */
+/* get = {ch}, where ch is the next UTF-8 character from the input, or void if
+no more characters. */
 value type_get(value f)
 	{
 	{
 	string ch = get_utf8();
 	(void)f;
-	return ch ? Qstr(ch) : Q(type_void);
+	return A(Q(type_single), ch ? Qstr(ch) : Q(type_void));
 	}
 	}

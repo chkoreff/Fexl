@@ -340,7 +340,7 @@ static value parse_lambda(unsigned long first_line)
 	/* Parse the body of the function and apply the definition if any. */
 	exp = lam(sym,parse_exp());
 	if (def)
-		exp = app(app(hold(query),def),exp);
+		exp = app(exp,def);
 	return exp;
 	}
 

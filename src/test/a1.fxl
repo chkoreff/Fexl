@@ -12,20 +12,20 @@
 \eval_file=(\name get_function_from_file name standard)
 \eval_str=(\str get_function_from_string str standard)
 
-\div=(later; say "==")
+\div=(say "==")
 
 (
-\ping=(later; say "ping")
+\ping=(say "ping")
 div
 ping
 div
 I ping
 
 div
-\talk=(later; ping)
-\talk=(later; talk talk talk)
-\talk=(later; talk talk)
-\talk=(later; talk talk)
+\talk=(ping)
+\talk=(talk talk talk)
+\talk=(talk talk)
+\talk=(talk talk)
 talk
 )
 
@@ -181,7 +181,6 @@ And the world is mine to win. ..."
 div
 \show_x=
 	(
-	later;
 	once (say "(CALC)")
 	\x=(* 5 6)
 	say ["x = " x]
@@ -195,21 +194,24 @@ show_x
 say "]"
 
 (
-\x=(later; once (put "(CALC)") (+ 2 (* 7 6)))
+\x=(once (put "(CALC)") (+ 2 (* 7 6)))
 
 \make_square=
 	(\x
-	later;
-	once (put ["square " x "="])
-	* x x
+	\f=
+		(
+		once (put ["square " x "="])
+		* x x
+		)
+	{f}
 	)
 
 div
 
 say (* x x)
 say (+ x x)
-\s4=(make_square 4)
-\s7=(make_square 7)
+make_square 4 \s4
+make_square 7 \s7
 
 say s4
 say s7
@@ -409,11 +411,11 @@ show_list (cons 1; cons 2; null)
 seed_rand 0.1964
 
 (
-\list_rand==(later; once; \x=rand [x;list_rand])
+\list_rand==(once; rand \x [x;list_rand])
 demo_rand list_rand
 )
 (
-\list_rand==(later; once; \x=rand [x;list_rand])
+\list_rand==(once; rand \x [x;list_rand])
 demo_rand list_rand
 )
 
@@ -433,7 +435,7 @@ div
 
 div
 (
-\try=(\x \x=x say (is_list x))
+\try=(\x say (is_list x))
 try []
 try ["a"]
 try ["a" 3]
@@ -457,14 +459,6 @@ say (is_void 2)
 say (is_void (say "hi"))
 say (is_void [])
 say (is_void void)
-div
-(
-\x=(later; later; later; later void)
-say (is_void x) # F
-say (is_void x) # F
-say (is_void x) # T
-say (is_void x) # T
-)
 
 # Test tuples
 div
@@ -542,7 +536,7 @@ put list
 (
 # Demonstrate that not all side effects repeat.
 div
-\talk=(later; say (^ (put "(L)" (+ 1 1)) (say "(R)" (- 8 5))))
+\talk=(say (^ (put "(L)" (+ 1 1)) (say "(R)" (- 8 5))))
 talk
 talk
 talk
@@ -553,11 +547,8 @@ eval_file "test/mf.fxl"
 
 \test_context=
 (
-later;
-
 \case_1=
 	(
-	later;
 	say "["
 
 	\context=
@@ -569,7 +560,6 @@ later;
 	eq x "is_void" {is_void};
 	eq x "say" {say};
 	eq x "void" {void};
-	eq x "later" {later};
 	void
 	)
 
@@ -580,13 +570,7 @@ later;
 	say "== run"
 	fred
 	wilma
-	say
-	[
-	"test void: "
-	(is_void void)  # T
-	(is_void (later void))  # T
-	(is_void (later; later void))  # F
-	]
+	say ["test void: " (is_void void)]
 	barney
 
 	say "]"
@@ -594,10 +578,10 @@ later;
 
 \case_2=
 	(
-	later;
-
 	say "["
-	\form=(get_function_from_string "say (+ 7 8)")
+	# LATER perhaps make get_function_XXX replace inline so we don't have to
+	# use "once" to force it to read only once.
+	\form=(once; get_function_from_string "say (+ 7 8)")
 
 	say "Run in standard context."
 	form standard

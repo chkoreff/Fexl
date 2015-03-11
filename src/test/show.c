@@ -44,7 +44,6 @@ void show(value f)
 	else if (f->T == type_cons) put("cons");
 	else if (f->T == type_null) put("null");
 	else if (f->T == type_add) put("+");
-	else if (f->T == type_query) put_ch('?');
 	else if (f->T == type_concat) put_ch('.');
 	else if (f->T == type_slice) put("slice");
 	else if (f->T == type_length) put("length");

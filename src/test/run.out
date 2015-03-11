@@ -465,11 +465,6 @@ F
 F
 T
 ==
-F
-F
-T
-T
-==
 
 x=3 
 x=3 y=4 
@@ -614,14 +609,13 @@ diff
 symbol fred
 symbol wilma
 symbol is_void
-symbol later
 symbol void
 symbol barney
 symbol say
 == run
 I am Fred.
 I am Wilma.
-test void: TTF
+test void: T
 I am Barney.
 ]
 [
