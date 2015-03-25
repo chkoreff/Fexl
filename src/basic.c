@@ -47,8 +47,16 @@ value type_Y(value f)
 value type_once(value f)
 	{
 	if (!f->L) return 0;
-	replace(f, eval(hold(f->R)));
-	return 0;
+	{
+	value g = eval(hold(f->R));
+	if (g != f->R)
+		replace(f->R, hold(g));
+
+	drop(f->L);
+	f->L = hold(I);
+	f->T = type_I;
+	return g;
+	}
 	}
 
 /* (void x) = void */

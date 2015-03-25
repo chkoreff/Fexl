@@ -194,6 +194,23 @@ show_x
 say "]"
 
 (
+# The once function now replaces only the right side instead of the entire
+# value, so calling the 
+# The once function used to replace the entire value, but calling the I
+# function here would 
+
+\hi=(once; say "Hi")
+
+# Calling the I function here used to break this test, printing "Hi" three
+# times instead of once.  That's fixed now.
+I
+
+hi
+hi
+hi
+)
+
+(
 \x=(once (put "(CALC)") (+ 2 (* 7 6)))
 
 \make_square=
