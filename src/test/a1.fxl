@@ -9,8 +9,8 @@
 	say "other"
 	)
 
-\eval_file=(\name get_function_from_file name standard)
-\eval_str=(\str get_function_from_string str standard)
+\eval_file=(\name parse_file name standard)
+\eval_str=(\str parse_string str standard)
 
 \div=(say "==")
 
@@ -596,7 +596,7 @@ eval_file "test/mf.fxl"
 \case_2=
 	(
 	say "["
-	\form=(get_function_from_string "say (+ 7 8)")
+	\form=(parse_string "say (+ 7 8)")
 
 	say "Run in standard context."
 	form standard
@@ -615,12 +615,12 @@ case_2
 test_context
 
 
-# Ensure that the get_function forms are evaluated once and replaced inline.
+# Ensure that the parse functions are evaluated once and replaced inline.
 (
 div
 \try=
 (
-get_function_from_file (say "Let's parse." "test/hello.fxl") standard
+parse_file (say "Let's parse." "test/hello.fxl") standard
 )
 
 try
@@ -637,7 +637,7 @@ div
 \x say [x " " (* 3 x)]
 ~~
 
-get_function_from_string (say "Let's parse." source) standard
+parse_string (say "Let's parse." source) standard
 )
 
 try 5

@@ -8,7 +8,7 @@
 #include <parse.h>
 #include <str.h>
 #include <str_input.h>
-#include <type_get_function.h>
+#include <type_parse.h>
 #include <type_str.h>
 #include <type_sym.h>
 
@@ -30,7 +30,7 @@ static value parse_file(string name)
 	return form;
 	}
 
-value type_get_function_from_file(value f)
+value type_parse_file(value f)
 	{
 	if (!f->L) return 0;
 	{
@@ -59,7 +59,7 @@ static value parse_string(string text)
 	return form;
 	}
 
-value type_get_function_from_string(value f)
+value type_parse_string(value f)
 	{
 	if (!f->L) return 0;
 	{

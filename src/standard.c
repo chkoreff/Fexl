@@ -8,11 +8,11 @@
 #include <str_input.h>
 #include <string.h> /* strcmp */
 #include <type_cmp.h>
-#include <type_get_function.h>
 #include <type_input.h>
 #include <type_math.h>
 #include <type_num.h>
 #include <type_output.h>
+#include <type_parse.h>
 #include <type_rand.h>
 #include <type_str.h>
 
@@ -59,10 +59,6 @@ static value standard_name(const char *name)
 	if (match("F")) return Q(type_F);
 	if (match("ge")) return Q(type_ge);
 	if (match("get")) return Q(type_get);
-	if (match("get_function_from_file"))
-		return Q(type_get_function_from_file);
-	if (match("get_function_from_string"))
-		return Q(type_get_function_from_string);
 	if (match("gt")) return Q(type_gt);
 	if (match("I")) return hold(I);
 	if (match("is_bool")) return Q(type_is_bool);
@@ -80,6 +76,8 @@ static value standard_name(const char *name)
 	if (match("null")) return hold(null);
 	if (match("num_str")) return Q(type_num_str);
 	if (match("once")) return Q(type_once);
+	if (match("parse_file")) return Q(type_parse_file);
+	if (match("parse_string")) return Q(type_parse_string);
 	if (match("put")) return Q(type_put);
 	if (match("put_to_error")) return Q(type_put_to_error);
 	if (match("rand")) return Q(type_rand);
@@ -130,7 +128,7 @@ null or empty. */
 value eval_file(const char *name)
 	{
 	value label = Qstr(str_new_data0(name ? name : ""));
-	value form = A(Q(type_get_function_from_file),label);
+	value form = A(Q(type_parse_file),label);
 	value context = Q(type_standard);
 	return eval(A(form,context));
 	}
