@@ -596,9 +596,7 @@ eval_file "test/mf.fxl"
 \case_2=
 	(
 	say "["
-	# LATER perhaps make get_function_XXX replace inline so we don't have to
-	# use "once" to force it to read only once.
-	\form=(once; get_function_from_string "say (+ 7 8)")
+	\form=(get_function_from_string "say (+ 7 8)")
 
 	say "Run in standard context."
 	form standard
@@ -615,6 +613,37 @@ case_2
 )
 
 test_context
+
+
+# Ensure that the get_function forms are evaluated once and replaced inline.
+(
+div
+\try=
+(
+get_function_from_file (say "Let's parse." "test/hello.fxl") standard
+)
+
+try
+try
+try
+)
+
+(
+div
+\try=
+(
+\source=
+~~
+\x say [x " " (* 3 x)]
+~~
+
+get_function_from_string (say "Let's parse." source) standard
+)
+
+try 5
+try 7.2
+try -1.3
+)
 
 \\
 Extra stuff not parsed.

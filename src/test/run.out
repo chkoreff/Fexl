@@ -625,6 +625,16 @@ Run in standard context.
 Run in weird context.
 56
 ]
+==
+Let's parse.
+Hello world!
+Hello world!
+Hello world!
+==
+Let's parse.
+5 15
+7.2 21.6
+-1.3 -3.9
 exit 0
 ====
 Hello

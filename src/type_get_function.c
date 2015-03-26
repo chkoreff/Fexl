@@ -12,6 +12,24 @@
 #include <type_str.h>
 #include <type_sym.h>
 
+static value parse_file(string name)
+	{
+	value form;
+	struct file_input save;
+
+	get_from_file(name->data,&save);
+	if (!getd)
+		{
+		put_to_error();
+		put("Could not open source file ");put(name->data);nl();
+		die(0);
+		}
+
+	form = parse_source(name->data);
+	restore_file_input(&save);
+	return form;
+	}
+
 value type_get_function_from_file(value f)
 	{
 	if (!f->L) return 0;
@@ -19,31 +37,26 @@ value type_get_function_from_file(value f)
 	value x = eval(hold(f->R));
 	if (x->T == type_str)
 		{
-		const char *name = ((string)data(x))->data;
-		struct file_input save;
-
-		get_from_file(name,&save);
-		if (!getd)
-			{
-			put_to_error();
-			put("Could not open source file ");put(name);nl();
-			die(0);
-			}
-
-		f = parse_source(name);
-
-		restore_file_input(&save);
-
-		f = A(A(Q(type_resolve),hold(x)),f);
+		value form = parse_file(data(x));
+		replace_A(f, A(Q(type_resolve),hold(x)), form);
 		}
 	else
-		{
 		replace_void(f);
-		f = 0;
-		}
+
 	drop(x);
-	return f;
+	return 0;
 	}
+	}
+
+static value parse_string(string text)
+	{
+	value form;
+	struct str_input save;
+
+	get_from_string(text,&save);
+	form = parse_source(0);
+	restore_str_input(&save);
+	return form;
 	}
 
 value type_get_function_from_string(value f)
@@ -53,22 +66,13 @@ value type_get_function_from_string(value f)
 	value x = eval(hold(f->R));
 	if (x->T == type_str)
 		{
-		string text = data(x);
-
-		struct str_input save;
-		get_from_string(text,&save);
-
-		f = parse_source(0);
-		restore_str_input(&save);
-
-		f = A(A(Q(type_resolve),Qstr(str_new_data0(""))),f);
+		value form = parse_string(data(x));
+		replace_A(f, A(Q(type_resolve),Qstr(str_new_data0(""))), form);
 		}
 	else
-		{
 		replace_void(f);
-		f = 0;
-		}
+
 	drop(x);
-	return f;
+	return 0;
 	}
 	}
