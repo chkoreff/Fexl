@@ -34,15 +34,13 @@ value Qsym(string name, unsigned long line)
 /* Apply f to g, where either can be a symbolic form. */
 value app(value f, value g)
 	{
-	value h = A(f,g);
-	if (f->T == type_sym || g->T == type_sym)
-		h->T = type_sym;
-	return h;
+	type t = (f->T == type_sym || g->T == type_sym) ? type_sym : type_A;
+	return V(t,f,g);
 	}
 
 static int sym_eq(symbol x, symbol y)
 	{
-	return str_eq((string)x->name->R->R,(string)y->name->R->R);
+	return str_eq((string)data(x->name),(string)data(y->name));
 	}
 
 static value combine_patterns(value p, value q)
@@ -59,9 +57,7 @@ static value combine_patterns(value p, value q)
 
 value Qsubst(value p, value f)
 	{
-	value g = A(hold(I),p);
-	g->T = type_subst;
-	return app(g,f);
+	return app(V(type_subst,Q(type_subst),p),f);
 	}
 
 /* Abstract the symbol from the body, returning a form which is a function of
@@ -72,7 +68,7 @@ static value abstract(value sym, value body)
 		return Qsubst(hold(C),hold(body));
 	else if (body->L == 0)
 		{
-		if (sym_eq((symbol)sym->R->R, (symbol)body->R->R))
+		if (sym_eq((symbol)data(sym), (symbol)data(body)))
 			return Qsubst(hold(I),hold(I));
 		else
 			return Qsubst(hold(C),hold(body));
@@ -142,7 +138,7 @@ static value dynamic_context(value x)
 	{
 	{
 	/* Define numeric literals. */
-	const char *name = ((string)x->R->R)->data;
+	const char *name = ((string)data(x))->data;
 	value def = Qnum_str0(name);
 	if (def) return def;
 	}
@@ -169,11 +165,11 @@ static value do_resolve(value exp)
 	if (!x) return exp;
 	{
 	value fun = do_resolve(abstract(x,exp));
-	symbol sym = (symbol)x->R->R;
+	symbol sym = (symbol)data(x);
 	value def = dynamic_context(sym->name);
 	if (!def)
 		{
-		const char *name = ((string)sym->name->R->R)->data;
+		const char *name = ((string)data(sym->name))->data;
 		undefined_symbol(name,sym->line);
 		def = hold(x);
 		}
@@ -206,7 +202,7 @@ value type_resolve(value f)
 	const char *save = source_label;
 
 	value label = f->L->L->R;
-	source_label = ((string)label->R->R)->data;
+	source_label = ((string)data(label))->data;
 
 	replace(f, resolve(hold(f->L->R), hold(f->R)));
 

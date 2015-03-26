@@ -79,7 +79,7 @@ void drop(value f)
 	}
 
 /* Return a value of type T with the given left and right side. */
-static value V(type T, value L, value R)
+value V(type T, value L, value R)
 	{
 	value f = free_list;
 	if (f)
@@ -106,8 +106,14 @@ value D(type T, void *data, type destroy)
 	return V(T,0,V(destroy,0,data));
 	}
 
+/* Return the data from an atom. */
+void *data(value f)
+	{
+	return f->R->R;
+	}
+
 /* The type for function application */
-static value type_A(value f)
+value type_A(value f)
 	{
 	value g = eval(hold(f->L));
 	if (g != f->L)

@@ -10,7 +10,7 @@ static value op_num(value f, number op(number))
 	{
 	value x = eval(hold(f->R));
 	if (x->T == type_num)
-		replace_num(f, op((number)x->R->R));
+		replace_num(f, op((number)data(x)));
 	else
 		replace_void(f);
 	drop(x);
@@ -25,7 +25,7 @@ static value op_num_num(value f, number op(number,number))
 	value x = eval(hold(f->L->R));
 	value y = eval(hold(f->R));
 	if (x->T == type_num && y->T == type_num)
-		replace_num(f, op((number)x->R->R,(number)y->R->R));
+		replace_num(f, op((number)data(x),(number)data(y)));
 	else
 		replace_void(f);
 	drop(x);

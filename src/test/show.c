@@ -20,18 +20,18 @@ void show(value f)
 		show(f->R);
 		put_ch(f->T == type_sym ? '}' : ')');
 		}
-	else if (f->T == type_num) put_num((number)f->R->R);
+	else if (f->T == type_num) put_num((number)data(f));
 	else if (f->T == type_str)
 		{
 		put_ch('"');
-		put_str((string)f->R->R);
+		put_str((string)data(f));
 		put_ch('"');
 		}
 	else if (f->T == type_sym)
 		{
-		symbol sym = (symbol)f->R->R;
+		symbol sym = (symbol)data(f);
 		put_ch('{');
-		put_str((string)sym->name->R->R);
+		put_str((string)data(sym->name));
 		put_ch('}');
 		}
 	else if (f->T == type_C) put_ch('C');

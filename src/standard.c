@@ -100,7 +100,7 @@ static value standard_name(const char *name)
 
 static value standard_context(value x)
 	{
-	const char *name = ((string)x->R->R)->data;
+	const char *name = ((string)data(x))->data;
 	return standard_name(name);
 	}
 

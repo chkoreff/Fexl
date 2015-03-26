@@ -13,9 +13,9 @@ static void putv(value x)
 	while (1)
 		{
 		if (x->T == type_str)
-			put_str((string)x->R->R);
+			put_str((string)data(x));
 		else if (x->T == type_num)
-			put_num((number)x->R->R);
+			put_num((number)data(x));
 		else if (x->T == type_T)
 			put_ch('T');
 		else if (x->T == type_F)

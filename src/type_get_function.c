@@ -19,7 +19,7 @@ value type_get_function_from_file(value f)
 	value x = eval(hold(f->R));
 	if (x->T == type_str)
 		{
-		const char *name = ((string)x->R->R)->data;
+		const char *name = ((string)data(x))->data;
 		struct file_input save;
 
 		get_from_file(name,&save);
@@ -53,7 +53,7 @@ value type_get_function_from_string(value f)
 	value x = eval(hold(f->R));
 	if (x->T == type_str)
 		{
-		string text = (string)x->R->R;
+		string text = (string)data(x);
 
 		struct str_input save;
 		get_from_string(text,&save);

@@ -13,9 +13,9 @@ static value op_cmp(value f, int op(int))
 	value x = eval(hold(f->L->R));
 	value y = eval(hold(f->R));
 	if (x->T == type_num && y->T == type_num)
-		replace_boolean(f, op(num_cmp((number)x->R->R,(number)y->R->R)));
+		replace_boolean(f, op(num_cmp((number)data(x),(number)data(y))));
 	else if (x->T == type_str && y->T == type_str)
-		replace_boolean(f, op(str_cmp((string)x->R->R,(string)y->R->R)));
+		replace_boolean(f, op(str_cmp((string)data(x),(string)data(y))));
 	else
 		replace_void(f);
 	drop(x);

@@ -31,7 +31,7 @@ value type_concat(value f)
 	value x = eval(hold(f->L->R));
 	value y = eval(hold(f->R));
 	if (x->T == type_str && y->T == type_str)
-		replace_str(f, str_concat((string)x->R->R,(string)y->R->R));
+		replace_str(f, str_concat((string)data(x),(string)data(y)));
 	else
 		replace_void(f);
 	drop(x);
@@ -47,7 +47,7 @@ value type_length(value f)
 	{
 	value x = eval(hold(f->R));
 	if (x->T == type_str)
-		replace_num(f, num_new_ulong(((string)x->R->R)->len));
+		replace_num(f, num_new_ulong(((string)data(x))->len));
 	else
 		replace_void(f);
 	drop(x);
@@ -69,11 +69,11 @@ value type_slice(value f)
 	value z = eval(hold(f->R));
 	if (x->T == type_str && y->T == type_num && z->T == type_num)
 		{
-		double yn = *((number)y->R->R);
-		double zn = *((number)z->R->R);
+		double yn = *((number)data(y));
+		double zn = *((number)data(z));
 		if (yn >= 0 && zn >= 0)
 			{
-			string xs = (string)x->R->R;
+			string xs = (string)data(x);
 			unsigned long pos = (unsigned long)yn;
 			unsigned long len = (unsigned long)zn;
 			if (pos < xs->len
@@ -104,7 +104,7 @@ value type_str_num(value f)
 	value x = eval(hold(f->R));
 	if (x->T == type_str)
 		{
-		number n = str0_num(((string)x->R->R)->data);
+		number n = str0_num(((string)data(x))->data);
 		if (n)
 			replace_num(f,n);
 		else
