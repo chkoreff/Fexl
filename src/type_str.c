@@ -31,7 +31,7 @@ value type_concat(value f)
 	value x = eval(hold(f->L->R));
 	value y = eval(hold(f->R));
 	if (x->T == type_str && y->T == type_str)
-		replace_str(f, str_concat((string)data(x),(string)data(y)));
+		replace_str(f, str_concat(data(x),data(y)));
 	else
 		replace_void(f);
 	drop(x);
@@ -73,7 +73,7 @@ value type_slice(value f)
 		double zn = *((number)data(z));
 		if (yn >= 0 && zn >= 0)
 			{
-			string xs = (string)data(x);
+			string xs = data(x);
 			unsigned long pos = (unsigned long)yn;
 			unsigned long len = (unsigned long)zn;
 			if (pos < xs->len

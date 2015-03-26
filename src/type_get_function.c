@@ -53,7 +53,7 @@ value type_get_function_from_string(value f)
 	value x = eval(hold(f->R));
 	if (x->T == type_str)
 		{
-		string text = (string)data(x);
+		string text = data(x);
 
 		struct str_input save;
 		get_from_string(text,&save);

@@ -40,7 +40,7 @@ value app(value f, value g)
 
 static int sym_eq(symbol x, symbol y)
 	{
-	return str_eq((string)data(x->name),(string)data(y->name));
+	return str_eq(data(x->name),data(y->name));
 	}
 
 static value combine_patterns(value p, value q)
@@ -68,7 +68,7 @@ static value abstract(value sym, value body)
 		return Qsubst(hold(C),hold(body));
 	else if (body->L == 0)
 		{
-		if (sym_eq((symbol)data(sym), (symbol)data(body)))
+		if (sym_eq(data(sym),data(body)))
 			return Qsubst(hold(I),hold(I));
 		else
 			return Qsubst(hold(C),hold(body));
@@ -165,7 +165,7 @@ static value do_resolve(value exp)
 	if (!x) return exp;
 	{
 	value fun = do_resolve(abstract(x,exp));
-	symbol sym = (symbol)data(x);
+	symbol sym = data(x);
 	value def = dynamic_context(sym->name);
 	if (!def)
 		{
