@@ -45,7 +45,7 @@ static int sym_eq(symbol x, symbol y)
 
 static value combine_patterns(value p, value q)
 	{
-	if (p->T == type_C && q->T == type_C)
+	if (p == C && q == C)
 		{
 		drop(p);
 		drop(q);
@@ -104,14 +104,24 @@ static value last_sym(value f)
 	return last_sym(f->L);
 	}
 
+/* Make a copy of f, but substitute x wherever I appears in pattern p.  There
+are a couple of cases where I look ahead at p->L for optimization purposes.  At
+this time it makes the code 1112 bytes smaller, and a certain test runs about
+3.5% faster.  At some point we might want to replace substitution patterns with
+trees of function pointers to avoid the conditional branching, which might be
+faster in itself, but might also give us more opportunities for "long reach"
+patterns that do certain common substitutions "all at once".
+*/
 static value x;
 static value substitute(value p, value f)
 	{
-	if (p->T == type_C)
+	if (p == C)
 		return hold(f);
-	else if (p->T == type_I)
+	else if (p == I)
 		return hold(x);
-	else if (p->L->T == type_C)
+	else if (p->L == I)
+		return A(hold(x),substitute(p->R,f->R));
+	else if (p->L == C)
 		return A(hold(f->L),substitute(p->R,f->R));
 	else
 		return A(substitute(p->L,f->L),substitute(p->R,f->R));
