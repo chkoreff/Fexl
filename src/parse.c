@@ -240,7 +240,7 @@ static value parse_list(void)
 static value parse_tuple(void)
 	{
 	value pattern = hold(I);
-	value form = hold(I);
+	value exp = hold(I);
 	while (1)
 		{
 		value term;
@@ -248,46 +248,43 @@ static value parse_tuple(void)
 		term = parse_term();
 		if (term == 0) break;
 		pattern = A(pattern,hold(C));
-		form = app(form,term);
+		exp = app(exp,term);
 		}
-	return Qsubst(pattern,form);
+	return Qsubst(pattern,exp);
 	}
 
 static value parse_term(void)
 	{
+	value exp;
 	unsigned long first_line = source_line;
 	if (ch == '(') /* parenthesized expression */
 		{
-		value exp;
 		skip();
 		exp = parse_exp();
 		if (ch != ')')
 			syntax_error("Unclosed parenthesis", first_line);
 		skip();
-		return exp;
 		}
 	else if (ch == '[') /* list */
 		{
-		value exp;
 		skip();
 		exp = parse_list();
 		if (ch != ']')
 			syntax_error("Unclosed bracket", first_line);
 		skip();
-		return exp;
 		}
 	else if (ch == '{') /* tuple */
 		{
-		value exp;
 		skip();
 		exp = parse_tuple();
 		if (ch != '}')
 			syntax_error("Unclosed brace", first_line);
 		skip();
-		return exp;
 		}
 	else
-		return parse_symbol();
+		exp = parse_symbol();
+
+	return exp;
 	}
 
 /* Parse a lambda form following the initial '\' character. */
