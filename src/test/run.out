@@ -607,8 +607,10 @@ diff
 1 1 1 0 1 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 
 [
 == resolve
+symbol say
 symbol fred
 symbol wilma
+symbol say
 symbol is_void
 symbol void
 symbol barney
@@ -724,6 +726,8 @@ Extraneous input on line 2
 exit 1
 ====
 Undefined symbol x on line 1
+Undefined symbol y on line 2
+Undefined symbol z on line 3
 Undefined symbol z on line 3
 Undefined symbol y on line 3
 exit 1

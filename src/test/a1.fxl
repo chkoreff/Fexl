@@ -194,11 +194,6 @@ show_x
 say "]"
 
 (
-# The once function now replaces only the right side instead of the entire
-# value, so calling the 
-# The once function used to replace the entire value, but calling the I
-# function here would 
-
 \hi=(once; say "Hi")
 
 # Calling the I function here used to break this test, printing "Hi" three

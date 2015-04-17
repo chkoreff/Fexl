@@ -55,29 +55,24 @@ static value combine_patterns(value p, value q)
 		return A(p,q);
 	}
 
-value Qsubst(value p, value f)
+/* Replace all occurrences of sym in exp with I, returning a pair with the
+replacement pattern and the updated exp. */
+static value remove_symbol(value sym, value exp)
 	{
-	return app(V(type_subst,Q(type_subst),p),f);
-	}
-
-/* Abstract the symbol from the body, returning a form which is a function of
-that symbol, and no longer contains that symbol. */
-static value abstract(value sym, value body)
-	{
-	if (body->T != type_sym)
-		return Qsubst(hold(C),hold(body));
-	else if (body->L == 0)
+	if (exp->T != type_sym)
+		return A(hold(C),hold(exp));
+	else if (exp->L == 0)
 		{
-		if (sym_eq(data(sym),data(body)))
-			return Qsubst(hold(I),hold(I));
+		if (sym_eq(data(sym),data(exp)))
+			return A(hold(I),hold(I));
 		else
-			return Qsubst(hold(C),hold(body));
+			return A(hold(C),hold(exp));
 		}
 	else
 		{
-		value f = abstract(sym,body->L);
-		value g = abstract(sym,body->R);
-		value h = Qsubst(combine_patterns(hold(f->L->R),hold(g->L->R)),
+		value f = remove_symbol(sym,exp->L);
+		value g = remove_symbol(sym,exp->R);
+		value h = A(combine_patterns(hold(f->L),hold(g->L)),
 			app(hold(f->R),hold(g->R)));
 		drop(f);
 		drop(g);
@@ -85,23 +80,22 @@ static value abstract(value sym, value body)
 		}
 	}
 
-value lam(value sym, value body)
+/* Return a function that calls substitute(p,f) when applied to x. */
+value Qsubst(value p, value f)
 	{
-	value f = abstract(sym,body);
-	drop(sym);
-	drop(body);
-	return f;
+	return app(V(type_subst,Q(type_subst),p),f);
 	}
 
-/* Return the last symbol in the value, if any, in right to left order. */
-static value last_sym(value f)
+/* Abstract the symbol from exp, returning a form which is a function of that
+symbol, and no longer contains that symbol. */
+value lam(value sym, value exp)
 	{
-	value sym;
-	if (f->T != type_sym) return 0;
-	if (f->L == 0) return f;
-	sym = last_sym(f->R);
-	if (sym) return sym;
-	return last_sym(f->L);
+	value pair = remove_symbol(sym,exp);
+	value f = Qsubst(hold(pair->L),hold(pair->R));
+	drop(pair);
+	drop(sym);
+	drop(exp);
+	return f;
 	}
 
 /* Make a copy of f, but substitute x wherever I appears in pattern p.  There
@@ -136,14 +130,8 @@ value type_subst(value f)
 	return f;
 	}
 
-static void undefined_symbol(const char *name, unsigned long line)
-	{
-	put_to_error();
-	put("Undefined symbol "); put(name); put_error_location(line);
-	}
-
+/* Resolve an individual symbol x with cur_context. */
 static value cur_context;
-
 static value dynamic_context(value x)
 	{
 	{
@@ -169,34 +157,50 @@ static value dynamic_context(value x)
 	}
 	}
 
+static short undefined = 0;
+static void undefined_symbol(const char *name, unsigned long line)
+	{
+	put_to_error();
+	put("Undefined symbol "); put(name); put_error_location(line);
+	undefined = 1;
+	}
+
+/* Resolve all symbols in exp with cur_context. */
 static value do_resolve(value exp)
 	{
-	value x = last_sym(exp);
-	if (!x) return exp;
-	{
-	value fun = do_resolve(abstract(x,exp));
-	symbol sym = data(x);
-	value def = dynamic_context(sym->name);
-	if (!def)
+	if (exp->T != type_sym)
+		return exp;
+	else if (exp->L == 0)
 		{
-		const char *name = ((string)data(sym->name))->data;
-		undefined_symbol(name,sym->line);
-		def = hold(x);
+		symbol sym = data(exp);
+		value def = dynamic_context(sym->name);
+		if (!def)
+			{
+			const char *name = ((string)data(sym->name))->data;
+			undefined_symbol(name,sym->line);
+			def = Q(type_void);
+			}
+		drop(exp);
+		return def;
 		}
-
-	fun = app(fun,def);
-	drop(exp);
-	return fun;
+	else
+		{
+		value f = do_resolve(hold(exp->L));
+		value g = do_resolve(hold(exp->R));
+		value result = A(f,g);
+		drop(exp);
+		return result;
+		}
 	}
-	}
 
+/* Resolve all symbols in exp with the definitions given by context. */
 static value resolve(value exp, value context)
 	{
 	value save = cur_context;
 	cur_context = context;
 
 	exp = do_resolve(exp);
-	if (exp->T == type_sym)
+	if (undefined)
 		die(0); /* The expression had undefined symbols. */
 
 	drop(context);
