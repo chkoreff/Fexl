@@ -57,9 +57,9 @@ value type_length(value f)
 
 /* LATER str_find, a.k.a. index */
 
-/* (slice str pos len) returns the len bytes of str starting at pos, or void if
-pos or len exceeds the bounds of str. */
-/* LATER make it forgiving like Perl */
+/* (slice str pos len) returns the len bytes of str starting at pos, clipping
+if necessary to stay within the bounds of str.  Returns void if pos or len is
+negative. */
 value type_slice(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
@@ -76,12 +76,14 @@ value type_slice(value f)
 			string xs = data(x);
 			unsigned long pos = (unsigned long)yn;
 			unsigned long len = (unsigned long)zn;
-			if (pos < xs->len
-				&& len <= xs->len
-				&& pos <= xs->len - len)
-				replace_str(f, str_new_data(xs->data + pos,len));
-			else
-				replace_void(f);
+
+			if (pos > xs->len)
+				pos = xs->len;
+
+			if (len > xs->len - pos)
+				len = xs->len - pos;
+
+			replace_str(f, str_new_data(xs->data + pos,len));
 			}
 		else
 			replace_void(f);

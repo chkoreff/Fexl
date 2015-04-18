@@ -63,16 +63,39 @@ num 0
 num -0
 num 43.8
 ==
-void
-str cd
 str 
-void
-void
-void
-str bc
+str 
+str 
+==
+str a
+str 
+str 
+==
+str 
+str a
+str ab
 str abc
-void
+str abcd
+str abcd
+==
+str 
+str b
+str bc
+str bcd
+str bcd
+==
+str 
 str c
+str cd
+str cd
+==
+str 
+str d
+str d
+==
+void
+void
+void
 void
 ==
 bool F
@@ -118,7 +141,7 @@ num 3
 void
 void
 str de
-void
+str defg
 void
 void
 num 42
