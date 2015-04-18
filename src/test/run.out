@@ -98,6 +98,33 @@ void
 void
 void
 ==
+num 3
+num 2
+void
+num 2
+void
+num 3
+num 3
+void
+void
+void
+num 0
+num 7
+num 15
+void
+num 6
+num 12
+void
+num 15
+void
+num 0
+void
+void
+void
+num 0
+void
+void
+==
 bool F
 bool F
 bool T

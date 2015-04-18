@@ -68,6 +68,53 @@ int str_eq(string x, string y)
 	return memcmp(x->data, y->data, x->len) == 0;
 	}
 
+/* Return the len bytes of x starting at pos, clipping if necessary to stay
+within the bounds of x. */
+string str_slice(string x, unsigned long pos, unsigned long len)
+	{
+	if (pos > x->len)
+		pos = x->len;
+
+	if (len > x->len - pos)
+		len = x->len - pos;
+
+	return str_new_data(x->data + pos,len);
+	}
+
+/* Search x for the first occurrence of y, starting at offset.  Return the
+position within x where y was found.  If the position returned is past the end
+of x, then y was not found. */
+unsigned long str_search(string x, string y, unsigned long offset)
+	{
+	unsigned long xn = x->len;
+	unsigned long yn = y->len;
+
+	/* Avoid unnecessary work if a match is impossible based on lengths. */
+	if (xn < yn || offset > xn - yn) return xn;
+
+	{
+	char *xs = x->data;
+	char *ys = y->data;
+	unsigned long xi = offset;
+	unsigned long yi = 0;
+	while (1)
+		{
+		if (yi >= yn) return xi - yi; /* found */
+		if (xi >= xn) return xn; /* not found */
+
+		if (xs[xi] == ys[yi])
+			yi++;
+		else
+			{
+			xi -= yi;
+			yi = 0;
+			}
+
+		xi++;
+		}
+	}
+	}
+
 void put_str(string x)
 	{
 	putd(x->data,x->len);

@@ -55,10 +55,7 @@ value type_length(value f)
 	}
 	}
 
-/* LATER str_find, a.k.a. index */
-
-/* (slice str pos len) returns the len bytes of str starting at pos, clipping
-if necessary to stay within the bounds of str.  Returns void if pos or len is
+/* (slice str pos len) calls str_slice, except it returns void if pos or len is
 negative. */
 value type_slice(value f)
 	{
@@ -72,18 +69,41 @@ value type_slice(value f)
 		double yn = *((number)data(y));
 		double zn = *((number)data(z));
 		if (yn >= 0 && zn >= 0)
+			replace_str(f, str_slice(data(x),yn,zn));
+		else
+			replace_void(f);
+		}
+	else
+		replace_void(f);
+
+	drop(x);
+	drop(y);
+	drop(z);
+	return 0;
+	}
+	}
+
+/* (search haystack needle offset) calls str_search. */
+value type_search(value f)
+	{
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	{
+	value x = eval(hold(f->L->L->R));
+	value y = eval(hold(f->L->R));
+	value z = eval(hold(f->R));
+
+	if (x->T == type_str && y->T == type_str && z->T == type_num)
+		{
+		double zn = *((number)data(z));
+		if (zn >= 0)
 			{
 			string xs = data(x);
-			unsigned long pos = (unsigned long)yn;
-			unsigned long len = (unsigned long)zn;
-
-			if (pos > xs->len)
-				pos = xs->len;
-
-			if (len > xs->len - pos)
-				len = xs->len - pos;
-
-			replace_str(f, str_new_data(xs->data + pos,len));
+			string ys = data(y);
+			unsigned long pos = str_search(xs,ys,zn);
+			if (pos < xs->len)
+				replace_num(f, num_new_ulong(pos));
+			else
+				replace_void(f);
 			}
 		else
 			replace_void(f);

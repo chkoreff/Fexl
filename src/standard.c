@@ -83,6 +83,7 @@ static value standard_name(const char *name)
 	if (match("rand")) return Q(type_rand);
 	if (match("round")) return Q(type_round);
 	if (match("say")) return Q(type_say);
+	if (match("search")) return Q(type_search);
 	if (match("seed_rand")) return Q(type_seed_rand);
 	if (match("sin")) return Q(type_sin);
 	if (match("slice")) return Q(type_slice);

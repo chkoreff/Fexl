@@ -79,6 +79,8 @@ show (str_num "0")
 show (str_num "-0")
 show (+ (str_num "1"); str_num; num_str; str_num "42.8")
 
+# Test slice.
+(
 div
 show (slice "" 0 0)
 show (slice "" 0 7)
@@ -115,6 +117,49 @@ show (slice "abcd" -2 3)
 show (slice "abcd" 2 -3)
 show (slice "" -1 2)
 show (slice "abc" -1 -2)
+)
+
+# Test search.
+(
+div
+\try=(\x\y\offset show (search x y offset))
+
+# These cases agree with the Perl "index" function.  Where Fexl returns void,
+# Perl returns -1.
+try "abcdefg" "de" 0 # 3
+try "abcdefg" "cde" 0 # 2
+try "abcdefg" "cdx" 0 # void
+try "abcdefg" "cde" 2 # 2
+try "abcdefg" "cde" 3 # void
+try "abcdefg" "de" 2 # 3
+try "abcdefg" "de" 3 # 3
+try "abcdefg" "de" 4 # void
+try "" "a" 0 # void
+try "" "" -1 # void
+try "abcdefghijklmnop" "" 0 # 0
+try "abcdefghijklmnop" "" 7 # 7
+try "abcdefghijklmnop" "" 15 # 15
+try "abcdefghijklmnop" "ghI" 0 # void
+try "abcdefghijklmnop" "ghi" 0 # 6
+try "abcdefghijklmnop" "mnop" 0 # 12
+try "abcdefghijklmnop" "mnopq" 0 # void
+try "abcdefghijklmnop" "p" 0 # 15
+try "abcdefghijklmnop" "q" 0 # void
+try "abcdefghijklmnop" "abcdefghijklmnop" 0 # 0
+try "abcdefghijklmnop" "abcdefghijklmnop" 1 # void
+try "abcdefghijklmnop" "abcdefghijklmnopq" 0 # void
+try "a" "ab" 0 # void
+try "a" "a" 0 # 0
+
+# These cases diverge from the Perl "index" function.  Fexl returns void, but
+# Perl shows a match at position 0.  The difference is because str_search does
+# not use -1 to indicate not found, since we use unsigned longs.  Instead, it
+# returns a position which points beyond the end of the subject string, and
+# when the subject string is empty, any value does that.  I find this
+# difference acceptable.
+try "" "" 0 # void
+try "" "" 8 # void
+)
 
 div
 show (is_str I)
