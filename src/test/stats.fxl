@@ -3,7 +3,6 @@
 \append==(\xs\ys xs ys \x\xs [x; append xs ys])
 \fold==(\fn\z\xs xs z \x\xs \z=(fn z x) fold fn z xs)
 \map==(\f\xs xs [] \x\xs [(f x); map f xs])
-\do==(\xs\fn xs () \x\xs fn x do xs fn)
 
 \list_sum=(fold + 0)
 \list_length=(fold (\n\_ + 1 n) 0)

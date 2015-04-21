@@ -1,8 +1,10 @@
 #include <value.h>
 #include <basic.h>
+#include <num.h>
 #include <stdio.h>
 #include <str.h>
 #include <type_input.h>
+#include <type_num.h>
 #include <type_str.h>
 
 /*
@@ -71,4 +73,39 @@ value type_get(value f)
 	string ch = get_utf8();
 	(void)f;
 	return A(Q(type_single), ch ? Qstr(ch) : Q(type_void));
+	}
+
+/* (char_width str pos) Return the width of the UTF-8 character which starts at
+the given position. */
+value type_char_width(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	{
+	value x = eval(hold(f->L->R));
+	value y = eval(hold(f->R));
+	if (x->T == type_str && y->T == type_num)
+		{
+		double yn = *((number)data(y));
+		if (yn >= 0)
+			{
+			string xs = data(x);
+			unsigned long pos = yn;
+			if (pos < xs->len)
+				{
+				char n = char_width(xs->data[pos]);
+				replace_num(f, num_new_ulong(n));
+				}
+			else
+				replace_void(f);
+			}
+		else
+			replace_void(f);
+		}
+	else
+		replace_void(f);
+
+	drop(x);
+	drop(y);
+	return f;
+	}
 	}

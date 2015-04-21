@@ -14,6 +14,9 @@
 
 \div=(say "==")
 
+# Do fn for each item in list xs.
+\each==(\xs\fn xs () \x\xs fn x each xs fn)
+
 (
 \ping=(say "ping")
 div
@@ -159,6 +162,25 @@ try "a" "a" 0 # 0
 # difference acceptable.
 try "" "" 0 # void
 try "" "" 8 # void
+)
+
+(
+say "== test char_width"
+
+# Return the list of UTF-8 chars starting from the given position.
+\str_chars==
+	(\str\pos
+	ge pos (length str) [];
+	\n=(char_width str pos)
+	\ch=(slice str pos n)
+	[ch; str_chars str (+ pos n)]
+	)
+
+\str="hej åabcüdef üä 1≠0 包子x"
+\list=(str_chars str 0)
+
+say ["str " str]
+each list (\ch say ["ch " ch])
 )
 
 div
@@ -463,8 +485,6 @@ say (length "abc")
 say (length (. "ab" "c"))
 
 div
-# Do fn for each item in list xs.
-\do==(\xs\fn xs () \x\xs fn x do xs fn)
 
 # Return the first n items of a list.
 \first==
@@ -474,7 +494,7 @@ div
 	[x;first (- n 1) xs]
 	)
 
-\show_list=(\xs say "[" (do xs say) say "]")
+\show_list=(\xs say "[" (each xs say) say "]")
 
 show_list (null)
 show_list [1 2]

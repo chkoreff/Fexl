@@ -33,15 +33,15 @@
 	tower (- n 1) f (f x)
 	)
 
-# (do xs fn) Apply function fn to each item in list xs.
-\do==(\xs\fn xs () \x\xs fn x do xs fn)
+# (each xs fn) Do fn to each item in list xs.
+\each==(\xs\fn xs () \x\xs fn x each xs fn)
 
 \x
 eq x "append" {append};
 eq x "say" {say};
 eq x "sort" {sort};
 eq x "tower" {tower};
-eq x "do" {do};
+eq x "each" {each};
 eq x "unique" {unique};
 void
 )
@@ -106,7 +106,7 @@ void
 \exp_list=(\n\xs tower n (\x append x x) xs)
 
 # Show all the entries of a list on separate lines.
-\show=(\xs do xs say)
+\show=(\xs each xs say)
 # Wrap the show inside matching brackets.
 \show=(\xs say "[" show xs say "]")
 

@@ -124,6 +124,31 @@ void
 num 0
 void
 void
+== test char_width
+str hej åabcüdef üä 1≠0 包子x
+ch h
+ch e
+ch j
+ch  
+ch å
+ch a
+ch b
+ch c
+ch ü
+ch d
+ch e
+ch f
+ch  
+ch ü
+ch ä
+ch  
+ch 1
+ch ≠
+ch 0
+ch  
+ch 包
+ch 子
+ch x
 ==
 bool F
 bool F

@@ -50,6 +50,7 @@ static value standard_name(const char *name)
 	if (match("*")) return Q(type_mul);
 	if (match("+")) return Q(type_add);
 	if (match("abs")) return Q(type_abs);
+	if (match("char_width")) return Q(type_char_width);
 	if (match("cons")) return hold(cons);
 	if (match("cos")) return Q(type_cos);
 	if (match("die")) return Q(type_die);
