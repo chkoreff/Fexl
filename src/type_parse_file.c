@@ -1,7 +1,6 @@
 #include <value.h>
 #include <basic.h>
 #include <die.h>
-#include <input.h>
 #include <output.h>
 #include <parse.h>
 #include <stdio.h>
@@ -20,22 +19,18 @@ static int get(void)
 static value parse_file(const char *name)
 	{
 	value exp;
-	input save_getd = getd;
 	FILE *save_source = source;
 
 	source = name && name[0] ? fopen(name,"r") : stdin;
-	getd = source ? get : 0;
-
-	if (!getd)
+	if (!source)
 		{
 		put_to_error();
 		put("Could not open source file ");put(name);nl();
 		die(0);
 		}
 
-	exp = parse_source(name);
+	exp = parse_source(name,get);
 
-	getd = save_getd;
 	source = save_source;
 	return exp;
 	}

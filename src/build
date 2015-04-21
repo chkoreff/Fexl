@@ -69,7 +69,6 @@ compile buffer
 compile convert
 compile die
 compile format
-compile input
 compile memory
 compile num
 compile output

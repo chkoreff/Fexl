@@ -4,7 +4,6 @@
 #include <buffer.h>
 #include <ctype.h>
 #include <die.h>
-#include <input.h>
 #include <output.h>
 #include <parse.h>
 #include <source.h>
@@ -46,6 +45,7 @@ file) or the special token "\\".  The \\ token stops the parser immediately, as
 if it had reached end of file.
 */
 
+static int (*get)(void); /* current source stream */
 static int ch; /* current character */
 static unsigned long source_line;  /* current line number */
 
@@ -58,7 +58,7 @@ static void syntax_error(const char *code, unsigned long line)
 
 static void skip(void)
 	{
-	ch = getd();
+	ch = get();
 	if (ch == '\n')
 		source_line++;
 	}
@@ -390,11 +390,14 @@ static value parse_exp(void)
 	}
 
 /* Parse the source stream. */
-value parse_source(const char *label)
+value parse_source(const char *label, int source(void))
 	{
 	value exp;
 	const char *save = source_label;
+	int (*save_get)(void) = get;
+
 	source_label = label;
+	get = source;
 
 	ch = 0;
 	source_line = 1;
@@ -404,5 +407,7 @@ value parse_source(const char *label)
 		syntax_error("Extraneous input", source_line);
 
 	source_label = save;
+	get = save_get;
+
 	return exp;
 	}

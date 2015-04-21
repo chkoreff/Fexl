@@ -1,6 +1,6 @@
 #include <value.h>
 #include <basic.h>
-#include <input.h>
+#include <stdio.h>
 #include <str.h>
 #include <type_input.h>
 #include <type_str.h>
@@ -40,10 +40,10 @@ static unsigned char char_width(unsigned char ch)
 	return n;
 	}
 
-/* Get the next UTF-8 character from the current input. */
+/* Get the next UTF-8 character from stdin. */
 static string get_utf8(void)
 	{
-	int ch = getd();
+	int ch = getchar();
 	if (ch == -1) return 0;
 	{
 	char buf[6];
@@ -57,14 +57,14 @@ static string get_utf8(void)
 		{
 		buf[pos++] = (char)ch;
 		if (pos >= len) break;
-		ch = getd();
+		ch = getchar();
 		if (ch == -1) return 0;
 		}
 	return str_new_data(buf,len);
 	}
 	}
 
-/* get = {ch}, where ch is the next UTF-8 character from the input, or void if
+/* get = {ch}, where ch is the next UTF-8 character from stdin, or void if
 no more characters. */
 value type_get(value f)
 	{

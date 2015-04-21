@@ -1,6 +1,5 @@
 #include <value.h>
 #include <basic.h>
-#include <input.h>
 #include <parse.h>
 #include <str.h>
 #include <type_parse_string.h>
@@ -18,17 +17,14 @@ static int get(void)
 static value parse_string(string text)
 	{
 	value exp;
-	input save_getd = getd;
 	string save_source = source;
 	unsigned long save_pos = pos;
 
 	source = text;
 	pos = 0;
-	getd = get;
 
-	exp = parse_source(0);
+	exp = parse_source(0,get);
 
-	getd = save_getd;
 	source = save_source;
 	pos = save_pos;
 	return exp;
