@@ -18,10 +18,7 @@ value type_seed_rand(value f)
 		f = hold(I);
 		}
 	else
-		{
 		replace_void(f);
-		f = 0;
-		}
 	drop(x);
 	return f;
 	}

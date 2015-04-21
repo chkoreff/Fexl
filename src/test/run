@@ -21,6 +21,7 @@ defg
 
 hij
 åabcüdef
+üä 1≠0 包子
 EOF
 ) | ../bin/fexl test/a2.fxl
 echo "exit $?"

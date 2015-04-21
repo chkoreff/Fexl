@@ -6,9 +6,6 @@
 #include <type_str.h>
 
 /*
-Get the next logical character from the current input.  This reads multi-byte
-sequences in the UTF-8 format.
-
 Reference for UTF-8: http://czyborra.com/utf/
 
 The binary representation of the character's integer value is thus simply
@@ -28,40 +25,50 @@ it is generally expected that the one million code points of the 20 bits
 offered by UTF-16 and 4-byte UTF-8 will suffice to cover all characters and
 that we will never get to see any Unicode character definitions beyond that.)
 */
+
+/* Return the width of a UTF-8 character whose leading byte is ch. */
+static unsigned char char_width(unsigned char ch)
+	{
+	unsigned char mask = 0x80;
+	unsigned char n = 0;
+	while (ch & mask)
+		{
+		n++;
+		mask >>= 1;
+		}
+	if (n == 0) return 1;
+	return n;
+	}
+
+/* Get the next UTF-8 character from the current input. */
 static string get_utf8(void)
 	{
-	char buf[6];
-	int mask = 0x80;
-	unsigned width = 1;
-
 	int ch = getd();
 	if (ch == -1) return 0;
+	{
+	char buf[6];
+	unsigned pos = 0;
+	unsigned len = char_width(ch);
 
-	buf[0] = (char)ch;
-	if ((ch & mask) == 0)
-		return str_new_data(buf,1);
+	if (len >= sizeof(buf))
+		len = sizeof(buf);
 
-	/* Read another byte for each high bit after the first one. */
 	while (1)
 		{
-		int next_ch;
-		mask >>= 1;
-		if ((ch & mask) == 0) break;
-		next_ch = getd();
-		if (next_ch == -1) break;
-		buf[width++] = (char)next_ch;
-		if (width >= sizeof(buf)) break;
+		buf[pos++] = (char)ch;
+		if (pos >= len) break;
+		ch = getd();
+		if (ch == -1) return 0;
 		}
-	return str_new_data(buf,width);
+	return str_new_data(buf,len);
+	}
 	}
 
 /* get = {ch}, where ch is the next UTF-8 character from the input, or void if
 no more characters. */
 value type_get(value f)
 	{
-	{
 	string ch = get_utf8();
 	(void)f;
 	return A(Q(type_single), ch ? Qstr(ch) : Q(type_void));
-	}
 	}

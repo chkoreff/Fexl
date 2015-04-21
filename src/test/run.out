@@ -720,6 +720,17 @@ ch = 'e'
 ch = 'f'
 ch = '
 '
+ch = 'ü'
+ch = 'ä'
+ch = ' '
+ch = '1'
+ch = '≠'
+ch = '0'
+ch = ' '
+ch = '包'
+ch = '子'
+ch = '
+'
 Good bye.
 exit 0
 ====
