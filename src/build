@@ -68,7 +68,6 @@ compile basic
 compile buffer
 compile convert
 compile die
-compile file_input
 compile format
 compile input
 compile memory
@@ -78,13 +77,13 @@ compile parse
 compile source
 compile standard
 compile str
-compile str_input
 compile type_cmp
 compile type_input
 compile type_math
 compile type_num
 compile type_output
-compile type_parse
+compile type_parse_file
+compile type_parse_string
 compile type_rand
 compile type_str
 compile type_sym

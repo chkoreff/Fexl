@@ -214,9 +214,8 @@ value type_resolve(value f)
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 	{
 	const char *save = source_label;
-
-	value label = f->L->L->R;
-	source_label = ((string)data(label))->data;
+	string label = data(f->L->L->R);
+	source_label = label->data;
 
 	replace(f, resolve(hold(f->L->R), hold(f->R)));
 

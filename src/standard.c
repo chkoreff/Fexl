@@ -5,14 +5,14 @@
 #include <num.h>
 #include <standard.h>
 #include <str.h>
-#include <str_input.h>
 #include <string.h> /* strcmp */
 #include <type_cmp.h>
 #include <type_input.h>
 #include <type_math.h>
 #include <type_num.h>
 #include <type_output.h>
-#include <type_parse.h>
+#include <type_parse_file.h>
+#include <type_parse_string.h>
 #include <type_rand.h>
 #include <type_str.h>
 
@@ -129,7 +129,7 @@ null or empty. */
 value eval_file(const char *name)
 	{
 	value label = Qstr(str_new_data0(name ? name : ""));
-	value form = A(Q(type_parse_file),label);
+	value exp = A(Q(type_parse_file),label);
 	value context = Q(type_standard);
-	return eval(A(form,context));
+	return eval(A(exp,context));
 	}
