@@ -202,7 +202,7 @@ put "tuvwxyz"
 get
 
 # Flatten a piece of data (string, number, or list) into a string.
-\flatten==
+\flatten=
 	(\x
 	buf_new \buf
 	\put=(buf_put buf)
