@@ -183,6 +183,47 @@ say ["str " str]
 each list (\ch say ["ch " ch])
 )
 
+(
+say "== test buf"
+buf_new \buf
+\put=(buf_put buf)
+\get=(buf_get buf \x say [": " x])
+put "abc"
+put "defg"
+get
+get
+put "abc"
+put "d"
+put ""
+put ""
+put "e"
+get
+put "tuvwxyz"
+get
+
+# Flatten a piece of data (string, number, or list) into a string.
+\flatten==
+	(\x
+	buf_new \buf
+	\put=(buf_put buf)
+	\flatten==
+		(\x
+		is_str x (put x);
+		is_num x (put (num_str x));
+		is_list x
+			(
+			x () \x\xs
+			flatten x
+			flatten xs
+			);
+		)
+	flatten x
+	buf_get buf I
+	)
+
+say (flatten [["ab" "c "] [[] [] ""] [2.3 " " -3.8] " defg"])
+)
+
 div
 show (is_str I)
 show (is_str 4)

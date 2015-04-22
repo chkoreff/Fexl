@@ -159,10 +159,7 @@ static string collect_string(
 		else if (match_pos > 0)
 			{
 			/* Buffer the ones matched so far and start over. */
-			unsigned long i;
-			for (i = 0; i < match_pos; i++)
-				buf = buf_add(buf, end_data[i]);
-
+			buf = buf_addn(buf,end_data,match_pos);
 			match_pos = 0;
 			}
 		else if (ch == -1)

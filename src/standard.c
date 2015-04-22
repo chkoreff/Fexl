@@ -5,6 +5,7 @@
 #include <standard.h>
 #include <str.h>
 #include <string.h> /* strcmp */
+#include <type_buf.h>
 #include <type_cmp.h>
 #include <type_input.h>
 #include <type_math.h>
@@ -14,8 +15,6 @@
 #include <type_parse_string.h>
 #include <type_rand.h>
 #include <type_str.h>
-
-/*LATER A "cd" function which temporarily changes directory, then back. */
 
 static const char *cur_name;
 
@@ -50,6 +49,9 @@ static value standard_name(const char *name)
 	if (match("*")) return Q(type_mul);
 	if (match("+")) return Q(type_add);
 	if (match("abs")) return Q(type_abs);
+	if (match("buf_get")) return Q(type_buf_get);
+	if (match("buf_new")) return Q(type_buf_new);
+	if (match("buf_put")) return Q(type_buf_put);
 	if (match("char_width")) return Q(type_char_width);
 	if (match("cons")) return hold(cons);
 	if (match("cos")) return Q(type_cos);

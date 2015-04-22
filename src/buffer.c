@@ -65,6 +65,21 @@ buffer buf_add(buffer buf, char ch)
 	return buf;
 	}
 
+/* To add a whole string we simply add the characters one at a time.  We could
+optimize it later, but it's fine for now. */
+buffer buf_addn(buffer buf, const char *str, unsigned long len)
+	{
+	unsigned long pos;
+	for (pos = 0; pos < len; pos++)
+		buf = buf_add(buf,str[pos]);
+	return buf;
+	}
+
+buffer buf_put(buffer buf, string str)
+	{
+	return buf_addn(buf,str->data,str->len);
+	}
+
 /* Clear the buffer and return its content. */
 string buf_finish(buffer buf)
 	{

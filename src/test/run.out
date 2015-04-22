@@ -149,6 +149,12 @@ ch
 ch 包
 ch 子
 ch x
+== test buf
+: abcdefg
+: 
+: abcde
+: tuvwxyz
+abc 2.3 -3.8 defg
 ==
 bool F
 bool F

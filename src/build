@@ -76,6 +76,7 @@ compile parse
 compile source
 compile standard
 compile str
+compile type_buf
 compile type_cmp
 compile type_input
 compile type_math
