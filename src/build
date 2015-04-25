@@ -80,6 +80,7 @@ compile type_buf
 compile type_cmp
 compile type_file
 compile type_input
+compile type_limit
 compile type_math
 compile type_num
 compile type_output

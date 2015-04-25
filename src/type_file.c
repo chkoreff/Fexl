@@ -122,4 +122,3 @@ value type_remove(value f)
 /* LATER strerror */
 /* LATER fdopen fflush */
 /* LATER pipe dup2 close fork wait */
-/* LATER limit_time limit_stack limit_memory */

@@ -10,6 +10,7 @@
 #include <type_cmp.h>
 #include <type_file.h>
 #include <type_input.h>
+#include <type_limit.h>
 #include <type_math.h>
 #include <type_num.h>
 #include <type_output.h>
@@ -77,6 +78,9 @@ static value standard(const char *name)
 	if (match("is_void")) return Q(type_is_void);
 	if (match("le")) return Q(type_le);
 	if (match("length")) return Q(type_length);
+	if (match("limit_memory")) return Q(type_limit_memory);
+	if (match("limit_stack")) return Q(type_limit_stack);
+	if (match("limit_time")) return Q(type_limit_time);
 	if (match("log")) return Q(type_log);
 	if (match("lt")) return Q(type_lt);
 	if (match("ne")) return Q(type_ne);
