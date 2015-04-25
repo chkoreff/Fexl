@@ -34,7 +34,7 @@ run()
 	if [ $code -ne 0 ]; then exit $code; fi
 	}
 
-cmd_compile="gcc -c -Wall -Werror -Wunused-parameter -ansi -pedantic -O3 -I ."
+cmd_compile="gcc -c -Wall -Werror -Wunused-parameter -O3 -I ."
 cmd_link="gcc -s -lm"
 
 compile()
@@ -78,6 +78,7 @@ compile standard
 compile str
 compile type_buf
 compile type_cmp
+compile type_file
 compile type_input
 compile type_math
 compile type_num

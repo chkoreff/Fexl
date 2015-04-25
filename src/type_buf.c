@@ -24,7 +24,6 @@ value type_buf_new(value f)
 value type_buf_put(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
-	{
 	value x = eval(hold(f->L->R));
 	value y = eval(hold(f->R));
 	if (x->T == type_buf && y->T == type_str)
@@ -41,14 +40,12 @@ value type_buf_put(value f)
 	drop(y);
 	return f;
 	}
-	}
 
 /* (buf_get buf) Clear the buffer and return {str}, where str is the current
 content of the buffer. */
 value type_buf_get(value f)
 	{
 	if (!f->L) return 0;
-	{
 	value x = eval(hold(f->R));
 	if (x->T == type_buf)
 		{
@@ -61,5 +58,4 @@ value type_buf_get(value f)
 		replace_void(f);
 	drop(x);
 	return f;
-	}
 	}

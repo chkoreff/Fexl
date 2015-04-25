@@ -134,19 +134,15 @@ value type_subst(value f)
 static value cur_context;
 static value dynamic_context(value x)
 	{
-	{
 	/* Define numeric literals. */
 	const char *name = ((string)data(x))->data;
 	value def = Qnum_str0(name);
 	if (def) return def;
-	}
 
-	{
 	/* Define other names using the given context. */
 	value single = Q(type_single);
 	value exp = eval(A(A(hold(cur_context),hold(x)),single));
 
-	value def;
 	if (exp->L == single)
 		def = hold(exp->R);
 	else
@@ -154,7 +150,6 @@ static value dynamic_context(value x)
 
 	drop(exp);
 	return def;
-	}
 	}
 
 static short undefined = 0;
@@ -212,7 +207,6 @@ static value resolve(value exp, value context)
 value type_resolve(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
-	{
 	const char *save = source_label;
 	string label = data(f->L->L->R);
 	source_label = label->data;
@@ -221,5 +215,4 @@ value type_resolve(value f)
 
 	source_label = save;
 	return f;
-	}
 	}

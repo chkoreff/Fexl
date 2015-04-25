@@ -3,10 +3,12 @@
 #include <die.h>
 #include <num.h>
 #include <standard.h>
+#include <stdio.h>
 #include <str.h>
 #include <string.h> /* strcmp */
 #include <type_buf.h>
 #include <type_cmp.h>
+#include <type_file.h>
 #include <type_input.h>
 #include <type_math.h>
 #include <type_num.h>
@@ -32,14 +34,10 @@ static value type_die(value f)
 	return 0;
 	}
 
-static value standard_name(const char *name)
+static value match_standard(void)
 	{
-	{
-	value def = Qnum_str0(name);
+	value def = Qnum_str0(cur_name);
 	if (def) return def;
-	}
-
-	cur_name = name;
 
 	if (match("^")) return Q(type_pow);
 	if (match("-")) return Q(type_sub);
@@ -59,6 +57,9 @@ static value standard_name(const char *name)
 	if (match("eq")) return Q(type_eq);
 	if (match("exp")) return Q(type_exp);
 	if (match("F")) return Q(type_F);
+	if (match("fgetc")) return Q(type_fgetc);
+	if (match("fopen")) return Q(type_fopen);
+	if (match("fwrite")) return Q(type_fwrite);
 	if (match("ge")) return Q(type_ge);
 	if (match("get")) return Q(type_get);
 	if (match("gt")) return Q(type_gt);
@@ -83,6 +84,7 @@ static value standard_name(const char *name)
 	if (match("put")) return Q(type_put);
 	if (match("put_to_error")) return Q(type_put_to_error);
 	if (match("rand")) return Q(type_rand);
+	if (match("remove")) return Q(type_remove);
 	if (match("round")) return Q(type_round);
 	if (match("say")) return Q(type_say);
 	if (match("search")) return Q(type_search);
@@ -91,6 +93,9 @@ static value standard_name(const char *name)
 	if (match("slice")) return Q(type_slice);
 	if (match("sqrt")) return Q(type_sqrt);
 	if (match("standard")) return Q(type_standard);
+	if (match("stdin")) return Qfile(stdin);
+	if (match("stderr")) return Qfile(stderr);
+	if (match("stdout")) return Qfile(stdout);
 	if (match("str_num")) return Q(type_str_num);
 	if (match("T")) return Q(type_T);
 	if (match("trunc")) return Q(type_trunc);
@@ -99,21 +104,15 @@ static value standard_name(const char *name)
 	return 0;
 	}
 
-static value standard_context(value x)
-	{
-	const char *name = ((string)data(x))->data;
-	return standard_name(name);
-	}
-
 /* (standard x) = {def} if x is defined, or void if x is not defined. */
 static value type_standard(value f)
 	{
 	if (!f->L) return 0;
-	{
 	value x = eval(hold(f->R));
 	if (x->T == type_str)
 		{
-		value def = standard_context(x);
+		cur_name = ((string)data(x))->data;
+		value def = match_standard();
 		if (def)
 			replace_single(f, def);
 		else
@@ -123,7 +122,6 @@ static value type_standard(value f)
 		replace_void(f);
 	drop(x);
 	return 0;
-	}
 	}
 
 /* Evaluate the named file in the standard context.  Use stdin if the name is

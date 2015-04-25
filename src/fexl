@@ -2,13 +2,13 @@
 ./build || exit
 
 # Disable core dump.
-ulimit -Sc 0
+ulimit -c 0
 
 # Limit stack and virtual memory in 1K blocks.
-ulimit -Ss 40000
-ulimit -Sv 100000
+ulimit -s 40000
+ulimit -v 100000
 
 # Limit CPU time in seconds.
-ulimit -St 20
+ulimit -t 20
 
 ../bin/fexl "$@"

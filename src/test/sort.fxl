@@ -96,9 +96,9 @@ void
 	#14 # 491520 words
 
 	# To use 15 you need to raise the limits:
-	# ulimit -Ss 160000
-	# ulimit -Sv 800000
-	# ulimit -St 30
+	# ulimit -s 160000
+	# ulimit -v 800000
+	# ulimit -t 30
 	#15 # 983040 words
 	)
 

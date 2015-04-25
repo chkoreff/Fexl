@@ -14,14 +14,12 @@ static unsigned long cur_bytes = 0;
 void *new_memory(unsigned long num_bytes)
 	{
 	if (num_bytes == 0) die("NEW0");
-	{
 	void *data = malloc(num_bytes);
 	if (data == 0)
 		die("The program ran out of memory.");
 	cur_blocks++;
 	cur_bytes += num_bytes;
 	return data;
-	}
 	}
 
 /* Free a previously allocated span of memory. */

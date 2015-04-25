@@ -718,6 +718,27 @@ Let's parse.
 5 15
 7.2 21.6
 -1.3 -3.9
+== test_file
+Write test/tmp.txt:
+Read test/tmp.txt:
+ch T
+ch e
+ch s
+ch t
+ch  
+ch d
+ch a
+ch t
+ch a
+ch 
+
+ch h
+ch e
+ch r
+ch e
+ch 
+
+Removed test/tmp.txt
 exit 0
 ====
 Hello

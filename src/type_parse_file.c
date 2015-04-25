@@ -38,7 +38,6 @@ static value parse_file(const char *name)
 value type_parse_file(value f)
 	{
 	if (!f->L) return 0;
-	{
 	value x = eval(hold(f->R));
 	if (x->T == type_str)
 		{
@@ -51,5 +50,4 @@ value type_parse_file(value f)
 
 	drop(x);
 	return 0;
-	}
 	}

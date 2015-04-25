@@ -770,5 +770,36 @@ try 7.2
 try -1.3
 )
 
+\test_file=
+(
+say "== test_file"
+\tmp_file="test/tmp.txt"
+
+(
+fopen tmp_file "w" \fh
+say ["Write " tmp_file ":"]
+fwrite fh
+~
+Test data
+here
+~
+)
+
+(
+fopen tmp_file "r" \fh
+say ["Read " tmp_file ":"]
+@\loop
+fgetc fh \ch
+is_void ch ();
+say ["ch " ch]
+loop
+)
+
+remove tmp_file \code
+say [(eq code 0 "Removed" "Could not remove") " " tmp_file]
+)
+
+test_file
+
 \\
 Extra stuff not parsed.
