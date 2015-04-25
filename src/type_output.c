@@ -24,10 +24,12 @@ static void putv(value x)
 			{
 			putv(x->L->R);
 			/* Eliminated tail recursive call putv(x->R) here. */
+			{
 			value y = eval(hold(x->R));
 			drop(x);
 			x = y;
 			continue;
+			}
 			}
 		drop(x);
 		return;
@@ -59,9 +61,11 @@ value type_say(value f)
 value type_put_to_error(value f)
 	{
 	if (!f->L) return 0;
+	{
 	output save = putd;
 	put_to_error();
 	f = eval(hold(f->R));
 	putd = save;
 	return f;
+	}
 	}

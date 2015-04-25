@@ -27,6 +27,7 @@ void replace_str(value f, string x)
 value type_concat(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
+	{
 	value x = eval(hold(f->L->R));
 	value y = eval(hold(f->R));
 	if (x->T == type_str && y->T == type_str)
@@ -37,11 +38,13 @@ value type_concat(value f)
 	drop(y);
 	return 0;
 	}
+	}
 
 /* (length x) is the length of string x */
 value type_length(value f)
 	{
 	if (!f->L) return 0;
+	{
 	value x = eval(hold(f->R));
 	if (x->T == type_str)
 		replace_num(f, num_new_ulong(((string)data(x))->len));
@@ -50,12 +53,14 @@ value type_length(value f)
 	drop(x);
 	return 0;
 	}
+	}
 
 /* (slice str pos len) calls str_slice, except it returns void if pos or len is
 negative. */
 value type_slice(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	{
 	value x = eval(hold(f->L->L->R));
 	value y = eval(hold(f->L->R));
 	value z = eval(hold(f->R));
@@ -76,11 +81,13 @@ value type_slice(value f)
 	drop(z);
 	return 0;
 	}
+	}
 
 /* (search haystack needle offset) calls str_search. */
 value type_search(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	{
 	value x = eval(hold(f->L->L->R));
 	value y = eval(hold(f->L->R));
 	value z = eval(hold(f->R));
@@ -109,11 +116,13 @@ value type_search(value f)
 	drop(z);
 	return 0;
 	}
+	}
 
 /* Convert string to number if possible. */
 value type_str_num(value f)
 	{
 	if (!f->L) return 0;
+	{
 	value x = eval(hold(f->R));
 	if (x->T == type_str)
 		{
@@ -127,6 +136,7 @@ value type_str_num(value f)
 		replace_void(f);
 	drop(x);
 	return 0;
+	}
 	}
 
 value type_is_str(value f)

@@ -33,6 +33,7 @@ static value parse_string(string text)
 value type_parse_string(value f)
 	{
 	if (!f->L) return 0;
+	{
 	value x = eval(hold(f->R));
 	if (x->T == type_str)
 		{
@@ -44,4 +45,5 @@ value type_parse_string(value f)
 
 	drop(x);
 	return 0;
+	}
 	}

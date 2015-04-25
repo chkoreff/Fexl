@@ -9,6 +9,7 @@
 static value op_cmp(value f, int op(int))
 	{
 	if (!f->L || !f->L->L) return 0;
+	{
 	value x = eval(hold(f->L->R));
 	value y = eval(hold(f->R));
 	if (x->T == type_num && y->T == type_num)
@@ -20,6 +21,7 @@ static value op_cmp(value f, int op(int))
 	drop(x);
 	drop(y);
 	return 0;
+	}
 	}
 
 static int lt(int x) { return x < 0; }

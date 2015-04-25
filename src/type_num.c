@@ -33,6 +33,7 @@ void replace_num(value f, number x)
 value type_num_str(value f)
 	{
 	if (!f->L) return 0;
+	{
 	value x = eval(hold(f->R));
 	if (x->T == type_num)
 		replace_str(f, num_str(data(x)));
@@ -40,6 +41,7 @@ value type_num_str(value f)
 		replace_void(f);
 	drop(x);
 	return 0;
+	}
 	}
 
 value type_is_num(value f)

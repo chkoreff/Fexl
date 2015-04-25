@@ -29,6 +29,7 @@ value Qfile(FILE *fh)
 value type_fopen(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
+	{
 	value x = eval(hold(f->L->R));
 	value y = eval(hold(f->R));
 	if (x->T == type_str && y->T == type_str)
@@ -47,12 +48,14 @@ value type_fopen(value f)
 	drop(y);
 	return f;
 	}
+	}
 
 /* (fgetc fh) = {ch}, where ch is the next byte from fh, or void if no more
 characters. */
 value type_fgetc(value f)
 	{
 	if (!f->L) return 0;
+	{
 	value x = eval(hold(f->R));
 	if (x->T == type_file)
 		{
@@ -71,11 +74,13 @@ value type_fgetc(value f)
 	drop(x);
 	return f;
 	}
+	}
 
 /* (fwrite fh str) Write string to file. */
 value type_fwrite(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
+	{
 	value x = eval(hold(f->L->R));
 	value y = eval(hold(f->R));
 	if (x->T == type_file && y->T == type_str)
@@ -92,12 +97,14 @@ value type_fwrite(value f)
 	drop(y);
 	return f;
 	}
+	}
 
 /* (remove path) = {code} Remove path from file system.  The code is 0 if
 successful or -1 otherwise. */
 value type_remove(value f)
 	{
 	if (!f->L) return 0;
+	{
 	value x = eval(hold(f->R));
 	if (x->T == type_str)
 		{
@@ -109,6 +116,7 @@ value type_remove(value f)
 		replace_void(f);
 	drop(x);
 	return f;
+	}
 	}
 
 /* LATER strerror */

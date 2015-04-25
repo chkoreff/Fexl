@@ -49,6 +49,7 @@ positive if x > y. */
 int str_cmp(string x, string y)
 	{
 	if (x == y) return 0;
+	{
 	unsigned long min_len = x->len < y->len ? x->len : y->len;
 	int cmp = memcmp(x->data, y->data, min_len);
 
@@ -56,6 +57,7 @@ int str_cmp(string x, string y)
 		cmp = x->len < y->len ? -1 : 1;
 
 	return cmp;
+	}
 	}
 
 /* Return true if the strings are equal. */
@@ -90,6 +92,7 @@ unsigned long str_search(string x, string y, unsigned long offset)
 	/* Avoid unnecessary work if a match is impossible based on lengths. */
 	if (xn < yn || offset > xn - yn) return xn;
 
+	{
 	char *xs = x->data;
 	char *ys = y->data;
 	unsigned long xi = offset;
@@ -109,6 +112,7 @@ unsigned long str_search(string x, string y, unsigned long offset)
 
 		xi++;
 		}
+	}
 	}
 
 void put_str(string x)

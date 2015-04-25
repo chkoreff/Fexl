@@ -199,10 +199,12 @@ static value parse_tilde_string(void)
 
 	skip();
 
+	{
 	string end = buf_finish(buf);
 	string content = collect_string(end->data, end->len, first_line);
 	str_free(end);
 	return Qstr(content);
+	}
 	}
 
 static value parse_symbol(void)
@@ -285,23 +287,27 @@ static value parse_term(void)
 /* Parse a lambda form following the initial '\' character. */
 static value parse_lambda(unsigned long first_line)
 	{
+	value sym, def=0, exp;
+	char is_recursive = 0;
+
 	/* Parse the symbol (function parameter). */
 	skip_white();
 
 	if (ch == '=')
 		{
 		/* Resolve expression in a context. */
+		value context, label;
 		skip();
 		skip_white();
-		value context = parse_term();
+		context = parse_term();
 		if (context == 0)
 			syntax_error("Missing context", first_line);
-		value exp = parse_exp();
-		value label = Qstr(str_new_data0(source_label ? source_label : ""));
+		exp = parse_exp();
+		label = Qstr(str_new_data0(source_label ? source_label : ""));
 		return app(A(A(Q(type_resolve),label),exp),context);
 		}
 
-	value sym = parse_name();
+	sym = parse_name();
 	if (sym == 0)
 		syntax_error("Missing symbol after '\\'", first_line);
 
@@ -309,8 +315,6 @@ static value parse_lambda(unsigned long first_line)
 	first_line = source_line;
 
 	/* Parse the definition of the symbol if we see an '=' char. */
-	value def = 0;
-	char is_recursive = 0;
 	if (ch == '=')
 		{
 		skip();
@@ -328,7 +332,7 @@ static value parse_lambda(unsigned long first_line)
 		def = app(hold(Y),lam(hold(sym),def));
 
 	/* Parse the body of the function and apply the definition if any. */
-	value exp = lam(sym,parse_exp());
+	exp = lam(sym,parse_exp());
 	if (def)
 		exp = app(exp,def);
 	return exp;

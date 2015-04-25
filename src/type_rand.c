@@ -9,6 +9,7 @@
 value type_seed_rand(value f)
 	{
 	if (!f->L) return 0;
+	{
 	value x = eval(hold(f->R));
 	if (x->T == type_num)
 		{
@@ -20,6 +21,7 @@ value type_seed_rand(value f)
 		replace_void(f);
 	drop(x);
 	return f;
+	}
 	}
 
 /* rand = {x}, where x is a weakly pseudo-random number with a uniform

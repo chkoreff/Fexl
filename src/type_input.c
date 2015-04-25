@@ -47,6 +47,7 @@ static string get_utf8(void)
 	{
 	int ch = getchar();
 	if (ch == -1) return 0;
+	{
 	char buf[6];
 	unsigned pos = 0;
 	unsigned len = char_width(ch);
@@ -63,6 +64,7 @@ static string get_utf8(void)
 		}
 	return str_new_data(buf,len);
 	}
+	}
 
 /* get = {ch}, where ch is the next UTF-8 character from stdin, or void if
 no more characters. */
@@ -78,6 +80,7 @@ the given position. */
 value type_char_width(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
+	{
 	value x = eval(hold(f->L->R));
 	value y = eval(hold(f->R));
 	if (x->T == type_str && y->T == type_num)
@@ -104,4 +107,5 @@ value type_char_width(value f)
 	drop(x);
 	drop(y);
 	return f;
+	}
 	}

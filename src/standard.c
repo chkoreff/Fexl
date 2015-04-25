@@ -34,10 +34,15 @@ static value type_die(value f)
 	return 0;
 	}
 
-static value match_standard(void)
+/* The standard (built-in) context */
+static value standard(const char *name)
 	{
-	value def = Qnum_str0(cur_name);
+	{
+	value def = Qnum_str0(name);
 	if (def) return def;
+	}
+
+	cur_name = name;
 
 	if (match("^")) return Q(type_pow);
 	if (match("-")) return Q(type_sub);
@@ -108,11 +113,12 @@ static value match_standard(void)
 static value type_standard(value f)
 	{
 	if (!f->L) return 0;
+	{
 	value x = eval(hold(f->R));
 	if (x->T == type_str)
 		{
-		cur_name = ((string)data(x))->data;
-		value def = match_standard();
+		const char *name = ((string)data(x))->data;
+		value def = standard(name);
 		if (def)
 			replace_single(f, def);
 		else
@@ -122,6 +128,7 @@ static value type_standard(value f)
 		replace_void(f);
 	drop(x);
 	return 0;
+	}
 	}
 
 /* Evaluate the named file in the standard context.  Use stdin if the name is
