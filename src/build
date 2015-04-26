@@ -87,6 +87,7 @@ compile type_output
 compile type_parse_file
 compile type_parse_string
 compile type_rand
+compile type_run
 compile type_str
 compile type_sym
 compile value

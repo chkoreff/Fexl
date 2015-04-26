@@ -1,6 +1,5 @@
 #include <value.h>
 #include <basic.h>
-#include <die.h>
 #include <num.h>
 #include <standard.h>
 #include <stdio.h>
@@ -17,6 +16,7 @@
 #include <type_parse_file.h>
 #include <type_parse_string.h>
 #include <type_rand.h>
+#include <type_run.h>
 #include <type_str.h>
 
 static const char *cur_name;
@@ -27,13 +27,6 @@ static int match(const char *other)
 	}
 
 static value type_standard(value f);
-
-static value type_die(value f)
-	{
-	(void)f;
-	die(0);
-	return 0;
-	}
 
 /* The standard (built-in) context */
 static value standard(const char *name)
@@ -53,6 +46,7 @@ static value standard(const char *name)
 	if (match("*")) return Q(type_mul);
 	if (match("+")) return Q(type_add);
 	if (match("abs")) return Q(type_abs);
+	if (match("argv")) return Q(type_argv);
 	if (match("buf_get")) return Q(type_buf_get);
 	if (match("buf_new")) return Q(type_buf_new);
 	if (match("buf_put")) return Q(type_buf_put);
