@@ -1,8 +1,10 @@
 #include <value.h>
 #include <basic.h>
+#include <die.h>
 #include <num.h>
 #include <stdio.h>
 #include <str.h>
+#include <sys/file.h> /* flock */
 #include <type_file.h>
 #include <type_num.h>
 #include <type_str.h>
@@ -118,6 +120,59 @@ value type_remove(value f)
 	return f;
 	}
 	}
+
+/* (fflush fh) Force a write of all buffered data to the file handle. */
+value type_fflush(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = eval(hold(f->R));
+	if (x->T == type_file)
+		{
+		FILE *fh = data(x);
+		fflush(fh);
+		f = hold(I);
+		}
+	else
+		replace_void(f);
+	drop(x);
+	return f;
+	}
+	}
+
+static value op_flock(value f, int operation)
+	{
+	if (!f->L) return 0;
+	{
+	value x = eval(hold(f->R));
+	if (x->T == type_file)
+		{
+		FILE *fh = data(x);
+		int code = flock(fileno(fh),operation);
+		if (code < 0)
+			{
+			perror("flock");
+			die(0);
+			}
+		f = hold(I);
+		}
+	else
+		replace_void(f);
+	drop(x);
+	return f;
+	}
+	}
+
+/* (flock_ex fh) Obtain an exclusive lock on the file handle, blocking as long
+as necessary. */
+value type_flock_ex(value f) { return op_flock(f,LOCK_EX); }
+
+/* (flock_sh fh) Obtain a shared lock on the file handle, blocking as long
+as necessary. */
+value type_flock_sh(value f) { return op_flock(f,LOCK_SH); }
+
+/* (flock_un fh) Unlock the file handle. */
+value type_flock_un(value f) { return op_flock(f,LOCK_UN); }
 
 /* LATER strerror */
 /* LATER fdopen fflush */

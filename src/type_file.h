@@ -3,3 +3,7 @@ extern value type_fopen(value f);
 extern value type_fgetc(value f);
 extern value type_fwrite(value f);
 extern value type_remove(value f);
+extern value type_fflush(value f);
+extern value type_flock_ex(value f);
+extern value type_flock_sh(value f);
+extern value type_flock_un(value f);
