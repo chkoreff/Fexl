@@ -9,7 +9,8 @@ int cur_out = 1;
 /* Put data to current output. */
 void putd(const char *data, unsigned long len)
 	{
-	(void)write(cur_out,data,len);
+	ssize_t n = write(cur_out,data,len);
+	(void)n;
 	}
 
 void put(const char *data)
