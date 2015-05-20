@@ -18,9 +18,7 @@ static void sym_free(symbol sym)
 
 value type_sym(value f)
 	{
-	if (!f->L) return 0;
-	replace_void(f);
-	return 0;
+	return type_void(f);
 	}
 
 value Qsym(string name, unsigned long line)

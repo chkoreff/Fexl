@@ -8,9 +8,7 @@
 
 value type_num(value f)
 	{
-	if (!f->L) return 0;
-	replace_void(f);
-	return 0;
+	return type_void(f);
 	}
 
 value Qnum(number x)

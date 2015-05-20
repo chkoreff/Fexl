@@ -7,9 +7,7 @@
 
 value type_buf(value f)
 	{
-	if (!f->L) return 0;
-	replace_void(f);
-	return 0;
+	return type_void(f);
 	}
 
 /* buf_new = {buf}, where buf is a new empty character buffer. */

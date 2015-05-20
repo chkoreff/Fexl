@@ -13,9 +13,7 @@
 
 value type_file(value f)
 	{
-	if (!f->L) return 0;
-	replace_void(f);
-	return 0;
+	return type_void(f);
 	}
 
 static void file_free(FILE *fh)

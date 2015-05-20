@@ -8,9 +8,7 @@
 
 value type_str(value f)
 	{
-	if (!f->L) return 0;
-	replace_void(f);
-	return 0;
+	return type_void(f);
 	}
 
 value Qstr(string x)
