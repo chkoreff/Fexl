@@ -3,6 +3,11 @@
 #include <num.h>
 #include <output.h>
 
+/* Explicitly declare certain functions which are missing from math.h on some
+machines. */
+extern double round(double);
+extern double trunc(double);
+
 void num_free(number x)
 	{
 	free_memory(x,sizeof(double));
