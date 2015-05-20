@@ -778,10 +778,11 @@ say "== test_file"
 (
 fopen tmp_file "w" \fh
 say ["Write " tmp_file ":"]
-fwrite fh
+fput fh
 ~
 Test data
 here
+üä 1≠0 包子
 ~
 )
 
@@ -789,7 +790,7 @@ here
 fopen tmp_file "r" \fh
 say ["Read " tmp_file ":"]
 @\loop
-fgetc fh \ch
+fget fh \ch
 is_void ch ();
 say ["ch " ch]
 loop

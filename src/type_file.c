@@ -2,11 +2,13 @@
 #include <basic.h>
 #include <die.h>
 #include <num.h>
+#include <output.h>
 #include <stdio.h>
 #include <str.h>
 #include <sys/file.h> /* flock */
 #include <type_file.h>
 #include <type_num.h>
+#include <type_output.h>
 #include <type_str.h>
 
 value type_file(value f)
@@ -52,55 +54,6 @@ value type_fopen(value f)
 	}
 	}
 
-/* (fgetc fh) = {ch}, where ch is the next byte from fh, or void if no more
-characters. */
-value type_fgetc(value f)
-	{
-	if (!f->L) return 0;
-	{
-	value x = eval(hold(f->R));
-	if (x->T == type_file)
-		{
-		FILE *fh = data(x);
-		int ch = fgetc(fh);
-		string s = 0;
-		if (ch >= 0)
-			{
-			char c = ch;
-			s = str_new_data(&c,1);
-			}
-		f = A(Q(type_single), s ? Qstr(s) : Q(type_void));
-		}
-	else
-		replace_void(f);
-	drop(x);
-	return f;
-	}
-	}
-
-/* (fwrite fh str) Write string to file. */
-value type_fwrite(value f)
-	{
-	if (!f->L || !f->L->L) return 0;
-	{
-	value x = eval(hold(f->L->R));
-	value y = eval(hold(f->R));
-	if (x->T == type_file && y->T == type_str)
-		{
-		FILE *fh = data(x);
-		string s = data(y);
-		size_t count = fwrite(s->data, 1, s->len, fh);
-		(void)count; /* ignore */
-		f = hold(I);
-		}
-	else
-		replace_void(f);
-	drop(x);
-	drop(y);
-	return f;
-	}
-	}
-
 /* (remove path) = {code} Remove path from file system.  The code is 0 if
 successful or -1 otherwise. */
 value type_remove(value f)
@@ -113,25 +66,6 @@ value type_remove(value f)
 		string path = data(x);
 		int code = remove(path->data);
 		f = A(Q(type_single), Qnum(num_new_double(code)));
-		}
-	else
-		replace_void(f);
-	drop(x);
-	return f;
-	}
-	}
-
-/* (fflush fh) Force a write of all buffered data to the file handle. */
-value type_fflush(value f)
-	{
-	if (!f->L) return 0;
-	{
-	value x = eval(hold(f->R));
-	if (x->T == type_file)
-		{
-		FILE *fh = data(x);
-		fflush(fh);
-		f = hold(I);
 		}
 	else
 		replace_void(f);

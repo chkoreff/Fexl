@@ -2,10 +2,13 @@
 #include <basic.h>
 #include <num.h>
 #include <output.h>
+#include <stdio.h>
 #include <str.h>
 #include <type_num.h>
+#include <type_file.h>
 #include <type_output.h>
 #include <type_str.h>
+#include <unistd.h> /* fsync */
 
 static void putv(value x)
 	{
@@ -57,15 +60,59 @@ value type_say(value f)
 	return f;
 	}
 
-/* (put_to_error x) = x.  Evaluates x with all output going to stderr. */
+/* (fput fh data) Put data to the file. */
+value type_fput(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	{
+	value x = eval(hold(f->L->R));
+	value y = hold(f->R);
+	if (x->T == type_file)
+		{
+		FILE *fh = data(x);
+		int save_cur_out = cur_out;
+		cur_out = fileno(fh);
+		putv(y);
+		cur_out = save_cur_out;
+		f = hold(I);
+		}
+	else
+		replace_void(f);
+	drop(x);
+	drop(y);
+	return f;
+	}
+	}
+
+/* (put_to_error x) = I.  Evaluate x with all output going to stderr. */
 value type_put_to_error(value f)
 	{
 	if (!f->L) return 0;
 	{
-	output save = putd;
+	int save_cur_out = cur_out;
 	put_to_error();
-	f = eval(hold(f->R));
-	putd = save;
+	drop(eval(hold(f->R)));
+	f = hold(I);
+	cur_out = save_cur_out;
+	return f;
+	}
+	}
+
+/* (fflush fh) Force a write of all buffered data to the file handle. */
+value type_fflush(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = eval(hold(f->R));
+	if (x->T == type_file)
+		{
+		FILE *fh = data(x);
+		fsync(fileno(fh));
+		f = hold(I);
+		}
+	else
+		replace_void(f);
+	drop(x);
 	return f;
 	}
 	}

@@ -738,6 +738,17 @@ ch r
 ch e
 ch 
 
+ch ü
+ch ä
+ch  
+ch 1
+ch ≠
+ch 0
+ch  
+ch 包
+ch 子
+ch 
+
 Removed test/tmp.txt
 exit 0
 ====

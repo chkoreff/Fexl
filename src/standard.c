@@ -58,12 +58,12 @@ static value standard(const char *name)
 	if (match("exp")) return Q(type_exp);
 	if (match("F")) return Q(type_F);
 	if (match("fflush")) return Q(type_fflush);
-	if (match("fgetc")) return Q(type_fgetc);
+	if (match("fget")) return Q(type_fget);
 	if (match("flock_ex")) return Q(type_flock_ex);
 	if (match("flock_sh")) return Q(type_flock_sh);
 	if (match("flock_un")) return Q(type_flock_un);
 	if (match("fopen")) return Q(type_fopen);
-	if (match("fwrite")) return Q(type_fwrite);
+	if (match("fput")) return Q(type_fput);
 	if (match("ge")) return Q(type_ge);
 	if (match("get")) return Q(type_get);
 	if (match("gt")) return Q(type_gt);

@@ -1,28 +1,16 @@
 #include <format.h>
-#include <stdio.h>
 #include <string.h> /* strlen */
 #include <output.h>
-
-static void write_data(FILE *fh, const char *data, unsigned long len)
-	{
-	size_t count = fwrite(data, 1, len, fh);
-	(void)count;  /* Ignore the return count. */
-	}
-
-/* Put data to stdout. */
-static void putd_out(const char *data, unsigned long len)
-	{
-	write_data(stdout,data,len);
-	}
-
-/* Put data to stderr. */
-static void putd_err(const char *data, unsigned long len)
-	{
-	write_data(stderr,data,len);
-	}
+#include <unistd.h> /* write */
 
 /* Initially we put data to stdout. */
-output putd = putd_out;
+int cur_out = 1;
+
+/* Put data to current output. */
+void putd(const char *data, unsigned long len)
+	{
+	(void)write(cur_out,data,len);
+	}
 
 void put(const char *data)
 	{
@@ -56,8 +44,13 @@ void nl(void)
 	putd("\n",1);
 	}
 
+void set_output(int fd)
+	{
+	fsync(cur_out);
+	cur_out = fd;
+	}
+
 void put_to_error(void)
 	{
-	fflush(stdout);
-	putd = putd_err;
+	set_output(2);
 	}

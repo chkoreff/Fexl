@@ -163,6 +163,7 @@ static void undefined_symbol(const char *name, unsigned long line)
 	put_to_error();
 	put("Undefined symbol "); put(name); put_error_location(line);
 	undefined = 1;
+	set_output(1);
 	}
 
 /* Resolve all symbols in exp with cur_context. */

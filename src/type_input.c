@@ -3,6 +3,7 @@
 #include <num.h>
 #include <stdio.h>
 #include <str.h>
+#include <type_file.h>
 #include <type_input.h>
 #include <type_num.h>
 #include <type_str.h>
@@ -42,10 +43,10 @@ static unsigned char char_width(unsigned char ch)
 	return n;
 	}
 
-/* Get the next UTF-8 character from stdin. */
-static string get_utf8(void)
+/* Get the next UTF-8 character from the file. */
+static string get_utf8(FILE *fh)
 	{
-	int ch = getchar();
+	int ch = fgetc(fh);
 	if (ch == -1) return 0;
 	{
 	char buf[6];
@@ -59,20 +60,41 @@ static string get_utf8(void)
 		{
 		buf[pos++] = (char)ch;
 		if (pos >= len) break;
-		ch = getchar();
+		ch = fgetc(fh);
 		if (ch == -1) return 0;
 		}
 	return str_new_data(buf,len);
 	}
 	}
 
+static value op_get(FILE *fh)
+	{
+	string ch = get_utf8(fh);
+	return A(Q(type_single), ch ? Qstr(ch) : Q(type_void));
+	}
+
 /* get = {ch}, where ch is the next UTF-8 character from stdin, or void if
 no more characters. */
 value type_get(value f)
 	{
-	string ch = get_utf8();
 	(void)f;
-	return A(Q(type_single), ch ? Qstr(ch) : Q(type_void));
+	return op_get(stdin);
+	}
+
+/* (fget fh) = {ch}, where ch is the next UTF-8 character from fh, or void if
+no more characters. */
+value type_fget(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = eval(hold(f->R));
+	if (x->T == type_file)
+		f = op_get(data(x));
+	else
+		replace_void(f);
+	drop(x);
+	return f;
+	}
 	}
 
 /* (char_width str pos) Return the width of the UTF-8 character which starts at
