@@ -18,6 +18,7 @@
 #include <type_rand.h>
 #include <type_run.h>
 #include <type_str.h>
+#include <type_var.h>
 
 static const char *cur_name;
 
@@ -106,6 +107,9 @@ static value standard(const char *name)
 	if (match("str_num")) return Q(type_str_num);
 	if (match("T")) return Q(type_T);
 	if (match("trunc")) return Q(type_trunc);
+	if (match("var_get")) return Q(type_var_get);
+	if (match("var_new")) return Q(type_var_new);
+	if (match("var_put")) return Q(type_var_put);
 	if (match("void")) return Q(type_void);
 
 	return 0;

@@ -750,6 +750,29 @@ ch 子
 ch 
 
 Removed test/tmp.txt
+The first 16 Fibonacci numbers:
+1
+1
+2
+3
+5
+8
+13
+21
+34
+55
+89
+144
+233
+377
+610
+987
+The first 5 Fibonacci numbers:
+1
+1
+2
+3
+5
 exit 0
 ====
 Hello

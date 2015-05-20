@@ -802,5 +802,42 @@ say [(eq code 0 "Removed" "Could not remove") " " tmp_file]
 
 test_file
 
+\test_var=
+(
+# In this test I created a little "assembly language" where I hide all the var
+# operations in one place: a function named "!" which creates a read and write
+# pair.  I didn't have to do this, but it was kind of fun.
+\fib=
+	(\max
+	\!=(var_new \v {(var_get v) (var_put v)})
+
+	say ["The first " max " Fibonacci numbers:"]
+
+	! \n?\n:
+	! \x?\x:
+	! \y?\y:
+
+	n: 0
+	x: 1
+	y: 1
+
+	@\loop
+	n? \n
+	ge n max ();
+	x? \x
+	y? \y
+	say x
+	x: y
+	y: (+ x y)
+	n: (+ n 1)
+	loop
+	)
+
+fib 16
+fib 5
+)
+
+test_var
+
 \\
 Extra stuff not parsed.

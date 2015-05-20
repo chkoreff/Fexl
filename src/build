@@ -90,6 +90,7 @@ compile type_rand
 compile type_run
 compile type_str
 compile type_sym
+compile type_var
 compile value
 lib_fexl=$objects
 
