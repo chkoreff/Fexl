@@ -15,20 +15,20 @@ Grammar:
 [
 exp    => empty
 exp    => term exp
-exp    => ; exp
+exp    => ';' exp
 exp    => \ sym exp
-exp    => \ sym = term exp
-exp    => \ sym == term exp
-exp    => \ = term exp
+exp    => \ sym '=' term exp
+exp    => \ sym '==' term exp
+exp    => \ '=' term exp
 
-term   => ( exp )
-term   => [ list ]
-term   => { tuple }
+term   => '(' exp ')'
+term   => '[' list ']'
+term   => '{' tuple '}'
 term   => sym
 
 list   => empty
 list   => term list
-list   => ; exp
+list   => ';' exp
 
 tuple  => empty
 tuple  => term tuple

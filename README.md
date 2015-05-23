@@ -74,7 +74,7 @@ To time a long series of calculations and output:
 
 	test/fib
 
-To see the current version number (http://semver.org/):
+To see the current version number (http://semver.org):
 
 	./version
 
