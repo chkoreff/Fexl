@@ -1,0 +1,80 @@
+#!/bin/sh
+# These are common shell routines used by build scripts, sourced with ".".
+# Note that these build scripts do not follow header dependencies, so if you
+# make significant changes to .h files, run ./build clean first.
+
+# stale $target $source1 ... $sourceN
+# Return true if $target does not exist or is older than any $source.
+stale()
+	{
+	local target="$1"; shift
+	if [ ! -e $target ]; then return 0; fi
+	for source in "$@"; do
+		if [ $source -nt $target ]; then return 0; fi
+	done
+	return 1
+	}
+
+# Run a system command and exit if unsuccessful.
+run()
+	{
+	if [ $verbose ]; then echo $@; fi
+	$@
+	local code=$?
+	if [ $code -ne 0 ]; then exit $code; fi
+	}
+
+path()
+	{
+	path="$path -I $1"
+	}
+
+need()
+	{
+	objects="$objects $1"
+	}
+
+# Compile a source file if it's newer than the object file.
+make()
+	{
+	local name="$1"
+	local file_o=../obj/$name.o
+	local file_c=$name.c
+	need $file_o
+	stale $file_o $file_c || return 0
+	mkdir -p `dirname $file_o`
+	local options="-Wall -Werror -Wunused-parameter -pedantic -O3"
+	run gcc -c $options $path $file_c -o $file_o
+	}
+
+# Link the object files if any is newer than the executable file.
+link()
+	{
+	local name="$1"
+	local file_e=../bin/$name
+	stale $file_e $objects || return 0
+	mkdir -p `dirname $file_e`
+	run gcc -s -lm $objects -o $file_e
+	}
+
+erase()
+	{
+	run rm -rf ../obj
+	run rm -rf ../bin
+	}
+
+case "$1" in
+	"") ;;
+	"clean") erase ;;
+	"erase") erase; exit ;;
+	*)
+		echo >&2 "Bad option $1"
+		exit 2
+		;;
+esac
+
+path=""
+objects=""
+
+# Always look in the current directory for header files.
+path .

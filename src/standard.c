@@ -19,7 +19,8 @@
 #include <type_run.h>
 #include <type_str.h>
 #include <type_var.h>
-#include <version.h>
+
+const char *const VERSION = "1.0.2";
 
 static const char *cur_name;
 

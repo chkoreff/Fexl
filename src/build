@@ -1,103 +1,33 @@
 #!/bin/sh
-# Build anything that's out of date.  This does not follow header dependencies,
-# so if you make significant changes to .h files, run ./clean first.
-
-# stale $target $source1 ... $sourceN
-# Return true if $target does not exist or is older than any $source.
-stale()
-	{
-	local target="$1"; shift
-
-	if [ ! -e $target ]; then
-		true
-		return
-	fi
-
-	for source in "$@"; do
-		if [ $source -nt $target ]; then
-			true
-			return
-		fi
-	done
-
-	false
-	}
-
-# Run a system command and exit if unsuccessful.
-run()
-	{
-	if [ $verbose ]; then
-	echo $@
-	fi
-	$@
-	local code=$?
-	if [ $code -ne 0 ]; then exit $code; fi
-	}
-
-cmd_compile="gcc -c -Wall -Werror -Wunused-parameter -pedantic -O3 -I ."
-cmd_link="gcc -s -lm"
-
-compile()
-	{
-	local name="$1"
-	local file_o=../obj/$name.o
-	local file_c=$name.c
-	objects="$objects $file_o"
-	stale $file_o $file_c
-	if [ $? -eq 0 ]; then
-	mkdir -p `dirname $file_o`
-	run $cmd_compile $file_c -o $file_o
-	fi
-	}
-
-link()
-	{
-	local name="$1"
-	shift
-	local file_e=../bin/$name
-	stale $file_e $@
-	if [ $? -eq 0 ]; then
-	mkdir -p `dirname $file_e`
-	run $cmd_link $@ -o $file_e
-	fi
-	}
-
-# Core modules
-objects=""
-compile basic
-compile buffer
-compile convert
-compile die
-compile format
-compile memory
-compile num
-compile output
-compile parse
-compile source
-compile standard
-compile str
-compile type_buf
-compile type_cmp
-compile type_file
-compile type_input
-compile type_limit
-compile type_math
-compile type_num
-compile type_output
-compile type_parse_file
-compile type_parse_string
-compile type_rand
-compile type_run
-compile type_str
-compile type_sym
-compile type_var
-compile value
-lib_fexl=$objects
-
-# Main program
-objects=""
-compile fexl
-link fexl $objects $lib_fexl
-
-# Only used for development but we make sure it compiles anyway.
-compile test/show
+. ./common
+make basic
+make buffer
+make convert
+make die
+make format
+make memory
+make num
+make output
+make parse
+make source
+make standard
+make str
+make type_buf
+make type_cmp
+make type_file
+make type_input
+make type_limit
+make type_math
+make type_num
+make type_output
+make type_parse_file
+make type_parse_string
+make type_rand
+make type_run
+make type_str
+make type_sym
+make type_var
+make value
+make fexl
+#make test/show
+link fexl

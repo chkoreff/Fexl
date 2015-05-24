@@ -46,9 +46,17 @@ To build the code:
 
 	./build
 
-To erase the build output files:
+To erase the output files and build the code from scratch:
 
-	./clean
+	./build clean
+
+To erase the output files:
+
+	./build erase
+
+To do a verbose build, showing all the commands:
+
+	verbose=1 ./build
 
 To build the code and run a fexl program:
 
