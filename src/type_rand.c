@@ -30,5 +30,5 @@ value type_rand(value f)
 	{
 	double x = ((double)rand()) / ((double)RAND_MAX);
 	(void)f;
-	return A(Q(type_single), Qnum(num_new_double(x)));
+	return A(Q(type_single), Qnum0(x));
 	}

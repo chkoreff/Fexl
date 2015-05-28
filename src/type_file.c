@@ -63,7 +63,7 @@ value type_remove(value f)
 		{
 		string path = data(x);
 		int code = remove(path->data);
-		f = A(Q(type_single), Qnum(num_new_double(code)));
+		f = A(Q(type_single), Qnum0(code));
 		}
 	else
 		replace_void(f);

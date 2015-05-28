@@ -820,8 +820,10 @@ ch = '
 Good bye.
 exit 0
 ====
+hello
 This goes to stderr.
 x = 7
+bye
 exit 0
 ====
 hi

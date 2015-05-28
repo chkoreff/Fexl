@@ -4,16 +4,14 @@ ulimit -s 40000
 
 run_fexl()
 	{
+	local file="$1"
 	echo "===="
-	../bin/fexl 2>&1
+	../bin/fexl $file 2>&1
 	echo "exit $?"
 	}
 
-echo "===="
-../bin/fexl test/a1.fxl
-echo "exit $?"
+run_fexl test/a1.fxl
 
-echo "===="
 (
 cat <<"EOF"
 abc
@@ -23,11 +21,9 @@ hij
 åabcüdef
 üä 1≠0 包子
 EOF
-) | ../bin/fexl test/a2.fxl
-echo "exit $?"
+) | run_fexl test/a2.fxl
 
 # Test sending output to stderr.
-echo "===="
 (
 cat <<"EOF"
 say "hello"
@@ -39,8 +35,7 @@ put_to_error
 	)
 say "bye"
 EOF
-) | ../bin/fexl 2>&1 >/dev/null
-echo "exit $?"
+) | run_fexl
 
 # Test the "die" function.
 (
@@ -65,7 +60,6 @@ echo -n "
 
 ~END
 abc~EN" | run_fexl
-
 
 echo -n "~" | run_fexl
 
@@ -114,9 +108,7 @@ c
 EOF
 ) | run_fexl
 
-echo "===="
-../bin/fexl 2>&1 missing.fxl
-echo "exit $?"
+run_fexl missing.fxl
 
 # Here we test setting ulimit to terminate misbehaving programs promptly.
 test_misbehavior=false

@@ -15,6 +15,5 @@ int main(int argc, char *argv[])
 	beg_basic();
 	drop(eval_file(name));
 	end_basic();
-	end_value();
 	return 0;
 	}

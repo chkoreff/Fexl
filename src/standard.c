@@ -20,7 +20,7 @@
 #include <type_str.h>
 #include <type_var.h>
 
-const char *const VERSION = "1.0.2";
+const char *const VERSION = "1.0.3";
 
 static const char *cur_name;
 

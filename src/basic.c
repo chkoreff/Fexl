@@ -179,4 +179,5 @@ void end_basic(void)
 	drop(Y);
 	drop(cons);
 	drop(null);
+	end_value();
 	}

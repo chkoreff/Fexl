@@ -16,6 +16,11 @@ value Qnum(number x)
 	return D(type_num,x,(type)num_free);
 	}
 
+value Qnum0(double val)
+	{
+	return Qnum(num_new_double(val));
+	}
+
 value Qnum_str0(const char *name)
 	{
 	number n = str0_num(name);

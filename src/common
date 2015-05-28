@@ -68,7 +68,7 @@ case "$1" in
 	"clean") erase ;;
 	"erase") erase; exit ;;
 	*)
-		echo >&2 "Bad option $1"
+		echo >&2 "Usage: $0 [ clean | erase ]"
 		exit 2
 		;;
 esac
