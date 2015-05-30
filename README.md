@@ -84,7 +84,7 @@ To time a long series of calculations and output:
 
 To see the current version number (http://semver.org):
 
-	./version
+	cat VERSION
 
 Guide to source code
 --------------------

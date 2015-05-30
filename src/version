@@ -1,2 +1,0 @@
-#!/bin/sh
-echo "say VERSION" | ./fexl
