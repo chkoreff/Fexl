@@ -20,8 +20,6 @@
 #include <type_str.h>
 #include <type_var.h>
 
-const char *const VERSION = "1.0.3";
-
 static const char *cur_name;
 
 static int match(const char *other)
@@ -112,7 +110,6 @@ static value standard(const char *name)
 	if (match("var_get")) return Q(type_var_get);
 	if (match("var_new")) return Q(type_var_new);
 	if (match("var_put")) return Q(type_var_put);
-	if (match("VERSION")) return Qstr(str_new_data0(VERSION));
 	if (match("void")) return Q(type_void);
 
 	return 0;
