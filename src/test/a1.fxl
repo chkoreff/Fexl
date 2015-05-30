@@ -387,6 +387,7 @@ say_x 5
 
 div
 
+# Run function f for each value in the range x through y.
 \do_range=
 	(\x\y\f
 	\x=(round x)
@@ -589,6 +590,10 @@ div
 try (null 1)
 try cons
 try (cons 1)
+try T
+try F
+try 3
+try ""
 )
 
 div

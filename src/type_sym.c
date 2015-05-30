@@ -32,8 +32,10 @@ value Qsym(string name, unsigned long line)
 /* Apply f to g, where either can be a symbolic form. */
 value app(value f, value g)
 	{
-	type t = (f->T == type_sym || g->T == type_sym) ? type_sym : type_A;
-	return V(t,f,g);
+	value h = A(f,g);
+	if (f->T == type_sym || g->T == type_sym)
+		h->T = type_sym;
+	return h;
 	}
 
 static int sym_eq(symbol x, symbol y)
@@ -81,7 +83,7 @@ static value remove_symbol(value sym, value exp)
 /* Return a function that calls substitute(p,f) when applied to x. */
 value Qsubst(value p, value f)
 	{
-	return app(V(type_subst,Q(type_subst),p),f);
+	return app(A(Q(type_subst),p),f);
 	}
 
 /* Abstract the symbol from exp, returning a form which is a function of that

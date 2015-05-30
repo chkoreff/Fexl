@@ -86,9 +86,7 @@ value type_cons(value f)
 /* (null A B) = A */
 value type_null(value f)
 	{
-	if (!f->L) return 0;
-	f->T = type_C;
-	return 0;
+	return type_T(f);
 	}
 
 value type_is_void(value f)
