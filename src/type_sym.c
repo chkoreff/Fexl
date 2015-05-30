@@ -3,8 +3,7 @@
 #include <die.h>
 #include <memory.h>
 #include <num.h>
-#include <output.h>
-#include <source.h>
+#include <report.h>
 #include <str.h>
 #include <type_num.h>
 #include <type_str.h>
@@ -158,13 +157,6 @@ static value dynamic_context(value x)
 	}
 
 static short undefined = 0;
-static void undefined_symbol(const char *name, unsigned long line)
-	{
-	put_to_error();
-	put("Undefined symbol "); put(name); put_error_location(line);
-	undefined = 1;
-	set_output(1);
-	}
 
 /* Resolve all symbols in exp with cur_context. */
 static value do_resolve(value exp)
@@ -179,6 +171,7 @@ static value do_resolve(value exp)
 			{
 			const char *name = ((string)data(sym->name))->data;
 			undefined_symbol(name,sym->line);
+			undefined = 1;
 			def = Q(type_void);
 			}
 		drop(exp);

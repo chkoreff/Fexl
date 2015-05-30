@@ -3,10 +3,8 @@
 #include <basic.h>
 #include <buffer.h>
 #include <ctype.h>
-#include <die.h>
-#include <output.h>
 #include <parse.h>
-#include <source.h>
+#include <report.h>
 #include <type_str.h>
 #include <type_sym.h>
 
@@ -48,13 +46,6 @@ if it had reached end of file.
 static int (*get)(void); /* current source stream */
 static int ch; /* current character */
 static unsigned long source_line;  /* current line number */
-
-static void syntax_error(const char *code, unsigned long line)
-	{
-	put_to_error();
-	put(code); put_error_location(line);
-	die(0);
-	}
 
 static void skip(void)
 	{
@@ -183,8 +174,12 @@ static value parse_quote_string(void)
 
 static value parse_tilde_string(void)
 	{
-	buffer buf = 0;
 	unsigned long first_line = source_line;
+	string end;
+
+	/* Parse the string terminator. */
+	{
+	buffer buf = 0;
 
 	while (1)
 		{
@@ -199,8 +194,11 @@ static value parse_tilde_string(void)
 
 	skip();
 
+	end = buf_finish(buf);
+	}
+
+	/* Gather string content up to the next occurrence of terminator. */
 	{
-	string end = buf_finish(buf);
 	string content = collect_string(end->data, end->len, first_line);
 	str_free(end);
 	return Qstr(content);
@@ -328,6 +326,7 @@ static value parse_lambda(unsigned long first_line)
 		if (def == 0)
 			syntax_error("Missing definition", first_line);
 		}
+
 	if (is_recursive)
 		def = app(hold(Y),lam(hold(sym),def));
 
@@ -370,6 +369,7 @@ static value parse_factor(void)
 		}
 	}
 
+/* Parse an expression. */
 static value parse_exp(void)
 	{
 	value exp = 0;
@@ -400,6 +400,7 @@ value parse_source(const char *label, int source(void))
 	source_line = 1;
 
 	exp = parse_exp();
+
 	if (ch != -1)
 		syntax_error("Extraneous input", source_line);
 
