@@ -44,7 +44,7 @@ value type_var_put(value f)
 		{
 		drop(x->R->R);
 		x->R->R = hold(y);
-		f = hold(I);
+		f = Q(type_I);
 		}
 	else
 		replace_void(f);

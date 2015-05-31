@@ -9,6 +9,7 @@ make memory
 make num
 make output
 make parse
+make pattern
 make report
 make standard
 make str

@@ -43,20 +43,20 @@ value type_put(value f)
 	{
 	if (!f->L) return 0;
 	putv(f->R);
-	return hold(I);
+	return Q(type_I);
 	}
 
 value type_nl(value f)
 	{
 	(void)f;
 	nl();
-	return hold(I);
+	return Q(type_I);
 	}
 
 value type_say(value f)
 	{
 	f = type_put(f);
-	if (f == I) nl();
+	if (f) nl();
 	return f;
 	}
 
@@ -74,7 +74,7 @@ value type_fput(value f)
 		cur_out = fileno(fh);
 		putv(y);
 		cur_out = save_cur_out;
-		f = hold(I);
+		f = Q(type_I);
 		}
 	else
 		replace_void(f);
@@ -92,7 +92,7 @@ value type_put_to_error(value f)
 	int save_cur_out = cur_out;
 	put_to_error();
 	drop(eval(hold(f->R)));
-	f = hold(I);
+	f = Q(type_I);
 	cur_out = save_cur_out;
 	return f;
 	}
@@ -108,7 +108,7 @@ value type_fflush(value f)
 		{
 		FILE *fh = data(x);
 		fsync(fileno(fh));
-		f = hold(I);
+		f = Q(type_I);
 		}
 	else
 		replace_void(f);

@@ -3,6 +3,7 @@
 #include <die.h>
 #include <memory.h>
 #include <num.h>
+#include <pattern.h>
 #include <report.h>
 #include <str.h>
 #include <type_num.h>
@@ -42,36 +43,25 @@ static int sym_eq(symbol x, symbol y)
 	return str_eq(data(x->name),data(y->name));
 	}
 
-static value combine_patterns(value p, value q)
-	{
-	if (p == C && q == C)
-		{
-		drop(p);
-		drop(q);
-		return hold(C);
-		}
-	else
-		return A(p,q);
-	}
-
 /* Replace all occurrences of sym in exp with I, returning a pair with the
 replacement pattern and the updated exp. */
 static value remove_symbol(value sym, value exp)
 	{
 	if (exp->T != type_sym)
-		return A(hold(C),hold(exp));
+		return A(none(),hold(exp));
 	else if (exp->L == 0)
 		{
 		if (sym_eq(data(sym),data(exp)))
-			return A(hold(I),hold(I));
+			return A(here(),Q(type_I));
 		else
-			return A(hold(C),hold(exp));
+			return A(none(),hold(exp));
 		}
 	else
 		{
 		value f = remove_symbol(sym,exp->L);
 		value g = remove_symbol(sym,exp->R);
-		value h = A(combine_patterns(hold(f->L),hold(g->L)),
+		value h = A(
+			fuse(hold(f->L),hold(g->L)),
 			app(hold(f->R),hold(g->R)));
 		drop(f);
 		drop(g);
@@ -79,7 +69,7 @@ static value remove_symbol(value sym, value exp)
 		}
 	}
 
-/* Return a function that calls substitute(p,f) when applied to x. */
+/* Return a function that calls subst(p,f) when applied to x. */
 value Qsubst(value p, value f)
 	{
 	return app(A(Q(type_subst),p),f);
@@ -97,35 +87,11 @@ value lam(value sym, value exp)
 	return f;
 	}
 
-/* Make a copy of f, but substitute x wherever I appears in pattern p.  There
-are a couple of cases where I look ahead at p->L for optimization purposes.  At
-this time it makes the code 1112 bytes smaller, and a certain test runs about
-3.5% faster.  At some point we might want to replace substitution patterns with
-trees of function pointers to avoid the conditional branching, which might be
-faster in itself, but might also give us more opportunities for "long reach"
-patterns that do certain common substitutions "all at once".
-*/
-static value x;
-static value substitute(value p, value f)
-	{
-	if (p == C)
-		return hold(f);
-	else if (p == I)
-		return hold(x);
-	else if (p->L == I)
-		return A(hold(x),substitute(p->R,f->R));
-	else if (p->L == C)
-		return A(hold(f->L),substitute(p->R,f->R));
-	else
-		return A(substitute(p->L,f->L),substitute(p->R,f->R));
-	}
-
 /* (subst pattern form arg) */
 value type_subst(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
-	x = f->R;
-	replace(f,substitute(f->L->L->R,f->L->R));
+	replace(f,subst(f->L->L->R,f->L->R,f->R));
 	return f;
 	}
 

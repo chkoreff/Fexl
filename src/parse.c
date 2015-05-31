@@ -4,6 +4,7 @@
 #include <buffer.h>
 #include <ctype.h>
 #include <parse.h>
+#include <pattern.h>
 #include <report.h>
 #include <type_str.h>
 #include <type_sym.h>
@@ -228,21 +229,21 @@ static value parse_list(void)
 		return parse_exp();
 		}
 	term = parse_term();
-	if (term == 0) return hold(null);
-	return app(app(hold(cons),term),parse_list());
+	if (term == 0) return Q(type_null);
+	return app(app(Q(type_cons),term),parse_list());
 	}
 
 static value parse_tuple(void)
 	{
-	value pattern = hold(I);
-	value exp = hold(I);
+	value pattern = here();
+	value exp = Q(type_I);
 	while (1)
 		{
 		value term;
 		skip_filler();
 		term = parse_term();
 		if (term == 0) break;
-		pattern = A(pattern,hold(C));
+		pattern = A(pattern,none());
 		exp = app(exp,term);
 		}
 	return Qsubst(pattern,exp);
@@ -328,7 +329,7 @@ static value parse_lambda(unsigned long first_line)
 		}
 
 	if (is_recursive)
-		def = app(hold(Y),lam(hold(sym),def));
+		def = app(Q(type_Y),lam(hold(sym),def));
 
 	/* Parse the body of the function and apply the definition if any. */
 	exp = lam(sym,parse_exp());
@@ -382,7 +383,7 @@ static value parse_exp(void)
 		else
 			exp = app(exp,factor);
 		}
-	if (exp == 0) exp = hold(I);
+	if (exp == 0) exp = Q(type_I);
 	return exp;
 	}
 

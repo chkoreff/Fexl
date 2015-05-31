@@ -86,7 +86,7 @@ static value op_flock(value f, int operation)
 			perror("flock");
 			die(0);
 			}
-		f = hold(I);
+		f = Q(type_I);
 		}
 	else
 		replace_void(f);

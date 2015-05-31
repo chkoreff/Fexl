@@ -43,7 +43,7 @@ static value standard(const char *name)
 	if (match("-")) return Q(type_sub);
 	if (match("/")) return Q(type_div);
 	if (match(".")) return Q(type_concat);
-	if (match("@")) return hold(Y);
+	if (match("@")) return Q(type_Y);
 	if (match("*")) return Q(type_mul);
 	if (match("+")) return Q(type_add);
 	if (match("abs")) return Q(type_abs);
@@ -52,7 +52,7 @@ static value standard(const char *name)
 	if (match("buf_new")) return Q(type_buf_new);
 	if (match("buf_put")) return Q(type_buf_put);
 	if (match("char_width")) return Q(type_char_width);
-	if (match("cons")) return hold(cons);
+	if (match("cons")) return Q(type_cons);
 	if (match("cos")) return Q(type_cos);
 	if (match("die")) return Q(type_die);
 	if (match("eq")) return Q(type_eq);
@@ -68,7 +68,7 @@ static value standard(const char *name)
 	if (match("ge")) return Q(type_ge);
 	if (match("get")) return Q(type_get);
 	if (match("gt")) return Q(type_gt);
-	if (match("I")) return hold(I);
+	if (match("I")) return Q(type_I);
 	if (match("is_bool")) return Q(type_is_bool);
 	if (match("is_good")) return Q(type_is_good);
 	if (match("is_list")) return Q(type_is_list);
@@ -84,7 +84,7 @@ static value standard(const char *name)
 	if (match("lt")) return Q(type_lt);
 	if (match("ne")) return Q(type_ne);
 	if (match("nl")) return Q(type_nl);
-	if (match("null")) return hold(null);
+	if (match("null")) return Q(type_null);
 	if (match("num_str")) return Q(type_num_str);
 	if (match("once")) return Q(type_once);
 	if (match("parse_file")) return Q(type_parse_file);

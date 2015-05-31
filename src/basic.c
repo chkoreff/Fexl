@@ -53,7 +53,7 @@ value type_once(value f)
 		replace(f->R, hold(g));
 
 	drop(f->L);
-	f->L = hold(I);
+	f->L = Q(type_I);
 	f->T = type_I;
 	return g;
 	}
@@ -153,29 +153,4 @@ void replace_single(value f, value x)
 	{
 	replace_A(f, Q(type_single), x);
 	f->T = type_single;
-	}
-
-value C;
-value I;
-value Y;
-value cons;
-value null;
-
-void beg_basic(void)
-	{
-	C = Q(type_C);
-	I = Q(type_I);
-	Y = Q(type_Y);
-	cons = Q(type_cons);
-	null = Q(type_null);
-	}
-
-void end_basic(void)
-	{
-	drop(C);
-	drop(I);
-	drop(Y);
-	drop(cons);
-	drop(null);
-	end_value();
 	}

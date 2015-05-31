@@ -31,7 +31,7 @@ value type_buf_put(value f)
 		string str = data(y);
 		buf = buf_put(buf,str);
 		x->R->R = (value)buf;
-		f = hold(I);
+		f = Q(type_I);
 		}
 	else
 		replace_void(f);
