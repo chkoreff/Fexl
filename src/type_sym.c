@@ -69,7 +69,7 @@ static value remove_symbol(value sym, value exp)
 		}
 	}
 
-/* Return a function that calls subst(p,f) when applied to x. */
+/* Return a function that calls subst(p,f,x) when applied to x. */
 value Qsubst(value p, value f)
 	{
 	return app(A(Q(type_subst),p),f);

@@ -243,7 +243,7 @@ static value parse_tuple(void)
 		skip_filler();
 		term = parse_term();
 		if (term == 0) break;
-		pattern = A(pattern,none());
+		pattern = fuse(pattern,none());
 		exp = app(exp,term);
 		}
 	return Qsubst(pattern,exp);
