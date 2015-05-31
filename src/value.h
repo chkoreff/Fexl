@@ -15,7 +15,6 @@ extern void drop(value f);
 extern value Q(type T);
 extern value D(type T, void *data, type destroy);
 extern void *data(value f);
-extern value type_A(value f);
 extern value A(value x, value y);
 extern void replace(value f, value g);
 extern void replace_Q(value f, type t);

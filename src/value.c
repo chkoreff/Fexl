@@ -113,7 +113,7 @@ void *data(value f)
 	}
 
 /* The type for function application */
-value type_A(value f)
+static value type_A(value f)
 	{
 	value g = eval(hold(f->L));
 	if (g != f->L)
