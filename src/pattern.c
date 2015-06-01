@@ -21,26 +21,20 @@ static value subst_1(value p, value f, value x)
 	return hold(x);
 	}
 
-static value subst_110(value p, value f, value x)
+static value subst_px0(value p, value f, value x)
 	{
 	return A(subst(p->L,f->L,x),hold(f->R));
 	}
 
-static value subst_101(value p, value f, value x)
+static value subst_p0x(value p, value f, value x)
 	{
 	return A(hold(f->L),subst(p->R,f->R,x));
 	}
 
-static value subst_111(value p, value f, value x)
+static value subst_pxx(value p, value f, value x)
 	{
 	return A(subst(p->L,f->L,x),subst(p->R,f->R,x));
 	}
-
-/* Make a pattern that ignores the form and returns the argument. */
-value none(void) { return Q((type)subst_0); }
-
-/* Make a pattern that returns the form and ignores the argument. */
-value here(void) { return Q((type)subst_1); }
 
 /* Make a pattern with the given builder and left and right sides. */
 static value P(builder b, value p, value q)
@@ -56,6 +50,12 @@ static int is_none(value p)
 	return (builder)p->T == subst_0;
 	}
 
+/* Make a pattern that ignores the form and returns the argument. */
+value none(void) { return Q((type)subst_0); }
+
+/* Make a pattern that returns the form and ignores the argument. */
+value here(void) { return Q((type)subst_1); }
+
 /* Make a pattern that sends the argument to the left and right as needed. */
 value fuse(value p, value q)
 	{
@@ -68,12 +68,12 @@ value fuse(value p, value q)
 			return none();
 			}
 		else
-			return P(subst_101,p,q);
+			return P(subst_p0x,p,q);
 		}
 	else if (is_none(q))
-		return P(subst_110,p,q);
+		return P(subst_px0,p,q);
 	else
-		return P(subst_111,p,q);
+		return P(subst_pxx,p,q);
 	}
 
 /* Use pattern p to make a copy of f with x substituted in various places. */
