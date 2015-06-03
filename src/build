@@ -4,6 +4,7 @@ make basic
 make buffer
 make convert
 make die
+make fexl
 make format
 make memory
 make num
@@ -29,6 +30,4 @@ make type_str
 make type_sym
 make type_var
 make value
-make fexl
-#make test/show
 link fexl

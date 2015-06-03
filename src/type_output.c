@@ -25,14 +25,13 @@ static void putv(value x)
 			put_ch('F');
 		else if (x->T == type_cons && x->L && x->L->L)
 			{
+			value y;
 			putv(x->L->R);
 			/* Eliminated tail recursive call putv(x->R) here. */
-			{
-			value y = eval(hold(x->R));
+			y = eval(hold(x->R));
 			drop(x);
 			x = y;
 			continue;
-			}
 			}
 		drop(x);
 		return;

@@ -46,17 +46,16 @@ value type_Y(value f)
 /* (once x) = x, but x is evaluated only once. */
 value type_once(value f)
 	{
+	value x;
 	if (!f->L) return 0;
-	{
-	value g = eval(hold(f->R));
-	if (g != f->R)
-		replace(f->R, hold(g));
+	x = eval(hold(f->R));
+	if (x != f->R)
+		replace(f->R, hold(x));
 
 	drop(f->L);
 	f->L = Q(type_I);
 	f->T = type_I;
-	return g;
-	}
+	return x;
 	}
 
 /* (void x) = void */
@@ -96,47 +95,43 @@ value type_is_void(value f)
 
 value type_is_good(value f)
 	{
+	value x;
 	if (!f->L) return 0;
-	{
-	value x = eval(hold(f->R));
+	x = eval(hold(f->R));
 	replace_boolean(f, x->T != type_void);
 	drop(x);
 	return 0;
 	}
-	}
 
 value type_is_bool(value f)
 	{
+	value x;
 	if (!f->L) return 0;
-	{
-	value x = eval(hold(f->R));
+	x = eval(hold(f->R));
 	replace_boolean(f, x->T == type_T || x->T == type_F);
 	drop(x);
 	return 0;
 	}
-	}
 
 value type_is_list(value f)
 	{
+	value x;
 	if (!f->L) return 0;
-	{
-	value x = eval(hold(f->R));
+	x = eval(hold(f->R));
 	replace_boolean(f, x->T == type_null
 		|| (x->T == type_cons && x->L && x->L->L));
 	drop(x);
 	return 0;
 	}
-	}
 
 value op_is_type(value f, type t)
 	{
+	value x;
 	if (!f->L) return 0;
-	{
-	value x = eval(hold(f->R));
+	x = eval(hold(f->R));
 	replace_boolean(f, x->T == t);
 	drop(x);
 	return 0;
-	}
 	}
 
 void replace_void(value f)

@@ -26,18 +26,25 @@ A union would do the trick, but the ISO C90 standard does not support unnamed
 unions, and using a named union is more pain than it's worth.
 */
 
-/*LATER perhaps limit size of free list, and free values when too many */
-
 static value free_list = 0;
+
+static void push_free(value f)
+	{
+	f->N = (unsigned long)free_list;
+	free_list = f;
+	}
+
+static value pop_free(void)
+	{
+	value f = free_list;
+	free_list = (value)f->N;
+	return f;
+	}
 
 static void clear_free_list(void)
 	{
 	while (free_list)
-		{
-		value f = free_list;
-		free_list = (value)f->N;
-		free_memory(f,sizeof(struct value));
-		}
+		free_memory(pop_free(),sizeof(struct value));
 	}
 
 void end_value(void)
@@ -58,11 +65,9 @@ static void recycle(value f)
 		{
 		/* Clear atom. */
 		f->R->T(f->R->R);
-		f->R->N = (unsigned long)free_list;
-		free_list = f->R;
+		push_free(f->R);
 		}
-	f->N = (unsigned long)free_list;
-	free_list = f;
+	push_free(f);
 	}
 
 /* Increment the reference count. */
@@ -81,12 +86,7 @@ void drop(value f)
 /* Return a value of type T with the given left and right side. */
 static value V(type T, value L, value R)
 	{
-	value f = free_list;
-	if (f)
-		free_list = (value)f->N;
-	else
-		f = (value)new_memory(sizeof(struct value));
-
+	value f = free_list ? pop_free() : new_memory(sizeof(struct value));
 	f->N = 1;
 	f->T = T;
 	f->L = L;
@@ -179,7 +179,7 @@ void replace_A(value f, value x, value y)
 	f->R = y;
 	}
 
-/* Reduce the value to its normal form if possible. */
+/* Reduce the value to its normal form, within limits on space and time. */
 value eval(value f)
 	{
 	while (1)
