@@ -1,83 +1,44 @@
 #include <value.h>
+#include <basic.h>
 #include <pattern.h>
 
-/* A builder is a function that uses pattern p to build a copy of form f with
-argument x substituted in various places. */
-typedef value (*builder)(value p, value f, value x);
-
-/* Here are some builders that perform some common substitutions. */
-
-static value subst_0(value p, value f, value x)
-	{
-	(void)p;
-	(void)x;
-	return hold(f);
-	}
-
-static value subst_1(value p, value f, value x)
-	{
-	(void)p;
-	(void)f;
-	return hold(x);
-	}
-
-static value subst_px0(value p, value f, value x)
-	{
-	return A(subst(p->L,f->L,x),hold(f->R));
-	}
-
-static value subst_p0x(value p, value f, value x)
-	{
-	return A(hold(f->L),subst(p->R,f->R,x));
-	}
-
-static value subst_pxx(value p, value f, value x)
-	{
-	return A(subst(p->L,f->L,x),subst(p->R,f->R,x));
-	}
-
-/* Make a pattern with the given builder and left and right sides. */
-static value P(builder b, value p, value q)
-	{
-	value r = A(p,q);
-	r->T = (type)b;
-	return r;
-	}
-
-/* Return true if the pattern is none. */
-static int is_none(value p)
-	{
-	return (builder)p->T == subst_0;
-	}
-
 /* Make a pattern that ignores the form and returns the argument. */
-value none(void) { return Q((type)subst_0); }
+value none(void) { return Q(type_C); }
 
 /* Make a pattern that returns the form and ignores the argument. */
-value here(void) { return Q((type)subst_1); }
+value here(void) { return Q(type_I); }
 
 /* Make a pattern that sends the argument to the left and right as needed. */
 value fuse(value p, value q)
 	{
-	if (is_none(p))
+	if (p->T == type_C && q->T == type_C)
 		{
-		if (is_none(q))
-			{
-			drop(p);
-			drop(q);
-			return none();
-			}
-		else
-			return P(subst_p0x,p,q);
+		drop(p);
+		drop(q);
+		return none();
 		}
-	else if (is_none(q))
-		return P(subst_px0,p,q);
 	else
-		return P(subst_pxx,p,q);
+		return A(p,q);
 	}
 
-/* Use pattern p to make a copy of f with x substituted in various places. */
+/* Use pattern p to make a copy of f with x substituted in various places.
+
+I do one level of look-ahead on the left and right patterns, which isn't
+strictly necessary but is 1% faster and saves 144 bytes.
+
+Checking p->R in addition to p->L is redundant, but is 0.4% faster and saves 80
+bytes.
+*/
 value subst(value p, value f, value x)
 	{
-	return ((builder)p->T)(p,f,x);
+	if (p->L && p->R)
+		{
+		value L = (p->L->T == type_C ? hold(f->L) : subst(p->L,f->L,x));
+		value R = (p->R->T == type_C ? hold(f->R) : subst(p->R,f->R,x));
+		return A(L,R);
+		}
+	else if (p->T == type_C)
+		return hold(f);
+	else
+		return hold(x);
 	}
