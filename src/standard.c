@@ -30,15 +30,8 @@ static int match(const char *other)
 static value type_standard(value f);
 
 /* The standard (built-in) context */
-static value standard(const char *name)
+static value standard(void)
 	{
-	{
-	value def = Qnum_str0(name);
-	if (def) return def;
-	}
-
-	cur_name = name;
-
 	if (match("^")) return Q(type_pow);
 	if (match("-")) return Q(type_sub);
 	if (match("/")) return Q(type_div);
@@ -123,8 +116,9 @@ static value type_standard(value f)
 	value x = eval(hold(f->R));
 	if (x->T == type_str)
 		{
-		const char *name = ((string)data(x))->data;
-		value def = standard(name);
+		value def;
+		cur_name = ((string)data(x))->data;
+		def = standard();
 		if (def)
 			replace_single(f, def);
 		else
