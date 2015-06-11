@@ -705,7 +705,7 @@ eval_file "test/mf.fxl"
 	eq x "wilma" {(say "I am Wilma.")};
 	eq x "barney" {(say "I am Barney.")};
 	eq x "is_void" {is_void};
-	eq x "say" {say};
+	eq x "say" (\: I : say);  # Test a special case in resolve.
 	eq x "void" {void};
 	void
 	)

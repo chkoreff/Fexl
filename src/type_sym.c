@@ -108,11 +108,10 @@ static value dynamic_context(value x)
 
 	{
 	/* Define other names using the given context. */
-	value single = Q(type_single);
-	value exp = eval(A(A(hold(cur_context),hold(x)),single));
+	value exp = eval(A(A(hold(cur_context),hold(x)),Q(type_single)));
 
 	value def;
-	if (exp->L == single)
+	if (exp->L && exp->L->T == type_single)
 		def = hold(exp->R);
 	else
 		def = 0;
