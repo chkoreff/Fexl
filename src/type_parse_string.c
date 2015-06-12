@@ -3,8 +3,8 @@
 #include <parse.h>
 #include <str.h>
 #include <type_parse_string.h>
+#include <type_resolve.h>
 #include <type_str.h>
-#include <type_sym.h>
 
 static string source;
 static unsigned long pos;
@@ -16,20 +16,22 @@ static int get(void)
 
 static value parse_string(string text)
 	{
-	value exp;
 	string save_source = source;
 	unsigned long save_pos = pos;
 
 	source = text;
 	pos = 0;
 
-	exp = parse_source(0,get);
+	{
+	value exp = parse_source("",get);
 
 	source = save_source;
 	pos = save_pos;
 	return exp;
 	}
+	}
 
+/* (parse_string str) */
 value type_parse_string(value f)
 	{
 	if (!f->L) return 0;

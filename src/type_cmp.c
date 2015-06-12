@@ -8,10 +8,10 @@
 
 static value op_cmp(value f, int op(int))
 	{
-	value x, y;
 	if (!f->L || !f->L->L) return 0;
-	x = eval(hold(f->L->R));
-	y = eval(hold(f->R));
+	{
+	value x = eval(hold(f->L->R));
+	value y = eval(hold(f->R));
 	if (x->T == type_num && y->T == type_num)
 		replace_boolean(f, op(num_cmp(data(x),data(y))));
 	else if (x->T == type_str && y->T == type_str)
@@ -21,6 +21,7 @@ static value op_cmp(value f, int op(int))
 	drop(x);
 	drop(y);
 	return 0;
+	}
 	}
 
 static int lt(int x) { return x < 0; }

@@ -6,6 +6,7 @@
 #include <parse.h>
 #include <pattern.h>
 #include <report.h>
+#include <type_resolve.h>
 #include <type_str.h>
 #include <type_sym.h>
 
@@ -221,16 +222,17 @@ static value parse_exp(void);
 
 static value parse_list(void)
 	{
-	value term;
 	skip_filler();
 	if (ch == ';')
 		{
 		skip();
 		return parse_exp();
 		}
-	term = parse_term();
+	{
+	value term = parse_term();
 	if (term == 0) return Q(type_null);
 	return app(app(Q(type_cons),term),parse_list());
+	}
 	}
 
 static value parse_tuple(void)
@@ -239,12 +241,13 @@ static value parse_tuple(void)
 	value exp = Q(type_I);
 	while (1)
 		{
-		value term;
 		skip_filler();
-		term = parse_term();
+		{
+		value term = parse_term();
 		if (term == 0) break;
 		pattern = fuse(pattern,none());
 		exp = app(exp,term);
+		}
 		}
 	return Qsubst(pattern,exp);
 	}
@@ -283,37 +286,46 @@ static value parse_term(void)
 	return exp;
 	}
 
+static value parse_context(unsigned long first_line)
+	{
+	value context = parse_term();
+	if (context == 0)
+		syntax_error("Missing context", first_line);
+	return context;
+	}
+
 /* Parse a lambda form following the initial '\' character. */
 static value parse_lambda(unsigned long first_line)
 	{
-	value sym, def=0, exp;
-	char is_recursive = 0;
-
 	/* Parse the symbol (function parameter). */
 	skip_white();
 
 	if (ch == '=')
 		{
 		/* Resolve expression in a context. */
-		value context, label;
 		skip();
 		skip_white();
-		context = parse_term();
-		if (context == 0)
-			syntax_error("Missing context", first_line);
-		exp = parse_exp();
-		label = Qstr(str_new_data0(source_label ? source_label : ""));
+		{
+		value context = parse_context(first_line);
+		value exp = parse_exp();
+		value label = Qstr(str_new_data0(source_label));
 		return app(A(A(Q(type_resolve),label),exp),context);
 		}
+		}
 
-	sym = parse_name();
+	{
+	/* Parse the lambda symbol. */
+	value sym = parse_name();
 	if (sym == 0)
 		syntax_error("Missing symbol after '\\'", first_line);
 
+	{
+	/* Parse the optional definition of the symbol. */
+	value def = 0;
+	{
+	char is_recursive = 0;
 	skip_filler();
 	first_line = source_line;
-
-	/* Parse the definition of the symbol if we see an '=' char. */
 	if (ch == '=')
 		{
 		skip();
@@ -330,12 +342,17 @@ static value parse_lambda(unsigned long first_line)
 
 	if (is_recursive)
 		def = app(Q(type_Y),lam(hold(sym),def));
+	}
 
 	/* Parse the body of the function and apply the definition if any. */
-	exp = lam(sym,parse_exp());
+	{
+	value exp = lam(sym,parse_exp());
 	if (def)
 		exp = app(exp,def);
 	return exp;
+	}
+	}
+	}
 	}
 
 /* Parse the next factor of an expression.  Return 0 if no factor found. */
@@ -390,7 +407,6 @@ static value parse_exp(void)
 /* Parse the source stream. */
 value parse_source(const char *label, int source(void))
 	{
-	value exp;
 	const char *save = source_label;
 	int (*save_get)(void) = get;
 
@@ -400,7 +416,8 @@ value parse_source(const char *label, int source(void))
 	ch = 0;
 	source_line = 1;
 
-	exp = parse_exp();
+	{
+	value exp = parse_exp();
 
 	if (ch != -1)
 		syntax_error("Extraneous input", source_line);
@@ -409,4 +426,5 @@ value parse_source(const char *label, int source(void))
 	get = save_get;
 
 	return exp;
+	}
 	}

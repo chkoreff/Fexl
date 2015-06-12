@@ -1,1 +1,2 @@
-extern value eval_file(const char *name);
+extern value standard(void);
+extern value type_standard(value f);

@@ -4,7 +4,6 @@
 #include <standard.h>
 #include <stdio.h>
 #include <str.h>
-#include <string.h> /* strcmp */
 #include <type_buf.h>
 #include <type_cmp.h>
 #include <type_file.h>
@@ -16,21 +15,13 @@
 #include <type_parse_file.h>
 #include <type_parse_string.h>
 #include <type_rand.h>
+#include <type_resolve.h>
 #include <type_run.h>
 #include <type_str.h>
 #include <type_var.h>
 
-static const char *cur_name;
-
-static int match(const char *other)
-	{
-	return strcmp(cur_name,other) == 0;
-	}
-
-static value type_standard(value f);
-
 /* The standard (built-in) context */
-static value standard(void)
+value standard(void)
 	{
 	if (match("^")) return Q(type_pow);
 	if (match("-")) return Q(type_sub);
@@ -109,34 +100,7 @@ static value standard(void)
 	}
 
 /* (standard x) = {def} if x is defined, or void if x is not defined. */
-static value type_standard(value f)
+value type_standard(value f)
 	{
-	if (!f->L) return 0;
-	{
-	value x = eval(hold(f->R));
-	if (x->T == type_str)
-		{
-		value def;
-		cur_name = ((string)data(x))->data;
-		def = standard();
-		if (def)
-			replace_single(f, def);
-		else
-			replace_void(f);
-		}
-	else
-		replace_void(f);
-	drop(x);
-	return 0;
-	}
-	}
-
-/* Evaluate the named file in the standard context.  Use stdin if the name is
-null or empty. */
-value eval_file(const char *name)
-	{
-	value label = Qstr(str_new_data0(name ? name : ""));
-	value exp = A(Q(type_parse_file),label);
-	value context = Q(type_standard);
-	return eval(A(exp,context));
+	return simple_context(f,standard);
 	}

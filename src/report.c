@@ -7,7 +7,7 @@ const char *source_label; /* name of current source file */
 static void put_error_location(unsigned long line)
 	{
 	put(" on line "); put_ulong(line);
-	if (source_label && source_label[0])
+	if (source_label[0])
 		{
 		put(" of ");put(source_label);
 		}

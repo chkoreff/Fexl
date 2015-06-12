@@ -14,6 +14,7 @@ make pattern
 make report
 make standard
 make str
+make top
 make type_buf
 make type_cmp
 make type_file
@@ -25,6 +26,7 @@ make type_output
 make type_parse_file
 make type_parse_string
 make type_rand
+make type_resolve
 make type_run
 make type_str
 make type_sym

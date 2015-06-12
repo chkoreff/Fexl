@@ -6,8 +6,8 @@
 #include <stdio.h>
 #include <str.h>
 #include <type_parse_file.h>
+#include <type_resolve.h>
 #include <type_str.h>
-#include <type_sym.h>
 
 static FILE *source;
 
@@ -18,10 +18,9 @@ static int get(void)
 
 static value parse_file(const char *name)
 	{
-	value exp;
 	FILE *save_source = source;
 
-	source = name && name[0] ? fopen(name,"r") : stdin;
+	source = name[0] ? fopen(name,"r") : stdin;
 	if (!source)
 		{
 		put_to_error();
@@ -29,12 +28,15 @@ static value parse_file(const char *name)
 		die(0);
 		}
 
-	exp = parse_source(name,get);
+	{
+	value exp = parse_source(name,get);
 
 	source = save_source;
 	return exp;
 	}
+	}
 
+/* (parse_file name) */
 value type_parse_file(value f)
 	{
 	if (!f->L) return 0;
