@@ -95,9 +95,10 @@ value type_subst(value f)
 	return f;
 	}
 
-/* Resolve an individual symbol x with cur_context. */
-static value cur_context;
-static value dynamic_context(value x)
+static short undefined = 0;
+
+/* Resolve an individual symbol with the context. */
+static value resolve_symbol(value x, value context)
 	{
 	{
 	/* Define numeric literals. */
@@ -108,9 +109,9 @@ static value dynamic_context(value x)
 
 	{
 	/* Define other names using the given context. */
-	value exp = eval(A(A(hold(cur_context),hold(x)),Q(type_single)));
-
+	value exp = eval(A(A(hold(context),hold(x)),Q(type_single)));
 	value def;
+
 	if (exp->L && exp->L->T == type_single)
 		def = hold(exp->R);
 	else
@@ -121,49 +122,46 @@ static value dynamic_context(value x)
 	}
 	}
 
-static short undefined = 0;
-
-/* Resolve all symbols in exp with cur_context. */
-static value do_resolve(value exp)
+/* Resolve all symbols in exp with the context. */
+static value do_resolve(value exp, value context)
 	{
+	value result;
+
 	if (exp->T != type_sym)
 		return exp;
-	else if (exp->L == 0)
+
+	if (exp->L == 0)
 		{
 		symbol sym = data(exp);
-		value def = dynamic_context(sym->name);
-		if (!def)
+		value x = sym->name;
+		result = resolve_symbol(x, context);
+		if (!result)
 			{
-			const char *name = ((string)data(sym->name))->data;
+			const char *name = ((string)data(x))->data;
 			undefined_symbol(name,sym->line);
 			undefined = 1;
-			def = Q(type_void);
+			result = Q(type_void);
 			}
-		drop(exp);
-		return def;
 		}
 	else
 		{
-		value f = do_resolve(hold(exp->L));
-		value g = do_resolve(hold(exp->R));
-		value result = A(f,g);
-		drop(exp);
-		return result;
+		value f = do_resolve(hold(exp->L),context);
+		value g = do_resolve(hold(exp->R),context);
+		result = A(f,g);
 		}
+
+	drop(exp);
+	return result;
 	}
 
 /* Resolve all symbols in exp with the definitions given by context. */
 static value resolve(value exp, value context)
 	{
-	value save = cur_context;
-	cur_context = context;
-
-	exp = do_resolve(exp);
+	exp = do_resolve(exp,context);
 	if (undefined)
 		die(0); /* The expression had undefined symbols. */
 
 	drop(context);
-	cur_context = save;
 	return exp;
 	}
 
