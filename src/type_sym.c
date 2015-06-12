@@ -95,8 +95,6 @@ value type_subst(value f)
 	return f;
 	}
 
-static short undefined = 0;
-
 /* Resolve an individual symbol with the context. */
 static value resolve_symbol(value x, value context)
 	{
@@ -121,6 +119,8 @@ static value resolve_symbol(value x, value context)
 	return def;
 	}
 	}
+
+static short undefined = 0;
 
 /* Resolve all symbols in exp with the context. */
 static value do_resolve(value exp, value context)
