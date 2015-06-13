@@ -6,5 +6,5 @@ extern void put_long(long x);
 extern void put_ulong(unsigned long x);
 extern void put_double(double x);
 extern void nl(void);
-extern void set_output(int fd);
 extern void put_to_error(void);
+extern void put_to_output(void);

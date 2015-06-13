@@ -25,5 +25,5 @@ void undefined_symbol(const char *name, unsigned long line)
 	{
 	put_to_error();
 	put("Undefined symbol "); put(name); put_error_location(line);
-	set_output(1);
+	put_to_output();
 	}
