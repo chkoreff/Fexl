@@ -23,7 +23,8 @@ void syntax_error(const char *code, unsigned long line)
 
 void undefined_symbol(const char *name, unsigned long line)
 	{
+	int save_cur_out = cur_out;
 	put_to_error();
 	put("Undefined symbol "); put(name); put_error_location(line);
-	put_to_output();
+	cur_out = save_cur_out;
 	}

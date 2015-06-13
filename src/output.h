@@ -7,4 +7,3 @@ extern void put_ulong(unsigned long x);
 extern void put_double(double x);
 extern void nl(void);
 extern void put_to_error(void);
-extern void put_to_output(void);

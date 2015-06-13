@@ -45,18 +45,8 @@ void nl(void)
 	putd("\n",1);
 	}
 
-static void set_output(int fd)
-	{
-	fsync(cur_out);
-	cur_out = fd;
-	}
-
 void put_to_error(void)
 	{
-	set_output(STDERR_FILENO);
-	}
-
-void put_to_output(void)
-	{
-	set_output(STDOUT_FILENO);
+	fsync(cur_out);
+	cur_out = STDERR_FILENO;
 	}
