@@ -72,7 +72,7 @@ static void skip_line(void)
 
 static int at_white(void)
 	{
-	return isspace(ch) || ch == 0;
+	return isspace(ch);
 	}
 
 static void skip_white(void)
@@ -185,7 +185,7 @@ static value parse_tilde_string(void)
 
 	while (1)
 		{
-		if (ch == -1 || isspace(ch))
+		if (ch == -1 || at_white())
 			break;
 		buf = buf_add(buf,(char)ch);
 		skip();
@@ -413,7 +413,7 @@ value parse_source(const char *label, int source(void))
 	source_label = label;
 	get = source;
 
-	ch = 0;
+	ch = ' ';
 	source_line = 1;
 
 	{

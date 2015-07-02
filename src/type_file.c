@@ -40,7 +40,7 @@ value type_fopen(value f)
 		string mode = data(y);
 		FILE *fh = fopen(path->data,mode->data);
 		if (fh)
-			f = A(Q(type_single),Qfile(fh));
+			f = single(Qfile(fh));
 		else
 			f = Q(type_void);
 		}
@@ -63,7 +63,7 @@ value type_remove(value f)
 		{
 		string path = data(x);
 		int code = remove(path->data);
-		f = A(Q(type_single), Qnum0(code));
+		f = single(Qnum0(code));
 		}
 	else
 		replace_void(f);

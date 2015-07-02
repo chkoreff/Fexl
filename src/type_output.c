@@ -55,9 +55,9 @@ value type_nl(value f)
 
 value type_say(value f)
 	{
-	f = type_put(f);
-	if (f) nl();
-	return f;
+	if (!f->L) return 0;
+	putv(f->R); nl();
+	return Q(type_I);
 	}
 
 /* (fput fh data) Put data to the file. */

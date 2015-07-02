@@ -15,7 +15,7 @@ value type_buf_new(value f)
 	{
 	buffer buf = 0;
 	(void)f;
-	return A(Q(type_single), D(type_buf,buf,(type)buf_free));
+	return single(D(type_buf,buf,(type)buf_free));
 	}
 
 /* (buf_put buf str) Appends the string to the buffer. */
@@ -53,7 +53,7 @@ value type_buf_get(value f)
 		buffer buf = data(x);
 		string str = buf_finish(buf);
 		x->R->R = 0;
-		f = A(Q(type_single),Qstr(str));
+		f = single(Qstr(str));
 		}
 	else
 		replace_void(f);

@@ -116,7 +116,7 @@ value simple_context(value f, value context(void))
 		{
 		value def = context();
 		if (def)
-			replace_single(f, def);
+			f = single(def);
 		else
 			replace_void(f);
 		}
@@ -124,6 +124,6 @@ value simple_context(value f, value context(void))
 	else
 		replace_void(f);
 	drop(x);
-	return 0;
+	return f;
 	}
 	}

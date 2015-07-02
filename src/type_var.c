@@ -15,7 +15,7 @@ value type_var(value f)
 value type_var_new(value f)
 	{
 	(void)f;
-	return A(Q(type_single),D(type_var,Q(type_void),(type)drop));
+	return single(D(type_var,Q(type_void),(type)drop));
 	}
 
 /* (var_get var) returns {val}, where val is the current value of x. */
@@ -25,7 +25,7 @@ value type_var_get(value f)
 	{
 	value x = eval(hold(f->R));
 	if (x->T == type_var)
-		f = A(Q(type_single),hold(data(x)));
+		f = single(hold(data(x)));
 	else
 		replace_void(f);
 	drop(x);

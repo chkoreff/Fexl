@@ -70,7 +70,7 @@ static string get_utf8(FILE *fh)
 static value op_get(FILE *fh)
 	{
 	string ch = get_utf8(fh);
-	return A(Q(type_single), ch ? Qstr(ch) : Q(type_void));
+	return single(ch ? Qstr(ch) : Q(type_void));
 	}
 
 /* get = {ch}, where ch is the next UTF-8 character from stdin, or void if

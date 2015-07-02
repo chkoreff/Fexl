@@ -149,8 +149,7 @@ void replace_boolean(value f, int x)
 	replace_Q(f, x ? type_T : type_F);
 	}
 
-void replace_single(value f, value x)
+value single(value x)
 	{
-	replace_A(f, Q(type_single), x);
-	f->T = type_single;
+	return A(Q(type_single), x);
 	}

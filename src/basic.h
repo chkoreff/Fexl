@@ -15,4 +15,4 @@ extern value type_is_list(value f);
 extern value op_is_type(value f, type t);
 extern void replace_void(value f);
 extern void replace_boolean(value f, int x);
-extern void replace_single(value f, value x);
+extern value single(value x);
