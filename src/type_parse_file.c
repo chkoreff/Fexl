@@ -36,22 +36,24 @@ static value parse_file(const char *name)
 	}
 	}
 
-/* (parse_file name) */
+/* (parse_file name context) = {f}, where f is the function specified in the
+named file in the given context.
+*/
 value type_parse_file(value f)
 	{
-	if (!f->L) return 0;
+	if (!f->L || !f->L->L) return 0;
 	{
-	value x = eval(hold(f->R));
+	value x = eval(hold(f->L->R));
 	if (x->T == type_str)
 		{
 		string name = data(x);
 		value exp = parse_file(name->data);
-		replace_A(f, A(Q(type_resolve),hold(x)), exp);
+		f = single(A(A(A(Q(type_resolve), hold(x)), exp), hold(f->R)));
 		}
 	else
 		replace_void(f);
 
 	drop(x);
-	return 0;
+	return f;
 	}
 	}

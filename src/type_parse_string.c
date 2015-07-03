@@ -31,21 +31,24 @@ static value parse_string(string text)
 	}
 	}
 
-/* (parse_string str) */
+/* (parse_string str context) = {f}, where f is the function specified by the
+string in the given context. */
 value type_parse_string(value f)
 	{
-	if (!f->L) return 0;
+	if (!f->L || !f->L->L) return 0;
 	{
-	value x = eval(hold(f->R));
+	value x = eval(hold(f->L->R));
 	if (x->T == type_str)
 		{
 		value exp = parse_string(data(x));
-		replace_A(f, A(Q(type_resolve),Qstr(str_new_data0(""))), exp);
+		f = single(
+			A(A(A(Q(type_resolve), Qstr(str_new_data0(""))), exp), hold(f->R))
+			);
 		}
 	else
 		replace_void(f);
 
 	drop(x);
-	return 0;
+	return f;
 	}
 	}

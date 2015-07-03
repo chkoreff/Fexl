@@ -1,4 +1,5 @@
 #include <value.h>
+#include <basic.h>
 #include <str.h>
 #include <top.h>
 #include <type_parse_file.h>
@@ -13,8 +14,7 @@ empty. */
 static value eval_file(const char *name, value context)
 	{
 	value label = Qstr(str_new_data0(name));
-	value exp = A(Q(type_parse_file),label);
-	return eval(A(exp,context));
+	return eval(A(A(A(Q(type_parse_file),label),context),Q(type_I)));
 	}
 
 int eval_top(int argc, char *argv[], value context)

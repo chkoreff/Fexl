@@ -9,8 +9,8 @@
 	say "other"
 	)
 
-\eval_file=(\name parse_file name standard)
-\eval_str=(\str parse_string str standard)
+\eval_file=(\name parse_file name standard I)
+\eval_str=(\str parse_string str standard I)
 
 \div=(say "==")
 
@@ -726,7 +726,7 @@ eval_file "test/mf.fxl"
 \case_2=
 	(
 	say "["
-	\form=(parse_string "say (+ 7 8)")
+	\form=(\context parse_string "say (+ 7 8)" context I)
 
 	say "Run in standard context."
 	form standard
@@ -744,13 +744,12 @@ case_2
 
 test_context
 
-
-# Ensure that the parse functions are evaluated once and replaced inline.
 (
 div
 \try=
 (
-parse_file (say "Let's parse." "test/hello.fxl") standard
+once (say "Let's parse.")
+eval_file "test/hello.fxl"
 )
 
 try
@@ -767,7 +766,8 @@ div
 \x say [x " " (* 3 x)]
 ~~
 
-parse_string (say "Let's parse." source) standard
+once (say "Let's parse.")
+eval_str source
 )
 
 try 5
