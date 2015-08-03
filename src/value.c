@@ -146,13 +146,13 @@ void replace(value f, value g)
 	drop(g);
 	}
 
-/* Equivalent to replace(f,Q(t)) */
-void replace_Q(value f, type t)
+/* Equivalent to replace(f,Q(T)) */
+void replace_Q(value f, type T)
 	{
 	drop(f->L);
 	drop(f->R);
 
-	f->T = t;
+	f->T = T;
 	f->L = 0;
 	f->R = 0;
 	}
