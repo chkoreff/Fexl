@@ -52,10 +52,8 @@ value type_once(value f)
 	if (x != f->R)
 		replace(f->R, hold(x));
 
-	drop(f->L);
-	f->L = Q(type_I);
-	f->T = type_I;
-	return x;
+	replace(f,x);
+	return f;
 	}
 	}
 

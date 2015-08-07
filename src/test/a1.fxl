@@ -338,6 +338,15 @@ hi
 )
 
 (
+# This used to cause a segfault when the once function attempted to replace
+# the nl with I, because the replace function was only designed to replace a
+# non-atomic value.  This is fixed now.
+\f=(once nl)
+f
+f
+)
+
+(
 \x=(once (put "(CALC)") (+ 2 (* 7 6)))
 
 \make_square=

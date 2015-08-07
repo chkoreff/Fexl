@@ -53,7 +53,7 @@ void end_value(void)
 	end_memory();
 	}
 
-static void recycle(value f)
+static void clear(value f)
 	{
 	if (f->L)
 		{
@@ -67,6 +67,11 @@ static void recycle(value f)
 		f->R->T(f->R->R);
 		push_free(f->R);
 		}
+	}
+
+static void recycle(value f)
+	{
+	clear(f);
 	push_free(f);
 	}
 
@@ -130,11 +135,10 @@ value A(value x, value y)
 	return V(type_A,x,y);
 	}
 
-/* Replace the content of f (non-atomic) with the content of g. */
+/* Replace the content of f with the content of g. */
 void replace(value f, value g)
 	{
-	drop(f->L);
-	drop(f->R);
+	clear(f);
 
 	if (g->L) hold(g->L);
 	if (g->R) hold(g->R);
@@ -149,9 +153,7 @@ void replace(value f, value g)
 /* Equivalent to replace(f,Q(T)) */
 void replace_Q(value f, type T)
 	{
-	drop(f->L);
-	drop(f->R);
-
+	clear(f);
 	f->T = T;
 	f->L = 0;
 	f->R = 0;
@@ -160,9 +162,7 @@ void replace_Q(value f, type T)
 /* Equivalent to replace(f,D(T,data,destroy)) */
 void replace_D(value f, type T, void *data, type destroy)
 	{
-	drop(f->L);
-	drop(f->R);
-
+	clear(f);
 	f->T = T;
 	f->L = 0;
 	f->R = V(destroy,0,data);
@@ -171,9 +171,7 @@ void replace_D(value f, type T, void *data, type destroy)
 /* Equivalent to replace(f,A(x,y)) */
 void replace_A(value f, value x, value y)
 	{
-	drop(f->L);
-	drop(f->R);
-
+	clear(f);
 	f->T = type_A;
 	f->L = x;
 	f->R = y;
