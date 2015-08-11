@@ -1,24 +1,5 @@
-#
-
-\append==(\xs\ys xs ys \x\xs [x; append xs ys])
-\fold==(\fn\z\xs xs z \x\xs \z=(fn z x) fold fn z xs)
-\map==(\f\xs xs [] \x\xs [(f x); map f xs])
-
-\list_sum=(fold + 0)
-\list_length=(fold (\n\_ + 1 n) 0)
-
-# Return the first n items of a list.
-\first==
-	(\n\xs
-	le n 0 [];
-	xs [] \x\xs
-	\n=(- n 1)
-	\xs=(first n xs)
-	[x;xs]
-	)
-
-\pi=3.14159265358979
-\tau=(* 2 pi)
+\=(use "test/lib.fxl")
+\=(use "test/common.fxl")
 
 # Normal distribution with mean 0 and standard deviation 1.
 \rand_normal=
@@ -33,53 +14,6 @@
 (
 \fund_list_ror
 \benchmark_list_ror
-
-# Repeat string x n times
-\repeat==
-	(\x\n
-	le n 0 "";
-	. x; repeat x (- n 1)
-	)
-
-# Split string x into groups of three with the given separator.
-\split3==
-	(\sep\x
-	\len=(length x)
-	le len 3 x
-	\pos=(- len 3)
-	\prefix=(slice x 0 pos)
-	\suffix=(slice x pos 3)
-	. (split3 sep prefix) (. sep suffix)
-	)
-
-# Format number x to n decimal places, with an optional separator for the
-# integer part.
-\format=
-	(\n\sep\x
-	# Get the list of all digits without the decimal point.
-	\factor=(^ 10 n)
-	\digits=(num_str; round; * factor (abs x))
-
-	# Pad 0s on the front as needed.
-	\pad=(repeat "0" (+ 1 (- n (length digits))))
-	\digits=(. pad digits)
-
-	# Extract integer and fractional part.
-	\pos=(- (length digits) n)
-	\xi=(slice digits 0 pos)
-	\xf=(slice digits pos n)
-
-	# Insert separator if desired.
-	\xi=(eq sep "" xi (split3 sep xi))
-
-	# Put a "." in front of any fractional part.
-	\xf=(eq xf "" "" (. "." xf))
-	# Determine the sign of result.
-	\sign=(lt x 0 "-" "")
-
-	\result=(. sign; . xi xf)
-	result
-	)
 
 \list_sub==
 	(\xs\ys
@@ -135,8 +69,8 @@
 # Sharpe Ratio of Fund vs. Benchmark Return
 \excess_sharpe=(list_sharpe excess_list_ror)
 
-\put_sharpe=(\sharpe put (format 4 "" sharpe))
-\put_ror=(\ror put (format 4 "" ror) put "%")
+\put_sharpe=(\sharpe put (format_num 4 "" sharpe))
+\put_ror=(\ror put (format_num 4 "" ror) put "%")
 \p=(say "<p>")
 
 (

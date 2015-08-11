@@ -1,0 +1,106 @@
+# Demonstrate the use of vars to maintain an evolving state.
+\=(use "test/lib.fxl")
+\=(use "test/common.fxl")
+
+## Here is the "API".
+
+var_new \v_list
+var_new \v_count
+var_new \v_map
+
+var_put v_list []
+var_put v_count 0
+var_put v_map void
+
+\update=
+	(\v\f
+	var_get v \x
+	? (f x) \y
+	var_put v y
+	)
+
+\push=
+	(\v\x
+	update v (cons x)
+	)
+
+\get_pairs=(var_get v_list)
+\get_count=(var_get v_count)
+
+\update_map=
+	(\v\key\val
+	update v
+		(\map
+		\x
+		eq x key val;
+		map x
+		)
+	)
+
+\add=
+	(\v\n
+	update v
+		(\x
+		\y=(+ n x)
+		say ["  add: " x " => " y]
+		y
+		)
+	)
+
+\set=
+	(\key\val
+	say ["set " key " = " val]
+	push v_list {key val}
+	add v_count 1
+	update_map v_map key val
+	)
+
+\get=
+	(\key
+	var_get v_map \map
+	{(map key)}
+	)
+
+## Now do some operations.
+
+\show_pairs=
+(
+\show_pair=(\pair pair \key\val say ["{ " key " " val " }"])
+get_pairs \list
+say "["
+each list show_pair
+say "]"
+)
+
+\show=
+	(\key
+	get key \val
+	say ["get " key " = " val]
+	)
+
+(
+\set_xyz=
+(
+set "x" "3"
+set "y" "4"
+set "z" "5"
+)
+
+\set_q=
+(
+set "q" "0"
+)
+
+set_xyz
+set_xyz
+set_q
+show_pairs
+get_count \count
+say ["count = " count]
+show "x"
+show "y"
+show "z"
+show "q"
+show "r"
+say "bye"
+)

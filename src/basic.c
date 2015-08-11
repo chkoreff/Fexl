@@ -43,6 +43,14 @@ value type_Y(value f)
 	return f;
 	}
 
+/* (? x f) = (f v), where v is the value of x. */
+value type_query(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	replace_A(f, hold(f->R), eval(hold(f->L->R)));
+	return f;
+	}
+
 /* (once x) = x, but x is evaluated only once. */
 value type_once(value f)
 	{

@@ -1,0 +1,7 @@
+# Routines shared by test programs
+\div=(say "==")
+\show_list=(\xs say "[" (each xs say) say "]")
+
+def "div" div;
+def "show_list" show_list;
+void

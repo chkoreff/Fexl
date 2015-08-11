@@ -4,11 +4,9 @@
 #include <num.h>
 #include <report.h>
 #include <str.h>
-#include <string.h> /* strcmp */
 #include <type_num.h>
-#include <type_resolve.h>
-#include <type_str.h>
 #include <type_sym.h>
+#include <type_resolve.h>
 
 /* Resolve an individual symbol with the context. */
 static value resolve_symbol(value x, value context)
@@ -92,38 +90,6 @@ value type_resolve(value f)
 	replace(f, resolve(hold(f->L->R), hold(f->R)));
 
 	source_label = save;
-	return f;
-	}
-	}
-
-/* These help with simple contexts like type_standard. */
-
-static const char *cur_name;
-
-int match(const char *other)
-	{
-	return strcmp(cur_name,other) == 0;
-	}
-
-value simple_context(value f, value context(void))
-	{
-	if (!f->L) return 0;
-	{
-	value x = eval(hold(f->R));
-	if (x->T == type_str)
-		{
-		cur_name = ((string)data(x))->data;
-		{
-		value def = context();
-		if (def)
-			f = single(def);
-		else
-			replace_void(f);
-		}
-		}
-	else
-		replace_void(f);
-	drop(x);
 	return f;
 	}
 	}

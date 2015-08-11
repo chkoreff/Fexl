@@ -1,4 +1,7 @@
 #
+\=(use "test/lib.fxl")
+\=(use "test/common.fxl")
+
 \show=
 	(\x
 	\type=(\t put [t " "] say x)
@@ -13,9 +16,6 @@
 \eval_str=(\str parse_string str standard I)
 
 \div=(say "==")
-
-# Do fn for each item in list xs.
-\each==(\xs\fn xs () \x\xs fn x each xs fn)
 
 (
 \ping=(say "ping")
@@ -201,26 +201,6 @@ get
 put "tuvwxyz"
 get
 
-# Flatten a piece of data (string, number, or list) into a string.
-\flatten=
-	(\x
-	buf_new \buf
-	\put=(buf_put buf)
-	\flatten==
-		(\x
-		is_str x (put x);
-		is_num x (put (num_str x));
-		is_list x
-			(
-			x () \x\xs
-			flatten x
-			flatten xs
-			);
-		)
-	flatten x
-	buf_get buf I
-	)
-
 say (flatten [["ab" "c "] [[] [] ""] [2.3 " " -3.8] " defg"])
 )
 
@@ -387,6 +367,7 @@ say ["x = " x]
 ~END
 
 div
+
 # This demonstrates that (\x f x) is not strictly equivalent to f, when side
 # effects are taken into account.
 \say_x=(\x put "x = " say x)
@@ -394,50 +375,32 @@ say_x 3
 say_x 4
 say_x 5
 
-div
+(
+# Here we extend the standard context to include the "show" routine so the
+# test code below the "use" can run.  I could have just moved the test code
+# above the use, but I wanted to test "extend" explicitly here.
+\=
+(
+extend;
+def "show" show;
+void
+)
 
-# Run function f for each value in the range x through y.
-\do_range=
-	(\x\y\f
-	\x=(round x)
-	\y=(round y)
-	\d=(le x y 1 -1)
-	\loop==
-		(\x
-		f x
-		eq x y ();
-		\x=(+ x d)
-		loop x
-		)
-	loop x
+\=(use "test/misc.fxl")
+
+(
+show "x"
+show (+ 2 3)
+show (is_good; standard "show")
+# Demonstrate that the standard context points directly to itself.
+show (is_good;
+	standard "standard" \standard
+	standard "standard" \standard
+	standard "show"
 	)
-
-# (fib n) returns the nth Fibonacci number starting at 0.
-\fib=
-	(
-	\loop==
-		(\x\y\n
-		le n 0 x;
-		\z=(+ x y)
-		\n=(- n 1)
-		loop y z n
-		)
-	loop 0 1
-	)
-
-\try=
-	(\x\y
-	do_range x y \n
-	put "fib " put n put " = " say (fib n)
-	)
-
-try 0 8
-div
-try 8 0
-div
-try 30 30
-div
-try 11.2 20.5
+)
+try_fib
+)
 
 div
 (
@@ -536,16 +499,6 @@ say (length "abc")
 say (length (. "ab" "c"))
 
 div
-
-# Return the first n items of a list.
-\first==
-	(\n\xs
-	le n 0 [];
-	xs [] \x\xs
-	[x;first (- n 1) xs]
-	)
-
-\show_list=(\xs say "[" (each xs say) say "]")
 
 show_list (null)
 show_list [1 2]
@@ -648,8 +601,6 @@ try ["a""b""c""d""e""f""g"] {1 2 3 4 5 6 7}
 )
 
 div
-\append==(\xs\ys xs ys \x\xs [x; append xs ys])
-
 \NL="
 "
 
@@ -819,12 +770,16 @@ test_file
 \test_var=
 (
 # In this test I created a little "assembly language" where I hide all the var
-# operations in one place: a function named "!" which creates a read and write
-# pair.  I didn't have to do this, but it was kind of fun.
+# operations in one place.
+
+# Define var_put to force evaluation before storing.
+\var_put=(\v\x ? x \x var_put v x)
+
+# The "!" function creates a read and write pair.
+\!=(var_new \v {(var_get v) (var_put v)})
+
 \fib=
 	(\max
-	\!=(var_new \v {(var_get v) (var_put v)})
-
 	say ["The first " max " Fibonacci numbers:"]
 
 	! \n?\n:
@@ -852,6 +807,14 @@ fib 5
 )
 
 test_var
+
+div
+say (argv 0)
+say (argv 1)
+say (argv 2)
+
+div
+eval_file "test/var.fxl"
 
 \\
 Extra stuff not parsed.

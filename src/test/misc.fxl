@@ -1,0 +1,36 @@
+# I put this code in a separate file to test multiple use calls.
+
+# (fib n) returns the nth Fibonacci number starting at 0.
+# LATER You could handle fib for negative n too:
+# (fib n) = (+ (fib; + n 2) (fib; + n 1))  # if n < 0
+\fib=
+	(
+	\loop==
+		(\x\y\n
+		le n 0 x;
+		loop y (+ x y) (- n 1)
+		)
+	loop 0 1
+	)
+
+\try_fib=
+(
+div
+
+\try=
+	(\x\y
+	do_range x y \n
+	put "fib " put n put " = " say (fib n)
+	)
+
+try 0 8
+div
+try 8 0
+div
+try 30 30
+div
+try 11.2 20.5
+)
+
+def "try_fib" try_fib;
+void

@@ -1,13 +1,12 @@
+#
+\=(use "test/lib.fxl")
+\=(use "test/common.fxl")
+
 # Here we use a highly restricted context which provides only the few functions
 # we need to test sorting.  I don't have to do it this way, but I'm exercising
 # the context mechanism.
 \=
 (
-\append==(\xs\ys xs ys \x\xs [x;append xs ys])
-
-# (filter f xs) is the list of items x in xs for which (f x) is true.
-\filter==(\f\xs xs [] \x\xs f x (cons x) (); filter f xs)
-
 # (unique xs) is the ordered list of unique elements in list xs.
 \unique==
 	(\xs
@@ -33,16 +32,13 @@
 	tower (- n 1) f (f x)
 	)
 
-# (each xs fn) Do fn to each item in list xs.
-\each==(\xs\fn xs () \x\xs fn x each xs fn)
-
-\x
-eq x "append" {append};
-eq x "say" {say};
-eq x "sort" {sort};
-eq x "tower" {tower};
-eq x "each" {each};
-eq x "unique" {unique};
+def "append" append;
+def "each" each;
+def "say" say;
+def "show_list" show_list;
+def "sort" sort;
+def "tower" tower;
+def "unique" unique;
 void
 )
 
@@ -105,10 +101,7 @@ void
 # (exp_list n xs) Make 2^n copies of list xs.
 \exp_list=(\n\xs tower n (\x append x x) xs)
 
-# Show all the entries of a list on separate lines.
-\show=(\xs each xs say)
-# Wrap the show inside matching brackets.
-\show=(\xs say "[" show xs say "]")
+\show=show_list
 
 # Make two copies of the list and sort it.
 show (sort; exp_list 1 list)

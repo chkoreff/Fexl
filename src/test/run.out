@@ -281,6 +281,10 @@ x = 81
 x = 3
 x = 4
 x = 5
+str x
+num 5
+bool T
+bool T
 ==
 fib 0 = 0
 fib 1 = 1
@@ -778,6 +782,41 @@ The first 5 Fibonacci numbers:
 2
 3
 5
+==
+../bin/fexl
+test/a1.fxl
+
+==
+set x = 3
+  add: 0 => 1
+set y = 4
+  add: 1 => 2
+set z = 5
+  add: 2 => 3
+set x = 3
+  add: 3 => 4
+set y = 4
+  add: 4 => 5
+set z = 5
+  add: 5 => 6
+set q = 0
+  add: 6 => 7
+[
+{ q 0 }
+{ z 5 }
+{ y 4 }
+{ x 3 }
+{ z 5 }
+{ y 4 }
+{ x 3 }
+]
+count = 7
+get x = 3
+get y = 4
+get z = 5
+get q = 0
+get r = 
+bye
 exit 0
 ====
 Hello

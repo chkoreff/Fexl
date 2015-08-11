@@ -1,4 +1,6 @@
 # https://en.wikipedia.org/wiki/Hofstadter_sequence#Hofstadter_Female_and_Male_sequences
+\=(use "test/lib.fxl")
+\=(use "test/common.fxl")
 
 \start=
 	(\base\other
@@ -22,22 +24,6 @@
 
 \female=(create 1)
 \male=(create 0)
-
-# Run function f for each value in the range x through y.
-\do_range=
-	(\x\y\f
-	\x=(round x)
-	\y=(round y)
-	\d=(le x y 1 -1)
-	\loop==
-		(\x
-		f x
-		eq x y ();
-		\x=(+ x d)
-		loop x
-		)
-	loop x
-	)
 
 \max=35
 

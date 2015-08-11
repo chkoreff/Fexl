@@ -1,17 +1,16 @@
 #
+\=(use "test/lib.fxl")
 \suffix=(\n eq n 1 "" "s")
-\sing_count=(\n put [n " " "bottle" (suffix n) " of beer"])
-\sing_line1=(\n sing_count n say " on the wall")
-\sing_line2=(\n sing_count n nl)
-\sing==
+\bottles_of_beer=(\n put [n " " "bottle" (suffix n) " of beer"])
+\on_the_wall=(say " on the wall")
+
+\sing=
 	(\n
-	le n 0 ();
-	sing_line1 n
-	sing_line2 n
+	do_range n 1 \n
+	bottles_of_beer n on_the_wall
+	bottles_of_beer n nl
 	say "Take one down, pass it around"
 	\n=(- n 1)
-	sing_line1 n
-	nl
-	sing n
+	bottles_of_beer n on_the_wall nl
 	)
 sing 3

@@ -12,9 +12,7 @@ make output
 make parse
 make pattern
 make report
-make standard
 make str
-make top
 make type_buf
 make type_cmp
 make type_file

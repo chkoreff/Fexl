@@ -1,0 +1,182 @@
+#
+# Append lists xs and ys.
+\append==(\xs\ys xs ys \x\xs [x; append xs ys])
+
+# Do fn for each item in list xs.
+\each==(\xs\fn xs () \x\xs fn x each xs fn)
+
+# Apply f to each element in list xs.
+\map==(\f\xs xs [] \x\xs [(f x); map f xs])
+
+# (filter f xs) is the list of items x in xs for which (f x) is true.
+\filter==(\f\xs xs [] \x\xs f x (cons x) (); filter f xs)
+
+# Using function fn and starting value z, run the function forward for each
+# element in the list.
+\fold==(\fn\z\xs xs z \x\xs \z=(fn z x) fold fn z xs)
+
+# Return the first n items of a list.
+\first==
+	(\n\xs
+	le n 0 [];
+	xs [] \x\xs
+	[x;first (- n 1) xs]
+	)
+
+\list_sum=(fold + 0)
+\list_length=(fold (\n\_ + 1 n) 0)
+
+\mod=(\x\n - x; * n; trunc; / x n)
+
+\pi=3.14159265358979
+\tau=(* 2 pi)
+
+# (check x y) = x if x is good, otherwise y.
+\check=(\x\y is_good x x y)
+
+# Run function f for each value in the range x through y.
+\do_range=
+	(\x\y\f
+	\x=(round x)
+	\y=(round y)
+	\d=(le x y 1 -1)
+	\loop==
+		(\x
+		f x
+		eq x y ();
+		loop (+ x d)
+		)
+	loop x
+	)
+
+# Flatten a piece of data (string, number, or list) into a string.
+\flatten=
+	(\x
+	buf_new \buf
+	\put=(buf_put buf)
+	\flatten==
+		(\x
+		is_str x (put x);
+		is_num x (put (num_str x));
+		is_list x
+			(
+			x () \x\xs
+			flatten x
+			flatten xs
+			);
+		)
+	flatten x
+	buf_get buf I
+	)
+
+\format_num=
+(
+# Repeat string x n times
+\repeat_str==
+	(\x\n
+	le n 0 "";
+	. x; repeat_str x (- n 1)
+	)
+
+# Split string x into groups of three with the given separator.
+\split3==
+	(\sep\x
+	\len=(length x)
+	le len 3 x
+	\pos=(- len 3)
+	\prefix=(slice x 0 pos)
+	\suffix=(slice x pos 3)
+	. (split3 sep prefix) (. sep suffix)
+	)
+
+# Format number x to n decimal places, with an optional separator for the
+# integer part.
+\format_num=
+	(\n\sep\x
+	# Get the list of all digits without the decimal point.
+	\factor=(^ 10 n)
+	\digits=(num_str; round; * factor (abs x))
+
+	# Pad 0s on the front as needed.
+	\pad=(repeat_str "0" (+ 1 (- n (length digits))))
+	\digits=(. pad digits)
+
+	# Extract integer and fractional part.
+	\pos=(- (length digits) n)
+	\xi=(slice digits 0 pos)
+	\xf=(slice digits pos n)
+
+	# Insert separator if desired.
+	\xi=(eq sep "" xi (split3 sep xi))
+
+	# Put a "." in front of any fractional part.
+	\xf=(eq xf "" "" (. "." xf))
+	# Determine the sign of result.
+	\sign=(lt x 0 "-" "")
+
+	\result=(. sign; . xi xf)
+	result
+	)
+format_num
+)
+
+## Context operations
+
+# Take a context cx and return a new context where key is defined as val.
+\def=
+	(\key\val\cx
+	\x
+	eq x key {val};
+	cx x
+	)
+
+# Overlay context cx_new on top of context cx_old.
+\chain=
+	(\cx_new\cx_old
+	\x
+	check (cx_new x);
+	cx_old x
+	)
+
+# (extend cx) Takes the context cx and returns an extended context where all of
+# cx is defined, but also the special functions "extend", "standard", and "use"
+# are redefined to refer to the extended context instead of the original
+# context.
+\extend==
+	(\cx
+	@\standard
+
+	\extend=(\cx extend; chain cx; standard)
+
+	\use=
+		(\file
+		\cx=(once; parse_file file standard I)
+		extend cx
+		)
+
+	def "extend" extend;
+	def "standard" standard;
+	def "use" use;
+	cx
+	)
+
+extend;
+def "append" append;
+def "chain" chain;
+def "check" check;
+def "def" def;
+def "do_range" do_range;
+def "each" each;
+def "extend" extend;
+def "filter" filter;
+def "first" first;
+def "flatten" flatten;
+def "fold" fold;
+def "format_num" format_num;
+def "list_length" list_length;
+def "list_sum" list_sum;
+def "map" map;
+def "mod" mod;
+def "pi" pi;
+def "tau" tau;
+standard
