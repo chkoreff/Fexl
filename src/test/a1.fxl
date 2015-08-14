@@ -816,5 +816,23 @@ say (argv 2)
 div
 eval_file "test/var.fxl"
 
+# Test eager evaluation.
+(
+(
+div
+\x=(put "x=" 3)   # normal definition
+say x
+say x
+say x
+)
+(
+div
+? (put "x=" 3) \x  # eager evaluation
+say x
+say x
+say x
+)
+)
+
 \\
 Extra stuff not parsed.

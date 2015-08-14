@@ -817,6 +817,14 @@ get z = 5
 get q = 0
 get r = 
 bye
+==
+x=3
+x=3
+x=3
+==
+x=3
+3
+3
 exit 0
 ====
 Hello
