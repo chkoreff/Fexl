@@ -15,7 +15,7 @@
 \fund_list_ror
 \benchmark_list_ror
 
-\list_sub==
+\list_sub=\
 	(\xs\ys
 	xs [] \x\xs
 	ys [] \y\ys
@@ -191,7 +191,7 @@ put_sharpe excess_sharpe nl
 ]
 
 make_rand_ror 1.4 6.0 \rand_ror
-\list_rand_ror==(once; rand_ror \x [x;list_rand_ror])
+\list_rand_ror=\(once; rand_ror \x [x;list_rand_ror])
 
 seed_rand 0.1964
 \len=(list_length benchmark_list_ror)
@@ -200,7 +200,7 @@ seed_rand 0.1964
 \show_returns=
 	(
 	\xs\ys
-	\show_lists==
+	\show_lists=\
 		(\xs\ys
 		xs () \x\xs
 		ys () \y\ys

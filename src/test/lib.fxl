@@ -1,22 +1,22 @@
 #
 # Append lists xs and ys.
-\append==(\xs\ys xs ys \x\xs [x; append xs ys])
+\append=\(\xs\ys xs ys \x\xs [x; append xs ys])
 
 # Do fn for each item in list xs.
-\each==(\xs\fn xs () \x\xs fn x each xs fn)
+\each=\(\xs\fn xs () \x\xs fn x each xs fn)
 
 # Apply f to each element in list xs.
-\map==(\f\xs xs [] \x\xs [(f x); map f xs])
+\map=\(\f\xs xs [] \x\xs [(f x); map f xs])
 
 # (filter f xs) is the list of items x in xs for which (f x) is true.
-\filter==(\f\xs xs [] \x\xs f x (cons x) (); filter f xs)
+\filter=\(\f\xs xs [] \x\xs f x (cons x) (); filter f xs)
 
 # Using function fn and starting value z, run the function forward for each
 # element in the list.
-\fold==(\fn\z\xs xs z \x\xs \z=(fn z x) fold fn z xs)
+\fold=\(\fn\z\xs xs z \x\xs \z=(fn z x) fold fn z xs)
 
 # Return the first n items of a list.
-\first==
+\first=\
 	(\n\xs
 	le n 0 [];
 	xs [] \x\xs
@@ -40,7 +40,7 @@
 	\x=(round x)
 	\y=(round y)
 	\d=(le x y 1 -1)
-	\loop==
+	\loop=\
 		(\x
 		f x
 		eq x y ();
@@ -54,7 +54,7 @@
 	(\x
 	buf_new \buf
 	\put=(buf_put buf)
-	\flatten==
+	\flatten=\
 		(\x
 		is_str x (put x);
 		is_num x (put (num_str x));
@@ -72,14 +72,14 @@
 \format_num=
 (
 # Repeat string x n times
-\repeat_str==
+\repeat_str=\
 	(\x\n
 	le n 0 "";
 	. x; repeat_str x (- n 1)
 	)
 
 # Split string x into groups of three with the given separator.
-\split3==
+\split3=\
 	(\sep\x
 	\len=(length x)
 	le len 3 x
@@ -142,7 +142,7 @@ format_num
 # cx is defined, but also the special functions "extend", "standard", and "use"
 # are redefined to refer to the extended context instead of the original
 # context.
-\extend==
+\extend=\
 	(\cx
 	@\standard
 

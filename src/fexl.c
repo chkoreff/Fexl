@@ -34,7 +34,6 @@ static value standard(void)
 	if (match("@")) return Q(type_Y);
 	if (match("*")) return Q(type_mul);
 	if (match("+")) return Q(type_add);
-	if (match("?")) return Q(type_query);
 	if (match("abs")) return Q(type_abs);
 	if (match("argv")) return Q(type_argv);
 	if (match("buf_get")) return Q(type_buf_get);

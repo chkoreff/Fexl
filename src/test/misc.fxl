@@ -5,7 +5,7 @@
 # (fib n) = (+ (fib; + n 2) (fib; + n 1))  # if n < 0
 \fib=
 	(
-	\loop==
+	\loop=\
 		(\x\y\n
 		le n 0 x;
 		loop y (+ x y) (- n 1)

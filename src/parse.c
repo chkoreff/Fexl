@@ -19,6 +19,7 @@ exp    => ';' exp
 exp    => \ sym exp
 exp    => \ sym '=' term exp
 exp    => \ sym '==' term exp
+exp    => \ sym '=\' term exp
 exp    => \ '=' term exp
 
 term   => '(' exp ')'
@@ -322,6 +323,7 @@ static value parse_lambda(unsigned long first_line)
 	{
 	/* Parse the optional definition of the symbol. */
 	value def = 0;
+	char is_eager = 0;
 	{
 	char is_recursive = 0;
 	skip_filler();
@@ -329,9 +331,14 @@ static value parse_lambda(unsigned long first_line)
 	if (ch == '=')
 		{
 		skip();
-		if (ch == '=')
+		if (ch == '\\')
 			{
 			is_recursive = 1;
+			skip();
+			}
+		else if (ch == '=')
+			{
+			is_eager = 1;
 			skip();
 			}
 		skip_filler();
@@ -348,7 +355,12 @@ static value parse_lambda(unsigned long first_line)
 	{
 	value exp = lam(sym,parse_exp());
 	if (def)
-		exp = app(exp,def);
+		{
+		if (is_eager)
+			exp = app(app(Q(type_query),def),exp);
+		else
+			exp = app(exp,def);
+		}
 	return exp;
 	}
 	}
