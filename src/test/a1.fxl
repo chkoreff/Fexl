@@ -15,8 +15,6 @@
 \eval_file=(\name parse_file name standard I)
 \eval_str=(\str parse_string str standard I)
 
-\div=(say "==")
-
 (
 \ping=(say "ping")
 div
