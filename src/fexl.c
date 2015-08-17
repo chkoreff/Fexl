@@ -115,22 +115,17 @@ static value type_standard(value f)
 	{
 	if (!f->L) return 0;
 	{
-	value x = eval(hold(f->R));
+	value x = arg(f->R);
 	if (x->T == type_str)
 		{
+		value def;
 		cur_name = ((string)data(x))->data;
-		{
-		value def = standard();
+		def = standard();
 		if (def)
-			f = single(def);
-		else
-			replace_void(f);
+			return single(def);
 		}
-		}
-	else
-		replace_void(f);
-	drop(x);
-	return f;
+	reduce_void(f);
+	return 0;
 	}
 	}
 
@@ -154,16 +149,15 @@ static value type_use(value f)
 	{
 	if (!f->L) return 0;
 	{
-	value x = eval(hold(f->R));
+	value x = arg(f->R);
 	if (x->T == type_str)
 		{
 		string name = data(x);
-		replace(f,eval_file(name->data));
+		reduce(f,eval_file(name->data));
+		return f;
 		}
-	else
-		replace_void(f);
-	drop(x);
-	return f;
+	reduce_void(f);
+	return 0;
 	}
 	}
 

@@ -12,7 +12,7 @@
 
 static void putv(value x)
 	{
-	x = eval(hold(x));
+	x = arg(x);
 	while (1)
 		{
 		if (x->T == type_str)
@@ -27,14 +27,9 @@ static void putv(value x)
 			{
 			putv(x->L->R);
 			/* Eliminated tail recursive call putv(x->R) here. */
-			{
-			value y = eval(hold(x->R));
-			drop(x);
-			x = y;
+			x = arg(x->R);
 			continue;
 			}
-			}
-		drop(x);
 		return;
 		}
 	}
@@ -65,22 +60,18 @@ value type_fput(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	{
-	value x = eval(hold(f->L->R));
-	value y = hold(f->R);
+	value x = arg(f->L->R);
 	if (x->T == type_file)
 		{
 		FILE *fh = data(x);
 		int save_cur_out = cur_out;
 		cur_out = fileno(fh);
-		putv(y);
+		putv(f->R);
 		cur_out = save_cur_out;
-		f = Q(type_I);
+		return Q(type_I);
 		}
-	else
-		replace_void(f);
-	drop(x);
-	drop(y);
-	return f;
+	reduce_void(f);
+	return 0;
 	}
 	}
 
@@ -103,16 +94,14 @@ value type_fflush(value f)
 	{
 	if (!f->L) return 0;
 	{
-	value x = eval(hold(f->R));
+	value x = arg(f->R);
 	if (x->T == type_file)
 		{
 		FILE *fh = data(x);
 		fsync(fileno(fh));
-		f = Q(type_I);
+		return Q(type_I);
 		}
-	else
-		replace_void(f);
-	drop(x);
-	return f;
+	reduce_void(f);
+	return 0;
 	}
 	}

@@ -818,13 +818,15 @@ get q = 0
 get r = 
 bye
 ==
-x=3
-x=3
-x=3
+()x=3
+3
+3
 ==
-x=3
+(x=)3
 3
 3
+==
+hi
 exit 0
 ====
 Hello

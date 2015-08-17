@@ -14,6 +14,6 @@ extern value type_is_good(value f);
 extern value type_is_bool(value f);
 extern value type_is_list(value f);
 extern value op_is_type(value f, type t);
-extern void replace_void(value f);
-extern void replace_boolean(value f, int x);
+extern void reduce_void(value f);
+extern void reduce_boolean(value f, int x);
 extern value single(value x);

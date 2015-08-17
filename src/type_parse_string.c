@@ -37,18 +37,15 @@ value type_parse_string(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	{
-	value x = eval(hold(f->L->R));
+	value x = arg(f->L->R);
 	if (x->T == type_str)
 		{
 		value exp = parse_string(data(x));
-		f = single(
+		return single(
 			A(A(A(Q(type_resolve), Qstr(str_new_data0(""))), exp), hold(f->R))
 			);
 		}
-	else
-		replace_void(f);
-
-	drop(x);
-	return f;
+	reduce_void(f);
+	return 0;
 	}
 	}

@@ -818,17 +818,28 @@ eval_file "test/var.fxl"
 (
 (
 div
+put "("
 \x=(put "x=" 3)   # normal definition
+put ")"
 say x
 say x
 say x
 )
 (
 div
+put "("
 \x==(put "x=" 3)  # eager evaluation
+put ")"
 say x
 say x
 say x
+)
+(
+div
+\thing=(say "hi" 3)
+\x==thing
+\x==thing
+\x==thing
 )
 )
 

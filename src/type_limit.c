@@ -26,16 +26,14 @@ static value op_set_limit(value f, int resource, const char *label)
 	{
 	if (!f->L) return 0;
 	{
-	value x = eval(hold(f->R));
+	value x = arg(f->R);
 	if (x->T == type_num)
 		{
 		set_limit(resource,label,data(x));
-		f = Q(type_I);
+		return Q(type_I);
 		}
-	else
-		replace_void(f);
-	drop(x);
-	return f;
+	reduce_void(f);
+	return 0;
 	}
 	}
 

@@ -43,17 +43,14 @@ value type_parse_file(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	{
-	value x = eval(hold(f->L->R));
+	value x = arg(f->L->R);
 	if (x->T == type_str)
 		{
 		string name = data(x);
 		value exp = parse_file(name->data);
-		f = single(A(A(A(Q(type_resolve), hold(x)), exp), hold(f->R)));
+		return single(A(A(A(Q(type_resolve), hold(x)), exp), hold(f->R)));
 		}
-	else
-		replace_void(f);
-
-	drop(x);
-	return f;
+	reduce_void(f);
+	return 0;
 	}
 	}

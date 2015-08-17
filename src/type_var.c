@@ -18,18 +18,16 @@ value type_var_new(value f)
 	return single(D(type_var,Q(type_void),(type)drop));
 	}
 
-/* (var_get var) returns {val}, where val is the current value of x. */
+/* (var_get var) returns {val}, where val is the current value of var. */
 value type_var_get(value f)
 	{
 	if (!f->L) return 0;
 	{
-	value x = eval(hold(f->R));
+	value x = arg(f->R);
 	if (x->T == type_var)
-		f = single(hold(data(x)));
-	else
-		replace_void(f);
-	drop(x);
-	return f;
+		return single(hold(data(x)));
+	reduce_void(f);
+	return 0;
 	}
 	}
 
@@ -38,18 +36,14 @@ value type_var_put(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	{
-	value x = eval(hold(f->L->R));
-	value y = hold(f->R);
+	value x = arg(f->L->R);
 	if (x->T == type_var)
 		{
 		drop(x->R->R);
-		x->R->R = hold(y);
-		f = Q(type_I);
+		x->R->R = hold(f->R);
+		return Q(type_I);
 		}
-	else
-		replace_void(f);
-	drop(x);
-	drop(y);
-	return f;
+	reduce_void(f);
+	return 0;
 	}
 	}

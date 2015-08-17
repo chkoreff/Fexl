@@ -10,16 +10,14 @@ static value op_cmp(value f, int op(int))
 	{
 	if (!f->L || !f->L->L) return 0;
 	{
-	value x = eval(hold(f->L->R));
-	value y = eval(hold(f->R));
+	value x = arg(f->L->R);
+	value y = arg(f->R);
 	if (x->T == type_num && y->T == type_num)
-		replace_boolean(f, op(num_cmp(data(x),data(y))));
+		reduce_boolean(f, op(num_cmp(data(x),data(y))));
 	else if (x->T == type_str && y->T == type_str)
-		replace_boolean(f, op(str_cmp(data(x),data(y))));
+		reduce_boolean(f, op(str_cmp(data(x),data(y))));
 	else
-		replace_void(f);
-	drop(x);
-	drop(y);
+		reduce_void(f);
 	return 0;
 	}
 	}

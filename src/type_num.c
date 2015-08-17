@@ -28,21 +28,20 @@ value Qnum_str0(const char *name)
 	return 0;
 	}
 
-void replace_num(value f, number x)
+void reduce_num(value f, number x)
 	{
-	replace_D(f,type_num,x,(type)num_free);
+	reduce_D(f,type_num,x,(type)num_free);
 	}
 
 value type_num_str(value f)
 	{
 	if (!f->L) return 0;
 	{
-	value x = eval(hold(f->R));
+	value x = arg(f->R);
 	if (x->T == type_num)
-		replace_str(f, num_str(data(x)));
+		reduce_str(f, num_str(data(x)));
 	else
-		replace_void(f);
-	drop(x);
+		reduce_void(f);
 	return 0;
 	}
 	}

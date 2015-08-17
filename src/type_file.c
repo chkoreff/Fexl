@@ -27,28 +27,23 @@ value Qfile(FILE *fh)
 	return D(type_file,fh,(type)file_free);
 	}
 
-/* (fopen path mode) Open a file and return {fh}, or void if not possible. */
+/* (fopen path mode) Open a file and return {fh}, where fh is the open file
+handle or void on failure. */
 value type_fopen(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	{
-	value x = eval(hold(f->L->R));
-	value y = eval(hold(f->R));
+	value x = arg(f->L->R);
+	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_str)
 		{
 		string path = data(x);
 		string mode = data(y);
 		FILE *fh = fopen(path->data,mode->data);
-		if (fh)
-			f = single(Qfile(fh));
-		else
-			f = Q(type_void);
+		return single(fh ? Qfile(fh) : Q(type_void));
 		}
-	else
-		replace_void(f);
-	drop(x);
-	drop(y);
-	return f;
+	reduce_void(f);
+	return 0;
 	}
 	}
 
@@ -58,17 +53,15 @@ value type_remove(value f)
 	{
 	if (!f->L) return 0;
 	{
-	value x = eval(hold(f->R));
+	value x = arg(f->R);
 	if (x->T == type_str)
 		{
 		string path = data(x);
 		int code = remove(path->data);
-		f = single(Qnum0(code));
+		return single(Qnum0(code));
 		}
-	else
-		replace_void(f);
-	drop(x);
-	return f;
+	reduce_void(f);
+	return 0;
 	}
 	}
 
@@ -76,7 +69,7 @@ static value op_flock(value f, int operation)
 	{
 	if (!f->L) return 0;
 	{
-	value x = eval(hold(f->R));
+	value x = arg(f->R);
 	if (x->T == type_file)
 		{
 		FILE *fh = data(x);
@@ -86,12 +79,10 @@ static value op_flock(value f, int operation)
 			perror("flock");
 			die(0);
 			}
-		f = Q(type_I);
+		return Q(type_I);
 		}
-	else
-		replace_void(f);
-	drop(x);
-	return f;
+	reduce_void(f);
+	return 0;
 	}
 	}
 

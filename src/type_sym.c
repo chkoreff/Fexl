@@ -87,6 +87,6 @@ value lam(value sym, value exp)
 value type_subst(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
-	replace(f,subst(f->L->L->R,f->L->R,f->R));
+	reduce(f,subst(f->L->L->R,f->L->R,f->R));
 	return f;
 	}

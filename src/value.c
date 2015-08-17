@@ -136,7 +136,7 @@ value A(value x, value y)
 	}
 
 /* Replace the content of f with the content of g. */
-void replace(value f, value g)
+void reduce(value f, value g)
 	{
 	clear(f);
 
@@ -150,8 +150,8 @@ void replace(value f, value g)
 	drop(g);
 	}
 
-/* Equivalent to replace(f,Q(T)) */
-void replace_Q(value f, type T)
+/* Equivalent to reduce(f,Q(T)) */
+void reduce_Q(value f, type T)
 	{
 	clear(f);
 	f->T = T;
@@ -159,8 +159,8 @@ void replace_Q(value f, type T)
 	f->R = 0;
 	}
 
-/* Equivalent to replace(f,D(T,data,destroy)) */
-void replace_D(value f, type T, void *data, type destroy)
+/* Equivalent to reduce(f,D(T,data,destroy)) */
+void reduce_D(value f, type T, void *data, type destroy)
 	{
 	clear(f);
 	f->T = T;
@@ -168,8 +168,8 @@ void replace_D(value f, type T, void *data, type destroy)
 	f->R = V(destroy,0,data);
 	}
 
-/* Equivalent to replace(f,A(x,y)) */
-void replace_A(value f, value x, value y)
+/* Equivalent to reduce(f,A(x,y)) */
+void reduce_A(value f, value x, value y)
 	{
 	clear(f);
 	f->T = type_A;
@@ -188,4 +188,15 @@ value eval(value f)
 		drop(f);
 		f = g;
 		}
+	}
+
+/* Reduce f to its final value. */
+value arg(value f)
+	{
+	value g = eval(hold(f));
+	if (g != f)
+		reduce(f,g);
+	else
+		f->N--;
+	return f;
 	}

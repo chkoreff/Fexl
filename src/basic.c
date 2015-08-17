@@ -5,7 +5,7 @@
 value type_C(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
-	replace(f,hold(f->L->R));
+	reduce(f,hold(f->L->R));
 	return f;
 	}
 
@@ -13,7 +13,7 @@ value type_C(value f)
 value type_I(value f)
 	{
 	if (!f->L) return 0;
-	replace(f,hold(f->R));
+	reduce(f,hold(f->R));
 	return f;
 	}
 
@@ -31,7 +31,7 @@ value type_T(value f)
 value type_F(value f)
 	{
 	if (!f->L) return 0;
-	replace_Q(f,type_I);
+	reduce_Q(f,type_I);
 	return 0;
 	}
 
@@ -39,7 +39,7 @@ value type_F(value f)
 value type_Y(value f)
 	{
 	if (!f->L) return 0;
-	replace_A(f, hold(f->R), A(hold(f->L),hold(f->R)));
+	reduce_A(f, hold(f->R), A(hold(f->L),hold(f->R)));
 	return f;
 	}
 
@@ -47,7 +47,7 @@ value type_Y(value f)
 value type_query(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
-	replace_A(f, hold(f->R), eval(hold(f->L->R)));
+	reduce_A(f, hold(f->R), hold(arg(f->L->R)));
 	return f;
 	}
 
@@ -55,21 +55,15 @@ value type_query(value f)
 value type_once(value f)
 	{
 	if (!f->L) return 0;
-	{
-	value x = eval(hold(f->R));
-	if (x != f->R)
-		replace(f->R, hold(x));
-
-	replace(f,x);
+	reduce(f,hold(arg(f->R)));
 	return f;
-	}
 	}
 
 /* (void x) = void */
 value type_void(value f)
 	{
 	if (!f->L) return 0;
-	replace_void(f);
+	reduce_void(f);
 	return 0;
 	}
 
@@ -77,7 +71,7 @@ value type_void(value f)
 value type_single(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
-	replace_A(f, hold(f->R), hold(f->L->R));
+	reduce_A(f, hold(f->R), hold(f->L->R));
 	return f;
 	}
 
@@ -85,7 +79,7 @@ value type_single(value f)
 value type_cons(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
-	replace_A(f, A(hold(f->R),hold(f->L->L->L->R)), hold(f->L->L->R));
+	reduce_A(f, A(hold(f->R),hold(f->L->L->L->R)), hold(f->L->L->R));
 	return f;
 	}
 
@@ -104,9 +98,8 @@ value type_is_good(value f)
 	{
 	if (!f->L) return 0;
 	{
-	value x = eval(hold(f->R));
-	replace_boolean(f, x->T != type_void);
-	drop(x);
+	value x = arg(f->R);
+	reduce_boolean(f, x->T != type_void);
 	return 0;
 	}
 	}
@@ -115,9 +108,8 @@ value type_is_bool(value f)
 	{
 	if (!f->L) return 0;
 	{
-	value x = eval(hold(f->R));
-	replace_boolean(f, x->T == type_T || x->T == type_F);
-	drop(x);
+	value x = arg(f->R);
+	reduce_boolean(f, x->T == type_T || x->T == type_F);
 	return 0;
 	}
 	}
@@ -126,10 +118,9 @@ value type_is_list(value f)
 	{
 	if (!f->L) return 0;
 	{
-	value x = eval(hold(f->R));
-	replace_boolean(f, x->T == type_null
+	value x = arg(f->R);
+	reduce_boolean(f, x->T == type_null
 		|| (x->T == type_cons && x->L && x->L->L));
-	drop(x);
 	return 0;
 	}
 	}
@@ -138,21 +129,20 @@ value op_is_type(value f, type t)
 	{
 	if (!f->L) return 0;
 	{
-	value x = eval(hold(f->R));
-	replace_boolean(f, x->T == t);
-	drop(x);
+	value x = arg(f->R);
+	reduce_boolean(f, x->T == t);
 	return 0;
 	}
 	}
 
-void replace_void(value f)
+void reduce_void(value f)
 	{
-	replace_Q(f,type_void);
+	reduce_Q(f,type_void);
 	}
 
-void replace_boolean(value f, int x)
+void reduce_boolean(value f, int x)
 	{
-	replace_Q(f, x ? type_T : type_F);
+	reduce_Q(f, x ? type_T : type_F);
 	}
 
 value single(value x)

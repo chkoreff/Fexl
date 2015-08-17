@@ -10,17 +10,15 @@ value type_seed_rand(value f)
 	{
 	if (!f->L) return 0;
 	{
-	value x = eval(hold(f->R));
+	value x = arg(f->R);
 	if (x->T == type_num)
 		{
 		double seed = *((number)data(x)) * (double)RAND_MAX;
 		srand(seed);
-		f = Q(type_I);
+		return Q(type_I);
 		}
-	else
-		replace_void(f);
-	drop(x);
-	return f;
+	reduce_void(f);
+	return 0;
 	}
 	}
 

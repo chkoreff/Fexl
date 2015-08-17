@@ -87,13 +87,11 @@ value type_fget(value f)
 	{
 	if (!f->L) return 0;
 	{
-	value x = eval(hold(f->R));
+	value x = arg(f->R);
 	if (x->T == type_file)
-		f = op_get(data(x));
-	else
-		replace_void(f);
-	drop(x);
-	return f;
+		return op_get(data(x));
+	reduce_void(f);
+	return 0;
 	}
 	}
 
@@ -103,8 +101,8 @@ value type_char_width(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	{
-	value x = eval(hold(f->L->R));
-	value y = eval(hold(f->R));
+	value x = arg(f->L->R);
+	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_num)
 		{
 		double yn = *((number)data(y));
@@ -115,19 +113,12 @@ value type_char_width(value f)
 			if (pos < xs->len)
 				{
 				char n = char_width(xs->data[pos]);
-				replace_num(f, num_new_ulong(n));
+				reduce_num(f, num_new_ulong(n));
+				return 0;
 				}
-			else
-				replace_void(f);
 			}
-		else
-			replace_void(f);
 		}
-	else
-		replace_void(f);
-
-	drop(x);
-	drop(y);
-	return f;
+	reduce_void(f);
+	return 0;
 	}
 	}

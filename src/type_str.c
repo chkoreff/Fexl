@@ -16,9 +16,9 @@ value Qstr(string x)
 	return D(type_str,x,(type)str_free);
 	}
 
-void replace_str(value f, string x)
+void reduce_str(value f, string x)
 	{
-	replace_D(f,type_str,x,(type)str_free);
+	reduce_D(f,type_str,x,(type)str_free);
 	}
 
 /* (. x y) is the concatenation of strings x and y. */
@@ -26,14 +26,12 @@ value type_concat(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	{
-	value x = eval(hold(f->L->R));
-	value y = eval(hold(f->R));
+	value x = arg(f->L->R);
+	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_str)
-		replace_str(f, str_concat(data(x),data(y)));
+		reduce_str(f, str_concat(data(x),data(y)));
 	else
-		replace_void(f);
-	drop(x);
-	drop(y);
+		reduce_void(f);
 	return 0;
 	}
 	}
@@ -43,12 +41,11 @@ value type_length(value f)
 	{
 	if (!f->L) return 0;
 	{
-	value x = eval(hold(f->R));
+	value x = arg(f->R);
 	if (x->T == type_str)
-		replace_num(f, num_new_ulong(((string)data(x))->len));
+		reduce_num(f, num_new_ulong(((string)data(x))->len));
 	else
-		replace_void(f);
-	drop(x);
+		reduce_void(f);
 	return 0;
 	}
 	}
@@ -59,24 +56,20 @@ value type_slice(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 	{
-	value x = eval(hold(f->L->L->R));
-	value y = eval(hold(f->L->R));
-	value z = eval(hold(f->R));
+	value x = arg(f->L->L->R);
+	value y = arg(f->L->R);
+	value z = arg(f->R);
 	if (x->T == type_str && y->T == type_num && z->T == type_num)
 		{
 		double yn = *((number)data(y));
 		double zn = *((number)data(z));
 		if (yn >= 0 && zn >= 0)
-			replace_str(f, str_slice(data(x),yn,zn));
-		else
-			replace_void(f);
+			{
+			reduce_str(f, str_slice(data(x),yn,zn));
+			return 0;
+			}
 		}
-	else
-		replace_void(f);
-
-	drop(x);
-	drop(y);
-	drop(z);
+	reduce_void(f);
 	return 0;
 	}
 	}
@@ -86,9 +79,9 @@ value type_search(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 	{
-	value x = eval(hold(f->L->L->R));
-	value y = eval(hold(f->L->R));
-	value z = eval(hold(f->R));
+	value x = arg(f->L->L->R);
+	value y = arg(f->L->R);
+	value z = arg(f->R);
 
 	if (x->T == type_str && y->T == type_str && z->T == type_num)
 		{
@@ -99,19 +92,13 @@ value type_search(value f)
 			string ys = data(y);
 			unsigned long pos = str_search(xs,ys,zn);
 			if (pos < xs->len)
-				replace_num(f, num_new_ulong(pos));
-			else
-				replace_void(f);
+				{
+				reduce_num(f, num_new_ulong(pos));
+				return 0;
+				}
 			}
-		else
-			replace_void(f);
 		}
-	else
-		replace_void(f);
-
-	drop(x);
-	drop(y);
-	drop(z);
+	reduce_void(f);
 	return 0;
 	}
 	}
@@ -121,18 +108,17 @@ value type_str_num(value f)
 	{
 	if (!f->L) return 0;
 	{
-	value x = eval(hold(f->R));
+	value x = arg(f->R);
 	if (x->T == type_str)
 		{
 		number n = str0_num(((string)data(x))->data);
 		if (n)
-			replace_num(f,n);
-		else
-			replace_void(f);
+			{
+			reduce_num(f,n);
+			return 0;
+			}
 		}
-	else
-		replace_void(f);
-	drop(x);
+	reduce_void(f);
 	return 0;
 	}
 	}

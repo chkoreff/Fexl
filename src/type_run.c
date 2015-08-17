@@ -24,18 +24,17 @@ value type_argv(value f)
 	{
 	if (!f->L) return 0;
 	{
-	value x = eval(hold(f->R));
+	value x = arg(f->R);
 	if (x->T == type_num)
 		{
 		int i = (int)(*(number)(data(x)));
 		if (i >= 0 && i < main_argc)
-			replace_str(f, str_new_data0(main_argv[i]));
-		else
-			replace_void(f);
+			{
+			reduce_str(f, str_new_data0(main_argv[i]));
+			return 0;
+			}
 		}
-	else
-		replace_void(f);
-	drop(x);
-	return f;
+	reduce_void(f);
+	return 0;
 	}
 	}
