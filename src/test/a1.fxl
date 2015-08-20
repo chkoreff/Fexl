@@ -770,9 +770,6 @@ test_file
 # In this test I created a little "assembly language" where I hide all the var
 # operations in one place.
 
-# Define var_put to force evaluation before storing.
-\var_put=(\v\x \x==x var_put v x)
-
 # The "!" function creates a read and write pair.
 \!=(var_new \v {(var_get v) (var_put v)})
 

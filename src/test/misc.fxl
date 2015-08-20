@@ -19,8 +19,8 @@ div
 
 \try=
 	(\x\y
-	do_range x y \n
-	put "fib " put n put " = " say (fib n)
+	each (range x y) \n
+	say ["fib " n " = " (fib n)]
 	)
 
 try 0 8

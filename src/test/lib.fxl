@@ -34,16 +34,16 @@
 # (check x y) = x if x is good, otherwise y.
 \check=(\x\y is_good x x y)
 
-# Run function f for each value in the range x through y.
-\do_range=
-	(\x\y\f
+# Produce the list of values in the range x through y.
+\range=
+	(\x\y
 	\x=(round x)
 	\y=(round y)
 	\d=(le x y 1 -1)
 	\loop=\
 		(\x
-		f x
-		eq x y ();
+		cons x;
+		eq x y [];
 		loop (+ x d)
 		)
 	loop x
@@ -165,7 +165,6 @@ def "append" append;
 def "chain" chain;
 def "check" check;
 def "def" def;
-def "do_range" do_range;
 def "each" each;
 def "extend" extend;
 def "filter" filter;
@@ -178,5 +177,6 @@ def "list_sum" list_sum;
 def "map" map;
 def "mod" mod;
 def "pi" pi;
+def "range" range;
 def "tau" tau;
 standard

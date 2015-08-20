@@ -3,4 +3,4 @@
 \=(use "test/common.fxl")
 \=(use "test/misc.fxl")
 
-do_range 1 1000 \n try_fib
+each (range 1 1000) \n try_fib

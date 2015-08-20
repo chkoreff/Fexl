@@ -15,8 +15,7 @@ var_put v_map void
 \update=
 	(\v\f
 	var_get v \x
-	\y==(f x)
-	var_put v y
+	var_put v (f x)
 	)
 
 \push=

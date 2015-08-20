@@ -30,7 +30,7 @@
 \show_sequence=
 	(\label\f
 	say label
-	do_range 0 max (\n put (f n) put " ")
+	each (range 0 max) (\n put [(f n) " "])
 	nl
 	)
 

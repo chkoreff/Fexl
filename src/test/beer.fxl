@@ -6,7 +6,7 @@
 
 \sing=
 	(\n
-	do_range n 1 \n
+	each (range n 1) \n
 	bottles_of_beer n on_the_wall
 	bottles_of_beer n nl
 	say "Take one down, pass it around"

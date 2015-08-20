@@ -40,7 +40,7 @@ value type_var_put(value f)
 	if (x->T == type_var)
 		{
 		drop(x->R->R);
-		x->R->R = hold(f->R);
+		x->R->R = hold(arg(f->R));
 		return Q(type_I);
 		}
 	reduce_void(f);
