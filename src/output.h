@@ -1,9 +1,7 @@
-extern int cur_out; /* current output file number */
-extern void putd(const char *data, unsigned long len);
-extern void put(const char *data);
-extern void put_ch(char ch);
-extern void put_long(long x);
-extern void put_ulong(unsigned long x);
-extern void put_double(double x);
-extern void nl(void);
-extern void put_to_error(void);
+extern void putd(int out, const char *data, unsigned long len);
+extern void put(int out, const char *data);
+extern void put_ch(int out, char ch);
+extern void put_long(int out, long x);
+extern void put_ulong(int out, unsigned long x);
+extern void put_double(int out, double x);
+extern void nl(int out);

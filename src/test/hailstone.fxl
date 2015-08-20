@@ -1,0 +1,27 @@
+#
+\=(use "test/lib.fxl")
+
+# divide even by 2
+# odd: multiply by 3 and add 1
+
+\is_even=(\x eq 0; mod x 2)
+
+# https://en.wikipedia.org/wiki/Collatz_conjecture
+# The "hailstone sequence"
+\try=
+	(
+	@\loop\x
+	say ["x = " x]
+	eq x 1 nl;
+	\y=(is_even x (/ x 2) (+ 1; * x 3))
+	loop y
+	)
+
+#try 3
+#try 4
+#try 5
+#try 19
+try 23
+#try 27
+#try 6171
+#try 9780657631

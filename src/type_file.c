@@ -98,5 +98,5 @@ value type_flock_sh(value f) { return op_flock(f,LOCK_SH); }
 value type_flock_un(value f) { return op_flock(f,LOCK_UN); }
 
 /* LATER strerror */
-/* LATER fdopen fflush */
+/* LATER fdopen */
 /* LATER pipe dup2 close fork wait */

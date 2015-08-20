@@ -44,6 +44,8 @@ static value standard(void)
 	if (match("cos")) return Q(type_cos);
 	if (match("die")) return Q(type_die);
 	if (match("eq")) return Q(type_eq);
+	if (match("error")) return Q(type_error);
+	if (match("eval")) return Q(type_eval);
 	if (match("exp")) return Q(type_exp);
 	if (match("F")) return Q(type_F);
 	if (match("fflush")) return Q(type_fflush);
@@ -78,7 +80,6 @@ static value standard(void)
 	if (match("parse_file")) return Q(type_parse_file);
 	if (match("parse_string")) return Q(type_parse_string);
 	if (match("put")) return Q(type_put);
-	if (match("put_to_error")) return Q(type_put_to_error);
 	if (match("rand")) return Q(type_rand);
 	if (match("remove")) return Q(type_remove);
 	if (match("round")) return Q(type_round);

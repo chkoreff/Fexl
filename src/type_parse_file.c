@@ -23,8 +23,7 @@ static value parse_file(const char *name)
 	source = name[0] ? fopen(name,"r") : stdin;
 	if (!source)
 		{
-		put_to_error();
-		put("Could not open source file ");put(name);nl();
+		put(2,"Could not open source file ");put(2,name);nl(2);
 		die(0);
 		}
 

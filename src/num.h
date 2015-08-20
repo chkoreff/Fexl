@@ -16,4 +16,4 @@ extern number num_log(number x);
 extern number num_sin(number x);
 extern number num_cos(number x);
 extern int num_cmp(number x, number y);
-extern void put_num(number x);
+extern void put_num(int out, number x);

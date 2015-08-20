@@ -8,7 +8,7 @@
 \=
 (
 # (unique xs) is the ordered list of unique elements in list xs.
-\unique=\
+\unique==
 	(\xs
 	xs [] \x\xs
 	append (unique; filter (gt x) xs); # all the items less than x
@@ -17,7 +17,7 @@
 	)
 
 # (sort xs) is the ordered list of all elements in list xs.
-\sort=\
+\sort==
 	(\xs
 	xs [] \x\xs
 	append (sort; filter (gt x) xs);   # all the items less than x
@@ -26,7 +26,7 @@
 	)
 
 # (tower n f x) is the result of applying f to x n times.
-\tower=\
+\tower==
 	(\n\f\x
 	le n 0 x;
 	tower (- n 1) f (f x)

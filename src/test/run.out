@@ -276,6 +276,24 @@ Take one down, pass it around
 0 bottles of beer on the wall
 
 ==
+x = 23
+x = 70
+x = 35
+x = 106
+x = 53
+x = 160
+x = 80
+x = 40
+x = 20
+x = 10
+x = 5
+x = 16
+x = 8
+x = 4
+x = 2
+x = 1
+
+==
 x = 81
 ==
 x = 3
@@ -727,7 +745,7 @@ Let's parse.
 5 15
 7.2 21.6
 -1.3 -3.9
-== test_file
+==
 Write test/tmp.txt:
 Read test/tmp.txt:
 ch T
@@ -759,6 +777,12 @@ ch 子
 ch 
 
 Removed test/tmp.txt
+==
+This should go to stdout.
+This goes to the file.
+This also goes to the file.
+Removed test/tmp.txt
+==
 The first 16 Fibonacci numbers:
 1
 1
@@ -873,12 +897,16 @@ ch = '
 '
 Good bye.
 exit 0
-====
+== stdout:
 hello
+This goes to stdout.
+This goes to stdout.
+bye
+== stderr:
 This goes to stderr.
 x = 7
-bye
-exit 0
+This goes to stderr.
+x = 7
 ====
 hi
 exit 1

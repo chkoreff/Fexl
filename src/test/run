@@ -23,19 +23,11 @@ hij
 EOF
 ) | run_fexl test/a2.fxl
 
-# Test sending output to stderr.
-(
-cat <<"EOF"
-say "hello"
-put_to_error
-	(
-	\x=(+ 4 3)
-	say "This goes to stderr."
-	put "x = " put x nl
-	)
-say "bye"
-EOF
-) | run_fexl
+# Test stdout versus stderr.
+echo "== stdout:"
+../bin/fexl test/a3.fxl 2>&1 2>/dev/null
+echo "== stderr:"
+../bin/fexl test/a3.fxl 2>&1 1>/dev/null
 
 # Test the "die" function.
 (

@@ -10,23 +10,23 @@
 #include <type_str.h>
 #include <unistd.h> /* fsync */
 
-static void putv(value x)
+static void putv(int out, value x)
 	{
 	x = arg(x);
 	while (1)
 		{
 		if (x->T == type_str)
-			put_str(data(x));
+			put_str(out,data(x));
 		else if (x->T == type_num)
-			put_num(data(x));
+			put_num(out,data(x));
 		else if (x->T == type_T)
-			put_ch('T');
+			put_ch(out,'T');
 		else if (x->T == type_F)
-			put_ch('F');
+			put_ch(out,'F');
 		else if (x->T == type_cons && x->L && x->L->L)
 			{
-			putv(x->L->R);
-			/* Eliminated tail recursive call putv(x->R) here. */
+			putv(out,x->L->R);
+			/* Eliminated tail recursive call putv(out,x->R) here. */
 			x = arg(x->R);
 			continue;
 			}
@@ -37,21 +37,21 @@ static void putv(value x)
 value type_put(value f)
 	{
 	if (!f->L) return 0;
-	putv(f->R);
+	putv(1,f->R);
 	return Q(type_I);
 	}
 
 value type_nl(value f)
 	{
 	(void)f;
-	nl();
+	nl(1);
 	return Q(type_I);
 	}
 
 value type_say(value f)
 	{
 	if (!f->L) return 0;
-	putv(f->R); nl();
+	putv(1,f->R); nl(1);
 	return Q(type_I);
 	}
 
@@ -64,10 +64,7 @@ value type_fput(value f)
 	if (x->T == type_file)
 		{
 		FILE *fh = data(x);
-		int save_cur_out = cur_out;
-		cur_out = fileno(fh);
-		putv(f->R);
-		cur_out = save_cur_out;
+		putv(fileno(fh),f->R);
 		return Q(type_I);
 		}
 	reduce_void(f);
@@ -75,18 +72,12 @@ value type_fput(value f)
 	}
 	}
 
-/* (put_to_error x) = I.  Evaluate x with all output going to stderr. */
-value type_put_to_error(value f)
+/* (error msg) Print the msg followed by newline to stderr. */
+value type_error(value f)
 	{
 	if (!f->L) return 0;
-	{
-	int save_cur_out = cur_out;
-	put_to_error();
-	drop(eval(hold(f->R)));
-	f = Q(type_I);
-	cur_out = save_cur_out;
-	return f;
-	}
+	putv(2,f->R); nl(2);
+	return Q(type_I);
 	}
 
 /* (fflush fh) Force a write of all buffered data to the file handle. */

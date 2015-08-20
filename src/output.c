@@ -3,50 +3,41 @@
 #include <output.h>
 #include <unistd.h> /* write */
 
-/* Initially we put data to stdout. */
-int cur_out = STDOUT_FILENO;
-
 /* Put data to current output. */
-void putd(const char *data, unsigned long len)
+void putd(int out, const char *data, unsigned long len)
 	{
-	ssize_t n = write(cur_out,data,len);
+	ssize_t n = write(out,data,len);
 	(void)n;
 	}
 
-void put(const char *data)
+void put(int out, const char *data)
 	{
-	putd(data, strlen(data));
+	putd(out, data, strlen(data));
 	}
 
-void put_ch(char ch)
+void put_ch(int out, char ch)
 	{
 	char buf[1];
 	buf[0] = ch;
-	putd(buf,1);
+	putd(out,buf,1);
 	}
 
-void put_long(long x)
+void put_long(int out, long x)
 	{
-	put(format_long(x));
+	put(out,format_long(x));
 	}
 
-void put_ulong(unsigned long x)
+void put_ulong(int out, unsigned long x)
 	{
-	put(format_ulong(x));
+	put(out,format_ulong(x));
 	}
 
-void put_double(double x)
+void put_double(int out, double x)
 	{
-	put(format_double(x));
+	put(out,format_double(x));
 	}
 
-void nl(void)
+void nl(int out)
 	{
-	putd("\n",1);
-	}
-
-void put_to_error(void)
-	{
-	fsync(cur_out);
-	cur_out = STDERR_FILENO;
+	putd(out,"\n",1);
 	}

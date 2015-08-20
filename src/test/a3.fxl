@@ -1,0 +1,14 @@
+#
+say "hello"
+\x=(+ 4 3)
+
+\talk=
+	(
+	error ["This goes to stderr."]
+	error ["x = " x]
+	say "This goes to stdout."
+	)
+
+talk
+talk
+say "bye"

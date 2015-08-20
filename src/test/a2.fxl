@@ -2,7 +2,7 @@
 say "Hello"
 say "Type some lines of input and I'll echo them back."
 say "Press Ctrl-D to stop."
-\echo=\
+\echo==
 	(
 	get \ch
 	is_void ch ();

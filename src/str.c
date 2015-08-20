@@ -115,7 +115,7 @@ unsigned long str_search(string x, string y, unsigned long offset)
 	}
 	}
 
-void put_str(string x)
+void put_str(int out, string x)
 	{
-	putd(x->data,x->len);
+	putd(out,x->data,x->len);
 	}

@@ -46,7 +46,7 @@ int num_cmp(number x, number y)
 	return 0;
 	}
 
-void put_num(number x)
+void put_num(int out, number x)
 	{
-	put_double(*x);
+	put_double(out,*x);
 	}

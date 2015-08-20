@@ -43,12 +43,13 @@ value type_Y(value f)
 	return f;
 	}
 
-/* (? x f) = (f v), where v is the value of x. */
-value type_query(value f)
+/* (eval x) Evaluates x in place and reduces to I. */
+value type_eval(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
-	reduce_A(f, hold(f->R), hold(arg(f->L->R)));
-	return f;
+	if (!f->L) return 0;
+	arg(f->R);
+	reduce_Q(f,type_I);
+	return 0;
 	}
 
 /* (once x) = x, but x is evaluated only once. */
