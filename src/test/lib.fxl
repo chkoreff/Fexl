@@ -23,11 +23,13 @@
 	filter xs
 	)
 
+# https://en.wikipedia.org/wiki/Fold_%28higher-order_function%29
+
 # Using function f and starting value z, run the function forward for each
-# element in the list.
+# element in the list.  (Also known as "foldl".)
 \fold=
 	(\f\z\xs
-	\fold==(\z\xs xs z \x\xs \z=(f z x) fold z xs)
+	\fold==(\z\xs xs z \x\xs \z=(f z x) eval z fold z xs)
 	fold z xs
 	)
 
@@ -43,6 +45,8 @@
 \list_length=(fold (\n\_ + 1 n) 0)
 
 \neg=(- 0)
+
+# Compute x modulo n.
 \mod=(\x\n - x; * n; trunc; / x n)
 
 \pi=3.14159265358979
@@ -57,13 +61,13 @@
 	\x=(round x)
 	\y=(round y)
 	\d=(le x y 1 -1)
-	\loop==
+	\range==
 		(\x
 		cons x;
 		eq x y [];
-		loop (+ x d)
+		range (+ x d)
 		)
-	loop x
+	range x
 	)
 
 # Flatten a piece of data (string, number, or list) into a string.

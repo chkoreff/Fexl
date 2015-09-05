@@ -190,13 +190,13 @@ value eval(value f)
 		}
 	}
 
-/* Reduce f to its final value. */
+/* Reduce f to its final value, always replacing it inline. */
 value arg(value f)
 	{
 	value g = eval(hold(f));
 	if (g != f)
 		reduce(f,g);
 	else
-		f->N--;
+		drop(g);
 	return f;
 	}
