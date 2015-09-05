@@ -166,12 +166,16 @@ try "" "" 8 # void
 say "== test char_width"
 
 # Return the list of UTF-8 chars starting from the given position.
-\str_chars==
+\str_chars=
 	(\str\pos
-	ge pos (length str) [];
-	\n=(char_width str pos)
-	\ch=(slice str pos n)
-	[ch; str_chars str (+ pos n)]
+	\str_chars==
+		(\pos
+		ge pos (length str) [];
+		\n=(char_width str pos)
+		\ch=(slice str pos n)
+		[ch; str_chars (+ pos n)]
+		)
+	str_chars pos
 	)
 
 \str="hej åabcüdef üä 1≠0 包子x"
@@ -874,6 +878,28 @@ eval x  # The effect only happens once.
 eval x
 eval x
 )
+)
+
+# Test numeric formatting.
+div
+(
+\try=
+	(\n\sep\x
+	say (format_num n sep x)
+	say (format_num n sep (neg x))
+	say (format_num n "" x)
+	nl
+	)
+
+try 8 "," 123456.789012
+try 7 "," 123456.789012
+try 6 "," 123456.789012
+try 2 "|" 123456.789012
+try 5 "," 12345678.789012
+try 8 "," .789012
+try 0 "," 00.789012
+try 0 "," 0
+try 3 "," 0
 )
 
 \\

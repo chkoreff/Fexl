@@ -2,18 +2,34 @@
 # Append lists xs and ys.
 \append==(\xs\ys xs ys \x\xs [x; append xs ys])
 
-# Do fn for each item in list xs.
-\each==(\xs\fn xs () \x\xs fn x each xs fn)
+# Do f for each item in list xs.
+\each=
+	(\xs\f
+	\each==(\xs xs () \x\xs f x each xs)
+	each xs
+	)
 
 # Apply f to each element in list xs.
-\map==(\f\xs xs [] \x\xs [(f x); map f xs])
+\map=
+	(\f\xs
+	\map==(\xs xs [] \x\xs [(f x); map xs])
+	map xs
+	)
 
 # (filter f xs) is the list of items x in xs for which (f x) is true.
-\filter==(\f\xs xs [] \x\xs f x (cons x) (); filter f xs)
+\filter=
+	(\f\xs
+	\filter==(\xs xs [] \x\xs f x (cons x) (); filter xs)
+	filter xs
+	)
 
-# Using function fn and starting value z, run the function forward for each
+# Using function f and starting value z, run the function forward for each
 # element in the list.
-\fold==(\fn\z\xs xs z \x\xs \z=(fn z x) fold fn z xs)
+\fold=
+	(\f\z\xs
+	\fold==(\z\xs xs z \x\xs \z=(f z x) fold z xs)
+	fold z xs
+	)
 
 # Return the first n items of a list.
 \first==
@@ -26,6 +42,7 @@
 \list_sum=(fold + 0)
 \list_length=(fold (\n\_ + 1 n) 0)
 
+\neg=(- 0)
 \mod=(\x\n - x; * n; trunc; / x n)
 
 \pi=3.14159265358979
@@ -72,21 +89,29 @@
 \format_num=
 (
 # Repeat string x n times
-\repeat_str==
+\repeat_str=
 	(\x\n
-	le n 0 "";
-	. x; repeat_str x (- n 1)
+	\repeat_str==
+		(\n
+		le n 0 "";
+		. x; repeat_str (- n 1)
+		)
+	repeat_str n
 	)
 
 # Split string x into groups of three with the given separator.
-\split3==
+\split3=
 	(\sep\x
-	\len=(length x)
-	le len 3 x
-	\pos=(- len 3)
-	\prefix=(slice x 0 pos)
-	\suffix=(slice x pos 3)
-	. (split3 sep prefix) (. sep suffix)
+	\split3==
+		(\x
+		\len=(length x)
+		le len 3 x
+		\pos=(- len 3)
+		\prefix=(slice x 0 pos)
+		\suffix=(slice x pos 3)
+		. (split3 prefix) (. sep suffix)
+		)
+	split3 x
 	)
 
 # Format number x to n decimal places, with an optional separator for the
@@ -144,20 +169,24 @@ format_num
 # context.
 \extend==
 	(\cx
-	@\standard
 
-	\extend=(\cx extend; chain cx; standard)
+	\standard==
+		(
+		\extend=(\cx extend; chain cx; standard)
 
-	\use=
-		(\file
-		\cx=(once; parse_file file standard I)
-		extend cx
+		\use=
+			(\file
+			\cx=(once; parse_file file standard I)
+			extend cx
+			)
+
+		def "extend" extend;
+		def "standard" standard;
+		def "use" use;
+		cx
 		)
 
-	def "extend" extend;
-	def "standard" standard;
-	def "use" use;
-	cx
+	standard
 	)
 
 extend;
@@ -176,6 +205,7 @@ def "list_length" list_length;
 def "list_sum" list_sum;
 def "map" map;
 def "mod" mod;
+def "neg" neg;
 def "pi" pi;
 def "range" range;
 def "tau" tau;

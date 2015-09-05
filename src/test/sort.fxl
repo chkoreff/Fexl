@@ -26,10 +26,14 @@
 	)
 
 # (tower n f x) is the result of applying f to x n times.
-\tower==
+\tower=
 	(\n\f\x
-	le n 0 x;
-	tower (- n 1) f (f x)
+	\tower==
+		(\n\x
+		le n 0 x;
+		tower (- n 1) (f x)
+		)
+	tower n x
 	)
 
 def "append" append;
