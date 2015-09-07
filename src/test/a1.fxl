@@ -841,6 +841,12 @@ fib 5
 )
 
 div
+(
+var_new \v
+\x=(var_get v I)
+var_put v x
+say "Passed var test of 20150907."
+)
 test_var
 
 div

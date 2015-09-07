@@ -783,6 +783,7 @@ This goes to the file.
 This also goes to the file.
 Removed test/tmp.txt
 ==
+Passed var test of 20150907.
 The first 16 Fibonacci numbers:
 1
 1

@@ -39,8 +39,9 @@ value type_var_put(value f)
 	value x = arg(f->L->R);
 	if (x->T == type_var)
 		{
+		value v = hold(arg(f->R));
 		drop(x->R->R);
-		x->R->R = hold(arg(f->R));
+		x->R->R = v;
 		return Q(type_I);
 		}
 	reduce_void(f);
