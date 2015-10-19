@@ -183,10 +183,12 @@ value eval(value f)
 	while (1)
 		{
 		value g = f->T(f);
-		if (g == f) continue;
 		if (g == 0) return f;
-		drop(f);
-		f = g;
+		if (g != f)
+			{
+			drop(f);
+			f = g;
+			}
 		}
 	}
 
