@@ -6,11 +6,11 @@ make convert
 make die
 make fexl
 make format
+make input
 make memory
 make num
 make output
 make parse
-make pattern
 make report
 make str
 make type_buf

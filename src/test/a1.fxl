@@ -746,14 +746,16 @@ try -1.3
 \write_file=
 	(\content
 	fopen tmp_file "w" \fh
-	fput fh content
+	put_to fh;
+	put content
 	)
 
 \show_chars=
 	(\f
 	fopen tmp_file "r" \fh
+	get_from fh;
 	@\loop
-	fget fh \ch
+	get \ch
 	is_void ch ();
 	f ch
 	loop
@@ -788,7 +790,7 @@ here
 ~
 This goes to the file.
 ~
-(say "This should go to stdout.")
+(put_to stdout; say "This should go to stdout.")
 ~
 This also goes to the file.
 ~
@@ -909,6 +911,80 @@ try 3 "," 0
 try 7 "," 314.159
 try 7 "," 0.159
 try 3 "," 0.159265
+)
+
+(
+\try=
+	(\list
+	div
+	each list (\x put [x " "]) nl
+	)
+try (reverse ["a" "b" "c"])
+try (reverse; range 1 5)
+)
+
+(
+div
+\try=
+	(\x
+	\y=(fexl_quote x)
+	say y
+	{y}
+	)
+
+\x="a b"
+try x \x
+try x \x
+try x \x
+try x \x
+try x \x
+)
+
+(
+div
+\x = ~ a & "b" 1<3~
+say x
+\x=(quote x)
+say x
+)
+
+(
+div
+\list=["a" "b" "c"]
+\try=(\n say [n " : " (check (list_at list n) "(void)")])
+try -1
+try 0
+try 1
+try 2
+try 3
+)
+
+(
+div
+\hello=(say "Hello")
+
+(
+# Test drop buffer without getting its content.
+buf_new \buf
+buf_put buf "x"
+)
+
+# Now test redirecting output to a buffer.
+\result=
+(
+buf_new \buf
+(
+put_to buf;
+hello
+say "line 1"
+say "line 2"
+put "line 3" nl
+)
+buf_get buf I
+)
+
+say "result:"
+put result
 )
 
 \\

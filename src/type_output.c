@@ -1,32 +1,33 @@
+#include <str.h>
 #include <value.h>
 #include <basic.h>
+#include <buffer.h>
 #include <num.h>
 #include <output.h>
 #include <stdio.h>
-#include <str.h>
-#include <type_num.h>
+#include <type_buf.h>
 #include <type_file.h>
+#include <type_num.h>
 #include <type_output.h>
 #include <type_str.h>
-#include <unistd.h> /* fsync */
 
-static void putv(int out, value x)
+static void putv(value x)
 	{
 	x = arg(x);
 	while (1)
 		{
 		if (x->T == type_str)
-			put_str(out,data(x));
+			put_str(data(x));
 		else if (x->T == type_num)
-			put_num(out,data(x));
+			put_num(data(x));
 		else if (x->T == type_T)
-			put_ch(out,'T');
+			put_ch('T');
 		else if (x->T == type_F)
-			put_ch(out,'F');
+			put_ch('F');
 		else if (x->T == type_cons && x->L && x->L->L)
 			{
-			putv(out,x->L->R);
-			/* Eliminated tail recursive call putv(out,x->R) here. */
+			putv(x->L->R);
+			/* Eliminated tail recursive call putv(x->R) here. */
 			x = arg(x->R);
 			continue;
 			}
@@ -37,60 +38,74 @@ static void putv(int out, value x)
 value type_put(value f)
 	{
 	if (!f->L) return 0;
-	putv(1,f->R);
+	putv(f->R);
 	return Q(type_I);
 	}
 
 value type_nl(value f)
 	{
 	(void)f;
-	nl(1);
+	nl();
 	return Q(type_I);
 	}
 
 value type_say(value f)
 	{
 	if (!f->L) return 0;
-	putv(1,f->R); nl(1);
+	putv(f->R); nl();
 	return Q(type_I);
 	}
 
-/* (fput fh data) Put data to the file. */
-value type_fput(value f)
+value type_flush(value f)
+	{
+	(void)f;
+	flush();
+	return Q(type_I);
+	}
+
+static buffer *cur_buf = 0;
+static void putd_buf(const char *data, unsigned long len)
+	{
+	buf_addn(cur_buf,data,len);
+	}
+
+/* (put_to target content)
+Evaluate the content with the current output temporarily set to the target,
+which may be a file or a buffer.
+LATER Might allow target to be an arbitrary function.
+*/
+value type_put_to(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	{
 	value x = arg(f->L->R);
 	if (x->T == type_file)
 		{
+		output save_putd = putd;
+		void *save_cur_out = cur_out;
 		FILE *fh = data(x);
-		putv(fileno(fh),f->R);
-		return Q(type_I);
+
+		put_to(fh);
+		f = eval(hold(f->R));
+
+		putd = save_putd;
+		cur_out = save_cur_out;
+		return f;
 		}
-	reduce_void(f);
-	return 0;
-	}
-	}
-
-/* (error msg) Print the msg followed by newline to stderr. */
-value type_error(value f)
-	{
-	if (!f->L) return 0;
-	putv(2,f->R); nl(2);
-	return Q(type_I);
-	}
-
-/* (fflush fh) Force a write of all buffered data to the file handle. */
-value type_fflush(value f)
-	{
-	if (!f->L) return 0;
-	{
-	value x = arg(f->R);
-	if (x->T == type_file)
+	else if (x->T == type_buf)
 		{
-		FILE *fh = data(x);
-		fsync(fileno(fh));
-		return Q(type_I);
+		output save_putd = putd;
+		buffer *save_cur_buf = cur_buf;
+		buffer *buf = data(x);
+
+		putd = putd_buf;
+		cur_buf = buf;
+
+		f = eval(hold(f->R));
+
+		putd = save_putd;
+		cur_buf = save_cur_buf;
+		return f;
 		}
 	reduce_void(f);
 	return 0;

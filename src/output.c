@@ -1,43 +1,66 @@
 #include <format.h>
+#include <stdio.h>
 #include <string.h> /* strlen */
 #include <output.h>
-#include <unistd.h> /* write */
 
-/* Put data to current output. */
-void putd(int out, const char *data, unsigned long len)
+void *cur_out;
+
+/* Put data to current output file. */
+static void putd_file(const char *data, unsigned long len)
 	{
-	ssize_t n = write(out,data,len);
+	size_t n = fwrite(data,1,len,cur_out);
 	(void)n;
 	}
 
-void put(int out, const char *data)
+output putd;
+
+void put(const char *data)
 	{
-	putd(out, data, strlen(data));
+	putd(data,strlen(data));
 	}
 
-void put_ch(int out, char ch)
+void put_ch(char ch)
 	{
 	char buf[1];
 	buf[0] = ch;
-	putd(out,buf,1);
+	putd(buf,1);
 	}
 
-void put_long(int out, long x)
+void put_long(long x)
 	{
-	put(out,format_long(x));
+	put(format_long(x));
 	}
 
-void put_ulong(int out, unsigned long x)
+void put_ulong(unsigned long x)
 	{
-	put(out,format_ulong(x));
+	put(format_ulong(x));
 	}
 
-void put_double(int out, double x)
+void put_double(double x)
 	{
-	put(out,format_double(x));
+	put(format_double(x));
 	}
 
-void nl(int out)
+void nl(void)
 	{
-	putd(out,"\n",1);
+	putd("\n",1);
+	}
+
+void put_to(void *out)
+	{
+	putd = putd_file;
+	cur_out = out;
+	}
+
+void put_to_error(void)
+	{
+	put_to(stderr);
+	}
+
+/* Force a write of all buffered data to the current output. */
+void flush(void)
+	{
+	/* Only call fflush if current output is a file. */
+	if (putd == putd_file)
+		fflush(cur_out);
 	}

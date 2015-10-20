@@ -6,21 +6,29 @@ const char *source_label; /* name of current source file */
 
 static void put_error_location(unsigned long line)
 	{
-	put(2," on line "); put_ulong(2,line);
+	put(" on line "); put_ulong(line);
 	if (source_label[0])
 		{
-		put(2," of ");put(2,source_label);
+		put(" of ");put(source_label);
 		}
-	nl(2);
+	nl();
 	}
 
 void syntax_error(const char *code, unsigned long line)
 	{
-	put(2,code); put_error_location(line);
+	put_to_error();
+	put(code); put_error_location(line);
 	die(0);
 	}
 
 void undefined_symbol(const char *name, unsigned long line)
 	{
-	put(2,"Undefined symbol "); put(2,name); put_error_location(line);
+	output save_putd = putd;
+	void *save_cur_out = cur_out;
+
+	put_to_error();
+	put("Undefined symbol "); put(name); put_error_location(line);
+
+	putd = save_putd;
+	cur_out = save_cur_out;
 	}

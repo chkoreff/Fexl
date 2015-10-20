@@ -1,6 +1,8 @@
 #include <value.h>
 #include <basic.h>
+#include <input.h>
 #include <num.h>
+#include <output.h>
 #include <stdio.h>
 #include <str.h>
 #include <string.h> /* strcmp */
@@ -44,19 +46,17 @@ static value standard(void)
 	if (match("cos")) return Q(type_cos);
 	if (match("die")) return Q(type_die);
 	if (match("eq")) return Q(type_eq);
-	if (match("error")) return Q(type_error);
 	if (match("eval")) return Q(type_eval);
 	if (match("exp")) return Q(type_exp);
 	if (match("F")) return Q(type_F);
-	if (match("fflush")) return Q(type_fflush);
-	if (match("fget")) return Q(type_fget);
 	if (match("flock_ex")) return Q(type_flock_ex);
 	if (match("flock_sh")) return Q(type_flock_sh);
 	if (match("flock_un")) return Q(type_flock_un);
+	if (match("flush")) return Q(type_flush);
 	if (match("fopen")) return Q(type_fopen);
-	if (match("fput")) return Q(type_fput);
 	if (match("ge")) return Q(type_ge);
 	if (match("get")) return Q(type_get);
+	if (match("get_from")) return Q(type_get_from);
 	if (match("gt")) return Q(type_gt);
 	if (match("I")) return Q(type_I);
 	if (match("is_bool")) return Q(type_is_bool);
@@ -65,6 +65,7 @@ static value standard(void)
 	if (match("is_num")) return Q(type_is_num);
 	if (match("is_str")) return Q(type_is_str);
 	if (match("is_void")) return Q(type_is_void);
+	if (match("later")) return Q(type_later);
 	if (match("le")) return Q(type_le);
 	if (match("length")) return Q(type_length);
 	if (match("limit_memory")) return Q(type_limit_memory);
@@ -80,6 +81,7 @@ static value standard(void)
 	if (match("parse_file")) return Q(type_parse_file);
 	if (match("parse_string")) return Q(type_parse_string);
 	if (match("put")) return Q(type_put);
+	if (match("put_to")) return Q(type_put_to);
 	if (match("rand")) return Q(type_rand);
 	if (match("remove")) return Q(type_remove);
 	if (match("round")) return Q(type_round);
@@ -167,6 +169,8 @@ int main(int argc, char *argv[])
 	const char *name = argc > 1 ? argv[1] : "";
 	main_argc = argc;
 	main_argv = argv;
+	get_from(stdin);
+	put_to(stdout);
 	drop(eval_file(name));
 	end_value();
 	return 0;

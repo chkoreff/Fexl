@@ -13,9 +13,8 @@ value type_buf(value f)
 /* buf_new = {buf}, where buf is a new empty character buffer. */
 value type_buf_new(value f)
 	{
-	buffer buf = 0;
 	(void)f;
-	return single(D(type_buf,buf,(type)buf_free));
+	return single(D(type_buf,buf_new(),(type)buf_free));
 	}
 
 /* (buf_put buf str) Appends the string to the buffer. */
@@ -27,10 +26,9 @@ value type_buf_put(value f)
 	value y = arg(f->R);
 	if (x->T == type_buf && y->T == type_str)
 		{
-		buffer buf = data(x);
+		buffer *buf = data(x);
 		string str = data(y);
-		buf = buf_put(buf,str);
-		x->R->R = (value)buf;
+		buf_put(buf,str);
 		return Q(type_I);
 		}
 	reduce_void(f);
@@ -47,9 +45,8 @@ value type_buf_get(value f)
 	value x = arg(f->R);
 	if (x->T == type_buf)
 		{
-		buffer buf = data(x);
-		string str = buf_finish(buf);
-		x->R->R = 0;
+		buffer *buf = data(x);
+		string str = buf_clear(buf);
 		return single(Qstr(str));
 		}
 	reduce_void(f);

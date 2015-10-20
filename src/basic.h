@@ -5,6 +5,7 @@ extern value type_F(value f);
 extern value type_Y(value f);
 extern value type_eval(value f);
 extern value type_once(value f);
+extern value type_later(value f);
 extern value type_void(value f);
 extern value type_single(value f);
 extern value type_cons(value f);

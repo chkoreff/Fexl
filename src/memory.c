@@ -41,9 +41,10 @@ void end_memory(void)
 	{
 	if (cur_blocks || cur_bytes)
 		{
-		put(2,"LEAK");
-		put(2," ");put_ulong(2,cur_blocks);
-		put(2," ");put_ulong(2,cur_bytes);
+		put_to_error();
+		put("LEAK");
+		put(" ");put_ulong(cur_blocks);
+		put(" ");put_ulong(cur_bytes);
 		die("");
 		}
 	}

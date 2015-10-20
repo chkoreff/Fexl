@@ -1,7 +1,6 @@
 #include <value.h>
 #include <basic.h>
 #include <memory.h>
-#include <pattern.h>
 #include <str.h>
 #include <type_str.h>
 #include <type_sym.h>
@@ -28,15 +27,32 @@ value Qsym(string name, unsigned long line)
 /* Apply f to g, where either can be a symbolic form. */
 value app(value f, value g)
 	{
-	value h = A(f,g);
-	if (f->T == type_sym || g->T == type_sym)
-		h->T = type_sym;
-	return h;
+	type t = (f->T == type_sym || g->T == type_sym) ? type_sym : type_A;
+	return V(t,f,g);
 	}
 
 static int sym_eq(symbol x, symbol y)
 	{
 	return str_eq(data(x->name),data(y->name));
+	}
+
+/* Make a pattern that ignores the form and returns the argument. */
+value none(void) { return Q(type_C); }
+
+/* Make a pattern that returns the form and ignores the argument. */
+value here(void) { return Q(type_I); }
+
+/* Make a pattern that sends the argument to the left and right as needed. */
+value fuse(value p, value q)
+	{
+	if (p->T == type_C && q->T == type_C)
+		{
+		drop(p);
+		drop(q);
+		return none();
+		}
+	else
+		return A(p,q);
 	}
 
 /* Replace all occurrences of sym in exp with I, returning a pair with the
@@ -68,7 +84,7 @@ static value remove_symbol(value sym, value exp)
 /* Return a function that calls subst(p,f,x) when applied to x. */
 value Qsubst(value p, value f)
 	{
-	return app(A(Q(type_subst),p),f);
+	return app(V(type_subst,Q(type_subst),p),f);
 	}
 
 /* Abstract the symbol from exp, returning a form which is a function of that
@@ -81,6 +97,28 @@ value lam(value sym, value exp)
 	drop(sym);
 	drop(exp);
 	return f;
+	}
+
+/* Use pattern p to make a copy of f with x substituted in various places.
+
+I do one level of look-ahead on the left and right patterns, which isn't
+strictly necessary but is 1% faster and saves 144 bytes.
+
+Checking p->R in addition to p->L is redundant, but is 0.4% faster and saves 80
+bytes.
+*/
+static value subst(value p, value f, value x)
+	{
+	if (p->L && p->R)
+		{
+		value L = (p->L->T == type_C ? hold(f->L) : subst(p->L,f->L,x));
+		value R = (p->R->T == type_C ? hold(f->R) : subst(p->R,f->R,x));
+		return A(L,R);
+		}
+	else if (p->T == type_C)
+		return hold(f);
+	else
+		return hold(x);
 	}
 
 /* (subst pattern form arg) */

@@ -3,8 +3,8 @@
 #include <basic.h>
 #include <buffer.h>
 #include <ctype.h>
+#include <input.h>
 #include <parse.h>
-#include <pattern.h>
 #include <report.h>
 #include <type_resolve.h>
 #include <type_str.h>
@@ -45,13 +45,12 @@ file) or the special token "\\".  The \\ token stops the parser immediately, as
 if it had reached end of file.
 */
 
-static int (*get)(void); /* current source stream */
 static int ch; /* current character */
 static unsigned long source_line;  /* current line number */
 
 static void skip(void)
 	{
-	ch = get();
+	ch = getd();
 	if (ch == '\n')
 		source_line++;
 	}
@@ -106,7 +105,7 @@ and a few other special characters.  This is the simplest rule that can work.
 */
 static value parse_name(void)
 	{
-	buffer buf = 0;
+	struct buffer buf = {0};
 	unsigned long first_line = source_line;
 
 	while (1)
@@ -124,12 +123,12 @@ static value parse_name(void)
 			|| ch == -1)
 			break;
 
-		buf = buf_add(buf,(char)ch);
+		buf_add(&buf,(char)ch);
 		skip();
 		}
 
-	if (!buf) return 0;
-	return Qsym(buf_finish(buf), first_line);
+	if (!buf.top) return 0;
+	return Qsym(buf_clear(&buf), first_line);
 	}
 
 /* Collect a string up to an ending terminator. */
@@ -140,7 +139,7 @@ static string collect_string(
 	)
 	{
 	unsigned long match_pos = 0;
-	buffer buf = 0;
+	struct buffer buf = {0};
 
 	while (match_pos < end_len)
 		{
@@ -152,19 +151,19 @@ static string collect_string(
 		else if (match_pos > 0)
 			{
 			/* Buffer the ones matched so far and start over. */
-			buf = buf_addn(buf,end_data,match_pos);
+			buf_addn(&buf,end_data,match_pos);
 			match_pos = 0;
 			}
 		else if (ch == -1)
 			syntax_error("Unclosed string", first_line);
 		else
 			{
-			buf = buf_add(buf,(char)ch);
+			buf_add(&buf,(char)ch);
 			skip();
 			}
 		}
 
-	return buf_finish(buf);
+	return buf_clear(&buf);
 	}
 
 static value parse_quote_string(void)
@@ -181,22 +180,22 @@ static value parse_tilde_string(void)
 
 	/* Parse the string terminator. */
 	{
-	buffer buf = 0;
+	struct buffer buf = {0};
 
 	while (1)
 		{
 		if (ch == -1 || at_white())
 			break;
-		buf = buf_add(buf,(char)ch);
+		buf_add(&buf,(char)ch);
 		skip();
 		}
 
-	if (ch == -1 || buf == 0)
+	if (ch == -1 || buf.top == 0)
 		syntax_error("Incomplete string terminator", first_line);
 
 	skip();
 
-	end = buf_finish(buf);
+	end = buf_clear(&buf);
 	}
 
 	/* Gather string content up to the next occurrence of terminator. */
@@ -404,15 +403,14 @@ static value parse_exp(void)
 	return exp;
 	}
 
-/* Parse the source stream. */
-value parse_source(const char *label, int source(void))
+/* Parse the current input. */
+value parse_source(const char *label)
 	{
 	const char *save = source_label;
-	int (*save_get)(void) = get;
+	int save_ch = ch;
+	unsigned long save_source_line = source_line;
 
 	source_label = label;
-	get = source;
-
 	ch = ' ';
 	source_line = 1;
 
@@ -423,7 +421,8 @@ value parse_source(const char *label, int source(void))
 		syntax_error("Extraneous input", source_line);
 
 	source_label = save;
-	get = save_get;
+	ch = save_ch;
+	source_line = save_source_line;
 
 	return exp;
 	}

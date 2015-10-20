@@ -8,6 +8,9 @@ struct symbol
 extern value type_sym(value f);
 extern value Qsym(string name, unsigned long line);
 extern value app(value f, value g);
+extern value none(void);
+extern value here(void);
+extern value fuse(value p, value q);
 extern value Qsubst(value p, value f);
 extern value lam(value sym, value exp);
 extern value type_subst(value f);

@@ -1,5 +1,6 @@
 #include <value.h>
 #include <basic.h>
+#include <input.h>
 #include <num.h>
 #include <stdio.h>
 #include <str.h>
@@ -43,10 +44,10 @@ static unsigned char char_width(unsigned char ch)
 	return n;
 	}
 
-/* Get the next UTF-8 character from the file. */
-static string get_utf8(FILE *fh)
+/* Get the next UTF-8 character from the current input. */
+static string get_utf8(void)
 	{
-	int ch = fgetc(fh);
+	int ch = getd();
 	if (ch == -1) return 0;
 	{
 	char buf[6];
@@ -60,39 +61,20 @@ static string get_utf8(FILE *fh)
 		{
 		buf[pos++] = (char)ch;
 		if (pos >= len) break;
-		ch = fgetc(fh);
+		ch = getd();
 		if (ch == -1) return 0;
 		}
 	return str_new_data(buf,len);
 	}
 	}
 
-static value op_get(FILE *fh)
-	{
-	string ch = get_utf8(fh);
-	return single(ch ? Qstr(ch) : Q(type_void));
-	}
-
 /* get = {ch}, where ch is the next UTF-8 character from stdin, or void if
 no more characters. */
 value type_get(value f)
 	{
+	string ch = get_utf8();
 	(void)f;
-	return op_get(stdin);
-	}
-
-/* (fget fh) = {ch}, where ch is the next UTF-8 character from fh, or void if
-no more characters. */
-value type_fget(value f)
-	{
-	if (!f->L) return 0;
-	{
-	value x = arg(f->R);
-	if (x->T == type_file)
-		return op_get(data(x));
-	reduce_void(f);
-	return 0;
-	}
+	return single(ch ? Qstr(ch) : Q(type_void));
 	}
 
 /* (char_width str pos) Return the width of the UTF-8 character which starts at
@@ -117,6 +99,58 @@ value type_char_width(value f)
 				return 0;
 				}
 			}
+		}
+	reduce_void(f);
+	return 0;
+	}
+	}
+
+string cur_text;
+unsigned long cur_pos;
+int getd_string(void)
+	{
+	return cur_pos < cur_text->len ? cur_text->data[cur_pos++] : -1;
+	}
+
+/* (get_from source content)
+Evaluate the content with the current input temporarily set to the source,
+which may be a file or a string.
+LATER Might allow source to be an arbitrary list.
+*/
+value type_get_from(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	{
+	value x = arg(f->L->R);
+	if (x->T == type_file)
+		{
+		input save_getd = getd;
+		void *save_cur_in = cur_in;
+		FILE *fh = data(x);
+
+		get_from(fh);
+		f = eval(hold(f->R));
+
+		getd = save_getd;
+		cur_in = save_cur_in;
+		return f;
+		}
+	else if (x->T == type_str)
+		{
+		input save_getd = getd;
+		string save_cur_text = cur_text;
+		unsigned long save_cur_pos = cur_pos;
+
+		getd = getd_string;
+		cur_text = data(x);
+		cur_pos = 0;
+
+		f = eval(hold(f->R));
+
+		getd = save_getd;
+		cur_text = save_cur_text;
+		cur_pos = save_cur_pos;
+		return f;
 		}
 	reduce_void(f);
 	return 0;

@@ -1,32 +1,29 @@
 #include <value.h>
 #include <basic.h>
+#include <input.h>
 #include <parse.h>
 #include <str.h>
+#include <type_input.h>
 #include <type_parse_string.h>
 #include <type_resolve.h>
 #include <type_str.h>
 
-static string source;
-static unsigned long pos;
-
-static int get(void)
-	{
-	return pos < source->len ? source->data[pos++] : -1;
-	}
-
 static value parse_string(string text)
 	{
-	string save_source = source;
-	unsigned long save_pos = pos;
+	input save_getd = getd;
+	string save_cur_text = cur_text;
+	unsigned long save_cur_pos = cur_pos;
 
-	source = text;
-	pos = 0;
+	getd = getd_string;
+	cur_text = text;
+	cur_pos = 0;
 
 	{
-	value exp = parse_source("",get);
+	value exp = parse_source("");
 
-	source = save_source;
-	pos = save_pos;
+	getd = save_getd;
+	cur_text = save_cur_text;
+	cur_pos = save_cur_pos;
 	return exp;
 	}
 	}

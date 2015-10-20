@@ -4,8 +4,10 @@ say "hello"
 
 \talk=
 	(
-	error ["This goes to stderr."]
-	error ["x = " x]
+	(put_to stderr;
+	say "This goes to stderr."
+	say ["x = " x]
+	)
 	say "This goes to stdout."
 	)
 

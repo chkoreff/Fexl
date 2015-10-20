@@ -3,87 +3,100 @@
 #include <memory.h>
 #include <string.h> /* memcpy */
 
-void buf_free(buffer buf)
+buffer *buf_new(void)
 	{
-	while (buf)
-		{
-		buffer next = buf->next;
-		str_free(buf->str);
-		free_memory(buf,sizeof(struct buffer));
-		buf = next;
-		}
+	struct buffer *buf = new_memory(sizeof(struct buffer));
+	buf->top = 0;
+	return buf;
 	}
 
-static buffer buf_push(buffer buf, const unsigned long size)
+static struct chunk *new_chunk(struct chunk *next, const unsigned long size)
 	{
-	string top = str_new(size);
-	buffer new = new_memory(sizeof(struct buffer));
+	struct chunk *new = new_memory(sizeof(struct chunk));
 	new->pos = 0;
-	new->str = top;
-	new->next = buf;
+	new->str = str_new(size);
+	new->next = next;
 	return new;
 	}
 
-static unsigned long buf_length(buffer buf)
+/* Add a single char to the buffer. */
+void buf_add(buffer *buf, char ch)
 	{
-	unsigned long len = 0;
-	while (buf)
+	struct chunk *top = buf->top;
+	if (!top || top->pos >= top->str->len)
 		{
-		len += buf->pos;
-		buf = buf->next;
-		}
-	return len;
-	}
-
-/* Return the buffer content in a string. */
-static string buf_string(buffer buf)
-	{
-	unsigned long offset = buf_length(buf);
-	string result = str_new(offset);
-	result->data[offset] = '\000'; /* Add trailing NUL byte. */
-
-	while (buf)
-		{
-		offset -= buf->pos;
-		memcpy(result->data + offset, buf->str->data, buf->pos);
-		buf = buf->next;
-		}
-
-	return result;
-	}
-
-buffer buf_add(buffer buf, char ch)
-	{
-	if (!buf || buf->pos >= buf->str->len)
-		{
-		unsigned long size = buf ? buf->pos : 16;
+		unsigned long size = top ? top->pos : 16;
 		if (size < 1048576) size <<= 1;
-		buf = buf_push(buf,size);
+		top = new_chunk(top,size);
+		buf->top = top;
 		}
-
-	buf->str->data[buf->pos++] = ch;
-	return buf;
+	top->str->data[top->pos++] = ch;
 	}
 
 /* To add a whole string we simply add the characters one at a time.  We could
 optimize it later, but it's fine for now. */
-buffer buf_addn(buffer buf, const char *str, unsigned long len)
+void buf_addn(buffer *buf, const char *str, unsigned long len)
 	{
 	unsigned long pos;
 	for (pos = 0; pos < len; pos++)
-		buf = buf_add(buf,str[pos]);
-	return buf;
+		buf_add(buf, str[pos]);
 	}
 
-buffer buf_put(buffer buf, string str)
+/* Add a string to the buffer. */
+void buf_put(buffer *buf, string str)
 	{
-	return buf_addn(buf,str->data,str->len);
+	buf_addn(buf,str->data,str->len);
 	}
 
-/* Clear the buffer and return its content. */
-string buf_finish(buffer buf)
+/* Clear the buffer, discarding its contents. */
+void buf_discard(buffer *buf)
 	{
-	string result = buf_string(buf);
-	buf_free(buf);
+	struct chunk *chunk = buf->top;
+	while (chunk)
+		{
+		struct chunk *next = chunk->next;
+		str_free(chunk->str);
+		free_memory(chunk,sizeof(struct chunk));
+		chunk = next;
+		}
+	buf->top = 0;
+	}
+
+unsigned long buf_length(buffer *buf)
+	{
+	unsigned long len = 0;
+	struct chunk *chunk = buf->top;
+	while (chunk)
+		{
+		len += chunk->pos;
+		chunk = chunk->next;
+		}
+	return len;
+	}
+
+/* Clear the buffer and return its content in a string. */
+string buf_clear(buffer *buf)
+	{
+	struct chunk *chunk = buf->top;
+	unsigned long offset = buf_length(buf);
+	string result = str_new(offset);
+	result->data[offset] = '\000'; /* Add trailing NUL byte. */
+
+	while (chunk)
+		{
+		struct chunk *next = chunk->next;
+		offset -= chunk->pos;
+		memcpy(result->data + offset, chunk->str->data, chunk->pos);
+		chunk = next;
+		}
+
+	buf_discard(buf);
 	return result;
+	}
+
+/* Free a dynamically allocated buffer. */
+void buf_free(buffer *buf)
+	{
+	buf_discard(buf);
+	free_memory(buf,sizeof(struct buffer));
 	}

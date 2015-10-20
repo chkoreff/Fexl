@@ -15,4 +15,4 @@ extern int str_cmp(string x, string y);
 extern int str_eq(string x, string y);
 extern string str_slice(string x, unsigned long pos, unsigned long len);
 extern unsigned long str_search(string x, string y, unsigned long offset);
-extern void put_str(int out, string x);
+extern void put_str(string x);

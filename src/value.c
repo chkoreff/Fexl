@@ -89,7 +89,7 @@ void drop(value f)
 	}
 
 /* Return a value of type T with the given left and right side. */
-static value V(type T, value L, value R)
+value V(type T, value L, value R)
 	{
 	value f = free_list ? pop_free() : new_memory(sizeof(struct value));
 	f->N = 1;
@@ -118,7 +118,7 @@ void *data(value f)
 	}
 
 /* The type for function application */
-static value type_A(value f)
+value type_A(value f)
 	{
 	value g = eval(hold(f->L));
 	if (g != f->L)

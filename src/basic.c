@@ -39,7 +39,7 @@ value type_F(value f)
 value type_Y(value f)
 	{
 	if (!f->L) return 0;
-	reduce_A(f, hold(f->R), A(hold(f->L),hold(f->R)));
+	reduce_A(f, hold(f->R), V(type_Y,hold(f->L),hold(f->R)));
 	return f;
 	}
 
@@ -58,6 +58,17 @@ value type_once(value f)
 	if (!f->L) return 0;
 	reduce(f,hold(arg(f->R)));
 	return f;
+	}
+
+/* (later x) = (I x), and the evaluation stops there.  This is used to return a
+function and postpone its evaluation until later. */
+value type_later(value f)
+	{
+	if (!f->L) return 0;
+	drop(f->L);
+	f->L = Q(type_I);
+	f->T = type_A;
+	return 0;
 	}
 
 /* (void x) = void */
@@ -148,5 +159,5 @@ void reduce_boolean(value f, int x)
 
 value single(value x)
 	{
-	return A(Q(type_single), x);
+	return V(type_single,Q(type_single), x);
 	}

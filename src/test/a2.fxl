@@ -10,4 +10,10 @@ say "Press Ctrl-D to stop."
 	echo
 	)
 echo
+
+(
+say "Get from string:"
+get_from "abc";
+echo
+)
 say "Good bye."
