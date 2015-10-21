@@ -308,7 +308,7 @@ static value parse_lambda(unsigned long first_line)
 		value context = parse_context(first_line);
 		value exp = parse_exp();
 		value label = Qstr(str_new_data0(source_label));
-		return app(A(A(Q(type_resolve),label),exp),context);
+		return app(A(V(type_resolve,Q(type_resolve),label),exp), context);
 		}
 		}
 
@@ -321,8 +321,8 @@ static value parse_lambda(unsigned long first_line)
 	{
 	/* Parse the optional definition of the symbol. */
 	value def = 0;
-	{
-	char is_recursive = 0;
+	char is_eager = 0;
+
 	skip_filler();
 	first_line = source_line;
 	if (ch == '=')
@@ -330,7 +330,7 @@ static value parse_lambda(unsigned long first_line)
 		skip();
 		if (ch == '=')
 			{
-			is_recursive = 1;
+			is_eager = 1;
 			skip();
 			}
 		skip_filler();
@@ -339,15 +339,16 @@ static value parse_lambda(unsigned long first_line)
 			syntax_error("Missing definition", first_line);
 		}
 
-	if (is_recursive)
-		def = app(Q(type_Y),lam(hold(sym),def));
-	}
-
 	/* Parse the body of the function and apply the definition if any. */
 	{
 	value exp = lam(sym,parse_exp());
 	if (def)
-		exp = app(exp,def);
+		{
+		if (is_eager)
+			exp = app(app(Q(type_query),def),exp);
+		else
+			exp = app(exp,def);
+		}
 	return exp;
 	}
 	}
@@ -404,7 +405,7 @@ static value parse_exp(void)
 	}
 
 /* Parse the current input. */
-value parse_source(const char *label)
+value parse(const char *label)
 	{
 	const char *save = source_label;
 	int save_ch = ch;

@@ -4,16 +4,13 @@
 
 \create=
 	(\base\other
-	\this==
-		(\n
-		le n 0 base ;
-		- n (other (this (- n 1)))
-		)
-	this
+	@\this\n
+	le n 0 base ;
+	- n (other (this (- n 1)))
 	)
 
-\male   == (create 0 (create 1 male))
-\female == (create 1 (create 0 female))
+\male   = (@\this create 0 (create 1 this))
+\female = (@\this create 1 (create 0 this))
 
 # LATER I wonder if producing the infinite list of male/female numbers might be
 # more efficient than calculating (male/female N) for each N.

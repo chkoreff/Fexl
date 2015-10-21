@@ -4,8 +4,8 @@
 # Normal distribution with mean 0 and standard deviation 1.
 \rand_normal=
 	(
-	rand \r1
-	rand \r2
+	\r1==rand
+	\r2==rand
 	\r=(* (sqrt; * -2 (log r1)) (cos; * tau r2))
 	{r}
 	)
@@ -15,12 +15,12 @@
 \fund_list_ror
 \benchmark_list_ror
 
-\list_sub==
-	(\xs\ys
+\list_sub=
+	(@\loop\xs\ys
 	xs [] \x\xs
 	ys [] \y\ys
 	\z=(- x y)
-	[z; list_sub xs ys]
+	[z; loop xs ys]
 	)
 
 \list_mean=(\xs / (list_sum xs) (list_length xs))
@@ -191,7 +191,7 @@ put_sharpe excess_sharpe nl
 ]
 
 make_rand_ror 1.4 6.0 \rand_ror
-\list_rand_ror==(once; rand_ror \x [x;list_rand_ror])
+\list_rand_ror=(@\loop once; rand_ror \x [x;loop])
 
 seed_rand 0.1964
 \len=(list_length benchmark_list_ror)
@@ -200,12 +200,12 @@ seed_rand 0.1964
 \show_returns=
 	(
 	\xs\ys
-	\show_lists==
-		(\xs\ys
+	\show_lists=
+		(@\loop\xs\ys
 		xs () \x\xs
 		ys () \y\ys
 		put x put " " put y nl
-		show_lists xs ys
+		loop xs ys
 		)
 	say "Returns (Fund vs. Benchmark)"
 	say "["

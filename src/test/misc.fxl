@@ -5,12 +5,10 @@
 # (fib n) = (+ (fib; + n 2) (fib; + n 1))  # if n < 0
 \fib=
 	(
-	\loop==
-		(\x\y\n
-		le n 0 x;
-		loop y (+ x y) (- n 1)
-		)
-	loop 0 1
+	(@\loop\x\y\n
+	le n 0 x;
+	loop y (+ x y) (- n 1)
+	) 0 1
 	)
 
 \try_fib=

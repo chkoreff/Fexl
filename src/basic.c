@@ -43,13 +43,18 @@ value type_Y(value f)
 	return f;
 	}
 
-/* (eval x) Evaluates x in place and reduces to I. */
-value type_eval(value f)
+/* (query x f) = (f v), where v is the final value of x. */
+value type_query(value f)
 	{
-	if (!f->L) return 0;
-	arg(f->R);
-	reduce_Q(f,type_I);
-	return 0;
+	if (!f->L || !f->L->L) return 0;
+	{
+	value v = eval(hold(f->L->R));
+	if (v != f->L->R)
+		f = A(hold(f->R), v);
+	else
+		reduce_A(f, hold(f->R), v);
+	return f;
+	}
 	}
 
 /* (once x) = x, but x is evaluated only once. */
@@ -79,14 +84,6 @@ value type_void(value f)
 	return 0;
 	}
 
-/* (single x p) = (p x) */
-value type_single(value f)
-	{
-	if (!f->L || !f->L->L) return 0;
-	reduce_A(f, hold(f->R), hold(f->L->R));
-	return f;
-	}
-
 /* (cons x y A B) = (B x y) */
 value type_cons(value f)
 	{
@@ -99,6 +96,14 @@ value type_cons(value f)
 value type_null(value f)
 	{
 	return type_T(f);
+	}
+
+/* Check if the argument is defined (non-void) without evaluating it. */
+value type_defined(value f)
+	{
+	if (!f->L) return 0;
+	reduce_boolean(f, f->R->T != type_void);
+	return 0;
 	}
 
 value type_is_void(value f)
@@ -157,7 +162,7 @@ void reduce_boolean(value f, int x)
 	reduce_Q(f, x ? type_T : type_F);
 	}
 
-value single(value x)
+value later(value x)
 	{
-	return V(type_single,Q(type_single), x);
+	return V(type_later,Q(type_later), x);
 	}

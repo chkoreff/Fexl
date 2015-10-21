@@ -4,10 +4,10 @@
 \=
 (
 \x
-\speaker=(\name \x put name put " says " say x)
-eq x "fred" {(speaker "Fred")};
-eq x "wilma" {(speaker "Wilma")};
-eq x "goodbye" {(say "Goodbye")};
+\speaker=(\name \x later; put name put " says " say x)
+eq x "fred" (speaker "Fred");
+eq x "wilma" (speaker "Wilma");
+eq x "goodbye" (later; say "Goodbye");
 standard x
 )
 

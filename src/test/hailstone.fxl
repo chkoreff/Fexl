@@ -8,11 +8,11 @@
 
 # https://en.wikipedia.org/wiki/Collatz_conjecture
 # The "hailstone sequence"
-\hailstone==
-	(\x
+\hailstone=
+	(@\loop\x
 	cons x;
 	le x 1 [];
-	hailstone (is_even x (/ x 2) (+ 1; * x 3))
+	loop (is_even x (/ x 2) (+ 1; * x 3))
 	)
 
 \try=

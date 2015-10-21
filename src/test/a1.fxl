@@ -12,8 +12,14 @@
 	say "other"
 	)
 
-\eval_file=(\name parse_file name standard I)
-\eval_str=(\str parse_string str standard I)
+\parse_string=
+	(\text\context
+	get_from text;
+	parse "" context
+	)
+
+\eval_file=(\name parse_file name standard)
+\eval_str=(\str parse_string str standard)
 
 (
 \ping=(say "ping")
@@ -167,15 +173,11 @@ say "== test char_width"
 
 # Return the list of UTF-8 chars starting from the given position.
 \str_chars=
-	(\str\pos
-	\str_chars==
-		(\pos
-		ge pos (length str) [];
-		\n=(char_width str pos)
-		\ch=(slice str pos n)
-		[ch; str_chars (+ pos n)]
-		)
-	str_chars pos
+	(\str @\loop \pos
+	ge pos (length str) [];
+	\n=(char_width str pos)
+	\ch=(slice str pos n)
+	[ch; loop (+ pos n)]
 	)
 
 \str="hej åabcüdef üä 1≠0 包子x"
@@ -187,9 +189,9 @@ each list (\ch say ["ch " ch])
 
 (
 say "== test buf"
-buf_new \buf
+\buf==buf_new
 \put=(buf_put buf)
-\get=(buf_get buf \x say [": " x])
+\get=(\x==(buf_get buf) say [": " x])
 put "abc"
 put "defg"
 get
@@ -232,7 +234,6 @@ show (void 3)
 show (length 3)
 show (length "abc")
 show (length 3 "abc")
-show (eval_file 32)
 show (lt 3 4)
 show (lt 3 "4")
 show (lt 3 "4" "5")
@@ -333,20 +334,17 @@ f
 
 \make_square=
 	(\x
-	\f=
-		(
-		once (put ["square " x "="])
-		* x x
-		)
-	{f}
+	later;
+	once (put ["square " x "="])
+	* x x
 	)
 
 div
 
 say (* x x)
 say (+ x x)
-make_square 4 \s4
-make_square 7 \s7
+\s4==(make_square 4)
+\s7==(make_square 7)
 
 say s4
 say s7
@@ -397,10 +395,15 @@ show "x"
 show (+ 2 3)
 show (is_good; standard "show")
 # Demonstrate that the standard context points directly to itself.
-show (is_good;
-	standard "standard" \standard
-	standard "standard" \standard
-	standard "show"
+show (
+	\def==
+		(
+		\cx=standard
+		\cx==(cx "standard")
+		\cx==(cx "standard")
+		cx "show"
+		)
+	defined def
 	)
 )
 try_fib
@@ -520,11 +523,11 @@ show_list (cons 1; cons 2; null)
 seed_rand 0.1964
 
 (
-\list_rand==(once; rand \x [x;list_rand])
+\list_rand=(@\loop once; \x==rand [x;loop])
 demo_rand list_rand
 )
 (
-\list_rand==(once; rand \x [x;list_rand])
+\list_rand=(@\loop once; \x==rand [x;loop])
 demo_rand list_rand
 )
 
@@ -576,12 +579,12 @@ say (is_void void)
 # Test tuples
 div
 (
-\show==
-	(\keys
+\show=
+	(@\loop\keys
 	keys () \key\keys
 	\val
 	put [key "=" val " "]
-	show keys
+	loop keys
 	)
 
 \try=
@@ -665,12 +668,12 @@ eval_file "test/mf.fxl"
 	\context=
 	(\x
 	say ["symbol " x]
-	eq x "fred" {(say "I am Fred.")};
-	eq x "wilma" {(say "I am Wilma.")};
-	eq x "barney" {(say "I am Barney.")};
-	eq x "is_void" {is_void};
-	eq x "say" (\: I : say);  # Test a special case in resolve.
-	eq x "void" {void};
+	eq x "fred" (later; say "I am Fred.");
+	eq x "wilma" (later; say "I am Wilma.");
+	eq x "barney" (later; say "I am Barney.");
+	eq x "is_void" is_void;
+	eq x "say" say;
+	eq x "void" (later void);
 	void
 	)
 
@@ -690,13 +693,13 @@ eval_file "test/mf.fxl"
 \case_2=
 	(
 	say "["
-	\form=(\context parse_string "say (+ 7 8)" context I)
+	\form=(\context parse_string "say (+ 7 8)" context)
 
 	say "Run in standard context."
 	form standard
 
 	say "Run in weird context."
-	\context=(\x eq x "say" {say}; eq x "+" {*}; void)
+	\context=(\x eq x "say" say; eq x "+" *; void)
 	form context
 
 	say "]"
@@ -745,17 +748,17 @@ try -1.3
 
 \write_file=
 	(\content
-	fopen tmp_file "w" \fh
+	\fh==(fopen tmp_file "w")
 	put_to fh;
 	put content
 	)
 
 \show_chars=
 	(\f
-	fopen tmp_file "r" \fh
+	\fh==(fopen tmp_file "r")
 	get_from fh;
 	@\loop
-	get \ch
+	\ch==get
 	is_void ch ();
 	f ch
 	loop
@@ -763,7 +766,7 @@ try -1.3
 
 \remove_file=
 	(
-	remove tmp_file \code
+	\code==(remove tmp_file)
 	say [(eq code 0 "Removed" "Could not remove") " " tmp_file]
 	)
 
@@ -812,7 +815,7 @@ test_file
 # operations in one place.
 
 # The "!" function creates a read and write pair.
-\!=(var_new \v {(var_get v) (var_put v)})
+\!=(\v==var_new {(\x==(var_get v) {x}) (var_put v)})
 
 \fib=
 	(\max
@@ -844,8 +847,8 @@ fib 5
 
 div
 (
-var_new \v
-\x=(var_get v I)
+\v==var_new
+\x==(var_get v)
 var_put v x
 say "Passed var test of 20150907."
 )
@@ -873,7 +876,7 @@ say x
 (
 div
 put "("
-\x=(put "x=" 3) eval x  # Force the eval.
+\x==(put "x=" 3) # Force the evaluation.
 put ")"
 say x
 say x
@@ -882,9 +885,9 @@ say x
 (
 div
 \x=(say "hi" 3)
-eval x  # The effect only happens once.
-eval x
-eval x
+\x==x  # The effect only happens once.
+\x==x
+\x==x
 )
 )
 
@@ -914,6 +917,27 @@ try 3 "," 0.159265
 )
 
 (
+div
+\talk=(say "Hi")
+talk
+talk
+)
+
+(
+div
+\talk=(say "Hi")
+\x==talk
+\x==talk
+)
+
+(
+div
+\talk==(say "Hi")
+talk
+talk
+)
+
+(
 \try=
 	(\list
 	div
@@ -929,15 +953,15 @@ div
 	(\x
 	\y=(fexl_quote x)
 	say y
-	{y}
+	y
 	)
 
 \x="a b"
-try x \x
-try x \x
-try x \x
-try x \x
-try x \x
+\x==(try x)
+\x==(try x)
+\x==(try x)
+\x==(try x)
+\x==(try x)
 )
 
 (
@@ -965,14 +989,14 @@ div
 
 (
 # Test drop buffer without getting its content.
-buf_new \buf
+\buf==buf_new
 buf_put buf "x"
 )
 
 # Now test redirecting output to a buffer.
 \result=
 (
-buf_new \buf
+\buf==buf_new
 (
 put_to buf;
 hello
@@ -980,7 +1004,7 @@ say "line 1"
 say "line 2"
 put "line 3" nl
 )
-buf_get buf I
+buf_get buf
 )
 
 say "result:"

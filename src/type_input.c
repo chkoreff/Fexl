@@ -68,13 +68,13 @@ static string get_utf8(void)
 	}
 	}
 
-/* get = {ch}, where ch is the next UTF-8 character from stdin, or void if
-no more characters. */
+/* get = ch, where ch is the next UTF-8 character from the current input, or
+void if no more characters. */
 value type_get(value f)
 	{
 	string ch = get_utf8();
 	(void)f;
-	return single(ch ? Qstr(ch) : Q(type_void));
+	return ch ? Qstr(ch) : Q(type_void);
 	}
 
 /* (char_width str pos) Return the width of the UTF-8 character which starts at

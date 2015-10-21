@@ -4,9 +4,9 @@
 
 ## Here is the "API".
 
-var_new \v_list
-var_new \v_count
-var_new \v_map
+\v_list==var_new
+\v_count==var_new
+\v_map==var_new
 
 var_put v_list []
 var_put v_count 0
@@ -14,7 +14,7 @@ var_put v_map void
 
 \update=
 	(\v\f
-	var_get v \x
+	\x==(var_get v)
 	var_put v (f x)
 	)
 
@@ -23,8 +23,8 @@ var_put v_map void
 	update v (cons x)
 	)
 
-\get_pairs=(var_get v_list)
-\get_count=(var_get v_count)
+\pairs=(var_get v_list)
+\count=(var_get v_count)
 
 \update_map=
 	(\v\key\val
@@ -54,27 +54,21 @@ var_put v_map void
 	update_map v_map key val
 	)
 
-\get=
-	(\key
-	var_get v_map \map
-	{(map key)}
-	)
+\get=(var_get v_map)
 
 ## Now do some operations.
 
 \show_pairs=
 (
 \show_pair=(\pair pair \key\val say ["{ " key " " val " }"])
-get_pairs \list
 say "["
-each list show_pair
+each pairs show_pair
 say "]"
 )
 
 \show=
 	(\key
-	get key \val
-	say ["get " key " = " val]
+	say ["get " key " = " (get key)]
 	)
 
 (
@@ -94,7 +88,6 @@ set_xyz
 set_xyz
 set_q
 show_pairs
-get_count \count
 say ["count = " count]
 show "x"
 show "y"

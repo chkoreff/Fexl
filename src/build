@@ -21,8 +21,7 @@ make type_limit
 make type_math
 make type_num
 make type_output
-make type_parse_file
-make type_parse_string
+make type_parse
 make type_rand
 make type_resolve
 make type_run

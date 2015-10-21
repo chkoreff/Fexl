@@ -20,16 +20,13 @@ static value resolve_symbol(value x, value context)
 
 	{
 	/* Define other names using the given context. */
-	value exp = eval(A(A(hold(context),hold(x)),Q(type_single)));
-	value def;
-
-	if (exp->L && exp->L->T == type_single)
-		def = hold(exp->R);
-	else
-		def = 0;
-
-	drop(exp);
-	return def;
+	value exp = eval(A(hold(context),hold(x)));
+	if (exp->T == type_void)
+		{
+		drop(exp);
+		exp = 0;
+		}
+	return exp;
 	}
 	}
 
@@ -92,4 +89,9 @@ value type_resolve(value f)
 	source_label = save;
 	return f;
 	}
+	}
+
+value op_resolve(value label, value exp, value context)
+	{
+	return A(A(V(type_resolve,Q(type_resolve), label), exp), context);
 	}

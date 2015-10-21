@@ -10,12 +10,10 @@
 # (tower n f x) is the result of applying f to x n times.
 \tower=
 	(\n\f\x
-	\tower==
-		(\n\x
-		le n 0 x;
-		tower (- n 1) (f x)
-		)
-	tower n x
+	(@\loop\n\x
+	le n 0 x;
+	loop (- n 1) (f x)
+	) n x
 	)
 
 def "append" append;

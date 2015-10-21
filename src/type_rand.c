@@ -22,11 +22,11 @@ value type_seed_rand(value f)
 	}
 	}
 
-/* rand = {x}, where x is a weakly pseudo-random number with a uniform
+/* rand = x, where x is a weakly pseudo-random number with a uniform
 distribution over 0 <= x <= 1. */
 value type_rand(value f)
 	{
 	double x = ((double)rand()) / ((double)RAND_MAX);
 	(void)f;
-	return single(Qnum0(x));
+	return Qnum0(x);
 	}

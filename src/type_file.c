@@ -27,7 +27,7 @@ value Qfile(FILE *fh)
 	return D(type_file,fh,(type)file_free);
 	}
 
-/* (fopen path mode) Open a file and return {fh}, where fh is the open file
+/* (fopen path mode) Open a file and return fh, where fh is the open file
 handle or void on failure. */
 value type_fopen(value f)
 	{
@@ -40,15 +40,15 @@ value type_fopen(value f)
 		string path = data(x);
 		string mode = data(y);
 		FILE *fh = fopen(path->data,mode->data);
-		return single(fh ? Qfile(fh) : Q(type_void));
+		return fh ? Qfile(fh) : Q(type_void);
 		}
 	reduce_void(f);
 	return 0;
 	}
 	}
 
-/* (remove path) = {code} Remove path from file system.  The code is 0 if
-successful or -1 otherwise. */
+/* (remove path) Remove path from file system; return 0 if successful or -1
+otherwise. */
 value type_remove(value f)
 	{
 	if (!f->L) return 0;
@@ -58,7 +58,7 @@ value type_remove(value f)
 		{
 		string path = data(x);
 		int code = remove(path->data);
-		return single(Qnum0(code));
+		return Qnum0(code);
 		}
 	reduce_void(f);
 	return 0;

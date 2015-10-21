@@ -175,7 +175,6 @@ void
 void
 num 3
 void
-void
 bool T
 void
 void
@@ -901,6 +900,14 @@ hi
 -0.159
 0.159
 
+==
+Hi
+Hi
+==
+Hi
+Hi
+==
+Hi
 ==
 c b a 
 ==

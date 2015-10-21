@@ -1,8 +1,10 @@
 #include <value.h>
 #include <basic.h>
+#include <die.h>
 #include <input.h>
 #include <num.h>
 #include <output.h>
+#include <parse.h>
 #include <stdio.h>
 #include <str.h>
 #include <string.h> /* strcmp */
@@ -14,9 +16,9 @@
 #include <type_math.h>
 #include <type_num.h>
 #include <type_output.h>
-#include <type_parse_file.h>
-#include <type_parse_string.h>
+#include <type_parse.h>
 #include <type_rand.h>
+#include <type_resolve.h>
 #include <type_run.h>
 #include <type_str.h>
 #include <type_var.h>
@@ -44,9 +46,9 @@ static value standard(void)
 	if (match("char_width")) return Q(type_char_width);
 	if (match("cons")) return Q(type_cons);
 	if (match("cos")) return Q(type_cos);
+	if (match("defined")) return Q(type_defined);
 	if (match("die")) return Q(type_die);
 	if (match("eq")) return Q(type_eq);
-	if (match("eval")) return Q(type_eval);
 	if (match("exp")) return Q(type_exp);
 	if (match("F")) return Q(type_F);
 	if (match("flock_ex")) return Q(type_flock_ex);
@@ -78,8 +80,7 @@ static value standard(void)
 	if (match("null")) return Q(type_null);
 	if (match("num_str")) return Q(type_num_str);
 	if (match("once")) return Q(type_once);
-	if (match("parse_file")) return Q(type_parse_file);
-	if (match("parse_string")) return Q(type_parse_string);
+	if (match("parse")) return Q(type_parse);
 	if (match("put")) return Q(type_put);
 	if (match("put_to")) return Q(type_put_to);
 	if (match("rand")) return Q(type_rand);
@@ -113,7 +114,7 @@ static int match(const char *other)
 	return strcmp(cur_name,other) == 0;
 	}
 
-/* (standard x) = {def} if x is defined, or void if x is not defined. */
+/* (standard x) returns the definition of symbol x, or void if not defined. */
 static value type_standard(value f)
 	{
 	if (!f->L) return 0;
@@ -125,10 +126,32 @@ static value type_standard(value f)
 		cur_name = ((string)data(x))->data;
 		def = standard();
 		if (def)
-			return single(def);
+			return later(def);
 		}
 	reduce_void(f);
 	return 0;
+	}
+	}
+
+static value parse_file(const char *name)
+	{
+	input save_getd = getd;
+	void *save_cur_in = cur_in;
+
+	cur_in = name[0] ? fopen(name,"r") : stdin;
+	if (!cur_in)
+		{
+		put_to_error();
+		put("Could not open source file ");put(name);nl();
+		die(0);
+		}
+
+	{
+	value exp = parse(name);
+
+	getd = save_getd;
+	cur_in = save_cur_in;
+	return exp;
 	}
 	}
 
@@ -137,16 +160,19 @@ null or empty. */
 static value eval_file(const char *name)
 	{
 	value label = Qstr(str_new_data0(name));
-	return eval(A(A(A(Q(type_parse_file),label),Q(type_standard)),Q(type_I)));
+	value exp = parse_file(name);
+	value context = Q(type_standard);
+	exp = op_resolve(label,exp,context);
+	return eval(exp);
 	}
 
-/* (use file) Equivalent to (once; parse_file file standard I).  This parses
+/* (use file) Equivalent to (once; parse_file file standard).  This parses
 file and evaluates it in the standard context, replacing itself with the final
 value so it only happens once.  This is used to bootstrap new contexts written
 in Fexl, so you can say this:
 	\=(use "lib.fxl")
 instead of this:
-	\=(once; parse_file "lib.fxl" standard I)
+	\=(once; parse_file "lib.fxl" standard)
 */
 static value type_use(value f)
 	{
