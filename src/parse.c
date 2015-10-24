@@ -71,7 +71,7 @@ static void skip_line(void)
 
 static int at_white(void)
 	{
-	return isspace(ch);
+	return isspace(ch) || iscntrl(ch);
 	}
 
 static void skip_white(void)
@@ -100,8 +100,8 @@ static void skip_filler(void)
 
 /* Parse a name, or return 0 if we don't see one.
 
-A name may contain just about anything, except for white space (including NUL)
-and a few other special characters.  This is the simplest rule that can work.
+A name may contain just about anything, except for white space and a few other
+special characters.  This is the simplest rule that can work.
 */
 static value parse_name(void)
 	{
