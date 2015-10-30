@@ -949,19 +949,25 @@ try (reverse; range 1 5)
 
 (
 div
-\try=
-	(\x
-	\y=(fexl_quote x)
-	say y
-	y
+\indent=
+	(@\loop\n
+	le n 0 ();
+	put " ";
+	loop (- n 1)
 	)
 
-\x="a b"
-\x==(try x)
-\x==(try x)
-\x==(try x)
-\x==(try x)
-\x==(try x)
+\test_quote=
+	(@\loop\x\n
+	le n 0 nl;
+	\x=(fexl_quote x)
+	\n=(- n 1)
+	indent (* 3 n); say x
+	loop x n
+	)
+
+test_quote "abc" 7
+test_quote "ab~1c" 3
+test_quote ~1 a"b"~2c~1 4
 )
 
 (

@@ -379,10 +379,10 @@ format_num
 		\check=(\y (is_void (search x y 0)) y)
 		check QU;
 		(@\loop\count
-		\term=(. "~" (eq count 0 ""; eq count 1 "~"; (num_str count)))
+		\term=(. "~"; num_str count)
 		check term;
 		loop (+ count 1)
-		) 0
+		) 1
 		)
 	. term; . (eq term QU "" " "); . x; term
 	)
