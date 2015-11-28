@@ -1,5 +1,5 @@
 #!/bin/bash
-# NOTE: We run in bash instead of sh so we get the right version of "time".
+# NOTE: I run in bash instead of sh so I get the right version of "time".
 ./build || exit
 time test/run | diff - test/run.out
 ls -l ../bin/fexl

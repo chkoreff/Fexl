@@ -29,10 +29,16 @@ value type_buf_put(value f)
 		buffer *buf = data(x);
 		string str = data(y);
 		buf_put(buf,str);
-		return Q(type_I);
+		f = Q(type_I);
 		}
-	reduce_void(f);
-	return 0;
+	else
+		{
+		reduce_void(f);
+		f = 0;
+		}
+	drop(x);
+	drop(y);
+	return f;
 	}
 	}
 
@@ -47,9 +53,14 @@ value type_buf_get(value f)
 		{
 		buffer *buf = data(x);
 		string str = buf_clear(buf);
-		return Qstr(str);
+		f = Qstr(str);
 		}
-	reduce_void(f);
-	return 0;
+	else
+		{
+		reduce_void(f);
+		f = 0;
+		}
+	drop(x);
+	return f;
 	}
 	}

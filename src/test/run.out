@@ -17,6 +17,13 @@ ping
 ping
 ping
 ==
+ping
+ping
+ping
+ping
+ping
+ping
+==
 str abc
 str abc
 void
@@ -843,8 +850,8 @@ get r =
 bye
 ==
 ()x=3
-3
-3
+x=3
+x=3
 ==
 (x=)3
 3
@@ -945,6 +952,15 @@ Hello
 line 1
 line 2
 line 3
+==
+[
+]
+==
+T
+T
+T
+T
+F
 exit 0
 ====
 Hello

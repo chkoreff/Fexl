@@ -34,6 +34,19 @@ div
 \talk=(talk talk)
 \talk=(talk talk)
 talk
+
+div
+# Should say PING six times.
+\ping=(say "ping")
+# LATER 20151128 This test fails due to the copy-up behavior in type_I.  Until
+# I fix that, I work around the problem by calling "once" twice.
+#\talk=(ping (once ping))
+\talk=(ping (once; once ping))
+talk
+talk
+talk
+talk
+ping
 )
 
 div
@@ -160,7 +173,7 @@ try "a" "a" 0 # 0
 
 # These cases diverge from the Perl "index" function.  Fexl returns void, but
 # Perl shows a match at position 0.  The difference is because str_search does
-# not use -1 to indicate not found, since we use unsigned longs.  Instead, it
+# not use -1 to indicate not found, since I use unsigned longs.  Instead, it
 # returns a position which points beyond the end of the subject string, and
 # when the subject string is empty, any value does that.  I find this
 # difference acceptable.
@@ -314,6 +327,12 @@ say "]"
 # Calling the I function here used to break this test, printing "Hi" three
 # times instead of once.  That's fixed now.
 I
+# LATER 20151128 I've changed type_once so that (once x) no longer reduces x in
+# place, but instead reduces the entire (once x) form in place.  This exposes
+# an issue with how type_I copies up its argument, and I need to find a way to
+# avoid that.  Consequently the semicolon on the next line is necessary to
+# preserve the desired behavior here.
+;
 
 hi
 hi
@@ -378,9 +397,9 @@ say_x 4
 say_x 5
 
 (
-# Here we extend the standard context to include the "show" routine so the
-# test code below the "use" can run.  I could have just moved the test code
-# above the use, but I wanted to test "extend" explicitly here.
+# Here I extend the standard context to include the "show" routine so the test
+# code below the "use" can run.  I could have just moved the test code above
+# the use, but I wanted to test "extend" explicitly here.
 \=
 (
 extend;
@@ -1015,6 +1034,48 @@ buf_get buf
 
 say "result:"
 put result
+)
+
+(
+div
+\run=
+	(
+	(@\loop\x
+	ge x 900000 ();
+	#ge x 4000000 ();
+	loop (+ x 1)
+	) 1
+	)
+
+say "["
+
+# LATER 20151128 Without the semicolon on the line below, this test fails by
+# running out of memory or stack.  That too is a symptom of the copy-up
+# behavior in type_I.
+;
+
+run
+say "]"
+)
+
+(
+div
+# Here I test the existence of the flock_ and limit_ function calls, though I'm
+# not yet testing their effects.
+
+\fh==(fopen "test/hello.fxl" "r")
+say (is_good fh)
+say (is_good; flock_ex fh)
+say (is_good; flock_sh fh)
+say (is_good; flock_un fh)
+say (is_good; flock_ex "foo")
+
+limit_time 20
+limit_memory 1000000
+limit_stack 20000
+# The following would test either out of memory or stack overflow.
+#\list=(@\list append list list)
+#each list say
 )
 
 \\

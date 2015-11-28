@@ -33,7 +33,7 @@ void buf_add(buffer *buf, char ch)
 	top->str->data[top->pos++] = ch;
 	}
 
-/* To add a whole string we simply add the characters one at a time.  We could
+/* To add a whole string I simply add the characters one at a time.  I could
 optimize it later, but it's fine for now. */
 void buf_addn(buffer *buf, const char *str, unsigned long len)
 	{

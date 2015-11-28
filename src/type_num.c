@@ -42,6 +42,7 @@ value type_num_str(value f)
 		reduce_str(f, num_str(data(x)));
 	else
 		reduce_void(f);
+	drop(x);
 	return 0;
 	}
 	}

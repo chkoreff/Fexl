@@ -120,7 +120,7 @@ void *data(value f)
 /* The type for function application */
 value type_A(value f)
 	{
-	value g = eval(hold(f->L));
+	value g = arg(f->L);
 	if (g != f->L)
 		return V(g->T,g,hold(f->R));
 
@@ -192,13 +192,7 @@ value eval(value f)
 		}
 	}
 
-/* Reduce f to its final value, always replacing it inline. */
 value arg(value f)
 	{
-	value g = eval(hold(f));
-	if (g != f)
-		reduce(f,g);
-	else
-		drop(g);
-	return f;
+	return eval(hold(f));
 	}

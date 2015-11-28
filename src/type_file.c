@@ -40,10 +40,16 @@ value type_fopen(value f)
 		string path = data(x);
 		string mode = data(y);
 		FILE *fh = fopen(path->data,mode->data);
-		return fh ? Qfile(fh) : Q(type_void);
+		f = fh ? Qfile(fh) : Q(type_void);
 		}
-	reduce_void(f);
-	return 0;
+	else
+		{
+		reduce_void(f);
+		f = 0;
+		}
+	drop(x);
+	drop(y);
+	return f;
 	}
 	}
 
@@ -58,10 +64,15 @@ value type_remove(value f)
 		{
 		string path = data(x);
 		int code = remove(path->data);
-		return Qnum0(code);
+		f = Qnum0(code);
 		}
-	reduce_void(f);
-	return 0;
+	else
+		{
+		reduce_void(f);
+		f = 0;
+		}
+	drop(x);
+	return f;
 	}
 	}
 
@@ -79,10 +90,15 @@ static value op_flock(value f, int operation)
 			perror("flock");
 			die(0);
 			}
-		return Q(type_I);
+		f = Q(type_I);
 		}
-	reduce_void(f);
-	return 0;
+	else
+		{
+		reduce_void(f);
+		f = 0;
+		}
+	drop(x);
+	return f;
 	}
 	}
 

@@ -4,8 +4,8 @@
 #include <stdlib.h> /* malloc free */
 
 /*
-Track the amount of memory used so we can detect memory leaks.  Normally this
-is impossible but we check it anyway in case of software error.
+Track the amount of memory used so I can detect memory leaks.  Normally this is
+impossible but I check it anyway in case of software error.
 */
 static unsigned long cur_blocks = 0;
 static unsigned long cur_bytes = 0;

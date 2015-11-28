@@ -32,6 +32,8 @@ value type_concat(value f)
 		reduce_str(f, str_concat(data(x),data(y)));
 	else
 		reduce_void(f);
+	drop(x);
+	drop(y);
 	return 0;
 	}
 	}
@@ -46,6 +48,7 @@ value type_length(value f)
 		reduce_num(f, num_new_ulong(((string)data(x))->len));
 	else
 		reduce_void(f);
+	drop(x);
 	return 0;
 	}
 	}
@@ -64,12 +67,15 @@ value type_slice(value f)
 		double yn = *((number)data(y));
 		double zn = *((number)data(z));
 		if (yn >= 0 && zn >= 0)
-			{
 			reduce_str(f, str_slice(data(x),yn,zn));
-			return 0;
-			}
+		else
+			reduce_void(f);
 		}
-	reduce_void(f);
+	else
+		reduce_void(f);
+	drop(x);
+	drop(y);
+	drop(z);
 	return 0;
 	}
 	}
@@ -92,13 +98,18 @@ value type_search(value f)
 			string ys = data(y);
 			unsigned long pos = str_search(xs,ys,zn);
 			if (pos < xs->len)
-				{
 				reduce_num(f, num_new_ulong(pos));
-				return 0;
-				}
+			else
+				reduce_void(f);
 			}
+		else
+			reduce_void(f);
 		}
-	reduce_void(f);
+	else
+		reduce_void(f);
+	drop(x);
+	drop(y);
+	drop(z);
 	return 0;
 	}
 	}
@@ -113,12 +124,13 @@ value type_str_num(value f)
 		{
 		number n = str0_num(((string)data(x))->data);
 		if (n)
-			{
 			reduce_num(f,n);
-			return 0;
-			}
+		else
+			reduce_void(f);
 		}
-	reduce_void(f);
+	else
+		reduce_void(f);
+	drop(x);
 	return 0;
 	}
 	}

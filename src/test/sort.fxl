@@ -2,8 +2,8 @@
 \=(use "test/lib.fxl")
 \=(use "test/common.fxl")
 
-# Here we use a highly restricted context which provides only the few functions
-# we need to test sorting.  I don't have to do it this way, but I'm exercising
+# Here I use a highly restricted context which provides only the few functions
+# I need to test sorting.  I don't have to do it this way, but I'm exercising
 # the context mechanism.
 \=
 (
@@ -26,7 +26,7 @@ def "unique" unique;
 void
 )
 
-# Here we test the sort.
+# Here I test the sort.
 
 # A list of 30 random words from diceware.com.
 \list =

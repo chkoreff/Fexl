@@ -13,6 +13,7 @@ static value op_num(value f, number op(number))
 		reduce_num(f, op(data(x)));
 	else
 		reduce_void(f);
+	drop(x);
 	return 0;
 	}
 	}
@@ -28,6 +29,8 @@ static value op_num_num(value f, number op(number,number))
 		reduce_num(f, op(data(x),data(y)));
 	else
 		reduce_void(f);
+	drop(x);
+	drop(y);
 	return 0;
 	}
 	}

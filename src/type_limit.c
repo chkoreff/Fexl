@@ -30,10 +30,15 @@ static value op_set_limit(value f, int resource, const char *label)
 	if (x->T == type_num)
 		{
 		set_limit(resource,label,data(x));
-		return Q(type_I);
+		f = Q(type_I);
 		}
-	reduce_void(f);
-	return 0;
+	else
+		{
+		reduce_void(f);
+		f = 0;
+		}
+	drop(x);
+	return f;
 	}
 	}
 

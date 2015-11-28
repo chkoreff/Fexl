@@ -48,7 +48,7 @@ value type_query(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	{
-	value v = eval(hold(f->L->R));
+	value v = arg(f->L->R);
 	if (v != f->L->R)
 		f = A(hold(f->R), v);
 	else
@@ -61,7 +61,7 @@ value type_query(value f)
 value type_once(value f)
 	{
 	if (!f->L) return 0;
-	reduce(f,hold(arg(f->R)));
+	reduce(f,arg(f->R));
 	return f;
 	}
 
@@ -117,6 +117,7 @@ value type_is_good(value f)
 	{
 	value x = arg(f->R);
 	reduce_boolean(f, x->T != type_void);
+	drop(x);
 	return 0;
 	}
 	}
@@ -127,6 +128,7 @@ value type_is_bool(value f)
 	{
 	value x = arg(f->R);
 	reduce_boolean(f, x->T == type_T || x->T == type_F);
+	drop(x);
 	return 0;
 	}
 	}
@@ -138,6 +140,7 @@ value type_is_list(value f)
 	value x = arg(f->R);
 	reduce_boolean(f, x->T == type_null
 		|| (x->T == type_cons && x->L && x->L->L));
+	drop(x);
 	return 0;
 	}
 	}
@@ -148,6 +151,7 @@ value op_is_type(value f, type t)
 	{
 	value x = arg(f->R);
 	reduce_boolean(f, x->T == t);
+	drop(x);
 	return 0;
 	}
 	}

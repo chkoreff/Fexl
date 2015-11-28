@@ -28,9 +28,14 @@ static void putv(value x)
 			{
 			putv(x->L->R);
 			/* Eliminated tail recursive call putv(x->R) here. */
-			x = arg(x->R);
+			{
+			value y = arg(x->R);
+			drop(x);
+			x = y;
 			continue;
 			}
+			}
+		drop(x);
 		return;
 		}
 	}
@@ -86,11 +91,10 @@ value type_put_to(value f)
 		FILE *fh = data(x);
 
 		put_to(fh);
-		f = eval(hold(f->R));
+		f = arg(f->R);
 
 		putd = save_putd;
 		cur_out = save_cur_out;
-		return f;
 		}
 	else if (x->T == type_buf)
 		{
@@ -101,13 +105,17 @@ value type_put_to(value f)
 		putd = putd_buf;
 		cur_buf = buf;
 
-		f = eval(hold(f->R));
+		f = arg(f->R);
 
 		putd = save_putd;
 		cur_buf = save_cur_buf;
-		return f;
 		}
-	reduce_void(f);
-	return 0;
+	else
+		{
+		reduce_void(f);
+		f = 0;
+		}
+	drop(x);
+	return f;
 	}
 	}

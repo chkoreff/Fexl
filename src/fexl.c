@@ -126,10 +126,20 @@ static value type_standard(value f)
 		cur_name = ((string)data(x))->data;
 		def = standard();
 		if (def)
-			return later(def);
+			f = later(def);
+		else
+			{
+			reduce_void(f);
+			f = 0;
+			}
 		}
-	reduce_void(f);
-	return 0;
+	else
+		{
+		reduce_void(f);
+		f = 0;
+		}
+	drop(x);
+	return f;
 	}
 	}
 
@@ -183,10 +193,14 @@ static value type_use(value f)
 		{
 		string name = data(x);
 		reduce(f,eval_file(name->data));
-		return f;
 		}
-	reduce_void(f);
-	return 0;
+	else
+		{
+		reduce_void(f);
+		f = 0;
+		}
+	drop(x);
+	return f;
 	}
 	}
 

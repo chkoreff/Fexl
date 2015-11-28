@@ -98,7 +98,7 @@ static void skip_filler(void)
 		}
 	}
 
-/* Parse a name, or return 0 if we don't see one.
+/* Parse a name, or return 0 if I don't see one.
 
 A name may contain just about anything, except for white space and a few other
 special characters.  This is the simplest rule that can work.

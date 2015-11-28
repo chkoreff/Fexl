@@ -21,9 +21,14 @@ value type_parse(value f)
 		value exp = parse(name->data);
 		value label = hold(x);
 		value context = hold(f->R);
-		return later(op_resolve(label,exp,context));
+		f = later(op_resolve(label,exp,context));
 		}
-	reduce_void(f);
-	return 0;
+	else
+		{
+		reduce_void(f);
+		f = 0;
+		}
+	drop(x);
+	return f;
 	}
 	}

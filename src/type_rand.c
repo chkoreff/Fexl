@@ -15,10 +15,15 @@ value type_seed_rand(value f)
 		{
 		double seed = *((number)data(x)) * (double)RAND_MAX;
 		srand(seed);
-		return Q(type_I);
+		f = Q(type_I);
 		}
-	reduce_void(f);
-	return 0;
+	else
+		{
+		reduce_void(f);
+		f = 0;
+		}
+	drop(x);
+	return f;
 	}
 	}
 

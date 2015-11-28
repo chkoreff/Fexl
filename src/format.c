@@ -17,7 +17,7 @@ const char *format_ulong(unsigned long x)
 	}
 
 /*
-We show 15 digits because that's what Perl does.  I considered using limits.h
+I show 15 digits because that's what Perl does.  I considered using limits.h
 to determine a machine-specific precision.  The problem is, DECIMAL_DIG (in
 float.h) is only guaranteed to be at least 10, which is a pretty poor worst
 case.

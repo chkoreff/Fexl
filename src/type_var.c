@@ -25,9 +25,14 @@ value type_var_get(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_var)
-		return hold(data(x));
-	reduce_void(f);
-	return 0;
+		f = hold(data(x));
+	else
+		{
+		reduce_void(f);
+		f = 0;
+		}
+	drop(x);
+	return f;
 	}
 	}
 
@@ -39,12 +44,17 @@ value type_var_put(value f)
 	value x = arg(f->L->R);
 	if (x->T == type_var)
 		{
-		value v = hold(arg(f->R));
+		value v = arg(f->R);
 		drop(x->R->R);
 		x->R->R = v;
-		return Q(type_I);
+		f = Q(type_I);
 		}
-	reduce_void(f);
-	return 0;
+	else
+		{
+		reduce_void(f);
+		f = 0;
+		}
+	drop(x);
+	return f;
 	}
 	}

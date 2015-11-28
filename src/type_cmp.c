@@ -18,6 +18,8 @@ static value op_cmp(value f, int op(int))
 		reduce_boolean(f, op(str_cmp(data(x),data(y))));
 	else
 		reduce_void(f);
+	drop(x);
+	drop(y);
 	return 0;
 	}
 	}

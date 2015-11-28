@@ -96,11 +96,17 @@ value type_char_width(value f)
 				{
 				char n = char_width(xs->data[pos]);
 				reduce_num(f, num_new_ulong(n));
-				return 0;
 				}
+			else
+				reduce_void(f);
 			}
+		else
+			reduce_void(f);
 		}
-	reduce_void(f);
+	else
+		reduce_void(f);
+	drop(x);
+	drop(y);
 	return 0;
 	}
 	}
@@ -129,11 +135,10 @@ value type_get_from(value f)
 		FILE *fh = data(x);
 
 		get_from(fh);
-		f = eval(hold(f->R));
+		f = arg(f->R);
 
 		getd = save_getd;
 		cur_in = save_cur_in;
-		return f;
 		}
 	else if (x->T == type_str)
 		{
@@ -145,14 +150,18 @@ value type_get_from(value f)
 		cur_text = data(x);
 		cur_pos = 0;
 
-		f = eval(hold(f->R));
+		f = arg(f->R);
 
 		getd = save_getd;
 		cur_text = save_cur_text;
 		cur_pos = save_cur_pos;
-		return f;
 		}
-	reduce_void(f);
-	return 0;
+	else
+		{
+		reduce_void(f);
+		f = 0;
+		}
+	drop(x);
+	return f;
 	}
 	}

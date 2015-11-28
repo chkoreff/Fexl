@@ -102,7 +102,7 @@ EOF
 
 run_fexl missing.fxl
 
-# Here we test setting ulimit to terminate misbehaving programs promptly.
+# Here I test setting ulimit to terminate misbehaving programs promptly.
 test_misbehavior=false
 # To enable the test, unpound the next line.
 #test_misbehavior=true
