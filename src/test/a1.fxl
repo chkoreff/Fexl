@@ -1048,12 +1048,6 @@ div
 	)
 
 say "["
-
-# LATER 20151128 Without the semicolon on the line below, this test fails by
-# running out of memory or stack.  That too is a symptom of the copy-up
-# behavior in type_I.
-;
-
 run
 say "]"
 )

@@ -120,12 +120,10 @@ void *data(value f)
 /* The type for function application */
 value type_A(value f)
 	{
-	value g = arg(f->L);
-	if (g != f->L)
-		return V(g->T,g,hold(f->R));
-
-	drop(g);
-	f->T = g->T;
+	value g = next_action(f->L);
+	if (g)
+		return A(g,hold(f->R));
+	f->T = f->L->T;
 	return f;
 	}
 
@@ -177,18 +175,25 @@ void reduce_A(value f, value x, value y)
 	f->R = y;
 	}
 
-/* Reduce the value to its normal form, within limits on space and time. */
-value eval(value f)
+/* Reduce the value until the next action, if any. */
+value next_action(value f)
 	{
 	while (1)
 		{
 		value g = f->T(f);
+		if (g != f) return g;
+		}
+	}
+
+/* Reduce the value until done. */
+value eval(value f)
+	{
+	while (1)
+		{
+		value g = next_action(f);
 		if (g == 0) return f;
-		if (g != f)
-			{
-			drop(f);
-			f = g;
-			}
+		drop(f);
+		f = g;
 		}
 	}
 

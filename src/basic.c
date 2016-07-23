@@ -43,16 +43,14 @@ value type_Y(value f)
 	return f;
 	}
 
-/* (query x f) = (f v), where v is the final value of x. */
+/* (query x) yields the final value of x. */
 value type_query(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (!f->L) return 0;
 	{
-	value v = arg(f->L->R);
-	if (v != f->L->R)
-		return A(hold(f->R), v);
-
-	reduce_A(f, hold(f->R), v);
+	value x = next_action(f->R);
+	if (x) return V(type_query,hold(f->L),x);
+	reduce(f,yield(hold(f->R)));
 	return f;
 	}
 	}
@@ -82,6 +80,14 @@ value type_void(value f)
 	if (!f->L) return 0;
 	reduce_void(f);
 	return 0;
+	}
+
+/* (yield x p) = (p x) Used to return a function without evaluating it. */
+value type_yield(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	reduce_A(f,hold(f->R),hold(f->L->R));
+	return f;
 	}
 
 /* (cons x y A B) = (B x y) */
@@ -164,6 +170,11 @@ void reduce_void(value f)
 void reduce_boolean(value f, int x)
 	{
 	reduce_Q(f, x ? type_T : type_F);
+	}
+
+value yield(value x)
+	{
+	return V(type_yield,Q(type_yield), x);
 	}
 
 value later(value x)
