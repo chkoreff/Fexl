@@ -125,7 +125,7 @@ value type_A(value f)
 		return V(g->T,g,hold(f->R));
 
 	drop(g);
-	f->T = f->L->T;
+	f->T = g->T;
 	return f;
 	}
 

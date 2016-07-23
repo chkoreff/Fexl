@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/bin/sh
 ./build || exit
-time ../bin/fexl test/fib.fxl >/dev/null
 ls -l ../bin/fexl
+. ./lib_test
+do_time ../bin/fexl test/fib.fxl >/dev/null

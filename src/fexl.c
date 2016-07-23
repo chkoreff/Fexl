@@ -143,6 +143,8 @@ static value type_standard(value f)
 	}
 	}
 
+/* Note that if name designates a directory the fopen will succeed, but it will
+behave like an empty file. */
 static value parse_file(const char *name)
 	{
 	input save_getd = getd;

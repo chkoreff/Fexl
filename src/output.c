@@ -21,14 +21,7 @@ void put(const char *data)
 
 void put_ch(char ch)
 	{
-	char buf[1];
-	buf[0] = ch;
-	putd(buf,1);
-	}
-
-void put_long(long x)
-	{
-	put(format_long(x));
+	putd(&ch,1);
 	}
 
 void put_ulong(unsigned long x)

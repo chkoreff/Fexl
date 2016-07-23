@@ -1,5 +1,5 @@
 #!/bin/sh
-. ./common
+. ./lib_build
 make basic
 make buffer
 make convert

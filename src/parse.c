@@ -407,7 +407,7 @@ static value parse_exp(void)
 /* Parse the current input. */
 value parse(const char *label)
 	{
-	const char *save = source_label;
+	const char *save_source_label = source_label;
 	int save_ch = ch;
 	unsigned long save_source_line = source_line;
 
@@ -421,7 +421,7 @@ value parse(const char *label)
 	if (ch != -1)
 		syntax_error("Extraneous input", source_line);
 
-	source_label = save;
+	source_label = save_source_label;
 	ch = save_ch;
 	source_line = save_source_line;
 

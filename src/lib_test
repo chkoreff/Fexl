@@ -1,0 +1,29 @@
+#!/bin/sh
+# These are common shell routines used by test scripts, sourced with ".".
+
+do_time()
+	{
+	/usr/bin/time -f "time %es space %MK" $@ || exit
+	}
+
+do_diff()
+	{
+	local prog="$1"
+	local out="$2"
+	do_time $prog | (diff - $out || true) || exit
+	}
+
+do_diff_fexl()
+	{
+	local name="$1"
+	#echo -n "$name: "
+	local prog="../bin/fexl test/$name.fxl"
+	local out="test/$name.out"
+	do_diff "$prog" $out
+	}
+
+doing()
+	{
+	local name="$1"
+	echo -n "test $name: "
+	}

@@ -50,9 +50,9 @@ value type_query(value f)
 	{
 	value v = arg(f->L->R);
 	if (v != f->L->R)
-		f = A(hold(f->R), v);
-	else
-		reduce_A(f, hold(f->R), v);
+		return A(hold(f->R), v);
+
+	reduce_A(f, hold(f->R), v);
 	return f;
 	}
 	}
