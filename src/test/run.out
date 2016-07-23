@@ -961,6 +961,19 @@ T
 T
 T
 F
+==
+Jan 31 January
+Feb 29 February
+Mar 31 March
+Apr 30 April
+May 31 May
+Jun 30 June
+Jul 31 July
+Aug 31 August
+Sep 30 September
+Oct 31 October
+Nov 30 November
+Dec 31 December
 exit 0
 ====
 Hello
@@ -1021,6 +1034,65 @@ This goes to stderr.
 x = 7
 This goes to stderr.
 x = 7
+====
+==
+封封aa小小
+==
+41 A 41
+4f O 4f
+4F O 4f
+61 a 61
+62 b 62
+7e ~ 7e
+c3a5 å c3a5
+c3bc ü c3bc
+c3a4 ä c3a4
+C3A4 ä c3a4
+e289a0 ≠ e289a0
+e5b081 封 e5b081
+e5b08f 小 e5b08f
+e5b08161e5b08f 封a小 e5b08161e5b08f
+==
+28b98aa5dac67e29a98d2920f91500b6
+28b98aa5dac67e29a98d2920f91500b6
+2
+
+6600f
+exit 0
+====
+ch 61
+ch 62
+ch 63
+ch 41
+ch 42
+ch 43
+ch 0a
+ch 6a
+ch 6a
+ch 6a
+ch 61
+ch e5
+ch b0
+ch 8f
+ch 0a
+ch c3
+ch a5
+ch c3
+ch bc
+ch c3
+ch a4
+ch e2
+ch 89
+ch a0
+ch 0a
+ch e5
+ch 8c
+ch 85
+ch e5
+ch ad
+ch 90
+ch 0a
+exit 0
 ====
 hi
 exit 1

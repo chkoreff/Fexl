@@ -1072,5 +1072,11 @@ limit_stack 20000
 #each list say
 )
 
+div
+each (range 1 12)
+	(\n
+	say [(short_month_name n) " " (ym_num_days 2016 n) " " (long_month_name n)]
+	)
+
 \\
 Extra stuff not parsed.

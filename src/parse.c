@@ -345,7 +345,7 @@ static value parse_lambda(unsigned long first_line)
 	if (def)
 		{
 		if (is_eager)
-			exp = app(app(Q(type_query),def),exp);
+			exp = app(app(Q(type_eval),def),exp);
 		else
 			exp = app(exp,def);
 		}

@@ -43,13 +43,13 @@ value type_Y(value f)
 	return f;
 	}
 
-/* (query x) yields the final value of x. */
-value type_query(value f)
+/* (eval x) yields the final value of x. */
+value type_eval(value f)
 	{
 	if (!f->L) return 0;
 	{
 	value x = next_action(f->R);
-	if (x) return V(type_query,hold(f->L),x);
+	if (x) return V(type_eval,hold(f->L),x);
 	reduce(f,yield(hold(f->R)));
 	return f;
 	}

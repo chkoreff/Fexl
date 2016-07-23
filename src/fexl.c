@@ -44,11 +44,13 @@ static value standard(void)
 	if (match("buf_new")) return Q(type_buf_new);
 	if (match("buf_put")) return Q(type_buf_put);
 	if (match("char_width")) return Q(type_char_width);
+	if (match("chr")) return Q(type_chr);
 	if (match("cons")) return Q(type_cons);
 	if (match("cos")) return Q(type_cos);
 	if (match("defined")) return Q(type_defined);
 	if (match("die")) return Q(type_die);
 	if (match("eq")) return Q(type_eq);
+	if (match("eval")) return Q(type_eval);
 	if (match("exp")) return Q(type_exp);
 	if (match("F")) return Q(type_F);
 	if (match("flock_ex")) return Q(type_flock_ex);
@@ -58,6 +60,7 @@ static value standard(void)
 	if (match("fopen")) return Q(type_fopen);
 	if (match("ge")) return Q(type_ge);
 	if (match("get")) return Q(type_get);
+	if (match("get_byte")) return Q(type_get_byte);
 	if (match("get_from")) return Q(type_get_from);
 	if (match("gt")) return Q(type_gt);
 	if (match("I")) return Q(type_I);
@@ -80,6 +83,7 @@ static value standard(void)
 	if (match("null")) return Q(type_null);
 	if (match("num_str")) return Q(type_num_str);
 	if (match("once")) return Q(type_once);
+	if (match("ord")) return Q(type_ord);
 	if (match("parse")) return Q(type_parse);
 	if (match("put")) return Q(type_put);
 	if (match("put_to")) return Q(type_put_to);
@@ -104,6 +108,8 @@ static value standard(void)
 	if (match("var_new")) return Q(type_var_new);
 	if (match("var_put")) return Q(type_var_put);
 	if (match("void")) return Q(type_void);
+	if (match("xor")) return Q(type_xor);
+	if (match("yield")) return Q(type_yield);
 	return 0;
 	}
 

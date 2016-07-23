@@ -135,6 +135,44 @@ value type_str_num(value f)
 	}
 	}
 
+/* (ord x) is the ordinal number of the first ASCII character of string x. */
+value type_ord(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_str)
+		{
+		string xs = data(x);
+		reduce_num(f,num_new_ulong(xs->len == 0 ? 0 :
+			(unsigned char)xs->data[0]));
+		}
+	else
+		reduce_void(f);
+	drop(x);
+	return 0;
+	}
+	}
+
+/* (chr x) is the ASCII character whose ordinal number is x. */
+value type_chr(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_num)
+		{
+		double xn = *((number)data(x));
+		char ch = xn;
+		reduce_str(f,str_new_data(&ch,1));
+		}
+	else
+		reduce_void(f);
+	drop(x);
+	return 0;
+	}
+	}
+
 value type_is_str(value f)
 	{
 	return op_is_type(f,type_str);

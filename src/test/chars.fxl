@@ -1,0 +1,44 @@
+#
+\=(use "test/lib.fxl")
+\=(use "test/common.fxl")
+
+\try=
+	(\str
+	\raw=(map_hex_to_raw_bytes str)
+	\test=(map_raw_bytes_to_hex raw)
+	say [str " " raw " " test]
+	)
+
+div
+say (str_map (\ch . ch ch) "封a小")
+div
+#try "07" # BEL (beeps)
+try "41" # A
+try "4f" # O
+try "4F" # O
+try "61" # a
+try "62" # b
+try "7e" # ~
+try "c3a5" # å
+try "c3bc" # ü
+try "c3a4" # ä
+try "C3A4" # ä
+try "e289a0" # ≠
+try "e5b081" # 封
+try "e5b08f" # 小
+try "e5b08161e5b08f" # 封a小
+
+div
+\try=(\x\y say; xor_hex x y)
+
+try
+"b6688fbe173973c25c0d922d13ef6e33"
+"9ed1051bcdff0debf580bb0deafa6e85"
+
+try
+"B6688FbE173973C25C0D922D13EF6E33"
+"9ED1051BcdfF0DEBF580BB0DEAFA6E85"
+
+try "B" "9"
+try "" ""
+try "c3f0a" "a5f05"

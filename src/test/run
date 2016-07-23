@@ -29,6 +29,17 @@ echo "== stdout:"
 echo "== stderr:"
 ../bin/fexl test/a3.fxl 2>&1 1>/dev/null
 
+run_fexl test/chars.fxl
+
+(
+cat <<"EOF"
+abcABC
+jjja小
+åüä≠
+包子
+EOF
+) | run_fexl test/get_byte.fxl
+
 # Test the "die" function.
 (
 cat <<"EOF"

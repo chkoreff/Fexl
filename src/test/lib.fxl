@@ -125,6 +125,14 @@
 	loop xs (- n 1)
 	)
 
+# Combine the elements of two lists pairwise.
+\list_combine=
+	(\f @\loop\xs\ys
+	xs ys \x\xt
+	ys xs \y\yt
+	cons (f x y) (loop xt yt)
+	)
+
 \column=(\n\xs map (\row list_at row n) xs)
 
 \format_num=
@@ -200,8 +208,8 @@ format_num
 ]
 \short_month_names=(map (\name slice name 0 3) long_month_names)
 
-\long_month_name=(\n \n=(- n 1) list_at long_month_names n)
-\short_month_name=(\n \n=(- n 1) list_at short_month_names n)
+\long_month_name=(\n list_at long_month_names (- n 1))
+\short_month_name=(\n list_at short_month_names (- n 1))
 
 \date_year=(\date slice date 0 4)
 \date_month=(\date slice date 0 6)
@@ -229,18 +237,37 @@ format_num
 	quarter
 	)
 
+\collect_chunks=
+	(\len\get_chunk
+	\buf==buf_new
+
+	(@\loop\pos
+	ge pos len ();
+	get_chunk pos \chunk\pos
+	buf_put buf chunk
+	loop pos
+	) 0
+
+	buf_get buf
+	)
+
+# Convert a string to a list of individual bytes.
+\str_bytes=
+	(\str
+	(@\loop\pos
+	\ch=(slice str pos 1)
+	eq ch "" [];
+	cons ch; loop (+ pos 1)
+	) 0
+	)
+
 # Apply a function to each logical character of a string.
 \str_map=
 	(\f\str
-	\buf==buf_new
-	(@\loop\pos
+	collect_chunks (length str) \pos
 	\n=(char_width str pos)
-	is_void n (buf_get buf);
-	\ch=(slice str pos n)
-	\ch=(f ch)
-	buf_put buf ch
-	loop (+ pos n)
-	) 0
+	\ch=(f; slice str pos n)
+	{ ch (+ pos n) }
 	)
 
 \quote_ch=
@@ -387,6 +414,64 @@ format_num
 	. term; . (eq term QU "" " "); . x; term
 	)
 
+# Map number 0-15 to one hex digit (lower-case).
+\hex_digit=
+	(\n
+	lt n 10 (chr (+ 48 n));
+	chr (+ 97 (- n 10))
+	)
+
+# Map number 0-255 to two hex digits.
+\hex_byte=
+	(\n
+	\hi=(trunc; / n 16)
+	\lo=(mod n 16)
+	. (hex_digit hi) (hex_digit lo)
+	)
+
+# Map digit "0"-"9" or "a"-"f" or "A"-"F" to a decimal number 0-15.
+\hex_digit_to_dec=
+	(\ch
+	\n=(ord ch)
+	and (ge n 48) (le n 57) (- n 48);  # 0-9
+	and (ge n 97) (le n 102) (- n 87); # a-f
+	and (ge n 65) (le n 70) (- n 55);  # A-F
+	void
+	)
+
+# Map a string specified in hexadecimal into the raw bytes.
+\map_hex_to_raw_bytes=
+	(\str
+	collect_chunks (length str) \pos
+	\get_nibble=
+		(\pos
+		\x=(hex_digit_to_dec; slice str pos 1)
+		{ x (+ pos 1) }
+		)
+	get_nibble pos \x\pos
+	get_nibble pos \y\pos
+	\byte=(chr; + (* 16 x) y)
+	{ byte pos }
+	)
+
+# Map raw bytes to their hexadecimal values.
+\map_raw_bytes_to_hex=
+	(\str
+	collect_chunks (length str) \pos
+	\ch=(hex_byte; ord; slice str pos 1)
+	{ ch (+ pos 1) }
+	)
+
+# XOR two hex digit strings together.
+\xor_hex=
+	(\x\y
+	\xl=(map hex_digit_to_dec; str_bytes x)
+	\yl=(map hex_digit_to_dec; str_bytes y)
+	\zl=(list_combine xor xl yl)
+	\zl=(map hex_digit zl)
+	to_str zl
+	)
+
 ## Context operations
 
 # Take a context cx and return a new context where key is defined as val.
@@ -451,6 +536,7 @@ def "append" append;
 def "chain" chain;
 def "check" check;
 def "colgroup" colgroup;
+def "collect_chunks" collect_chunks;
 def "column" column;
 def "date_month" date_month;
 def "date_normal" date_normal;
@@ -469,11 +555,17 @@ def "fold" fold;
 def "format_money" format_money;
 def "format_num" format_num;
 def "format_pct" format_pct;
+def "hex_byte" hex_byte;
+def "hex_digit" hex_digit;
+def "hex_digit_to_dec" hex_digit_to_dec;
 def "list_at" list_at;
+def "list_combine" list_combine;
 def "list_length" list_length;
 def "list_sum" list_sum;
 def "long_month_name" long_month_name;
 def "map" map;
+def "map_hex_to_raw_bytes" map_hex_to_raw_bytes;
+def "map_raw_bytes_to_hex" map_raw_bytes_to_hex;
 def "mod" mod;
 def "month_after" month_after;
 def "month_before" month_before;
@@ -489,10 +581,12 @@ def "reverse" reverse;
 def "shift" shift;
 def "short_month_name" short_month_name;
 def "sort" sort;
+def "str_bytes" str_bytes;
 def "str_map" str_map;
 def "tau" tau;
 def "to_str" to_str;
 def "unique" unique;
+def "xor_hex" xor_hex;
 def "ym_month" ym_month;
 def "ym_num_days" ym_num_days;
 def "ymd_date" ymd_date;

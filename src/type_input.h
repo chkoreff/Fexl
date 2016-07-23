@@ -1,4 +1,5 @@
 extern value type_get(value f);
+extern value type_get_byte(value f);
 extern value type_char_width(value f);
 extern string cur_text;
 extern unsigned long cur_pos;

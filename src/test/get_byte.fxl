@@ -1,0 +1,12 @@
+#
+\=(use "test/lib.fxl")
+\=(use "test/common.fxl")
+
+\echo=
+	(@\echo
+	\ch==get_byte
+	is_void ch ();
+	say ["ch " (hex_byte; ord ch)]
+	echo
+	)
+echo

@@ -7,6 +7,7 @@ extern number num_sub(number x, number y);
 extern number num_mul(number x, number y);
 extern number num_div(number x, number y);
 extern number num_pow(number x, number y);
+extern number num_xor(number x, number y);
 extern number num_round(number x);
 extern number num_trunc(number x);
 extern number num_abs(number x);

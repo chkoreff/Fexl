@@ -40,6 +40,7 @@ value type_sub(value f) { return op_num_num(f,num_sub); }
 value type_mul(value f) { return op_num_num(f,num_mul); }
 value type_div(value f) { return op_num_num(f,num_div); }
 value type_pow(value f) { return op_num_num(f,num_pow); }
+value type_xor(value f) { return op_num_num(f,num_xor); }
 value type_round(value f) { return op_num(f,num_round); }
 value type_trunc(value f) { return op_num(f,num_trunc); }
 value type_abs(value f) { return op_num(f,num_abs); }
