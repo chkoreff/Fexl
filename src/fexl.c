@@ -134,16 +134,10 @@ static value type_standard(value f)
 		if (def)
 			f = later(def);
 		else
-			{
 			reduce_void(f);
-			f = 0;
-			}
 		}
 	else
-		{
 		reduce_void(f);
-		f = 0;
-		}
 	drop(x);
 	return f;
 	}
@@ -203,10 +197,7 @@ static value type_use(value f)
 		reduce(f,eval_file(name->data));
 		}
 	else
-		{
 		reduce_void(f);
-		f = 0;
-		}
 	drop(x);
 	return f;
 	}

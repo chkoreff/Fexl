@@ -32,10 +32,7 @@ value type_buf_put(value f)
 		f = Q(type_I);
 		}
 	else
-		{
 		reduce_void(f);
-		f = 0;
-		}
 	drop(x);
 	drop(y);
 	return f;
@@ -56,10 +53,7 @@ value type_buf_get(value f)
 		f = Qstr(str);
 		}
 	else
-		{
 		reduce_void(f);
-		f = 0;
-		}
 	drop(x);
 	return f;
 	}

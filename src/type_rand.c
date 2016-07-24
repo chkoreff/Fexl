@@ -18,10 +18,7 @@ value type_seed_rand(value f)
 		f = Q(type_I);
 		}
 	else
-		{
 		reduce_void(f);
-		f = 0;
-		}
 	drop(x);
 	return f;
 	}

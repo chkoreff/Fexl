@@ -24,10 +24,7 @@ value type_parse(value f)
 		f = later(op_resolve(label,exp,context));
 		}
 	else
-		{
 		reduce_void(f);
-		f = 0;
-		}
 	drop(x);
 	return f;
 	}

@@ -177,10 +177,7 @@ value type_get_from(value f)
 		cur_pos = save_cur_pos;
 		}
 	else
-		{
 		reduce_void(f);
-		f = 0;
-		}
 	drop(x);
 	return f;
 	}

@@ -111,10 +111,7 @@ value type_put_to(value f)
 		cur_buf = save_cur_buf;
 		}
 	else
-		{
 		reduce_void(f);
-		f = 0;
-		}
 	drop(x);
 	return f;
 	}
