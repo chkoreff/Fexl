@@ -49,7 +49,7 @@ static value do_resolve(value exp, value context)
 			const char *name = ((string)data(x))->data;
 			undefined_symbol(name,sym->line);
 			undefined = 1;
-			result = Q(type_void);
+			result = Qvoid();
 			}
 		}
 	else
@@ -84,7 +84,7 @@ value type_resolve(value f)
 	string label = data(f->L->L->R);
 	source_label = label->data;
 
-	reduce(f, resolve(hold(f->L->R), hold(f->R)));
+	reduce(f,resolve(hold(f->L->R),hold(f->R)));
 
 	source_label = save;
 	return f;

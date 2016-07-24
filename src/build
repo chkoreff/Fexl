@@ -29,4 +29,5 @@ make type_str
 make type_sym
 make type_var
 make value
+#make test/show
 link fexl

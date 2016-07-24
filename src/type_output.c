@@ -20,9 +20,9 @@ static void putv(value x)
 			put_str(data(x));
 		else if (x->T == type_num)
 			put_num(data(x));
-		else if (x->T == type_T)
+		else if (x->T == type_T && !x->L)
 			put_ch('T');
-		else if (x->T == type_F)
+		else if (x->T == type_F && !x->L)
 			put_ch('F');
 		else if (x->T == type_cons && x->L && x->L->L)
 			{
@@ -44,28 +44,28 @@ value type_put(value f)
 	{
 	if (!f->L) return 0;
 	putv(f->R);
-	return Q(type_I);
+	return QI();
 	}
 
 value type_nl(value f)
 	{
 	(void)f;
 	nl();
-	return Q(type_I);
+	return QI();
 	}
 
 value type_say(value f)
 	{
 	if (!f->L) return 0;
 	putv(f->R); nl();
-	return Q(type_I);
+	return QI();
 	}
 
 value type_flush(value f)
 	{
 	(void)f;
 	flush();
-	return Q(type_I);
+	return QI();
 	}
 
 static buffer *cur_buf = 0;

@@ -40,7 +40,7 @@ value type_fopen(value f)
 		string path = data(x);
 		string mode = data(y);
 		FILE *fh = fopen(path->data,mode->data);
-		f = fh ? Qfile(fh) : Q(type_void);
+		f = fh ? Qfile(fh) : Qvoid();
 		}
 	else
 		reduce_void(f);
@@ -84,7 +84,7 @@ static value op_flock(value f, int operation)
 			perror("flock");
 			die(0);
 			}
-		f = Q(type_I);
+		f = QI();
 		}
 	else
 		reduce_void(f);

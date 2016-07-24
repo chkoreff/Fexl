@@ -236,15 +236,15 @@ static value parse_list(void)
 
 static value parse_tuple(void)
 	{
-	value pattern = here();
-	value exp = Q(type_I);
+	value pattern = QT();
+	value exp = QI();
 	while (1)
 		{
 		skip_filler();
 		{
 		value term = parse_term();
 		if (term == 0) break;
-		pattern = fuse(pattern,none());
+		pattern = fuse(pattern,QF());
 		exp = app(exp,term);
 		}
 		}
@@ -400,7 +400,7 @@ static value parse_exp(void)
 		else
 			exp = app(exp,factor);
 		}
-	if (exp == 0) exp = Q(type_I);
+	if (exp == 0) exp = QI();
 	return exp;
 	}
 

@@ -1,4 +1,3 @@
-extern value type_C(value f);
 extern value type_I(value f);
 extern value type_T(value f);
 extern value type_F(value f);
@@ -16,6 +15,10 @@ extern value type_is_good(value f);
 extern value type_is_bool(value f);
 extern value type_is_list(value f);
 extern value op_is_type(value f, type t);
+extern value Qvoid(void);
+extern value QI(void);
+extern value QF(void);
+extern value QT(void);
 extern void reduce_void(value f);
 extern void reduce_boolean(value f, int x);
 extern value yield(value x);

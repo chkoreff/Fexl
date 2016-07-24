@@ -29,7 +29,7 @@ value type_buf_put(value f)
 		buffer *buf = data(x);
 		string str = data(y);
 		buf_put(buf,str);
-		f = Q(type_I);
+		f = QI();
 		}
 	else
 		reduce_void(f);

@@ -30,7 +30,7 @@ static value op_set_limit(value f, int resource, const char *label)
 	if (x->T == type_num)
 		{
 		set_limit(resource,label,data(x));
-		f = Q(type_I);
+		f = QI();
 		}
 	else
 		reduce_void(f);

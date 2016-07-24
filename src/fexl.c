@@ -52,7 +52,7 @@ static value standard(void)
 	if (match("eq")) return Q(type_eq);
 	if (match("eval")) return Q(type_eval);
 	if (match("exp")) return Q(type_exp);
-	if (match("F")) return Q(type_F);
+	if (match("F")) return QF();
 	if (match("flock_ex")) return Q(type_flock_ex);
 	if (match("flock_sh")) return Q(type_flock_sh);
 	if (match("flock_un")) return Q(type_flock_un);
@@ -63,7 +63,7 @@ static value standard(void)
 	if (match("get_byte")) return Q(type_get_byte);
 	if (match("get_from")) return Q(type_get_from);
 	if (match("gt")) return Q(type_gt);
-	if (match("I")) return Q(type_I);
+	if (match("I")) return QI();
 	if (match("is_bool")) return Q(type_is_bool);
 	if (match("is_good")) return Q(type_is_good);
 	if (match("is_list")) return Q(type_is_list);
@@ -101,13 +101,13 @@ static value standard(void)
 	if (match("stderr")) return Qfile(stderr);
 	if (match("stdout")) return Qfile(stdout);
 	if (match("str_num")) return Q(type_str_num);
-	if (match("T")) return Q(type_T);
+	if (match("T")) return QT();
 	if (match("trunc")) return Q(type_trunc);
 	if (match("use")) return Q(type_use);
 	if (match("var_get")) return Q(type_var_get);
 	if (match("var_new")) return Q(type_var_new);
 	if (match("var_put")) return Q(type_var_put);
-	if (match("void")) return Q(type_void);
+	if (match("void")) return Qvoid();
 	if (match("xor")) return Q(type_xor);
 	if (match("yield")) return Q(type_yield);
 	return 0;

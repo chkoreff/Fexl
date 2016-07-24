@@ -29,7 +29,7 @@ value type_argv(value f)
 		{
 		int i = (int)(*(number)(data(x)));
 		if (i >= 0 && i < main_argc)
-			reduce_str(f, str_new_data0(main_argv[i]));
+			reduce_str(f,str_new_data0(main_argv[i]));
 		else
 			reduce_void(f);
 		}

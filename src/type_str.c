@@ -29,7 +29,7 @@ value type_concat(value f)
 	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_str)
-		reduce_str(f, str_concat(data(x),data(y)));
+		reduce_str(f,str_concat(data(x),data(y)));
 	else
 		reduce_void(f);
 	drop(x);
@@ -45,7 +45,7 @@ value type_length(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
-		reduce_num(f, num_new_ulong(((string)data(x))->len));
+		reduce_num(f,num_new_ulong(((string)data(x))->len));
 	else
 		reduce_void(f);
 	drop(x);
@@ -67,7 +67,7 @@ value type_slice(value f)
 		double yn = *((number)data(y));
 		double zn = *((number)data(z));
 		if (yn >= 0 && zn >= 0)
-			reduce_str(f, str_slice(data(x),yn,zn));
+			reduce_str(f,str_slice(data(x),yn,zn));
 		else
 			reduce_void(f);
 		}
@@ -98,7 +98,7 @@ value type_search(value f)
 			string ys = data(y);
 			unsigned long pos = str_search(xs,ys,zn);
 			if (pos < xs->len)
-				reduce_num(f, num_new_ulong(pos));
+				reduce_num(f,num_new_ulong(pos));
 			else
 				reduce_void(f);
 			}

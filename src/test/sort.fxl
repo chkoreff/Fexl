@@ -7,13 +7,11 @@
 # the context mechanism.
 \=
 (
-# (tower n f x) is the result of applying f to x n times.
+# (tower f n x) is the result of applying f to x n times.
 \tower=
-	(\n\f\x
-	(@\loop\n\x
+	(\f @\loop\n\x
 	le n 0 x;
 	loop (- n 1) (f x)
-	) n x
 	)
 
 def "append" append;
@@ -83,7 +81,7 @@ void
 	)
 
 # (exp_list n xs) Make 2^n copies of list xs.
-\exp_list=(\n\xs tower n (\x append x x) xs)
+\exp_list=(tower (\x append x x))
 
 \show=show_list
 

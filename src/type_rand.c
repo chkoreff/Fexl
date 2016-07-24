@@ -15,7 +15,7 @@ value type_seed_rand(value f)
 		{
 		double seed = *((number)data(x)) * (double)RAND_MAX;
 		srand(seed);
-		f = Q(type_I);
+		f = QI();
 		}
 	else
 		reduce_void(f);

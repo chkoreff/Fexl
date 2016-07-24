@@ -39,7 +39,7 @@ value type_num_str(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
-		reduce_str(f, num_str(data(x)));
+		reduce_str(f,num_str(data(x)));
 	else
 		reduce_void(f);
 	drop(x);

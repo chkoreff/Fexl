@@ -74,7 +74,7 @@ value type_get(value f)
 	{
 	string ch = get_utf8();
 	(void)f;
-	return ch ? Qstr(ch) : Q(type_void);
+	return ch ? Qstr(ch) : Qvoid();
 	}
 
 /* Get the next single byte from the current input. */
@@ -94,7 +94,7 @@ value type_get_byte(value f)
 	{
 	string ch = get_byte();
 	(void)f;
-	return ch ? Qstr(ch) : Q(type_void);
+	return ch ? Qstr(ch) : Qvoid();
 	}
 
 /* (char_width str pos) Return the width of the UTF-8 character which starts at
@@ -115,7 +115,7 @@ value type_char_width(value f)
 			if (pos < xs->len)
 				{
 				char n = char_width(xs->data[pos]);
-				reduce_num(f, num_new_ulong(n));
+				reduce_num(f,num_new_ulong(n));
 				}
 			else
 				reduce_void(f);
