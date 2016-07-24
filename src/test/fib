@@ -2,4 +2,4 @@
 ./build || exit
 ls -l ../bin/fexl
 . ./lib_test
-do_time ../bin/fexl test/fib.fxl >/dev/null
+do_time "../bin/fexl test/fib.fxl >/dev/null"

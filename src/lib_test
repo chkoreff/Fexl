@@ -3,14 +3,26 @@
 
 do_time()
 	{
-	/usr/bin/time -f "time %es space %MK" $@ || exit
+	local usr_cmd="$1"
+	cmd_time=/usr/bin/time
+	if [ -x $cmd_time ]; then
+	# Use the enhanced time command.
+	cmd="$cmd_time -f \"time %es space %MK\" $usr_cmd"
+	( /bin/sh -c "$cmd" ) || exit
+	else
+	# Use the time command built into bash.
+	cmd="\
+TIMEFORMAT=\"time %2Rs\"
+time $usr_cmd"
+	( /bin/bash -c "$cmd" ) || exit
+	fi
 	}
 
 do_diff()
 	{
 	local prog="$1"
 	local out="$2"
-	do_time $prog | (diff - $out || true) || exit
+	do_time "$prog" | (diff - $out || true) || exit
 	}
 
 do_diff_fexl()
