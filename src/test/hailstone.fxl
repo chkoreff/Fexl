@@ -1,5 +1,5 @@
 #
-\=(use "test/lib.fxl")
+use "test/common.fxl" \;
 
 # divide even by 2
 # odd: multiply by 3 and add 1

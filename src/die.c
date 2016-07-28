@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <die.h>
 #include <output.h>
 #include <stdlib.h> /* exit */
@@ -6,8 +7,7 @@ void die(const char *msg)
 	{
 	if (msg)
 		{
-		put_to_error();
-		put(msg);nl();
+		fput(stderr,msg);fnl(stderr);
 		}
 	exit(1);
 	}

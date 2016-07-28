@@ -1,15 +1,16 @@
-# Define an enhanced context which includes all the standard symbols along with
-# a few new ones.
+# Use an enhanced context which includes all the standard symbols along with a
+# few new ones.
+use "test/common.fxl" \;
 
-\=
+use_context
 (
-\x
-\speaker=(\name \x later; put name put " says " say x)
-eq x "fred" (speaker "Fred");
-eq x "wilma" (speaker "Wilma");
-eq x "goodbye" (later; say "Goodbye");
-standard x
+\speaker=(\name \x put name put " says " say x)
+def "fred" (speaker "Fred");
+def "wilma" (speaker "Wilma");
+def "goodbye" (say "Goodbye");
+standard
 )
+\;
 
 # Now run this program in the context specified above.
 say "Hi"

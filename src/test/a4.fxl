@@ -1,0 +1,13 @@
+# This runs in constant space as expected.
+\run=
+	(
+	(@\loop\x
+	ge x 900000 ();
+	#ge x 5000000 ();
+	loop (+ x 1)
+	) 1
+	)
+
+say "["
+run
+say "]"

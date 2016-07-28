@@ -1,7 +1,6 @@
 #include <memory.h>
-#include <output.h>
 #include <str.h>
-#include <string.h>
+#include <string.h> /* memcpy strlen */
 
 /* A string has a length field, followed by that number of bytes (which may
 include NULs), followed by a trailing NUL byte.  The trailing NUL byte makes it
@@ -113,9 +112,4 @@ unsigned long str_search(string x, string y, unsigned long offset)
 		xi++;
 		}
 	}
-	}
-
-void put_str(string x)
-	{
-	putd(x->data,x->len);
 	}

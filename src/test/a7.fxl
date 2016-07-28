@@ -1,0 +1,10 @@
+# The resolve happens first, so it says the error message before it says "beg".
+(
+resolve standard \;
+xsay "Hello"
+)
+\hello
+
+say "beg"
+hello
+say "end"

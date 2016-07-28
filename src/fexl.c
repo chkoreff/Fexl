@@ -1,17 +1,14 @@
 #include <value.h>
 #include <basic.h>
-#include <die.h>
-#include <input.h>
+#include <fexl.h>
 #include <num.h>
-#include <output.h>
-#include <parse.h>
 #include <stdio.h>
 #include <str.h>
 #include <string.h> /* strcmp */
 #include <type_buf.h>
 #include <type_cmp.h>
 #include <type_file.h>
-#include <type_input.h>
+#include <type_istr.h>
 #include <type_limit.h>
 #include <type_math.h>
 #include <type_num.h>
@@ -24,9 +21,6 @@
 #include <type_var.h>
 
 static int match(const char *other);
-
-static value type_standard(value f);
-static value type_use(value f);
 
 /* The standard (built-in) context */
 static value standard(void)
@@ -47,21 +41,21 @@ static value standard(void)
 	if (match("chr")) return Q(type_chr);
 	if (match("cons")) return Q(type_cons);
 	if (match("cos")) return Q(type_cos);
-	if (match("defined")) return Q(type_defined);
 	if (match("die")) return Q(type_die);
 	if (match("eq")) return Q(type_eq);
 	if (match("eval")) return Q(type_eval);
 	if (match("exp")) return Q(type_exp);
 	if (match("F")) return QF();
+	if (match("fflush")) return Q(type_fflush);
+	if (match("fget")) return Q(type_fget);
+	if (match("fgetc")) return Q(type_fgetc);
 	if (match("flock_ex")) return Q(type_flock_ex);
 	if (match("flock_sh")) return Q(type_flock_sh);
 	if (match("flock_un")) return Q(type_flock_un);
-	if (match("flush")) return Q(type_flush);
 	if (match("fopen")) return Q(type_fopen);
+	if (match("fput")) return Q(type_fput);
+	if (match("fsay")) return Q(type_fsay);
 	if (match("ge")) return Q(type_ge);
-	if (match("get")) return Q(type_get);
-	if (match("get_byte")) return Q(type_get_byte);
-	if (match("get_from")) return Q(type_get_from);
 	if (match("gt")) return Q(type_gt);
 	if (match("I")) return QI();
 	if (match("is_bool")) return Q(type_is_bool);
@@ -70,7 +64,6 @@ static value standard(void)
 	if (match("is_num")) return Q(type_is_num);
 	if (match("is_str")) return Q(type_is_str);
 	if (match("is_void")) return Q(type_is_void);
-	if (match("later")) return Q(type_later);
 	if (match("le")) return Q(type_le);
 	if (match("length")) return Q(type_length);
 	if (match("limit_memory")) return Q(type_limit_memory);
@@ -86,13 +79,16 @@ static value standard(void)
 	if (match("ord")) return Q(type_ord);
 	if (match("parse")) return Q(type_parse);
 	if (match("put")) return Q(type_put);
-	if (match("put_to")) return Q(type_put_to);
 	if (match("rand")) return Q(type_rand);
+	if (match("readstr")) return Q(type_readstr);
 	if (match("remove")) return Q(type_remove);
+	if (match("resolve")) return Q(type_resolve);
 	if (match("round")) return Q(type_round);
 	if (match("say")) return Q(type_say);
 	if (match("search")) return Q(type_search);
 	if (match("seed_rand")) return Q(type_seed_rand);
+	if (match("sget")) return Q(type_sget);
+	if (match("sgetc")) return Q(type_sgetc);
 	if (match("sin")) return Q(type_sin);
 	if (match("slice")) return Q(type_slice);
 	if (match("sqrt")) return Q(type_sqrt);
@@ -120,8 +116,8 @@ static int match(const char *other)
 	return strcmp(cur_name,other) == 0;
 	}
 
-/* (standard x) returns the definition of symbol x, or void if not defined. */
-static value type_standard(value f)
+/* (standard x) yields the definition of symbol x, or void if not defined. */
+value type_standard(value f)
 	{
 	if (!f->L) return 0;
 	{
@@ -132,7 +128,7 @@ static value type_standard(value f)
 		cur_name = ((string)data(x))->data;
 		def = standard();
 		if (def)
-			f = later(def);
+			f = yield(def);
 		else
 			reduce_void(f);
 		}
@@ -143,62 +139,38 @@ static value type_standard(value f)
 	}
 	}
 
-/* Note that if name designates a directory the fopen will succeed, but it will
-behave like an empty file. */
-static value parse_file(const char *name)
+static value use_context(value context, value exp)
 	{
-	input save_getd = getd;
-	void *save_cur_in = cur_in;
-
-	cur_in = name[0] ? fopen(name,"r") : stdin;
-	if (!cur_in)
-		{
-		put_to_error();
-		put("Could not open source file ");put(name);nl();
-		die(0);
-		}
-
-	{
-	value exp = parse(name);
-
-	getd = save_getd;
-	cur_in = save_cur_in;
-	return exp;
-	}
+	return eval(A(A(A(Q(type_resolve),context),exp),QI()));
 	}
 
 /* Evaluate the named file in the standard context.  Use stdin if the name is
 null or empty. */
-static value eval_file(const char *name)
+static value eval_file(value name)
 	{
-	value label = Qstr(str_new_data0(name));
-	value exp = parse_file(name);
-	value context = Q(type_standard);
-	exp = op_resolve(label,exp,context);
-	return eval(exp);
+	return use_context(Q(type_standard),parse_file(name));
 	}
 
-/* (use file) Equivalent to (once; parse_file file standard).  This parses
-file and evaluates it in the standard context, replacing itself with the final
-value so it only happens once.  This is used to bootstrap new contexts written
-in Fexl, so you can say this:
-	\=(use "lib.fxl")
-instead of this:
-	\=(once; parse_file "lib.fxl" standard)
+/* (use file)
+Equivalent to:
+	(use_context (once; parse_file file standard)).
+This is used to bootstrap new contexts written in Fexl so you can do this:
+	use "lib.fxl") \; ...
 */
-static value type_use(value f)
+value type_use(value f)
 	{
-	if (!f->L) return 0;
+	if (!f->L || !f->L->L) return 0;
 	{
-	value x = arg(f->R);
-	if (x->T == type_str)
+	value name = arg(f->L->R);
+	if (name->T == type_str)
 		{
-		string name = data(x);
-		reduce(f,eval_file(name->data));
+		value exp = hold(f->R);
+		value context = eval_file(hold(name));
+		reduce(f,use_context(context,exp));
 		}
 	else
 		reduce_void(f);
-	drop(x);
+	drop(name);
 	return f;
 	}
 	}
@@ -208,9 +180,7 @@ int main(int argc, char *argv[])
 	const char *name = argc > 1 ? argv[1] : "";
 	main_argc = argc;
 	main_argv = argv;
-	get_from(stdin);
-	put_to(stdout);
-	drop(eval_file(name));
+	drop(eval_file(Qstr(str_new_data0(name))));
 	end_value();
 	return 0;
 	}

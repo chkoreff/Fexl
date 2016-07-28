@@ -3,6 +3,7 @@
 #include <value.h>
 #include <basic.h>
 #include <convert.h>
+#include <input.h>
 #include <type_num.h>
 #include <type_str.h>
 
@@ -169,6 +170,40 @@ value type_chr(value f)
 	else
 		reduce_void(f);
 	drop(x);
+	return 0;
+	}
+	}
+
+/* (char_width str pos) Return the width of the UTF-8 character which starts at
+the given position. */
+value type_char_width(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	{
+	value x = arg(f->L->R);
+	value y = arg(f->R);
+	if (x->T == type_str && y->T == type_num)
+		{
+		double yn = *((number)data(y));
+		if (yn >= 0)
+			{
+			string xs = data(x);
+			unsigned long pos = yn;
+			if (pos < xs->len)
+				{
+				char n = char_width(xs->data[pos]);
+				reduce_num(f,num_new_ulong(n));
+				}
+			else
+				reduce_void(f);
+			}
+		else
+			reduce_void(f);
+		}
+	else
+		reduce_void(f);
+	drop(x);
+	drop(y);
 	return 0;
 	}
 	}

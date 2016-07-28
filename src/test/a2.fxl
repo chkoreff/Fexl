@@ -1,19 +1,45 @@
 #
+use "test/common.fxl" \;
+
+# Echo the characters from the input.
+\echo=
+	(\get @\loop
+	get \ch
+	is_void ch ();
+	say ["ch = '" ch "'"]
+	loop
+	)
+
 say "Hello"
 say "Type some lines of input and I'll echo them back."
 say "Press Ctrl-D to stop."
-\echo=
-	(@\echo
-	\ch==get
-	is_void ch ();
-	say ["ch = '" ch "'"]
-	echo
-	)
-echo
+echo (fget stdin)
 
 (
-say "Get from string:"
-get_from "abc";
-echo
+\str="abcåabcüdef封x"
+(
+say ["Get from string [" str "]"]
+readstr str \in
+echo (sget in)
 )
+(
+say ["String to list [" str "]"]
+show_list (str_chars str)
+)
+)
+
+(
+\str="AOOab~åüää≠封小xyz"
+(
+say ["Show logical characters in [" str "]"]
+readstr str \in
+echo (sget in)
+)
+(
+say ["Show individual hex bytes in [" str "]"]
+readstr str \in
+echo (sgetc in \ch yield; hex_byte; ord ch)
+)
+)
+
 say "Good bye."

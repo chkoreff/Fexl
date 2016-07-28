@@ -29,6 +29,11 @@ echo "== stdout:"
 echo "== stderr:"
 ../bin/fexl test/a3.fxl 2>&1 1>/dev/null
 
+run_fexl test/a4.fxl
+run_fexl test/a5.fxl
+run_fexl test/a6.fxl
+run_fexl test/a7.fxl
+run_fexl test/a8.fxl
 run_fexl test/chars.fxl
 
 (
@@ -101,17 +106,22 @@ y
 	(z z y)
 " | run_fexl
 
-echo -n "\=
-" | run_fexl
-
 (
 cat <<"EOF"
-\=(\x eq x "b" {(say "b")} void) a b
+resolve (\x eq x "b" {(say "b")} void) \; a b
 c
 EOF
 ) | run_fexl
 
 run_fexl missing.fxl
+
+(
+cat <<"EOF"
+use "test/common.fxl" \;
+parse_file "missing.fxl" standard \f
+f
+EOF
+) | run_fexl
 
 # Here I test setting ulimit to terminate misbehaving programs promptly.
 test_misbehavior=false

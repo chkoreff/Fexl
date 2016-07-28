@@ -1,6 +1,5 @@
 #
-\=(use "test/lib.fxl")
-\=(use "test/common.fxl")
+use "test/common.fxl" \;
 
 \show=
 	(\x
@@ -14,12 +13,12 @@
 
 \parse_string=
 	(\text\context
-	get_from text;
-	parse "" context
+	parse text "" \exp
+	resolve context exp
 	)
 
-\eval_file=(\name parse_file name standard)
-\eval_str=(\str parse_string str standard)
+\eval_file=(\name parse_file name standard I)
+\eval_str=(\str parse_string str standard I)
 
 (
 \ping=(say "ping")
@@ -38,10 +37,8 @@ talk
 div
 # Should say PING six times.
 \ping=(say "ping")
-# LATER 20151128 This test fails due to the copy-up behavior in type_I.  Until
-# I fix that, I work around the problem by calling "once" twice.
-#\talk=(ping (once ping))
-\talk=(ping (once; once ping))
+#\talk=(ping (once ping)) # NOTE 20160726 doesn't work yet
+\talk=(ping (once; once ping)) # workaround
 talk
 talk
 talk
@@ -202,9 +199,9 @@ each list (\ch say ["ch " ch])
 
 (
 say "== test buf"
-\buf==buf_new
+buf_new \buf
 \put=(buf_put buf)
-\get=(\x==(buf_get buf) say [": " x])
+\get=(buf_get buf \x say [": " x])
 put "abc"
 put "defg"
 get
@@ -322,30 +319,51 @@ show_x
 say "]"
 
 (
-\hi=(once; say "Hi")
-
-# Calling the I function here used to break this test, printing "Hi" three
-# times instead of once.  That's fixed now.
+\test_1=
+(
+say "== test_1" # says PING 1 time
+#\ping=(once; say "PING") # NOTE 20160726 doesn't work yet
+\ping=(once; once; say "PING") # workaround
 I
-# LATER 20151128 I've changed type_once so that (once x) no longer reduces x in
-# place, but instead reduces the entire (once x) form in place.  This exposes
-# an issue with how type_I copies up its argument, and I need to find a way to
-# avoid that.  Consequently the semicolon on the next line is necessary to
-# preserve the desired behavior here.
-;
-
-hi
-hi
-hi
+ping
+ping
+ping
 )
 
+\test_2=
 (
-# This used to cause a segfault when the once function attempted to replace
-# the nl with I, because the replace function was only designed to replace a
-# non-atomic value.  This is fixed now.
-\f=(once nl)
-f
-f
+say "== test_2" # says PING 5 times
+\ping=(say "PING")
+#\talk=(ping (once ping)) # NOTE 20160726 doesn't work yet
+\talk=(ping (once; once ping)) # workaround
+\talk=(talk talk)
+\talk=(talk talk)
+talk
+)
+
+\test_3=
+(
+say "== test_3" # says PING 3 times
+\ping=(say "PING")
+\talk=(eval ping I)
+talk talk talk
+)
+
+\test_4=
+(
+say "== test_4" # says PING pong PING PING PING
+\ping=(say "PING")
+#\talk=(ping (once (say "pong"))) # NOTE 20160726 doesn't work yet
+\talk=(ping (once; once (say "pong"))) # workaround
+\talk=(talk talk)
+\talk=(talk talk)
+talk
+)
+
+test_1
+test_2
+test_3
+test_4
 )
 
 (
@@ -353,7 +371,7 @@ f
 
 \make_square=
 	(\x
-	later;
+	yield;
 	once (put ["square " x "="])
 	* x x
 	)
@@ -362,8 +380,8 @@ div
 
 say (* x x)
 say (+ x x)
-\s4==(make_square 4)
-\s7==(make_square 7)
+make_square 4 \s4
+make_square 7 \s7
 
 say s4
 say s7
@@ -389,25 +407,19 @@ say ["x = " x]
 
 div
 
-# This demonstrates that (\x f x) is not strictly equivalent to f, when side
-# effects are taken into account.
-\say_x=(\x put "x = " say x)
-say_x 3
-say_x 4
-say_x 5
-
 (
-# Here I extend the standard context to include the "show" routine so the test
+# Here I enhance the standard context to include the "show" routine so the test
 # code below the "use" can run.  I could have just moved the test code above
-# the use, but I wanted to test "extend" explicitly here.
-\=
+# the use, but I wanted to test "export" explicitly here.
+use_context
 (
-extend;
+export;
 def "show" show;
 void
 )
+\;
 
-\=(use "test/misc.fxl")
+use "test/misc.fxl" \;
 
 (
 show "x"
@@ -415,14 +427,14 @@ show (+ 2 3)
 show (is_good; standard "show")
 # Demonstrate that the standard context points directly to itself.
 show (
-	\def==
+	\val=
 		(
 		\cx=standard
-		\cx==(cx "standard")
-		\cx==(cx "standard")
+		cx "standard" \cx
+		cx "standard" \cx
 		cx "show"
 		)
-	defined def
+	is_good val
 	)
 )
 try_fib
@@ -542,11 +554,11 @@ show_list (cons 1; cons 2; null)
 seed_rand 0.1964
 
 (
-\list_rand=(@\loop once; \x==rand [x;loop])
+\list_rand=(@\loop once; rand \x [x;loop])
 demo_rand list_rand
 )
 (
-\list_rand=(@\loop once; \x==rand [x;loop])
+\list_rand=(@\loop once; rand \x [x;loop])
 demo_rand list_rand
 )
 
@@ -685,20 +697,21 @@ eval_file "test/mf.fxl"
 	say "["
 
 	\context=
-	(\x
-	say ["symbol " x]
-	eq x "fred" (later; say "I am Fred.");
-	eq x "wilma" (later; say "I am Wilma.");
-	eq x "barney" (later; say "I am Barney.");
-	eq x "is_void" is_void;
-	eq x "say" say;
-	eq x "void" (later void);
+	(
+	def "fred" (say "I am Fred.");
+	def "wilma" (say "I am Wilma.");
+	def "barney" (say "I am Barney.");
+	def "is_void" is_void;
+	def "say" say;
+	def "void" void;
 	void
 	)
 
+	\context=(\x say ["symbol " x] context x)
+
 	say "== resolve"
 
-	\=context
+	use_context context \;
 
 	say "== run"
 	fred
@@ -712,20 +725,36 @@ eval_file "test/mf.fxl"
 \case_2=
 	(
 	say "["
-	\form=(\context parse_string "say (+ 7 8)" context)
+	\form=(\context parse_string "say (+ 7 8)" context I)
 
 	say "Run in standard context."
 	form standard
 
 	say "Run in weird context."
-	\context=(\x eq x "say" say; eq x "+" *; void)
+	\context=(\x eq x "say" {say}; eq x "+" {*}; void)
 	form context
 
 	say "]"
 	)
 
+\case_3=
+	(
+	\run=
+	(
+	use_context standard \;
+	say "PING"
+	)
+
+	say "["
+	run
+	run
+	run
+	say "]"
+	)
+
 case_1
 case_2
+case_3
 )
 
 test_context
@@ -767,17 +796,15 @@ try -1.3
 
 \write_file=
 	(\content
-	\fh==(fopen tmp_file "w")
-	put_to fh;
-	put content
+	fopen tmp_file "w" \fh
+	fput fh content
 	)
 
 \show_chars=
 	(\f
-	\fh==(fopen tmp_file "r")
-	get_from fh;
+	fopen tmp_file "r" \fh
 	@\loop
-	\ch==get
+	fget fh \ch
 	is_void ch ();
 	f ch
 	loop
@@ -785,7 +812,7 @@ try -1.3
 
 \remove_file=
 	(
-	\code==(remove tmp_file)
+	remove tmp_file \code
 	say [(eq code 0 "Removed" "Could not remove") " " tmp_file]
 	)
 
@@ -812,7 +839,7 @@ here
 ~
 This goes to the file.
 ~
-(put_to stdout; say "This should go to stdout.")
+(say "This should go to stdout.")
 ~
 This also goes to the file.
 ~
@@ -834,7 +861,7 @@ test_file
 # operations in one place.
 
 # The "!" function creates a read and write pair.
-\!=(\v==var_new {(\x==(var_get v) {x}) (var_put v)})
+\!=(var_new \v {(var_get v) (var_put v)})
 
 \fib=
 	(\max
@@ -866,8 +893,8 @@ fib 5
 
 div
 (
-\v==var_new
-\x==(var_get v)
+var_new \v
+var_get v \x
 var_put v x
 say "Passed var test of 20150907."
 )
@@ -895,7 +922,7 @@ say x
 (
 div
 put "("
-\x==(put "x=" 3) # Force the evaluation.
+eval (put "x=" 3) \x # Force the evaluation.
 put ")"
 say x
 say x
@@ -904,9 +931,9 @@ say x
 (
 div
 \x=(say "hi" 3)
-\x==x  # The effect only happens once.
-\x==x
-\x==x
+eval x \x  # The effect only happens once.
+eval x \x
+eval x \x
 )
 )
 
@@ -945,13 +972,13 @@ talk
 (
 div
 \talk=(say "Hi")
-\x==talk
-\x==talk
+eval talk \x
+eval talk \x
 )
 
 (
 div
-\talk==(say "Hi")
+eval (say "Hi") \talk
 talk
 talk
 )
@@ -1010,26 +1037,28 @@ try 3
 
 (
 div
-\hello=(say "Hello")
 
 (
 # Test drop buffer without getting its content.
-\buf==buf_new
+buf_new \buf
 buf_put buf "x"
 )
 
 # Now test redirecting output to a buffer.
 \result=
 (
-\buf==buf_new
+buf_new \buf
+\put=(\x buf_put buf; to_str x)
+\nl=(buf_put buf NL)
+\say=(\x put x nl)
 (
-put_to buf;
+\hello=(say "Hello")
 hello
-say "line 1"
+say ["line " 1]
 say "line 2"
-put "line 3" nl
+put ["line " 3] nl
 )
-buf_get buf
+buf_get buf I
 )
 
 say "result:"
@@ -1038,26 +1067,10 @@ put result
 
 (
 div
-\run=
-	(
-	(@\loop\x
-	ge x 900000 ();
-	#ge x 4000000 ();
-	loop (+ x 1)
-	) 1
-	)
-
-say "["
-run
-say "]"
-)
-
-(
-div
 # Here I test the existence of the flock_ and limit_ function calls, though I'm
 # not yet testing their effects.
 
-\fh==(fopen "test/hello.fxl" "r")
+fopen "test/hello.fxl" "r" \fh
 say (is_good fh)
 say (is_good; flock_ex fh)
 say (is_good; flock_sh fh)

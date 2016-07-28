@@ -56,7 +56,7 @@
 \fold=
 	(\f @\loop \z\xs
 	xs z \x\xs
-	\z==(f z x)
+	eval (f z x) \z
 	loop z xs
 	)
 
@@ -101,9 +101,10 @@
 # Flatten a piece of data (string, number, or list) into a string.
 \to_str=
 	(\x
-	\buf==buf_new
+	buf_new \buf
 	\put=(buf_put buf)
 	(@\loop\x
+	eval x \x
 	is_str x (put x);
 	is_num x (put (num_str x));
 	is_list x
@@ -113,7 +114,7 @@
 		loop xs
 		);
 	) x
-	buf_get buf
+	buf_get buf I
 	)
 
 # (list_at xs n) is the item at position n in list xs, counting from 0.
@@ -237,38 +238,41 @@ format_num
 	quarter
 	)
 
-\collect_chunks=
-	(\len\get_chunk
-	\buf==buf_new
-
-	(@\loop\pos
-	ge pos len ();
-	get_chunk pos \chunk\pos
-	buf_put buf chunk
-	loop pos
-	) 0
-
-	buf_get buf
+# Gather input items into a list.
+\get_list=
+	(\get @\loop
+	get \x is_void x [];
+	cons x; loop
 	)
 
-# Convert a string to a list of individual bytes.
-\str_bytes=
-	(\str
-	(@\loop\pos
-	\ch=(slice str pos 1)
-	eq ch "" [];
-	cons ch; loop (+ pos 1)
-	) 0
+# Gather input strings into a string.
+\get_str=
+	(\get
+	buf_new \buf
+	(
+	@\loop
+	get \x is_void x ();
+	buf_put buf x
+	loop
 	)
+	buf_get buf I
+	)
+
+# Convert a string to a list with a given function.
+\str_list=
+	(\get\str
+	readstr str \in
+	get_list (get in)
+	)
+
+# Return the list of individual bytes in a string.
+\str_bytes=(str_list sgetc)
+
+# Return the list of UTF-8 characters in a string.
+\str_chars=(str_list sget)
 
 # Apply a function to each logical character of a string.
-\str_map=
-	(\f\str
-	collect_chunks (length str) \pos
-	\n=(char_width str pos)
-	\ch=(f; slice str pos n)
-	{ ch (+ pos n) }
-	)
+\str_map=(\f\str map f; str_chars str)
 
 \quote_ch=
 	(\ch
@@ -442,24 +446,21 @@ format_num
 # Map a string specified in hexadecimal into the raw bytes.
 \map_hex_to_raw_bytes=
 	(\str
-	collect_chunks (length str) \pos
-	\get_nibble=
-		(\pos
-		\x=(hex_digit_to_dec; slice str pos 1)
-		{ x (+ pos 1) }
-		)
-	get_nibble pos \x\pos
-	get_nibble pos \y\pos
-	\byte=(chr; + (* 16 x) y)
-	{ byte pos }
+	readstr str \in get_str;
+	\nibble=(sgetc in \x yield; hex_digit_to_dec x)
+	nibble \x
+	nibble \y
+	yield;
+	chr; + (* 16 x) y
 	)
 
 # Map raw bytes to their hexadecimal values.
 \map_raw_bytes_to_hex=
 	(\str
-	collect_chunks (length str) \pos
-	\ch=(hex_byte; ord; slice str pos 1)
-	{ ch (+ pos 1) }
+	readstr str \in get_str;
+	sgetc in \x
+	yield;
+	hex_byte; ord; x
 	)
 
 # XOR two hex digit strings together.
@@ -478,7 +479,7 @@ format_num
 \def=
 	(\key\val\cx
 	\x
-	eq x key (later val);
+	eq x key (yield val);
 	cx x
 	)
 
@@ -486,42 +487,48 @@ format_num
 \chain=
 	(\cx_new\cx_old
 	\x
-	\def==(cx_new x)
-	defined def (later def);
-	cx_old x
+	check (cx_new x) (cx_old x)
+	)
+
+\use_context=
+	(\context\exp
+	resolve context exp I
+	)
+
+\NL="
+"
+
+\error=
+	(\msg
+	fsay stderr msg
+	die
 	)
 
 \parse_file=
 	(\name\context
-	\fh==(fopen name "r")
-	is_void fh
-		(
-		put_to stderr;
-		say ["Could not open source file " name]
-		die
-		);
-	get_from fh;
-	parse name context
+	fopen name "r" \fh
+	is_void fh (error ["Could not open source file " name]);
+	parse fh name \exp
+	resolve context exp
 	)
 
-# (extend cx) Takes the context cx and returns an extended context where all of
-# cx is defined, but also the special functions "extend", "standard", and "use"
-# are redefined to refer to the extended context instead of the original
-# context.
-\extend=
-	(@\extend\cx
+# (export cx) Returns a new context where all of cx is defined, but also the
+# special functions "export", "standard", and "use" are redefined to refer to
+# the new context instead of the original context.
+\export=
+	(@\export\cx
 
 	\standard=
 		(@\standard
-		\extend=(\cx extend; chain cx; standard)
+		\export=(\cx export; chain cx; standard)
 
 		\use=
 			(\file
-			\cx=(once; parse_file file standard)
-			extend cx
+			\cx=(export; once; parse_file file standard I)
+			use_context cx
 			)
 
-		def "extend" extend;
+		def "export" export;
 		def "standard" standard;
 		def "use" use;
 		cx
@@ -530,13 +537,12 @@ format_num
 	standard
 	)
 
-extend;
+export;
 def "and" and;
 def "append" append;
 def "chain" chain;
 def "check" check;
 def "colgroup" colgroup;
-def "collect_chunks" collect_chunks;
 def "column" column;
 def "date_month" date_month;
 def "date_normal" date_normal;
@@ -546,7 +552,8 @@ def "date_ymd" date_ymd;
 def "day_after" day_after;
 def "def" def;
 def "each" each;
-def "extend" extend;
+def "error" error;
+def "export" export;
 def "fexl_quote" fexl_quote;
 def "fill_day" fill_day;
 def "filter" filter;
@@ -571,6 +578,7 @@ def "month_after" month_after;
 def "month_before" month_before;
 def "month_ym" month_ym;
 def "neg" neg;
+def "NL" NL;
 def "or" or;
 def "parse_file" parse_file;
 def "pi" pi;
@@ -582,10 +590,12 @@ def "shift" shift;
 def "short_month_name" short_month_name;
 def "sort" sort;
 def "str_bytes" str_bytes;
+def "str_chars" str_chars;
 def "str_map" str_map;
 def "tau" tau;
 def "to_str" to_str;
 def "unique" unique;
+def "use_context" use_context;
 def "xor_hex" xor_hex;
 def "ym_month" ym_month;
 def "ym_num_days" ym_num_days;

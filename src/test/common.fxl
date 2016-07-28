@@ -1,7 +1,9 @@
 # Routines shared by test programs
+use "test/lib.fxl" \;
 \div=(say "==")
 \show_list=(\xs say "[" (each xs say) say "]")
 
+export;
 def "div" div;
 def "show_list" show_list;
 void

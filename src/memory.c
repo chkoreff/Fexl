@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <die.h>
 #include <memory.h>
 #include <output.h>
@@ -41,10 +42,9 @@ void end_memory(void)
 	{
 	if (cur_blocks || cur_bytes)
 		{
-		put_to_error();
-		put("LEAK");
-		put(" ");put_ulong(cur_blocks);
-		put(" ");put_ulong(cur_bytes);
+		fput(stderr,"LEAK");
+		fput(stderr," ");fput_ulong(stderr,cur_blocks);
+		fput(stderr," ");fput_ulong(stderr,cur_bytes);
 		die("");
 		}
 	}

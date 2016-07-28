@@ -55,17 +55,6 @@ value type_once(value f)
 	return f;
 	}
 
-/* (later x) = (I x), and the evaluation stops there.  This is used to return a
-function and postpone its evaluation until later. */
-value type_later(value f)
-	{
-	if (!f->L) return 0;
-	drop(f->L);
-	f->L = QI();
-	f->T = type_A;
-	return 0;
-	}
-
 /* (void x) = void */
 value type_void(value f)
 	{
@@ -94,14 +83,6 @@ value type_cons(value f)
 value type_null(value f)
 	{
 	return type_T(f);
-	}
-
-/* Check if the argument is defined (non-void) without evaluating it. */
-value type_defined(value f)
-	{
-	if (!f->L) return 0;
-	reduce_boolean(f,(f->R->T != type_void));
-	return 0;
 	}
 
 value type_is_void(value f)
@@ -187,9 +168,4 @@ void reduce_boolean(value f, int x)
 value yield(value x)
 	{
 	return V(type_yield,Q(type_yield), x);
-	}
-
-value later(value x)
-	{
-	return V(type_later,Q(type_later), x);
 	}

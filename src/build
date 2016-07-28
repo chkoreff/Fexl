@@ -17,6 +17,7 @@ make type_buf
 make type_cmp
 make type_file
 make type_input
+make type_istr
 make type_limit
 make type_math
 make type_num

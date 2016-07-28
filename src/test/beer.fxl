@@ -1,5 +1,5 @@
 #
-\=(use "test/lib.fxl")
+use "test/common.fxl" \;
 \suffix=(\n eq n 1 "" "s")
 \bottles_of_beer=(\n put [n " " "bottle" (suffix n) " of beer"])
 \on_the_wall=(say " on the wall")

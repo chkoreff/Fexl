@@ -5,8 +5,8 @@
 #include <report.h>
 #include <str.h>
 #include <type_num.h>
-#include <type_sym.h>
 #include <type_resolve.h>
+#include <type_sym.h>
 
 /* Resolve an individual symbol with the context. */
 static value resolve_symbol(value x, value context)
@@ -20,13 +20,16 @@ static value resolve_symbol(value x, value context)
 
 	{
 	/* Define other names using the given context. */
-	value exp = eval(A(hold(context),hold(x)));
-	if (exp->T == type_void)
-		{
-		drop(exp);
-		exp = 0;
-		}
-	return exp;
+	value exp = eval(A(A(hold(context),hold(x)),Q(type_yield)));
+	value def;
+
+	if (exp->L && exp->L->T == type_yield)
+		def = hold(exp->R);
+	else
+		def = 0;
+
+	drop(exp);
+	return def;
 	}
 	}
 
@@ -75,23 +78,29 @@ static value resolve(value exp, value context)
 	return exp;
 	}
 
-/* (resolve label form context) */
+/* (resolve context form) Resolve the form in the context and yield the
+resulting function. */
 value type_resolve(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	if (!f->L || !f->L->L) return 0;
 	{
-	const char *save = source_label;
-	string label = data(f->L->L->R);
-	source_label = label->data;
+	value form = arg(f->R);
+	if (form->T == type_sym)
+		{
+		value label = form->L;
+		value exp = form->R;
+		value context = f->L->R;
 
-	reduce(f,resolve(hold(f->L->R),hold(f->R)));
+		const char *save_source_label = source_label;
+		source_label = ((string)data(label))->data;
 
-	source_label = save;
+		reduce(f,yield(resolve(hold(exp),hold(context))));
+
+		source_label = save_source_label;
+		}
+	else
+		reduce_void(f);
+	drop(form);
 	return f;
 	}
-	}
-
-value op_resolve(value label, value exp, value context)
-	{
-	return A(A(V(type_resolve,Q(type_resolve), label), exp), context);
 	}

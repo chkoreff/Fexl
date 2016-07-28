@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <die.h>
 #include <output.h>
 #include <report.h>
@@ -6,29 +7,22 @@ const char *source_label; /* name of current source file */
 
 static void put_error_location(unsigned long line)
 	{
-	put(" on line "); put_ulong(line);
+	fput(stderr," on line "); fput_ulong(stderr,line);
 	if (source_label[0])
 		{
-		put(" of ");put(source_label);
+		fput(stderr," of ");fput(stderr,source_label);
 		}
-	nl();
+	fnl(stderr);
 	}
 
 void syntax_error(const char *code, unsigned long line)
 	{
-	put_to_error();
-	put(code); put_error_location(line);
+	fput(stderr,code); put_error_location(line);
 	die(0);
 	}
 
 void undefined_symbol(const char *name, unsigned long line)
 	{
-	output save_putd = putd;
-	void *save_cur_out = cur_out;
-
-	put_to_error();
-	put("Undefined symbol "); put(name); put_error_location(line);
-
-	putd = save_putd;
-	cur_out = save_cur_out;
+	fput(stderr,"Undefined symbol "); fput(stderr,name);
+	put_error_location(line);
 	}

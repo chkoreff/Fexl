@@ -1,11 +1,10 @@
 #
-\=(use "test/lib.fxl")
-\=(use "test/common.fxl")
+use "test/common.fxl" \;
 
 # Here I use a highly restricted context which provides only the few functions
 # I need to test sorting.  I don't have to do it this way, but I'm exercising
 # the context mechanism.
-\=
+use_context
 (
 # (tower f n x) is the result of applying f to x n times.
 \tower=
@@ -23,6 +22,7 @@ def "tower" tower;
 def "unique" unique;
 void
 )
+\;
 
 # Here I test the sort.
 

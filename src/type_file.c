@@ -1,14 +1,14 @@
+#include <str.h>
 #include <value.h>
 #include <basic.h>
 #include <die.h>
+#include <input.h>
 #include <num.h>
-#include <output.h>
 #include <stdio.h>
-#include <str.h>
 #include <sys/file.h> /* flock */
 #include <type_file.h>
+#include <type_input.h>
 #include <type_num.h>
-#include <type_output.h>
 #include <type_str.h>
 
 value type_file(value f)
@@ -27,7 +27,7 @@ value Qfile(FILE *fh)
 	return D(type_file,fh,(type)file_free);
 	}
 
-/* (fopen path mode) Open a file and return fh, where fh is the open file
+/* (fopen path mode) Open a file and yield fh, where fh is the open file
 handle or void on failure. */
 value type_fopen(value f)
 	{
@@ -40,7 +40,7 @@ value type_fopen(value f)
 		string path = data(x);
 		string mode = data(y);
 		FILE *fh = fopen(path->data,mode->data);
-		f = fh ? Qfile(fh) : Qvoid();
+		f = yield(fh ? Qfile(fh) : Qvoid());
 		}
 	else
 		reduce_void(f);
@@ -50,7 +50,20 @@ value type_fopen(value f)
 	}
 	}
 
-/* (remove path) Remove path from file system; return 0 if successful or -1
+/* (fgetc fh) yields the next single byte from the file, or void if no more. */
+value type_fgetc(value f)
+	{
+	return op_getc(f,type_file,(input)fgetc);
+	}
+
+/* (fget in) yields the next UTF-8 character from the file, or void if no more.
+*/
+value type_fget(value f)
+	{
+	return op_get(f,type_file,(input)fgetc);
+	}
+
+/* (remove path) Remove path from file system; yield 0 if successful or -1
 otherwise. */
 value type_remove(value f)
 	{
@@ -61,7 +74,7 @@ value type_remove(value f)
 		{
 		string path = data(x);
 		int code = remove(path->data);
-		f = Qnum0(code);
+		f = yield(Qnum0(code));
 		}
 	else
 		reduce_void(f);

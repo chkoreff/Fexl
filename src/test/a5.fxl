@@ -1,0 +1,15 @@
+#
+use "test/common.fxl" \;
+
+use_context
+(
+def "talk" (say "TALK");
+standard
+)
+\;
+say "begin"
+talk
+talk
+talk
+talk
+say "end"

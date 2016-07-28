@@ -1,6 +1,5 @@
 #
-\=(use "test/lib.fxl")
-\=(use "test/common.fxl")
-\=(use "test/misc.fxl")
+use "test/common.fxl" \;
+use "test/misc.fxl" \;
 
 each (range 1 1000) \n try_fib

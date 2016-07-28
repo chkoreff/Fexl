@@ -1,6 +1,5 @@
 # https://en.wikipedia.org/wiki/Hofstadter_sequence#Hofstadter_Female_and_Male_sequences
-\=(use "test/lib.fxl")
-\=(use "test/common.fxl")
+use "test/common.fxl" \;
 
 \create=
 	(\base\other

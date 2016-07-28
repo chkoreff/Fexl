@@ -1,7 +1,6 @@
-#include <math.h> /* exp log sin cos */
+#include <math.h> /* cos exp fabs log pow sin sqrt */
 #include <memory.h>
 #include <num.h>
-#include <output.h>
 
 /* Explicitly declare certain functions which are missing from math.h on some
 machines. */
@@ -49,9 +48,4 @@ int num_cmp(number x, number y)
 	if (*x < *y) return -1;
 	if (*x > *y) return 1;
 	return 0;
-	}
-
-void put_num(number x)
-	{
-	put_double(*x);
 	}

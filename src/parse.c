@@ -6,7 +6,6 @@
 #include <input.h>
 #include <parse.h>
 #include <report.h>
-#include <type_resolve.h>
 #include <type_str.h>
 #include <type_sym.h>
 
@@ -15,20 +14,19 @@ Grammar:
 [
 exp    => empty
 exp    => term exp
-exp    => ';' exp
+exp    => ; exp
 exp    => \ sym exp
-exp    => \ sym '=' term exp
-exp    => \ sym '==' term exp
-exp    => \ '=' term exp
+exp    => \ sym = term exp
+exp    => \ ; exp
 
-term   => '(' exp ')'
-term   => '[' list ']'
-term   => '{' tuple '}'
+term   => ( exp )
+term   => [ list ]
+term   => { tuple }
 term   => sym
 
 list   => empty
 list   => term list
-list   => ';' exp
+list   => ; exp
 
 tuple  => empty
 tuple  => term tuple
@@ -46,13 +44,15 @@ if it had reached end of file.
 */
 
 static int ch; /* current character */
-static unsigned long source_line;  /* current line number */
+static unsigned long line; /* current line number */
+static input get; /* current input routine */
+static void *source; /* current input source */
 
 static void skip(void)
 	{
-	ch = getd();
+	ch = get(source);
 	if (ch == '\n')
-		source_line++;
+		line++;
 	}
 
 static void skip_line(void)
@@ -106,7 +106,7 @@ special characters.  This is the simplest rule that can work.
 static value parse_name(void)
 	{
 	struct buffer buf = {0};
-	unsigned long first_line = source_line;
+	unsigned long first_line = line;
 
 	while (1)
 		{
@@ -168,14 +168,14 @@ static string collect_string(
 
 static value parse_quote_string(void)
 	{
-	unsigned long first_line = source_line;
+	unsigned long first_line = line;
 	skip();
 	return Qstr(collect_string("\"",1,first_line));
 	}
 
 static value parse_tilde_string(void)
 	{
-	unsigned long first_line = source_line;
+	unsigned long first_line = line;
 	string end;
 
 	/* Parse the string terminator. */
@@ -254,7 +254,7 @@ static value parse_tuple(void)
 static value parse_term(void)
 	{
 	value exp;
-	unsigned long first_line = source_line;
+	unsigned long first_line = line;
 	if (ch == '(') /* parenthesized expression */
 		{
 		skip();
@@ -285,31 +285,18 @@ static value parse_term(void)
 	return exp;
 	}
 
-static value parse_context(unsigned long first_line)
-	{
-	value context = parse_term();
-	if (context == 0)
-		syntax_error("Missing context", first_line);
-	return context;
-	}
-
 /* Parse a lambda form following the initial '\' character. */
 static value parse_lambda(unsigned long first_line)
 	{
 	/* Parse the symbol (function parameter). */
 	skip_white();
 
-	if (ch == '=')
+	if (ch == ';')
 		{
-		/* Resolve expression in a context. */
-		skip();
-		skip_white();
-		{
-		value context = parse_context(first_line);
+		/* Parse unresolved form. */
 		value exp = parse_exp();
 		value label = Qstr(str_new_data0(source_label));
-		return app(A(V(type_resolve,Q(type_resolve),label),exp), context);
-		}
+		return A(QI(),app(label,exp));
 		}
 
 	{
@@ -321,18 +308,12 @@ static value parse_lambda(unsigned long first_line)
 	{
 	/* Parse the optional definition of the symbol. */
 	value def = 0;
-	char is_eager = 0;
 
 	skip_filler();
-	first_line = source_line;
+	first_line = line;
 	if (ch == '=')
 		{
 		skip();
-		if (ch == '=')
-			{
-			is_eager = 1;
-			skip();
-			}
 		skip_filler();
 		def = parse_term();
 		if (def == 0)
@@ -342,13 +323,7 @@ static value parse_lambda(unsigned long first_line)
 	/* Parse the body of the function and apply the definition if any. */
 	{
 	value exp = lam(sym,parse_exp());
-	if (def)
-		{
-		if (is_eager)
-			exp = app(app(Q(type_eval),def),exp);
-		else
-			exp = app(exp,def);
-		}
+	if (def) exp = app(exp,def);
 	return exp;
 	}
 	}
@@ -363,7 +338,7 @@ static value parse_factor(void)
 		return 0;
 	else if (ch == '\\')
 		{
-		unsigned long first_line = source_line;
+		unsigned long first_line = line;
 		skip();
 		if (ch == '\\')
 			{
@@ -382,7 +357,7 @@ static value parse_factor(void)
 		{
 		value factor = parse_term();
 		if (ch == '=')
-			syntax_error("Missing symbol declaration before '='", source_line);
+			syntax_error("Missing symbol declaration before '='", line);
 		return factor;
 		}
 	}
@@ -404,27 +379,26 @@ static value parse_exp(void)
 	return exp;
 	}
 
-/* Parse the current input. */
-value parse(const char *label)
+/* Parse the given input. */
+value parse(input _get, void *_source, value label)
 	{
 	const char *save_source_label = source_label;
-	int save_ch = ch;
-	unsigned long save_source_line = source_line;
 
-	source_label = label;
+	get = _get;
+	source = _source;
+
+	source_label = ((string)data(label))->data;
 	ch = ' ';
-	source_line = 1;
+	line = 1;
 
 	{
 	value exp = parse_exp();
 
 	if (ch != -1)
-		syntax_error("Extraneous input", source_line);
+		syntax_error("Extraneous input", line);
 
 	source_label = save_source_label;
-	ch = save_ch;
-	source_line = save_source_line;
 
-	return exp;
+	return app(label,exp);
 	}
 	}

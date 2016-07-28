@@ -1,10 +1,9 @@
 #
-\=(use "test/lib.fxl")
-\=(use "test/common.fxl")
+use "test/common.fxl" \;
 
 \echo=
 	(@\echo
-	\ch==get_byte
+	fgetc stdin \ch
 	is_void ch ();
 	say ["ch " (hex_byte; ord ch)]
 	echo

@@ -11,9 +11,16 @@ static void sym_free(symbol sym)
 	free_memory(sym,sizeof(struct symbol));
 	}
 
+/*
+This type returns 0 so that symbolic forms returned from the parse routine
+evaluate properly.
+LATER 20160726 Revisit why we see form applied to form, which is why we can't
+use type_void here.
+*/
 value type_sym(value f)
 	{
-	return type_void(f);
+	(void)f;
+	return 0;
 	}
 
 value Qsym(string name, unsigned long line)

@@ -1,0 +1,66 @@
+#
+use "test/common.fxl" \;
+
+(
+div
+standard "say" \say
+# LATER 20151128 should numeric symbols be defined in standard?
+(check (standard "3") {"VOID"}) \x
+say x
+)
+
+\parse=(say "(parsing)" parse)
+\resolve=(say "(resolving)" resolve)
+
+\parse_string=
+	(\x
+	parse x "source" \exp
+	resolve standard exp
+	)
+
+\parse_file=
+	(\name
+	fopen name "r" \fh
+	is_void fh (error ["Could not open source file " name]);
+	parse fh name \exp
+	resolve standard exp
+	)
+
+\trace_parse=
+	(\parse\x
+	say "["
+	parse x \f
+	say "]"
+	yield f
+	)
+
+\parse_string=(trace_parse parse_string)
+\parse_file=(trace_parse parse_file)
+
+\do_test=
+(\parse
+div
+parse \f
+f
+f
+)
+
+\test_1=(do_test; parse_file "test/hello.fxl")
+\test_2=(do_test; parse_string ~ say "HI"~)
+\test_3=
+(
+div
+\program=
+~
+say ["x = " (+ 3 4)]
+~
+readstr program \get
+parse get "" \form
+resolve standard form \fn
+say "got it"
+fn
+)
+
+test_1
+test_2
+test_3

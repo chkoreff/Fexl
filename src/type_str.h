@@ -8,4 +8,5 @@ extern value type_search(value f);
 extern value type_str_num(value f);
 extern value type_ord(value f);
 extern value type_chr(value f);
+extern value type_char_width(value f);
 extern value type_is_str(value f);

@@ -240,8 +240,24 @@ x = 30
 x = 30
 x = 30
 ]
-Hi
-
+== test_1
+PING
+== test_2
+PING
+PING
+PING
+PING
+PING
+== test_3
+PING
+PING
+PING
+== test_4
+PING
+pong
+PING
+PING
+PING
 ==
 (CALC)1936
 88
@@ -302,9 +318,6 @@ x = 1
 ==
 x = 81
 ==
-x = 3
-x = 4
-x = 5
 str x
 num 5
 bool T
@@ -741,6 +754,11 @@ Run in standard context.
 Run in weird context.
 56
 ]
+[
+PING
+PING
+PING
+]
 ==
 Let's parse.
 Hello world!
@@ -953,9 +971,6 @@ line 1
 line 2
 line 3
 ==
-[
-]
-==
 T
 T
 T
@@ -1018,10 +1033,80 @@ ch = '包'
 ch = '子'
 ch = '
 '
-Get from string:
+Get from string [abcåabcüdef封x]
 ch = 'a'
 ch = 'b'
 ch = 'c'
+ch = 'å'
+ch = 'a'
+ch = 'b'
+ch = 'c'
+ch = 'ü'
+ch = 'd'
+ch = 'e'
+ch = 'f'
+ch = '封'
+ch = 'x'
+String to list [abcåabcüdef封x]
+[
+a
+b
+c
+å
+a
+b
+c
+ü
+d
+e
+f
+封
+x
+]
+Show logical characters in [AOOab~åüää≠封小xyz]
+ch = 'A'
+ch = 'O'
+ch = 'O'
+ch = 'a'
+ch = 'b'
+ch = '~'
+ch = 'å'
+ch = 'ü'
+ch = 'ä'
+ch = 'ä'
+ch = '≠'
+ch = '封'
+ch = '小'
+ch = 'x'
+ch = 'y'
+ch = 'z'
+Show individual hex bytes in [AOOab~åüää≠封小xyz]
+ch = '41'
+ch = '4f'
+ch = '4f'
+ch = '61'
+ch = '62'
+ch = '7e'
+ch = 'c3'
+ch = 'a5'
+ch = 'c3'
+ch = 'bc'
+ch = 'c3'
+ch = 'a4'
+ch = 'c3'
+ch = 'a4'
+ch = 'e2'
+ch = '89'
+ch = 'a0'
+ch = 'e5'
+ch = 'b0'
+ch = '81'
+ch = 'e5'
+ch = 'b0'
+ch = '8f'
+ch = '78'
+ch = '79'
+ch = '7a'
 Good bye.
 exit 0
 == stdout:
@@ -1034,6 +1119,61 @@ This goes to stderr.
 x = 7
 This goes to stderr.
 x = 7
+====
+[
+]
+exit 0
+====
+begin
+TALK
+TALK
+TALK
+TALK
+end
+exit 0
+====
+==
+VOID
+==
+[
+(parsing)
+(resolving)
+]
+Hello world!
+Hello world!
+==
+[
+(parsing)
+(resolving)
+]
+HI
+HI
+==
+(parsing)
+(resolving)
+got it
+x = 7
+exit 0
+====
+Undefined symbol xsay on line 4 of test/a7.fxl
+exit 1
+====
+[
+0.927291684284476
+0.471201063818858
+0.677796232364046
+]
+[
+0.927291684284476
+0.471201063818858
+0.677796232364046
+]
+[
+0.927291684284476
+0.471201063818858
+0.677796232364046
+]
+exit 0
 ====
 ==
 封封aa小小
@@ -1149,11 +1289,11 @@ Undefined symbol z on line 3
 Undefined symbol y on line 3
 exit 1
 ====
-Missing context on line 1
-exit 1
-====
 Undefined symbol a on line 1
 Undefined symbol c on line 2
+exit 1
+====
+Could not open source file missing.fxl
 exit 1
 ====
 Could not open source file missing.fxl

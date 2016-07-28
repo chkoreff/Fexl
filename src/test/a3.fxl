@@ -1,10 +1,12 @@
 #
+use "test/common.fxl" \;
 say "hello"
 \x=(+ 4 3)
 
 \talk=
 	(
-	(put_to stderr;
+	(
+	\say=(fsay stderr)
 	say "This goes to stderr."
 	say ["x = " x]
 	)
