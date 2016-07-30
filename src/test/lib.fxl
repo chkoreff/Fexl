@@ -83,7 +83,7 @@
 \tau=(* 2 pi)
 
 # (check x y) = x if x is good, otherwise y.
-\check=(\x\y is_good x x y)
+\check=(\x is_good x x)
 
 # Produce the list of values in the range x through y.
 \range=
@@ -249,8 +249,7 @@ format_num
 \get_str=
 	(\get
 	buf_new \buf
-	(
-	@\loop
+	(@\loop
 	get \x is_void x ();
 	buf_put buf x
 	loop
@@ -258,21 +257,34 @@ format_num
 	buf_get buf I
 	)
 
+# Gather a list of strings into a string.
+\list_str=
+	(\xs
+	buf_new \buf
+	(@\loop\xs
+	xs () \x\xs
+	buf_put buf x
+	loop xs
+	)
+	xs
+	buf_get buf I
+	)
+
 # Convert a string to a list with a given function.
-\str_list=
+\get_str_list=
 	(\get\str
 	readstr str \in
 	get_list (get in)
 	)
 
 # Return the list of individual bytes in a string.
-\str_bytes=(str_list sgetc)
+\str_bytes=(get_str_list sgetc)
 
 # Return the list of UTF-8 characters in a string.
-\str_chars=(str_list sget)
+\str_chars=(get_str_list sget)
 
 # Apply a function to each logical character of a string.
-\str_map=(\f\str map f; str_chars str)
+\str_map=(\f\str list_str; map f; str_chars str)
 
 \quote_ch=
 	(\ch

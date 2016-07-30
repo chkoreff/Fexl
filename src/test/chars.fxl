@@ -9,7 +9,9 @@ use "test/common.fxl" \;
 	)
 
 div
-say (str_map (\ch . ch ch) "封a小")
+\doubled=(str_map (\ch . ch ch) "封a小")
+say doubled
+say (is_str doubled)
 div
 #try "07" # BEL (beeps)
 try "41" # A
