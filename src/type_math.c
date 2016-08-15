@@ -10,7 +10,7 @@ static value op_num(value f, number op(number))
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
-		reduce_num(f,op(data(x)));
+		reduce_num(f,op((number)x->R));
 	else
 		reduce_void(f);
 	drop(x);
@@ -26,7 +26,7 @@ static value op_num_num(value f, number op(number,number))
 	value y = arg(f->R);
 
 	if (x->T == type_num && y->T == type_num)
-		reduce_num(f,op(data(x),data(y)));
+		reduce_num(f,op((number)x->R,(number)y->R));
 	else
 		reduce_void(f);
 	drop(x);

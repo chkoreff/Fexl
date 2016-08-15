@@ -108,12 +108,6 @@ value D(type T, void *data)
 	return V(T,0,data);
 	}
 
-/* Return the data from an atom. */
-void *data(value f)
-	{
-	return f->R;
-	}
-
 /* The type for function application */
 value type_A(value f)
 	{

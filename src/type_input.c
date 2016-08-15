@@ -12,7 +12,7 @@ value op_getc(value f, type t, input get)
 	value x = arg(f->R);
 	if (x->T == t)
 		{
-		int ch = get(data(x));
+		int ch = get(x->R);
 		if (ch == -1)
 			f = Qvoid();
 		else
@@ -37,7 +37,7 @@ value op_get(value f, type t, input get)
 	value x = arg(f->R);
 	if (x->T == t)
 		{
-		string ch = get_utf8(get,data(x));
+		string ch = get_utf8(get,x->R);
 		action = 1;
 		f = yield(ch ? Qstr(ch) : Qvoid());
 		}

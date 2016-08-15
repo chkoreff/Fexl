@@ -25,7 +25,7 @@ static void istr_free(struct istr *in)
 
 int sgetc(struct istr *in)
 	{
-	string str = data(in->str);
+	string str = (string)in->str->R;
 	return in->pos < str->len ? str->data[in->pos++] : -1;
 	}
 
@@ -39,7 +39,7 @@ value type_istr(value f)
 	{
 	if (f->N == 0)
 		{
-		istr_free(data(f));
+		istr_free((struct istr *)f->R);
 		return 0;
 		}
 	return type_void(f);

@@ -10,7 +10,7 @@ value type_num(value f)
 	{
 	if (f->N == 0)
 		{
-		num_free(data(f));
+		num_free((number)f->R);
 		return 0;
 		}
 	return type_void(f);
@@ -44,7 +44,7 @@ value type_num_str(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
-		reduce_str(f,num_str(data(x)));
+		reduce_str(f,num_str((number)x->R));
 	else
 		reduce_void(f);
 	drop(x);

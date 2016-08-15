@@ -13,7 +13,7 @@ value type_seed_rand(value f)
 	value x = arg(f->R);
 	if (x->T == type_num)
 		{
-		double seed = *((number)data(x)) * (double)RAND_MAX;
+		double seed = *((number)x->R) * (double)RAND_MAX;
 		srand(seed);
 		action = 1;
 		f = QI();

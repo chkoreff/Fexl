@@ -10,7 +10,7 @@ value type_var(value f)
 	{
 	if (f->N == 0)
 		{
-		drop(data(f));
+		drop(f->R);
 		return 0;
 		}
 	return type_void(f);
@@ -33,7 +33,7 @@ value type_var_get(value f)
 	if (x->T == type_var)
 		{
 		action = 1;
-		f = yield(hold(data(x)));
+		f = yield(hold(x->R));
 		}
 	else
 		reduce_void(f);

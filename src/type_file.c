@@ -21,7 +21,7 @@ value type_file(value f)
 	{
 	if (f->N == 0)
 		{
-		file_free(data(f));
+		file_free((FILE *)f->R);
 		return 0;
 		}
 	return type_void(f);
@@ -42,8 +42,8 @@ value type_fopen(value f)
 	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_str)
 		{
-		string path = data(x);
-		string mode = data(y);
+		string path = (string)x->R;
+		string mode = (string)y->R;
 		FILE *fh = fopen(path->data,mode->data);
 		action = 1;
 		f = yield(fh ? Qfile(fh) : Qvoid());
@@ -78,7 +78,7 @@ value type_remove(value f)
 	value x = arg(f->R);
 	if (x->T == type_str)
 		{
-		string path = data(x);
+		string path = (string)x->R;
 		int code = remove(path->data);
 		action = 1;
 		f = yield(Qnum0(code));
@@ -97,7 +97,7 @@ static value op_flock(value f, int operation)
 	value x = arg(f->R);
 	if (x->T == type_file)
 		{
-		FILE *fh = data(x);
+		FILE *fh = (FILE *)x->R;
 		int code = flock(fileno(fh),operation);
 		if (code < 0)
 			{

@@ -21,7 +21,7 @@ value type_sym(value f)
 	{
 	if (f->N == 0)
 		{
-		sym_free(data(f));
+		sym_free((symbol)f->R);
 		return 0;
 		}
 	return 0;
@@ -44,7 +44,7 @@ value app(value f, value g)
 
 static int sym_eq(symbol x, symbol y)
 	{
-	return str_eq(data(x->name),data(y->name));
+	return str_eq((string)x->name->R,(string)y->name->R);
 	}
 
 /* Make a pattern that sends the argument to the left and right as needed. */
@@ -68,7 +68,7 @@ static value remove_symbol(value sym, value exp)
 		return A(QF(),hold(exp));
 	else if (exp->L == 0)
 		{
-		if (sym_eq(data(sym),data(exp)))
+		if (sym_eq((symbol)sym->R,(symbol)exp->R))
 			return A(QT(),QT());
 		else
 			return A(QF(),hold(exp));

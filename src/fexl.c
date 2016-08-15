@@ -125,7 +125,7 @@ value type_standard(value f)
 	if (x->T == type_str)
 		{
 		value def;
-		cur_name = ((string)data(x))->data;
+		cur_name = ((string)x->R)->data;
 		def = standard();
 		if (def)
 			reduce(f,yield(def));

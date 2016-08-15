@@ -25,9 +25,9 @@ static void fputv(FILE *fh, value x)
 	while (1)
 		{
 		if (x->T == type_str)
-			fput_str(fh,data(x));
+			fput_str(fh,(string)x->R);
 		else if (x->T == type_num)
-			fput_num(fh,data(x));
+			fput_num(fh,(number)x->R);
 		else if (x->T == type_T && !x->L)
 			fput_ch(fh,'T');
 		else if (x->T == type_F && !x->L)
@@ -85,7 +85,7 @@ static value op_output(value f, void put(FILE *fh, value x))
 	value out = arg(f->L->R);
 	if (out->T == type_file)
 		{
-		FILE *fh = data(out);
+		FILE *fh = (FILE *)out->R;
 		put(fh,f->R);
 		action = 1;
 		f = QI();
@@ -114,7 +114,7 @@ value type_fflush(value f)
 	value out = arg(f->R);
 	if (out->T == type_file)
 		{
-		FILE *fh = data(out);
+		FILE *fh = (FILE *)out->R;
 		fflush(fh);
 		action = 1;
 		f = QI();
