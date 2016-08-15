@@ -11,9 +11,7 @@
 	)
 
 seed_rand 0.1964
-# LATER 20160726 why do we need the "once loop" here instead of just "loop"
-# as in stats.fxl?
-\xs=(@\loop once; rand \x [x;once loop])
+\xs=(@\loop once; rand \x [x;loop])
 
 show3 xs
 show3 xs

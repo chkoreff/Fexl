@@ -37,8 +37,7 @@ talk
 div
 # Should say PING six times.
 \ping=(say "ping")
-#\talk=(ping (once ping)) # NOTE 20160726 doesn't work yet
-\talk=(ping (once; once ping)) # workaround
+\talk=(ping (once ping))
 talk
 talk
 talk
@@ -322,8 +321,7 @@ say "]"
 \test_1=
 (
 say "== test_1" # says PING 1 time
-#\ping=(once; say "PING") # NOTE 20160726 doesn't work yet
-\ping=(once; once; say "PING") # workaround
+\ping=(once; say "PING")
 I
 ping
 ping
@@ -334,8 +332,7 @@ ping
 (
 say "== test_2" # says PING 5 times
 \ping=(say "PING")
-#\talk=(ping (once ping)) # NOTE 20160726 doesn't work yet
-\talk=(ping (once; once ping)) # workaround
+\talk=(ping (once ping))
 \talk=(talk talk)
 \talk=(talk talk)
 talk
@@ -353,8 +350,7 @@ talk talk talk
 (
 say "== test_4" # says PING pong PING PING PING
 \ping=(say "PING")
-#\talk=(ping (once (say "pong"))) # NOTE 20160726 doesn't work yet
-\talk=(ping (once; once (say "pong"))) # workaround
+\talk=(ping (once (say "pong")))
 \talk=(talk talk)
 \talk=(talk talk)
 talk

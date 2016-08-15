@@ -58,6 +58,7 @@ value type_put(value f)
 	{
 	if (!f->L) return 0;
 	fputv(stdout,f->R);
+	action = 1;
 	return QI();
 	}
 
@@ -65,6 +66,7 @@ value type_nl(value f)
 	{
 	(void)f;
 	fnl(stdout);
+	action = 1;
 	return QI();
 	}
 
@@ -72,6 +74,7 @@ value type_say(value f)
 	{
 	if (!f->L) return 0;
 	fputv(stdout,f->R);fnl(stdout);
+	action = 1;
 	return QI();
 	}
 
@@ -84,6 +87,7 @@ static value op_output(value f, void put(FILE *fh, value x))
 		{
 		FILE *fh = data(out);
 		put(fh,f->R);
+		action = 1;
 		f = QI();
 		}
 	else
@@ -112,6 +116,7 @@ value type_fflush(value f)
 		{
 		FILE *fh = data(out);
 		fflush(fh);
+		action = 1;
 		f = QI();
 		}
 	else

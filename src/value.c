@@ -11,9 +11,7 @@ The T field is the type, a C routine which reduces the value during evaluation.
 The L and R fields are the left and right components of the value.
 If L != 0 and R != 0, the value represents the application of L to R.
 If L == 0 and R == 0, the value represents a primary function.
-If L == 0 and R != 0, the value represents an atom.  In that case, R points to
-another value which holds a destroy function in T, and a pointer to the atom
-data in R.
+If L == 0 and R != 0, the value represents an atom with data R.
 
 The N field also serves to link values on the free list.  It is not strictly
 portable to store a pointer in an unsigned long field, but people have relied
@@ -61,11 +59,10 @@ static void clear(value f)
 		drop(f->L);
 		drop(f->R);
 		}
-	else if (f->R && --f->R->N == 0)
+	else if (f->R)
 		{
 		/* Clear atom. */
-		f->R->T(f->R->R);
-		push_free(f->R);
+		f->T(f);
 		}
 	}
 
@@ -105,22 +102,22 @@ value Q(type T)
 	return V(T,0,0);
 	}
 
-/* Create an atom of type T with the given data and destroy routine. */
-value D(type T, void *data, type destroy)
+/* Create an atom of type T with the given data. */
+value D(type T, void *data)
 	{
-	return V(T,0,V(destroy,0,data));
+	return V(T,0,data);
 	}
 
 /* Return the data from an atom. */
 void *data(value f)
 	{
-	return f->R->R;
+	return f->R;
 	}
 
 /* The type for function application */
 value type_A(value f)
 	{
-	value g = next_action(f->L);
+	value g = next_action(&f->L);
 	if (g)
 		return A(g,hold(f->R));
 	f->T = f->L->T;
@@ -133,22 +130,23 @@ value A(value x, value y)
 	return V(type_A,x,y);
 	}
 
-/* Replace the content of f with the content of g. */
+/* (J g) = g.  The reduce routine uses type_J to make f equivalent to g without
+having to copy the components of g into f.  */
+value type_J(value f)
+	{
+	return hold(f->R);
+	}
+
+/* Reduce f to the equivalent of g. */
 void reduce(value f, value g)
 	{
 	clear(f);
-
-	if (g->L) hold(g->L);
-	if (g->R) hold(g->R);
-
-	f->T = g->T;
-	f->L = g->L;
-	f->R = g->R;
-
-	drop(g);
+	f->T = type_J;
+	f->L = Q(type_J);
+	f->R = g;
 	}
 
-/* Equivalent to reduce(f,Q(T)) */
+/* Reduce f to Q(T). */
 void reduce_Q(value f, type T)
 	{
 	clear(f);
@@ -157,16 +155,16 @@ void reduce_Q(value f, type T)
 	f->R = 0;
 	}
 
-/* Equivalent to reduce(f,D(T,data,destroy)) */
-void reduce_D(value f, type T, void *data, type destroy)
+/* Reduce f to D(T,data). */
+void reduce_D(value f, type T, void *data)
 	{
 	clear(f);
 	f->T = T;
 	f->L = 0;
-	f->R = V(destroy,0,data);
+	f->R = data;
 	}
 
-/* Equivalent to reduce(f,A(x,y)) */
+/* Reduce f to A(x,y). */
 void reduce_A(value f, value x, value y)
 	{
 	clear(f);
@@ -175,13 +173,29 @@ void reduce_A(value f, value x, value y)
 	f->R = y;
 	}
 
-/* Reduce the value until the next action, if any. */
-value next_action(value f)
+/*
+A type function sets the action flag true to indicate a repeatable side-effect.
+Otherwise the value would be regarded as a pure function and the side-effect
+would only happen once.
+*/
+int action;
+
+/* Evaluate up to the first action, if any, and replace along the way. */
+value next_action(value *p)
 	{
+	value f = *p;
+	action = 0;
 	while (1)
 		{
 		value g = f->T(f);
-		if (g != f) return g;
+		if (g == 0) return 0;
+		if (action) return g;
+		if (g != f)
+			{
+			drop(f);
+			f = g;
+			*p = f;
+			}
 		}
 	}
 
@@ -190,7 +204,7 @@ value eval(value f)
 	{
 	while (1)
 		{
-		value g = next_action(f);
+		value g = next_action(&f);
 		if (g == 0) return f;
 		drop(f);
 		f = g;

@@ -64,6 +64,7 @@ value type_parse(value f)
 			f = yield(parse_istr(data(source),hold(label)));
 		else
 			reduce_void(f);
+		action = 1;
 		}
 	else
 		reduce_void(f);

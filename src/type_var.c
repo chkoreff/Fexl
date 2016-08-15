@@ -8,6 +8,11 @@ human user, redefining print to capture output in a memory buffer, etc. */
 
 value type_var(value f)
 	{
+	if (f->N == 0)
+		{
+		drop(data(f));
+		return 0;
+		}
 	return type_void(f);
 	}
 
@@ -15,7 +20,8 @@ value type_var(value f)
 value type_var_new(value f)
 	{
 	(void)f;
-	return yield(D(type_var,Qvoid(),(type)drop));
+	action = 1;
+	return yield(D(type_var,Qvoid()));
 	}
 
 /* (var_get var) yields val, where val is the current value of var. */
@@ -25,7 +31,10 @@ value type_var_get(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_var)
+		{
+		action = 1;
 		f = yield(hold(data(x)));
+		}
 	else
 		reduce_void(f);
 	drop(x);
@@ -42,8 +51,9 @@ value type_var_put(value f)
 	if (x->T == type_var)
 		{
 		value v = arg(f->R);
-		drop(x->R->R);
-		x->R->R = v;
+		drop(x->R);
+		x->R = v;
+		action = 1;
 		f = QI();
 		}
 	else

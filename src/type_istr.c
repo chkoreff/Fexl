@@ -32,11 +32,16 @@ int sgetc(struct istr *in)
 value Qistr(value x)
 	{
 	struct istr *in = istr_new(x);
-	return D(type_istr,in,(type)istr_free);
+	return D(type_istr,in);
 	}
 
 value type_istr(value f)
 	{
+	if (f->N == 0)
+		{
+		istr_free(data(f));
+		return 0;
+		}
 	return type_void(f);
 	}
 
@@ -47,7 +52,10 @@ value type_readstr(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
+		{
+		action = 1;
 		f = yield(Qistr(hold(x)));
+		}
 	else
 		reduce_void(f);
 	drop(x);

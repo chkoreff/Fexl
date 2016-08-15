@@ -7,6 +7,11 @@
 
 value type_buf(value f)
 	{
+	if (f->N == 0)
+		{
+		buf_free(data(f));
+		return 0;
+		}
 	return type_void(f);
 	}
 
@@ -14,7 +19,8 @@ value type_buf(value f)
 value type_buf_new(value f)
 	{
 	(void)f;
-	return yield(D(type_buf,buf_new(),(type)buf_free));
+	action = 1;
+	return yield(D(type_buf,buf_new()));
 	}
 
 /* (buf_put buf str) Appends the string to the buffer. */
@@ -29,6 +35,7 @@ value type_buf_put(value f)
 		buffer *buf = data(x);
 		string str = data(y);
 		buf_put(buf,str);
+		action = 1;
 		f = QI();
 		}
 	else
@@ -50,6 +57,7 @@ value type_buf_get(value f)
 		{
 		buffer *buf = data(x);
 		string str = buf_clear(buf);
+		action = 1;
 		f = yield(Qstr(str));
 		}
 	else

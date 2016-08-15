@@ -19,7 +19,11 @@ use type_void here.
 */
 value type_sym(value f)
 	{
-	(void)f;
+	if (f->N == 0)
+		{
+		sym_free(data(f));
+		return 0;
+		}
 	return 0;
 	}
 
@@ -28,7 +32,7 @@ value Qsym(string name, unsigned long line)
 	symbol sym = new_memory(sizeof(struct symbol));
 	sym->name = Qstr(name);
 	sym->line = line;
-	return D(type_sym,sym,(type)sym_free);
+	return D(type_sym,sym);
 	}
 
 /* Apply f to g, where either can be a symbolic form. */

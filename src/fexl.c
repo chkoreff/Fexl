@@ -128,7 +128,7 @@ value type_standard(value f)
 		cur_name = ((string)data(x))->data;
 		def = standard();
 		if (def)
-			f = yield(def);
+			reduce(f,yield(def));
 		else
 			reduce_void(f);
 		}

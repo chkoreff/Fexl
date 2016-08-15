@@ -11,20 +11,25 @@
 #include <type_num.h>
 #include <type_str.h>
 
-value type_file(value f)
-	{
-	return type_void(f);
-	}
-
 static void file_free(FILE *fh)
 	{
 	if (fileno(fh) > 2)  /* don't close stdin, stdout, or stderr */
 		fclose(fh);
 	}
 
+value type_file(value f)
+	{
+	if (f->N == 0)
+		{
+		file_free(data(f));
+		return 0;
+		}
+	return type_void(f);
+	}
+
 value Qfile(FILE *fh)
 	{
-	return D(type_file,fh,(type)file_free);
+	return D(type_file,fh);
 	}
 
 /* (fopen path mode) Open a file and yield fh, where fh is the open file
@@ -40,6 +45,7 @@ value type_fopen(value f)
 		string path = data(x);
 		string mode = data(y);
 		FILE *fh = fopen(path->data,mode->data);
+		action = 1;
 		f = yield(fh ? Qfile(fh) : Qvoid());
 		}
 	else
@@ -74,6 +80,7 @@ value type_remove(value f)
 		{
 		string path = data(x);
 		int code = remove(path->data);
+		action = 1;
 		f = yield(Qnum0(code));
 		}
 	else
@@ -97,6 +104,7 @@ static value op_flock(value f, int operation)
 			perror("flock");
 			die(0);
 			}
+		action = 1;
 		f = QI();
 		}
 	else

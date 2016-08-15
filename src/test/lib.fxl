@@ -73,6 +73,7 @@
 
 \and=(\x\y x y F)
 \or=(\x\y x T y)
+\not=(\x x F T)
 
 \neg=(- 0)
 
@@ -591,6 +592,7 @@ def "month_before" month_before;
 def "month_ym" month_ym;
 def "neg" neg;
 def "NL" NL;
+def "not" not;
 def "or" or;
 def "parse_file" parse_file;
 def "pi" pi;

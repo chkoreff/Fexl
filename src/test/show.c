@@ -47,6 +47,11 @@ void put_num(number x)
 	fput_num(stdout,x);
 	}
 
+void nl(void)
+	{
+	fnl(stdout);
+	}
+
 void put_type(type t)
 	{
 	if (0) ;
@@ -89,6 +94,7 @@ void put_type(type t)
 	else if (t == type_is_str) put("is_str");
 	else if (t == type_is_void) put("is_void");
 	else if (t == type_istr) put("istr");
+	else if (t == type_J) put_ch('J');
 	else if (t == type_le) put("le");
 	else if (t == type_length) put("length");
 	else if (t == type_limit_memory) put("limit_memory");
