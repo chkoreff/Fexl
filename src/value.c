@@ -133,21 +133,6 @@ value A(value x, value y)
 	return V(type_A,x,y);
 	}
 
-/* Replace the content of f with the content of g. */
-static void replace(value f, value g)
-	{
-	clear(f);
-
-	if (g->L) hold(g->L);
-	if (g->R) hold(g->R);
-
-	f->T = g->T;
-	f->L = g->L;
-	f->R = g->R;
-
-	drop(g);
-	}
-
 /* The reduce routine uses type_J to make f equivalent to g, but it replaces f
 with g only after evaluating g.  That gives the correct behavior when using the
 "once" function. */
@@ -159,12 +144,21 @@ value type_J(value f)
 		value y = x->T(x);
 		if (y == 0)
 			{
-			replace(f,hold(x));
+			drop(f->L);
+
+			if (x->L) hold(x->L);
+			if (x->R) hold(x->R);
+
+			f->T = x->T;
+			f->L = x->L;
+			f->R = x->R;
+
+			drop(x);
 			return 0;
 			}
 		if (y != x)
 			return y;
-		while (x->T == type_J) /* Avoid stacks of J forms. */
+		if (x->T == type_J) /* Avoid stacks of J forms. */
 			{
 			x = hold(x->R);
 			drop(f->R);
