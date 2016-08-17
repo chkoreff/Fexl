@@ -25,7 +25,7 @@ static value parse_istr(struct istr *istr, value label)
 succeed, but it will behave like an empty file. */
 value parse_file(value name)
 	{
-	const char *name_s = ((string)name->R)->data;
+	const char *name_s = ((string)data(name))->data;
 	FILE *fh = name_s[0] ? fopen(name_s,"r") : stdin;
 	if (!fh)
 		{
@@ -57,14 +57,13 @@ value type_parse(value f)
 	if (label->T == type_str)
 		{
 		if (source->T == type_file)
-			f = yield(parse_fh((FILE *)source->R,hold(label)));
+			f = yield(parse_fh(data(source),hold(label)));
 		else if (source->T == type_str)
 			f = yield(parse_string(source,hold(label)));
 		else if (source->T == type_istr)
-			f = yield(parse_istr((struct istr *)source->R,hold(label)));
+			f = yield(parse_istr(data(source),hold(label)));
 		else
 			reduce_void(f);
-		action = 1;
 		}
 	else
 		reduce_void(f);

@@ -9,22 +9,17 @@
 
 value type_str(value f)
 	{
-	if (f->N == 0)
-		{
-		str_free((string)f->R);
-		return 0;
-		}
 	return type_void(f);
 	}
 
 value Qstr(string x)
 	{
-	return D(type_str,x);
+	return D(type_str,x,(type)str_free);
 	}
 
 void reduce_str(value f, string x)
 	{
-	reduce_D(f,type_str,x);
+	reduce_D(f,type_str,x,(type)str_free);
 	}
 
 /* (. x y) is the concatenation of strings x and y. */
@@ -35,7 +30,7 @@ value type_concat(value f)
 	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_str)
-		reduce_str(f,str_concat((string)x->R,(string)y->R));
+		reduce_str(f,str_concat(data(x),data(y)));
 	else
 		reduce_void(f);
 	drop(x);
@@ -51,7 +46,7 @@ value type_length(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
-		reduce_num(f,num_new_ulong(((string)x->R)->len));
+		reduce_num(f,num_new_ulong(((string)data(x))->len));
 	else
 		reduce_void(f);
 	drop(x);
@@ -70,10 +65,10 @@ value type_slice(value f)
 	value z = arg(f->R);
 	if (x->T == type_str && y->T == type_num && z->T == type_num)
 		{
-		double yn = *((number)y->R);
-		double zn = *((number)z->R);
+		double yn = *((number)data(y));
+		double zn = *((number)data(z));
 		if (yn >= 0 && zn >= 0)
-			reduce_str(f,str_slice((string)x->R,yn,zn));
+			reduce_str(f,str_slice(data(x),yn,zn));
 		else
 			reduce_void(f);
 		}
@@ -97,11 +92,11 @@ value type_search(value f)
 
 	if (x->T == type_str && y->T == type_str && z->T == type_num)
 		{
-		double zn = *((number)z->R);
+		double zn = *((number)data(z));
 		if (zn >= 0)
 			{
-			string xs = (string)x->R;
-			string ys = (string)y->R;
+			string xs = data(x);
+			string ys = data(y);
 			unsigned long pos = str_search(xs,ys,zn);
 			if (pos < xs->len)
 				reduce_num(f,num_new_ulong(pos));
@@ -128,7 +123,7 @@ value type_str_num(value f)
 	value x = arg(f->R);
 	if (x->T == type_str)
 		{
-		number n = str0_num(((string)x->R)->data);
+		number n = str0_num(((string)data(x))->data);
 		if (n)
 			reduce_num(f,n);
 		else
@@ -149,7 +144,7 @@ value type_ord(value f)
 	value x = arg(f->R);
 	if (x->T == type_str)
 		{
-		string xs = (string)x->R;
+		string xs = data(x);
 		reduce_num(f,num_new_ulong(xs->len == 0 ? 0 :
 			(unsigned char)xs->data[0]));
 		}
@@ -168,7 +163,7 @@ value type_chr(value f)
 	value x = arg(f->R);
 	if (x->T == type_num)
 		{
-		double xn = *((number)x->R);
+		double xn = *((number)data(x));
 		char ch = xn;
 		reduce_str(f,str_new_data(&ch,1));
 		}
@@ -189,10 +184,10 @@ value type_char_width(value f)
 	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_num)
 		{
-		double yn = *((number)y->R);
+		double yn = *((number)data(y));
 		if (yn >= 0)
 			{
-			string xs = (string)x->R;
+			string xs = data(x);
 			unsigned long pos = yn;
 			if (pos < xs->len)
 				{

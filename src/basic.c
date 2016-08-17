@@ -40,7 +40,7 @@ value type_eval(value f)
 	{
 	if (!f->L) return 0;
 	{
-	value x = next_action(&f->R);
+	value x = next_action(f->R);
 	if (x) return V(type_eval,hold(f->L),x);
 	reduce(f,yield(hold(f->R)));
 	return f;

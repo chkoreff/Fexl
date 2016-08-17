@@ -8,17 +8,12 @@
 
 value type_num(value f)
 	{
-	if (f->N == 0)
-		{
-		num_free((number)f->R);
-		return 0;
-		}
 	return type_void(f);
 	}
 
 value Qnum(number x)
 	{
-	return D(type_num,x);
+	return D(type_num,x,(type)num_free);
 	}
 
 value Qnum0(double x)
@@ -35,7 +30,7 @@ value Qnum_str0(const char *name)
 
 void reduce_num(value f, number x)
 	{
-	reduce_D(f,type_num,x);
+	reduce_D(f,type_num,x,(type)num_free);
 	}
 
 value type_num_str(value f)
@@ -44,7 +39,7 @@ value type_num_str(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
-		reduce_str(f,num_str((number)x->R));
+		reduce_str(f,num_str(data(x)));
 	else
 		reduce_void(f);
 	drop(x);

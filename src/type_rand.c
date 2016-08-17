@@ -13,9 +13,8 @@ value type_seed_rand(value f)
 	value x = arg(f->R);
 	if (x->T == type_num)
 		{
-		double seed = *((number)x->R) * (double)RAND_MAX;
+		double seed = *((number)data(x)) * (double)RAND_MAX;
 		srand(seed);
-		action = 1;
 		f = QI();
 		}
 	else
@@ -31,6 +30,5 @@ value type_rand(value f)
 	{
 	double x = ((double)rand()) / ((double)RAND_MAX);
 	(void)f;
-	action = 1;
 	return yield(Qnum0(x));
 	}

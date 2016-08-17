@@ -19,17 +19,12 @@ static void file_free(FILE *fh)
 
 value type_file(value f)
 	{
-	if (f->N == 0)
-		{
-		file_free((FILE *)f->R);
-		return 0;
-		}
 	return type_void(f);
 	}
 
 value Qfile(FILE *fh)
 	{
-	return D(type_file,fh);
+	return D(type_file,fh,(type)file_free);
 	}
 
 /* (fopen path mode) Open a file and yield fh, where fh is the open file
@@ -42,10 +37,9 @@ value type_fopen(value f)
 	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_str)
 		{
-		string path = (string)x->R;
-		string mode = (string)y->R;
+		string path = data(x);
+		string mode = data(y);
 		FILE *fh = fopen(path->data,mode->data);
-		action = 1;
 		f = yield(fh ? Qfile(fh) : Qvoid());
 		}
 	else
@@ -78,9 +72,8 @@ value type_remove(value f)
 	value x = arg(f->R);
 	if (x->T == type_str)
 		{
-		string path = (string)x->R;
+		string path = data(x);
 		int code = remove(path->data);
-		action = 1;
 		f = yield(Qnum0(code));
 		}
 	else
@@ -97,14 +90,13 @@ static value op_flock(value f, int operation)
 	value x = arg(f->R);
 	if (x->T == type_file)
 		{
-		FILE *fh = (FILE *)x->R;
+		FILE *fh = data(x);
 		int code = flock(fileno(fh),operation);
 		if (code < 0)
 			{
 			perror("flock");
 			die(0);
 			}
-		action = 1;
 		f = QI();
 		}
 	else

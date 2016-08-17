@@ -13,7 +13,7 @@ static value resolve_symbol(value x, value context)
 	{
 	{
 	/* Define numeric literals. */
-	const char *name = ((string)x->R)->data;
+	const char *name = ((string)data(x))->data;
 	value def = Qnum_str0(name);
 	if (def) return def;
 	}
@@ -44,12 +44,12 @@ static value do_resolve(value exp, value context)
 	value result;
 	if (exp->L == 0)
 		{
-		symbol sym = (symbol)exp->R;
+		symbol sym = data(exp);
 		value x = sym->name;
 		result = resolve_symbol(x, context);
 		if (!result)
 			{
-			const char *name = ((string)x->R)->data;
+			const char *name = ((string)data(x))->data;
 			undefined_symbol(name,sym->line);
 			undefined = 1;
 			result = Qvoid();
@@ -92,7 +92,7 @@ value type_resolve(value f)
 		value context = f->L->R;
 
 		const char *save_source_label = source_label;
-		source_label = ((string)label->R)->data;
+		source_label = ((string)data(label))->data;
 
 		reduce(f,yield(resolve(hold(exp),hold(context))));
 

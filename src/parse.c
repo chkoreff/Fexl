@@ -387,7 +387,7 @@ value parse(input _get, void *_source, value label)
 	get = _get;
 	source = _source;
 
-	source_label = ((string)label->R)->data;
+	source_label = ((string)data(label))->data;
 	ch = ' ';
 	line = 1;
 

@@ -25,23 +25,18 @@ static void istr_free(struct istr *in)
 
 int sgetc(struct istr *in)
 	{
-	string str = (string)in->str->R;
+	string str = data(in->str);
 	return in->pos < str->len ? str->data[in->pos++] : -1;
 	}
 
 value Qistr(value x)
 	{
 	struct istr *in = istr_new(x);
-	return D(type_istr,in);
+	return D(type_istr,in,(type)istr_free);
 	}
 
 value type_istr(value f)
 	{
-	if (f->N == 0)
-		{
-		istr_free((struct istr *)f->R);
-		return 0;
-		}
 	return type_void(f);
 	}
 
@@ -52,10 +47,7 @@ value type_readstr(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
-		{
-		action = 1;
 		f = yield(Qistr(hold(x)));
-		}
 	else
 		reduce_void(f);
 	drop(x);

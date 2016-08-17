@@ -19,11 +19,7 @@ use type_void here.
 */
 value type_sym(value f)
 	{
-	if (f->N == 0)
-		{
-		sym_free((symbol)f->R);
-		return 0;
-		}
+	(void)f;
 	return 0;
 	}
 
@@ -32,7 +28,7 @@ value Qsym(string name, unsigned long line)
 	symbol sym = new_memory(sizeof(struct symbol));
 	sym->name = Qstr(name);
 	sym->line = line;
-	return D(type_sym,sym);
+	return D(type_sym,sym,(type)sym_free);
 	}
 
 /* Apply f to g, where either can be a symbolic form. */
@@ -44,7 +40,7 @@ value app(value f, value g)
 
 static int sym_eq(symbol x, symbol y)
 	{
-	return str_eq((string)x->name->R,(string)y->name->R);
+	return str_eq(data(x->name),data(y->name));
 	}
 
 /* Make a pattern that sends the argument to the left and right as needed. */
@@ -68,7 +64,7 @@ static value remove_symbol(value sym, value exp)
 		return A(QF(),hold(exp));
 	else if (exp->L == 0)
 		{
-		if (sym_eq((symbol)sym->R,(symbol)exp->R))
+		if (sym_eq(data(sym),data(exp)))
 			return A(QT(),QT());
 		else
 			return A(QF(),hold(exp));

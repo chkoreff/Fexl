@@ -169,27 +169,27 @@ void show(value f)
 		{
 		put_ch(' ');
 		if (f->T == type_num)
-			put_num((number)f->R);
+			put_num(data(f));
 		else if (f->T == type_str)
 			{
 			put_ch('"');
-			put_str((string)f->R);
+			put_str(data(f));
 			put_ch('"');
 			}
 		else if (f->T == type_sym)
 			{
-			symbol sym = (symbol)f->R;
+			symbol sym = data(f);
 			put_ch('"');
-			put_str((string)sym->name->R);
+			put_str(data(sym->name));
 			put_ch('"');
 			}
 		else if (f->T == type_var)
-			show(f->R);
+			show(data(f));
 		else if (f->T == type_buf)
 			put("...");
 		else if (f->T == type_file)
 			{
-			FILE *fh = (FILE *)f->R;
+			FILE *fh = data(f);
 			put_ulong(fileno(fh));
 			}
 		else
