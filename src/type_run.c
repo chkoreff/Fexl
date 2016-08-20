@@ -27,7 +27,7 @@ value type_argv(value f)
 	value x = arg(f->R);
 	if (x->T == type_num)
 		{
-		int i = (int)(*(number)(data(x)));
+		int i = (int)(*(number)data(x));
 		if (i >= 0 && i < main_argc)
 			reduce_str(f,str_new_data0(main_argv[i]));
 		else
