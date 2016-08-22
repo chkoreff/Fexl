@@ -1,11 +1,13 @@
 #include <stdio.h>
+#include <str.h>
 #include <value.h>
 #include <basic.h>
 #include <fexl.h>
+#include <file.h>
 #include <num.h>
 #include <output.h>
-#include <str.h>
-#include <test/show.h>
+#include <output2.h>
+#include <show.h>
 #include <type_buf.h>
 #include <type_cmp.h>
 #include <type_file.h>
@@ -21,36 +23,6 @@
 #include <type_str.h>
 #include <type_sym.h>
 #include <type_var.h>
-
-void put(const char *data)
-	{
-	fput(stdout,data);
-	}
-
-void put_ch(char ch)
-	{
-	fput_ch(stdout,ch);
-	}
-
-void put_ulong(unsigned long x)
-	{
-	fput_ulong(stdout,x);
-	}
-
-void put_str(string x)
-	{
-	fput_str(stdout,x);
-	}
-
-void put_num(number x)
-	{
-	fput_num(stdout,x);
-	}
-
-void nl(void)
-	{
-	fnl(stdout);
-	}
 
 void put_type(type t)
 	{

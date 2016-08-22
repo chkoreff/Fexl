@@ -20,7 +20,12 @@
 #include <type_str.h>
 #include <type_var.h>
 
-static int match(const char *other);
+static const char *cur_name;
+
+static int match(const char *other)
+	{
+	return strcmp(cur_name,other) == 0;
+	}
 
 /* The standard (built-in) context */
 static value standard(void)
@@ -107,13 +112,6 @@ static value standard(void)
 	if (match("xor")) return Q(type_xor);
 	if (match("yield")) return Q(type_yield);
 	return 0;
-	}
-
-static const char *cur_name;
-
-static int match(const char *other)
-	{
-	return strcmp(cur_name,other) == 0;
 	}
 
 /* (standard x) yields the definition of symbol x, or void if not defined. */

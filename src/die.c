@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <die.h>
-#include <output.h>
+#include <file.h>
 #include <stdlib.h> /* exit */
 
 void die(const char *msg)

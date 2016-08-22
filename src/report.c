@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <die.h>
-#include <output.h>
+#include <file.h>
 #include <report.h>
 
 const char *source_label; /* name of current source file */

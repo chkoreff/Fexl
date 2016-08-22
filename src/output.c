@@ -1,35 +1,23 @@
 #include <stdio.h>
-#include <format.h>
+#include <file.h>
 #include <output.h>
-#include <string.h> /* strlen */
 
-void fputd(FILE *fh, const char *data, unsigned long len)
+void put(const char *data)
 	{
-	size_t n = fwrite(data,1,len,fh);
-	(void)n;
+	fput(stdout,data);
 	}
 
-void fput(FILE *fh, const char *data)
+void put_ch(char ch)
 	{
-	fputd(fh,data,strlen(data));
+	fput_ch(stdout,ch);
 	}
 
-void fput_ch(FILE *fh, char ch)
+void put_ulong(unsigned long x)
 	{
-	fputd(fh,&ch,1);
+	fput_ulong(stdout,x);
 	}
 
-void fput_ulong(FILE *fh, unsigned long x)
+void nl(void)
 	{
-	fput(fh,format_ulong(x));
-	}
-
-void fput_double(FILE *fh, double x)
-	{
-	fput(fh,format_double(x));
-	}
-
-void fnl(FILE *fh)
-	{
-	fputd(fh,"\n",1);
+	fnl(stdout);
 	}

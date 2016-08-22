@@ -120,9 +120,8 @@ void *data(value f)
 /* The type for function application */
 value type_A(value f)
 	{
-	value g = next_action(f->L);
-	if (g)
-		return A(g,hold(f->R));
+	value x = next_action(f->L);
+	if (x) return A(x,hold(f->R));
 	f->T = f->L->T;
 	return f;
 	}
@@ -133,9 +132,9 @@ value A(value x, value y)
 	return V(type_A,x,y);
 	}
 
-/* The reduce routine uses type_J to make f equivalent to g, but it replaces f
-with g only after evaluating g.  That gives the correct behavior when using the
-"once" function. */
+/* The reduce routine uses type_J to make f equivalent to g.  This replaces f
+with the content of g only after reducing g to its final value.  That gives
+the correct behavior when using the "once" function. */
 value type_J(value f)
 	{
 	value x = f->R;
@@ -144,15 +143,13 @@ value type_J(value f)
 		value y = x->T(x);
 		if (y == 0)
 			{
+			/* Replace f with final value x. */
 			drop(f->L);
-
 			if (x->L) hold(x->L);
 			if (x->R) hold(x->R);
-
 			f->T = x->T;
 			f->L = x->L;
 			f->R = x->R;
-
 			drop(x);
 			return 0;
 			}

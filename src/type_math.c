@@ -24,7 +24,6 @@ static value op_num_num(value f, number op(number,number))
 	{
 	value x = arg(f->L->R);
 	value y = arg(f->R);
-
 	if (x->T == type_num && y->T == type_num)
 		reduce_num(f,op(data(x),data(y)));
 	else

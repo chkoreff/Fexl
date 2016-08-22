@@ -9,10 +9,8 @@ value type_I(value f)
 	return f;
 	}
 
-/* Boolean types:
-(T x y) = x
-(F x y) = y
-*/
+/* Boolean types */
+/* (T x y) = x */
 value type_T(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
@@ -20,6 +18,7 @@ value type_T(value f)
 	return f;
 	}
 
+/* (F x y) = y */
 value type_F(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
@@ -135,14 +134,14 @@ value op_is_type(value f, type t)
 	}
 	}
 
-value Qvoid(void)
-	{
-	return Q(type_void);
-	}
-
 value QI(void)
 	{
 	return Q(type_I);
+	}
+
+value QT(void)
+	{
+	return Q(type_T);
 	}
 
 value QF(void)
@@ -150,9 +149,9 @@ value QF(void)
 	return Q(type_F);
 	}
 
-value QT(void)
+value Qvoid(void)
 	{
-	return Q(type_T);
+	return Q(type_void);
 	}
 
 void reduce_void(value f)

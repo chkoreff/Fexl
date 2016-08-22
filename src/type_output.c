@@ -1,23 +1,14 @@
+#include <num.h>
 #include <stdio.h>
+#include <str.h>
 #include <value.h>
 #include <basic.h>
-#include <num.h>
-#include <output.h>
-#include <str.h>
+#include <file.h>
+#include <file2.h>
 #include <type_file.h>
 #include <type_num.h>
 #include <type_output.h>
 #include <type_str.h>
-
-void fput_str(FILE *fh, string x)
-	{
-	fputd(fh,x->data,x->len);
-	}
-
-void fput_num(FILE *fh, number x)
-	{
-	fput_double(fh,*x);
-	}
 
 static void fputv(FILE *fh, value x)
 	{

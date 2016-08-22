@@ -3,8 +3,8 @@
 #include <value.h>
 #include <basic.h>
 #include <die.h>
+#include <file.h>
 #include <input.h>
-#include <output.h>
 #include <parse.h>
 #include <type_file.h>
 #include <type_istr.h>
@@ -59,7 +59,7 @@ value type_parse(value f)
 		if (source->T == type_file)
 			f = yield(parse_fh(data(source),hold(label)));
 		else if (source->T == type_str)
-			f = yield(parse_string(source,hold(label)));
+			reduce(f,yield(parse_string(source,hold(label))));
 		else if (source->T == type_istr)
 			f = yield(parse_istr(data(source),hold(label)));
 		else
