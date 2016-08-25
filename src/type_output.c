@@ -62,7 +62,7 @@ value type_nl(value f)
 value type_say(value f)
 	{
 	if (!f->L) return 0;
-	fputv(stdout,f->R);fnl(stdout);
+	fsayv(stdout,f->R);
 	return QI();
 	}
 
