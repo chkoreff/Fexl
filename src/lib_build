@@ -54,7 +54,7 @@ link()
 	local file_e=../bin/$name
 	stale $file_e $objects || return 0
 	mkdir -p `dirname $file_e`
-	run gcc -s -lm $objects -o $file_e
+	run gcc -s $objects -o $file_e -lm
 	}
 
 erase()
