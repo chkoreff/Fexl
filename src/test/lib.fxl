@@ -56,7 +56,7 @@
 \fold=
 	(\f @\loop \z\xs
 	xs z \x\xs
-	eval (f z x) \z
+	\z==(f z x)
 	loop z xs
 	)
 
@@ -105,7 +105,7 @@
 	buf_new \buf
 	\put=(buf_put buf)
 	(@\loop\x
-	eval x \x
+	\x==x
 	is_str x (put x);
 	is_num x (put (num_str x));
 	is_list x

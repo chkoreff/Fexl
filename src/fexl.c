@@ -153,7 +153,7 @@ static value eval_file(value name)
 Equivalent to:
 	(use_context (once; parse_file file standard)).
 This is used to bootstrap new contexts written in Fexl so you can do this:
-	use "lib.fxl") \; ...
+	use "lib.fxl" \; ...
 */
 value type_use(value f)
 	{
