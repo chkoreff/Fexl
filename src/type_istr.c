@@ -40,14 +40,14 @@ value type_istr(value f)
 	return type_void(f);
 	}
 
-/* (readstr str) yields an iterator on the string. */
+/* (readstr str) returns an iterator on the string. */
 value type_readstr(value f)
 	{
 	if (!f->L) return 0;
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
-		f = yield(Qistr(hold(x)));
+		f = Qistr(hold(x));
 	else
 		reduce_void(f);
 	drop(x);
@@ -55,15 +55,14 @@ value type_readstr(value f)
 	}
 	}
 
-/* (sgetc in) yields the next single byte from the string, or void if no more.
-*/
+/* (sgetc in) returns the next single byte from the string, or void if none. */
 value type_sgetc(value f)
 	{
 	return op_getc(f,type_istr,(input)sgetc);
 	}
 
-/* (sget in) yields the next UTF-8 character from the string, or void if no
-more. */
+/* (sget in) returns the next UTF-8 character from the string, or void if none.
+*/
 value type_sget(value f)
 	{
 	return op_get(f,type_istr,(input)sgetc);

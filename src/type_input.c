@@ -20,7 +20,6 @@ value op_getc(value f, type t, input get)
 			char c = (char)ch;
 			f = Qstr(str_new_data(&c,1));
 			}
-		f = yield(f);
 		}
 	else
 		reduce_void(f);
@@ -37,7 +36,7 @@ value op_get(value f, type t, input get)
 	if (x->T == t)
 		{
 		string ch = get_utf8(get,data(x));
-		f = yield(ch ? Qstr(ch) : Qvoid());
+		f = ch ? Qstr(ch) : Qvoid();
 		}
 	else
 		reduce_void(f);

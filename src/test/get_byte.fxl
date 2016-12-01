@@ -3,7 +3,7 @@ use "test/common.fxl" \;
 
 \echo=
 	(@\echo
-	fgetc stdin \ch
+	\ch==(fgetc stdin)
 	is_void ch ();
 	say ["ch " (hex_byte; ord ch)]
 	echo

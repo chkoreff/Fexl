@@ -45,7 +45,7 @@ static value parse_string(value str, value label)
 	}
 
 /* (parse source label) Parse the source, using the given label for any syntax
-error messages, and yield the resulting form.  The source may be type_file,
+error messages, and return the resulting form.  The source may be type_file,
 type_str, or type_istr.
 */
 value type_parse(value f)
@@ -57,11 +57,11 @@ value type_parse(value f)
 	if (label->T == type_str)
 		{
 		if (source->T == type_file)
-			f = yield(parse_fh(data(source),hold(label)));
+			f = parse_fh(data(source),hold(label));
 		else if (source->T == type_str)
-			reduce(f,yield(parse_string(source,hold(label))));
+			reduce(f,parse_string(source,hold(label)));
 		else if (source->T == type_istr)
-			f = yield(parse_istr(data(source),hold(label)));
+			f = parse_istr(data(source),hold(label));
 		else
 			reduce_void(f);
 		}

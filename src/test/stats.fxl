@@ -3,9 +3,8 @@ use "test/common.fxl" \;
 # Normal distribution with mean 0 and standard deviation 1.
 \rand_normal=
 	(
-	rand \r1
-	rand \r2
-	yield;
+	\r1==rand
+	\r2==rand
 	* (sqrt; * -2 (log r1)) (cos; * tau r2)
 	)
 
@@ -103,10 +102,10 @@ put_sharpe excess_sharpe nl
 	\mean=(/ pct_mean 100)
 	\stddev=(/ pct_stddev 100)
 	yield;
-	rand_normal \x
+	\x==rand_normal
 	\factor=(+ (+ 1 mean) (* stddev x))
 	\ror=(* 100 (- factor 1))
-	yield ror
+	ror
 	)
 
 # Return data for 200810 - 201407
@@ -187,7 +186,7 @@ put_sharpe excess_sharpe nl
 ]
 
 make_rand_ror 1.4 6.0 \rand_ror
-\list_rand_ror=(@\loop once; rand_ror \x [x;loop])
+\list_rand_ror=(@\loop once; \x==rand_ror [x;loop])
 
 seed_rand 0.1964
 \len=(list_length benchmark_list_ror)

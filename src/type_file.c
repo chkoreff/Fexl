@@ -27,7 +27,7 @@ value Qfile(FILE *fh)
 	return D(type_file,fh,(type)file_free);
 	}
 
-/* (fopen path mode) Open a file and yield fh, where fh is the open file
+/* (fopen path mode) Open a file and return fh, where fh is the open file
 handle or void on failure. */
 value type_fopen(value f)
 	{
@@ -40,7 +40,7 @@ value type_fopen(value f)
 		string path = data(x);
 		string mode = data(y);
 		FILE *fh = fopen(path->data,mode->data);
-		f = yield(fh ? Qfile(fh) : Qvoid());
+		f = fh ? Qfile(fh) : Qvoid();
 		}
 	else
 		reduce_void(f);
@@ -50,20 +50,19 @@ value type_fopen(value f)
 	}
 	}
 
-/* (fgetc fh) yields the next single byte from the file, or void if no more. */
+/* (fgetc fh) returns the next single byte from the file, or void if none. */
 value type_fgetc(value f)
 	{
 	return op_getc(f,type_file,(input)fgetc);
 	}
 
-/* (fget in) yields the next UTF-8 character from the file, or void if no more.
-*/
+/* (fget in) returns the next UTF-8 character from the file, or void if none. */
 value type_fget(value f)
 	{
 	return op_get(f,type_file,(input)fgetc);
 	}
 
-/* (remove path) Remove path from file system; yield 0 if successful or -1
+/* (remove path) Remove path from file system; return 0 if successful or -1
 otherwise. */
 value type_remove(value f)
 	{
@@ -74,7 +73,7 @@ value type_remove(value f)
 		{
 		string path = data(x);
 		int code = remove(path->data);
-		f = yield(Qnum0(code));
+		f = Qnum0(code);
 		}
 	else
 		reduce_void(f);

@@ -14,24 +14,24 @@ say x
 
 \parse_string=
 	(\x
-	parse x "source" \exp
+	\exp==(parse x "source")
 	resolve standard exp
 	)
 
 \parse_file=
 	(\name
-	fopen name "r" \fh
+	\fh==(fopen name "r")
 	is_void fh (error ["Could not open source file " name]);
-	parse fh name \exp
+	\exp==(parse fh name)
 	resolve standard exp
 	)
 
 \trace_parse=
 	(\parse\x
 	say "["
-	parse x \f
+	\f==(parse x)
 	say "]"
-	yield f
+	f
 	)
 
 \parse_string=(trace_parse parse_string)
@@ -40,7 +40,7 @@ say x
 \do_test=
 (\parse
 div
-parse \f
+\f==parse
 f
 f
 )
@@ -54,8 +54,8 @@ div
 ~
 say ["x = " (+ 3 4)]
 ~
-readstr program \get
-parse get "" \form
+\get==(readstr program)
+\form==(parse get "")
 resolve standard form \fn
 say "got it"
 fn

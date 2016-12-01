@@ -10,11 +10,11 @@ value type_buf(value f)
 	return type_void(f);
 	}
 
-/* buf_new yields a new empty character buffer. */
+/* buf_new returns a new empty character buffer. */
 value type_buf_new(value f)
 	{
 	(void)f;
-	return yield(D(type_buf,buf_new(),(type)buf_free));
+	return D(type_buf,buf_new(),(type)buf_free);
 	}
 
 /* (buf_put buf str) Appends the string to the buffer. */
@@ -39,7 +39,7 @@ value type_buf_put(value f)
 	}
 	}
 
-/* (buf_get buf) Clear the buffer and yield str, where str is the current
+/* (buf_get buf) Clear the buffer and return str, where str is the current
 content of the buffer. */
 value type_buf_get(value f)
 	{
@@ -50,7 +50,7 @@ value type_buf_get(value f)
 		{
 		buffer *buf = data(x);
 		string str = buf_clear(buf);
-		f = yield(Qstr(str));
+		f = Qstr(str);
 		}
 	else
 		reduce_void(f);

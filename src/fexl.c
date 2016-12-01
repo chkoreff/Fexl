@@ -48,7 +48,6 @@ static value standard(void)
 	if (match("cos")) return Q(type_cos);
 	if (match("die")) return Q(type_die);
 	if (match("eq")) return Q(type_eq);
-	if (match("eval")) return Q(type_eval);
 	if (match("exp")) return Q(type_exp);
 	if (match("F")) return QF();
 	if (match("fflush")) return Q(type_fflush);

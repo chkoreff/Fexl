@@ -13,7 +13,7 @@ use "test/common.fxl" \;
 
 \parse_string=
 	(\text\context
-	parse text "" \exp
+	\exp==(parse text "")
 	resolve context exp
 	)
 
@@ -198,9 +198,9 @@ each list (\ch say ["ch " ch])
 
 (
 say "== test buf"
-buf_new \buf
+\buf==buf_new
 \put=(buf_put buf)
-\get=(buf_get buf \x say [": " x])
+\get=(say [": " (buf_get buf)])
 put "abc"
 put "defg"
 get
@@ -550,11 +550,11 @@ show_list (cons 1; cons 2; null)
 seed_rand 0.1964
 
 (
-\list_rand=(@\loop once; rand \x [x;loop])
+\list_rand=(@\loop once; \x==rand [x;loop])
 demo_rand list_rand
 )
 (
-\list_rand=(@\loop once; rand \x [x;loop])
+\list_rand=(@\loop once; \x==rand [x;loop])
 demo_rand list_rand
 )
 
@@ -792,15 +792,15 @@ try -1.3
 
 \write_file=
 	(\content
-	fopen tmp_file "w" \fh
+	\fh==(fopen tmp_file "w")
 	fput fh content
 	)
 
 \show_chars=
 	(\f
-	fopen tmp_file "r" \fh
+	\fh==(fopen tmp_file "r")
 	@\loop
-	fget fh \ch
+	\ch==(fget fh)
 	is_void ch ();
 	f ch
 	loop
@@ -808,7 +808,7 @@ try -1.3
 
 \remove_file=
 	(
-	remove tmp_file \code
+	\code==(remove tmp_file)
 	say [(eq code 0 "Removed" "Could not remove") " " tmp_file]
 	)
 
@@ -857,7 +857,7 @@ test_file
 # operations in one place.
 
 # The "!" function creates a read and write pair.
-\!=(var_new \v {(var_get v) (var_put v)})
+\!=(\v==var_new {(\x==(var_get v) {x}) (var_put v)})
 
 \fib=
 	(\max
@@ -889,8 +889,8 @@ fib 5
 
 div
 (
-var_new \v
-var_get v \x
+\v==var_new
+\x==(var_get v)
 var_put v x
 say "Passed var test of 20150907."
 )
@@ -1037,14 +1037,14 @@ div
 
 (
 # Test drop buffer without getting its content.
-buf_new \buf
+\buf==buf_new
 buf_put buf "x"
 )
 
 # Now test redirecting output to a buffer.
 \result=
 (
-buf_new \buf
+\buf==buf_new
 \put=(\x buf_put buf; to_str x)
 \nl=(buf_put buf NL)
 \say=(\x put x nl)
@@ -1055,7 +1055,7 @@ say ["line " 1]
 say "line 2"
 put ["line " 3] nl
 )
-buf_get buf I
+buf_get buf
 )
 
 say "result:"
@@ -1067,7 +1067,7 @@ div
 # Here I test the existence of the flock_ and limit_ function calls, though I'm
 # not yet testing their effects.
 
-fopen "test/hello.fxl" "r" \fh
+\fh==(fopen "test/hello.fxl" "r")
 say (is_good fh)
 say (is_good; flock_ex fh)
 say (is_good; flock_sh fh)

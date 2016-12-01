@@ -11,21 +11,21 @@ value type_var(value f)
 	return type_void(f);
 	}
 
-/* var_new yields a new variable with a void value. */
+/* var_new returns a new variable with a void value. */
 value type_var_new(value f)
 	{
 	(void)f;
-	return yield(D(type_var,Qvoid(),(type)drop));
+	return D(type_var,Qvoid(),(type)drop);
 	}
 
-/* (var_get var) yields val, where val is the current value of var. */
+/* (var_get var) returns val, where val is the current value of var. */
 value type_var_get(value f)
 	{
 	if (!f->L) return 0;
 	{
 	value x = arg(f->R);
 	if (x->T == type_var)
-		f = yield(hold(data(x)));
+		f = hold(data(x));
 	else
 		reduce_void(f);
 	drop(x);

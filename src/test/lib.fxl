@@ -102,7 +102,7 @@
 # Flatten a piece of data (string, number, or list) into a string.
 \to_str=
 	(\x
-	buf_new \buf
+	\buf==buf_new
 	\put=(buf_put buf)
 	(@\loop\x
 	\x==x
@@ -115,7 +115,7 @@
 		loop xs
 		);
 	) x
-	buf_get buf I
+	buf_get buf
 	)
 
 # (list_at xs n) is the item at position n in list xs, counting from 0.
@@ -242,39 +242,41 @@ format_num
 # Gather input items into a list.
 \get_list=
 	(\get @\loop
-	get \x is_void x [];
+	\x==get
+	is_void x [];
 	cons x; loop
 	)
 
 # Gather input strings into a string.
 \get_str=
 	(\get
-	buf_new \buf
+	\buf==buf_new
 	(@\loop
-	get \x is_void x ();
+	\x==get
+	is_void x ();
 	buf_put buf x
 	loop
 	)
-	buf_get buf I
+	buf_get buf
 	)
 
 # Gather a list of strings into a string.
 \list_str=
 	(\xs
-	buf_new \buf
+	\buf==buf_new
 	(@\loop\xs
 	xs () \x\xs
 	buf_put buf x
 	loop xs
 	)
 	xs
-	buf_get buf I
+	buf_get buf
 	)
 
 # Convert a string to a list with a given function.
 \get_str_list=
 	(\get\str
-	readstr str \in
+	\in==(readstr str)
 	get_list (get in)
 	)
 
@@ -459,20 +461,20 @@ format_num
 # Map a string specified in hexadecimal into the raw bytes.
 \map_hex_to_raw_bytes=
 	(\str
-	readstr str \in get_str;
-	\nibble=(sgetc in \x yield; hex_digit_to_dec x)
-	nibble \x
-	nibble \y
-	yield;
+	\in==(readstr str)
+	get_str;
+	\nibble=(\x==(sgetc in) hex_digit_to_dec x)
+	\x==nibble
+	\y==nibble
 	chr; + (* 16 x) y
 	)
 
 # Map raw bytes to their hexadecimal values.
 \map_raw_bytes_to_hex=
 	(\str
-	readstr str \in get_str;
-	sgetc in \x
-	yield;
+	\in==(readstr str)
+	get_str;
+	\x==(sgetc in)
 	hex_byte; ord; x
 	)
 
@@ -519,9 +521,9 @@ format_num
 
 \parse_file=
 	(\name\context
-	fopen name "r" \fh
+	\fh==(fopen name "r")
 	is_void fh (error ["Could not open source file " name]);
-	parse fh name \exp
+	\exp==(parse fh name)
 	resolve context exp
 	)
 
