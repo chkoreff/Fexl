@@ -137,13 +137,13 @@ value type_standard(value f)
 	}
 	}
 
-/* Return a function which resolves the expression in the given context. */
+/* Return a function which evaluates the expression in the given context. */
 static value use_context(value context, value exp)
 	{
 	return A(A(A(Q(type_resolve),context),exp),QI());
 	}
 
-/* Return a function which resolves the named file in the standard context. */
+/* Return a function which evaluates the named file in the standard context. */
 static value parse_standard(value name)
 	{
 	return use_context(Q(type_standard),parse_file(name));
