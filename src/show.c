@@ -20,6 +20,7 @@
 #include <type_rand.h>
 #include <type_resolve.h>
 #include <type_run.h>
+#include <type_standard.h>
 #include <type_str.h>
 #include <type_sym.h>
 #include <type_var.h>

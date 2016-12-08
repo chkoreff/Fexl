@@ -17,7 +17,7 @@ exp    => term exp
 exp    => ; exp
 exp    => \ sym exp
 exp    => \ sym = term exp
-exp    => \ sym '==' term exp
+exp    => \ sym == term exp
 exp    => \ ; exp
 
 term   => ( exp )
@@ -396,11 +396,10 @@ static value parse_exp(void)
 value parse(input _get, void *_source, value label)
 	{
 	const char *save_source_label = source_label;
+	source_label = ((string)data(label))->data;
 
 	get = _get;
 	source = _source;
-
-	source_label = ((string)data(label))->data;
 	ch = ' ';
 	line = 1;
 

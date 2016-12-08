@@ -39,32 +39,27 @@ static short undefined = 0;
 static value do_resolve(value exp, value context)
 	{
 	if (exp->T != type_sym)
-		return exp;
-	{
-	value result;
-	if (exp->L == 0)
+		return hold(exp);
+	else if (exp->L == 0)
 		{
 		symbol sym = data(exp);
 		value x = sym->name;
-		result = resolve_symbol(x, context);
-		if (!result)
+		value def = resolve_symbol(x, context);
+		if (!def)
 			{
 			const char *name = ((string)data(x))->data;
 			undefined_symbol(name,sym->line);
 			undefined = 1;
-			result = Qvoid();
+			def = Qvoid();
 			}
+		return def;
 		}
 	else
 		{
-		value f = do_resolve(hold(exp->L),context);
-		value g = do_resolve(hold(exp->R),context);
-		result = A(f,g);
+		value f = do_resolve(exp->L,context);
+		value g = do_resolve(exp->R,context);
+		return A(f,g);
 		}
-
-	drop(exp);
-	return result;
-	}
 	}
 
 /* Resolve all symbols in exp with the definitions given by context. */
@@ -74,7 +69,6 @@ static value resolve(value exp, value context)
 	if (undefined)
 		die(0); /* The expression had undefined symbols. */
 
-	drop(context);
 	return exp;
 	}
 
@@ -94,7 +88,7 @@ value type_resolve(value f)
 		const char *save_source_label = source_label;
 		source_label = ((string)data(label))->data;
 
-		reduce(f,yield(resolve(hold(exp),hold(context))));
+		reduce(f,yield(resolve(exp,context)));
 
 		source_label = save_source_label;
 		}

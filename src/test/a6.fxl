@@ -4,7 +4,7 @@ use "test/common.fxl" \;
 (
 div
 standard "say" \say
-# LATER 20151128 should numeric symbols be defined in standard?
+# Note that numbers are not defined as symbols in standard.
 (check (standard "3") {"VOID"}) \x
 say x
 )
