@@ -2,12 +2,11 @@
 #include <fexl.h>
 #include <type_standard.h>
 
-/* Command line arguments */
 int main_argc;
 char **main_argv;
 
 /* Evaluate the named file in the standard context.  Use stdin if the name is
-null or empty.  If the name designates a directory it behaves like an empty
+missing or empty.  If the name designates a directory it behaves like an empty
 file. */
 int main(int argc, char *argv[])
 	{

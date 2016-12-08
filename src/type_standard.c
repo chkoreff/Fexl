@@ -155,9 +155,9 @@ value eval_file(const char *name)
 	return eval(parse_standard(Qstr(str_new_data0(name))));
 	}
 
-/* (use file)
+/* (use file exp)
 Equivalent to:
-	(use_context (once; parse_file file standard)).
+	(use_context (once; parse_file file standard) exp).
 This is used to bootstrap new contexts written in Fexl so you can do this:
 	use "lib.fxl" \; ...
 */
@@ -168,8 +168,8 @@ value type_use(value f)
 	value name = arg(f->L->R);
 	if (name->T == type_str)
 		{
-		value exp = hold(f->R);
 		value context = parse_standard(hold(name));
+		value exp = hold(f->R);
 		reduce(f,use_context(context,exp));
 		}
 	else
