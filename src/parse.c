@@ -392,9 +392,18 @@ static value parse_exp(void)
 	return exp;
 	}
 
+static value parse_input(void)
+	{
+	value exp = parse_exp();
+	if (ch != -1)
+		syntax_error("Extraneous input", line);
+	return exp;
+	}
+
 /* Parse the given input. */
 value parse(input _get, void *_source, value label)
 	{
+	value exp;
 	const char *save_source_label = source_label;
 	source_label = ((string)data(label))->data;
 
@@ -403,14 +412,8 @@ value parse(input _get, void *_source, value label)
 	ch = ' ';
 	line = 1;
 
-	{
-	value exp = parse_exp();
-
-	if (ch != -1)
-		syntax_error("Extraneous input", line);
+	exp = app(label,parse_input());
 
 	source_label = save_source_label;
-
-	return app(label,exp);
-	}
+	return exp;
 	}

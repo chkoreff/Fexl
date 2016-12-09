@@ -1,9 +1,9 @@
+#include <num.h>
+#include <str.h>
 #include <value.h>
 #include <basic.h>
 #include <die.h>
-#include <num.h>
 #include <report.h>
-#include <str.h>
 #include <type_num.h>
 #include <type_resolve.h>
 #include <type_sym.h>
@@ -68,7 +68,6 @@ static value resolve(value exp, value context)
 	exp = do_resolve(exp,context);
 	if (undefined)
 		die(0); /* The expression had undefined symbols. */
-
 	return exp;
 	}
 

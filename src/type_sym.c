@@ -11,15 +11,11 @@ static void sym_free(symbol sym)
 	free_memory(sym,sizeof(struct symbol));
 	}
 
-/*
-This type returns 0 so that symbolic forms returned from the parse routine
-evaluate properly.
-LATER 20160726 Revisit why we see form applied to form, which is why we can't
-use type_void here.
-*/
 value type_sym(value f)
 	{
-	(void)f;
+	if (!f->L) return 0; /* leaf symbol */
+	if (f->L->T == type_str) return 0; /* parsed form */
+	reduce_void(f);
 	return 0;
 	}
 

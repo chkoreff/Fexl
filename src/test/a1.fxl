@@ -602,6 +602,8 @@ say (is_void 2)
 say (is_void (say "hi"))
 say (is_void [])
 say (is_void void)
+# Symbolic form applied to anything is void.
+say (is_void ( (\; f x) 3) )
 
 # Test tuples
 div

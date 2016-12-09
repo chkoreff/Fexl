@@ -32,8 +32,10 @@ make type_str
 make type_sym
 make type_var
 make value
-# Used only during development:
-#make output
-#make output2
-#make show
+# These are used only during development.
+if false; then
+make output
+make output2
+make show
+fi
 link fexl

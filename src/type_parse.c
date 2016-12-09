@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <str.h>
+#include <input.h>
 #include <value.h>
 #include <basic.h>
 #include <die.h>
 #include <file.h>
-#include <input.h>
 #include <parse.h>
 #include <type_file.h>
 #include <type_istr.h>
@@ -21,6 +21,14 @@ static value parse_istr(struct istr *istr, value label)
 	return parse((input)sgetc,istr,label);
 	}
 
+static value parse_string(value str, value label)
+	{
+	struct istr istr;
+	istr.str = str;
+	istr.pos = 0;
+	return parse_istr(&istr,label);
+	}
+
 /* Parse a named file.  Note that if name designates a directory the fopen will
 succeed, but it will behave like an empty file. */
 value parse_file(value name)
@@ -34,14 +42,6 @@ value parse_file(value name)
 		die(0);
 		}
 	return parse_fh(fh,name);
-	}
-
-static value parse_string(value str, value label)
-	{
-	struct istr istr;
-	istr.str = str;
-	istr.pos = 0;
-	return parse_istr(&istr,label);
 	}
 
 /* (parse source label) Parse the source, using the given label for any syntax
