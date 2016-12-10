@@ -258,6 +258,22 @@ pong
 PING
 PING
 PING
+== test_5
+==
+PING
+pong
+PING
+PING
+PING
+==
+PING
+pong
+PING
+pong
+PING
+pong
+PING
+pong
 ==
 (CALC)1936
 88

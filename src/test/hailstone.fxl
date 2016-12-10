@@ -17,10 +17,7 @@ use "test/common.fxl" \;
 
 \try=
 	(\x
-	(
-	each (hailstone x) \x
-	say ["x = " x]
-	)
+	each (hailstone x) (\x say ["x = " x])
 	nl
 	)
 

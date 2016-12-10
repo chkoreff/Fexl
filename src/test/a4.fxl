@@ -1,4 +1,4 @@
-# This runs in constant space as expected.
+#
 \run=
 	(
 	(@\loop\x
@@ -8,6 +8,15 @@
 	) 1
 	)
 
-say "["
+# NOTE: Without the semicolon after the first "say" the script would die with
+# an out of memory error.  The side effect causes evaluation to continue while
+# still holding onto an argument that could otherwise be dropped.  I fought
+# with this for a while but gave up because it would mean short-circuiting
+# arg() calls whenever an action (side effect) is encountered, rebuilding the
+# parent form with the new value, and returning so the parent can continue
+# evaluating *after* the old argument is dropped.  That would be a nightmare of
+# going through every single arg() call and doing a whole bunch of convoluted
+# code.  It just isn't worth it, considering how easy the workaround is.
+say "[" ;
 run
 say "]"

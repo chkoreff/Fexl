@@ -39,9 +39,10 @@ value type_eval(value f)
 	{
 	if (!f->L) return 0;
 	{
-	value x = next_action(f->R);
-	if (x) return V(type_eval,hold(f->L),x);
-	reduce(f,yield(hold(f->R)));
+	value x = arg(f->R);
+	value y = yield(x);
+	if (x != f->R) return y;
+	reduce(f,y);
 	return f;
 	}
 	}

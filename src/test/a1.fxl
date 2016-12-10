@@ -356,10 +356,32 @@ say "== test_4" # says PING pong PING PING PING
 talk
 )
 
+\test_5=
+(
+say "== test_5"
+\try=
+	(\talk
+	div
+	\talk=(talk talk)
+	\talk=(talk talk)
+	talk
+	)
+
+# Says PING 4 times with a pong only after the first one.
+try (say "PING"; once; say "pong")
+
+# Says PING 4 times with a pong after each one.  The missing semicolon means
+# that we evaluate (say "PING" once) = (I once) = once, however because of the
+# side effect it is not replaced inline, which nullifies the effect of the
+# once.
+try (say "PING" once; say "pong")
+)
+
 test_1
 test_2
 test_3
 test_4
+test_5
 )
 
 (

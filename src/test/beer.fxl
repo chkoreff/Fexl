@@ -1,16 +1,18 @@
 #
 use "test/common.fxl" \;
-\suffix=(\n eq n 1 "" "s")
-\bottles_of_beer=(\n put [n " " "bottle" (suffix n) " of beer"])
-\on_the_wall=(say " on the wall")
+\bottles=
+	(\n\wall
+	\s=(eq n 1 "" "s")
+	say [n " bottle"s " of beer" (wall (" on the wall") "")]
+	)
 
 \sing=
 	(\n
 	each (range n 1) \n
-	bottles_of_beer n on_the_wall
-	bottles_of_beer n nl
+	bottles n T
+	bottles n F
 	say "Take one down, pass it around"
-	\n=(- n 1)
-	bottles_of_beer n on_the_wall nl
+	bottles (- n 1) T
+	nl
 	)
 sing 3
