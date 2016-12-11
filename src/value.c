@@ -141,7 +141,19 @@ value type_J(value f)
 	value x = f->R;
 	while (1)
 		{
-		value y = x->T(x);
+		value y;
+		if (x->T == type_J) /* Avoid stacks of J forms. */
+			{
+			x = hold(x->R);
+			drop(f->R);
+			f->R = x;
+			continue;
+			}
+
+		y = x->T(x);
+		if (y == x)
+			continue;
+
 		if (y == 0)
 			{
 			/* Replace f with final value x. */
@@ -152,16 +164,8 @@ value type_J(value f)
 			f->L = x->L;
 			f->R = x->R;
 			drop(x);
-			return 0;
 			}
-		if (y != x)
-			return y;
-		if (x->T == type_J) /* Avoid stacks of J forms. */
-			{
-			x = hold(x->R);
-			drop(f->R);
-			f->R = x;
-			}
+		return y;
 		}
 	}
 
