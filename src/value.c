@@ -212,7 +212,7 @@ value eval(value f)
 		{
 		value g = f->T(f);
 		if (g == 0) break;
-		if (f != g)
+		if (g != f)
 			{
 			drop(f);
 			f = g;

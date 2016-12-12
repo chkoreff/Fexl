@@ -174,14 +174,11 @@ static value parse_quote_string(void)
 	return Qstr(collect_string("\"",1,first_line));
 	}
 
-static value parse_tilde_string(void)
-	{
-	unsigned long first_line = line;
-	string end;
-
-	/* Parse the string terminator. */
+/* Parse a tilde string terminator. */
+static string parse_terminator(unsigned long first_line)
 	{
 	struct buffer buf = {0};
+	string end;
 
 	while (1)
 		{
@@ -197,14 +194,23 @@ static value parse_tilde_string(void)
 	skip();
 
 	end = buf_clear(&buf);
+	return end;
 	}
 
-	/* Gather string content up to the next occurrence of terminator. */
+/* Gather string content up to the next occurrence of terminator. */
+static string parse_content(string end, unsigned long first_line)
 	{
 	string content = collect_string(end->data, end->len, first_line);
 	str_free(end);
-	return Qstr(content);
+	return content;
 	}
+
+static value parse_tilde_string(void)
+	{
+	unsigned long first_line = line;
+	string end = parse_terminator(first_line);
+	string content = parse_content(end,first_line);
+	return Qstr(content);
 	}
 
 static value parse_symbol(void)
@@ -228,11 +234,14 @@ static value parse_list(void)
 		skip();
 		return parse_exp();
 		}
-	{
-	value term = parse_term();
-	if (term == 0) return Q(type_null);
-	return app(app(Q(type_cons),term),parse_list());
-	}
+	else
+		{
+		value term = parse_term();
+		if (term == 0)
+			return Q(type_null);
+		else
+			return app(app(Q(type_cons),term),parse_list());
+		}
 	}
 
 static value parse_tuple(void)
@@ -289,28 +298,16 @@ static value parse_term(void)
 /* Parse a lambda form following the initial '\' character. */
 static value parse_lambda(unsigned long first_line)
 	{
-	/* Parse the symbol (function parameter). */
+	value sym, def=0, exp;
+	char is_eager = 0;
+
+	/* Parse the symbol. */
 	skip_white();
-
-	if (ch == ';')
-		{
-		/* Parse unresolved form. */
-		value exp = parse_exp();
-		value label = Qstr(str_new_data0(source_label));
-		return A(QI(),app(label,exp));
-		}
-
-	{
-	/* Parse the lambda symbol. */
-	value sym = parse_name();
+	sym = parse_name();
 	if (sym == 0)
 		syntax_error("Missing symbol after '\\'", first_line);
 
-	{
 	/* Parse the optional definition of the symbol. */
-	value def = 0;
-	char is_eager = 0;
-
 	skip_filler();
 	first_line = line;
 	if (ch == '=')
@@ -327,20 +324,24 @@ static value parse_lambda(unsigned long first_line)
 			syntax_error("Missing definition", first_line);
 		}
 
-	/* Parse the body of the function and apply the definition if any. */
+	/* Parse the body of the function. */
+	exp = lam(sym,parse_exp());
+
+	/* Apply the definition if any. */
+	if (def == 0)
+		return exp;
+	else if (is_eager)
+		return app(app(Q(type_eval),def),exp);
+	else
+		return app(exp,def);
+	}
+
+/* Parse unresolved form. */
+static value parse_form(void)
 	{
-	value exp = lam(sym,parse_exp());
-	if (def)
-		{
-		if (is_eager)
-			exp = app(app(Q(type_eval),def),exp);
-		else
-			exp = app(exp,def);
-		}
-	return exp;
-	}
-	}
-	}
+	value exp = parse_exp();
+	value label = Qstr(str_new_data0(source_label));
+	return A(QI(),app(label,exp));
 	}
 
 /* Parse the next factor of an expression.  Return 0 if no factor found. */
@@ -357,6 +358,11 @@ static value parse_factor(void)
 			{
 			ch = -1; /* Two backslashes simulates end of file. */
 			return 0;
+			}
+		else if (ch == ';')
+			{
+			skip();
+			return parse_form();
 			}
 		else
 			return parse_lambda(first_line);
