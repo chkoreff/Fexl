@@ -133,49 +133,19 @@ value A(value x, value y)
 	return V(type_A,x,y);
 	}
 
-/* The reduce routine uses type_J to make f equivalent to g.  This replaces f
-with the content of g only after reducing g to its final value.  That gives
-the correct behavior when using the "once" function. */
-value type_J(value f)
-	{
-	value x = f->R;
-	while (1)
-		{
-		value y;
-		if (x->T == type_J) /* Avoid stacks of J forms. */
-			{
-			x = hold(x->R);
-			drop(f->R);
-			f->R = x;
-			continue;
-			}
-
-		y = x->T(x);
-		if (y == x)
-			continue;
-
-		if (y == 0)
-			{
-			/* Replace f with final value x. */
-			drop(f->L);
-			if (x->L) hold(x->L);
-			if (x->R) hold(x->R);
-			f->T = x->T;
-			f->L = x->L;
-			f->R = x->R;
-			drop(x);
-			}
-		return y;
-		}
-	}
-
-/* Reduce f to the equivalent of g. */
+/* Replace the content of f with the content of g. */
 void reduce(value f, value g)
 	{
 	clear(f);
-	f->T = type_J;
-	f->L = Q(type_J);
-	f->R = g;
+
+	if (g->L) hold(g->L);
+	if (g->R) hold(g->R);
+
+	f->T = g->T;
+	f->L = g->L;
+	f->R = g->R;
+
+	drop(g);
 	}
 
 /* Reduce f to Q(T). */

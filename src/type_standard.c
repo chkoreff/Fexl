@@ -63,7 +63,6 @@ static value standard(void)
 	if (match("T")) return QT();
 	if (match("F")) return QF();
 	if (match("@")) return Q(type_Y);
-	if (match("once")) return Q(type_once);
 	if (match("void")) return Qvoid();
 	if (match("yield")) return Q(type_yield);
 	if (match("cons")) return Q(type_cons);
@@ -171,7 +170,7 @@ value eval_file(const char *name)
 
 /* (use file exp)
 Equivalent to:
-	(use_context (once; parse_file file standard) exp).
+	(use_context (\= parse_file file standard) exp).
 This is used to bootstrap new contexts written in Fexl so you can do this:
 	use "lib.fxl" \; ...
 */

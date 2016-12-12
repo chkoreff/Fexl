@@ -27,7 +27,6 @@
 void put_type(type t)
 	{
 	if (t == type_A) put_ch('A');
-	else if (t == type_J) put_ch('J');
 
 	else if (t == type_sym) put("sym");
 	else if (t == type_subst) put("subst");

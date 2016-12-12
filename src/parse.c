@@ -19,6 +19,7 @@ exp    => \ sym exp
 exp    => \ sym = term exp
 exp    => \ sym == term exp
 exp    => \ ; exp
+exp    => \ = exp
 
 term   => ( exp )
 term   => [ list ]
@@ -344,6 +345,16 @@ static value parse_form(void)
 	return A(QI(),app(label,exp));
 	}
 
+/* Parse once expression. */
+static value parse_once(void)
+	{
+	value exp =  parse_exp();
+	/* We must wrap it inside two once functions to pass all the tests. */
+	exp = app(Q(type_once),exp);
+	exp = app(Q(type_once),exp);
+	return exp;
+	}
+
 /* Parse the next factor of an expression.  Return 0 if no factor found. */
 static value parse_factor(void)
 	{
@@ -363,6 +374,11 @@ static value parse_factor(void)
 			{
 			skip();
 			return parse_form();
+			}
+		else if (ch == '=')
+			{
+			skip();
+			return parse_once();
 			}
 		else
 			return parse_lambda(first_line);
