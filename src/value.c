@@ -134,7 +134,7 @@ value A(value x, value y)
 	}
 
 /* Replace the content of f with the content of g. */
-value reduce(value f, value g)
+static value replace(value f, value g)
 	{
 	clear(f);
 
@@ -146,6 +146,43 @@ value reduce(value f, value g)
 	f->R = g->R;
 
 	drop(g);
+	return f;
+	}
+
+/* The reduce routine uses type_J to make f equivalent to g.  This replaces f
+with the content of g only after reducing g to its final value.  That gives
+the correct behavior when using the "once" function. */
+value type_J(value f)
+	{
+	value x = f->R;
+	while (1)
+		{
+		value y;
+		if (x->T == type_J) /* Avoid stacks of J forms. */
+			{
+			x = hold(x->R);
+			drop(f->R);
+			f->R = x;
+			continue;
+			}
+
+		y = x->T(x);
+		if (y == x)
+			continue;
+
+		if (y == 0)
+			replace(f,hold(x));
+		return y;
+		}
+	}
+
+/* Reduce f to the equivalent of g. */
+value reduce(value f, value g)
+	{
+	clear(f);
+	f->T = type_J;
+	f->L = Q(type_J);
+	f->R = g;
 	return f;
 	}
 

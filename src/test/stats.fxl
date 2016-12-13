@@ -186,7 +186,7 @@ put_sharpe excess_sharpe nl
 ]
 
 make_rand_ror 1.4 6.0 \rand_ror
-\list_rand_ror=(\= @\loop \x==rand_ror [x;\=loop])
+\list_rand_ror=(@\loop once; \x==rand_ror [x;loop])
 
 seed_rand 0.1964
 \len=(list_length benchmark_list_ror)

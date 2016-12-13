@@ -37,7 +37,7 @@ talk
 div
 # Should say PING six times.
 \ping=(say "ping")
-\talk=(ping \=ping)
+\talk=(ping (once ping))
 talk
 talk
 talk
@@ -305,7 +305,7 @@ And the world is mine to win. ..."
 div
 \show_x=
 	(
-	(\=say "(CALC)")
+	once (say "(CALC)")
 	\x=(* 5 6)
 	say ["x = " x]
 	)
@@ -321,7 +321,7 @@ say "]"
 \test_1=
 (
 say "== test_1" # says PING 1 time
-\ping=(\=say "PING")
+\ping=(once; say "PING")
 I
 ping
 ping
@@ -332,7 +332,7 @@ ping
 (
 say "== test_2" # says PING 5 times
 \ping=(say "PING")
-\talk=(ping (\=ping))
+\talk=(ping (once ping))
 \talk=(talk talk)
 \talk=(talk talk)
 talk
@@ -350,7 +350,7 @@ talk talk talk
 (
 say "== test_4" # says PING pong PING PING PING
 \ping=(say "PING")
-\talk=(ping (\=say "pong"))
+\talk=(ping (once (say "pong")))
 \talk=(talk talk)
 \talk=(talk talk)
 talk
@@ -368,7 +368,13 @@ say "== test_5"
 	)
 
 # Says PING 4 times with a pong only after the first one.
-try (say "PING" \= say "pong")
+try (say "PING"; once; say "pong")
+
+# Says PING 4 times with a pong after each one.  The missing semicolon means
+# that we evaluate (say "PING" once) = (I once) = once, however because of the
+# side effect it is not replaced inline, which nullifies the effect of the
+# once.
+try (say "PING" once; say "pong")
 )
 
 test_1
@@ -379,12 +385,12 @@ test_5
 )
 
 (
-\x=((\=put "(CALC)") + 2 (* 7 6))
+\x=(once (put "(CALC)") + 2 (* 7 6))
 
 \make_square=
 	(\x
 	yield;
-	(\= put ["square " x "="])
+	once (put ["square " x "="])
 	* x x
 	)
 
@@ -566,11 +572,11 @@ show_list (cons 1; cons 2; null)
 seed_rand 0.1964
 
 (
-\list_rand=(\= @\loop \x==rand [x;\=loop])
+\list_rand=(@\loop once; \x==rand [x;loop])
 demo_rand list_rand
 )
 (
-\list_rand=(\= @\loop \x==rand [x;\=loop])
+\list_rand=(@\loop once; \x==rand [x;loop])
 demo_rand list_rand
 )
 
@@ -777,7 +783,7 @@ test_context
 div
 \try=
 (
-(\=say "Let's parse.")
+once (say "Let's parse.")
 eval_file "test/hello.fxl"
 )
 
@@ -795,7 +801,7 @@ div
 \x say [x " " (* 3 x)]
 ~~
 
-(\=say "Let's parse.")
+once (say "Let's parse.")
 eval_str source
 )
 
