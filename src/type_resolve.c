@@ -87,12 +87,12 @@ value type_resolve(value f)
 		const char *save_source_label = source_label;
 		source_label = ((string)data(label))->data;
 
-		reduce(f,yield(resolve(exp,context)));
+		f = reduce(f,yield(resolve(exp,context)));
 
 		source_label = save_source_label;
 		}
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(form);
 	return f;
 	}

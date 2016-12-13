@@ -139,12 +139,12 @@ value type_standard(value f)
 		cur_name = ((string)data(x))->data;
 		def = standard();
 		if (def)
-			reduce(f,yield(def));
+			f = reduce(f,yield(def));
 		else
-			reduce_void(f);
+			f = reduce_void(f);
 		}
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(x);
 	return f;
 	}
@@ -183,10 +183,10 @@ value type_use(value f)
 		{
 		value context = parse_standard(hold(name));
 		value exp = hold(f->R);
-		reduce(f,use_context(context,exp));
+		f = reduce(f,use_context(context,exp));
 		}
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(name);
 	return f;
 	}

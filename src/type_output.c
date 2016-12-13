@@ -78,7 +78,7 @@ static value op_output(value f, void put(FILE *fh, value x))
 		f = QI();
 		}
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(out);
 	return f;
 	}
@@ -106,7 +106,7 @@ value type_fflush(value f)
 		f = QI();
 		}
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(out);
 	return f;
 	}

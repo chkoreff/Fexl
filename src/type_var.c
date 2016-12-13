@@ -27,7 +27,7 @@ value type_var_get(value f)
 	if (x->T == type_var)
 		f = hold(data(x));
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(x);
 	return f;
 	}
@@ -47,7 +47,7 @@ value type_var_put(value f)
 		f = QI();
 		}
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(x);
 	return f;
 	}

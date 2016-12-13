@@ -17,6 +17,6 @@ extern value QI(void);
 extern value QT(void);
 extern value QF(void);
 extern value Qvoid(void);
-extern void reduce_void(value f);
-extern void reduce_boolean(value f, int x);
+extern value reduce_void(value f);
+extern value reduce_boolean(value f, int x);
 extern value yield(value x);

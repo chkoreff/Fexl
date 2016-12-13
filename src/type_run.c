@@ -10,9 +10,8 @@
 
 value type_die(value f)
 	{
-	(void)f;
 	die(0);
-	return 0;
+	return f;
 	}
 
 /* (argv i) Return the command line argument at position i (starting at 0), or
@@ -26,13 +25,13 @@ value type_argv(value f)
 		{
 		int i = (int)(*(number)data(x));
 		if (i >= 0 && i < main_argc)
-			reduce_str(f,str_new_data0(main_argv[i]));
+			f = reduce_str(f,str_new_data0(main_argv[i]));
 		else
-			reduce_void(f);
+			f = reduce_void(f);
 		}
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(x);
-	return 0;
+	return f;
 	}
 	}

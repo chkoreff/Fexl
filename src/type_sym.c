@@ -15,8 +15,7 @@ value type_sym(value f)
 	{
 	if (!f->L) return 0; /* leaf symbol */
 	if (f->L->T == type_str) return 0; /* parsed form */
-	reduce_void(f);
-	return 0;
+	return reduce_void(f);
 	}
 
 value Qsym(string name, unsigned long line)
@@ -122,6 +121,5 @@ static value subst(value p, value f, value x)
 value type_subst(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
-	reduce(f,subst(f->L->L->R,f->L->R,f->R));
-	return f;
+	return reduce(f,subst(f->L->L->R,f->L->R,f->R));
 	}

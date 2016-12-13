@@ -32,7 +32,7 @@ value type_buf_put(value f)
 		f = QI();
 		}
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(x);
 	drop(y);
 	return f;
@@ -53,7 +53,7 @@ value type_buf_get(value f)
 		f = Qstr(str);
 		}
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(x);
 	return f;
 	}

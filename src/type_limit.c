@@ -33,7 +33,7 @@ static value op_set_limit(value f, int resource, const char *label)
 		f = QI();
 		}
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(x);
 	return f;
 	}

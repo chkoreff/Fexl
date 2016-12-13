@@ -49,7 +49,7 @@ value type_readstr(value f)
 	if (x->T == type_str)
 		f = Qistr(hold(x));
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(x);
 	return f;
 	}

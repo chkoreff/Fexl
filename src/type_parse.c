@@ -59,14 +59,14 @@ value type_parse(value f)
 		if (source->T == type_file)
 			f = parse_fh(data(source),hold(label));
 		else if (source->T == type_str)
-			reduce(f,parse_string(source,hold(label)));
+			f = reduce(f,parse_string(source,hold(label)));
 		else if (source->T == type_istr)
 			f = parse_istr(data(source),hold(label));
 		else
-			reduce_void(f);
+			f = reduce_void(f);
 		}
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(source);
 	drop(label);
 	return f;

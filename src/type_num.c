@@ -28,9 +28,9 @@ value Qnum_str0(const char *name)
 	return 0;
 	}
 
-void reduce_num(value f, number x)
+value reduce_num(value f, number x)
 	{
-	reduce_D(f,type_num,x,(type)num_free);
+	return reduce_D(f,type_num,x,(type)num_free);
 	}
 
 value type_num_str(value f)
@@ -39,11 +39,11 @@ value type_num_str(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
-		reduce_str(f,num_str(data(x)));
+		f = reduce_str(f,num_str(data(x)));
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(x);
-	return 0;
+	return f;
 	}
 	}
 

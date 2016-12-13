@@ -134,7 +134,7 @@ value A(value x, value y)
 	}
 
 /* Replace the content of f with the content of g. */
-void reduce(value f, value g)
+value reduce(value f, value g)
 	{
 	clear(f);
 
@@ -146,33 +146,37 @@ void reduce(value f, value g)
 	f->R = g->R;
 
 	drop(g);
+	return f;
 	}
 
 /* Reduce f to Q(T). */
-void reduce_Q(value f, type T)
+value reduce_Q(value f, type T)
 	{
 	clear(f);
 	f->T = T;
 	f->L = 0;
 	f->R = 0;
+	return 0;
 	}
 
 /* Reduce f to D(T,data,destroy). */
-void reduce_D(value f, type T, void *data, type destroy)
+value reduce_D(value f, type T, void *data, type destroy)
 	{
 	clear(f);
 	f->T = T;
 	f->L = 0;
 	f->R = V(destroy,0,data);
+	return 0;
 	}
 
 /* Reduce f to A(x,y). */
-void reduce_A(value f, value x, value y)
+value reduce_A(value f, value x, value y)
 	{
 	clear(f);
 	f->T = type_A;
 	f->L = x;
 	f->R = y;
+	return f;
 	}
 
 /* Reduce the value until done. */

@@ -18,7 +18,7 @@ value type_seed_rand(value f)
 		f = QI();
 		}
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(x);
 	return f;
 	}

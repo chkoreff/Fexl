@@ -43,7 +43,7 @@ value type_fopen(value f)
 		f = fh ? Qfile(fh) : Qvoid();
 		}
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(x);
 	drop(y);
 	return f;
@@ -76,7 +76,7 @@ value type_remove(value f)
 		f = Qnum0(code);
 		}
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(x);
 	return f;
 	}
@@ -99,7 +99,7 @@ static value op_flock(value f, int operation)
 		f = QI();
 		}
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(x);
 	return f;
 	}

@@ -17,9 +17,9 @@ value Qstr(string x)
 	return D(type_str,x,(type)str_free);
 	}
 
-void reduce_str(value f, string x)
+value reduce_str(value f, string x)
 	{
-	reduce_D(f,type_str,x,(type)str_free);
+	return reduce_D(f,type_str,x,(type)str_free);
 	}
 
 /* (. x y) is the concatenation of strings x and y. */
@@ -30,12 +30,12 @@ value type_concat(value f)
 	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_str)
-		reduce_str(f,str_concat(data(x),data(y)));
+		f = reduce_str(f,str_concat(data(x),data(y)));
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(x);
 	drop(y);
-	return 0;
+	return f;
 	}
 	}
 
@@ -46,11 +46,11 @@ value type_length(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
-		reduce_num(f,num_new_ulong(((string)data(x))->len));
+		f = reduce_num(f,num_new_ulong(((string)data(x))->len));
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(x);
-	return 0;
+	return f;
 	}
 	}
 
@@ -68,16 +68,16 @@ value type_slice(value f)
 		double yn = *((number)data(y));
 		double zn = *((number)data(z));
 		if (yn >= 0 && zn >= 0)
-			reduce_str(f,str_slice(data(x),yn,zn));
+			f = reduce_str(f,str_slice(data(x),yn,zn));
 		else
-			reduce_void(f);
+			f = reduce_void(f);
 		}
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(x);
 	drop(y);
 	drop(z);
-	return 0;
+	return f;
 	}
 	}
 
@@ -99,19 +99,19 @@ value type_search(value f)
 			string ys = data(y);
 			unsigned long pos = str_search(xs,ys,zn);
 			if (pos < xs->len)
-				reduce_num(f,num_new_ulong(pos));
+				f = reduce_num(f,num_new_ulong(pos));
 			else
-				reduce_void(f);
+				f = reduce_void(f);
 			}
 		else
-			reduce_void(f);
+			f = reduce_void(f);
 		}
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(x);
 	drop(y);
 	drop(z);
-	return 0;
+	return f;
 	}
 	}
 
@@ -125,14 +125,14 @@ value type_str_num(value f)
 		{
 		number n = str0_num(((string)data(x))->data);
 		if (n)
-			reduce_num(f,n);
+			f = reduce_num(f,n);
 		else
-			reduce_void(f);
+			f = reduce_void(f);
 		}
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(x);
-	return 0;
+	return f;
 	}
 	}
 
@@ -145,13 +145,13 @@ value type_ord(value f)
 	if (x->T == type_str)
 		{
 		string xs = data(x);
-		reduce_num(f,num_new_ulong(xs->len == 0 ? 0 :
+		f = reduce_num(f,num_new_ulong(xs->len == 0 ? 0 :
 			(unsigned char)xs->data[0]));
 		}
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(x);
-	return 0;
+	return f;
 	}
 	}
 
@@ -165,12 +165,12 @@ value type_chr(value f)
 		{
 		double xn = *((number)data(x));
 		char ch = xn;
-		reduce_str(f,str_new_data(&ch,1));
+		f = reduce_str(f,str_new_data(&ch,1));
 		}
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(x);
-	return 0;
+	return f;
 	}
 	}
 
@@ -192,19 +192,19 @@ value type_char_width(value f)
 			if (pos < xs->len)
 				{
 				char n = char_width(xs->data[pos]);
-				reduce_num(f,num_new_ulong(n));
+				f = reduce_num(f,num_new_ulong(n));
 				}
 			else
-				reduce_void(f);
+				f = reduce_void(f);
 			}
 		else
-			reduce_void(f);
+			f = reduce_void(f);
 		}
 	else
-		reduce_void(f);
+		f = reduce_void(f);
 	drop(x);
 	drop(y);
-	return 0;
+	return f;
 	}
 	}
 
