@@ -13,8 +13,7 @@
 
 static void file_free(FILE *fh)
 	{
-	if (fileno(fh) > 2)  /* don't close stdin, stdout, or stderr */
-		fclose(fh);
+	(void)fh;
 	}
 
 value type_file(value f)
@@ -46,6 +45,25 @@ value type_fopen(value f)
 		f = reduce_void(f);
 	drop(x);
 	drop(y);
+	return f;
+	}
+	}
+
+/* (fclose fh) Close the file handle. */
+value type_fclose(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value out = arg(f->R);
+	if (out->T == type_file)
+		{
+		FILE *fh = data(out);
+		fclose(fh);
+		f = QI();
+		}
+	else
+		f = reduce_void(f);
+	drop(out);
 	return f;
 	}
 	}

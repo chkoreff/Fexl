@@ -10,33 +10,24 @@
 #include <type_output.h>
 #include <type_str.h>
 
+/* LATER 20161216 make this print an infinite list using constant memory */
 static void fputv(FILE *fh, value x)
 	{
 	x = arg(x);
-	while (1)
+	if (x->T == type_str)
+		fput_str(fh,data(x));
+	else if (x->T == type_num)
+		fput_num(fh,data(x));
+	else if (x->T == type_T && !x->L)
+		fput_ch(fh,'T');
+	else if (x->T == type_F && !x->L)
+		fput_ch(fh,'F');
+	else if (x->T == type_cons && x->L && x->L->L)
 		{
-		if (x->T == type_str)
-			fput_str(fh,data(x));
-		else if (x->T == type_num)
-			fput_num(fh,data(x));
-		else if (x->T == type_T && !x->L)
-			fput_ch(fh,'T');
-		else if (x->T == type_F && !x->L)
-			fput_ch(fh,'F');
-		else if (x->T == type_cons && x->L && x->L->L)
-			{
-			fputv(fh,x->L->R);
-			/* Eliminated tail recursive call fputv(fh,x->R) here. */
-			{
-			value y = arg(x->R);
-			drop(x);
-			x = y;
-			continue;
-			}
-			}
-		drop(x);
-		return;
+		fputv(fh,x->L->R);
+		fputv(fh,x->R);
 		}
+	drop(x);
 	}
 
 static void fsayv(FILE *fh, value x)

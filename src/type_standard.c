@@ -90,6 +90,7 @@ static value standard(void)
 	if (match("stdout")) return Qfile(stdout);
 	if (match("stderr")) return Qfile(stderr);
 	if (match("fopen")) return Q(type_fopen);
+	if (match("fclose")) return Q(type_fclose);
 	if (match("fgetc")) return Q(type_fgetc);
 	if (match("fget")) return Q(type_fget);
 	if (match("remove")) return Q(type_remove);

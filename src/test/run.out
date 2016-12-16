@@ -1,4 +1,4 @@
-====
+==== test/a1.fxl
 ==
 ping
 ==
@@ -240,40 +240,6 @@ x = 30
 x = 30
 x = 30
 ]
-== test_1
-PING
-== test_2
-PING
-PING
-PING
-PING
-PING
-== test_3
-PING
-PING
-PING
-== test_4
-PING
-pong
-PING
-PING
-PING
-== test_5
-==
-PING
-pong
-PING
-PING
-PING
-==
-PING
-pong
-PING
-pong
-PING
-pong
-PING
-pong
 ==
 (CALC)1936
 88
@@ -824,6 +790,23 @@ This goes to the file.
 This also goes to the file.
 Removed test/tmp.txt
 ==
+put a
+get a
+get void
+put bc
+get b
+put d
+get c
+get d
+put efg
+get e
+put h
+get f
+get g
+get h
+get void
+Removed test/tmp.txt
+==
 Passed var test of 20150907.
 The first 16 Fibonacci numbers:
 1
@@ -1008,7 +991,7 @@ Oct 31 October
 Nov 30 November
 Dec 31 December
 exit 0
-====
+==== test/a2.fxl
 Hello
 Type some lines of input and I'll echo them back.
 Press Ctrl-D to stop.
@@ -1137,11 +1120,11 @@ This goes to stderr.
 x = 7
 This goes to stderr.
 x = 7
-====
+==== test/a4.fxl
 [
 ]
 exit 0
-====
+==== test/a5.fxl
 begin
 TALK
 TALK
@@ -1149,7 +1132,7 @@ TALK
 TALK
 end
 exit 0
-====
+==== test/a6.fxl
 ==
 VOID
 ==
@@ -1172,10 +1155,10 @@ HI
 got it
 x = 7
 exit 0
-====
+==== test/a7.fxl
 Undefined symbol xsay on line 4 of test/a7.fxl
 exit 1
-====
+==== test/a8.fxl
 [
 0.927291684284476
 0.471201063818858
@@ -1192,7 +1175,55 @@ exit 1
 0.677796232364046
 ]
 exit 0
-====
+==== test/a9.fxl
+== test_1
+PING
+== test_2
+PING
+PING
+PING
+PING
+PING
+== test_3
+PING
+PING
+PING
+== test_4
+PING
+pong
+PING
+PING
+PING
+== test_5
+==
+PING
+pong
+PING
+PING
+PING
+==
+PING
+pong
+PING
+pong
+PING
+pong
+PING
+pong
+== test_6
+PING
+PING
+== test_7
+type_I
+PING
+type_T
+PING
+type_F
+PING
+type_subst
+PING
+exit 0
+==== test/chars.fxl
 ==
 封封aa小小
 T
@@ -1218,7 +1249,7 @@ e5b08161e5b08f 封a小 e5b08161e5b08f
 
 6600f
 exit 0
-====
+==== test/get_byte.fxl
 ch 61
 ch 62
 ch 63
@@ -1311,7 +1342,7 @@ exit 1
 Undefined symbol a on line 1
 Undefined symbol c on line 2
 exit 1
-====
+==== missing.fxl
 Could not open source file missing.fxl
 exit 1
 ====

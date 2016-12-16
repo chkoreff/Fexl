@@ -318,73 +318,6 @@ show_x
 say "]"
 
 (
-\test_1=
-(
-say "== test_1" # says PING 1 time
-\ping=(once; say "PING")
-I
-ping
-ping
-ping
-)
-
-\test_2=
-(
-say "== test_2" # says PING 5 times
-\ping=(say "PING")
-\talk=(ping (once ping))
-\talk=(talk talk)
-\talk=(talk talk)
-talk
-)
-
-\test_3=
-(
-say "== test_3" # says PING 3 times
-\ping=(say "PING")
-\talk=(\x==ping x)
-talk talk talk
-)
-
-\test_4=
-(
-say "== test_4" # says PING pong PING PING PING
-\ping=(say "PING")
-\talk=(ping (once (say "pong")))
-\talk=(talk talk)
-\talk=(talk talk)
-talk
-)
-
-\test_5=
-(
-say "== test_5"
-\try=
-	(\talk
-	div
-	\talk=(talk talk)
-	\talk=(talk talk)
-	talk
-	)
-
-# Says PING 4 times with a pong only after the first one.
-try (say "PING"; once; say "pong")
-
-# Says PING 4 times with a pong after each one.  The missing semicolon means
-# that we evaluate (say "PING" once) = (I once) = once, however because of the
-# side effect it is not replaced inline, which nullifies the effect of the
-# once.
-try (say "PING" once; say "pong")
-)
-
-test_1
-test_2
-test_3
-test_4
-test_5
-)
-
-(
 \x=(once (put "(CALC)") + 2 (* 7 6))
 
 \make_square=
@@ -818,6 +751,7 @@ try -1.3
 	(\content
 	\fh==(fopen tmp_file "w")
 	fput fh content
+	fclose fh  # You must do this.
 	)
 
 \show_chars=
@@ -869,8 +803,46 @@ This also goes to the file.
 	remove_file
 	)
 
+# Here I test interleaved writes and reads to the same file, which acts like a
+# queue.
+\test_3=
+	(
+	div
+
+	\open=(fopen tmp_file)
+
+	\put=
+		(\x
+		say ["put " x]
+		\fh=(once; open "w")
+		fput fh x
+		fflush fh  # You must do this.
+		)
+
+	\get=
+		(
+		\fh=(once; open "r")
+		\ch==(fget fh)
+		say ["get " (is_void ch "void" ch)]
+		)
+
+	put "a"
+	get get
+	put "bc"
+	get
+	put "d"
+	get get
+	put "efg"
+	get
+	put "h"
+	get get get get
+
+	remove_file
+	)
+
 test_1
 test_2
+test_3
 )
 
 test_file

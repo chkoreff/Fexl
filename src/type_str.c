@@ -89,7 +89,6 @@ value type_search(value f)
 	value x = arg(f->L->L->R);
 	value y = arg(f->L->R);
 	value z = arg(f->R);
-
 	if (x->T == type_str && y->T == type_str && z->T == type_num)
 		{
 		double zn = *((number)data(z));

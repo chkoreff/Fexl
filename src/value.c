@@ -149,9 +149,8 @@ static value replace(value f, value g)
 	return f;
 	}
 
-/* The reduce routine uses type_J to make f equivalent to g.  This replaces f
-with the content of g only after reducing g to its final value.  That gives
-the correct behavior when using the "once" function. */
+/* type_J(f) evaluates the right side first, then if possible replaces f with
+the final value.  This ensures proper behavior with the "once" function. */
 value type_J(value f)
 	{
 	value x = f->R;

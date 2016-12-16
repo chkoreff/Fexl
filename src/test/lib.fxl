@@ -74,8 +74,11 @@
 \and=(\x\y x y F)
 \or=(\x\y x T y)
 \not=(\x x F T)
+\if=(\x\y x y I)
 
 \neg=(- 0)
+\max=(\x\y gt x y x y)
+\min=(\x\y lt x y x y)
 
 # Compute x modulo n.
 \mod=(\x\n - x; * n; trunc; / x n)
@@ -580,6 +583,7 @@ def "format_pct" format_pct;
 def "hex_byte" hex_byte;
 def "hex_digit" hex_digit;
 def "hex_digit_to_dec" hex_digit_to_dec;
+def "if" if;
 def "list_at" list_at;
 def "list_combine" list_combine;
 def "list_length" list_length;
@@ -588,6 +592,8 @@ def "long_month_name" long_month_name;
 def "map" map;
 def "map_hex_to_raw_bytes" map_hex_to_raw_bytes;
 def "map_raw_bytes_to_hex" map_raw_bytes_to_hex;
+def "max" max;
+def "min" min;
 def "mod" mod;
 def "month_after" month_after;
 def "month_before" month_before;

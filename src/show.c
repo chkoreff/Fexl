@@ -93,6 +93,7 @@ void put_type(type t)
 
 	else if (t == type_file) put("file");
 	else if (t == type_fopen) put("fopen");
+	else if (t == type_fclose) put("fclose");
 	else if (t == type_fgetc) put("fgetc");
 	else if (t == type_fget) put("fget");
 	else if (t == type_remove) put("remove");
