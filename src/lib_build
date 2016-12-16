@@ -43,9 +43,7 @@ make()
 	need $file_o
 	stale $file_o $file_c || return 0
 	mkdir -p `dirname $file_o`
-	# NOTE Forbid declaration after statement for ISO C90 compatibility.
-	local options="-Wall -Werror -Wunused-parameter \
--Wdeclaration-after-statement -pedantic -O3"
+	local options="-Wall -Werror -Wunused-parameter -pedantic -O3"
 	run gcc -c $options $path $file_c -o $file_o
 	}
 
