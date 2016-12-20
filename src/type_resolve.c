@@ -1,11 +1,13 @@
 #include <num.h>
 #include <str.h>
 #include <value.h>
+
 #include <basic.h>
 #include <die.h>
 #include <report.h>
 #include <type_num.h>
 #include <type_resolve.h>
+#include <type_str.h>
 #include <type_sym.h>
 
 /* Resolve an individual symbol with the context. */
@@ -13,7 +15,7 @@ static value resolve_symbol(value x, value context)
 	{
 	{
 	/* Define numeric literals. */
-	const char *name = ((string)data(x))->data;
+	const char *name = str_data(x);
 	value def = Qnum_str0(name);
 	if (def) return def;
 	}
@@ -42,12 +44,12 @@ static value do_resolve(value exp, value context)
 		return hold(exp);
 	else if (exp->L == 0)
 		{
-		symbol sym = data(exp);
+		symbol sym = get_sym(exp);
 		value x = sym->name;
 		value def = resolve_symbol(x, context);
 		if (!def)
 			{
-			const char *name = ((string)data(x))->data;
+			const char *name = str_data(x);
 			undefined_symbol(name,sym->line);
 			undefined = 1;
 			def = Qvoid();
@@ -85,7 +87,7 @@ value type_resolve(value f)
 		value context = f->L->R;
 
 		const char *save_source_label = source_label;
-		source_label = ((string)data(label))->data;
+		source_label = str_data(label);
 
 		f = reduce(f,yield(resolve(exp,context)));
 

@@ -1,7 +1,8 @@
+#include <str.h>
 #include <value.h>
+
 #include <basic.h>
 #include <memory.h>
-#include <str.h>
 #include <type_str.h>
 #include <type_sym.h>
 
@@ -13,6 +14,11 @@ static void sym_free(symbol sym)
 
 value type_sym(value f)
 	{
+	if (f->N == 0)
+		{
+		sym_free(get_sym(f));
+		return 0;
+		}
 	if (!f->L) return 0; /* leaf symbol */
 	if (f->L->T == type_str) return 0; /* parsed form */
 	return reduce_void(f);
@@ -23,7 +29,12 @@ value Qsym(string name, unsigned long line)
 	symbol sym = new_memory(sizeof(struct symbol));
 	sym->name = Qstr(name);
 	sym->line = line;
-	return D(type_sym,sym,(type)sym_free);
+	return D(type_sym,sym);
+	}
+
+symbol get_sym(value x)
+	{
+	return (symbol)data(x);
 	}
 
 /* Apply f to g, where either can be a symbolic form. */
@@ -35,11 +46,11 @@ value app(value f, value g)
 
 static int sym_eq(symbol x, symbol y)
 	{
-	return str_eq(data(x->name),data(y->name));
+	return str_eq(get_str(x->name),get_str(y->name));
 	}
 
 /* Make a pattern that sends the argument to the left and right as needed. */
-value fuse(value p, value q)
+static value fuse(value p, value q)
 	{
 	if (p->T == type_F && q->T == type_F)
 		{
@@ -59,7 +70,7 @@ static value remove_symbol(value sym, value exp)
 		return A(QF(),hold(exp));
 	else if (exp->L == 0)
 		{
-		if (sym_eq(data(sym),data(exp)))
+		if (sym_eq(get_sym(sym),get_sym(exp)))
 			return A(QT(),QT());
 		else
 			return A(QF(),hold(exp));
@@ -90,8 +101,6 @@ value lam(value sym, value exp)
 	value pair = remove_symbol(sym,exp);
 	value f = Qsubst(hold(pair->L),hold(pair->R));
 	drop(pair);
-	drop(sym);
-	drop(exp);
 	return f;
 	}
 
@@ -117,7 +126,7 @@ static value subst(value p, value f, value x)
 		return hold(x);
 	}
 
-/* (subst pattern form value) */
+/* (subst p e x) Calls substitute. */
 value type_subst(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;

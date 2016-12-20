@@ -1,7 +1,9 @@
 #include <str.h>
-#include <value.h>
-#include <basic.h>
+
 #include <input.h>
+#include <value.h>
+
+#include <basic.h>
 #include <memory.h>
 #include <type_input.h>
 #include <type_istr.h>
@@ -25,18 +27,28 @@ static void istr_free(struct istr *in)
 
 int sgetc(struct istr *in)
 	{
-	string str = data(in->str);
+	string str = get_str(in->str);
 	return in->pos < str->len ? str->data[in->pos++] : -1;
 	}
 
 value Qistr(value x)
 	{
 	struct istr *in = istr_new(x);
-	return D(type_istr,in,(type)istr_free);
+	return D(type_istr,in);
+	}
+
+struct istr *get_istr(value x)
+	{
+	return (struct istr *)data(x);
 	}
 
 value type_istr(value f)
 	{
+	if (f->N == 0)
+		{
+		istr_free(get_istr(f));
+		return 0;
+		}
 	return type_void(f);
 	}
 

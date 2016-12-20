@@ -1,7 +1,9 @@
-#include <stdio.h>
 #include <str.h>
+
 #include <input.h>
+#include <stdio.h>
 #include <value.h>
+
 #include <basic.h>
 #include <die.h>
 #include <file.h>
@@ -33,15 +35,18 @@ static value parse_string(value str, value label)
 succeed, but it will behave like an empty file. */
 value parse_file(value name)
 	{
-	const char *name_s = ((string)data(name))->data;
+	const char *name_s = str_data(name);
 	FILE *fh = name_s[0] ? fopen(name_s,"r") : stdin;
+	value exp;
 	if (!fh)
 		{
 		fput(stderr,"Could not open source file ");
 		fput(stderr,name_s);fnl(stderr);
 		die(0);
 		}
-	return parse_fh(fh,name);
+	exp = parse_fh(fh,name);
+	if (fh != stdin) fclose(fh);
+	return exp;
 	}
 
 /* (parse source label) Parse the source, using the given label for any syntax
@@ -57,11 +62,11 @@ value type_parse(value f)
 	if (label->T == type_str)
 		{
 		if (source->T == type_file)
-			f = parse_fh(data(source),hold(label));
+			f = parse_fh(get_fh(source),hold(label));
 		else if (source->T == type_str)
 			f = reduce(f,parse_string(source,hold(label)));
 		else if (source->T == type_istr)
-			f = parse_istr(data(source),hold(label));
+			f = parse_istr(get_istr(source),hold(label));
 		else
 			f = reduce_void(f);
 		}

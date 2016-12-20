@@ -1,4 +1,4 @@
-#include <math.h> /* cos exp fabs log pow sin sqrt */
+#include <math.h> /* pow fabs sqrt exp log sin cos M_PI */
 #include <memory.h>
 #include <num.h>
 
@@ -42,6 +42,8 @@ number num_exp(number x) { return num_new_double(exp(*x)); }
 number num_log(number x) { return num_new_double(log(*x)); }
 number num_sin(number x) { return num_new_double(sin(*x)); }
 number num_cos(number x) { return num_new_double(cos(*x)); }
+
+number num_pi(void) { return num_new_double(M_PI); }
 
 int num_cmp(number x, number y)
 	{

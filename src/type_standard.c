@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <str.h>
 #include <value.h>
+
 #include <basic.h>
 #include <string.h> /* strcmp */
 #include <type_buf.h>
@@ -51,6 +52,7 @@ static value standard(void)
 	if (match("log")) return Q(type_log);
 	if (match("sin")) return Q(type_sin);
 	if (match("cos")) return Q(type_cos);
+	if (match("pi")) return Qnum(num_pi());
 
 	if (match("lt")) return Q(type_lt);
 	if (match("le")) return Q(type_le);
@@ -63,6 +65,7 @@ static value standard(void)
 	if (match("T")) return QT();
 	if (match("F")) return QF();
 	if (match("@")) return Q(type_Y);
+	if (match("eval")) return Q(type_eval);
 	if (match("once")) return Q(type_once);
 	if (match("void")) return Qvoid();
 	if (match("yield")) return Q(type_yield);
@@ -138,7 +141,7 @@ value type_standard(value f)
 	if (x->T == type_str)
 		{
 		value def;
-		cur_name = ((string)data(x))->data;
+		cur_name = str_data(x);
 		def = standard();
 		if (def)
 			f = reduce(f,yield(def));
@@ -167,7 +170,7 @@ static value parse_standard(value name)
 /* Evaluate a named file in the standard context. */
 value eval_file(const char *name)
 	{
-	return eval(parse_standard(Qstr(str_new_data0(name))));
+	return eval(parse_standard(Qstr0(name)));
 	}
 
 /* (use file exp)

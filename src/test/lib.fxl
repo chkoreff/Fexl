@@ -83,7 +83,6 @@
 # Compute x modulo n.
 \mod=(\x\n - x; * n; trunc; / x n)
 
-\pi=3.14159265358979
 \tau=(* 2 pi)
 
 # (check x y) = x if x is good, otherwise y.
@@ -603,7 +602,6 @@ def "NL" NL;
 def "not" not;
 def "or" or;
 def "parse_file" parse_file;
-def "pi" pi;
 def "quote" quote;
 def "quote_ch" quote_ch;
 def "range" range;

@@ -1,4 +1,5 @@
 #include <str.h>
+
 #include <buffer.h>
 #include <memory.h>
 #include <string.h> /* memcpy */

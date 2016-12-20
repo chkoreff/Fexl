@@ -1,29 +1,33 @@
 #include <str.h>
-#include <value.h>
-#include <basic.h>
-#include <die.h>
+
 #include <input.h>
 #include <num.h>
 #include <stdio.h>
+#include <value.h>
+
+#include <basic.h>
+#include <die.h>
 #include <sys/file.h> /* flock */
 #include <type_file.h>
 #include <type_input.h>
 #include <type_num.h>
 #include <type_str.h>
 
-static void file_free(FILE *fh)
-	{
-	(void)fh;
-	}
-
 value type_file(value f)
 	{
+	if (f->N == 0)
+		return 0;
 	return type_void(f);
 	}
 
 value Qfile(FILE *fh)
 	{
-	return D(type_file,fh,(type)file_free);
+	return D(type_file,fh);
+	}
+
+FILE *get_fh(value x)
+	{
+	return (FILE *)data(x);
 	}
 
 /* (fopen path mode) Open a file and return fh, where fh is the open file
@@ -36,8 +40,8 @@ value type_fopen(value f)
 	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_str)
 		{
-		string path = data(x);
-		string mode = data(y);
+		string path = get_str(x);
+		string mode = get_str(y);
 		FILE *fh = fopen(path->data,mode->data);
 		f = fh ? Qfile(fh) : Qvoid();
 		}
@@ -57,8 +61,7 @@ value type_fclose(value f)
 	value out = arg(f->R);
 	if (out->T == type_file)
 		{
-		FILE *fh = data(out);
-		fclose(fh);
+		fclose(get_fh(out));
 		f = QI();
 		}
 	else
@@ -89,7 +92,7 @@ value type_remove(value f)
 	value x = arg(f->R);
 	if (x->T == type_str)
 		{
-		string path = data(x);
+		string path = get_str(x);
 		int code = remove(path->data);
 		f = Qnum0(code);
 		}
@@ -107,8 +110,7 @@ static value op_flock(value f, int operation)
 	value x = arg(f->R);
 	if (x->T == type_file)
 		{
-		FILE *fh = data(x);
-		int code = flock(fileno(fh),operation);
+		int code = flock(fileno(get_fh(x)),operation);
 		if (code < 0)
 			{
 			perror("flock");

@@ -1,4 +1,5 @@
 #include <value.h>
+
 #include <basic.h>
 #include <type_var.h>
 
@@ -8,14 +9,24 @@ human user, redefining print to capture output in a memory buffer, etc. */
 
 value type_var(value f)
 	{
+	if (f->N == 0)
+		{
+		drop(get_var(f));
+		return 0;
+		}
 	return type_void(f);
+	}
+
+value get_var(value x)
+	{
+	return data(x);
 	}
 
 /* var_new returns a new variable with a void value. */
 value type_var_new(value f)
 	{
 	(void)f;
-	return D(type_var,Qvoid(),(type)drop);
+	return D(type_var,Qvoid());
 	}
 
 /* (var_get var) returns val, where val is the current value of var. */
@@ -25,7 +36,7 @@ value type_var_get(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_var)
-		f = hold(data(x));
+		f = hold(get_var(x));
 	else
 		f = reduce_void(f);
 	drop(x);

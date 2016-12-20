@@ -16,4 +16,5 @@ extern number num_exp(number x);
 extern number num_log(number x);
 extern number num_sin(number x);
 extern number num_cos(number x);
+extern number num_pi(void);
 extern int num_cmp(number x, number y);

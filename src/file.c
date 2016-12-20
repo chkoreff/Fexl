@@ -1,4 +1,5 @@
 #include <stdio.h>
+
 #include <file.h>
 #include <format.h>
 #include <string.h> /* strlen */
@@ -31,5 +32,5 @@ void fput_double(FILE *fh, double x)
 
 void fnl(FILE *fh)
 	{
-	fputd(fh,"\n",1);
+	fput_ch(fh,'\n');
 	}

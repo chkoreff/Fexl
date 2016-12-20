@@ -1,9 +1,11 @@
 #include <str.h>
+
+#include <input.h>
 #include <value.h>
+
 #include <basic.h>
 #include <buffer.h>
-#include <ctype.h>
-#include <input.h>
+#include <ctype.h> /* isspace iscntrl */
 #include <parse.h>
 #include <report.h>
 #include <type_str.h>
@@ -178,8 +180,6 @@ static value parse_quote_string(void)
 static string parse_terminator(unsigned long first_line)
 	{
 	struct buffer buf = {0};
-	string end;
-
 	while (1)
 		{
 		if (ch == -1 || at_white())
@@ -188,13 +188,11 @@ static string parse_terminator(unsigned long first_line)
 		skip();
 		}
 
-	if (ch == -1 || buf.top == 0)
+	if (ch == -1)
 		syntax_error("Incomplete string terminator", first_line);
 
 	skip();
-
-	end = buf_clear(&buf);
-	return end;
+	return buf_clear(&buf);
 	}
 
 /* Gather string content up to the next occurrence of terminator. */
@@ -250,13 +248,12 @@ static value parse_tuple(void)
 	value exp = QI();
 	while (1)
 		{
+		value term;
 		skip_filler();
-		{
-		value term = parse_term();
+		term = parse_term();
 		if (term == 0) break;
-		pattern = fuse(pattern,QF());
+		pattern = A(pattern,QF());
 		exp = app(exp,term);
-		}
 		}
 	return Qsubst(pattern,exp);
 	}
@@ -298,7 +295,7 @@ static value parse_term(void)
 /* Parse a lambda form following the initial '\' character. */
 static value parse_lambda(unsigned long first_line)
 	{
-	value sym, def=0, exp;
+	value sym, def=0, body, exp;
 	char is_eager = 0;
 
 	/* Parse the symbol. */
@@ -325,7 +322,10 @@ static value parse_lambda(unsigned long first_line)
 		}
 
 	/* Parse the body of the function. */
-	exp = lam(sym,parse_exp());
+	body = parse_exp();
+	exp = lam(sym,body);
+	drop(sym);
+	drop(body);
 
 	/* Apply the definition if any. */
 	if (def == 0)
@@ -336,12 +336,17 @@ static value parse_lambda(unsigned long first_line)
 		return app(exp,def);
 	}
 
+static value make_form(value label, value exp)
+	{
+	return V(type_sym,label,exp);
+	}
+
 /* Parse unresolved form. */
 static value parse_form(void)
 	{
 	value exp = parse_exp();
-	value label = Qstr(str_new_data0(source_label));
-	return A(QI(),app(label,exp));
+	value label = Qstr0(source_label);
+	return A(QI(),make_form(label,exp));
 	}
 
 /* Parse the next factor of an expression.  Return 0 if no factor found. */
@@ -411,14 +416,14 @@ value parse(input _get, void *_source, value label)
 	{
 	value exp;
 	const char *save_source_label = source_label;
-	source_label = ((string)data(label))->data;
+	source_label = str_data(label);
 
 	get = _get;
 	source = _source;
 	ch = ' ';
 	line = 1;
 
-	exp = app(label,parse_input());
+	exp = make_form(label,parse_input());
 
 	source_label = save_source_label;
 	return exp;

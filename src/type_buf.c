@@ -1,12 +1,23 @@
 #include <str.h>
 #include <value.h>
+
 #include <basic.h>
 #include <buffer.h>
 #include <type_buf.h>
 #include <type_str.h>
 
+static buffer *get_buf(value x)
+	{
+	return (buffer *)data(x);
+	}
+
 value type_buf(value f)
 	{
+	if (f->N == 0)
+		{
+		buf_free(get_buf(f));
+		return 0;
+		}
 	return type_void(f);
 	}
 
@@ -14,7 +25,7 @@ value type_buf(value f)
 value type_buf_new(value f)
 	{
 	(void)f;
-	return D(type_buf,buf_new(),(type)buf_free);
+	return D(type_buf,buf_new());
 	}
 
 /* (buf_put buf str) Appends the string to the buffer. */
@@ -26,8 +37,8 @@ value type_buf_put(value f)
 	value y = arg(f->R);
 	if (x->T == type_buf && y->T == type_str)
 		{
-		buffer *buf = data(x);
-		string str = data(y);
+		buffer *buf = get_buf(x);
+		string str = get_str(y);
 		buf_put(buf,str);
 		f = QI();
 		}
@@ -48,7 +59,7 @@ value type_buf_get(value f)
 	value x = arg(f->R);
 	if (x->T == type_buf)
 		{
-		buffer *buf = data(x);
+		buffer *buf = get_buf(x);
 		string str = buf_clear(buf);
 		f = Qstr(str);
 		}

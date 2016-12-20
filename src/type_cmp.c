@@ -1,7 +1,8 @@
-#include <value.h>
-#include <basic.h>
 #include <num.h>
 #include <str.h>
+#include <value.h>
+
+#include <basic.h>
 #include <type_cmp.h>
 #include <type_num.h>
 #include <type_str.h>
@@ -13,9 +14,9 @@ static value op_cmp(value f, int op(int))
 	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_num && y->T == type_num)
-		f = reduce_boolean(f,op(num_cmp(data(x),data(y))));
+		f = reduce_boolean(f,op(num_cmp(get_num(x),get_num(y))));
 	else if (x->T == type_str && y->T == type_str)
-		f = reduce_boolean(f,op(str_cmp(data(x),data(y))));
+		f = reduce_boolean(f,op(str_cmp(get_str(x),get_str(y))));
 	else
 		f = reduce_void(f);
 	drop(x);

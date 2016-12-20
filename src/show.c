@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <str.h>
 #include <value.h>
+
 #include <basic.h>
-#include <fexl.h>
 #include <output.h>
 #include <output2.h>
 #include <show.h>
@@ -24,7 +24,7 @@
 #include <type_sym.h>
 #include <type_var.h>
 
-void put_type(type t)
+static void put_type(type t)
 	{
 	if (t == type_A) put_ch('A');
 	else if (t == type_J) put_ch('J');
@@ -131,16 +131,19 @@ void put_type(type t)
 	else if (t == type_limit_memory) put("limit_memory");
 	else if (t == type_limit_stack) put("limit_stack");
 
-	else
-		{
-		put_ch('T');
-		put_ulong((unsigned long)t);
-		}
+	else put_ch('?');
+	}
+
+static void put_quote(string x)
+	{
+	put_ch('"');
+	put_str(x);
+	put_ch('"');
 	}
 
 void show(value f)
 	{
-	put("[");
+	put_ch('[');
 	put_type(f->T);
 	if (f->L)
 		{
@@ -153,31 +156,84 @@ void show(value f)
 		{
 		put_ch(' ');
 		if (f->T == type_num)
-			put_num(data(f));
+			put_num(get_num(f));
 		else if (f->T == type_str)
-			{
-			put_ch('"');
-			put_str(data(f));
-			put_ch('"');
-			}
+			put_quote(get_str(f));
 		else if (f->T == type_sym)
 			{
-			symbol sym = data(f);
-			put_ch('"');
-			put_str(data(sym->name));
-			put_ch('"');
+			symbol x = get_sym(f);
+			put_quote(get_str(x->name));
+			put_ch(' ');
+			put_ulong(x->line);
 			}
 		else if (f->T == type_var)
-			show(data(f));
+			show(get_var(f));
 		else if (f->T == type_buf)
 			put("...");
 		else if (f->T == type_file)
-			{
-			FILE *fh = data(f);
-			put_ulong(fileno(fh));
-			}
+			put_ulong(fileno(get_fh(f)));
 		else
-			put("?");
+			put_ch('?');
 		}
-	put("]");
+	put_ch(']');
+	}
+
+void show_line(const char *name, value f)
+	{
+	put(name);show(f);nl();
+	}
+
+static unsigned long depth = 0;
+
+static void indent(void)
+	{
+	if (1)
+	{
+	unsigned long i;
+	for (i = 1; i < depth; i++)
+		put("  ");
+	}
+	else
+	{
+	put_ulong(depth);put(" ");
+	}
+	}
+
+static void trace_line(const char *name, value f)
+	{
+	if (0 && depth > 1) return; /* Configure max depth here. */
+	indent();show_line(name,f);
+	}
+
+static void begin_eval(value f)
+	{
+	depth++;
+	trace_line("[ ",f);
+	}
+
+static void next_eval(value f)
+	{
+	if (0) return;
+	trace_line(": ",f);
+	}
+
+static void end_eval(value f)
+	{
+	trace_line("] ",f);
+	depth--;
+	}
+
+/* Reduce the value until done, printing trace lines along the way. */
+value trace_eval(value f)
+	{
+	begin_eval(f);
+	while (1)
+		{
+		value g = f->T(f);
+		if (g == 0) break;
+		f = g;
+		next_eval(f);
+		}
+	end_eval(f);
+	return f;
 	}

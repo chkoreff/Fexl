@@ -1,5 +1,6 @@
 extern value type_file(value f);
 extern value Qfile(FILE *fh);
+extern FILE *get_fh(value x);
 extern value type_fopen(value f);
 extern value type_fclose(value f);
 extern value type_fgetc(value f);

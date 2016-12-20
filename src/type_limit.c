@@ -1,26 +1,12 @@
+#include <num.h>
 #include <value.h>
+
 #include <basic.h>
 #include <die.h>
-#include <num.h>
 #include <stdio.h> /* perror */
 #include <sys/resource.h>
-#include <type_num.h>
 #include <type_limit.h>
-
-static void set_limit(int resource, const char *label, number n)
-	{
-	struct rlimit rlim;
-	rlim.rlim_cur = *n;
-	rlim.rlim_max = *n;
-	{
-	int code = setrlimit(resource,&rlim);
-	if (code < 0)
-		{
-		perror(label);
-		die(0);
-		}
-	}
-	}
+#include <type_num.h>
 
 static value op_set_limit(value f, int resource, const char *label)
 	{
@@ -29,7 +15,17 @@ static value op_set_limit(value f, int resource, const char *label)
 	value x = arg(f->R);
 	if (x->T == type_num)
 		{
-		set_limit(resource,label,data(x));
+		int code;
+		struct rlimit rlim;
+		rlim_t n = get_double(x);
+		rlim.rlim_cur = n;
+		rlim.rlim_max = n;
+		code = setrlimit(resource,&rlim);
+		if (code < 0)
+			{
+			perror(label);
+			die(0);
+			}
 		f = QI();
 		}
 	else

@@ -1,4 +1,5 @@
 #include <stdio.h>
+
 #include <die.h>
 #include <file.h>
 #include <report.h>

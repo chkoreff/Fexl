@@ -1,9 +1,10 @@
+#include <num.h>
+#include <str.h>
 #include <value.h>
+
 #include <basic.h>
 #include <die.h>
 #include <fexl.h>
-#include <num.h>
-#include <str.h>
 #include <type_num.h>
 #include <type_run.h>
 #include <type_str.h>
@@ -23,7 +24,7 @@ value type_argv(value f)
 	value x = arg(f->R);
 	if (x->T == type_num)
 		{
-		int i = (int)(*(number)data(x));
+		int i = get_double(x);
 		if (i >= 0 && i < main_argc)
 			f = reduce_str(f,str_new_data0(main_argv[i]));
 		else

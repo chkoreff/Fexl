@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <str.h>
 #include <value.h>
+
 #include <basic.h>
 #include <file.h>
 #include <file2.h>
@@ -15,9 +16,9 @@ static void fputv(FILE *fh, value x)
 	{
 	x = arg(x);
 	if (x->T == type_str)
-		fput_str(fh,data(x));
+		fput_str(fh,get_str(x));
 	else if (x->T == type_num)
-		fput_num(fh,data(x));
+		fput_num(fh,get_num(x));
 	else if (x->T == type_T && !x->L)
 		fput_ch(fh,'T');
 	else if (x->T == type_F && !x->L)
@@ -64,8 +65,7 @@ static value op_output(value f, void put(FILE *fh, value x))
 	value out = arg(f->L->R);
 	if (out->T == type_file)
 		{
-		FILE *fh = data(out);
-		put(fh,f->R);
+		put(get_fh(out),f->R);
 		f = QI();
 		}
 	else
@@ -92,8 +92,7 @@ value type_fflush(value f)
 	value out = arg(f->R);
 	if (out->T == type_file)
 		{
-		FILE *fh = data(out);
-		fflush(fh);
+		fflush(get_fh(out));
 		f = QI();
 		}
 	else

@@ -1,6 +1,7 @@
-#include <value.h>
-#include <basic.h>
 #include <num.h>
+#include <value.h>
+
+#include <basic.h>
 #include <type_math.h>
 #include <type_num.h>
 
@@ -10,7 +11,7 @@ static value op_num(value f, number op(number))
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
-		f = reduce_num(f,op(data(x)));
+		f = reduce_num(f,op(get_num(x)));
 	else
 		f = reduce_void(f);
 	drop(x);
@@ -25,7 +26,7 @@ static value op_num_num(value f, number op(number,number))
 	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_num && y->T == type_num)
-		f = reduce_num(f,op(data(x),data(y)));
+		f = reduce_num(f,op(get_num(x),get_num(y)));
 	else
 		f = reduce_void(f);
 	drop(x);

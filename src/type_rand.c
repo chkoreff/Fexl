@@ -1,7 +1,8 @@
-#include <value.h>
-#include <basic.h>
 #include <num.h>
-#include <stdlib.h> /* rand */
+#include <value.h>
+
+#include <basic.h>
+#include <stdlib.h> /* srand rand RAND_MAX */
 #include <type_num.h>
 #include <type_rand.h>
 
@@ -13,7 +14,7 @@ value type_seed_rand(value f)
 	value x = arg(f->R);
 	if (x->T == type_num)
 		{
-		double seed = *((number)data(x)) * (double)RAND_MAX;
+		double seed = get_double(x) * (double)RAND_MAX;
 		srand(seed);
 		f = QI();
 		}

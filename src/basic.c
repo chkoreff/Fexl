@@ -1,4 +1,5 @@
 #include <value.h>
+
 #include <basic.h>
 
 /* (I x) = x */
@@ -9,19 +10,17 @@ value type_I(value f)
 	}
 
 /* Boolean types */
-/* (T x y) = x */
-value type_T(value f)
+static value op_boolean(value f, int flag)
 	{
 	if (!f->L || !f->L->L) return 0;
-	return reduce(f,hold(f->L->R));
+	{
+	value x = flag ? hold(f->L->R) : hold(f->R);
+	return reduce(f,x);
+	}
 	}
 
-/* (F x y) = y */
-value type_F(value f)
-	{
-	if (!f->L || !f->L->L) return 0;
-	return reduce(f,hold(f->R));
-	}
+value type_T(value f) { return op_boolean(f,1); } /* (T x y) = x */
+value type_F(value f) { return op_boolean(f,0); } /* (F x y) = y */
 
 /* (Y x) = (x (Y x)) */
 value type_Y(value f)
@@ -76,45 +75,6 @@ value type_null(value f)
 	return type_T(f);
 	}
 
-value type_is_void(value f)
-	{
-	return op_is_type(f,type_void);
-	}
-
-value type_is_good(value f)
-	{
-	if (!f->L) return 0;
-	{
-	value x = arg(f->R);
-	f = reduce_boolean(f,(x->T != type_void));
-	drop(x);
-	return f;
-	}
-	}
-
-value type_is_bool(value f)
-	{
-	if (!f->L) return 0;
-	{
-	value x = arg(f->R);
-	f = reduce_boolean(f,((x->T == type_T || x->T == type_F) && !x->L));
-	drop(x);
-	return f;
-	}
-	}
-
-value type_is_list(value f)
-	{
-	if (!f->L) return 0;
-	{
-	value x = arg(f->R);
-	f = reduce_boolean(f,((x->T == type_null && !x->L)
-		|| (x->T == type_cons && x->L && x->L->L)));
-	drop(x);
-	return f;
-	}
-	}
-
 value op_is_type(value f, type t)
 	{
 	if (!f->L) return 0;
@@ -126,25 +86,46 @@ value op_is_type(value f, type t)
 	}
 	}
 
-value QI(void)
+value type_is_void(value f)
 	{
-	return Q(type_I);
+	return op_is_type(f,type_void);
 	}
 
-value QT(void)
+static value op_predicate(value f, int op(value x))
 	{
-	return Q(type_T);
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	f = reduce_boolean(f,op(x));
+	drop(x);
+	return f;
+	}
 	}
 
-value QF(void)
+static int op_is_good(value x)
 	{
-	return Q(type_F);
+	return (x->T != type_void);
 	}
 
-value Qvoid(void)
+static int op_is_bool(value x)
 	{
-	return Q(type_void);
+	return (x->T == type_T || x->T == type_F) && !x->L;
 	}
+
+static int op_is_list(value x)
+	{
+	return (x->T == type_null && !x->L)
+		|| (x->T == type_cons && x->L && x->L->L);
+	}
+
+value type_is_good(value f) { return op_predicate(f,op_is_good); }
+value type_is_bool(value f) { return op_predicate(f,op_is_bool); }
+value type_is_list(value f) { return op_predicate(f,op_is_list); }
+
+value QI(void) { return Q(type_I); }
+value QT(void) { return Q(type_T); }
+value QF(void) { return Q(type_F); }
+value Qvoid(void) { return Q(type_void); }
 
 value reduce_void(value f)
 	{

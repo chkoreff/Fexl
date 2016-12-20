@@ -1,6 +1,7 @@
 #include <num.h>
 #include <str.h>
 #include <value.h>
+
 #include <basic.h>
 #include <convert.h>
 #include <input.h>
@@ -9,17 +10,37 @@
 
 value type_str(value f)
 	{
+	if (f->N == 0)
+		{
+		str_free(get_str(f));
+		return 0;
+		}
 	return type_void(f);
 	}
 
 value Qstr(string x)
 	{
-	return D(type_str,x,(type)str_free);
+	return D(type_str,x);
+	}
+
+value Qstr0(const char *data)
+	{
+	return Qstr(str_new_data0(data));
+	}
+
+string get_str(value x)
+	{
+	return (string)data(x);
+	}
+
+const char *str_data(value x)
+	{
+	return get_str(x)->data;
 	}
 
 value reduce_str(value f, string x)
 	{
-	return reduce_D(f,type_str,x,(type)str_free);
+	return reduce_D(f,type_str,x);
 	}
 
 /* (. x y) is the concatenation of strings x and y. */
@@ -30,7 +51,7 @@ value type_concat(value f)
 	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_str)
-		f = reduce_str(f,str_concat(data(x),data(y)));
+		f = reduce_str(f,str_concat(get_str(x),get_str(y)));
 	else
 		f = reduce_void(f);
 	drop(x);
@@ -46,7 +67,7 @@ value type_length(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
-		f = reduce_num(f,num_new_ulong(((string)data(x))->len));
+		f = reduce_num(f,num_new_ulong(get_str(x)->len));
 	else
 		f = reduce_void(f);
 	drop(x);
@@ -65,10 +86,10 @@ value type_slice(value f)
 	value z = arg(f->R);
 	if (x->T == type_str && y->T == type_num && z->T == type_num)
 		{
-		double yn = *((number)data(y));
-		double zn = *((number)data(z));
+		double yn = get_double(y);
+		double zn = get_double(z);
 		if (yn >= 0 && zn >= 0)
-			f = reduce_str(f,str_slice(data(x),yn,zn));
+			f = reduce_str(f,str_slice(get_str(x),yn,zn));
 		else
 			f = reduce_void(f);
 		}
@@ -91,11 +112,11 @@ value type_search(value f)
 	value z = arg(f->R);
 	if (x->T == type_str && y->T == type_str && z->T == type_num)
 		{
-		double zn = *((number)data(z));
+		double zn = get_double(z);
 		if (zn >= 0)
 			{
-			string xs = data(x);
-			string ys = data(y);
+			string xs = get_str(x);
+			string ys = get_str(y);
 			unsigned long pos = str_search(xs,ys,zn);
 			if (pos < xs->len)
 				f = reduce_num(f,num_new_ulong(pos));
@@ -122,7 +143,7 @@ value type_str_num(value f)
 	value x = arg(f->R);
 	if (x->T == type_str)
 		{
-		number n = str0_num(((string)data(x))->data);
+		number n = str0_num(str_data(x));
 		if (n)
 			f = reduce_num(f,n);
 		else
@@ -143,7 +164,7 @@ value type_ord(value f)
 	value x = arg(f->R);
 	if (x->T == type_str)
 		{
-		string xs = data(x);
+		string xs = get_str(x);
 		f = reduce_num(f,num_new_ulong(xs->len == 0 ? 0 :
 			(unsigned char)xs->data[0]));
 		}
@@ -162,7 +183,7 @@ value type_chr(value f)
 	value x = arg(f->R);
 	if (x->T == type_num)
 		{
-		double xn = *((number)data(x));
+		double xn = get_double(x);
 		char ch = xn;
 		f = reduce_str(f,str_new_data(&ch,1));
 		}
@@ -183,10 +204,10 @@ value type_char_width(value f)
 	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_num)
 		{
-		double yn = *((number)data(y));
+		double yn = get_double(y);
 		if (yn >= 0)
 			{
-			string xs = data(x);
+			string xs = get_str(x);
 			unsigned long pos = yn;
 			if (pos < xs->len)
 				{
