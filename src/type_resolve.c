@@ -45,11 +45,10 @@ static value do_resolve(value exp, value context)
 	else if (exp->L == 0)
 		{
 		symbol sym = get_sym(exp);
-		value x = sym->name;
-		value def = resolve_symbol(x, context);
+		value def = resolve_symbol(sym->name, context);
 		if (!def)
 			{
-			const char *name = str_data(x);
+			const char *name = str_data(sym->name);
 			undefined_symbol(name,sym->line);
 			undefined = 1;
 			def = Qvoid();

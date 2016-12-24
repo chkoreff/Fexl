@@ -44,84 +44,89 @@ value app(value f, value g)
 	return V(t,f,g);
 	}
 
-static int sym_eq(symbol x, symbol y)
+/* Return a function that calls subst(p,e,x) when applied to x. */
+value Qsubst(value p, value e)
 	{
-	return str_eq(get_str(x->name),get_str(y->name));
+	type t = (e->T == type_sym ? type_sym : type_subst);
+	return V(t,V(type_subst,Q(type_subst),p),e);
+	}
+
+/* Return the equivalent of (C x) */
+static value keep(value x)
+	{
+	return Qsubst(QF(),hold(x));
+	}
+
+/* Return the equivalent of I. */
+static value here(void)
+	{
+	return Qsubst(QT(),QI());
 	}
 
 /* Make a pattern that sends the argument to the left and right as needed. */
-static value fuse(value p, value q)
+static value combine(value p, value q)
 	{
 	if (p->T == type_F && q->T == type_F)
 		{
-		drop(p);
 		drop(q);
-		return QF();
+		return p;
 		}
 	else
 		return A(p,q);
 	}
 
-/* Replace all occurrences of sym in exp with T, returning a pair with the
-replacement pattern and the updated exp. */
-static value remove_symbol(value sym, value exp)
+/* Return the equivalent of (S x y) */
+static value fuse(value x, value y)
 	{
-	if (exp->T != type_sym)
-		return A(QF(),hold(exp));
-	else if (exp->L == 0)
-		{
-		if (sym_eq(get_sym(sym),get_sym(exp)))
-			return A(QT(),QT());
-		else
-			return A(QF(),hold(exp));
-		}
-	else
-		{
-		value f = remove_symbol(sym,exp->L);
-		value g = remove_symbol(sym,exp->R);
-		value h = A(
-			fuse(hold(f->L),hold(g->L)),
-			app(hold(f->R),hold(g->R)));
-		drop(f);
-		drop(g);
-		return h;
-		}
+	value p = combine(hold(x->L->R),hold(y->L->R));
+	value e = app(hold(x->R),hold(y->R));
+	drop(x);
+	drop(y);
+	return Qsubst(p,e);
 	}
 
-/* Return a function that calls subst(p,f,x) when applied to x. */
-value Qsubst(value p, value f)
+string sym_name(symbol x)
 	{
-	return app(V(type_subst,Q(type_subst),p),f);
+	return get_str(x->name);
+	}
+
+static int sym_eq(symbol x, symbol y)
+	{
+	return str_eq(sym_name(x),sym_name(y));
 	}
 
 /* Abstract the symbol from exp, returning a form which is a function of that
 symbol, and no longer contains that symbol. */
 value lam(value sym, value exp)
 	{
-	value pair = remove_symbol(sym,exp);
-	value f = Qsubst(hold(pair->L),hold(pair->R));
-	drop(pair);
-	return f;
+	if (exp->T != type_sym)
+		return keep(exp);
+	else if (exp->L == 0)
+		{
+		if (sym_eq(get_sym(sym),get_sym(exp)))
+			return here();
+		else
+			return keep(exp);
+		}
+	else
+		return fuse(lam(sym,exp->L),lam(sym,exp->R));
 	}
 
-/* Use pattern p to make a copy of f with x substituted in various places.
+/* Use pattern p to make a copy of expression e with argument x substituted in
+the places designated by the pattern.
 
 I do one level of look-ahead on the left and right patterns, which isn't
-strictly necessary but is slightly faster and smaller.
-
-Checking p->R in addition to p->L is redundant, but is slightly faster and
-smaller.
-*/
-static value subst(value p, value f, value x)
+strictly necessary but is slightly faster. */
+static value subst(value p, value e, value x)
 	{
-	if (p->L && p->R)
+	if (p->L)
 		{
-		value L = (p->L->T == type_F ? hold(f->L) : subst(p->L,f->L,x));
-		value R = (p->R->T == type_F ? hold(f->R) : subst(p->R,f->R,x));
+		value L = (p->L->T == type_F ? hold(e->L) : subst(p->L,e->L,x));
+		value R = (p->R->T == type_F ? hold(e->R) : subst(p->R,e->R,x));
 		return A(L,R);
 		}
 	else if (p->T == type_F)
-		return hold(f);
+		return hold(e);
 	else
 		return hold(x);
 	}

@@ -162,7 +162,7 @@ void show(value f)
 		else if (f->T == type_sym)
 			{
 			symbol x = get_sym(f);
-			put_quote(get_str(x->name));
+			put_quote(sym_name(x));
 			put_ch(' ');
 			put_ulong(x->line);
 			}
