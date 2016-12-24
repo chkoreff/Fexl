@@ -19,9 +19,7 @@ value type_sym(value f)
 		sym_free(get_sym(f));
 		return 0;
 		}
-	if (!f->L) return 0; /* leaf symbol */
-	if (f->L->T == type_str) return 0; /* parsed form */
-	return reduce_void(f);
+	return type_void(f);
 	}
 
 value Qsym(string name, unsigned long line)

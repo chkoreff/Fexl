@@ -10,6 +10,7 @@
 #include <type_buf.h>
 #include <type_cmp.h>
 #include <type_file.h>
+#include <type_form.h>
 #include <type_istr.h>
 #include <type_limit.h>
 #include <type_math.h>
@@ -31,6 +32,8 @@ static void put_type(type t)
 
 	else if (t == type_sym) put("sym");
 	else if (t == type_subst) put("subst");
+
+	else if (t == type_form) put("form");
 
 	else if (t == type_put) put("put");
 	else if (t == type_nl) put("nl");
@@ -172,6 +175,13 @@ void show(value f)
 				put_quote(sym_name(x));
 				put_ch(' ');
 				put_ulong(x->line);
+				}
+			else if (f->T == type_form)
+				{
+				form x = get_form(f);
+				put_quote(get_str(x->label));
+				put_ch(' ');
+				show(x->exp);
 				}
 			else if (f->T == type_var)
 				show(get_var(f));

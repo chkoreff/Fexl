@@ -8,6 +8,7 @@
 #include <ctype.h> /* isspace iscntrl */
 #include <parse.h>
 #include <report.h>
+#include <type_form.h>
 #include <type_str.h>
 #include <type_sym.h>
 
@@ -336,17 +337,12 @@ static value parse_lambda(unsigned long first_line)
 		return app(exp,def);
 	}
 
-static value make_form(value label, value exp)
-	{
-	return V(type_sym,label,exp);
-	}
-
 /* Parse unresolved form. */
 static value parse_form(void)
 	{
-	value exp = parse_exp();
 	value label = Qstr0(source_label);
-	return A(hold(&QI),make_form(label,exp));
+	value exp = parse_exp();
+	return Qform(label,exp);
 	}
 
 /* Parse the next factor of an expression.  Return 0 if no factor found. */
@@ -423,7 +419,7 @@ value parse(input _get, void *_source, value label)
 	ch = ' ';
 	line = 1;
 
-	exp = make_form(label,parse_input());
+	exp = Qform(label,parse_input());
 
 	source_label = save_source_label;
 	return exp;

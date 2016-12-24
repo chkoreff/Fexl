@@ -7,6 +7,7 @@
 #include <report.h>
 #include <type_num.h>
 #include <type_resolve.h>
+#include <type_form.h>
 #include <type_str.h>
 #include <type_sym.h>
 
@@ -101,17 +102,17 @@ value type_resolve(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	{
-	value form = arg(f->R);
-	if (form->T == type_sym)
+	value x = arg(f->R);
+	if (x->T == type_form)
 		{
-		value label = form->L;
-		value exp = form->R;
+		form form = get_form(x);
 		value context = f->L->R;
+		value exp;
 
 		const char *save_source_label = source_label;
-		source_label = str_data(label);
+		source_label = str_data(form->label);
 
-		exp = resolve(exp,context);
+		exp = resolve(form->exp,context);
 		report_undef(exp);
 		f = reduce(f,yield(exp));
 
@@ -119,7 +120,7 @@ value type_resolve(value f)
 		}
 	else
 		f = reduce_void(f);
-	drop(form);
+	drop(x);
 	return f;
 	}
 	}
