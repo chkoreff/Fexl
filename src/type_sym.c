@@ -47,26 +47,27 @@ value app(value f, value g)
 /* Return a function that calls subst(p,e,x) when applied to x. */
 value Qsubst(value p, value e)
 	{
+	static struct value v = { 1, type_subst, 0, 0 };
 	type t = (e->T == type_sym ? type_sym : type_subst);
-	return V(t,V(type_subst,Q(type_subst),p),e);
+	return V(t,V(type_subst,hold(&v),p),e);
 	}
 
 /* Return the equivalent of (C x) */
 static value keep(value x)
 	{
-	return Qsubst(QF(),hold(x));
+	return Qsubst(hold(&QF),hold(x));
 	}
 
 /* Return the equivalent of I. */
 static value here(void)
 	{
-	return Qsubst(QT(),QI());
+	return Qsubst(hold(&QT),hold(&QI));
 	}
 
 /* Make a pattern that sends the argument to the left and right as needed. */
 static value combine(value p, value q)
 	{
-	if (p->T == type_F && q->T == type_F)
+	if (p == &QF && q == &QF)
 		{
 		drop(q);
 		return p;
@@ -121,11 +122,11 @@ static value subst(value p, value e, value x)
 	{
 	if (p->L)
 		{
-		value L = (p->L->T == type_F ? hold(e->L) : subst(p->L,e->L,x));
-		value R = (p->R->T == type_F ? hold(e->R) : subst(p->R,e->R,x));
+		value L = (p->L == &QF ? hold(e->L) : subst(p->L,e->L,x));
+		value R = (p->R == &QF ? hold(e->R) : subst(p->R,e->R,x));
 		return A(L,R);
 		}
-	else if (p->T == type_F)
+	else if (p == &QF)
 		return hold(e);
 	else
 		return hold(x);

@@ -40,7 +40,7 @@ value type_buf_put(value f)
 		buffer *buf = get_buf(x);
 		string str = get_str(y);
 		buf_put(buf,str);
-		f = QI();
+		f = hold(&QI);
 		}
 	else
 		f = reduce_void(f);

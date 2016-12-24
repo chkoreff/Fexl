@@ -16,7 +16,7 @@ value op_getc(value f, type t, input get)
 		{
 		int ch = get(data(x));
 		if (ch == -1)
-			f = Qvoid();
+			f = hold(&Qvoid);
 		else
 			{
 			char c = (char)ch;
@@ -38,7 +38,7 @@ value op_get(value f, type t, input get)
 	if (x->T == t)
 		{
 		string ch = get_utf8(get,data(x));
-		f = ch ? Qstr(ch) : Qvoid();
+		f = ch ? Qstr(ch) : hold(&Qvoid);
 		}
 	else
 		f = reduce_void(f);

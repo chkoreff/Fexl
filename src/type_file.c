@@ -43,7 +43,7 @@ value type_fopen(value f)
 		string path = get_str(x);
 		string mode = get_str(y);
 		FILE *fh = fopen(path->data,mode->data);
-		f = fh ? Qfile(fh) : Qvoid();
+		f = fh ? Qfile(fh) : hold(&Qvoid);
 		}
 	else
 		f = reduce_void(f);
@@ -62,7 +62,7 @@ value type_fclose(value f)
 	if (out->T == type_file)
 		{
 		fclose(get_fh(out));
-		f = QI();
+		f = hold(&QI);
 		}
 	else
 		f = reduce_void(f);
@@ -116,7 +116,7 @@ static value op_flock(value f, int operation)
 			perror("flock");
 			die(0);
 			}
-		f = QI();
+		f = hold(&QI);
 		}
 	else
 		f = reduce_void(f);

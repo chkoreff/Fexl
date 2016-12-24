@@ -22,7 +22,7 @@ static value resolve_symbol(value x, value context)
 
 	{
 	/* Define other names using the given context. */
-	value exp = eval(A(A(hold(context),hold(x)),Q(type_yield)));
+	value exp = eval(A(A(hold(context),hold(x)),hold(&Qyield)));
 	value def;
 
 	if (exp->L && exp->L->T == type_yield)

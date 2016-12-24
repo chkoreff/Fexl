@@ -26,7 +26,7 @@ value get_var(value x)
 value type_var_new(value f)
 	{
 	(void)f;
-	return D(type_var,Qvoid());
+	return D(type_var,hold(&Qvoid));
 	}
 
 /* (var_get var) returns val, where val is the current value of var. */
@@ -55,7 +55,7 @@ value type_var_put(value f)
 		value v = arg(f->R);
 		drop(x->R->R);
 		x->R->R = v;
-		f = QI();
+		f = hold(&QI);
 		}
 	else
 		f = reduce_void(f);

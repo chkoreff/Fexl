@@ -61,16 +61,16 @@ static value standard(void)
 	if (match("ge")) return Q(type_ge);
 	if (match("gt")) return Q(type_gt);
 
-	if (match("I")) return QI();
-	if (match("T")) return QT();
-	if (match("F")) return QF();
+	if (match("I")) return hold(&QI);
+	if (match("T")) return hold(&QT);
+	if (match("F")) return hold(&QF);
 	if (match("@")) return Q(type_Y);
-	if (match("eval")) return Q(type_eval);
+	if (match("eval")) return hold(&Qeval);
 	if (match("once")) return Q(type_once);
-	if (match("void")) return Qvoid();
-	if (match("yield")) return Q(type_yield);
-	if (match("cons")) return Q(type_cons);
-	if (match("null")) return Q(type_null);
+	if (match("void")) return hold(&Qvoid);
+	if (match("yield")) return hold(&Qyield);
+	if (match("cons")) return hold(&Qcons);
+	if (match("null")) return hold(&Qnull);
 	if (match("is_void")) return Q(type_is_void);
 	if (match("is_good")) return Q(type_is_good);
 	if (match("is_bool")) return Q(type_is_bool);
@@ -158,7 +158,7 @@ value type_standard(value f)
 /* Return a function which evaluates the expression in the given context. */
 static value use_context(value context, value exp)
 	{
-	return A(A(A(Q(type_resolve),context),exp),QI());
+	return A(A(A(Q(type_resolve),context),exp),hold(&QI));
 	}
 
 /* Return a function which evaluates the named file in the standard context. */

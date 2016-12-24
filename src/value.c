@@ -176,9 +176,10 @@ value type_J(value f)
 /* Reduce f to the equivalent of g. */
 value reduce(value f, value g)
 	{
+	static struct value v = { 1, type_J, 0, 0 };
 	clear(f);
 	f->T = type_J;
-	f->L = Q(type_J);
+	f->L = hold(&v);
 	f->R = g;
 	return f;
 	}

@@ -26,7 +26,7 @@ static value op_set_limit(value f, int resource, const char *label)
 			perror(label);
 			die(0);
 			}
-		f = QI();
+		f = hold(&QI);
 		}
 	else
 		f = reduce_void(f);
