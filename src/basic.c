@@ -14,10 +14,7 @@ value type_I(value f)
 static value op_boolean(value f, int flag)
 	{
 	if (!f->L || !f->L->L) return 0;
-	{
-	value x = flag ? hold(f->L->R) : hold(f->R);
-	return reduce(f,x);
-	}
+	return reduce(f,hold(flag ? f->L->R : f->R));
 	}
 
 value type_T(value f) { return op_boolean(f,1); } /* (T x y) = x */

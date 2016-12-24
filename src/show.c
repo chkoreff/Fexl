@@ -141,99 +141,53 @@ static void put_quote(string x)
 	put_ch('"');
 	}
 
+static unsigned long depth;
+
 void show(value f)
 	{
-	put_ch('[');
-	put_type(f->T);
-	if (f->L)
+	depth++;
+	if (depth > 5)
+		put_ch('_');
+	else
 		{
-		put_ch(' ');
-		show(f->L);
-		put_ch(' ');
-		show(f->R);
-		}
-	else if (f->R)
-		{
-		put_ch(' ');
-		if (f->T == type_num)
-			put_num(get_num(f));
-		else if (f->T == type_str)
-			put_quote(get_str(f));
-		else if (f->T == type_sym)
+		put_ch('[');
+		put_type(f->T);
+		if (f->L)
 			{
-			symbol x = get_sym(f);
-			put_quote(sym_name(x));
 			put_ch(' ');
-			put_ulong(x->line);
+			show(f->L);
+			put_ch(' ');
+			show(f->R);
 			}
-		else if (f->T == type_var)
-			show(get_var(f));
-		else if (f->T == type_buf || f->T == type_istr)
-			put("...");
-		else if (f->T == type_file)
-			put_ulong(fileno(get_fh(f)));
-		else
-			put_ch('?');
+		else if (f->R)
+			{
+			put_ch(' ');
+			if (f->T == type_num)
+				put_num(get_num(f));
+			else if (f->T == type_str)
+				put_quote(get_str(f));
+			else if (f->T == type_sym)
+				{
+				symbol x = get_sym(f);
+				put_quote(sym_name(x));
+				put_ch(' ');
+				put_ulong(x->line);
+				}
+			else if (f->T == type_var)
+				show(get_var(f));
+			else if (f->T == type_buf || f->T == type_istr)
+				put("...");
+			else if (f->T == type_file)
+				put_ulong(fileno(get_fh(f)));
+			else
+				put_ch('?');
+			}
+		put_ch(']');
 		}
-	put_ch(']');
+	depth--;
 	}
 
 void show_line(const char *name, value f)
 	{
 	put(name);show(f);nl();
-	}
-
-static unsigned long depth = 0;
-
-static void indent(void)
-	{
-	if (1)
-	{
-	unsigned long i;
-	for (i = 1; i < depth; i++)
-		put("  ");
-	}
-	else
-	{
-	put_ulong(depth);put(" ");
-	}
-	}
-
-static void trace_line(const char *name, value f)
-	{
-	if (0 && depth > 1) return; /* Configure max depth here. */
-	indent();show_line(name,f);
-	}
-
-static void begin_eval(value f)
-	{
-	depth++;
-	trace_line("[ ",f);
-	}
-
-static void next_eval(value f)
-	{
-	if (0) return;
-	trace_line(": ",f);
-	}
-
-static void end_eval(value f)
-	{
-	trace_line("] ",f);
-	depth--;
-	}
-
-/* Reduce the value until done, printing trace lines along the way. */
-value trace_eval(value f)
-	{
-	begin_eval(f);
-	while (1)
-		{
-		value g = f->T(f);
-		if (g == 0) break;
-		f = g;
-		next_eval(f);
-		}
-	end_eval(f);
-	return f;
 	}
