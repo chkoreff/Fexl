@@ -168,7 +168,7 @@ void show(value f)
 			}
 		else if (f->T == type_var)
 			show(get_var(f));
-		else if (f->T == type_buf)
+		else if (f->T == type_buf || f->T == type_istr)
 			put("...");
 		else if (f->T == type_file)
 			put_ulong(fileno(get_fh(f)));

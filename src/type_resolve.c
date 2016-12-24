@@ -35,10 +35,8 @@ static value resolve_symbol(value x, value context)
 	}
 	}
 
-static short undefined = 0;
-
-/* Resolve all symbols in exp with the context. */
-static value do_resolve(value exp, value context)
+/* Resolve all symbols in exp with the definitions given by context. */
+static value resolve(value exp, value context)
 	{
 	if (exp->T != type_sym)
 		return hold(exp);
@@ -46,30 +44,55 @@ static value do_resolve(value exp, value context)
 		{
 		symbol sym = get_sym(exp);
 		value def = resolve_symbol(sym->name, context);
-		if (!def)
-			{
-			const char *name = str_data(sym->name);
-			undefined_symbol(name,sym->line);
-			undefined = 1;
-			def = Qvoid();
-			}
+		if (!def) def = hold(exp);
 		return def;
 		}
 	else
 		{
-		value f = do_resolve(exp->L,context);
-		value g = do_resolve(exp->R,context);
-		return A(f,g);
+		value f = resolve(exp->L,context);
+		value g = resolve(exp->R,context);
+		return app(f,g);
 		}
 	}
 
-/* Resolve all symbols in exp with the definitions given by context. */
-static value resolve(value exp, value context)
+/* Return the first undefined symbol in the expression. */
+static value first_undef(value exp)
 	{
-	exp = do_resolve(exp,context);
+	if (exp->T != type_sym)
+		return 0;
+	else if (exp->L == 0)
+		return exp;
+	else
+		{
+		value x = first_undef(exp->L);
+		if (x) return x;
+		return first_undef(exp->R);
+		}
+	}
+
+/* Report all distinct undefined symbols in the expression. */
+static void report_undef(value exp)
+	{
+	short undefined = 0;
+	hold(exp);
+	while (1)
+		{
+		value x = first_undef(exp);
+		if (x == 0) break;
+		{
+		value next;
+		symbol sym = get_sym(x);
+		const char *name = str_data(sym->name);
+		undefined_symbol(name,sym->line);
+		undefined = 1;
+		next = lam(x,exp);
+		drop(exp);
+		exp = next;
+		}
+		}
 	if (undefined)
 		die(0); /* The expression had undefined symbols. */
-	return exp;
+	drop(exp);
 	}
 
 /* (resolve context form) Resolve the form in the context and yield the
@@ -88,7 +111,9 @@ value type_resolve(value f)
 		const char *save_source_label = source_label;
 		source_label = str_data(label);
 
-		f = reduce(f,yield(resolve(exp,context)));
+		exp = resolve(exp,context);
+		report_undef(exp);
+		f = reduce(f,yield(exp));
 
 		source_label = save_source_label;
 		}
