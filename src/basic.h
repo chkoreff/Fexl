@@ -1,4 +1,3 @@
-extern value type_I(value f);
 extern value type_T(value f);
 extern value type_F(value f);
 extern value type_Y(value f);
@@ -13,7 +12,6 @@ extern value type_is_void(value f);
 extern value type_is_good(value f);
 extern value type_is_bool(value f);
 extern value type_is_list(value f);
-extern struct value QI;
 extern struct value QT;
 extern struct value QF;
 extern struct value Qeval;

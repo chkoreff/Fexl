@@ -19,6 +19,8 @@ extern void *data(value f);
 extern value type_A(value f);
 extern value A(value x, value y);
 extern value type_J(value f);
+extern value type_I(value f);
+extern struct value QI;
 extern value reduce(value f, value g);
 extern value reduce_Q(value f, type T);
 extern value reduce_D(value f, type T, void *data);

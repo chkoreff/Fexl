@@ -173,13 +173,22 @@ value type_J(value f)
 		}
 	}
 
+/* (I x) = x */
+value type_I(value f)
+	{
+	if (!f->L) return 0;
+	f->T = type_J;
+	return f;
+	}
+
+struct value QI = { 1, type_I, 0, 0 };
+
 /* Reduce f to the equivalent of g. */
 value reduce(value f, value g)
 	{
-	static struct value v = { 1, type_J, 0, 0 };
 	clear(f);
 	f->T = type_J;
-	f->L = hold(&v);
+	f->L = hold(&QI);
 	f->R = g;
 	return f;
 	}
