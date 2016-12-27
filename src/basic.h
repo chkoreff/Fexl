@@ -21,4 +21,4 @@ extern struct value Qvoid;
 extern struct value Qyield;
 extern value reduce_void(value f);
 extern value reduce_boolean(value f, int x);
-extern value yield(value x);
+extern value reduce_yield(value f, value x);

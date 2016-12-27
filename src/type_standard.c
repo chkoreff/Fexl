@@ -144,7 +144,7 @@ value type_standard(value f)
 		cur_name = str_data(x);
 		def = standard();
 		if (def)
-			f = reduce(f,yield(def));
+			f = reduce_yield(f,def);
 		else
 			f = reduce_void(f);
 		}

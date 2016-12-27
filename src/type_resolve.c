@@ -114,7 +114,7 @@ value type_resolve(value f)
 
 		exp = resolve(form->exp,context);
 		report_undef(exp);
-		f = reduce(f,yield(exp));
+		f = reduce_yield(f,exp);
 
 		source_label = save_source_label;
 		}

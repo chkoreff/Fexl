@@ -25,9 +25,10 @@ value type_eval(value f)
 	if (!f->L) return 0;
 	{
 	value x = arg(f->R);
-	value y = yield(x);
-	if (x != f->R) return y;
-	return reduce(f,y);
+	if (x != f->R) return V(type_yield,hold(&Qyield),x);
+	f->T = type_yield;
+	drop(x);
+	return f;
 	}
 	}
 
@@ -130,7 +131,12 @@ value reduce_boolean(value f, int x)
 	return reduce_Q(f,(x ? type_T : type_F));
 	}
 
-value yield(value x)
+value reduce_yield(value f, value x)
 	{
-	return V(type_yield,hold(&Qyield), x);
+	drop(f->L);
+	drop(f->R);
+	f->T = type_yield;
+	f->L = hold(&QI);
+	f->R = x;
+	return 0;
 	}
