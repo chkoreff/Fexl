@@ -131,8 +131,8 @@ static void put_type(type t)
 	else if (t == type_var_put) put("var_put");
 
 	else if (t == type_limit_time) put("limit_time");
-	else if (t == type_limit_memory) put("limit_memory");
 	else if (t == type_limit_stack) put("limit_stack");
+	else if (t == type_limit_memory) put("limit_memory");
 
 	else put_ch('?');
 	}

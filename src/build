@@ -9,6 +9,7 @@ make file
 make file2
 make format
 make input
+make limit
 make memory
 make num
 make parse

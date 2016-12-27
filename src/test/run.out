@@ -990,6 +990,27 @@ Sep 30 September
 Oct 31 October
 Nov 30 November
 Dec 31 December
+==
+== put
+[abcdefg3.2TFABCD]
+== say
+[abcdefg
+3.2
+T
+F
+
+ABCD
+]
+== fput
+[abcdefg3.2TFABCD]
+== fsay
+[abcdefg
+3.2
+T
+F
+
+ABCD
+]
 exit 0
 ==== test/a2.fxl
 Hello

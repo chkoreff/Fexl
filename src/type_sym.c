@@ -45,9 +45,8 @@ value app(value f, value g)
 /* Return a function that calls subst(p,e,x) when applied to x. */
 value Qsubst(value p, value e)
 	{
-	static struct value v = { 1, type_subst, 0, 0 };
 	type t = (e->T == type_sym ? type_sym : type_subst);
-	return V(t,V(type_subst,hold(&v),p),e);
+	return V(t,V(type_subst,hold(&QI),p),e);
 	}
 
 /* Return the equivalent of (C x) */

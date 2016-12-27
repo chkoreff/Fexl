@@ -1084,5 +1084,27 @@ each (range 1 12)
 	say [(short_month_name n) " " (ym_num_days 2016 n) " " (long_month_name n)]
 	)
 
+(
+# Try the various kinds of output functions.
+div
+\try=
+(\label\do
+say ["== "label]
+put "["
+do (. "abcde" "fg")
+do (+ 1 2.2)
+do (I T)
+do F
+do (\x\y y)
+do [["" "A"] ["B" "C"] "D"]
+say "]"
+)
+
+try "put" put
+try "say" say
+try "fput" (fput stdout)
+try "fsay" (fsay stdout)
+)
+
 \\
 Extra stuff not parsed.
