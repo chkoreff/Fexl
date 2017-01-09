@@ -757,11 +757,13 @@ try -1.3
 \show_chars=
 	(\f
 	\fh==(fopen tmp_file "r")
-	@\loop
+	(@\loop
 	\ch==(fget fh)
 	is_void ch ();
 	f ch
 	loop
+	)
+	fclose fh
 	)
 
 \remove_file=
@@ -1069,6 +1071,8 @@ say (is_good; flock_ex fh)
 say (is_good; flock_sh fh)
 say (is_good; flock_un fh)
 say (is_good; flock_ex "foo")
+fclose fh
+is_void fh (say "File handle is properly void after close.") ()
 
 limit_time 20
 limit_memory 1000000

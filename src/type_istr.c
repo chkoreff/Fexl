@@ -34,7 +34,7 @@ int sgetc(struct istr *in)
 value Qistr(value x)
 	{
 	struct istr *in = istr_new(x);
-	return D(type_istr,in);
+	return D(type_istr,in,(type)istr_free);
 	}
 
 struct istr *get_istr(value x)
@@ -44,11 +44,6 @@ struct istr *get_istr(value x)
 
 value type_istr(value f)
 	{
-	if (f->N == 0)
-		{
-		istr_free(get_istr(f));
-		return 0;
-		}
 	return type_void(f);
 	}
 

@@ -977,6 +977,7 @@ T
 T
 T
 F
+File handle is properly void after close.
 ==
 Jan 31 January
 Feb 29 February

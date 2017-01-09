@@ -23,6 +23,7 @@ say x
 	\fh==(fopen name "r")
 	is_void fh (error ["Could not open source file " name]);
 	\exp==(parse fh name)
+	fclose fh
 	resolve standard exp
 	)
 

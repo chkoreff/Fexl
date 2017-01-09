@@ -14,11 +14,6 @@ static void sym_free(symbol sym)
 
 value type_sym(value f)
 	{
-	if (f->N == 0)
-		{
-		sym_free(get_sym(f));
-		return 0;
-		}
 	return type_void(f);
 	}
 
@@ -27,7 +22,7 @@ value Qsym(string name, unsigned long line)
 	symbol sym = new_memory(sizeof(struct symbol));
 	sym->name = Qstr(name);
 	sym->line = line;
-	return D(type_sym,sym);
+	return D(type_sym,sym,(type)sym_free);
 	}
 
 symbol get_sym(value x)

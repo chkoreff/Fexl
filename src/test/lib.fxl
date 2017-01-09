@@ -526,6 +526,7 @@ format_num
 	\fh==(eq name "" stdin; fopen name "r")
 	is_void fh (error ["Could not open source file " name]);
 	\exp==(parse fh name)
+	if (ne name "") (fclose fh)
 	resolve context exp
 	)
 

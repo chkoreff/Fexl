@@ -15,11 +15,6 @@ static void form_free(form form)
 
 value type_form(value f)
 	{
-	if (f->N == 0)
-		{
-		form_free(get_form(f));
-		return 0;
-		}
 	return type_void(f);
 	}
 
@@ -28,7 +23,7 @@ value Qform(value label, value exp)
 	form x = new_memory(sizeof(struct form));
 	x->label = label;
 	x->exp = exp;
-	return D(type_form,x);
+	return D(type_form,x,(type)form_free);
 	}
 
 form get_form(value f)

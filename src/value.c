@@ -11,9 +11,8 @@ The T field is the type, a C routine which reduces the value during evaluation.
 The L and R fields are the left and right components of the value.
 If L != 0 and R != 0, the value represents the application of L to R.
 If L == 0 and R == 0, the value represents a primary function.
-If L == 0 and R != 0, the value represents an atom, and R->R points to some
-data.  The reason for the indirection is so I can do inline replacement, but I
-plan to eliminate that technique soon.
+If L == 0 and R != 0, the value represents an atom, and R->R points to the
+atom data, and R->T points to the atom destructor.
 
 The N field also serves to link values on the free list.  It is not strictly
 portable to store a pointer in an unsigned long field, but people have relied
@@ -58,10 +57,9 @@ static void clear(value f)
 		}
 	else if (f->R && --f->R->N == 0) /* Clear atom. */
 		{
-		f->N = 0;
-		f->T(f);
-		push_free(f->R);
+		f->R->T(f->R->R);
 		f->R->R = 0;
+		push_free(f->R);
 		}
 	}
 
@@ -103,10 +101,10 @@ value Q(type T)
 	return V(T,0,0);
 	}
 
-/* Create an atom of type T with the given data. */
-value D(type T, void *data)
+/* Create an atom of type T with the given data and destroy routine. */
+value D(type T, void *data, type destroy)
 	{
-	return V(T,0,V(0,0,data));
+	return V(T,0,V(destroy,0,data));
 	}
 
 /* Return the data from an atom. */
@@ -154,22 +152,22 @@ value type_J(value f)
 	value x = f->R;
 	while (1)
 		{
-		value y;
 		if (x->T == type_J) /* Avoid stacks of J forms. */
 			{
 			x = hold(x->R);
 			drop(f->R);
 			f->R = x;
-			continue;
 			}
-
-		y = x->T(x);
-		if (y == x)
-			continue;
-
-		if (y == 0)
-			replace(f,hold(x));
-		return y;
+		else
+			{
+			value y = x->T(x);
+			if (y == 0)
+				{
+				replace(f,hold(x));
+				return 0;
+				}
+			if (y != x) return y;
+			}
 		}
 	}
 
@@ -203,13 +201,13 @@ value reduce_Q(value f, type T)
 	return 0;
 	}
 
-/* Reduce f to D(T,data). */
-value reduce_D(value f, type T, void *data)
+/* Reduce f to D(T,data,destroy). */
+value reduce_D(value f, type T, void *data, type destroy)
 	{
 	clear(f);
 	f->T = T;
 	f->L = 0;
-	f->R = V(0,0,data);
+	f->R = V(destroy,0,data);
 	return 0;
 	}
 

@@ -13,16 +13,21 @@
 #include <type_num.h>
 #include <type_str.h>
 
+/* Does not close the file handle upon free.  You must do that explicitly with
+fclose. */
+static void file_free(FILE *fh)
+	{
+	(void)fh;
+	}
+
 value type_file(value f)
 	{
-	if (f->N == 0)
-		return 0;
 	return type_void(f);
 	}
 
 value Qfile(FILE *fh)
 	{
-	return D(type_file,fh);
+	return D(type_file,fh,(type)file_free);
 	}
 
 FILE *get_fh(value x)
@@ -53,7 +58,8 @@ value type_fopen(value f)
 	}
 	}
 
-/* (fclose fh) Close the file handle. */
+/* (fclose fh) Close the file handle, and reduce it to void so it doesn't core
+dump if you mistakenly try to close it again. */
 value type_fclose(value f)
 	{
 	if (!f->L) return 0;
@@ -62,6 +68,7 @@ value type_fclose(value f)
 	if (out->T == type_file)
 		{
 		fclose(get_fh(out));
+		reduce_void(out);
 		f = hold(&QI);
 		}
 	else

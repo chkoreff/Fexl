@@ -29,6 +29,7 @@ static void put_type(type t)
 	{
 	if (t == type_A) put_ch('A');
 	else if (t == type_J) put_ch('J');
+	else if (t == type_I) put_ch('I');
 
 	else if (t == type_sym) put("sym");
 	else if (t == type_subst) put("subst");
@@ -64,7 +65,6 @@ static void put_type(type t)
 	else if (t == type_ge) put("ge");
 	else if (t == type_gt) put("gt");
 
-	else if (t == type_I) put_ch('I');
 	else if (t == type_T) put_ch('T');
 	else if (t == type_F) put_ch('F');
 	else if (t == type_Y) put_ch('@');
@@ -111,9 +111,11 @@ static void put_type(type t)
 	else if (t == type_rand) put("rand");
 
 	else if (t == type_standard) put("standard");
-	else if (t == type_parse) put("parse");
-	else if (t == type_resolve) put("resolve");
 	else if (t == type_use) put("use");
+
+	else if (t == type_parse) put("parse");
+
+	else if (t == type_resolve) put("resolve");
 
 	else if (t == type_buf) put("buf");
 	else if (t == type_buf_new) put("buf_new");

@@ -9,17 +9,12 @@
 
 value type_num(value f)
 	{
-	if (f->N == 0)
-		{
-		num_free(get_num(f));
-		return 0;
-		}
 	return type_void(f);
 	}
 
 value Qnum(number x)
 	{
-	return D(type_num,x);
+	return D(type_num,x,(type)num_free);
 	}
 
 value Qnum0(double x)
@@ -46,7 +41,7 @@ double get_double(value x)
 
 value reduce_num(value f, number x)
 	{
-	return reduce_D(f,type_num,x);
+	return reduce_D(f,type_num,x,(type)num_free);
 	}
 
 value type_num_str(value f)
