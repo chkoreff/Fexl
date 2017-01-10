@@ -10,12 +10,17 @@
 
 value type_str(value f)
 	{
+	if (f->T == 0)
+		{
+		str_free(get_str(f));
+		return 0;
+		}
 	return type_void(f);
 	}
 
 value Qstr(string x)
 	{
-	return D(type_str,x,(type)str_free);
+	return D(type_str,x);
 	}
 
 value Qstr0(const char *data)
@@ -35,7 +40,7 @@ const char *str_data(value x)
 
 value reduce_str(value f, string x)
 	{
-	return reduce_D(f,type_str,x,(type)str_free);
+	return reduce_D(f,type_str,x);
 	}
 
 /* (. x y) is the concatenation of strings x and y. */

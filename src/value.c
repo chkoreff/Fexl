@@ -11,8 +11,9 @@ The T field is the type, a C routine which reduces the value during evaluation.
 The L and R fields are the left and right components of the value.
 If L != 0 and R != 0, the value represents the application of L to R.
 If L == 0 and R == 0, the value represents a primary function.
-If L == 0 and R != 0, the value represents an atom, and R->R points to the
-atom data, and R->T points to the atom destructor.
+If L == 0 and R != 0, the value represents an atom, and R->R points to the atom
+data.  The reason for the indirection is so I can do inline replacement, but I
+plan to eliminate that technique soon.
 
 The N field also serves to link values on the free list.  It is not strictly
 portable to store a pointer in an unsigned long field, but people have relied
@@ -57,7 +58,9 @@ static void clear(value f)
 		}
 	else if (f->R && --f->R->N == 0) /* Clear atom. */
 		{
-		f->R->T(f->R->R);
+		type T = f->T;
+		f->T = 0;
+		T(f);
 		f->R->R = 0;
 		push_free(f->R);
 		}
@@ -101,10 +104,10 @@ value Q(type T)
 	return V(T,0,0);
 	}
 
-/* Create an atom of type T with the given data and destroy routine. */
-value D(type T, void *data, type destroy)
+/* Create an atom of type T with the given data. */
+value D(type T, void *data)
 	{
-	return V(T,0,V(destroy,0,data));
+	return V(T,0,V(0,0,data));
 	}
 
 /* Return the data from an atom. */
@@ -201,13 +204,13 @@ value reduce_Q(value f, type T)
 	return 0;
 	}
 
-/* Reduce f to D(T,data,destroy). */
-value reduce_D(value f, type T, void *data, type destroy)
+/* Reduce f to D(T,data). */
+value reduce_D(value f, type T, void *data)
 	{
 	clear(f);
 	f->T = T;
 	f->L = 0;
-	f->R = V(destroy,0,data);
+	f->R = V(0,0,data);
 	return 0;
 	}
 

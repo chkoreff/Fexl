@@ -9,6 +9,11 @@ human user, redefining print to capture output in a memory buffer, etc. */
 
 value type_var(value f)
 	{
+	if (f->T == 0)
+		{
+		drop(get_var(f));
+		return 0;
+		}
 	return type_void(f);
 	}
 
@@ -21,7 +26,7 @@ value get_var(value x)
 value type_var_new(value f)
 	{
 	(void)f;
-	return D(type_var,hold(&Qvoid),(type)drop);
+	return D(type_var,hold(&Qvoid));
 	}
 
 /* (var_get var) returns val, where val is the current value of var. */

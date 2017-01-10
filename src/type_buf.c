@@ -13,6 +13,11 @@ static buffer *get_buf(value x)
 
 value type_buf(value f)
 	{
+	if (f->T == 0)
+		{
+		buf_free(get_buf(f));
+		return 0;
+		}
 	return type_void(f);
 	}
 
@@ -20,7 +25,7 @@ value type_buf(value f)
 value type_buf_new(value f)
 	{
 	(void)f;
-	return D(type_buf,buf_new(),(type)buf_free);
+	return D(type_buf,buf_new());
 	}
 
 /* (buf_put buf str) Appends the string to the buffer. */

@@ -13,21 +13,16 @@
 #include <type_num.h>
 #include <type_str.h>
 
-/* Does not close the file handle upon free.  You must do that explicitly with
-fclose. */
-static void file_free(FILE *fh)
-	{
-	(void)fh;
-	}
-
 value type_file(value f)
 	{
+	if (f->T == 0)
+		return 0;
 	return type_void(f);
 	}
 
 value Qfile(FILE *fh)
 	{
-	return D(type_file,fh,(type)file_free);
+	return D(type_file,fh);
 	}
 
 FILE *get_fh(value x)
