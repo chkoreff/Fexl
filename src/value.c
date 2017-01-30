@@ -34,18 +34,12 @@ static void push_free(value f)
 	free_list = f;
 	}
 
-/* Increment the reference count. */
-value hold(value f)
+/* Pop the first entry off the free list and clear it. */
+static value pop_free(void)
 	{
-	f->N++;
+	value f = free_list;
+	free_list = (value)f->N;
 	return f;
-	}
-
-/* Decrement the reference count and recycle if it drops to zero. */
-void drop(value f)
-	{
-	if (--f->N == 0)
-		push_free(f);
 	}
 
 /* Clear the contents of a value. */
@@ -58,21 +52,30 @@ static void clear(value f)
 		}
 	else if (f->R && --f->R->N == 0) /* Clear atom. */
 		{
-		type T = f->T;
-		f->T = 0;
-		T(f);
+		f->T(f);
 		f->R->R = 0;
 		push_free(f->R);
 		}
 	}
 
-/* Pop the first entry off the free list and clear it. */
-static value pop_free(void)
+static void recycle(value f)
 	{
-	value f = free_list;
-	free_list = (value)f->N;
 	clear(f);
+	push_free(f);
+	}
+
+/* Increment the reference count. */
+value hold(value f)
+	{
+	f->N++;
 	return f;
+	}
+
+/* Decrement the reference count and recycle if it drops to zero. */
+void drop(value f)
+	{
+	if (--f->N == 0)
+		recycle(f);
 	}
 
 static void clear_free_list(void)
@@ -148,8 +151,8 @@ static value replace(value f, value g)
 	return f;
 	}
 
-/* type_J(f) evaluates the right side first, then if possible replaces f with
-the final value.  This ensures proper behavior with the "once" function. */
+/* (J x) Steps the right side until done or an action occurs.  If done, it
+replaces itself with the final value. */
 value type_J(value f)
 	{
 	value x = f->R;

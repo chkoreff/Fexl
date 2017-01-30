@@ -10,7 +10,7 @@
 
 value type_str(value f)
 	{
-	if (f->T == 0)
+	if (f->N == 0)
 		{
 		str_free(get_str(f));
 		return 0;

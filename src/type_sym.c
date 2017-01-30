@@ -14,7 +14,7 @@ static void sym_free(symbol sym)
 
 value type_sym(value f)
 	{
-	if (f->T == 0)
+	if (f->N == 0)
 		{
 		sym_free(get_sym(f));
 		return 0;

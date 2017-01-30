@@ -9,7 +9,7 @@ human user, redefining print to capture output in a memory buffer, etc. */
 
 value type_var(value f)
 	{
-	if (f->T == 0)
+	if (f->N == 0)
 		{
 		drop(get_var(f));
 		return 0;

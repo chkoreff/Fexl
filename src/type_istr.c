@@ -44,7 +44,7 @@ struct istr *get_istr(value x)
 
 value type_istr(value f)
 	{
-	if (f->T == 0)
+	if (f->N == 0)
 		{
 		istr_free(get_istr(f));
 		return 0;

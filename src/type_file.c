@@ -15,7 +15,7 @@
 
 value type_file(value f)
 	{
-	if (f->T == 0)
+	if (f->N == 0)
 		return 0;
 	return type_void(f);
 	}

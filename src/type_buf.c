@@ -13,7 +13,7 @@ static buffer *get_buf(value x)
 
 value type_buf(value f)
 	{
-	if (f->T == 0)
+	if (f->N == 0)
 		{
 		buf_free(get_buf(f));
 		return 0;

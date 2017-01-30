@@ -9,7 +9,7 @@
 
 value type_num(value f)
 	{
-	if (f->T == 0)
+	if (f->N == 0)
 		{
 		num_free(get_num(f));
 		return 0;

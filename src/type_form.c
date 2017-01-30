@@ -15,7 +15,7 @@ static void form_free(form form)
 
 value type_form(value f)
 	{
-	if (f->T == 0)
+	if (f->N == 0)
 		{
 		form_free(get_form(f));
 		return 0;
