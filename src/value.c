@@ -34,7 +34,6 @@ static void push_free(value f)
 	free_list = f;
 	}
 
-/* Pop the first entry off the free list and clear it. */
 static value pop_free(void)
 	{
 	value f = free_list;
