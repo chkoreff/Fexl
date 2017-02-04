@@ -39,6 +39,5 @@ if false; then
 make output
 make output2
 make show
-make trace
 fi
 link fexl
