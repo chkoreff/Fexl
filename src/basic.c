@@ -24,10 +24,9 @@ value type_eval(value f)
 	{
 	if (!f->L) return 0;
 	{
-	value x = arg(f->R);
+	value x = argp(&f->R);
 	if (x != f->R) return V(type_yield,hold(&Qyield),x);
 	f->T = type_yield;
-	drop(x);
 	return f;
 	}
 	}

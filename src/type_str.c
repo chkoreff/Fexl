@@ -30,7 +30,7 @@ value Qstr0(const char *data)
 
 string get_str(value x)
 	{
-	return (string)data(x);
+	return (string)x->R;
 	}
 
 const char *str_data(value x)

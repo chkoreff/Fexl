@@ -14,7 +14,7 @@ value op_getc(value f, type t, input get)
 	value x = arg(f->R);
 	if (x->T == t)
 		{
-		void *source = data(x);
+		void *source = x->R;
 		int ch = get(source);
 		if (ch == -1)
 			f = hold(&Qvoid);
@@ -38,7 +38,7 @@ value op_get(value f, type t, input get)
 	value x = arg(f->R);
 	if (x->T == t)
 		{
-		void *source = data(x);
+		void *source = x->R;
 		string ch = get_utf8(get,source);
 		f = ch ? Qstr(ch) : hold(&Qvoid);
 		}

@@ -27,7 +27,7 @@ value Qfile(FILE *fh)
 
 FILE *get_fh(value x)
 	{
-	return (FILE *)data(x);
+	return (FILE *)x->R;
 	}
 
 /* (fopen path mode) Open a file and return fh, where fh is the open file

@@ -8,7 +8,7 @@
 
 static buffer *get_buf(value x)
 	{
-	return (buffer *)data(x);
+	return (buffer *)x->R;
 	}
 
 value type_buf(value f)

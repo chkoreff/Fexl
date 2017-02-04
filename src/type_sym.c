@@ -32,7 +32,7 @@ value Qsym(string name, unsigned long line)
 
 symbol get_sym(value x)
 	{
-	return (symbol)data(x);
+	return (symbol)x->R;
 	}
 
 /* Apply f to g, where either can be a symbolic form. */

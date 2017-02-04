@@ -186,7 +186,7 @@ void show(value f)
 				show(x->exp);
 				}
 			else if (f->T == type_var)
-				show(get_var(f));
+				show(f->R);
 			else if (f->T == type_buf || f->T == type_istr)
 				put("...");
 			else if (f->T == type_file)

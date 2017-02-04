@@ -11,15 +11,10 @@ value type_var(value f)
 	{
 	if (f->N == 0)
 		{
-		drop(get_var(f));
+		drop(f->R);
 		return 0;
 		}
 	return type_void(f);
-	}
-
-value get_var(value x)
-	{
-	return data(x);
 	}
 
 /* var_new returns a new variable with a void value. */
@@ -36,7 +31,7 @@ value type_var_get(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_var)
-		f = hold(get_var(x));
+		f = hold(x->R);
 	else
 		f = reduce_void(f);
 	drop(x);
@@ -53,8 +48,8 @@ value type_var_put(value f)
 	if (x->T == type_var)
 		{
 		value v = arg(f->R);
-		drop(x->R->R);
-		x->R->R = v;
+		drop(x->R);
+		x->R = v;
 		f = hold(&QI);
 		}
 	else

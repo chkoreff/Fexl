@@ -36,7 +36,7 @@ value Qnum_str0(const char *name)
 
 number get_num(value x)
 	{
-	return (number)data(x);
+	return (number)x->R;
 	}
 
 double get_double(value x)

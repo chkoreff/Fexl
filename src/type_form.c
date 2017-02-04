@@ -33,5 +33,5 @@ value Qform(value label, value exp)
 
 form get_form(value f)
 	{
-	return (form)data(f);
+	return (form)f->R;
 	}

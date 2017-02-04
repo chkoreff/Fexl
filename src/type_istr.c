@@ -39,7 +39,7 @@ value Qistr(value x)
 
 struct istr *get_istr(value x)
 	{
-	return (struct istr *)data(x);
+	return (struct istr *)x->R;
 	}
 
 value type_istr(value f)

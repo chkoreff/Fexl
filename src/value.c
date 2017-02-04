@@ -11,9 +11,7 @@ The T field is the type, a C routine which reduces the value during evaluation.
 The L and R fields are the left and right components of the value.
 If L != 0 and R != 0, the value represents the application of L to R.
 If L == 0 and R == 0, the value represents a primary function.
-If L == 0 and R != 0, the value represents an atom, and R->R points to the atom
-data.  The reason for the indirection is so I can do inline replacement, but I
-plan to eliminate that technique soon.
+If L == 0 and R != 0, the value represents an atom, and R points to the data.
 
 The N field also serves to link values on the free list.  It is not strictly
 portable to store a pointer in an unsigned long field, but people have relied
@@ -49,12 +47,8 @@ static void clear(value f)
 		drop(f->L);
 		drop(f->R);
 		}
-	else if (f->R && --f->R->N == 0) /* Clear atom. */
-		{
+	else if (f->R) /* Clear atom. */
 		f->T(f);
-		f->R->R = 0;
-		push_free(f->R);
-		}
 	}
 
 static void recycle(value f)
@@ -109,22 +103,15 @@ value Q(type T)
 /* Create an atom of type T with the given data. */
 value D(type T, void *data)
 	{
-	return V(T,0,V(0,0,data));
-	}
-
-/* Return the data from an atom. */
-void *data(value f)
-	{
-	return f->R->R;
+	return V(T,0,data);
 	}
 
 /* The type for function application */
 value type_A(value f)
 	{
-	value x = arg(f->L);
+	value x = argp(&f->L);
 	if (x != f->L) return V(x->T,x,hold(f->R));
 	f->T = x->T;
-	drop(x);
 	return f;
 	}
 
@@ -134,24 +121,7 @@ value A(value x, value y)
 	return V(type_A,x,y);
 	}
 
-/* Replace the content of f with the content of g. */
-static value replace(value f, value g)
-	{
-	clear(f);
-
-	if (g->L) hold(g->L);
-	if (g->R) hold(g->R);
-
-	f->T = g->T;
-	f->L = g->L;
-	f->R = g->R;
-
-	drop(g);
-	return f;
-	}
-
-/* (J x) Steps the right side until done or an action occurs.  If done, it
-replaces itself with the final value. */
+/* (J x) Steps the right side until done or an action occurs. */
 value type_J(value f)
 	{
 	value x = f->R;
@@ -166,11 +136,6 @@ value type_J(value f)
 		else
 			{
 			value y = x->T(x);
-			if (y == 0)
-				{
-				replace(f,hold(x));
-				return 0;
-				}
 			if (y != x) return y;
 			}
 		}
@@ -212,7 +177,7 @@ value reduce_D(value f, type T, void *data)
 	clear(f);
 	f->T = T;
 	f->L = 0;
-	f->R = V(0,0,data);
+	f->R = data;
 	return 0;
 	}
 
@@ -232,16 +197,36 @@ value eval(value f)
 	while (1)
 		{
 		value g = f->T(f);
-		if (g == 0) return f;
+		if (g == 0) break;
 		if (g != f)
 			{
 			drop(f);
 			f = g;
 			}
 		}
+
+	if (f->T == type_J)
+		{
+		value r = hold(f->R);
+		drop(f);
+		f = r;
+		}
+	return f;
 	}
 
 value arg(value f)
 	{
 	return eval(hold(f));
+	}
+
+value argp(value *p)
+	{
+	value f = *p;
+	value g = arg(f);
+	if (g == f || (f->T == type_J && g == f->R))
+		{
+		drop(f);
+		*p = g;
+		}
+	return g;
 	}
