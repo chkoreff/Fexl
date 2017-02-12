@@ -106,11 +106,26 @@ value D(type T, void *data)
 	return V(T,0,data);
 	}
 
+value type_H(value f)
+	{
+	value x = argp(&f->R);
+	if (x != f->R) return x;
+	return reduce(f,hold(x));
+	}
+
+static value H(value x)
+	{
+	if (x->T == type_H)
+		return hold(x);
+	else
+		return V(type_H,hold(&QI),hold(x));
+	}
+
 /* The type for function application */
 value type_A(value f)
 	{
 	value x = argp(&f->L);
-	if (x != f->L) return V(x->T,x,hold(f->R));
+	if (x != f->L) return V(x->T,x,H(f->R));
 	f->T = x->T;
 	return f;
 	}
@@ -207,9 +222,9 @@ value eval(value f)
 
 	if (f->T == type_J)
 		{
-		value r = hold(f->R);
+		value g = hold(f->R);
 		drop(f);
-		f = r;
+		f = g;
 		}
 	return f;
 	}

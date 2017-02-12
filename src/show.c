@@ -25,11 +25,12 @@
 #include <type_sym.h>
 #include <type_var.h>
 
-static void put_type(type t)
+void put_type(type t)
 	{
 	if (t == type_A) put_ch('A');
 	else if (t == type_J) put_ch('J');
 	else if (t == type_I) put_ch('I');
+	else if (t == type_H) put_ch('H');
 
 	else if (t == type_sym) put("sym");
 	else if (t == type_subst) put("subst");
