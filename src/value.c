@@ -110,7 +110,7 @@ value type_H(value f)
 	{
 	value x = argp(&f->R);
 	if (x != f->R) return x;
-	return reduce(f,hold(x));
+	return reduce(f,x);
 	}
 
 static value H(value x)
@@ -127,6 +127,7 @@ value type_A(value f)
 	value x = argp(&f->L);
 	if (x != f->L) return V(x->T,x,H(f->R));
 	f->T = x->T;
+	drop(x);
 	return f;
 	}
 
@@ -238,10 +239,10 @@ value argp(value *p)
 	{
 	value f = *p;
 	value g = arg(f);
-	if (g == f || (f->T == type_J && g == f->R))
+	if (f->T == type_J && g == f->R)
 		{
 		drop(f);
-		*p = g;
+		*p = hold(g);
 		}
 	return g;
 	}
