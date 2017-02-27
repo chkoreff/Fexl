@@ -63,7 +63,8 @@ value type_fclose(value f)
 	if (out->T == type_file)
 		{
 		fclose(get_fh(out));
-		reduce_void(out);
+		out->T = type_void;
+		out->R = 0;
 		f = hold(&QI);
 		}
 	else
