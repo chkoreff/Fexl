@@ -164,7 +164,7 @@ value type_I(value f)
 	return f;
 	}
 
-struct value QI = { 1, type_I, 0, 0 };
+struct value QI = { 1, type_I };
 
 /* Reduce f to the equivalent of g. */
 value reduce(value f, value g)

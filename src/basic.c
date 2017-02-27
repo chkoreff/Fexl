@@ -112,13 +112,13 @@ value type_is_good(value f) { return op_predicate(f,op_is_good); }
 value type_is_bool(value f) { return op_predicate(f,op_is_bool); }
 value type_is_list(value f) { return op_predicate(f,op_is_list); }
 
-struct value QT = { 1, type_T, 0, 0 };
-struct value QF = { 1, type_F, 0, 0 };
-struct value Qeval = { 1, type_eval, 0, 0 };
-struct value Qvoid = { 1, type_void, 0, 0 };
-struct value Qyield = { 1, type_yield, 0, 0 };
-struct value Qcons = { 1, type_cons, 0, 0 };
-struct value Qnull = { 1, type_null, 0, 0 };
+struct value QT = { 1, type_T };
+struct value QF = { 1, type_F };
+struct value Qeval = { 1, type_eval };
+struct value Qvoid = { 1, type_void };
+struct value Qyield = { 1, type_yield };
+struct value Qcons = { 1, type_cons };
+struct value Qnull = { 1, type_null };
 
 value reduce_void(value f)
 	{

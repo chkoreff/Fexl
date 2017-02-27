@@ -4,6 +4,7 @@
 #include <value.h>
 
 #include <basic.h>
+#include <die.h>
 #include <string.h> /* strcmp */
 #include <type_buf.h>
 #include <type_cmp.h>
@@ -167,12 +168,6 @@ static value parse_standard(value name)
 	return use_context(Q(type_standard),parse_file(name));
 	}
 
-/* Evaluate a named file in the standard context. */
-value eval_file(const char *name)
-	{
-	return eval(parse_standard(Qstr0(name)));
-	}
-
 /* (use file exp)
 Equivalent to:
 	(use_context (once; parse_file file standard) exp).
@@ -195,4 +190,22 @@ value type_use(value f)
 	drop(name);
 	return f;
 	}
+	}
+
+/* Evaluate a named file in the standard context. */
+void eval_file(const char *name)
+	{
+	drop(eval(parse_standard(Qstr0(name))));
+	end_value();
+	if (0
+		|| QI.N != 1
+		|| QT.N != 1
+		|| QF.N != 1
+		|| Qeval.N != 1
+		|| Qvoid.N != 1
+		|| Qyield.N != 1
+		|| Qcons.N != 1
+		|| Qnull.N != 1
+		)
+		die("XREF");
 	}
