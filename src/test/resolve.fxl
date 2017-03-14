@@ -4,6 +4,7 @@ use "test/common.fxl" \;
 
 use_context
 (
+say "Evaluating the context."
 \speaker=(\name \x put name put " says " say x)
 def "fred" (speaker "Fred");
 def "wilma" (speaker "Wilma");

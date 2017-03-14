@@ -73,8 +73,7 @@ talk
 
 \test_7=
 (
-# This verifies that I, T, and F still use the technique of reducing to type_J
-# instead of direct replacement.
+# This verifies that I, T, and F don't do direct copy-up.
 say "== test_7"
 (
 say "type_I"

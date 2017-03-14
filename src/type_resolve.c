@@ -106,7 +106,7 @@ value type_resolve(value f)
 	if (x->T == type_form)
 		{
 		form form = get_form(x);
-		value context = f->L->R;
+		value context = arg(f->L->R);
 		value exp;
 
 		const char *save_source_label = source_label;
@@ -117,6 +117,7 @@ value type_resolve(value f)
 		f = reduce_yield(f,exp);
 
 		source_label = save_source_label;
+		drop(context);
 		}
 	else
 		f = reduce_void(f);
