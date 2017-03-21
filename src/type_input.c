@@ -25,7 +25,7 @@ value op_getc(value f, type t, input get)
 			}
 		}
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}
@@ -43,7 +43,7 @@ value op_get(value f, type t, input get)
 		f = ch ? Qstr(ch) : hold(&Qvoid);
 		}
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}

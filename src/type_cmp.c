@@ -14,11 +14,11 @@ static value op_cmp(value f, int op(int))
 	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_num && y->T == type_num)
-		f = reduce_boolean(f,op(num_cmp(get_num(x),get_num(y))));
+		f = boolean(op(num_cmp(get_num(x),get_num(y))));
 	else if (x->T == type_str && y->T == type_str)
-		f = reduce_boolean(f,op(str_cmp(get_str(x),get_str(y))));
+		f = boolean(op(str_cmp(get_str(x),get_str(y))));
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	drop(y);
 	return f;

@@ -43,7 +43,7 @@ value type_buf_put(value f)
 		f = hold(&QI);
 		}
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	drop(y);
 	return f;
@@ -64,7 +64,7 @@ value type_buf_get(value f)
 		f = Qstr(str);
 		}
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}

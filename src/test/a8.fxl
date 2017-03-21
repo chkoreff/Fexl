@@ -1,4 +1,6 @@
 #
+use "test/common.fxl" \;
+
 \show3=
 	(\xs
 	say "["
@@ -10,9 +12,9 @@
 	say "]"
 	)
 
-seed_rand 0.1964
-\xs=(@\loop once; \x==rand [x;loop])
+stream_values rand \xs
 
+seed_rand 0.1964
 show3 xs
 show3 xs
 show3 xs

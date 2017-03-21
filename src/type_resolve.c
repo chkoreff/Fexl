@@ -114,13 +114,13 @@ value type_resolve(value f)
 
 		exp = resolve(form->exp,context);
 		report_undef(exp);
-		f = reduce_yield(f,exp);
+		f = yield(exp);
 
 		source_label = save_source_label;
 		drop(context);
 		}
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}

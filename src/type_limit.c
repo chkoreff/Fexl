@@ -17,7 +17,7 @@ static value op_limit(value f, void op(unsigned long))
 		f = hold(&QI);
 		}
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}

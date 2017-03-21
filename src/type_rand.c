@@ -19,7 +19,7 @@ value type_seed_rand(value f)
 		f = hold(&QI);
 		}
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}

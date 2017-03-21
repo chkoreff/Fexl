@@ -614,7 +614,9 @@ y = 6
 ==
 (L)(R)
 8
+(L)(R)
 8
+(L)(R)
 8
 [
 am
@@ -1136,7 +1138,9 @@ exit 0
 == stdout:
 hello
 This goes to stdout.
+x = 7
 This goes to stdout.
+x = 7
 bye
 == stderr:
 This goes to stderr.
@@ -1216,34 +1220,6 @@ PING
 pong
 PING
 PING
-PING
-== test_5
-==
-PING
-pong
-PING
-PING
-PING
-==
-PING
-pong
-PING
-pong
-PING
-pong
-PING
-pong
-== test_6
-PING
-PING
-== test_7
-type_I
-PING
-type_T
-PING
-type_F
-PING
-type_subst
 PING
 exit 0
 ==== test/chars.fxl

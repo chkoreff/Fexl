@@ -1,4 +1,7 @@
 #!/bin/sh
+# Set this flag to enable development code.
+DEV=0
+
 . ./lib_build
 make basic
 make buffer
@@ -34,8 +37,7 @@ make type_str
 make type_sym
 make type_var
 make value
-# These are used only during development.
-if false; then
+if [ $DEV -eq 1 ]; then
 make output
 make output2
 make show

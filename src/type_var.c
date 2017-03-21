@@ -33,7 +33,7 @@ value type_var_get(value f)
 	if (x->T == type_var)
 		f = hold(x->R);
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}
@@ -53,7 +53,7 @@ value type_var_put(value f)
 		f = hold(&QI);
 		}
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}

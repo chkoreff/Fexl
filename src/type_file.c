@@ -46,14 +46,14 @@ value type_fopen(value f)
 		f = fh ? Qfile(fh) : hold(&Qvoid);
 		}
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	drop(y);
 	return f;
 	}
 	}
 
-/* (fclose fh) Close the file handle, and reduce it to void so it doesn't core
+/* (fclose fh) Close the file handle, and set it to void so it doesn't core
 dump if you mistakenly try to close it again. */
 value type_fclose(value f)
 	{
@@ -68,7 +68,7 @@ value type_fclose(value f)
 		f = hold(&QI);
 		}
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(out);
 	return f;
 	}
@@ -100,7 +100,7 @@ value type_remove(value f)
 		f = Qnum0(code);
 		}
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}
@@ -122,7 +122,7 @@ static value op_flock(value f, int operation)
 		f = hold(&QI);
 		}
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}

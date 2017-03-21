@@ -2,62 +2,46 @@
 
 #include <basic.h>
 
-/* Boolean types */
-static value op_boolean(value f, int flag)
+/* (I x) = x */
+value type_I(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
-	return reduce(f,hold(flag ? f->L->R : f->R));
+	if (!f->L) return 0;
+	return hold(f->R);
 	}
 
-value type_T(value f) { return op_boolean(f,1); } /* (T x y) = x */
-value type_F(value f) { return op_boolean(f,0); } /* (F x y) = y */
+/* (T x y) = x */
+value type_T(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	return hold(f->L->R);
+	}
+
+/* (F x) = I */
+value type_F(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	return hold(f->R);
+	}
 
 /* (Y x) = (x (Y x)) */
 value type_Y(value f)
 	{
 	if (!f->L) return 0;
-	return reduce_A(f,hold(f->R),V(type_Y,hold(f->L),hold(f->R)));
-	}
-
-/* (eval x) yields the final value of x. */
-value type_eval(value f)
-	{
-	if (!f->L) return 0;
-	{
-	value x = argp(&f->R);
-	if (x != f->R) return V(type_yield,hold(&Qyield),x);
-	f->T = type_yield;
-	drop(x);
-	return f;
-	}
-	}
-
-/* (once x) = x, but x is evaluated only once. */
-value type_once(value f)
-	{
-	if (!f->L) return 0;
-	return reduce(f,arg(f->R));
+	return A(hold(f->R),hold(f));
 	}
 
 /* (void x) = void */
 value type_void(value f)
 	{
 	if (!f->L) return 0;
-	return reduce_void(f);
-	}
-
-/* (yield x p) = (p x) Used to return a function without evaluating it. */
-value type_yield(value f)
-	{
-	if (!f->L || !f->L->L) return 0;
-	return reduce_A(f,hold(f->R),hold(f->L->R));
+	return hold(&Qvoid);
 	}
 
 /* (cons x y A B) = (B x y) */
 value type_cons(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
-	return reduce_A(f,A(hold(f->R),hold(f->L->L->L->R)),hold(f->L->L->R));
+	return A(A(hold(f->R),hold(f->L->L->L->R)),hold(f->L->L->R));
 	}
 
 /* (null A B) = A */
@@ -66,12 +50,43 @@ value type_null(value f)
 	return type_T(f);
 	}
 
+/* (yield x p) = (p x) Used to return a function without evaluating it. */
+value type_yield(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	return A(hold(f->R),hold(f->L->R));
+	}
+
+/* (eval x) yields the final value of x. */
+value type_eval(value f)
+	{
+	if (!f->L) return 0;
+	return yield(arg(f->R));
+	}
+
+/* (O x) Evaluate x once, replacing the right side with the final value. */
+value type_O(value f)
+	{
+	value x = arg(f->R);
+	drop(f->R);
+	f->T = type_I;
+	f->R = x;
+	return hold(x);
+	}
+
+/* (once x) Yields (O x). */
+value type_once(value f)
+	{
+	if (!f->L) return 0;
+	return yield(V(type_O,hold(&QI),hold(f->R)));
+	}
+
 value op_is_type(value f, type t)
 	{
 	if (!f->L) return 0;
 	{
 	value x = arg(f->R);
-	f = reduce_boolean(f,(x->T == t));
+	f = boolean(x->T == t);
 	drop(x);
 	return f;
 	}
@@ -87,7 +102,7 @@ static value op_predicate(value f, int op(value x))
 	if (!f->L) return 0;
 	{
 	value x = arg(f->R);
-	f = reduce_boolean(f,op(x));
+	f = boolean(op(x));
 	drop(x);
 	return f;
 	}
@@ -113,30 +128,23 @@ value type_is_good(value f) { return op_predicate(f,op_is_good); }
 value type_is_bool(value f) { return op_predicate(f,op_is_bool); }
 value type_is_list(value f) { return op_predicate(f,op_is_list); }
 
+value boolean(int x)
+	{
+	return hold(x ? &QT : &QF);
+	}
+
+value yield(value x)
+	{
+	return AV(hold(&Qyield),x);
+	}
+
+struct value QI = { 1, type_I };
 struct value QT = { 1, type_T };
 struct value QF = { 1, type_F };
-struct value Qeval = { 1, type_eval };
+struct value QY = { 1, type_Y };
 struct value Qvoid = { 1, type_void };
-struct value Qyield = { 1, type_yield };
 struct value Qcons = { 1, type_cons };
 struct value Qnull = { 1, type_null };
-
-value reduce_void(value f)
-	{
-	return reduce_Q(f,type_void);
-	}
-
-value reduce_boolean(value f, int x)
-	{
-	return reduce_Q(f,(x ? type_T : type_F));
-	}
-
-value reduce_yield(value f, value x)
-	{
-	drop(f->L);
-	drop(f->R);
-	f->T = type_yield;
-	f->L = hold(&QI);
-	f->R = x;
-	return 0;
-	}
+struct value Qyield = { 1, type_yield };
+struct value Qeval = { 1, type_eval };
+struct value Qonce = { 1, type_once };

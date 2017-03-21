@@ -10,7 +10,9 @@ use_context
 \tower=
 	(\f @\loop\n\x
 	le n 0 x;
-	loop (- n 1) (f x)
+	\n==(- n 1)
+	\x==(f x)
+	loop n x
 	)
 
 def "append" append;
@@ -72,11 +74,6 @@ void
 	#12 # 122880 words
 	#13 # 245760 words
 	#14 # 491520 words
-
-	# To use 15 you need to raise the limits:
-	# ulimit -s 160000
-	# ulimit -v 800000
-	# ulimit -t 30
 	#15 # 983040 words
 	)
 

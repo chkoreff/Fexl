@@ -2,7 +2,11 @@
 # Append lists xs and ys.
 \append=
 	(\xs\ys
-	(@\loop\xs xs ys \x\xs [x; loop xs])
+	(@\loop\xs
+	xs ys \x\xs
+	\tail=;(loop xs)
+	[x;tail]
+	)
 	xs
 	)
 
@@ -16,13 +20,18 @@
 # Apply f to each element in list xs.
 \map=
 	(\f @\loop \xs
-	xs [] \x\xs [(f x); loop xs]
+	xs [] \x\xs
+	\x==(f x)
+	\tail=;(loop xs)
+	[x;tail]
 	)
 
 # (filter f xs) is the list of items x in xs for which (f x) is true.
 \filter=
 	(\f @\loop \xs
-	xs [] \x\xs f x (cons x) (); loop xs
+	xs [] \x\xs
+	\tail=;(loop xs)
+	f x [x;tail] tail
 	)
 
 # Reverse list xs.
@@ -33,23 +42,30 @@
 	xs []
 	)
 
-# (unique xs) is the ordered list of unique elements in list xs.
-\unique=
-	(@\unique\xs
+# (g_sort lt eq gt unique xs) Generic sort routine.
+# This returns the ordered list of elements in xs.  Elements in the list are
+# compared with the lt, eq, and gt functions.  Duplicate elements are discarded
+# if unique is true.
+\g_sort=
+	(\lt\eq\gt\unique @\sort \xs
 	xs [] \x\xs
-	append (unique; filter (gt x) xs); # all the items less than x
-	cons x;                            # x itself
-	unique; filter (lt x) xs           # all the items greater than x
+
+	\ltx=(filter (gt x) xs)
+	\eqx=(filter (eq x) xs)
+	\gtx=(filter (lt x) xs)
+
+	append (sort ltx);
+	cons x;
+	unique () (append eqx);
+	sort gtx
 	)
 
-# (sort xs) is the ordered list of all elements in list xs.
-\sort=
-	(@\sort\xs
-	xs [] \x\xs
-	append (sort; filter (gt x) xs);   # all the items less than x
-	cons x; append (filter (eq x) xs); # all the items equal to x
-	sort; filter (lt x) xs             # all the items greater than x
-	)
+# The sort and unique functions operate on lists whose elements are all either
+# strings or numbers.
+\sort_normal=(g_sort lt eq gt)
+
+\unique=(sort_normal T)
+\sort=(sort_normal F)
 
 # Using function f and starting value z, run the function forward for each
 # element in the list.
@@ -65,7 +81,8 @@
 	(@\loop\n\xs
 	le n 0 [];
 	xs [] \x\xs
-	[x;loop (- n 1) xs]
+	\n==(- n 1)
+	[x;loop n xs]
 	)
 
 \list_sum=(fold + 0)
@@ -91,13 +108,14 @@
 # Produce the list of values in the range x through y.
 \range=
 	(\x\y
-	\x=(round x)
-	\y=(round y)
-	\d=(le x y 1 -1)
+	\x==(round x)
+	\y==(round y)
+	\d==(le x y 1 -1)
 	(@\loop\x
 	cons x;
 	eq x y [];
-	loop (+ x d)
+	\x==(+ x d)
+	loop x
 	) x
 	)
 
@@ -126,7 +144,8 @@
 	xs void \x\xs
 	lt n 0 void;
 	eq n 0 x;
-	loop xs (- n 1)
+	\n==(- n 1)
+	loop xs n
 	)
 
 # Combine the elements of two lists pairwise.
@@ -134,7 +153,8 @@
 	(\f @\loop\xs\ys
 	xs ys \x\xt
 	ys xs \y\yt
-	cons (f x y) (loop xt yt)
+	\z==(f x y)
+	cons z (loop xt yt)
 	)
 
 \column=(\n\xs map (\row list_at row n) xs)
@@ -145,17 +165,18 @@
 \repeat_str=
 	(\x @\loop \n
 	le n 0 "";
-	. x; loop (- n 1)
+	\n==(- n 1)
+	. x; loop n
 	)
 
 # Split string x into groups of three with the given separator.
 \split3=
 	(\sep @\loop \x
-	\len=(length x)
+	\len==(length x)
 	le len 3 x
-	\pos=(- len 3)
-	\prefix=(slice x 0 pos)
-	\suffix=(slice x pos 3)
+	\pos==(- len 3)
+	\prefix==(slice x 0 pos)
+	\suffix==(slice x pos 3)
 	. (loop prefix) (. sep suffix)
 	)
 
@@ -424,12 +445,13 @@ format_num
 	\QU=~ "~
 	\term=
 		(
-		\check=(\y (is_void (search x y 0)) y)
+		\check=(\y is_void (search x y 0) y)
 		check QU;
 		(@\loop\count
-		\term=(. "~"; num_str count)
+		\term==(. "~"; num_str count)
 		check term;
-		loop (+ count 1)
+		\count==(+ count 1)
+		loop count
 		) 1
 		)
 	. term; . (eq term QU "" " "); . x; term
@@ -542,7 +564,8 @@ format_num
 
 		\use=
 			(\file
-			\cx=(export; once; parse_file file standard I)
+			\cx=;(parse_file file standard I)
+			\cx=(export cx)
 			use_context cx
 			)
 
@@ -580,6 +603,7 @@ def "fold" fold;
 def "format_money" format_money;
 def "format_num" format_num;
 def "format_pct" format_pct;
+def "g_sort" g_sort;
 def "hex_byte" hex_byte;
 def "hex_digit" hex_digit;
 def "hex_digit_to_dec" hex_digit_to_dec;

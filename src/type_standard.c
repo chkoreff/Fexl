@@ -22,6 +22,14 @@
 #include <type_str.h>
 #include <type_var.h>
 
+#if DEV
+#include <file.h>
+#include <memory.h>
+#endif
+
+struct value Qresolve = { 1, type_resolve };
+struct value Qstandard = { 1, type_standard };
+
 static const char *cur_name;
 
 static int match(const char *other)
@@ -32,10 +40,11 @@ static int match(const char *other)
 /* The standard (built-in) context */
 static value standard(void)
 	{
-	if (match("put")) return Q(type_put);
-	if (match("nl")) return Q(type_nl);
+	if (match("put")) return hold(&Qput);
+	if (match("nl")) return hold(&Qnl);
 	if (match("say")) return Q(type_say);
-	if (match("fput")) return Q(type_fput);
+	if (match("fput")) return hold(&Qfput);
+	if (match("fnl")) return hold(&Qfnl);
 	if (match("fsay")) return Q(type_fsay);
 	if (match("fflush")) return Q(type_fflush);
 
@@ -66,12 +75,10 @@ static value standard(void)
 	if (match("T")) return hold(&QT);
 	if (match("F")) return hold(&QF);
 	if (match("@")) return Q(type_Y);
-	if (match("eval")) return hold(&Qeval);
-	if (match("once")) return Q(type_once);
 	if (match("void")) return hold(&Qvoid);
-	if (match("yield")) return hold(&Qyield);
 	if (match("cons")) return hold(&Qcons);
 	if (match("null")) return hold(&Qnull);
+	if (match("yield")) return hold(&Qyield);
 	if (match("is_void")) return Q(type_is_void);
 	if (match("is_good")) return Q(type_is_good);
 	if (match("is_bool")) return Q(type_is_bool);
@@ -108,9 +115,9 @@ static value standard(void)
 	if (match("seed_rand")) return Q(type_seed_rand);
 	if (match("rand")) return Q(type_rand);
 
-	if (match("standard")) return Q(type_standard);
+	if (match("standard")) return hold(&Qstandard);
 	if (match("parse")) return Q(type_parse);
-	if (match("resolve")) return Q(type_resolve);
+	if (match("resolve")) return hold(&Qresolve);
 	if (match("use")) return Q(type_use);
 
 	if (match("buf_new")) return Q(type_buf_new);
@@ -145,12 +152,12 @@ value type_standard(value f)
 		cur_name = str_data(x);
 		def = standard();
 		if (def)
-			f = reduce_yield(f,def);
+			f = yield(def);
 		else
-			f = reduce_void(f);
+			f = hold(&Qvoid);
 		}
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}
@@ -159,18 +166,21 @@ value type_standard(value f)
 /* Return a function which evaluates the expression in the given context. */
 static value use_context(value context, value exp)
 	{
-	return A(A(A(Q(type_resolve),context),exp),hold(&QI));
+	return A(AV(AV(hold(&Qresolve),context),exp),hold(&QI));
 	}
 
 /* Return a function which evaluates the named file in the standard context. */
 static value parse_standard(value name)
 	{
-	return use_context(Q(type_standard),parse_file(name));
+	return use_context(hold(&Qstandard),parse_file(name));
 	}
 
 /* (use file exp)
 Equivalent to:
-	(use_context (once; parse_file file standard) exp).
+	(
+	\context=;(parse_file file standard I)
+	use_context context exp
+	)
 This is used to bootstrap new contexts written in Fexl so you can do this:
 	use "lib.fxl" \; ...
 */
@@ -183,10 +193,10 @@ value type_use(value f)
 		{
 		value context = parse_standard(hold(name));
 		value exp = hold(f->R);
-		f = reduce(f,use_context(context,exp));
+		f = use_context(context,exp);
 		}
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(name);
 	return f;
 	}
@@ -196,16 +206,32 @@ value type_use(value f)
 void eval_file(const char *name)
 	{
 	drop(eval(parse_standard(Qstr0(name))));
+
+	#if DEV
+	if (0)
+	{
+	fput(stderr,"num_steps = ");fput_ulong(stderr,num_steps);fnl(stderr);
+	fput(stderr,"max_bytes = ");fput_ulong(stderr,max_bytes);fnl(stderr);
+	}
+	#endif
+
 	end_value();
 	if (0
 		|| QI.N != 1
 		|| QT.N != 1
 		|| QF.N != 1
-		|| Qeval.N != 1
+		|| QY.N != 1
 		|| Qvoid.N != 1
-		|| Qyield.N != 1
 		|| Qcons.N != 1
 		|| Qnull.N != 1
+		|| Qyield.N != 1
+		|| Qeval.N != 1
+		|| Qonce.N != 1
+		|| Qput.N != 1
+		|| Qnl.N != 1
+		|| Qfput.N != 1
+		|| Qfnl.N != 1
+		|| Qresolve.N != 1
 		)
 		die("XREF");
 	}

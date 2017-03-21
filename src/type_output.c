@@ -11,37 +11,32 @@
 #include <type_output.h>
 #include <type_str.h>
 
-/* LATER 20161216 make this print an infinite list using constant memory */
-static void fputv(FILE *fh, value x)
+static value op_put(FILE *fh, value f)
 	{
-	x = arg(x);
-	if (x->T == type_str)
-		fput_str(fh,get_str(x));
-	else if (x->T == type_num)
-		fput_num(fh,get_num(x));
-	else if (x->T == type_T && !x->L)
-		fput_ch(fh,'T');
-	else if (x->T == type_F && !x->L)
-		fput_ch(fh,'F');
-	else if (x->T == type_cons && x->L && x->L->L)
+	value x = arg(f->R);
+	if (x->T == type_cons && x->L && x->L->L)
+		f = A(AV(hold(f->L),hold(x->L->R)),AV(hold(f->L),hold(x->R)));
+	else
 		{
-		fputv(fh,x->L->R);
-		fputv(fh,x->R);
+		if (x->T == type_str)
+			fput_str(fh,get_str(x));
+		else if (x->T == type_num)
+			fput_num(fh,get_num(x));
+		else if (x->T == type_T && !x->L)
+			fput_ch(fh,'T');
+		else if (x->T == type_F && !x->L)
+			fput_ch(fh,'F');
+
+		f = hold(&QI);
 		}
 	drop(x);
-	}
-
-static void fsayv(FILE *fh, value x)
-	{
-	fputv(fh,x);
-	fnl(fh);
+	return f;
 	}
 
 value type_put(value f)
 	{
 	if (!f->L) return 0;
-	fputv(stdout,f->R);
-	return hold(&QI);
+	return op_put(stdout,f);
 	}
 
 value type_nl(value f)
@@ -54,35 +49,46 @@ value type_nl(value f)
 value type_say(value f)
 	{
 	if (!f->L) return 0;
-	fsayv(stdout,f->R);
-	return hold(&QI);
+	return A(AV(hold(&Qput),hold(f->R)),hold(&Qnl));
 	}
 
-static value op_output(value f, void put(FILE *fh, value x))
+value type_fput(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	{
 	value out = arg(f->L->R);
 	if (out->T == type_file)
-		{
-		put(get_fh(out),f->R);
-		f = hold(&QI);
-		}
+		f = op_put(get_fh(out),f);
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(out);
 	return f;
 	}
 	}
 
-value type_fput(value f)
+value type_fnl(value f)
 	{
-	return op_output(f,fputv);
+	if (!f->L) return 0;
+	{
+	value out = arg(f->R);
+	if (out->T == type_file)
+		{
+		fnl(get_fh(out));
+		f = hold(&QI);
+		}
+	else
+		f = hold(&Qvoid);
+	drop(out);
+	return f;
+	}
 	}
 
 value type_fsay(value f)
 	{
-	return op_output(f,fsayv);
+	if (!f->L || !f->L->L) return 0;
+	return A(
+		AV(AV(hold(&Qfput),hold(f->L->R)),hold(f->R)),
+		AV(hold(&Qfnl),hold(f->L->R)));
 	}
 
 value type_fflush(value f)
@@ -96,8 +102,13 @@ value type_fflush(value f)
 		f = hold(&QI);
 		}
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(out);
 	return f;
 	}
 	}
+
+struct value Qput = { 1, type_put };
+struct value Qnl = { 1, type_nl };
+struct value Qfput = { 1, type_fput };
+struct value Qfnl = { 1, type_fnl };

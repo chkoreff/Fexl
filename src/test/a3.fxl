@@ -4,13 +4,19 @@ say "hello"
 \x=(+ 4 3)
 
 \talk=
-	(
-	(
-	\say=(fsay stderr)
-	say "This goes to stderr."
-	say ["x = " x]
+	(\out\label
+	\put=(fput out)
+	\say=(fsay out)
+	\nl=(fnl out)
+	say ["This goes to "label"."]
+	put ["x = " x]
+	nl
 	)
-	say "This goes to stdout."
+
+\talk=
+	(
+	talk stderr "stderr"
+	talk stdout "stdout"
 	)
 
 talk

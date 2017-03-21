@@ -28,9 +28,6 @@
 void put_type(type t)
 	{
 	if (t == type_A) put_ch('A');
-	else if (t == type_J) put_ch('J');
-	else if (t == type_I) put_ch('I');
-	else if (t == type_H) put_ch('H');
 
 	else if (t == type_sym) put("sym");
 	else if (t == type_subst) put("subst");
@@ -41,6 +38,7 @@ void put_type(type t)
 	else if (t == type_nl) put("nl");
 	else if (t == type_say) put("say");
 	else if (t == type_fput) put("fput");
+	else if (t == type_fnl) put("fnl");
 	else if (t == type_fsay) put("fsay");
 	else if (t == type_fflush) put("fflush");
 
@@ -66,15 +64,17 @@ void put_type(type t)
 	else if (t == type_ge) put("ge");
 	else if (t == type_gt) put("gt");
 
+	else if (t == type_I) put_ch('I');
 	else if (t == type_T) put_ch('T');
 	else if (t == type_F) put_ch('F');
 	else if (t == type_Y) put_ch('@');
-	else if (t == type_eval) put("eval");
-	else if (t == type_once) put("once");
 	else if (t == type_void) put("void");
-	else if (t == type_yield) put("yield");
 	else if (t == type_cons) put("cons");
 	else if (t == type_null) put("null");
+	else if (t == type_yield) put("yield");
+	else if (t == type_eval) put("eval");
+	else if (t == type_O) put_ch('O');
+	else if (t == type_once) put("once");
 	else if (t == type_is_void) put("is_void");
 	else if (t == type_is_good) put("is_good");
 	else if (t == type_is_bool) put("is_bool");

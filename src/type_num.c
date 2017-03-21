@@ -44,20 +44,15 @@ double get_double(value x)
 	return *get_num(x);
 	}
 
-value reduce_num(value f, number x)
-	{
-	return reduce_D(f,type_num,x);
-	}
-
 value type_num_str(value f)
 	{
 	if (!f->L) return 0;
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
-		f = reduce_str(f,num_str(get_num(x)));
+		f = Qstr(num_str(get_num(x)));
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}

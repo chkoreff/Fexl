@@ -35,6 +35,16 @@ symbol get_sym(value x)
 	return (symbol)x->R;
 	}
 
+string sym_name(symbol x)
+	{
+	return get_str(x->name);
+	}
+
+static int sym_eq(symbol x, symbol y)
+	{
+	return str_eq(sym_name(x),sym_name(y));
+	}
+
 /* Apply f to g, where either can be a symbolic form. */
 value app(value f, value g)
 	{
@@ -83,16 +93,6 @@ static value fuse(value x, value y)
 	return Qsubst(p,e);
 	}
 
-string sym_name(symbol x)
-	{
-	return get_str(x->name);
-	}
-
-static int sym_eq(symbol x, symbol y)
-	{
-	return str_eq(sym_name(x),sym_name(y));
-	}
-
 /* Abstract the symbol from exp, returning a form which is a function of that
 symbol, and no longer contains that symbol. */
 value lam(value sym, value exp)
@@ -133,5 +133,5 @@ static value subst(value p, value e, value x)
 value type_subst(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
-	return reduce(f,subst(f->L->L->R,f->L->R,f->R));
+	return subst(f->L->L->R,f->L->R,f->R);
 	}

@@ -9,6 +9,9 @@
 is impossible but I check it anyway in case of software error. */
 static unsigned long cur_blocks = 0;
 static unsigned long cur_bytes = 0;
+#if DEV
+unsigned long max_bytes = 0; /* highwater */
+#endif
 
 /* Return a new span of memory of size num_bytes, or die if not possible. */
 void *new_memory(unsigned long num_bytes)
@@ -20,6 +23,9 @@ void *new_memory(unsigned long num_bytes)
 		die("The program ran out of memory.");
 	cur_blocks++;
 	cur_bytes += num_bytes;
+	#if DEV
+	if (cur_bytes > max_bytes) max_bytes = cur_bytes;
+	#endif
 	return data;
 	}
 	}

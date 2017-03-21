@@ -26,12 +26,12 @@ value type_argv(value f)
 		{
 		int i = get_double(x);
 		if (i >= 0 && i < main_argc)
-			f = reduce_str(f,str_new_data0(main_argv[i]));
+			f = Qstr(str_new_data0(main_argv[i]));
 		else
-			f = reduce_void(f);
+			f = hold(&Qvoid);
 		}
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}

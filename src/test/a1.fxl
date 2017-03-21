@@ -37,7 +37,8 @@ talk
 div
 # Should say PING six times.
 \ping=(say "ping")
-\talk=(ping (once ping))
+\other=;ping
+\talk=(ping other)
 talk
 talk
 talk
@@ -184,8 +185,8 @@ say "== test char_width"
 \str_chars=
 	(\str @\loop \pos
 	ge pos (length str) [];
-	\n=(char_width str pos)
-	\ch=(slice str pos n)
+	\n==(char_width str pos)
+	\ch==(slice str pos n)
 	[ch; loop (+ pos n)]
 	)
 
@@ -303,9 +304,10 @@ And the world is mine to win. ..."
 # Test single evaluation.
 (
 div
+\notify=;(say "(CALC)")
 \show_x=
 	(
-	once (say "(CALC)")
+	notify
 	\x=(* 5 6)
 	say ["x = " x]
 	)
@@ -318,12 +320,14 @@ show_x
 say "]"
 
 (
-\x=(once (put "(CALC)") + 2 (* 7 6))
+\notify=;(put "(CALC)")
+\x=(notify + 2 (* 7 6))
 
 \make_square=
 	(\x
+	\notify=;(put ["square " x "="])
 	yield;
-	once (put ["square " x "="])
+	notify
 	* x x
 	)
 
@@ -504,14 +508,8 @@ show_list (cons 1; cons 2; null)
 
 seed_rand 0.1964
 
-(
-\list_rand=(@\loop once; \x==rand [x;loop])
-demo_rand list_rand
-)
-(
-\list_rand=(@\loop once; \x==rand [x;loop])
-demo_rand list_rand
-)
+stream_values rand demo_rand
+stream_values rand demo_rand
 
 div
 eval_file "test/stats.fxl"
@@ -632,7 +630,7 @@ put list
 )
 
 (
-# Demonstrate that not all side effects repeat.
+# Demonstrate the repetition of side effects.
 div
 \talk=(say (^ (put "(L)" (+ 1 1)) (say "(R)" (- 8 5))))
 talk
@@ -714,9 +712,10 @@ test_context
 
 (
 div
+\notify=;(say "Let's parse.")
 \try=
 (
-once (say "Let's parse.")
+notify
 eval_file "test/hello.fxl"
 )
 
@@ -727,6 +726,7 @@ try
 
 (
 div
+\notify=;(say "Let's parse.")
 \try=
 (
 \source=
@@ -734,7 +734,7 @@ div
 \x say [x " " (* 3 x)]
 ~~
 
-once (say "Let's parse.")
+notify
 eval_str source
 )
 
@@ -812,19 +812,19 @@ This also goes to the file.
 	div
 
 	\open=(fopen tmp_file)
+	\fh_w=;(open "w")
+	\fh_r=;(open "r")
 
 	\put=
 		(\x
 		say ["put " x]
-		\fh=(once; open "w")
-		fput fh x
-		fflush fh  # You must do this.
+		fput fh_w x
+		fflush fh_w  # You must do this.
 		)
 
 	\get=
 		(
-		\fh=(once; open "r")
-		\ch==(fget fh)
+		\ch==(fget fh_r)
 		say ["get " (is_void ch "void" ch)]
 		)
 
@@ -991,6 +991,7 @@ try (reverse; range 1 5)
 div
 \indent=
 	(@\loop\n
+	\n==n
 	le n 0 ();
 	put " ";
 	loop (- n 1)
@@ -999,8 +1000,8 @@ div
 \test_quote=
 	(@\loop\x\n
 	le n 0 nl;
-	\x=(fexl_quote x)
-	\n=(- n 1)
+	\x==(fexl_quote x)
+	\n==(- n 1)
 	indent (* 3 n); say x
 	loop x n
 	)

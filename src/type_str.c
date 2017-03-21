@@ -38,11 +38,6 @@ const char *str_data(value x)
 	return get_str(x)->data;
 	}
 
-value reduce_str(value f, string x)
-	{
-	return reduce_D(f,type_str,x);
-	}
-
 /* (. x y) is the concatenation of strings x and y. */
 value type_concat(value f)
 	{
@@ -51,9 +46,9 @@ value type_concat(value f)
 	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_str)
-		f = reduce_str(f,str_concat(get_str(x),get_str(y)));
+		f = Qstr(str_concat(get_str(x),get_str(y)));
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	drop(y);
 	return f;
@@ -67,9 +62,9 @@ value type_length(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
-		f = reduce_num(f,num_new_ulong(get_str(x)->len));
+		f = Qnum(num_new_ulong(get_str(x)->len));
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}
@@ -89,12 +84,12 @@ value type_slice(value f)
 		double yn = get_double(y);
 		double zn = get_double(z);
 		if (yn >= 0 && zn >= 0)
-			f = reduce_str(f,str_slice(get_str(x),yn,zn));
+			f = Qstr(str_slice(get_str(x),yn,zn));
 		else
-			f = reduce_void(f);
+			f = hold(&Qvoid);
 		}
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	drop(y);
 	drop(z);
@@ -119,15 +114,15 @@ value type_search(value f)
 			string ys = get_str(y);
 			unsigned long pos = str_search(xs,ys,zn);
 			if (pos < xs->len)
-				f = reduce_num(f,num_new_ulong(pos));
+				f = Qnum(num_new_ulong(pos));
 			else
-				f = reduce_void(f);
+				f = hold(&Qvoid);
 			}
 		else
-			f = reduce_void(f);
+			f = hold(&Qvoid);
 		}
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	drop(y);
 	drop(z);
@@ -145,12 +140,12 @@ value type_str_num(value f)
 		{
 		number n = str0_num(str_data(x));
 		if (n)
-			f = reduce_num(f,n);
+			f = Qnum(n);
 		else
-			f = reduce_void(f);
+			f = hold(&Qvoid);
 		}
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}
@@ -165,11 +160,11 @@ value type_ord(value f)
 	if (x->T == type_str)
 		{
 		string xs = get_str(x);
-		f = reduce_num(f,num_new_ulong(xs->len == 0 ? 0 :
+		f = Qnum(num_new_ulong(xs->len == 0 ? 0 :
 			(unsigned char)xs->data[0]));
 		}
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}
@@ -185,10 +180,10 @@ value type_chr(value f)
 		{
 		double xn = get_double(x);
 		char ch = xn;
-		f = reduce_str(f,str_new_data(&ch,1));
+		f = Qstr(str_new_data(&ch,1));
 		}
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}
@@ -212,16 +207,16 @@ value type_char_width(value f)
 			if (pos < xs->len)
 				{
 				char n = char_width(xs->data[pos]);
-				f = reduce_num(f,num_new_ulong(n));
+				f = Qnum(num_new_ulong(n));
 				}
 			else
-				f = reduce_void(f);
+				f = hold(&Qvoid);
 			}
 		else
-			f = reduce_void(f);
+			f = hold(&Qvoid);
 		}
 	else
-		f = reduce_void(f);
+		f = hold(&Qvoid);
 	drop(x);
 	drop(y);
 	return f;
