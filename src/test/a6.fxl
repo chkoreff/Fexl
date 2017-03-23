@@ -32,7 +32,7 @@ say x
 	say "["
 	\f==(parse x)
 	say "]"
-	f
+	return f
 	)
 
 \parse_string=(trace_parse parse_string)
@@ -57,7 +57,7 @@ say ["x = " (+ 3 4)]
 ~
 \get==(readstr program)
 \form==(parse get "")
-resolve standard form \fn
+\fn==(resolve standard form)
 say "got it"
 fn
 )

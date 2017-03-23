@@ -26,7 +26,7 @@ static value resolve_symbol(value x, value context)
 	value exp = eval(A(A(hold(context),hold(x)),hold(&Qyield)));
 	value def;
 
-	if (exp->L && exp->L->T == type_yield)
+	if (exp->L == &Qyield)
 		def = hold(exp->R);
 	else
 		def = 0;
@@ -96,7 +96,7 @@ static void report_undef(value exp)
 	drop(exp);
 	}
 
-/* (resolve context form) Resolve the form in the context and yield the
+/* (resolve context form) Resolve the form in the context and return the
 resulting function. */
 value type_resolve(value f)
 	{
@@ -114,7 +114,7 @@ value type_resolve(value f)
 
 		exp = resolve(form->exp,context);
 		report_undef(exp);
-		f = yield(exp);
+		f = V(type_return,hold(&QI),exp);
 
 		source_label = save_source_label;
 		drop(context);

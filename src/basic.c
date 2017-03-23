@@ -50,18 +50,19 @@ value type_null(value f)
 	return type_T(f);
 	}
 
-/* (yield x p) = (p x) Used to return a function without evaluating it. */
+/* (yield x) = {x}.  This is used to return a symbol definition in the standard
+context. */
 value type_yield(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	return A(hold(f->R),hold(f->L->R));
 	}
 
-/* (eval x) yields the final value of x. */
+/* (eval x next) = (next y), where y is the final value of x. */
 value type_eval(value f)
 	{
-	if (!f->L) return 0;
-	return yield(arg(f->R));
+	if (!f->L || !f->L->L) return 0;
+	return A(hold(f->R),arg(f->L->R));
 	}
 
 /* (O x) Evaluate x once, replacing the right side with the final value. */
@@ -74,11 +75,19 @@ value type_O(value f)
 	return hold(x);
 	}
 
-/* (once x) Yields (O x). */
+/* (once x next) = (next (O x)) */
 value type_once(value f)
 	{
+	if (!f->L || !f->L->L) return 0;
+	return A(hold(f->R),V(type_O,hold(&QI),hold(f->L->R)));
+	}
+
+/* (return x) Returns x without evaluating it. */
+value type_return(value f)
+	{
 	if (!f->L) return 0;
-	return yield(V(type_O,hold(&QI),hold(f->R)));
+	f->T = type_I;
+	return 0;
 	}
 
 value op_is_type(value f, type t)
@@ -131,11 +140,6 @@ value type_is_list(value f) { return op_predicate(f,op_is_list); }
 value boolean(int x)
 	{
 	return hold(x ? &QT : &QF);
-	}
-
-value yield(value x)
-	{
-	return AV(hold(&Qyield),x);
 	}
 
 struct value QI = { 1, type_I };

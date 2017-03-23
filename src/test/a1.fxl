@@ -3,6 +3,7 @@ use "test/common.fxl" \;
 
 \show=
 	(\x
+	\x==x
 	\type=(\t put [t " "] say x)
 	is_str x (type "str");
 	is_num x (type "num");
@@ -12,13 +13,14 @@ use "test/common.fxl" \;
 	)
 
 \parse_string=
-	(\text\context
-	\exp==(parse text "")
-	resolve context exp
+	(\str\context
+	\exp==(parse str "")
+	\f==(resolve context exp)
+	return f
 	)
 
-\eval_file=(\name parse_file name standard I)
-\eval_str=(\str parse_string str standard I)
+\eval_file=(\name \f==(parse_file name standard) f)
+\eval_str=(\str \f==(parse_string str standard) f)
 
 (
 \ping=(say "ping")
@@ -184,6 +186,7 @@ say "== test char_width"
 # Return the list of UTF-8 chars starting from the given position.
 \str_chars=
 	(\str @\loop \pos
+	\pos==pos
 	ge pos (length str) [];
 	\n==(char_width str pos)
 	\ch==(slice str pos n)
@@ -326,7 +329,7 @@ say "]"
 \make_square=
 	(\x
 	\notify=;(put ["square " x "="])
-	yield;
+	return;
 	notify
 	* x x
 	)
@@ -335,8 +338,8 @@ div
 
 say (* x x)
 say (+ x x)
-make_square 4 \s4
-make_square 7 \s7
+\s4==(make_square 4)
+\s7==(make_square 7)
 
 say s4
 say s7
@@ -399,26 +402,26 @@ div
 (
 \x="1234567890123456"
 # Now make a string with length 16*(2^20) = 16,777,216 bytes.
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
+\x==(. x x)
+\x==(. x x)
+\x==(. x x)
+\x==(. x x)
+\x==(. x x)
+\x==(. x x)
+\x==(. x x)
+\x==(. x x)
+\x==(. x x)
+\x==(. x x)
+\x==(. x x)
+\x==(. x x)
+\x==(. x x)
+\x==(. x x)
+\x==(. x x)
+\x==(. x x)
+\x==(. x x)
+\x==(. x x)
+\x==(. x x)
+\x==(. x x)
 put "length is " put (length x) nl
 )
 
@@ -501,6 +504,7 @@ show_list (cons 1; cons 2; null)
 
 \demo_rand=
 	(\list
+	\list=;list
 	div
 	show_list (first 5 list)
 	show_list (first 5 list)
@@ -508,8 +512,10 @@ show_list (cons 1; cons 2; null)
 
 seed_rand 0.1964
 
-stream_values rand demo_rand
-stream_values rand demo_rand
+\list_rand=(stream_values rand)
+
+demo_rand list_rand
+demo_rand list_rand
 
 div
 eval_file "test/stats.fxl"
@@ -676,7 +682,7 @@ eval_file "test/mf.fxl"
 \case_2=
 	(
 	say "["
-	\form=(\context parse_string "say (+ 7 8)" context I)
+	\form=(\context \f==(parse_string "say (+ 7 8)" context) f)
 
 	say "Run in standard context."
 	form standard

@@ -75,6 +75,7 @@ void put_type(type t)
 	else if (t == type_eval) put("eval");
 	else if (t == type_O) put_ch('O');
 	else if (t == type_once) put("once");
+	else if (t == type_return) put("return");
 	else if (t == type_is_void) put("is_void");
 	else if (t == type_is_good) put("is_good");
 	else if (t == type_is_bool) put("is_bool");

@@ -79,10 +79,10 @@
 # Return the first n items of a list.
 \first=
 	(@\loop\n\xs
+	\n==n
 	le n 0 [];
 	xs [] \x\xs
-	\n==(- n 1)
-	[x;loop n xs]
+	[x;loop (- n 1) xs]
 	)
 
 \list_sum=(fold + 0)
@@ -142,10 +142,10 @@
 \list_at=
 	(@\loop\xs\n
 	xs void \x\xs
+	\n==n
 	lt n 0 void;
 	eq n 0 x;
-	\n==(- n 1)
-	loop xs n
+	loop xs (- n 1)
 	)
 
 # Combine the elements of two lists pairwise.
@@ -153,7 +153,7 @@
 	(\f @\loop\xs\ys
 	xs ys \x\xt
 	ys xs \y\yt
-	\z==(f x y)
+	\z=(f x y)
 	cons z (loop xt yt)
 	)
 
@@ -164,19 +164,20 @@
 # Repeat string x n times
 \repeat_str=
 	(\x @\loop \n
+	\n==n
 	le n 0 "";
-	\n==(- n 1)
-	. x; loop n
+	. x; loop (- n 1)
 	)
 
 # Split string x into groups of three with the given separator.
 \split3=
 	(\sep @\loop \x
+	\x==x
 	\len==(length x)
 	le len 3 x
 	\pos==(- len 3)
-	\prefix==(slice x 0 pos)
-	\suffix==(slice x pos 3)
+	\prefix=(slice x 0 pos)
+	\suffix=(slice x pos 3)
 	. (loop prefix) (. sep suffix)
 	)
 
@@ -185,6 +186,8 @@
 \format_num=
 	(\n\sep\x
 	# Get the list of all digits without the decimal point.
+	\n==n
+	\x==x
 	\factor=(^ 10 n)
 	\digits=(num_str; round; * factor (abs x))
 
@@ -241,9 +244,9 @@ format_num
 
 \date_ymd =
 	(\date
-	\year=(date_year date)
-	\month=(slice date 4 2)
-	\day=(slice date 6 2)
+	\year==(date_year date)
+	\month==(slice date 4 2)
+	\day==(slice date 6 2)
 	{year month day}
 	)
 
@@ -256,9 +259,9 @@ format_num
 \date_quarter=
 	(\date
 	date_ymd date \year\month\day
-	\month=(str_num month)
-	\quarter=(+ 1; trunc; / (- month 1) 3)
-	\quarter=(. year; num_str quarter)
+	\month==(str_num month)
+	\quarter==(+ 1; trunc; / (- month 1) 3)
+	\quarter==(. year; num_str quarter)
 	quarter
 	)
 
@@ -326,8 +329,8 @@ format_num
 
 \month_ym=
 	(\month
-	\y=(str_num; slice month 0 4)
-	\m=(str_num; slice month 4 2)
+	\y==(str_num; slice month 0 4)
+	\m==(str_num; slice month 4 2)
 	{y m}
 	)
 
@@ -409,13 +412,13 @@ format_num
 \day_after=
 	(\date
 	date_ymd date \y\m\d
-	\y=(str_num y)
-	\m=(str_num m)
-	\d=(str_num d)
+	\y==(str_num y)
+	\m==(str_num m)
+	\d==(str_num d)
 
-	\max=(ym_num_days y m)
+	\max==(ym_num_days y m)
 
-	\d=(+ d 1)
+	\d==(+ d 1)
 
 	\ymd=
 		(
@@ -460,6 +463,7 @@ format_num
 # Map number 0-15 to one hex digit (lower-case).
 \hex_digit=
 	(\n
+	\n==n
 	lt n 10 (chr (+ 48 n));
 	chr (+ 97 (- n 10))
 	)
@@ -475,7 +479,7 @@ format_num
 # Map digit "0"-"9" or "a"-"f" or "A"-"F" to a decimal number 0-15.
 \hex_digit_to_dec=
 	(\ch
-	\n=(ord ch)
+	\n==(ord ch)
 	and (ge n 48) (le n 57) (- n 48);  # 0-9
 	and (ge n 97) (le n 102) (- n 87); # a-f
 	and (ge n 65) (le n 70) (- n 55);  # A-F
@@ -518,7 +522,7 @@ format_num
 \def=
 	(\key\val\cx
 	\x
-	eq x key (yield val);
+	eq x key {val};
 	cx x
 	)
 
@@ -531,7 +535,8 @@ format_num
 
 \use_context=
 	(\context\exp
-	resolve context exp I
+	\f==(resolve context exp)
+	f
 	)
 
 \NL="
@@ -549,7 +554,8 @@ format_num
 	is_void fh (error ["Could not open source file " name]);
 	\exp==(parse fh name)
 	if (ne name "") (fclose fh)
-	resolve context exp
+	\f==(resolve context exp)
+	return f
 	)
 
 # (export cx) Returns a new context where all of cx is defined, but also the
@@ -564,7 +570,10 @@ format_num
 
 		\use=
 			(\file
-			\cx=;(parse_file file standard I)
+			\cx==(
+				\f==(parse_file file standard)
+				f
+				)
 			\cx=(export cx)
 			use_context cx
 			)

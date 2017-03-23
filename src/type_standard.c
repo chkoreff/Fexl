@@ -78,7 +78,7 @@ static value standard(void)
 	if (match("void")) return hold(&Qvoid);
 	if (match("cons")) return hold(&Qcons);
 	if (match("null")) return hold(&Qnull);
-	if (match("yield")) return hold(&Qyield);
+	if (match("return")) return Q(type_return);
 	if (match("is_void")) return Q(type_is_void);
 	if (match("is_good")) return Q(type_is_good);
 	if (match("is_bool")) return Q(type_is_bool);
@@ -152,7 +152,7 @@ value type_standard(value f)
 		cur_name = str_data(x);
 		def = standard();
 		if (def)
-			f = yield(def);
+			f = AV(hold(&Qyield),def);
 		else
 			f = hold(&Qvoid);
 		}
@@ -166,7 +166,7 @@ value type_standard(value f)
 /* Return a function which evaluates the expression in the given context. */
 static value use_context(value context, value exp)
 	{
-	return A(AV(AV(hold(&Qresolve),context),exp),hold(&QI));
+	return eval(AV(AV(hold(&Qresolve),context),exp));
 	}
 
 /* Return a function which evaluates the named file in the standard context. */
@@ -178,8 +178,9 @@ static value parse_standard(value name)
 /* (use file exp)
 Equivalent to:
 	(
-	\context=;(parse_file file standard I)
-	use_context context exp
+	\context==(\f==(parse_file file standard) f)
+	\f==(resolve context exp)
+	f
 	)
 This is used to bootstrap new contexts written in Fexl so you can do this:
 	use "lib.fxl" \; ...

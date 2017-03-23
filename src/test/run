@@ -37,6 +37,7 @@ run_fexl test/a6.fxl
 run_fexl test/a7.fxl
 run_fexl test/a8.fxl
 run_fexl test/a9.fxl
+run_fexl test/b10.fxl
 run_fexl test/chars.fxl
 
 (
@@ -121,9 +122,9 @@ run_fexl missing.fxl
 (
 cat <<"EOF"
 use "test/common.fxl" \;
-parse_file "missing.fxl" standard \f
-f
+parse_file "missing.fxl" standard
 EOF
+
 ) | run_fexl
 
 # Here I test setting ulimit to terminate misbehaving programs promptly.

@@ -1,0 +1,64 @@
+#
+use "test/common.fxl" \;
+
+# Return the (lazy) list of bytes read from the file handle.
+\file_bytes=
+	(\fh @\loop
+	\ch=;(put "get " fgetc fh)
+	\tail=;loop
+	is_void ch [];
+	cons ch tail
+	)
+
+\fh_entropy==
+	(
+	\source="/dev/urandom" # Normally you'd use this.
+	\source="/dev/zero" # Tests all zeroes.
+	\source="test/a1.fxl" # Testing with fixed file contents.
+	\fh=;(fopen source "r")
+	fh
+	)
+
+\get_bytes=
+	(\n
+	\bytes=;(file_bytes fh_entropy)
+	\bytes=(first 16 bytes)
+	return bytes
+	)
+
+\get_random_id=
+	(
+	\bytes==(get_bytes 16)
+	\bytes=(map (\ch hex_byte (ord ch)) bytes)
+	to_str bytes
+	)
+
+\show=
+	(\xs
+	put "[ "
+	each xs (\x put [(hex_byte;ord x) " "])
+	say "]"
+	)
+
+\show_bytes=
+	(
+	\bytes==(get_bytes 16)
+	show bytes
+	show bytes
+	show bytes
+	nl
+	)
+
+\show_id=
+	(
+	\x==get_random_id
+	say x
+	say x
+	say x
+	nl
+	)
+
+show_bytes
+show_bytes
+show_id
+show_id

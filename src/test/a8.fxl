@@ -12,7 +12,7 @@ use "test/common.fxl" \;
 	say "]"
 	)
 
-stream_values rand \xs
+\xs==(stream_values rand)
 
 seed_rand 0.1964
 show3 xs

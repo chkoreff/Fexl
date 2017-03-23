@@ -1183,7 +1183,7 @@ got it
 x = 7
 exit 0
 ==== test/a7.fxl
-Undefined symbol xsay on line 4 of test/a7.fxl
+Undefined symbol xsay on line 2 of test/a7.fxl
 exit 1
 ==== test/a8.fxl
 [
@@ -1221,6 +1221,24 @@ pong
 PING
 PING
 PING
+exit 0
+==== test/b10.fxl
+[ get 23 get 0a get 75 get 73 get 65 get 20 get 22 get 74 get 65 get 73 get 74 get 2f get 63 get 6f get 6d get 6d ]
+[ 23 0a 75 73 65 20 22 74 65 73 74 2f 63 6f 6d 6d ]
+[ 23 0a 75 73 65 20 22 74 65 73 74 2f 63 6f 6d 6d ]
+
+[ get 6f get 6e get 2e get 66 get 78 get 6c get 22 get 20 get 5c get 3b get 0a get 0a get 5c get 73 get 68 get 6f ]
+[ 6f 6e 2e 66 78 6c 22 20 5c 3b 0a 0a 5c 73 68 6f ]
+[ 6f 6e 2e 66 78 6c 22 20 5c 3b 0a 0a 5c 73 68 6f ]
+
+get get get get get get get get get get get get get get get get 773d0a09285c780a095c783d3d780a09
+773d0a09285c780a095c783d3d780a09
+773d0a09285c780a095c783d3d780a09
+
+get get get get get get get get get get get get get get get get 5c747970653d285c7420707574205b74
+5c747970653d285c7420707574205b74
+5c747970653d285c7420707574205b74
+
 exit 0
 ==== test/chars.fxl
 ==
