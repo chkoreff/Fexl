@@ -14,7 +14,7 @@ use "test/common.fxl" \;
 	(
 	\source="/dev/urandom" # Normally you'd use this.
 	\source="/dev/zero" # Tests all zeroes.
-	\source="test/a1.fxl" # Testing with fixed file contents.
+	\source="test/chars.fxl" # Testing with fixed file contents.
 	\fh=;(fopen source "r")
 	fh
 	)

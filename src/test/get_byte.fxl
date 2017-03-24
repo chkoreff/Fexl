@@ -8,4 +8,6 @@ use "test/common.fxl" \;
 	say ["ch " (hex_byte; ord ch)]
 	echo
 	)
+say "["
 echo
+say "]"

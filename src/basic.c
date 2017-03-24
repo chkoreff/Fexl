@@ -27,7 +27,7 @@ value type_F(value f)
 value type_Y(value f)
 	{
 	if (!f->L) return 0;
-	return A(hold(f->R),hold(f));
+	return AV(arg(f->R),hold(f));
 	}
 
 /* (void x) = void */
@@ -41,7 +41,7 @@ value type_void(value f)
 value type_cons(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
-	return A(A(hold(f->R),hold(f->L->L->L->R)),hold(f->L->L->R));
+	return AV(eval(AV(arg(f->R),hold(f->L->L->L->R))),hold(f->L->L->R));
 	}
 
 /* (null A B) = A */
@@ -50,19 +50,22 @@ value type_null(value f)
 	return type_T(f);
 	}
 
-/* (yield x) = {x}.  This is used to return a symbol definition in the standard
-context. */
+/* (yield x p) = (p x).  This is used to return a symbol definition in the
+standard context. */
 value type_yield(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
-	return A(hold(f->R),hold(f->L->R));
+	return AV(arg(f->R),hold(f->L->R));
 	}
 
 /* (eval x next) = (next y), where y is the final value of x. */
 value type_eval(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
-	return A(hold(f->R),arg(f->L->R));
+	{
+	value x = arg(f->L->R);
+	return AV(arg(f->R),x);
+	}
 	}
 
 /* (O x) Evaluate x once, replacing the right side with the final value. */

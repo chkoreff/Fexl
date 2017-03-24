@@ -211,6 +211,7 @@ void eval_file(const char *name)
 	#if DEV
 	if (0)
 	{
+	fnl(stderr);
 	fput(stderr,"num_steps = ");fput_ulong(stderr,num_steps);fnl(stderr);
 	fput(stderr,"max_bytes = ");fput_ulong(stderr,max_bytes);fnl(stderr);
 	}

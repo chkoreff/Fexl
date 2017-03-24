@@ -1223,21 +1223,21 @@ PING
 PING
 exit 0
 ==== test/b10.fxl
-[ get 23 get 0a get 75 get 73 get 65 get 20 get 22 get 74 get 65 get 73 get 74 get 2f get 63 get 6f get 6d get 6d ]
-[ 23 0a 75 73 65 20 22 74 65 73 74 2f 63 6f 6d 6d ]
-[ 23 0a 75 73 65 20 22 74 65 73 74 2f 63 6f 6d 6d ]
+[ get 23 get 61 get 62 get 63 get 64 get 65 get 66 get 67 get 68 get 69 get 6a get 6b get 6c get 6d get 6e get 6f ]
+[ 23 61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f ]
+[ 23 61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f ]
 
-[ get 6f get 6e get 2e get 66 get 78 get 6c get 22 get 20 get 5c get 3b get 0a get 0a get 5c get 73 get 68 get 6f ]
-[ 6f 6e 2e 66 78 6c 22 20 5c 3b 0a 0a 5c 73 68 6f ]
-[ 6f 6e 2e 66 78 6c 22 20 5c 3b 0a 0a 5c 73 68 6f ]
+[ get 70 get 71 get 72 get 73 get 74 get 75 get 76 get 77 get 78 get 79 get 7a get 0a get 23 get 61 get 62 get 63 ]
+[ 70 71 72 73 74 75 76 77 78 79 7a 0a 23 61 62 63 ]
+[ 70 71 72 73 74 75 76 77 78 79 7a 0a 23 61 62 63 ]
 
-get get get get get get get get get get get get get get get get 773d0a09285c780a095c783d3d780a09
-773d0a09285c780a095c783d3d780a09
-773d0a09285c780a095c783d3d780a09
+get get get get get get get get get get get get get get get get 6465666768696a6b6c6d6e6f70717273
+6465666768696a6b6c6d6e6f70717273
+6465666768696a6b6c6d6e6f70717273
 
-get get get get get get get get get get get get get get get get 5c747970653d285c7420707574205b74
-5c747970653d285c7420707574205b74
-5c747970653d285c7420707574205b74
+get get get get get get get get get get get get get get get get 7475767778797a0a2361626364656667
+7475767778797a0a2361626364656667
+7475767778797a0a2361626364656667
 
 exit 0
 ==== test/chars.fxl
@@ -1267,6 +1267,7 @@ e5b08161e5b08f 封a小 e5b08161e5b08f
 6600f
 exit 0
 ==== test/get_byte.fxl
+[
 ch 61
 ch 62
 ch 63
@@ -1299,6 +1300,7 @@ ch e5
 ch ad
 ch 90
 ch 0a
+]
 exit 0
 ====
 hi

@@ -4,38 +4,31 @@
 do_time()
 	{
 	local usr_cmd="$1"
-	cmd_time=/usr/bin/time
-	if [ -x $cmd_time ]; then
-	# Use the enhanced time command.
-	cmd="$cmd_time -f \"time %es space %MK\" $usr_cmd"
-	( /bin/sh -c "$cmd" ) || exit
-	else
-	# Use the time command built into bash.
-	cmd="\
+	local cmd="\
 TIMEFORMAT=\"time %2Rs\"
 time $usr_cmd"
-	( /bin/bash -c "$cmd" ) || exit
-	fi
+	/bin/bash -c "$cmd" 2>&1
+	}
+
+doing()
+	{
+	local name="$1"
+	echo -n "do $name: "
 	}
 
 do_diff()
 	{
 	local prog="$1"
 	local out="$2"
-	do_time "$prog" | (diff - $out || true) || exit
+	doing $prog
+	do_time "$prog | diff - $out"
 	}
 
 do_diff_fexl()
 	{
 	local name="$1"
-	#echo -n "$name: "
 	local prog="../bin/fexl test/$name.fxl"
 	local out="test/$name.out"
-	do_diff "$prog" $out
-	}
-
-doing()
-	{
-	local name="$1"
-	echo -n "test $name: "
+	doing $name
+	do_time "$prog | diff - $out"
 	}

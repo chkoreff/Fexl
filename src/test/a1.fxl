@@ -1081,12 +1081,15 @@ say (is_good; flock_ex "foo")
 fclose fh
 is_void fh (say "File handle is properly void after close.") ()
 
+if F
+(
 limit_time 20
 limit_memory 1000000
 limit_stack 20000
 # The following would test either out of memory or stack overflow.
 #\list=(@\list append list list)
 #each list say
+)
 )
 
 div
