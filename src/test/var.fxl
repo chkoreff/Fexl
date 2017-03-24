@@ -3,9 +3,9 @@ use "test/common.fxl" \;
 
 ## Here is the "API".
 
-\v_list==var_new
-\v_count==var_new
-\v_map==var_new
+\v_list=var_new
+\v_count=var_new
+\v_map=var_new
 
 var_put v_list []
 var_put v_count 0
@@ -13,7 +13,7 @@ var_put v_map void
 
 \update=
 	(\v\f
-	\x==(var_get v)
+	\x=(var_get v)
 	var_put v (f x)
 	)
 
@@ -22,8 +22,8 @@ var_put v_map void
 	update v (cons x)
 	)
 
-\pairs=(var_get v_list)
-\count=(var_get v_count)
+\pairs=(later; var_get v_list)
+\count=(later; var_get v_count)
 
 \update_map=
 	(\v\key\val
@@ -53,12 +53,12 @@ var_put v_map void
 	update_map v_map key val
 	)
 
-\get=(var_get v_map)
+\get=(later; var_get v_map)
 
 ## Now do some operations.
 
 \show_pairs=
-(
+(later;
 \show_pair=(\pair pair \key\val say ["{ " key " " val " }"])
 say "["
 each pairs show_pair
@@ -72,14 +72,14 @@ say "]"
 
 (
 \set_xyz=
-(
+(later;
 set "x" "3"
 set "y" "4"
 set "z" "5"
 )
 
 \set_q=
-(
+(later;
 set "q" "0"
 )
 

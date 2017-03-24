@@ -78,15 +78,16 @@ value type_O(value f)
 	return hold(x);
 	}
 
-/* (once x next) = (next (O x)) */
+/* (once x) Return a value which will evaluate x at most once. */
 value type_once(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
-	return A(hold(f->R),V(type_O,hold(&QI),hold(f->L->R)));
+	if (!f->L) return 0;
+	f->T = type_O;
+	return 0;
 	}
 
-/* (return x) Returns x without evaluating it. */
-value type_return(value f)
+/* (later x) Return x without evaluating it. */
+value type_later(value f)
 	{
 	if (!f->L) return 0;
 	f->T = type_I;
@@ -154,4 +155,3 @@ struct value Qcons = { 1, type_cons };
 struct value Qnull = { 1, type_null };
 struct value Qyield = { 1, type_yield };
 struct value Qeval = { 1, type_eval };
-struct value Qonce = { 1, type_once };

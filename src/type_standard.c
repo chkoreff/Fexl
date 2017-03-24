@@ -78,7 +78,8 @@ static value standard(void)
 	if (match("void")) return hold(&Qvoid);
 	if (match("cons")) return hold(&Qcons);
 	if (match("null")) return hold(&Qnull);
-	if (match("return")) return Q(type_return);
+	if (match("once")) return Q(type_once);
+	if (match("later")) return Q(type_later);
 	if (match("is_void")) return Q(type_is_void);
 	if (match("is_good")) return Q(type_is_good);
 	if (match("is_bool")) return Q(type_is_bool);
@@ -228,7 +229,6 @@ void eval_file(const char *name)
 		|| Qnull.N != 1
 		|| Qyield.N != 1
 		|| Qeval.N != 1
-		|| Qonce.N != 1
 		|| Qput.N != 1
 		|| Qnl.N != 1
 		|| Qfput.N != 1

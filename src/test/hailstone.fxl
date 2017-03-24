@@ -12,7 +12,7 @@ use "test/common.fxl" \;
 	(@\loop\x
 	cons x;
 	le x 1 [];
-	\x==(is_even x (/ x 2) (+ 1; * x 3))
+	\x=(is_even x (/ x 2) (+ 1; * x 3))
 	loop x
 	)
 

@@ -7,14 +7,15 @@
 	(
 	(@\loop\x\y\n
 	le n 0 x;
-	\z==(+ x y)
-	\n==(- n 1)
+	\z=(+ x y)
+	\n=(- n 1)
 	loop y z n
 	) 0 1
 	)
 
 \try_fib=
 (
+later;
 div
 
 \try=

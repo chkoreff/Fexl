@@ -2,8 +2,8 @@
 use "test/common.fxl" \;
 
 \echo=
-	(@\echo
-	\ch==(fgetc stdin)
+	(later; @\echo
+	\ch=(fgetc stdin)
 	is_void ch ();
 	say ["ch " (hex_byte; ord ch)]
 	echo

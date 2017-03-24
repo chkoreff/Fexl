@@ -5,7 +5,7 @@ use "test/common.fxl" \;
 	(\base\other
 	@\this\n
 	le n 0 base ;
-	\x==(this (- n 1))
+	\x=(this (- n 1))
 	- n (other x)
 	)
 

@@ -4,31 +4,31 @@ use "test/common.fxl" \;
 # Return the (lazy) list of bytes read from the file handle.
 \file_bytes=
 	(\fh @\loop
-	\ch=;(put "get " fgetc fh)
-	\tail=;loop
+	\ch=(once; put "get " fgetc fh)
+	\tail=(once loop)
 	is_void ch [];
 	cons ch tail
 	)
 
-\fh_entropy==
+\fh_entropy=
 	(
 	\source="/dev/urandom" # Normally you'd use this.
 	\source="/dev/zero" # Tests all zeroes.
 	\source="test/chars.fxl" # Testing with fixed file contents.
-	\fh=;(fopen source "r")
+	\fh=(once; fopen source "r")
 	fh
 	)
 
 \get_bytes=
 	(\n
-	\bytes=;(file_bytes fh_entropy)
-	\bytes=(first 16 bytes)
-	return bytes
+	\bytes=(once; file_bytes fh_entropy)
+	\bytes=(later; first 16 bytes)
+	later bytes
 	)
 
 \get_random_id=
-	(
-	\bytes==(get_bytes 16)
+	(later;
+	\bytes=(get_bytes 16)
 	\bytes=(map (\ch hex_byte (ord ch)) bytes)
 	to_str bytes
 	)
@@ -41,8 +41,8 @@ use "test/common.fxl" \;
 	)
 
 \show_bytes=
-	(
-	\bytes==(get_bytes 16)
+	(later;
+	\bytes=(get_bytes 16)
 	show bytes
 	show bytes
 	show bytes
@@ -50,8 +50,8 @@ use "test/common.fxl" \;
 	)
 
 \show_id=
-	(
-	\x==get_random_id
+	(later;
+	\x=get_random_id
 	say x
 	say x
 	say x

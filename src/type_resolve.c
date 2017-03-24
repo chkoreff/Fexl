@@ -114,7 +114,7 @@ value type_resolve(value f)
 
 		exp = resolve(form->exp,context);
 		report_undef(exp);
-		f = V(type_return,hold(&QI),exp);
+		f = V(type_later,hold(&QI),exp);
 
 		source_label = save_source_label;
 		drop(context);

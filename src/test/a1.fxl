@@ -3,7 +3,7 @@ use "test/common.fxl" \;
 
 \show=
 	(\x
-	\x==x
+	\x=x
 	\type=(\t put [t " "] say x)
 	is_str x (type "str");
 	is_num x (type "num");
@@ -14,33 +14,33 @@ use "test/common.fxl" \;
 
 \parse_string=
 	(\str\context
-	\exp==(parse str "")
-	\f==(resolve context exp)
-	return f
+	\exp=(parse str "")
+	\f=(resolve context exp)
+	later f
 	)
 
-\eval_file=(\name \f==(parse_file name standard) f)
-\eval_str=(\str \f==(parse_string str standard) f)
+\eval_file=(\name \f=(parse_file name standard) f)
+\eval_str=(\str \f=(parse_string str standard) f)
 
 (
-\ping=(say "ping")
+\ping=(later; say "ping")
 div
 ping
 div
 I ping
 
 div
-\talk=(ping)
-\talk=(talk talk talk)
-\talk=(talk talk)
-\talk=(talk talk)
+\talk=(later; ping)
+\talk=(later; talk talk talk)
+\talk=(later; talk talk)
+\talk=(later; talk talk)
 talk
 
 div
 # Should say PING six times.
-\ping=(say "ping")
-\other=;ping
-\talk=(ping other)
+\ping=(later; say "ping")
+\other=(once ping)
+\talk=(later; ping other)
 talk
 talk
 talk
@@ -186,10 +186,10 @@ say "== test char_width"
 # Return the list of UTF-8 chars starting from the given position.
 \str_chars=
 	(\str @\loop \pos
-	\pos==pos
+	\pos=pos
 	ge pos (length str) [];
-	\n==(char_width str pos)
-	\ch==(slice str pos n)
+	\n=(char_width str pos)
+	\ch=(slice str pos n)
 	[ch; loop (+ pos n)]
 	)
 
@@ -202,9 +202,9 @@ each list (\ch say ["ch " ch])
 
 (
 say "== test buf"
-\buf==buf_new
+\buf=buf_new
 \put=(buf_put buf)
-\get=(say [": " (buf_get buf)])
+\get=(later; say [": " (buf_get buf)])
 put "abc"
 put "defg"
 get
@@ -307,9 +307,10 @@ And the world is mine to win. ..."
 # Test single evaluation.
 (
 div
-\notify=;(say "(CALC)")
+\notify=(once; say "(CALC)")
 \show_x=
 	(
+	later;
 	notify
 	\x=(* 5 6)
 	say ["x = " x]
@@ -323,13 +324,13 @@ show_x
 say "]"
 
 (
-\notify=;(put "(CALC)")
-\x=(notify + 2 (* 7 6))
+\notify=(once; put "(CALC)")
+\x=(later; notify + 2 (* 7 6))
 
 \make_square=
 	(\x
-	\notify=;(put ["square " x "="])
-	return;
+	\notify=(once; put ["square " x "="])
+	later;
 	notify
 	* x x
 	)
@@ -338,8 +339,8 @@ div
 
 say (* x x)
 say (+ x x)
-\s4==(make_square 4)
-\s7==(make_square 7)
+\s4=(make_square 4)
+\s7=(make_square 7)
 
 say s4
 say s7
@@ -402,26 +403,26 @@ div
 (
 \x="1234567890123456"
 # Now make a string with length 16*(2^20) = 16,777,216 bytes.
-\x==(. x x)
-\x==(. x x)
-\x==(. x x)
-\x==(. x x)
-\x==(. x x)
-\x==(. x x)
-\x==(. x x)
-\x==(. x x)
-\x==(. x x)
-\x==(. x x)
-\x==(. x x)
-\x==(. x x)
-\x==(. x x)
-\x==(. x x)
-\x==(. x x)
-\x==(. x x)
-\x==(. x x)
-\x==(. x x)
-\x==(. x x)
-\x==(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
+\x=(. x x)
 put "length is " put (length x) nl
 )
 
@@ -504,7 +505,7 @@ show_list (cons 1; cons 2; null)
 
 \demo_rand=
 	(\list
-	\list=;list
+	\list=(once list)
 	div
 	show_list (first 5 list)
 	show_list (first 5 list)
@@ -512,7 +513,7 @@ show_list (cons 1; cons 2; null)
 
 seed_rand 0.1964
 
-\list_rand=(stream_values rand)
+\list_rand=(later; stream_values rand)
 
 demo_rand list_rand
 demo_rand list_rand
@@ -638,7 +639,7 @@ put list
 (
 # Demonstrate the repetition of side effects.
 div
-\talk=(say (^ (put "(L)" (+ 1 1)) (say "(R)" (- 8 5))))
+\talk=(later; say (^ (put "(L)" (+ 1 1)) (say "(R)" (- 8 5))))
 talk
 talk
 talk
@@ -650,7 +651,7 @@ eval_file "test/mf.fxl"
 \test_context=
 (
 \case_1=
-	(
+	(later;
 	say "["
 
 	\context=
@@ -680,9 +681,9 @@ eval_file "test/mf.fxl"
 	)
 
 \case_2=
-	(
+	(later;
 	say "["
-	\form=(\context \f==(parse_string "say (+ 7 8)" context) f)
+	\form=(\context \f=(parse_string "say (+ 7 8)" context) f)
 
 	say "Run in standard context."
 	form standard
@@ -695,9 +696,9 @@ eval_file "test/mf.fxl"
 	)
 
 \case_3=
-	(
+	(later;
 	\run=
-	(
+	(later;
 	use_context standard \;
 	say "PING"
 	)
@@ -718,9 +719,9 @@ test_context
 
 (
 div
-\notify=;(say "Let's parse.")
+\notify=(once; say "Let's parse.")
 \try=
-(
+(later;
 notify
 eval_file "test/hello.fxl"
 )
@@ -732,9 +733,9 @@ try
 
 (
 div
-\notify=;(say "Let's parse.")
+\notify=(once; say "Let's parse.")
 \try=
-(
+(later;
 \source=
 ~~
 \x say [x " " (* 3 x)]
@@ -750,21 +751,21 @@ try -1.3
 )
 
 \test_file=
-(
+(later;
 \tmp_file="test/tmp.txt"
 
 \write_file=
 	(\content
-	\fh==(fopen tmp_file "w")
+	\fh=(fopen tmp_file "w")
 	fput fh content
 	fclose fh  # You must do this.
 	)
 
 \show_chars=
 	(\f
-	\fh==(fopen tmp_file "r")
+	\fh=(fopen tmp_file "r")
 	(@\loop
-	\ch==(fget fh)
+	\ch=(fget fh)
 	is_void ch ();
 	f ch
 	loop
@@ -773,13 +774,13 @@ try -1.3
 	)
 
 \remove_file=
-	(
-	\code==(remove tmp_file)
+	(later;
+	\code=(remove tmp_file)
 	say [(eq code 0 "Removed" "Could not remove") " " tmp_file]
 	)
 
 \test_1=
-	(
+	(later;
 	div
 	say ["Write " tmp_file ":"]
 	write_file
@@ -794,7 +795,7 @@ here
 	)
 
 \test_2=
-	(
+	(later;
 	div
 	write_file
 	[
@@ -814,12 +815,12 @@ This also goes to the file.
 # Here I test interleaved writes and reads to the same file, which acts like a
 # queue.
 \test_3=
-	(
+	(later;
 	div
 
-	\open=(fopen tmp_file)
-	\fh_w=;(open "w")
-	\fh_r=;(open "r")
+	\open=(later; fopen tmp_file)
+	\fh_w=(once; open "w")
+	\fh_r=(once; open "r")
 
 	\put=
 		(\x
@@ -829,8 +830,8 @@ This also goes to the file.
 		)
 
 	\get=
-		(
-		\ch==(fget fh_r)
+		(later;
+		\ch=(fget fh_r)
 		say ["get " (is_void ch "void" ch)]
 		)
 
@@ -856,12 +857,12 @@ test_3
 test_file
 
 \test_var=
-(
+(later;
 # In this test I created a little "assembly language" where I hide all the var
 # operations in one place.
 
 # The "!" function creates a read and write pair.
-\!=(\v==var_new {(\x==(var_get v) {x}) (var_put v)})
+\!=(later; \v=var_new {(\x=(var_get v) {x}) (var_put v)})
 
 \fib=
 	(\max
@@ -893,8 +894,8 @@ fib 5
 
 div
 (
-\v==var_new
-\x==(var_get v)
+\v=var_new
+\x=(var_get v)
 var_put v x
 say "Passed var test of 20150907."
 )
@@ -913,7 +914,7 @@ eval_file "test/var.fxl"
 (
 div
 put "("
-\x=(put "x=" 3)
+\x=(later; put "x=" 3)
 put ")"
 say x
 say x
@@ -922,7 +923,7 @@ say x
 (
 div
 put "("
-\x==(put "x=" 3) # Force the evaluation.
+\x=(put "x=" 3) # Force the evaluation.
 put ")"
 say x
 say x
@@ -930,10 +931,10 @@ say x
 )
 (
 div
-\x=(say "hi" 3)
-\x==x # The effect only happens once.
-\x==x
-\x==x
+\x=(later; say "hi" 3)
+\x=x # The effect only happens once.
+\x=x
+\x=x
 )
 )
 
@@ -964,21 +965,21 @@ try 3 "," 0.159265
 
 (
 div
-\talk=(say "Hi")
+\talk=(later; say "Hi")
 talk
 talk
 )
 
 (
 div
-\talk=(say "Hi")
-\x==talk
-\x==talk
+\talk=(later; say "Hi")
+\x=talk
+\x=talk
 )
 
 (
 div
-\talk==(say "Hi")
+\talk=(say "Hi")
 talk
 talk
 )
@@ -997,7 +998,7 @@ try (reverse; range 1 5)
 div
 \indent=
 	(@\loop\n
-	\n==n
+	\n=n
 	le n 0 ();
 	put " ";
 	loop (- n 1)
@@ -1006,8 +1007,8 @@ div
 \test_quote=
 	(@\loop\x\n
 	le n 0 nl;
-	\x==(fexl_quote x)
-	\n==(- n 1)
+	\x=(fexl_quote x)
+	\n=(- n 1)
 	indent (* 3 n); say x
 	loop x n
 	)
@@ -1042,19 +1043,19 @@ div
 
 (
 # Test drop buffer without getting its content.
-\buf==buf_new
+\buf=buf_new
 buf_put buf "x"
 )
 
 # Now test redirecting output to a buffer.
 \result=
-(
-\buf==buf_new
+(later;
+\buf=buf_new
 \put=(\x buf_put buf; to_str x)
-\nl=(buf_put buf NL)
+\nl=(later; buf_put buf NL)
 \say=(\x put x nl)
 (
-\hello=(say "Hello")
+\hello=(later; say "Hello")
 hello
 say ["line " 1]
 say "line 2"
@@ -1072,7 +1073,7 @@ div
 # Here I test the existence of the flock_ and limit_ function calls, though I'm
 # not yet testing their effects.
 
-\fh==(fopen "test/hello.fxl" "r")
+\fh=(fopen "test/hello.fxl" "r")
 say (is_good fh)
 say (is_good; flock_ex fh)
 say (is_good; flock_sh fh)

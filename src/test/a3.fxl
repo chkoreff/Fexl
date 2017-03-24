@@ -7,14 +7,14 @@ say "hello"
 	(\out\label
 	\put=(fput out)
 	\say=(fsay out)
-	\nl=(fnl out)
+	\nl=(later; fnl out)
 	say ["This goes to "label"."]
 	put ["x = " x]
 	nl
 	)
 
 \talk=
-	(
+	(later;
 	talk stderr "stderr"
 	talk stdout "stdout"
 	)

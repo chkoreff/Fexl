@@ -4,7 +4,7 @@
 	(\xs\ys
 	(@\loop\xs
 	xs ys \x\xs
-	\tail=;(loop xs)
+	\tail=(once; loop xs)
 	[x;tail]
 	)
 	xs
@@ -21,8 +21,8 @@
 \map=
 	(\f @\loop \xs
 	xs [] \x\xs
-	\x==(f x)
-	\tail=;(loop xs)
+	\x=(f x)
+	\tail=(once; loop xs)
 	[x;tail]
 	)
 
@@ -30,7 +30,7 @@
 \filter=
 	(\f @\loop \xs
 	xs [] \x\xs
-	\tail=;(loop xs)
+	\tail=(once; loop xs)
 	f x [x;tail] tail
 	)
 
@@ -72,14 +72,14 @@
 \fold=
 	(\f @\loop \z\xs
 	xs z \x\xs
-	\z==(f z x)
+	\z=(f z x)
 	loop z xs
 	)
 
 # Return the first n items of a list.
 \first=
 	(@\loop\n\xs
-	\n==n
+	\n=n
 	le n 0 [];
 	xs [] \x\xs
 	[x;loop (- n 1) xs]
@@ -108,13 +108,13 @@
 # Produce the list of values in the range x through y.
 \range=
 	(\x\y
-	\x==(round x)
-	\y==(round y)
-	\d==(le x y 1 -1)
+	\x=(round x)
+	\y=(round y)
+	\d=(le x y 1 -1)
 	(@\loop\x
 	cons x;
 	eq x y [];
-	\x==(+ x d)
+	\x=(+ x d)
 	loop x
 	) x
 	)
@@ -122,10 +122,10 @@
 # Flatten a piece of data (string, number, or list) into a string.
 \to_str=
 	(\x
-	\buf==buf_new
+	\buf=buf_new
 	\put=(buf_put buf)
 	(@\loop\x
-	\x==x
+	\x=x
 	is_str x (put x);
 	is_num x (put (num_str x));
 	is_list x
@@ -142,7 +142,7 @@
 \list_at=
 	(@\loop\xs\n
 	xs void \x\xs
-	\n==n
+	\n=n
 	lt n 0 void;
 	eq n 0 x;
 	loop xs (- n 1)
@@ -164,7 +164,7 @@
 # Repeat string x n times
 \repeat_str=
 	(\x @\loop \n
-	\n==n
+	\n=n
 	le n 0 "";
 	. x; loop (- n 1)
 	)
@@ -172,10 +172,10 @@
 # Split string x into groups of three with the given separator.
 \split3=
 	(\sep @\loop \x
-	\x==x
-	\len==(length x)
+	\x=x
+	\len=(length x)
 	le len 3 x
-	\pos==(- len 3)
+	\pos=(- len 3)
 	\prefix=(slice x 0 pos)
 	\suffix=(slice x pos 3)
 	. (loop prefix) (. sep suffix)
@@ -186,8 +186,8 @@
 \format_num=
 	(\n\sep\x
 	# Get the list of all digits without the decimal point.
-	\n==n
-	\x==x
+	\n=n
+	\x=x
 	\factor=(^ 10 n)
 	\digits=(num_str; round; * factor (abs x))
 
@@ -244,9 +244,9 @@ format_num
 
 \date_ymd =
 	(\date
-	\year==(date_year date)
-	\month==(slice date 4 2)
-	\day==(slice date 6 2)
+	\year=(date_year date)
+	\month=(slice date 4 2)
+	\day=(slice date 6 2)
 	{year month day}
 	)
 
@@ -259,16 +259,16 @@ format_num
 \date_quarter=
 	(\date
 	date_ymd date \year\month\day
-	\month==(str_num month)
-	\quarter==(+ 1; trunc; / (- month 1) 3)
-	\quarter==(. year; num_str quarter)
+	\month=(str_num month)
+	\quarter=(+ 1; trunc; / (- month 1) 3)
+	\quarter=(. year; num_str quarter)
 	quarter
 	)
 
 # Gather input items into a list.
 \get_list=
 	(\get @\loop
-	\x==get
+	\x=get
 	is_void x [];
 	cons x; loop
 	)
@@ -276,9 +276,9 @@ format_num
 # Gather input strings into a string.
 \get_str=
 	(\get
-	\buf==buf_new
+	\buf=buf_new
 	(@\loop
-	\x==get
+	\x=get
 	is_void x ();
 	buf_put buf x
 	loop
@@ -289,7 +289,7 @@ format_num
 # Gather a list of strings into a string.
 \list_str=
 	(\xs
-	\buf==buf_new
+	\buf=buf_new
 	(@\loop\xs
 	xs () \x\xs
 	buf_put buf x
@@ -302,7 +302,7 @@ format_num
 # Convert a string to a list with a given function.
 \get_str_list=
 	(\get\str
-	\in==(readstr str)
+	\in=(readstr str)
 	get_list (get in)
 	)
 
@@ -329,8 +329,8 @@ format_num
 
 \month_ym=
 	(\month
-	\y==(str_num; slice month 0 4)
-	\m==(str_num; slice month 4 2)
+	\y=(str_num; slice month 0 4)
+	\m=(str_num; slice month 4 2)
 	{y m}
 	)
 
@@ -412,13 +412,13 @@ format_num
 \day_after=
 	(\date
 	date_ymd date \y\m\d
-	\y==(str_num y)
-	\m==(str_num m)
-	\d==(str_num d)
+	\y=(str_num y)
+	\m=(str_num m)
+	\d=(str_num d)
 
-	\max==(ym_num_days y m)
+	\max=(ym_num_days y m)
 
-	\d==(+ d 1)
+	\d=(+ d 1)
 
 	\ymd=
 		(
@@ -451,9 +451,9 @@ format_num
 		\check=(\y is_void (search x y 0) y)
 		check QU;
 		(@\loop\count
-		\term==(. "~"; num_str count)
+		\term=(. "~"; num_str count)
 		check term;
-		\count==(+ count 1)
+		\count=(+ count 1)
 		loop count
 		) 1
 		)
@@ -463,7 +463,7 @@ format_num
 # Map number 0-15 to one hex digit (lower-case).
 \hex_digit=
 	(\n
-	\n==n
+	\n=n
 	lt n 10 (chr (+ 48 n));
 	chr (+ 97 (- n 10))
 	)
@@ -479,7 +479,7 @@ format_num
 # Map digit "0"-"9" or "a"-"f" or "A"-"F" to a decimal number 0-15.
 \hex_digit_to_dec=
 	(\ch
-	\n==(ord ch)
+	\n=(ord ch)
 	and (ge n 48) (le n 57) (- n 48);  # 0-9
 	and (ge n 97) (le n 102) (- n 87); # a-f
 	and (ge n 65) (le n 70) (- n 55);  # A-F
@@ -489,20 +489,20 @@ format_num
 # Map a string specified in hexadecimal into the raw bytes.
 \map_hex_to_raw_bytes=
 	(\str
-	\in==(readstr str)
+	\in=(readstr str)
 	get_str;
-	\nibble=(\x==(sgetc in) hex_digit_to_dec x)
-	\x==nibble
-	\y==nibble
+	\nibble=(later; \x=(sgetc in) hex_digit_to_dec x)
+	\x=nibble
+	\y=nibble
 	chr; + (* 16 x) y
 	)
 
 # Map raw bytes to their hexadecimal values.
 \map_raw_bytes_to_hex=
 	(\str
-	\in==(readstr str)
+	\in=(readstr str)
 	get_str;
-	\x==(sgetc in)
+	\x=(sgetc in)
 	hex_byte; ord; x
 	)
 
@@ -535,7 +535,7 @@ format_num
 
 \use_context=
 	(\context\exp
-	\f==(resolve context exp)
+	\f=(resolve context exp)
 	f
 	)
 
@@ -550,12 +550,12 @@ format_num
 
 \parse_file=
 	(\name\context
-	\fh==(eq name "" stdin; fopen name "r")
+	\fh=(eq name "" stdin; fopen name "r")
 	is_void fh (error ["Could not open source file " name]);
-	\exp==(parse fh name)
+	\exp=(parse fh name)
 	if (ne name "") (fclose fh)
-	\f==(resolve context exp)
-	return f
+	\f=(resolve context exp)
+	later f
 	)
 
 # (export cx) Returns a new context where all of cx is defined, but also the
@@ -570,8 +570,8 @@ format_num
 
 		\use=
 			(\file
-			\cx==(
-				\f==(parse_file file standard)
+			\cx=(
+				\f=(parse_file file standard)
 				f
 				)
 			\cx=(export cx)

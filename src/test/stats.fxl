@@ -2,9 +2,9 @@ use "test/common.fxl" \;
 
 # Normal distribution with mean 0 and standard deviation 1.
 \rand_normal=
-	(
-	\r1==rand
-	\r2==rand
+	(later;
+	\r1=rand
+	\r2=rand
 	* (sqrt; * -2 (log r1)) (cos; * tau r2)
 	)
 
@@ -19,9 +19,9 @@ use "test/common.fxl" \;
 
 \list_variance=
 	(\list
-	\mean==(list_mean list)
-	\diff==(map (\val - val mean) list)
-	\square_diff==(map (\val * val val) diff)
+	\mean=(list_mean list)
+	\diff=(map (\val - val mean) list)
+	\square_diff=(map (\val * val val) diff)
 	list_mean square_diff
 	)
 
@@ -63,7 +63,7 @@ use "test/common.fxl" \;
 
 \put_sharpe=(\sharpe put (format_num 4 "" sharpe))
 \put_ror=(\ror put (format_num 4 "" ror) put "%")
-\p=(say "<p>")
+\p=(later; say "<p>")
 
 (
 say "Average Fund vs. Risk-Free Return"
@@ -93,10 +93,10 @@ put_sharpe excess_sharpe nl
 # Make a random Rate of Return function with given mean and stddev.
 \make_rand_ror=
 	(\pct_mean\pct_stddev
-	\mean==(/ pct_mean 100)
-	\stddev==(/ pct_stddev 100)
-	return;
-	\x==rand_normal
+	\mean=(/ pct_mean 100)
+	\stddev=(/ pct_stddev 100)
+	later;
+	\x=rand_normal
 	\factor=(+ (+ 1 mean) (* stddev x))
 	\ror=(* 100 (- factor 1))
 	ror
@@ -179,16 +179,15 @@ put_sharpe excess_sharpe nl
 0.827713059473001
 ]
 
-\rand_ror==(make_rand_ror 1.4 6.0)
-\list_rand_ror==(stream_values rand_ror)
+\rand_ror=(make_rand_ror 1.4 6.0)
+\list_rand_ror=(stream_values rand_ror)
 
 seed_rand 0.1964
 \len=(list_length benchmark_list_ror)
 \fund_list_ror=(first len list_rand_ror)
 
 \show_returns=
-	(
-	\xs\ys
+	(\xs\ys
 	\show_lists=
 		(@\loop\xs\ys
 		xs () \x\xs

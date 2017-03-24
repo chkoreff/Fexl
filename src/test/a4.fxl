@@ -1,10 +1,11 @@
 #
 \run=
 	(
+	later;
 	(@\loop\x
 	ge x 1000000 ();
 	#ge x 5000000 ();
-	\x==(+ x 1)
+	\x=(+ x 1)
 	loop x
 	) 1
 	)

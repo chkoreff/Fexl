@@ -10,8 +10,8 @@ use_context
 \tower=
 	(\f @\loop\n\x
 	le n 0 x;
-	\n==(- n 1)
-	\x==(f x)
+	\n=(- n 1)
+	\x=(f x)
 	loop n x
 	)
 
