@@ -75,18 +75,15 @@ static value here(void)
 static value combine(value p, value q)
 	{
 	if (p == &QF && q == &QF)
-		{
-		drop(q);
-		return p;
-		}
+		return hold(p);
 	else
-		return A(p,q);
+		return A(hold(p),hold(q));
 	}
 
 /* Return the equivalent of (S x y) */
 static value fuse(value x, value y)
 	{
-	value p = combine(hold(x->L->R),hold(y->L->R));
+	value p = combine(x->L->R,y->L->R);
 	value e = app(hold(x->R),hold(y->R));
 	drop(x);
 	drop(y);

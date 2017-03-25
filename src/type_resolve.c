@@ -14,23 +14,16 @@
 /* Resolve an individual symbol with the context. */
 static value resolve_symbol(value x, value context)
 	{
+	value name = get_sym(x)->name;
 	{
 	/* Define numeric literals. */
-	const char *name = str_data(x);
-	value def = Qnum_str0(name);
+	value def = Qnum_str0(str_data(name));
 	if (def) return def;
 	}
-
 	{
 	/* Define other names using the given context. */
-	value exp = eval(A(A(hold(context),hold(x)),hold(&Qyield)));
-	value def;
-
-	if (exp->L == &Qyield)
-		def = hold(exp->R);
-	else
-		def = 0;
-
+	value exp = eval(A(A(hold(context),hold(name)),hold(&Qyield)));
+	value def = hold((exp->L == &Qyield) ? exp->R : x);
 	drop(exp);
 	return def;
 	}
@@ -42,12 +35,7 @@ static value resolve(value exp, value context)
 	if (exp->T != type_sym)
 		return hold(exp);
 	else if (exp->L == 0)
-		{
-		symbol sym = get_sym(exp);
-		value def = resolve_symbol(sym->name, context);
-		if (!def) def = hold(exp);
-		return def;
-		}
+		return resolve_symbol(exp,context);
 	else
 		{
 		value f = resolve(exp->L,context);
@@ -107,14 +95,13 @@ value type_resolve(value f)
 		{
 		form form = get_form(x);
 		value context = arg(f->L->R);
-		value exp;
 
 		const char *save_source_label = source_label;
 		source_label = str_data(form->label);
 
-		exp = resolve(form->exp,context);
-		report_undef(exp);
-		f = V(type_later,hold(&QI),exp);
+		f = resolve(form->exp,context);
+		report_undef(f);
+		f = V(type_later,hold(&QI),f);
 
 		source_label = save_source_label;
 		drop(context);

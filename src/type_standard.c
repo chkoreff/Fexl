@@ -153,7 +153,7 @@ value type_standard(value f)
 		cur_name = str_data(x);
 		def = standard();
 		if (def)
-			f = AV(hold(&Qyield),def);
+			f = AQ(hold(&Qyield),def);
 		else
 			f = hold(&Qvoid);
 		}
@@ -167,7 +167,7 @@ value type_standard(value f)
 /* Return a function which evaluates the expression in the given context. */
 static value use_context(value context, value exp)
 	{
-	return eval(AV(AV(hold(&Qresolve),context),exp));
+	return eval(AQ(AQ(hold(&Qresolve),context),exp));
 	}
 
 /* Return a function which evaluates the named file in the standard context. */
@@ -234,6 +234,7 @@ void eval_file(const char *name)
 		|| Qfput.N != 1
 		|| Qfnl.N != 1
 		|| Qresolve.N != 1
+		|| Qstandard.N != 1
 		)
 		die("XREF");
 	}
