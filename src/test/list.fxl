@@ -1,0 +1,232 @@
+# Append lists xs and ys.
+\append=
+	(\xs\ys
+	(@\loop\xs
+	xs ys \x\xs
+	\tail=(once; loop xs)
+	[x;tail]
+	)
+	xs
+	)
+
+# Do f for each item in list xs.
+\each=
+	(\xs\f
+	(@\loop\xs xs () \x\xs f x loop xs)
+	xs
+	)
+
+# Apply f to each element in list xs.
+\map=
+	(\f @\loop \xs
+	xs [] \x\xs
+	\x=(f x)
+	\tail=(once; loop xs)
+	[x;tail]
+	)
+
+# (filter f xs) is the list of items x in xs for which (f x) is true.
+\filter=
+	(\f @\loop \xs
+	xs [] \x\xs
+	\tail=(once; loop xs)
+	f x [x;tail] tail
+	)
+
+# Reverse list xs.
+\reverse=
+	(\xs
+	# Push all entries in list xs onto list ys.
+	(@\loop\xs\ys xs ys \x\xs loop xs [x;ys])
+	xs []
+	)
+
+# (g_sort lt eq gt unique xs) Generic sort routine.
+# This returns the ordered list of elements in xs.  Elements in the list are
+# compared with the lt, eq, and gt functions.  Duplicate elements are discarded
+# if unique is true.
+\g_sort=
+	(\lt\eq\gt\unique @\sort \xs
+	xs [] \x\xs
+
+	\ltx=(filter (gt x) xs)
+	\eqx=(filter (eq x) xs)
+	\gtx=(filter (lt x) xs)
+
+	append (sort ltx);
+	cons x;
+	unique () (append eqx);
+	sort gtx
+	)
+
+# The sort and unique functions operate on lists whose elements are all either
+# strings or numbers.
+\sort_normal=(g_sort lt eq gt)
+
+\unique=(sort_normal T)
+\sort=(sort_normal F)
+
+# Using function f and starting value z, run the function forward for each
+# element in the list.
+\fold=
+	(\f @\loop \z\xs
+	xs z \x\xs
+	\z=(f z x)
+	loop z xs
+	)
+
+# Return the first n items of a list.
+\first=
+	(@\loop\n\xs
+	\n=n
+	le n 0 [];
+	xs [] \x\xs
+	[x;loop (- n 1) xs]
+	)
+
+\list_sum=(fold + 0)
+\list_length=(fold (\n\_ + 1 n) 0)
+
+# Produce the list of values in the range x through y.
+\range=
+	(\x\y
+	\x=(round x)
+	\y=(round y)
+	\d=(le x y 1 -1)
+	(@\loop\x
+	cons x;
+	eq x y [];
+	\x=(+ x d)
+	loop x
+	) x
+	)
+
+# (list_at xs n) is the item at position n in list xs, counting from 0.
+\list_at=
+	(@\loop\xs\n
+	xs void \x\xs
+	\n=n
+	lt n 0 void;
+	eq n 0 x;
+	loop xs (- n 1)
+	)
+
+# Combine the elements of two lists pairwise.
+\list_combine=
+	(\f @\loop\xs\ys
+	xs ys \x\xt
+	ys xs \y\yt
+	\z=(f x y)
+	cons z (loop xt yt)
+	)
+
+# Get the nth column of a table.
+\column=(\n\xs map (\row list_at row n) xs)
+
+# Shift the first item off a list.
+\shift=(\xs xs {void []} \x\xs {x xs})
+
+# (stream_values fn) is the infinite list of values of function fn.  This is
+# useful for generating streams of random values.
+\stream_values=
+	(\fn @\loop
+	\x=(once fn)
+	\xs=(once loop)
+	[x;xs]
+	)
+
+# Gather input items into a list.
+\get_list=
+	(\get @\loop
+	\x=get
+	is_void x [];
+	cons x; loop
+	)
+
+# Flatten a piece of data (string, number, or list) into a string.
+\to_str=
+	(\x
+	\buf=buf_new
+	\put=(buf_put buf)
+	(@\loop\x
+	\x=x
+	is_str x (put x);
+	is_num x (put (num_str x));
+	is_list x
+		(
+		x () \x\xs
+		loop x
+		loop xs
+		);
+	) x
+	buf_get buf
+	)
+
+# Gather input strings into a string.
+\get_str=
+	(\get
+	\buf=buf_new
+	(@\loop
+	\x=get
+	is_void x ();
+	buf_put buf x
+	loop
+	)
+	buf_get buf
+	)
+
+# Gather a list of strings into a string.
+\list_str=
+	(\xs
+	\buf=buf_new
+	(@\loop\xs
+	xs () \x\xs
+	buf_put buf x
+	loop xs
+	)
+	xs
+	buf_get buf
+	)
+
+# Convert a string to a list with a given function.
+\get_str_list=
+	(\get\str
+	\in=(readstr str)
+	get_list (get in)
+	)
+
+# Return the list of individual bytes in a string.
+\str_bytes=(get_str_list sgetc)
+
+# Return the list of UTF-8 characters in a string.
+\str_chars=(get_str_list sget)
+
+# Apply a function to each logical character of a string.
+\str_map=(\f\str list_str; map f; str_chars str)
+
+def "append" append;
+def "column" column;
+def "each" each;
+def "filter" filter;
+def "first" first;
+def "fold" fold;
+def "get_list" get_list;
+def "get_str" get_str;
+def "g_sort" g_sort;
+def "list_at" list_at;
+def "list_combine" list_combine;
+def "list_length" list_length;
+def "list_str" list_str;
+def "list_sum" list_sum;
+def "map" map;
+def "range" range;
+def "reverse" reverse;
+def "shift" shift;
+def "sort" sort;
+def "str_bytes" str_bytes;
+def "str_chars" str_chars;
+def "str_map" str_map;
+def "stream_values" stream_values;
+def "to_str" to_str;
+def "unique" unique;
+void

@@ -1,0 +1,87 @@
+#
+\NL="
+"
+
+\format_num=
+(
+# Repeat string x n times
+\repeat_str=
+	(\x @\loop \n
+	\n=n
+	le n 0 "";
+	. x; loop (- n 1)
+	)
+
+# Split string x into groups of three with the given separator.
+\split3=
+	(\sep @\loop \x
+	\x=x
+	\len=(length x)
+	le len 3 x
+	\pos=(- len 3)
+	\prefix=(slice x 0 pos)
+	\suffix=(slice x pos 3)
+	. (loop prefix) (. sep suffix)
+	)
+
+# Format number x to n decimal places, with an optional separator for the
+# integer part.
+\format_num=
+	(\n\sep\x
+	# Get the list of all digits without the decimal point.
+	\n=n
+	\x=x
+	\factor=(^ 10 n)
+	\digits=(num_str; round; * factor (abs x))
+
+	# Pad 0s on the front as needed.
+	\pad=(repeat_str "0" (+ 1 (- n (length digits))))
+	\digits=(. pad digits)
+
+	# Extract integer and fractional part.
+	\pos=(- (length digits) n)
+	\xi=(slice digits 0 pos)
+	\xf=(slice digits pos n)
+
+	# Insert separator if desired.
+	\xi=(eq sep "" xi (split3 sep xi))
+
+	# Put a "." in front of any fractional part.
+	\xf=(eq xf "" "" (. "." xf))
+	# Determine the sign of result.
+	\sign=(lt x 0 "-" "")
+
+	\result=(. sign; . xi xf)
+	result
+	)
+format_num
+)
+
+\format_money=(format_num 2 ",")
+\format_pct=(\amount . (format_num 4 "," (* 100 amount)) "%")
+
+# Quote a string, enclosing it within terminators to make it suitable for
+# reading as a Fexl string.
+\fexl_quote=
+	(\x
+	\QU=~ "~
+	\term=
+		(
+		\check=(\y is_void (search x y 0) y)
+		check QU;
+		(@\loop\count
+		\term=(. "~"; num_str count)
+		check term;
+		\count=(+ count 1)
+		loop count
+		) 1
+		)
+	. term; . (eq term QU "" " "); . x; term
+	)
+
+def "fexl_quote" fexl_quote;
+def "format_money" format_money;
+def "format_num" format_num;
+def "format_pct" format_pct;
+def "NL" NL;
+void

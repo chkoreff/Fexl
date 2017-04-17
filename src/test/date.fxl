@@ -1,0 +1,173 @@
+#
+\long_month_names=
+[
+"January"
+"February"
+"March"
+"April"
+"May"
+"June"
+"July"
+"August"
+"September"
+"October"
+"November"
+"December"
+]
+
+\short_month_names=(map (\name slice name 0 3) long_month_names)
+
+\long_month_name=(\n list_at long_month_names (- n 1))
+\short_month_name=(\n list_at short_month_names (- n 1))
+
+\date_year=(\date slice date 0 4)
+\date_month=(\date slice date 0 6)
+
+\date_ymd =
+	(\date
+	\year=(date_year date)
+	\month=(slice date 4 2)
+	\day=(slice date 6 2)
+	{year month day}
+	)
+
+\date_normal=
+	(\date
+	date_ymd date \year\month\day
+	[month "/" day "/" year]
+	)
+
+\date_quarter=
+	(\date
+	date_ymd date \year\month\day
+	\month=(str_num month)
+	\quarter=(+ 1; trunc; / (- month 1) 3)
+	\quarter=(. year; num_str quarter)
+	quarter
+	)
+
+\month_ym=
+	(\month
+	\y=(str_num; slice month 0 4)
+	\m=(str_num; slice month 4 2)
+	{y m}
+	)
+
+\two_digits=(\x lt x 10 (. "0") (); num_str x)
+
+\ym_month=
+	(\y\m
+	. (num_str y) (two_digits m)
+	)
+
+\ymd_date=
+	(\y\m\d
+	. (ym_month y m) (two_digits d)
+	)
+
+\month_before=
+	(\month
+	month_ym month \y\m
+	eq m 1 {(- y 1) 12} {y (- m 1)} ym_month
+	)
+
+\month_after=
+	(\month
+	month_ym month \y\m
+	eq m 12 {(+ y 1) 1} {y (+ m 1)} ym_month
+	)
+
+# Compute the number of days for a given year and month.
+# I note that "cal 2 1700" shows 29 days, even though according to these rules
+# it should only have 28.
+#
+# Test cases:
+# try 1700 2 28
+# try 1900 2 28
+# try 2000 2 29
+# try 2001 2 28
+# try 2004 2 29
+# try 2015 2 28
+# try 2015 3 31
+
+\ym_num_days=
+	(\y\m
+	\case=(eq m)
+	case 1 31 ;
+	case 2
+		(
+		\case=(\n ne 0 (mod y n))
+		case 4 28 ;
+		case 100 29 ;
+		case 400 28 ;
+		29
+		);
+	case 3 31 ;
+	case 4 30 ;
+	case 5 31 ;
+	case 6 30 ;
+	case 7 31 ;
+	case 8 31 ;
+	case 9 30 ;
+	case 10 31 ;
+	case 11 30 ;
+	case 12 31 ;
+	void
+	)
+
+# If the day is missing, fill in the last day of the month.
+\fill_day=
+	(\date
+	eq (length date) 6
+		(
+		\y=(str_num; slice date 0 4)
+		\m=(str_num; slice date 4 2)
+		\d=(ym_num_days y m)
+		ymd_date y m d
+		);
+	date
+	)
+
+\day_after=
+	(\date
+	date_ymd date \y\m\d
+	\y=(str_num y)
+	\m=(str_num m)
+	\d=(str_num d)
+
+	\max=(ym_num_days y m)
+
+	\d=(+ d 1)
+
+	\ymd=
+		(
+		le d max { y m d };
+		\m=(+ m 1)
+		\d=1
+		le m 12 { y m d };
+		\y=(+ y 1)
+		\m=1
+		{ y m d }
+		)
+
+	ymd ymd_date
+	)
+
+def "date_month" date_month;
+def "date_normal" date_normal;
+def "date_quarter" date_quarter;
+def "date_year" date_year;
+def "date_ymd" date_ymd;
+def "day_after" day_after;
+def "fill_day" fill_day;
+def "long_month_name" long_month_name;
+def "long_month_names" long_month_names;
+def "month_after" month_after;
+def "month_before" month_before;
+def "month_ym" month_ym;
+def "short_month_name" short_month_name;
+def "short_month_names" short_month_names;
+def "ymd_date" ymd_date;
+def "ym_month" ym_month;
+def "ym_num_days" ym_num_days;
+void

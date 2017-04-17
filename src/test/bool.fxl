@@ -1,0 +1,9 @@
+#
+\and=(\x\y x y F)
+\or=(\x\y x T y)
+\not=(\x x F T)
+
+def "and" and;
+def "not" not;
+def "or" or;
+void

@@ -1,0 +1,16 @@
+#
+\neg=(- 0)
+\max=(\x\y gt x y x y)
+\min=(\x\y lt x y x y)
+
+# Compute x modulo n.
+\mod=(\x\n - x; * n; trunc; / x n)
+
+\tau=(* 2 pi)
+
+def "max" max;
+def "min" min;
+def "mod" mod;
+def "neg" neg;
+def "tau" tau;
+void

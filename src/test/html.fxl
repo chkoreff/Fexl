@@ -1,0 +1,24 @@
+# Quote a character for embedding in HTML.
+\quote_ch=
+	(\ch
+	eq ch "&" "&amp;" ;
+	eq ch ~ "~ "&quot;" ;
+	eq ch "<" "&lt;" ;
+	eq ch ">" "&gt;" ;
+	ch
+	)
+
+# Quote a string for embedding in HTML.
+\quote=(str_map quote_ch)
+
+\colgroup=
+	(\widths
+	say "<colgroup>"
+	each widths (\width say ["<col width=" width ">"])
+	say "</colgroup>"
+	)
+
+def "colgroup" colgroup;
+def "quote" quote;
+def "quote_ch" quote_ch;
+void

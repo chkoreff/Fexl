@@ -1,0 +1,63 @@
+# Map number 0-15 to one hex digit (lower-case).
+\hex_digit=
+	(\n
+	\n=n
+	lt n 10 (chr (+ 48 n));
+	chr (+ 97 (- n 10))
+	)
+
+# Map number 0-255 to two hex digits.
+\hex_byte=
+	(\n
+	\hi=(trunc; / n 16)
+	\lo=(mod n 16)
+	. (hex_digit hi) (hex_digit lo)
+	)
+
+# Map digit "0"-"9" or "a"-"f" or "A"-"F" to a decimal number 0-15.
+\hex_digit_to_dec=
+	(\ch
+	\n=(ord ch)
+	and (ge n 48) (le n 57) (- n 48);  # 0-9
+	and (ge n 97) (le n 102) (- n 87); # a-f
+	and (ge n 65) (le n 70) (- n 55);  # A-F
+	void
+	)
+
+# Map a string specified in hexadecimal into the raw bytes.
+\map_hex_to_raw_bytes=
+	(\str
+	\in=(readstr str)
+	get_str;
+	\nibble=(later; \x=(sgetc in) hex_digit_to_dec x)
+	\x=nibble
+	\y=nibble
+	chr; + (* 16 x) y
+	)
+
+# Map raw bytes to their hexadecimal values.
+\map_raw_bytes_to_hex=
+	(\str
+	\in=(readstr str)
+	get_str;
+	\x=(sgetc in)
+	hex_byte; ord; x
+	)
+
+# XOR two hex digit strings together.
+\xor_hex=
+	(\x\y
+	\xl=(map hex_digit_to_dec; str_bytes x)
+	\yl=(map hex_digit_to_dec; str_bytes y)
+	\zl=(list_combine xor xl yl)
+	\zl=(map hex_digit zl)
+	to_str zl
+	)
+
+def "hex_byte" hex_byte;
+def "hex_digit" hex_digit;
+def "hex_digit_to_dec" hex_digit_to_dec;
+def "map_hex_to_raw_bytes" map_hex_to_raw_bytes;
+def "map_raw_bytes_to_hex" map_raw_bytes_to_hex;
+def "xor_hex" xor_hex;
+void
