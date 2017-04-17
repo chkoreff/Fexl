@@ -1,19 +1,4 @@
 # Routines shared by test programs
 use "test/lib.fxl" \;
-\div=(later; say "==")
-\show_list=(\xs say "[" (each xs say) say "]")
-
-# (stream_values fn) is the infinite list of values of function fn.  This is
-# useful for generating streams of random values.
-\stream_values=
-	(\fn @\loop
-	\x=(once fn)
-	\xs=(once loop)
-	[x;xs]
-	)
-
-export;
-def "div" div;
-def "show_list" show_list;
-def "stream_values" stream_values;
-void
+use "test/test.fxl" \;
+standard

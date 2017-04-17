@@ -33,6 +33,5 @@ div
 try 11.2 20.5
 )
 
-export;
 def "try_fib" try_fib;
 void

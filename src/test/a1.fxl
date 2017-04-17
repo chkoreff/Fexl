@@ -378,7 +378,7 @@ void
 )
 \;
 
-use "test/misc.fxl" \;
+use "test/try_fib.fxl" \;
 
 (
 show "x"

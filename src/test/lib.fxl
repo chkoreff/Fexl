@@ -219,6 +219,15 @@ format_num
 
 \shift=(\xs xs {void []} \x\xs {x xs})
 
+# (stream_values fn) is the infinite list of values of function fn.  This is
+# useful for generating streams of random values.
+\stream_values=
+	(\fn @\loop
+	\x=(once fn)
+	\xs=(once loop)
+	[x;xs]
+	)
+
 \long_month_names=
 [
 "January"
@@ -603,7 +612,6 @@ def "day_after" day_after;
 def "def" def;
 def "each" each;
 def "error" error;
-def "export" export;
 def "fexl_quote" fexl_quote;
 def "fill_day" fill_day;
 def "filter" filter;
@@ -646,6 +654,7 @@ def "sort" sort;
 def "str_bytes" str_bytes;
 def "str_chars" str_chars;
 def "str_map" str_map;
+def "stream_values" stream_values;
 def "tau" tau;
 def "to_str" to_str;
 def "unique" unique;
