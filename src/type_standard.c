@@ -179,8 +179,8 @@ static value parse_standard(value name)
 /* (use file exp)
 Equivalent to:
 	(
-	\context==(\f==(parse_file file standard) f)
-	\f==(resolve context exp)
+	\context=(parse_file file standard)
+	\f=(resolve context exp)
 	f
 	)
 This is used to bootstrap new contexts written in Fexl so you can do this:
