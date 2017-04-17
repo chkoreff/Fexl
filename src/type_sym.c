@@ -56,25 +56,25 @@ value app(value f, value g)
 value Qsubst(value p, value e)
 	{
 	type t = (e->T == type_sym ? type_sym : type_subst);
-	return V(t,V(type_subst,hold(&QI),p),e);
+	return V(t,V(type_subst,hold(QI),p),e);
 	}
 
 /* Return the equivalent of (C x) */
 static value keep(value x)
 	{
-	return Qsubst(hold(&QF),hold(x));
+	return Qsubst(hold(QF),hold(x));
 	}
 
 /* Return the equivalent of I. */
 static value here(void)
 	{
-	return Qsubst(hold(&QT),hold(&QI));
+	return Qsubst(hold(QT),hold(QI));
 	}
 
 /* Make a pattern that sends the argument to the left and right as needed. */
 static value combine(value p, value q)
 	{
-	if (p == &QF && q == &QF)
+	if (p == QF && q == QF)
 		return hold(p);
 	else
 		return A(hold(p),hold(q));
@@ -116,11 +116,11 @@ static value subst(value p, value e, value x)
 	{
 	if (p->L)
 		{
-		value L = (p->L == &QF ? hold(e->L) : subst(p->L,e->L,x));
-		value R = (p->R == &QF ? hold(e->R) : subst(p->R,e->R,x));
+		value L = (p->L == QF ? hold(e->L) : subst(p->L,e->L,x));
+		value R = (p->R == QF ? hold(e->R) : subst(p->R,e->R,x));
 		return A(L,R);
 		}
-	else if (p == &QF)
+	else if (p == QF)
 		return hold(e);
 	else
 		return hold(x);

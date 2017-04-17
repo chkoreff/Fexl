@@ -4,7 +4,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <die.h>
 #include <string.h> /* strcmp */
 #include <type_buf.h>
 #include <type_cmp.h>
@@ -27,8 +26,8 @@
 #include <memory.h>
 #endif
 
-struct value Qresolve = { 1, type_resolve };
-struct value Qstandard = { 1, type_standard };
+static value Qresolve;
+static value Qstandard;
 
 static const char *cur_name;
 
@@ -40,11 +39,11 @@ static int match(const char *other)
 /* The standard (built-in) context */
 static value standard(void)
 	{
-	if (match("put")) return hold(&Qput);
-	if (match("nl")) return hold(&Qnl);
+	if (match("put")) return hold(Qput);
+	if (match("nl")) return hold(Qnl);
 	if (match("say")) return Q(type_say);
-	if (match("fput")) return hold(&Qfput);
-	if (match("fnl")) return hold(&Qfnl);
+	if (match("fput")) return hold(Qfput);
+	if (match("fnl")) return hold(Qfnl);
 	if (match("fsay")) return Q(type_fsay);
 	if (match("fflush")) return Q(type_fflush);
 
@@ -71,13 +70,13 @@ static value standard(void)
 	if (match("ge")) return Q(type_ge);
 	if (match("gt")) return Q(type_gt);
 
-	if (match("I")) return hold(&QI);
-	if (match("T")) return hold(&QT);
-	if (match("F")) return hold(&QF);
-	if (match("@")) return Q(type_Y);
-	if (match("void")) return hold(&Qvoid);
-	if (match("cons")) return hold(&Qcons);
-	if (match("null")) return hold(&Qnull);
+	if (match("I")) return hold(QI);
+	if (match("T")) return hold(QT);
+	if (match("F")) return hold(QF);
+	if (match("@")) return hold(QY);
+	if (match("void")) return hold(Qvoid);
+	if (match("cons")) return hold(Qcons);
+	if (match("null")) return hold(Qnull);
 	if (match("once")) return Q(type_once);
 	if (match("later")) return Q(type_later);
 	if (match("is_void")) return Q(type_is_void);
@@ -116,9 +115,9 @@ static value standard(void)
 	if (match("seed_rand")) return Q(type_seed_rand);
 	if (match("rand")) return Q(type_rand);
 
-	if (match("standard")) return hold(&Qstandard);
+	if (match("standard")) return hold(Qstandard);
 	if (match("parse")) return Q(type_parse);
-	if (match("resolve")) return hold(&Qresolve);
+	if (match("resolve")) return hold(Qresolve);
 	if (match("use")) return Q(type_use);
 
 	if (match("buf_new")) return Q(type_buf_new);
@@ -153,12 +152,12 @@ value type_standard(value f)
 		cur_name = str_data(x);
 		def = standard();
 		if (def)
-			f = AQ(hold(&Qyield),def);
+			f = AQ(hold(Qyield),def);
 		else
-			f = hold(&Qvoid);
+			f = hold(Qvoid);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}
@@ -167,13 +166,13 @@ value type_standard(value f)
 /* Return a function which evaluates the expression in the given context. */
 static value use_context(value context, value exp)
 	{
-	return eval(AQ(AQ(hold(&Qresolve),context),exp));
+	return eval(AQ(AQ(hold(Qresolve),context),exp));
 	}
 
 /* Return a function which evaluates the named file in the standard context. */
 static value parse_standard(value name)
 	{
-	return use_context(hold(&Qstandard),parse_file(name));
+	return use_context(hold(Qstandard),parse_file(name));
 	}
 
 /* (use file exp)
@@ -198,15 +197,33 @@ value type_use(value f)
 		f = use_context(context,exp);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(name);
 	return f;
 	}
 	}
 
+static void beg_standard(void)
+	{
+	beg_basic();
+	beg_output();
+	Qresolve = Q(type_resolve);
+	Qstandard = Q(type_standard);
+	}
+
+static void end_standard(void)
+	{
+	end_basic();
+	end_output();
+	drop(Qresolve);
+	drop(Qstandard);
+	end_value();
+	}
+
 /* Evaluate a named file in the standard context. */
 void eval_file(const char *name)
 	{
+	beg_standard();
 	drop(eval(parse_standard(Qstr0(name))));
 
 	#if DEV
@@ -218,23 +235,5 @@ void eval_file(const char *name)
 	}
 	#endif
 
-	end_value();
-	if (0
-		|| QI.N != 1
-		|| QT.N != 1
-		|| QF.N != 1
-		|| QY.N != 1
-		|| Qvoid.N != 1
-		|| Qcons.N != 1
-		|| Qnull.N != 1
-		|| Qyield.N != 1
-		|| Qeval.N != 1
-		|| Qput.N != 1
-		|| Qnl.N != 1
-		|| Qfput.N != 1
-		|| Qfnl.N != 1
-		|| Qresolve.N != 1
-		|| Qstandard.N != 1
-		)
-		die("XREF");
+	end_standard();
 	}

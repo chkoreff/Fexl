@@ -52,7 +52,7 @@ value type_num_str(value f)
 	if (x->T == type_num)
 		f = Qstr(num_str(get_num(x)));
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}

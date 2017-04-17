@@ -28,10 +28,10 @@ value type_argv(value f)
 		if (i >= 0 && i < main_argc)
 			f = Qstr(str_new_data0(main_argv[i]));
 		else
-			f = hold(&Qvoid);
+			f = hold(Qvoid);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}

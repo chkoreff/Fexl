@@ -43,10 +43,10 @@ value type_fopen(value f)
 		string path = get_str(x);
 		string mode = get_str(y);
 		FILE *fh = fopen(path->data,mode->data);
-		f = fh ? Qfile(fh) : hold(&Qvoid);
+		f = fh ? Qfile(fh) : hold(Qvoid);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	drop(y);
 	return f;
@@ -65,10 +65,10 @@ value type_fclose(value f)
 		fclose(get_fh(out));
 		out->T = type_void;
 		out->R = 0;
-		f = hold(&QI);
+		f = hold(QI);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(out);
 	return f;
 	}
@@ -100,7 +100,7 @@ value type_remove(value f)
 		f = Qnum0(code);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}
@@ -119,10 +119,10 @@ static value op_flock(value f, int operation)
 			perror("flock");
 			die(0);
 			}
-		f = hold(&QI);
+		f = hold(QI);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}

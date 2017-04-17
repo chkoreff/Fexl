@@ -68,10 +68,10 @@ value type_parse(value f)
 		else if (source->T == type_istr)
 			f = parse_istr(get_istr(source),hold(label));
 		else
-			f = hold(&Qvoid);
+			f = hold(Qvoid);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(source);
 	drop(label);
 	return f;

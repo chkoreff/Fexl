@@ -21,7 +21,7 @@ value type_var(value f)
 value type_var_new(value f)
 	{
 	(void)f;
-	return D(type_var,hold(&Qvoid));
+	return D(type_var,hold(Qvoid));
 	}
 
 /* (var_get var) returns val, where val is the current value of var. */
@@ -33,7 +33,7 @@ value type_var_get(value f)
 	if (x->T == type_var)
 		f = hold(x->R);
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}
@@ -50,10 +50,10 @@ value type_var_put(value f)
 		value v = arg(f->R);
 		drop(x->R);
 		x->R = v;
-		f = hold(&QI);
+		f = hold(QI);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}

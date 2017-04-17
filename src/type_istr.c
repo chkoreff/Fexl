@@ -61,7 +61,7 @@ value type_readstr(value f)
 	if (x->T == type_str)
 		f = Qistr(hold(x));
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}

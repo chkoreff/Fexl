@@ -40,10 +40,10 @@ value type_buf_put(value f)
 		buffer *buf = get_buf(x);
 		string str = get_str(y);
 		buf_put(buf,str);
-		f = hold(&QI);
+		f = hold(QI);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	drop(y);
 	return f;
@@ -64,7 +64,7 @@ value type_buf_get(value f)
 		f = Qstr(str);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}

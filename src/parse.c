@@ -236,23 +236,23 @@ static value parse_list(void)
 		{
 		value term = parse_term();
 		if (term == 0)
-			return hold(&Qnull);
+			return hold(Qnull);
 		else
-			return app(app(hold(&Qcons),term),parse_list());
+			return app(app(hold(Qcons),term),parse_list());
 		}
 	}
 
 static value parse_tuple(void)
 	{
-	value pattern = hold(&QT);
-	value exp = hold(&QI);
+	value pattern = hold(QT);
+	value exp = hold(QI);
 	while (1)
 		{
 		value term;
 		skip_filler();
 		term = parse_term();
 		if (term == 0) break;
-		pattern = A(pattern,hold(&QF));
+		pattern = A(pattern,hold(QF));
 		exp = app(exp,term);
 		}
 	return Qsubst(pattern,exp);
@@ -325,7 +325,7 @@ static value parse_lambda(unsigned long first_line)
 	if (def == 0)
 		return exp;
 	else
-		return app(app(hold(&Qeval),def),exp);
+		return app(app(hold(Qeval),def),exp);
 	}
 
 /* Parse unresolved form. */
@@ -386,7 +386,7 @@ static value parse_exp(void)
 		else
 			exp = app(exp,factor);
 		}
-	if (exp == 0) exp = hold(&QI);
+	if (exp == 0) exp = hold(QI);
 	return exp;
 	}
 

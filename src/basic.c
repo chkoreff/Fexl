@@ -34,7 +34,7 @@ value type_Y(value f)
 value type_void(value f)
 	{
 	if (!f->L) return 0;
-	return hold(&Qvoid);
+	return hold(Qvoid);
 	}
 
 /* (cons x y A B) = (B x y) */
@@ -143,15 +143,41 @@ value type_is_list(value f) { return op_predicate(f,op_is_list); }
 
 value boolean(int x)
 	{
-	return hold(x ? &QT : &QF);
+	return hold(x ? QT : QF);
 	}
 
-struct value QI = { 1, type_I };
-struct value QT = { 1, type_T };
-struct value QF = { 1, type_F };
-struct value QY = { 1, type_Y };
-struct value Qvoid = { 1, type_void };
-struct value Qcons = { 1, type_cons };
-struct value Qnull = { 1, type_null };
-struct value Qyield = { 1, type_yield };
-struct value Qeval = { 1, type_eval };
+value QI;
+value QT;
+value QF;
+value QY;
+value Qvoid;
+value Qcons;
+value Qnull;
+value Qyield;
+value Qeval;
+
+void beg_basic(void)
+	{
+	QI = Q(type_I);
+	QT = Q(type_T);
+	QF = Q(type_F);
+	QY = Q(type_Y);
+	Qvoid = Q(type_void);
+	Qcons = Q(type_cons);
+	Qnull = Q(type_null);
+	Qyield = Q(type_yield);
+	Qeval = Q(type_eval);
+	}
+
+void end_basic(void)
+	{
+	drop(QI);
+	drop(QT);
+	drop(QF);
+	drop(QY);
+	drop(Qvoid);
+	drop(Qcons);
+	drop(Qnull);
+	drop(Qyield);
+	drop(Qeval);
+	}

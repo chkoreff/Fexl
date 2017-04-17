@@ -48,7 +48,7 @@ value type_concat(value f)
 	if (x->T == type_str && y->T == type_str)
 		f = Qstr(str_concat(get_str(x),get_str(y)));
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	drop(y);
 	return f;
@@ -64,7 +64,7 @@ value type_length(value f)
 	if (x->T == type_str)
 		f = Qnum(num_new_ulong(get_str(x)->len));
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}
@@ -86,10 +86,10 @@ value type_slice(value f)
 		if (yn >= 0 && zn >= 0)
 			f = Qstr(str_slice(get_str(x),yn,zn));
 		else
-			f = hold(&Qvoid);
+			f = hold(Qvoid);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	drop(y);
 	drop(z);
@@ -116,13 +116,13 @@ value type_search(value f)
 			if (pos < xs->len)
 				f = Qnum(num_new_ulong(pos));
 			else
-				f = hold(&Qvoid);
+				f = hold(Qvoid);
 			}
 		else
-			f = hold(&Qvoid);
+			f = hold(Qvoid);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	drop(y);
 	drop(z);
@@ -142,10 +142,10 @@ value type_str_num(value f)
 		if (n)
 			f = Qnum(n);
 		else
-			f = hold(&Qvoid);
+			f = hold(Qvoid);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}
@@ -164,7 +164,7 @@ value type_ord(value f)
 			(unsigned char)xs->data[0]));
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}
@@ -183,7 +183,7 @@ value type_chr(value f)
 		f = Qstr(str_new_data(&ch,1));
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}
@@ -210,13 +210,13 @@ value type_char_width(value f)
 				f = Qnum(num_new_ulong(n));
 				}
 			else
-				f = hold(&Qvoid);
+				f = hold(Qvoid);
 			}
 		else
-			f = hold(&Qvoid);
+			f = hold(Qvoid);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	drop(y);
 	return f;

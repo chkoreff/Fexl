@@ -22,8 +22,8 @@ static value resolve_symbol(value x, value context)
 	}
 	{
 	/* Define other names using the given context. */
-	value exp = eval(A(A(hold(context),hold(name)),hold(&Qyield)));
-	value def = hold((exp->L == &Qyield) ? exp->R : x);
+	value exp = eval(A(A(hold(context),hold(name)),hold(Qyield)));
+	value def = hold((exp->L == Qyield) ? exp->R : x);
 	drop(exp);
 	return def;
 	}
@@ -101,13 +101,13 @@ value type_resolve(value f)
 
 		f = resolve(form->exp,context);
 		report_undef(f);
-		f = V(type_later,hold(&QI),f);
+		f = V(type_later,hold(QI),f);
 
 		source_label = save_source_label;
 		drop(context);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}
