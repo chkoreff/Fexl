@@ -6,14 +6,21 @@ use_context
 (
 say "Evaluating the context."
 \speaker=(\name \x put name put " says " say x)
+export;
 def "fred" (speaker "Fred");
 def "wilma" (speaker "Wilma");
 def "goodbye" (say "Goodbye");
-standard
-)
-\;
+void
+) \;
 
-# Now run this program in the context specified above.
+use_context
+(
+export;
+def "fred" (put "HEY: " fred);
+void
+) \;
+
+# Now run this program in the enhanced context.
 say "Hi"
 say (+ 32 (* 5 5))
 say (is_void void)

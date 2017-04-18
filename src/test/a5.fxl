@@ -3,8 +3,9 @@ use "test/common.fxl" \;
 
 use_context
 (
+export;
 def "talk" (say "TALK");
-standard
+void
 )
 \;
 say "begin"
