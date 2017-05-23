@@ -152,7 +152,7 @@ value type_standard(value f)
 		cur_name = str_data(x);
 		def = standard();
 		if (def)
-			f = AQ(hold(Qyield),def);
+			f = A(hold(Qyield),def);
 		else
 			f = hold(Qvoid);
 		}
@@ -166,7 +166,7 @@ value type_standard(value f)
 /* Return a function which evaluates the expression in the given context. */
 static value use_context(value context, value exp)
 	{
-	return eval(AQ(AQ(hold(Qresolve),context),exp));
+	return eval(A(A(hold(Qresolve),context),exp));
 	}
 
 /* Return a function which evaluates the named file in the standard context. */

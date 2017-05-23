@@ -15,7 +15,7 @@ static value op_put(FILE *fh, value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_cons && x->L && x->L->L)
-		f = AV(AQ(hold(f->L),hold(x->L->R)),AQ(hold(f->L),hold(x->R)));
+		f = A(A(hold(f->L),hold(x->L->R)),A(hold(f->L),hold(x->R)));
 	else
 		{
 		if (x->T == type_str)
@@ -49,7 +49,7 @@ value type_nl(value f)
 value type_say(value f)
 	{
 	if (!f->L) return 0;
-	return AV(AQ(hold(Qput),hold(f->R)),hold(Qnl));
+	return A(A(hold(Qput),hold(f->R)),hold(Qnl));
 	}
 
 value type_fput(value f)
@@ -86,8 +86,8 @@ value type_fnl(value f)
 value type_fsay(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
-	return AV(AQ(AQ(hold(Qfput),hold(f->L->R)),hold(f->R)),
-		AQ(hold(Qfnl),hold(f->L->R)));
+	return A(A(A(hold(Qfput),hold(f->L->R)),hold(f->R)),
+		A(hold(Qfnl),hold(f->L->R)));
 	}
 
 value type_fflush(value f)

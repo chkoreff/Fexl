@@ -27,7 +27,7 @@ value type_F(value f)
 value type_Y(value f)
 	{
 	if (!f->L) return 0;
-	return AV(hold(f->R),hold(f));
+	return A(hold(f->R),hold(f));
 	}
 
 /* (void x) = void */
@@ -41,7 +41,7 @@ value type_void(value f)
 value type_cons(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
-	return AV(AV(hold(f->R),hold(f->L->L->L->R)),hold(f->L->L->R));
+	return A(A(hold(f->R),hold(f->L->L->L->R)),hold(f->L->L->R));
 	}
 
 /* (null A B) = A */
@@ -55,7 +55,7 @@ standard context. */
 value type_yield(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
-	return AV(hold(f->R),hold(f->L->R));
+	return A(hold(f->R),hold(f->L->R));
 	}
 
 /* (eval x next) = (next y), where y is the final value of x. */
@@ -64,7 +64,7 @@ value type_eval(value f)
 	if (!f->L || !f->L->L) return 0;
 	{
 	value x = arg(f->L->R);
-	return AV(hold(f->R),x);
+	return A(hold(f->R),x);
 	}
 	}
 

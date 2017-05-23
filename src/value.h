@@ -15,8 +15,6 @@ extern void end_value(void);
 extern value V(type T, value L, value R);
 extern value Q(type T);
 extern value D(type T, void *data);
-extern value AQ(value x, value y);
-extern value AV(value x, value y);
 extern value type_A(value f);
 extern value A(value x, value y);
 #if DEV

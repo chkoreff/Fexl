@@ -98,22 +98,11 @@ value D(type T, void *data)
 	return V(T,0,data);
 	}
 
-/* Apply x to y, where x is already fully evaluated. */
-value AQ(value x, value y)
-	{
-	return V(x->T,x,y);
-	}
-
-/* Apply x to y, after evaluating x. */
-value AV(value x, value y)
-	{
-	return AQ(eval(x),y);
-	}
-
 /* The type for function application */
 value type_A(value f)
 	{
-	return AV(hold(f->L),hold(f->R));
+	value x = arg(f->L);
+	return V(x->T,x,hold(f->R));
 	}
 
 /* Apply x to y. */
