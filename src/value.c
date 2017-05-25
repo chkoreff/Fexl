@@ -83,6 +83,9 @@ value V(type T, value L, value R)
 	f->T = T;
 	f->L = L;
 	f->R = R;
+	#if DEV
+	count_V++;
+	#endif
 	return f;
 	}
 
@@ -113,6 +116,7 @@ value A(value x, value y)
 
 #if DEV
 unsigned long num_steps = 0;
+unsigned long count_V = 0;
 #endif
 
 static value step(value f)

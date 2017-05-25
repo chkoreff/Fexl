@@ -59,52 +59,54 @@ value Qsubst(value p, value e)
 	return V(t,V(type_subst,hold(QI),p),e);
 	}
 
-/* Return the equivalent of (C x) */
-static value keep(value x)
-	{
-	return Qsubst(hold(QF),hold(x));
-	}
-
-/* Return the equivalent of I. */
-static value here(void)
-	{
-	return Qsubst(hold(QT),hold(QI));
-	}
-
-/* Make a pattern that sends the argument to the left and right as needed. */
-static value combine(value p, value q)
-	{
-	if (p == QF && q == QF)
-		return hold(p);
-	else
-		return A(hold(p),hold(q));
-	}
-
-/* Return the equivalent of (S x y) */
-static value fuse(value x, value y)
-	{
-	value p = combine(x->L->R,y->L->R);
-	value e = app(hold(x->R),hold(y->R));
-	drop(x);
-	drop(y);
-	return Qsubst(p,e);
-	}
-
-/* Abstract the symbol from exp, returning a form which is a function of that
-symbol, and no longer contains that symbol. */
-value lam(value sym, value exp)
+/* Abstract a symbol from an expression.  Sets *p to the pattern where the
+symbol appears in the expression.  Sets *e to the expression with QI
+substituted wherever the symbol occurred. */
+static void abstract(value sym, value exp, value *p, value *e)
 	{
 	if (exp->T != type_sym)
-		return keep(exp);
+		{
+		*p = hold(QF);
+		*e = hold(exp);
+		}
 	else if (exp->L == 0)
 		{
 		if (sym_eq(get_sym(sym),get_sym(exp)))
-			return here();
+			{
+			*p = hold(QT);
+			*e = hold(QI);
+			}
 		else
-			return keep(exp);
+			{
+			*p = hold(QF);
+			*e = hold(exp);
+			}
 		}
 	else
-		return fuse(lam(sym,exp->L),lam(sym,exp->R));
+		{
+		value xp, xe;
+		value yp, ye;
+
+		abstract(sym,exp->L,&xp,&xe);
+		abstract(sym,exp->R,&yp,&ye);
+
+		if (xp == QF && yp == QF)
+			{
+			*p = xp;
+			drop(yp);
+			}
+		else
+			*p = A(xp,yp);
+
+		*e = app(xe,ye);
+		}
+	}
+
+value lam(value sym, value exp)
+	{
+	value p,e;
+	abstract(sym,exp,&p,&e);
+	return Qsubst(p,e);
 	}
 
 /* Use pattern p to make a copy of expression e with argument x substituted in

@@ -232,6 +232,7 @@ void eval_file(const char *name)
 	fnl(stderr);
 	fput(stderr,"num_steps = ");fput_ulong(stderr,num_steps);fnl(stderr);
 	fput(stderr,"max_bytes = ");fput_ulong(stderr,max_bytes);fnl(stderr);
+	fput(stderr,"count_V = ");fput_ulong(stderr,count_V);fnl(stderr);
 	}
 	#endif
 

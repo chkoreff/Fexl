@@ -19,6 +19,7 @@ extern value type_A(value f);
 extern value A(value x, value y);
 #if DEV
 extern unsigned long num_steps;
+extern unsigned long count_V;
 #endif
 extern value eval(value f);
 extern value arg(value f);
