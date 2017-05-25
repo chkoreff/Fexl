@@ -110,22 +110,12 @@ value lam(value sym, value exp)
 	}
 
 /* Use pattern p to make a copy of expression e with argument x substituted in
-the places designated by the pattern.
-
-I do one level of look-ahead on the left and right patterns, which isn't
-strictly necessary but is slightly faster. */
+the places designated by the pattern. */
 static value subst(value p, value e, value x)
 	{
-	if (p->L)
-		{
-		value L = (p->L == QF ? hold(e->L) : subst(p->L,e->L,x));
-		value R = (p->R == QF ? hold(e->R) : subst(p->R,e->R,x));
-		return A(L,R);
-		}
-	else if (p == QF)
-		return hold(e);
-	else
-		return hold(x);
+	if (p == QF) return hold(e);
+	if (p == QT) return hold(x);
+	return A(subst(p->L,e->L,x),subst(p->R,e->R,x));
 	}
 
 /* (subst p e x) Calls substitute. */
