@@ -60,7 +60,7 @@ static value first_undef(value exp)
 	}
 
 /* Report all distinct undefined symbols in the expression. */
-static void report_undef(value exp)
+static void report_undef(value exp, const char *label)
 	{
 	short undefined = 0;
 	hold(exp);
@@ -72,7 +72,7 @@ static void report_undef(value exp)
 		value next;
 		symbol sym = get_sym(x);
 		const char *name = str_data(sym->name);
-		undefined_symbol(name,sym->line);
+		undefined_symbol(name,sym->line,label);
 		undefined = 1;
 		next = lam(x,exp);
 		drop(exp);
@@ -95,15 +95,12 @@ value type_resolve(value f)
 		{
 		form form = get_form(x);
 		value context = arg(f->L->R);
-
-		const char *save_source_label = source_label;
-		source_label = str_data(form->label);
+		const char *label = str_data(form->label);
 
 		f = resolve(form->exp,context);
-		report_undef(f);
+		report_undef(f,label);
 		f = V(type_later,hold(QI),f);
 
-		source_label = save_source_label;
 		drop(context);
 		}
 	else

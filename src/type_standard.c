@@ -221,7 +221,7 @@ static void end_standard(void)
 	}
 
 /* Evaluate a named file in the standard context. */
-void eval_file(const char *name)
+void eval_standard(const char *name)
 	{
 	beg_standard();
 	drop(eval(parse_standard(Qstr0(name))));

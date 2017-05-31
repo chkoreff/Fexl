@@ -50,6 +50,7 @@ static int ch; /* current character */
 static unsigned long line; /* current line number */
 static input get; /* current input routine */
 static void *source; /* current input source */
+static value label; /* label of current input source */
 
 static void skip(void)
 	{
@@ -99,6 +100,11 @@ static void skip_filler(void)
 		else
 			return;
 		}
+	}
+
+static void syntax_error(const char *code, unsigned long line)
+	{
+	fatal_error(code,line,str_data(label));
 	}
 
 /* Parse a name, or return 0 if I don't see one.
@@ -331,9 +337,8 @@ static value parse_lambda(unsigned long first_line)
 /* Parse unresolved form. */
 static value parse_form(void)
 	{
-	value label = Qstr0(source_label);
 	value exp = parse_exp();
-	return Qform(label,exp);
+	return Qform(hold(label),exp);
 	}
 
 /* Parse the next factor of an expression.  Return 0 if no factor found. */
@@ -399,19 +404,17 @@ static value parse_input(void)
 	}
 
 /* Parse the given input. */
-value parse(input _get, void *_source, value label)
+value parse(input _get, void *_source, value _label)
 	{
 	value exp;
-	const char *save_source_label = source_label;
-	source_label = str_data(label);
 
 	get = _get;
 	source = _source;
+	label = _label;
 	ch = ' ';
 	line = 1;
 
-	exp = Qform(label,parse_input());
+	exp = Qform(_label,parse_input());
 
-	source_label = save_source_label;
 	return exp;
 	}

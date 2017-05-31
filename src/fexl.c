@@ -14,6 +14,6 @@ int main(int argc, char *argv[])
 	const char *name = argc > 1 ? argv[1] : "";
 	main_argc = argc;
 	main_argv = argv;
-	eval_file(name);
+	eval_standard(name);
 	return 0;
 	}

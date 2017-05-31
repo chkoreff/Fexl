@@ -4,26 +4,24 @@
 #include <file.h>
 #include <report.h>
 
-const char *source_label; /* name of current source file */
-
-static void put_error_location(unsigned long line)
+static void put_error_location(unsigned long line, const char *label)
 	{
 	fput(stderr," on line "); fput_ulong(stderr,line);
-	if (source_label[0])
+	if (label[0])
 		{
-		fput(stderr," of ");fput(stderr,source_label);
+		fput(stderr," of ");fput(stderr,label);
 		}
 	fnl(stderr);
 	}
 
-void syntax_error(const char *code, unsigned long line)
+void fatal_error(const char *code, unsigned long line, const char *label)
 	{
-	fput(stderr,code); put_error_location(line);
+	fput(stderr,code); put_error_location(line,label);
 	die(0);
 	}
 
-void undefined_symbol(const char *name, unsigned long line)
+void undefined_symbol(const char *name, unsigned long line, const char *label)
 	{
 	fput(stderr,"Undefined symbol "); fput(stderr,name);
-	put_error_location(line);
+	put_error_location(line,label);
 	}
