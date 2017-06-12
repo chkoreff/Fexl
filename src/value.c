@@ -1,4 +1,5 @@
 #include <memory.h>
+#include <die.h>
 #include <value.h>
 
 /*
@@ -36,16 +37,6 @@ static value pop_free(void)
 	{
 	value f = free_list;
 	free_list = (value)f->N;
-	if (f->L) /* Clear pair. */
-		{
-		drop(f->L);
-		drop(f->R);
-		}
-	else if (f->R) /* Clear atom. */
-		{
-		f->N = 0;
-		f->T(f);
-		}
 	return f;
 	}
 
@@ -56,11 +47,35 @@ value hold(value f)
 	return f;
 	}
 
-/* Decrement the reference count and free if it drops to zero. */
+/* Clear the content of a value going on the free list. */
+static void clear(value f)
+	{
+	if (f->L) /* Clear pair. */
+		{
+		drop(f->L);
+		drop(f->R);
+		}
+	else if (f->R) /* Clear atom. */
+		{
+		f->N = 0;
+		f->T(f);
+		}
+	f->T = 0;
+	f->L = 0;
+	f->R = 0;
+	}
+
+/* Decrement the reference count and recycle if it drops to zero. */
 void drop(value f)
 	{
+	if (f->N == 0)
+		die("XDROP");
+
 	if (--f->N == 0)
+		{
+		clear(f);
 		push_free(f);
+		}
 	}
 
 static void clear_free_list(void)
