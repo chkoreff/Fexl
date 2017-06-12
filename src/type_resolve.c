@@ -44,40 +44,21 @@ static value resolve(value exp, value context)
 		}
 	}
 
-/* Return the first undefined symbol in the expression. */
-static value first_undef(value exp)
-	{
-	if (exp->T != type_sym)
-		return 0;
-	else if (exp->L == 0)
-		return exp;
-	else
-		{
-		value x = first_undef(exp->L);
-		if (x) return x;
-		return first_undef(exp->R);
-		}
-	}
-
-/* Report all distinct undefined symbols in the expression. */
+/* Report all undefined symbols in the expression. */
 static void report_undef(value exp, const char *label)
 	{
-	short undefined = 0;
-	hold(exp);
-	while (1)
+	if (exp->T != type_sym)
+		;
+	else if (exp->L == 0)
 		{
-		value x = first_undef(exp);
-		if (x == 0) break;
+		const char *name = sym_name(exp)->data;
+		undefined_symbol(name,sym_line(exp),label);
+		}
+	else
 		{
-		const char *name = sym_name(x)->data;
-		undefined_symbol(name,sym_line(x),label);
-		undefined = 1;
-		exp = lambda(sym_name(x),exp);
+		report_undef(exp->L,label);
+		report_undef(exp->R,label);
 		}
-		}
-	if (undefined)
-		die(0); /* The expression had undefined symbols. */
-	drop(exp);
 	}
 
 /* (resolve context form) Resolve the form in the context and return the
@@ -95,6 +76,8 @@ value type_resolve(value f)
 
 		f = resolve(form->exp,context);
 		report_undef(f,label);
+		if (f->T == type_sym)
+			die(0); /* The expression had undefined symbols. */
 		f = V(type_later,hold(QI),f);
 
 		drop(context);
