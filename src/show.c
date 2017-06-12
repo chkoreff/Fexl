@@ -175,17 +175,15 @@ void show(value f)
 				put_quote(get_str(f));
 			else if (f->T == type_sym)
 				{
-				symbol x = get_sym(f);
-				put_quote(sym_name(x));
+				put_quote(sym_name(f));
 				put_ch(' ');
-				put_ulong(x->line);
+				put_ulong(sym_line(f));
 				}
 			else if (f->T == type_form)
 				{
-				form x = get_form(f);
-				put_quote(get_str(x->label));
+				put_quote(get_str(form_label(f)));
 				put_ch(' ');
-				show(x->exp);
+				show(form_exp(f));
 				}
 			else if (f->T == type_var)
 				show(f->R);

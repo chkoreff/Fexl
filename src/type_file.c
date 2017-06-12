@@ -40,9 +40,9 @@ value type_fopen(value f)
 	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_str)
 		{
-		string path = get_str(x);
-		string mode = get_str(y);
-		FILE *fh = fopen(path->data,mode->data);
+		const char *path = str_data(x);
+		const char *mode = str_data(y);
+		FILE *fh = fopen(path,mode);
 		f = fh ? Qfile(fh) : hold(Qvoid);
 		}
 	else
@@ -95,8 +95,8 @@ value type_remove(value f)
 	value x = arg(f->R);
 	if (x->T == type_str)
 		{
-		string path = get_str(x);
-		int code = remove(path->data);
+		const char *path = str_data(x);
+		int code = remove(path);
 		f = Qnum0(code);
 		}
 	else

@@ -69,14 +69,10 @@ static void report_undef(value exp, const char *label)
 		value x = first_undef(exp);
 		if (x == 0) break;
 		{
-		value next;
-		symbol sym = get_sym(x);
-		const char *name = str_data(sym->name);
-		undefined_symbol(name,sym->line,label);
+		const char *name = sym_name(x)->data;
+		undefined_symbol(name,sym_line(x),label);
 		undefined = 1;
-		next = lam(x,exp);
-		drop(exp);
-		exp = next;
+		exp = lambda(sym_name(x),exp);
 		}
 		}
 	if (undefined)

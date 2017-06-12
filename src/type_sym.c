@@ -35,14 +35,14 @@ symbol get_sym(value x)
 	return (symbol)x->R;
 	}
 
-string sym_name(symbol x)
+string sym_name(value x)
 	{
-	return get_str(x->name);
+	return get_str(get_sym(x)->name);
 	}
 
-static int sym_eq(symbol x, symbol y)
+unsigned long sym_line(value x)
 	{
-	return str_eq(sym_name(x),sym_name(y));
+	return get_sym(x)->line;
 	}
 
 /* Apply f to g, where either can be a symbolic form. */
@@ -59,10 +59,10 @@ value Qsubst(value p, value e)
 	return V(t,V(type_subst,hold(QI),p),e);
 	}
 
-/* Abstract a symbol from an expression.  Sets *p to the pattern where the
-symbol appears in the expression.  Sets *e to the expression with QI
-substituted wherever the symbol occurred. */
-static void abstract(value sym, value exp, value *p, value *e)
+/* Abstract a name from an expression.  Sets *p to the pattern where the name
+appears in the expression.  Sets *e to the expression with QI substituted
+wherever the name occurred. */
+static void abstract(string name, value exp, value *p, value *e)
 	{
 	if (exp->T != type_sym)
 		{
@@ -71,7 +71,7 @@ static void abstract(value sym, value exp, value *p, value *e)
 		}
 	else if (exp->L == 0)
 		{
-		if (sym_eq(get_sym(sym),get_sym(exp)))
+		if (str_eq(name,sym_name(exp)))
 			{
 			*p = hold(QT);
 			*e = hold(QI);
@@ -87,8 +87,8 @@ static void abstract(value sym, value exp, value *p, value *e)
 		value xp, xe;
 		value yp, ye;
 
-		abstract(sym,exp->L,&xp,&xe);
-		abstract(sym,exp->R,&yp,&ye);
+		abstract(name,exp->L,&xp,&xe);
+		abstract(name,exp->R,&yp,&ye);
 
 		if (xp == QF && yp == QF)
 			{
@@ -102,11 +102,14 @@ static void abstract(value sym, value exp, value *p, value *e)
 		}
 	}
 
-value lam(value sym, value exp)
+/* Abstract the name from the expression and return a substitution form. */
+value lambda(string name, value exp)
 	{
-	value p,e;
-	abstract(sym,exp,&p,&e);
-	return Qsubst(p,e);
+	value p,e,f;
+	abstract(name,exp,&p,&e);
+	f = Qsubst(p,e);
+	drop(exp);
+	return f;
 	}
 
 /* Use pattern p to make a copy of expression e with argument x substituted in

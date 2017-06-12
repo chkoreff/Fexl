@@ -301,7 +301,7 @@ static value parse_term(void)
 /* Parse a lambda form following the initial '\' character. */
 static value parse_lambda(unsigned long first_line)
 	{
-	value sym, def=0, body, exp;
+	value sym, def=0, exp;
 
 	/* Parse the symbol. */
 	skip_white();
@@ -322,10 +322,9 @@ static value parse_lambda(unsigned long first_line)
 		}
 
 	/* Parse the body of the function. */
-	body = parse_exp();
-	exp = lam(sym,body);
+	exp = parse_exp();
+	exp = lambda(sym_name(sym),exp);
 	drop(sym);
-	drop(body);
 
 	/* Apply the definition if any. */
 	if (def == 0)
