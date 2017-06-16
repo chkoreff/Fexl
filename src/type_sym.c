@@ -6,7 +6,7 @@
 #include <type_str.h>
 #include <type_sym.h>
 
-static void sym_free(symbol sym)
+static void sym_free(struct symbol *sym)
 	{
 	drop(sym->name);
 	free_memory(sym,sizeof(struct symbol));
@@ -24,15 +24,15 @@ value type_sym(value f)
 
 value Qsym(string name, unsigned long line)
 	{
-	symbol sym = new_memory(sizeof(struct symbol));
+	struct symbol *sym = new_memory(sizeof(struct symbol));
 	sym->name = Qstr(name);
 	sym->line = line;
 	return D(type_sym,sym);
 	}
 
-symbol get_sym(value x)
+struct symbol *get_sym(value x)
 	{
-	return (symbol)x->R;
+	return (struct symbol *)x->R;
 	}
 
 string sym_name(value x)

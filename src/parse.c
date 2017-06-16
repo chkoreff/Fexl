@@ -137,7 +137,7 @@ static value parse_name(void)
 		}
 
 	if (!buf.top) return 0;
-	return Qsym(buf_clear(&buf), first_line);
+	return Qsym(buf_clear(&buf),first_line);
 	}
 
 /* Collect a string up to an ending terminator. */
@@ -333,7 +333,7 @@ static value parse_lambda(unsigned long first_line)
 		return app(app(hold(Qeval),def),exp);
 	}
 
-/* Parse unresolved form. */
+/* Parse a form (unresolved symbolic expression). */
 static value parse_form(void)
 	{
 	value exp = parse_exp();
@@ -394,26 +394,21 @@ static value parse_exp(void)
 	return exp;
 	}
 
-static value parse_input(void)
-	{
-	value exp = parse_exp();
-	if (ch != -1)
-		syntax_error("Extraneous input", line);
-	return exp;
-	}
-
 /* Parse the given input. */
-value parse(input _get, void *_source, value _label)
+value parse_input(input _get, void *_source, value _label)
 	{
-	value exp;
-
 	get = _get;
 	source = _source;
 	label = _label;
 	ch = ' ';
 	line = 1;
 
-	exp = Qform(_label,parse_input());
+	{
+	value exp = parse_exp();
+	if (ch != -1)
+		syntax_error("Extraneous input", line);
 
+	exp = Qform(label,exp);
 	return exp;
+	}
 	}

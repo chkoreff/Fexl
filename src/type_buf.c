@@ -6,9 +6,9 @@
 #include <type_buf.h>
 #include <type_str.h>
 
-static buffer *get_buf(value x)
+static buffer get_buf(value x)
 	{
-	return (buffer *)x->R;
+	return (buffer)x->R;
 	}
 
 value type_buf(value f)
@@ -37,7 +37,7 @@ value type_buf_put(value f)
 	value y = arg(f->R);
 	if (x->T == type_buf && y->T == type_str)
 		{
-		buffer *buf = get_buf(x);
+		buffer buf = get_buf(x);
 		string str = get_str(y);
 		buf_put(buf,str);
 		f = hold(QI);
@@ -59,7 +59,7 @@ value type_buf_get(value f)
 	value x = arg(f->R);
 	if (x->T == type_buf)
 		{
-		buffer *buf = get_buf(x);
+		buffer buf = get_buf(x);
 		string str = buf_clear(buf);
 		f = Qstr(str);
 		}

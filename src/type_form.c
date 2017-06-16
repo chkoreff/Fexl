@@ -6,7 +6,7 @@
 #include <type_form.h>
 #include <type_str.h>
 
-static void form_free(form f)
+static void form_free(struct form *f)
 	{
 	drop(f->label);
 	drop(f->exp);
@@ -25,15 +25,15 @@ value type_form(value f)
 
 value Qform(value label, value exp)
 	{
-	form x = new_memory(sizeof(struct form));
+	struct form *x = new_memory(sizeof(struct form));
 	x->label = label;
 	x->exp = exp;
 	return D(type_form,x);
 	}
 
-form get_form(value f)
+struct form *get_form(value f)
 	{
-	return (form)f->R;
+	return (struct form *)f->R;
 	}
 
 value form_label(value f)

@@ -4,6 +4,7 @@
 #include <value.h>
 
 #include <basic.h>
+#include <fexl.h>
 #include <output.h>
 #include <output2.h>
 #include <show.h>
@@ -20,7 +21,6 @@
 #include <type_rand.h>
 #include <type_resolve.h>
 #include <type_run.h>
-#include <type_standard.h>
 #include <type_str.h>
 #include <type_sym.h>
 #include <type_var.h>
@@ -148,55 +148,70 @@ static void put_quote(string x)
 	put_ch('"');
 	}
 
-static unsigned long depth;
+static unsigned long max_depth;
+static unsigned long max_call;
+
+static void limit_show(value f)
+	{
+	if (max_call == 0 || max_depth == 0)
+		{
+		put_ch('_');
+		return;
+		}
+
+	max_call--;
+	max_depth--;
+
+	put_ch('[');
+	put_type(f->T);
+	if (f->L)
+		{
+		put_ch(' ');
+		limit_show(f->L);
+		put_ch(' ');
+		limit_show(f->R);
+		}
+	else if (f->R)
+		{
+		put_ch(' ');
+		if (f->T == type_num)
+			put_num(get_num(f));
+		else if (f->T == type_str)
+			put_quote(get_str(f));
+		else if (f->T == type_sym)
+			{
+			put_quote(sym_name(f));
+			if (0)
+			{
+			put_ch(' ');
+			put_ulong(sym_line(f));
+			}
+			}
+		else if (f->T == type_form)
+			{
+			put_quote(get_str(form_label(f)));
+			put_ch(' ');
+			limit_show(form_exp(f));
+			}
+		else if (f->T == type_var)
+			limit_show(f->R);
+		else if (f->T == type_buf || f->T == type_istr)
+			put("...");
+		else if (f->T == type_file)
+			put_ulong(fileno(get_fh(f)));
+		else
+			put_ch('?');
+		}
+	put_ch(']');
+
+	max_depth++;
+	}
 
 void show(value f)
 	{
-	depth++;
-	if (depth > 5)
-		put_ch('_');
-	else
-		{
-		put_ch('[');
-		put_type(f->T);
-		if (f->L)
-			{
-			put_ch(' ');
-			show(f->L);
-			put_ch(' ');
-			show(f->R);
-			}
-		else if (f->R)
-			{
-			put_ch(' ');
-			if (f->T == type_num)
-				put_num(get_num(f));
-			else if (f->T == type_str)
-				put_quote(get_str(f));
-			else if (f->T == type_sym)
-				{
-				put_quote(sym_name(f));
-				put_ch(' ');
-				put_ulong(sym_line(f));
-				}
-			else if (f->T == type_form)
-				{
-				put_quote(get_str(form_label(f)));
-				put_ch(' ');
-				show(form_exp(f));
-				}
-			else if (f->T == type_var)
-				show(f->R);
-			else if (f->T == type_buf || f->T == type_istr)
-				put("...");
-			else if (f->T == type_file)
-				put_ulong(fileno(get_fh(f)));
-			else
-				put_ch('?');
-			}
-		put_ch(']');
-		}
-	depth--;
+	max_depth = 12;
+	max_call = 200;
+	limit_show(f);
 	}
 
 void show_line(const char *name, value f)

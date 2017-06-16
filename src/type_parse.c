@@ -15,12 +15,12 @@
 
 static value parse_fh(FILE *fh, value label)
 	{
-	return parse((input)fgetc,fh,label);
+	return parse_input((input)fgetc,fh,label);
 	}
 
 static value parse_istr(struct istr *istr, value label)
 	{
-	return parse((input)sgetc,istr,label);
+	return parse_input((input)sgetc,istr,label);
 	}
 
 static value parse_string(value str, value label)

@@ -4,7 +4,7 @@
 #include <memory.h>
 #include <string.h> /* memcpy */
 
-buffer *buf_new(void)
+buffer buf_new(void)
 	{
 	struct buffer *buf = new_memory(sizeof(struct buffer));
 	buf->top = 0;
@@ -21,7 +21,7 @@ static struct chunk *new_chunk(struct chunk *next, const unsigned long size)
 	}
 
 /* Add a single char to the buffer. */
-void buf_add(buffer *buf, char ch)
+void buf_add(buffer buf, char ch)
 	{
 	struct chunk *top = buf->top;
 	if (!top || top->pos >= top->str->len)
@@ -36,7 +36,7 @@ void buf_add(buffer *buf, char ch)
 
 /* To add a whole string I simply add the characters one at a time.  I could
 optimize it later, but it's fine for now. */
-void buf_addn(buffer *buf, const char *str, unsigned long len)
+void buf_addn(buffer buf, const char *str, unsigned long len)
 	{
 	unsigned long pos;
 	for (pos = 0; pos < len; pos++)
@@ -44,13 +44,13 @@ void buf_addn(buffer *buf, const char *str, unsigned long len)
 	}
 
 /* Add a string to the buffer. */
-void buf_put(buffer *buf, string str)
+void buf_put(buffer buf, string str)
 	{
 	buf_addn(buf,str->data,str->len);
 	}
 
 /* Clear the buffer, discarding its contents. */
-void buf_discard(buffer *buf)
+void buf_discard(buffer buf)
 	{
 	struct chunk *chunk = buf->top;
 	while (chunk)
@@ -63,7 +63,7 @@ void buf_discard(buffer *buf)
 	buf->top = 0;
 	}
 
-unsigned long buf_length(buffer *buf)
+unsigned long buf_length(buffer buf)
 	{
 	unsigned long len = 0;
 	struct chunk *chunk = buf->top;
@@ -76,7 +76,7 @@ unsigned long buf_length(buffer *buf)
 	}
 
 /* Clear the buffer and return its content in a string. */
-string buf_clear(buffer *buf)
+string buf_clear(buffer buf)
 	{
 	struct chunk *chunk = buf->top;
 	unsigned long offset = buf_length(buf);
@@ -96,7 +96,7 @@ string buf_clear(buffer *buf)
 	}
 
 /* Free a dynamically allocated buffer. */
-void buf_free(buffer *buf)
+void buf_free(buffer buf)
 	{
 	buf_discard(buf);
 	free_memory(buf,sizeof(struct buffer));

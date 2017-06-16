@@ -70,7 +70,7 @@ value type_resolve(value f)
 	value x = arg(f->R);
 	if (x->T == type_form)
 		{
-		form form = get_form(x);
+		struct form *form = get_form(x);
 		value context = arg(f->L->R);
 		const char *label = str_data(form->label);
 

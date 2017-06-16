@@ -32,7 +32,6 @@ make type_parse
 make type_rand
 make type_resolve
 make type_run
-make type_standard
 make type_str
 make type_sym
 make type_var

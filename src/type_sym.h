@@ -1,4 +1,3 @@
-typedef struct symbol *symbol;
 struct symbol
 	{
 	value name;
@@ -7,7 +6,7 @@ struct symbol
 
 extern value type_sym(value f);
 extern value Qsym(string name, unsigned long line);
-extern symbol get_sym(value x);
+extern struct symbol *get_sym(value x);
 extern string sym_name(value x);
 extern unsigned long sym_line(value x);
 extern value app(value f, value g);

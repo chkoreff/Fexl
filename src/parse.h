@@ -1,1 +1,1 @@
-extern value parse(input get, void *source, value label);
+extern value parse_input(input _get, void *_source, value _label);
