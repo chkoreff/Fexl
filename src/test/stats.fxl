@@ -1,3 +1,5 @@
+#
+evaluate;
 use "test/common.fxl" \;
 
 # Normal distribution with mean 0 and standard deviation 1.

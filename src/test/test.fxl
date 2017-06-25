@@ -1,7 +1,13 @@
 #
+evaluate;
+use "test/list.fxl";
+use_standard;
+\;
+
 \div=(later; say "==")
 \show_list=(\xs say "[" (each xs say) say "]")
 
-def "div" div;
-def "show_list" show_list;
-void
+\form
+define "div" div;
+define "show_list" show_list;
+form

@@ -1,4 +1,9 @@
 # I put this code in a separate file to test multiple use calls.
+evaluate;
+use "test/test.fxl";
+use "test/list.fxl";
+use_standard;
+\;
 
 # (fib n) returns the nth Fibonacci number starting at 0.
 # LATER You could handle fib for negative n too:
@@ -33,5 +38,6 @@ div
 try 11.2 20.5
 )
 
-def "try_fib" try_fib;
-void
+\form
+define "try_fib" try_fib;
+form

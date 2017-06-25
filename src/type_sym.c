@@ -2,13 +2,17 @@
 #include <value.h>
 
 #include <basic.h>
+#include <die.h>
 #include <memory.h>
+#include <report.h>
+#include <type_form.h>
 #include <type_str.h>
 #include <type_sym.h>
 
 static void sym_free(struct symbol *sym)
 	{
-	drop(sym->name);
+	str_free(sym->name);
+	drop(sym->label);
 	free_memory(sym,sizeof(struct symbol));
 	}
 
@@ -22,11 +26,12 @@ value type_sym(value f)
 	return type_void(f);
 	}
 
-value Qsym(string name, unsigned long line)
+value Qsym(string name, unsigned long line, value label)
 	{
 	struct symbol *sym = new_memory(sizeof(struct symbol));
-	sym->name = Qstr(name);
+	sym->name = name;
 	sym->line = line;
+	sym->label = label;
 	return D(type_sym,sym);
 	}
 
@@ -37,12 +42,17 @@ struct symbol *get_sym(value x)
 
 string sym_name(value x)
 	{
-	return get_str(get_sym(x)->name);
+	return get_sym(x)->name;
 	}
 
 unsigned long sym_line(value x)
 	{
 	return get_sym(x)->line;
+	}
+
+string sym_label(value x)
+	{
+	return get_str(get_sym(x)->label);
 	}
 
 /* Apply f to g, where either can be a symbolic form. */
@@ -110,6 +120,111 @@ value lambda(string name, value exp)
 	f = Qsubst(p,e);
 	drop(exp);
 	return f;
+	}
+
+/* Report all undefined symbols in the expression. */
+static void report_undef(value exp)
+	{
+	if (exp->T != type_sym)
+		;
+	else if (exp->L == 0)
+		{
+		const char *name = sym_name(exp)->data;
+		const char *label = sym_label(exp)->data;
+		undefined_symbol(name,sym_line(exp),label);
+		}
+	else
+		{
+		report_undef(exp->L);
+		report_undef(exp->R);
+		}
+	}
+
+static value check_undef(value f)
+	{
+	if (f->T == type_sym)
+		{
+		report_undef(f);
+		die(0); /* The expression had undefined symbols. */
+		drop(f);
+		f = hold(Qvoid);
+		}
+	return f;
+	}
+
+/* (evaluate form) Evaluate the form if it is fully resolved, otherwise report
+all the symbols as undefined and die. */
+value type_evaluate(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_form)
+		f = check_undef(hold(form_exp(x)));
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
+	}
+
+/* (resolved form) Return the form expression if it is fully resolved,
+otherwise report all the symbols as undefined and die. */
+value type_resolved(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_form)
+		f = A(Q(type_later),check_undef(hold(form_exp(x))));
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
+	}
+
+/* (is_resolved form) Return true if the form is fully resolved (contains no
+symbols). */
+value type_is_resolved(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_form)
+		f = boolean(form_exp(x)->T != type_sym);
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
+	}
+
+/* (define name def form) Define name as def in form. */
+value type_define(value f)
+	{
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	{
+	value name = arg(f->L->L->R);
+	if (name->T == type_str)
+		{
+		value form = arg(f->R);
+		if (form->T == type_form)
+			{
+			value def = hold(f->L->R);
+			value exp = hold(form_exp(form));
+			exp = lambda(get_str(name),exp);
+			f = Qform(app(exp,def));
+			}
+		else
+			f = hold(Qvoid);
+		drop(form);
+		}
+	else
+		f = hold(Qvoid);
+	drop(name);
+	return f;
+	}
 	}
 
 /* Use pattern p to make a copy of expression e with argument x substituted in

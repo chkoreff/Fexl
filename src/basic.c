@@ -50,14 +50,6 @@ value type_null(value f)
 	return type_T(f);
 	}
 
-/* (yield x p) = (p x).  This is used to return a symbol definition in the
-standard context. */
-value type_yield(value f)
-	{
-	if (!f->L || !f->L->L) return 0;
-	return A(hold(f->R),hold(f->L->R));
-	}
-
 /* (eval x next) = (next y), where y is the final value of x. */
 value type_eval(value f)
 	{
@@ -153,7 +145,6 @@ value QY;
 value Qvoid;
 value Qcons;
 value Qnull;
-value Qyield;
 value Qeval;
 
 void beg_basic(void)
@@ -165,7 +156,6 @@ void beg_basic(void)
 	Qvoid = Q(type_void);
 	Qcons = Q(type_cons);
 	Qnull = Q(type_null);
-	Qyield = Q(type_yield);
 	Qeval = Q(type_eval);
 	}
 
@@ -178,6 +168,5 @@ void end_basic(void)
 	drop(Qvoid);
 	drop(Qcons);
 	drop(Qnull);
-	drop(Qyield);
 	drop(Qeval);
 	}

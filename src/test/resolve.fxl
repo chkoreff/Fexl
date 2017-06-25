@@ -1,24 +1,34 @@
-# Use an enhanced context which includes all the standard symbols along with a
-# few new ones.
+# Test fancy extended standard context.
+evaluate;
 use "test/common.fxl" \;
 
-use_context
+\use_standard=
 (
-say "Evaluating the context."
 \speaker=(\name \x put name put " says " say x)
-export;
-def "fred" (speaker "Fred");
-def "wilma" (speaker "Wilma");
-def "goodbye" (say "Goodbye");
-void
-) \;
+\form
+define "fred" (speaker "Fred");
+define "wilma" (speaker "Wilma");
+define "goodbye" (say "Goodbye");
+use_standard;
+form
+)
 
-use_context
-(
-export;
-def "fred" (put "HEY: " fred);
-void
-) \;
+\use_standard=
+(\form
+use_standard;
+define "use_standard" use_standard;
+form
+)
+
+evaluate;
+say "Evaluating the context."
+use_standard;
+\;
+
+evaluate;
+use_standard;
+define "fred" (put "HEY: " fred);
+\;
 
 # Now run this program in the enhanced context.
 say "Hi"

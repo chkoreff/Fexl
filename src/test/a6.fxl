@@ -1,53 +1,39 @@
 #
+evaluate;
 use "test/common.fxl" \;
 
-(
-div
-standard "say" \say
-# Note that numbers are not defined as symbols in standard.
-(check (standard "3") {"VOID"}) \x
-say x
-)
-
-\parse=(later; say "(parsing)" parse)
-\resolve=(later; say "(resolving)" resolve)
-
-\parse_string=
-	(\x
-	\exp=(parse x "source")
-	resolve standard exp
+\parse=
+	(\type\source
+	say "(parsing)"
+	\form=
+		(
+		eq type "file" (parse_file source);
+		eq type "string" (parse source "");
+		eq type "stream" (parse source "");
+		void
+		)
+	say "(resolving)"
+	resolved (use_standard form)
 	)
 
-\parse_file=
-	(\name
-	\fh=(fopen name "r")
-	is_void fh (error ["Could not open source file " name]);
-	\exp=(parse fh name)
-	fclose fh
-	resolve standard exp
-	)
-
-\trace_parse=
-	(\parse\x
+\parse=
+	(\type\source
 	say "["
-	\f=(parse x)
+	\f=(parse type source)
 	say "]"
 	later f
 	)
 
-\parse_string=(trace_parse parse_string)
-\parse_file=(trace_parse parse_file)
-
 \do_test=
-(\parse
-div
-\f=parse
-f
-f
-)
+	(\parse
+	div
+	\f=parse
+	f
+	f
+	)
 
-\test_1=(later; do_test; parse_file "test/hello.fxl")
-\test_2=(later; do_test; parse_string ~ say "HI"~)
+\test_1=(later; do_test; parse "file" "test/hello.fxl")
+\test_2=(later; do_test; parse "string" ~ say "HI"~)
 \test_3=
 (later;
 div
@@ -56,8 +42,7 @@ div
 say ["x = " (+ 3 4)]
 ~
 \get=(readstr program)
-\form=(parse get "")
-\fn=(resolve standard form)
+\fn=(parse "stream" get)
 say "got it"
 fn
 )

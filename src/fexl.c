@@ -9,6 +9,7 @@
 #include <type_buf.h>
 #include <type_cmp.h>
 #include <type_file.h>
+#include <type_form.h>
 #include <type_istr.h>
 #include <type_limit.h>
 #include <type_math.h>
@@ -16,18 +17,15 @@
 #include <type_output.h>
 #include <type_parse.h>
 #include <type_rand.h>
-#include <type_resolve.h>
 #include <type_run.h>
 #include <type_str.h>
+#include <type_sym.h>
 #include <type_var.h>
 
 #if DEV
 #include <file.h>
 #include <memory.h>
 #endif
-
-static value Qresolve;
-static value Qstandard;
 
 static const char *cur_name;
 
@@ -36,10 +34,9 @@ static int match(const char *other)
 	return strcmp(cur_name,other) == 0;
 	}
 
-/* Define built-in symbols. */
-static value define(const char *name)
+/* Define standard symbols. */
+static value define_standard(const char *name)
 	{
-	/* Define other names. */
 	cur_name = name;
 
 	if (match("put")) return hold(Qput);
@@ -118,10 +115,15 @@ static value define(const char *name)
 	if (match("seed_rand")) return Q(type_seed_rand);
 	if (match("rand")) return Q(type_rand);
 
-	if (match("standard")) return hold(Qstandard);
-	if (match("parse")) return Q(type_parse);
-	if (match("resolve")) return hold(Qresolve);
+	if (match("use_standard")) return Q(type_use_standard);
+	if (match("evaluate")) return Q(type_evaluate);
+	if (match("resolved")) return Q(type_resolved);
+	if (match("is_resolved")) return Q(type_is_resolved);
+	if (match("define")) return Q(type_define);
 	if (match("use")) return Q(type_use);
+
+	if (match("parse")) return Q(type_parse);
+	if (match("parse_file")) return Q(type_parse_file);
 
 	if (match("buf_new")) return Q(type_buf_new);
 	if (match("buf_put")) return Q(type_buf_put);
@@ -142,20 +144,41 @@ static value define(const char *name)
 	return 0;
 	}
 
-/* (standard sym) returns {val} if the symbol is defined as val, or void if the
-symbol is not defined.  It returns val as a singleton so it's not evaluated. */
-value type_standard(value f)
+/* Return an expression where each symbol in the original is replaced with its
+standard definition.  If a symbol has no definition, it remains unchanged in
+the result. */
+static value resolve(value exp)
+	{
+	if (exp->T != type_sym)
+		return exp;
+	else if (exp->L == 0)
+		{
+		const char *name = sym_name(exp)->data;
+		value def = define_standard(name);
+		if (!def) def = hold(exp);
+		drop(exp);
+		return def;
+		}
+	else
+		{
+		value L = resolve(hold(exp->L));
+		value R = resolve(hold(exp->R));
+		drop(exp);
+		return app(L,R);
+		}
+	}
+
+/* (use_standard exp) Define standard symbols in the expression. */
+value type_use_standard(value f)
 	{
 	if (!f->L) return 0;
 	{
 	value x = arg(f->R);
-	if (x->T == type_str)
+	if (x->T == type_form)
 		{
-		value def = define(str_data(x));
-		if (def)
-			f = A(hold(Qyield),def);
-		else
-			f = hold(Qvoid);
+		value exp = hold(form_exp(x));
+		exp = resolve(exp);
+		f = Qform(exp);
 		}
 	else
 		f = hold(Qvoid);
@@ -164,27 +187,23 @@ value type_standard(value f)
 	}
 	}
 
-/* Return a function which evaluates the expression in the given context. */
-static value use_context(value context, value exp)
+static value eval_file(value name)
 	{
-	return eval(A(A(hold(Qresolve),context),exp));
+	value f;
+	f = A(Q(type_parse_file),name);
+	f = A(Q(type_use_standard),f);
+	f = A(Q(type_evaluate),f);
+	f = eval(f);
+	return f;
 	}
 
-/* Return a function which evaluates the named file in the standard context. */
-static value parse_standard(value name)
-	{
-	return use_context(hold(Qstandard),parse_file(name));
-	}
+/* (use name form)
+If the form has symbols, read the function from the named file and apply it to
+the form.  The usual purpose of the function is to define some of the symbols
+which occur in the form.
 
-/* (use file exp)
-Equivalent to:
-	(
-	\context=(parse_file file standard)
-	\f=(resolve context exp)
-	f
-	)
-This is used to bootstrap new contexts written in Fexl so you can do this:
-	use "lib.fxl" \; ...
+If the form has no symbols, the file is not read, and the form is returned
+unchanged.
 */
 value type_use(value f)
 	{
@@ -193,9 +212,17 @@ value type_use(value f)
 	value name = arg(f->L->R);
 	if (name->T == type_str)
 		{
-		value context = parse_standard(hold(name));
-		value exp = hold(f->R);
-		f = use_context(context,exp);
+		value form = arg(f->R);
+		if (form->T == type_form)
+			{
+			if (form_exp(form)->T == type_sym)
+				f = A(eval_file(hold(name)),hold(form));
+			else
+				f = hold(form);
+			}
+		else
+			f = hold(Qvoid);
+		drop(form);
 		}
 	else
 		f = hold(Qvoid);
@@ -214,15 +241,8 @@ int main(int argc, char *argv[])
 
 	beg_basic();
 	beg_output();
-	Qresolve = Q(type_resolve);
-	Qstandard = Q(type_standard);
 
-	{
-	value f;
-	f = parse_standard(Qstr0(name));
-	f = eval(f);
-	drop(f);
-	}
+	drop(eval_file(Qstr0(name)));
 
 	#if DEV
 	if (0)
@@ -236,8 +256,6 @@ int main(int argc, char *argv[])
 
 	end_basic();
 	end_output();
-	drop(Qresolve);
-	drop(Qstandard);
 	end_value();
 
 	return 0;

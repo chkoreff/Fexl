@@ -302,8 +302,6 @@ x = 81
 ==
 str x
 num 5
-bool T
-bool T
 ==
 fib 0 = 0
 fib 1 = 1
@@ -723,11 +721,9 @@ diff
 symbol say
 symbol fred
 symbol wilma
-symbol say
 symbol is_void
 symbol void
 symbol barney
-symbol say
 == run
 I am Fred.
 I am Wilma.
@@ -1161,8 +1157,6 @@ end
 exit 0
 ==== test/a6.fxl
 ==
-VOID
-==
 [
 (parsing)
 (resolving)
@@ -1177,8 +1171,10 @@ Hello world!
 HI
 HI
 ==
+[
 (parsing)
 (resolving)
+]
 got it
 x = 7
 exit 0
@@ -1349,6 +1345,9 @@ Unclosed brace on line 3
 exit 1
 ====
 Extraneous input on line 2
+exit 1
+====
+Number used as a lambda symbol on line 3
 exit 1
 ====
 Undefined symbol x on line 1

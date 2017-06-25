@@ -31,24 +31,6 @@ static value parse_string(value str, value label)
 	return parse_istr(&istr,label);
 	}
 
-/* Parse a named file.  Note that if name designates a directory the fopen will
-succeed, but it will behave like an empty file. */
-value parse_file(value name)
-	{
-	const char *name_s = str_data(name);
-	FILE *fh = name_s[0] ? fopen(name_s,"r") : stdin;
-	value exp;
-	if (!fh)
-		{
-		fput(stderr,"Could not open source file ");
-		fput(stderr,name_s);fnl(stderr);
-		die(0);
-		}
-	exp = parse_fh(fh,name);
-	if (fh != stdin) fclose(fh);
-	return exp;
-	}
-
 /* (parse source label) Parse the source, using the given label for any syntax
 error messages, and return the resulting form.  The source may be type_file,
 type_str, or type_istr.
@@ -62,11 +44,11 @@ value type_parse(value f)
 	if (label->T == type_str)
 		{
 		if (source->T == type_file)
-			f = parse_fh(get_fh(source),hold(label));
+			f = parse_fh(get_fh(source),label);
 		else if (source->T == type_str)
-			f = parse_string(source,hold(label));
+			f = parse_string(source,label);
 		else if (source->T == type_istr)
-			f = parse_istr(get_istr(source),hold(label));
+			f = parse_istr(get_istr(source),label);
 		else
 			f = hold(Qvoid);
 		}
@@ -74,6 +56,40 @@ value type_parse(value f)
 		f = hold(Qvoid);
 	drop(source);
 	drop(label);
+	return f;
+	}
+	}
+
+/* Parse a named file.  Note that if name designates a directory the fopen will
+succeed, but it will behave like an empty file. */
+static value parse_file(value name)
+	{
+	const char *name_s = str_data(name);
+	FILE *fh = name_s[0] ? fopen(name_s,"r") : stdin;
+	value exp;
+	if (!fh)
+		{
+		fput(stderr,"Could not open source file ");
+		fput(stderr,name_s);fnl(stderr);
+		die(0);
+		}
+	exp = parse_fh(fh,name);
+	if (fh != stdin) fclose(fh);
+	drop(name);
+	return exp;
+	}
+
+/* (parse_file name) Parse the named file. */
+value type_parse_file(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value name = arg(f->R);
+	if (name->T == type_str)
+		f = parse_file(hold(name));
+	else
+		f = hold(Qvoid);
+	drop(name);
 	return f;
 	}
 	}

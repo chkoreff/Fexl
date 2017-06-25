@@ -204,29 +204,30 @@
 # Apply a function to each logical character of a string.
 \str_map=(\f\str list_str; map f; str_chars str)
 
-def "append" append;
-def "column" column;
-def "each" each;
-def "filter" filter;
-def "first" first;
-def "fold" fold;
-def "get_list" get_list;
-def "get_str" get_str;
-def "g_sort" g_sort;
-def "list_at" list_at;
-def "list_combine" list_combine;
-def "list_length" list_length;
-def "list_str" list_str;
-def "list_sum" list_sum;
-def "map" map;
-def "range" range;
-def "reverse" reverse;
-def "shift" shift;
-def "sort" sort;
-def "str_bytes" str_bytes;
-def "str_chars" str_chars;
-def "str_map" str_map;
-def "stream_values" stream_values;
-def "to_str" to_str;
-def "unique" unique;
-void
+\form
+define "append" append;
+define "column" column;
+define "each" each;
+define "filter" filter;
+define "first" first;
+define "fold" fold;
+define "get_list" get_list;
+define "get_str" get_str;
+define "g_sort" g_sort;
+define "list_at" list_at;
+define "list_combine" list_combine;
+define "list_length" list_length;
+define "list_str" list_str;
+define "list_sum" list_sum;
+define "map" map;
+define "range" range;
+define "reverse" reverse;
+define "shift" shift;
+define "sort" sort;
+define "str_bytes" str_bytes;
+define "str_chars" str_chars;
+define "str_map" str_map;
+define "stream_values" stream_values;
+define "to_str" to_str;
+define "unique" unique;
+form

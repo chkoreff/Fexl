@@ -1,4 +1,5 @@
 #
+evaluate;
 use "test/common.fxl" \;
 
 # Echo the characters from the input.

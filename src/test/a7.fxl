@@ -1,5 +1,5 @@
 #
-\hello=(resolve standard \; xsay "Hello")
+\hello=(resolved; use_standard \; xsay "Hello")
 say "beg"
 hello
 hello

@@ -1,4 +1,9 @@
 #
+evaluate;
+use "test/math.fxl";
+use "test/list.fxl";
+use_standard;
+\;
 \long_month_names=
 [
 "January"
@@ -153,21 +158,22 @@
 	ymd ymd_date
 	)
 
-def "date_month" date_month;
-def "date_normal" date_normal;
-def "date_quarter" date_quarter;
-def "date_year" date_year;
-def "date_ymd" date_ymd;
-def "day_after" day_after;
-def "fill_day" fill_day;
-def "long_month_name" long_month_name;
-def "long_month_names" long_month_names;
-def "month_after" month_after;
-def "month_before" month_before;
-def "month_ym" month_ym;
-def "short_month_name" short_month_name;
-def "short_month_names" short_month_names;
-def "ymd_date" ymd_date;
-def "ym_month" ym_month;
-def "ym_num_days" ym_num_days;
-void
+\form
+define "date_month" date_month;
+define "date_normal" date_normal;
+define "date_quarter" date_quarter;
+define "date_year" date_year;
+define "date_ymd" date_ymd;
+define "day_after" day_after;
+define "fill_day" fill_day;
+define "long_month_name" long_month_name;
+define "long_month_names" long_month_names;
+define "month_after" month_after;
+define "month_before" month_before;
+define "month_ym" month_ym;
+define "short_month_name" short_month_name;
+define "short_month_names" short_month_names;
+define "ymd_date" ymd_date;
+define "ym_month" ym_month;
+define "ym_num_days" ym_num_days;
+form

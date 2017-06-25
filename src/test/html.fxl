@@ -1,3 +1,8 @@
+#
+evaluate;
+use "test/list.fxl";
+use_standard;
+\;
 # Quote a character for embedding in HTML.
 \quote_ch=
 	(\ch
@@ -18,7 +23,8 @@
 	say "</colgroup>"
 	)
 
-def "colgroup" colgroup;
-def "quote" quote;
-def "quote_ch" quote_ch;
-void
+\form
+define "colgroup" colgroup;
+define "quote" quote;
+define "quote_ch" quote_ch;
+form

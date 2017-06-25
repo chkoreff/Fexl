@@ -1,4 +1,5 @@
 #
+evaluate;
 use "test/common.fxl" \;
 
 # Return the (lazy) list of bytes read from the file handle.

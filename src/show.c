@@ -19,7 +19,6 @@
 #include <type_output.h>
 #include <type_parse.h>
 #include <type_rand.h>
-#include <type_resolve.h>
 #include <type_run.h>
 #include <type_str.h>
 #include <type_sym.h>
@@ -71,7 +70,6 @@ void put_type(type t)
 	else if (t == type_void) put("void");
 	else if (t == type_cons) put("cons");
 	else if (t == type_null) put("null");
-	else if (t == type_yield) put("yield");
 	else if (t == type_eval) put("eval");
 	else if (t == type_O) put_ch('O');
 	else if (t == type_once) put("once");
@@ -112,12 +110,15 @@ void put_type(type t)
 	else if (t == type_seed_rand) put("seed_rand");
 	else if (t == type_rand) put("rand");
 
-	else if (t == type_standard) put("standard");
+	else if (t == type_use_standard) put("use_standard");
+	else if (t == type_evaluate) put("evaluate");
+	else if (t == type_resolved) put("resolved");
+	else if (t == type_is_resolved) put("is_resolved");
+	else if (t == type_define) put("define");
 	else if (t == type_use) put("use");
 
 	else if (t == type_parse) put("parse");
-
-	else if (t == type_resolve) put("resolve");
+	else if (t == type_parse_file) put("parse_file");
 
 	else if (t == type_buf) put("buf");
 	else if (t == type_buf_new) put("buf_new");
@@ -185,14 +186,12 @@ static void limit_show(value f)
 			{
 			put_ch(' ');
 			put_ulong(sym_line(f));
+			put_ch(' ');
+			put_quote(sym_label(f));
 			}
 			}
 		else if (f->T == type_form)
-			{
-			put_quote(get_str(form_label(f)));
-			put_ch(' ');
 			limit_show(form_exp(f));
-			}
 		else if (f->T == type_var)
 			limit_show(f->R);
 		else if (f->T == type_buf || f->T == type_istr)

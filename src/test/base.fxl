@@ -1,30 +1,8 @@
-# Base library which bootstraps the export mechanism.
-
+#
 \if=(\x\y x y I)
 
 # (check x y) = x if x is good, otherwise y.
 \check=(\x \x=x is_good x x)
-
-# Take a context cx and return a new context where key is defined as val.
-\def=
-	(\key\val\cx
-	\x
-	eq x key {val};
-	cx x
-	)
-
-# Overlay context cx_new on top of context cx_old.
-\chain=
-	(\cx_new\cx_old
-	\x
-	check (cx_new x) (cx_old x)
-	)
-
-\use_context=
-	(\context\exp
-	\f=(resolve context exp)
-	f
-	)
 
 \error=
 	(\msg
@@ -32,51 +10,8 @@
 	die
 	)
 
-\parse_file=
-	(\name\context
-	\fh=(eq name "" stdin; fopen name "r")
-	is_void fh (error ["Could not open source file " name]);
-	\exp=(parse fh name)
-	if (ne name "") (fclose fh)
-	\f=(resolve context exp)
-	later f
-	)
-
-# (export cx) Returns a new context where all of cx is defined, but also the
-# special functions "export", "standard", and "use" are redefined to refer to
-# the new context instead of the original context.
-\export=
-	(@\export\cx
-
-	\standard=
-		(@\standard
-		\export=(\cx export; chain cx; standard)
-
-		\use=
-			(\file
-			\cx=(
-				\f=(parse_file file standard)
-				f
-				)
-			\cx=(export cx)
-			use_context cx
-			)
-
-		def "export" export;
-		def "standard" standard;
-		def "use" use;
-		cx
-		)
-
-	standard
-	)
-
-export;
-def "chain" chain;
-def "check" check;
-def "def" def;
-def "error" error;
-def "if" if;
-def "parse_file" parse_file;
-def "use_context" use_context;
-standard
+\form
+define "check" check;
+define "error" error;
+define "if" if;
+form

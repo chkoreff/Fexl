@@ -1,6 +1,4 @@
 #
-use "test/common.fxl" \;
-
 \test_1=
 (later;
 say "== test_1" # says PING 1 time

@@ -1,3 +1,11 @@
+#
+evaluate;
+use "test/list.fxl";
+use "test/math.fxl";
+use "test/bool.fxl";
+use_standard;
+\;
+
 # Map number 0-15 to one hex digit (lower-case).
 \hex_digit=
 	(\n
@@ -54,10 +62,11 @@
 	to_str zl
 	)
 
-def "hex_byte" hex_byte;
-def "hex_digit" hex_digit;
-def "hex_digit_to_dec" hex_digit_to_dec;
-def "map_hex_to_raw_bytes" map_hex_to_raw_bytes;
-def "map_raw_bytes_to_hex" map_raw_bytes_to_hex;
-def "xor_hex" xor_hex;
-void
+\form
+define "hex_byte" hex_byte;
+define "hex_digit" hex_digit;
+define "hex_digit_to_dec" hex_digit_to_dec;
+define "map_hex_to_raw_bytes" map_hex_to_raw_bytes;
+define "map_raw_bytes_to_hex" map_raw_bytes_to_hex;
+define "xor_hex" xor_hex;
+form

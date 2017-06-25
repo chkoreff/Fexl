@@ -1,4 +1,5 @@
 #
+evaluate;
 use "test/common.fxl" \;
 
 \show=
@@ -12,15 +13,8 @@ use "test/common.fxl" \;
 	say "other"
 	)
 
-\parse_string=
-	(\str\context
-	\exp=(parse str "")
-	\f=(resolve context exp)
-	later f
-	)
-
-\eval_file=(\name \f=(parse_file name standard) f)
-\eval_str=(\str \f=(parse_string str standard) f)
+\eval_file=(\name evaluate; use_standard; parse_file name)
+\eval_str=(\str evaluate; use_standard; parse str "")
 
 (
 \ping=(later; say "ping")
@@ -367,35 +361,13 @@ say ["x = " x]
 div
 
 (
-# Here I enhance the standard context to include the "show" routine so the test
-# code below the "use" can run.  I could have just moved the test code above
-# the use, but I wanted to test "export" explicitly here.
-use_context
-(
-export;
-def "show" show;
-void
-)
+evaluate;
+use "test/try_fib.fxl";
+define "show" show;
+use_standard;
 \;
-
-use "test/try_fib.fxl" \;
-
-(
 show "x"
 show (+ 2 3)
-show (is_good; standard "show")
-# Demonstrate that the standard context points directly to itself.
-show (
-	\val=
-		(
-		\cx=standard
-		cx "standard" \cx
-		cx "standard" \cx
-		cx "show"
-		)
-	is_good val
-	)
-)
 try_fib
 )
 
@@ -653,24 +625,22 @@ eval_file "test/mf.fxl"
 \case_1=
 	(later;
 	say "["
-
-	\context=
-	(
-	def "fred" (say "I am Fred.");
-	def "wilma" (say "I am Wilma.");
-	def "barney" (say "I am Barney.");
-	def "is_void" is_void;
-	def "say" say;
-	def "void" void;
-	void
-	)
-
-	\context=(\x say ["symbol " x] context x)
-
 	say "== resolve"
 
-	use_context context \;
+	\define=
+		(\x\def\form
+		say ["symbol "x]
+		define x def form
+		)
 
+	evaluate;
+	define "say" say;
+	define "fred" (say "I am Fred.");
+	define "wilma" (say "I am Wilma.");
+	define "is_void" is_void;
+	define "void" void;
+	define "barney" (say "I am Barney.");
+	\;
 	say "== run"
 	fred
 	wilma
@@ -683,14 +653,22 @@ eval_file "test/mf.fxl"
 \case_2=
 	(later;
 	say "["
-	\form=(\context \f=(parse_string "say (+ 7 8)" context) f)
+	\form=(parse "say (+ 7 8)" "")
 
 	say "Run in standard context."
-	form standard
+	(
+	evaluate;
+	use_standard;
+	form
+	)
 
 	say "Run in weird context."
-	\context=(\x eq x "say" {say}; eq x "+" {*}; void)
-	form context
+	(
+	evaluate;
+	define "say" say;
+	define "+" *;
+	form
+	)
 
 	say "]"
 	)
@@ -698,10 +676,14 @@ eval_file "test/mf.fxl"
 \case_3=
 	(later;
 	\run=
-	(later;
-	use_context standard \;
-	say "PING"
-	)
+		(
+		\form=
+			(use_standard \;
+			say "PING"
+			)
+		later;
+		evaluate form
+		)
 
 	say "["
 	run

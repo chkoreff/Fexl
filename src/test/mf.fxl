@@ -1,4 +1,5 @@
 # https://en.wikipedia.org/wiki/Hofstadter_sequence#Hofstadter_Female_and_Male_sequences
+evaluate;
 use "test/common.fxl" \;
 
 \create=

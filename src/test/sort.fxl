@@ -1,11 +1,8 @@
 #
-use "test/common.fxl" \;
+evaluate;
+use "test/common.fxl";
+\;
 
-# Here I use a highly restricted context which provides only the few functions
-# I need to test sorting.  I don't have to do it this way, but I'm exercising
-# the context mechanism.
-use_context
-(
 # (tower f n x) is the result of applying f to x n times.
 \tower=
 	(\f @\loop\n\x
@@ -15,17 +12,14 @@ use_context
 	loop n x
 	)
 
-def "append" append;
-def "each" each;
-def "say" say;
-def "show_list" show_list;
-def "sort" sort;
-def "tower" tower;
-def "unique" unique;
-void
-)
+# Test restricted evaluation by defining only the necessary functions.
+evaluate;
+define "append" append;
+define "show_list" show_list;
+define "sort" sort;
+define "tower" tower;
+define "unique" unique;
 \;
-
 # Here I test the sort.
 
 # A list of 30 random words from diceware.com.

@@ -1,12 +1,7 @@
 #
-use "test/common.fxl" \;
-
-use_context
-(
-export;
-def "talk" (say "TALK");
-void
-)
+evaluate;
+define "talk" (say "TALK");
+use_standard;
 \;
 say "begin"
 talk

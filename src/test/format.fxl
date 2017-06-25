@@ -79,9 +79,10 @@ format_num
 	. term; . (eq term QU "" " "); . x; term
 	)
 
-def "fexl_quote" fexl_quote;
-def "format_money" format_money;
-def "format_num" format_num;
-def "format_pct" format_pct;
-def "NL" NL;
-void
+\form
+define "fexl_quote" fexl_quote;
+define "format_money" format_money;
+define "format_num" format_num;
+define "format_pct" format_pct;
+define "NL" NL;
+form

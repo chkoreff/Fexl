@@ -8,9 +8,10 @@
 
 \tau=(* 2 pi)
 
-def "max" max;
-def "min" min;
-def "mod" mod;
-def "neg" neg;
-def "tau" tau;
-void
+\form
+define "max" max;
+define "min" min;
+define "mod" mod;
+define "neg" neg;
+define "tau" tau;
+form

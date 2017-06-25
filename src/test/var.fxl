@@ -1,4 +1,5 @@
 # Demonstrate the use of vars to maintain an evolving state.
+evaluate;
 use "test/common.fxl" \;
 
 ## Here is the "API".

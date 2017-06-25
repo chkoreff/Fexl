@@ -1,5 +1,6 @@
 #
-use "test/common.fxl" \;
-use "test/try_fib.fxl" \;
-
+evaluate;
+use "test/try_fib.fxl";
+use "test/common.fxl";
+\;
 each (range 1 1000) \n try_fib
