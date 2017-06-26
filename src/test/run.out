@@ -337,6 +337,23 @@ fib 19 = 4181
 fib 20 = 6765
 fib 21 = 10946
 ==
+hi
+I am Fred.
+35.2
+74.5
+74.5
+74.5
+15
+14
+14.8
+3.84707681233427
+121.510417518735
+1.56861591791385
+-0.996164608835841
+bye
+==
+45.87
+==
 length is 16777216
 ==
 Hello world.
@@ -1347,14 +1364,11 @@ exit 1
 Extraneous input on line 2
 exit 1
 ====
-Number used as a lambda symbol on line 3
-exit 1
-====
-Undefined symbol x on line 1
-Undefined symbol y on line 2
-Undefined symbol z on line 3
-Undefined symbol z on line 3
-Undefined symbol y on line 3
+Undefined symbol a on line 2
+Undefined symbol b on line 2
+Undefined symbol c on line 2
+Undefined symbol d on line 2
+Undefined symbol x on line 8
 exit 1
 ====
 Undefined symbol a on line 1

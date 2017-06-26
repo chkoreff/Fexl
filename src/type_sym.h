@@ -1,6 +1,6 @@
 struct symbol
 	{
-	string name;
+	value name;
 	unsigned long line;
 	value label;
 	};
@@ -14,6 +14,7 @@ extern string sym_label(value x);
 extern value app(value f, value g);
 extern value Qsubst(value p, value e);
 extern value lambda(string name, value exp);
+extern value op_resolve(value resolve_name(value name), value f);
 extern value type_evaluate(value f);
 extern value type_resolved(value f);
 extern value type_is_resolved(value f);

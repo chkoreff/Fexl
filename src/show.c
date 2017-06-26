@@ -111,11 +111,13 @@ void put_type(type t)
 	else if (t == type_rand) put("rand");
 
 	else if (t == type_use_standard) put("use_standard");
+	else if (t == type_use_numbers) put("use_numbers");
+	else if (t == type_use) put("use");
+
 	else if (t == type_evaluate) put("evaluate");
 	else if (t == type_resolved) put("resolved");
 	else if (t == type_is_resolved) put("is_resolved");
 	else if (t == type_define) put("define");
-	else if (t == type_use) put("use");
 
 	else if (t == type_parse) put("parse");
 	else if (t == type_parse_file) put("parse_file");

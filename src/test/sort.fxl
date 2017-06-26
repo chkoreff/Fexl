@@ -19,6 +19,7 @@ define "show_list" show_list;
 define "sort" sort;
 define "tower" tower;
 define "unique" unique;
+use_numbers;
 \;
 # Here I test the sort.
 

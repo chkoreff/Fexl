@@ -11,7 +11,7 @@
 
 static void sym_free(struct symbol *sym)
 	{
-	str_free(sym->name);
+	drop(sym->name);
 	drop(sym->label);
 	free_memory(sym,sizeof(struct symbol));
 	}
@@ -29,7 +29,7 @@ value type_sym(value f)
 value Qsym(string name, unsigned long line, value label)
 	{
 	struct symbol *sym = new_memory(sizeof(struct symbol));
-	sym->name = name;
+	sym->name = Qstr(name);
 	sym->line = line;
 	sym->label = label;
 	return D(type_sym,sym);
@@ -42,7 +42,7 @@ struct symbol *get_sym(value x)
 
 string sym_name(value x)
 	{
-	return get_sym(x)->name;
+	return get_str(get_sym(x)->name);
 	}
 
 unsigned long sym_line(value x)
@@ -102,13 +102,18 @@ static void abstract(string name, value exp, value *p, value *e)
 
 		if (xp == QF && yp == QF)
 			{
-			*p = xp;
+			drop(xe);
+			drop(ye);
 			drop(yp);
+
+			*p = QF;
+			*e = hold(exp);
 			}
 		else
+			{
 			*p = A(xp,yp);
-
-		*e = app(xe,ye);
+			*e = app(xe,ye);
+			}
 		}
 	}
 
@@ -122,34 +127,116 @@ value lambda(string name, value exp)
 	return f;
 	}
 
-/* Report all undefined symbols in the expression. */
-static void report_undef(value exp)
+/* Return an expression where each symbol in the original is replaced with the
+definition given by resolve_name.  If a symbol has no definition, it remains
+unchanged in the result. */
+static value resolve(value resolve_name(value name), value exp)
 	{
 	if (exp->T != type_sym)
-		;
+		return hold(exp);
 	else if (exp->L == 0)
 		{
-		const char *name = sym_name(exp)->data;
-		const char *label = sym_label(exp)->data;
-		undefined_symbol(name,sym_line(exp),label);
+		value def = resolve_name(get_sym(exp)->name);
+		if (def)
+			return def;
+		else
+			return hold(exp);
 		}
 	else
 		{
-		report_undef(exp->L);
-		report_undef(exp->R);
+		value L = resolve(resolve_name,exp->L);
+		value R = resolve(resolve_name,exp->R);
+		if (L == exp->L && R == exp->R)
+			{
+			drop(L);
+			drop(R);
+			return hold(exp);
+			}
+		else
+			return app(L,R);
 		}
 	}
 
-static value check_undef(value f)
+value op_resolve(value resolve_name(value name), value f)
 	{
-	if (f->T == type_sym)
-		{
-		report_undef(f);
-		die(0); /* The expression had undefined symbols. */
-		drop(f);
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_form)
+		f = Qform(resolve(resolve_name,form_exp(x)));
+	else
 		f = hold(Qvoid);
-		}
+	drop(x);
 	return f;
+	}
+	}
+
+/* Return an expression where each occurrence of name is replaced with def. */
+static value define(string name, value def, value exp)
+	{
+	if (exp->T != type_sym)
+		return hold(exp);
+	else if (exp->L == 0)
+		{
+		if (str_eq(name,sym_name(exp)))
+			return hold(def);
+		else
+			return hold(exp);
+		}
+	else
+		{
+		value L = define(name,def,exp->L);
+		value R = define(name,def,exp->R);
+		if (L == exp->L && R == exp->R)
+			{
+			drop(L);
+			drop(R);
+			return hold(exp);
+			}
+		else
+			return app(L,R);
+		}
+	}
+
+/* Return the first undefined symbol in the expression. */
+static value first_undef(value exp)
+	{
+	if (exp->T != type_sym)
+		return 0;
+	else if (exp->L == 0)
+		return exp;
+	else
+		{
+		value x = first_undef(exp->L);
+		if (x) return x;
+		return first_undef(exp->R);
+		}
+	}
+
+/* If the expression has symbols, report each distinct symbol as undefined and
+then die. */
+static value check_undef(value exp)
+	{
+	if (exp->T != type_sym)
+		return hold(exp);
+
+	hold(exp);
+	while (1)
+		{
+		value x = first_undef(exp);
+		if (x == 0) break;
+		{
+		value old = exp;
+		exp = define(sym_name(x),QI,exp);
+		drop(old);
+		undefined_symbol(sym_name(x)->data,sym_line(x),sym_label(x)->data);
+		}
+		}
+
+	drop(exp);
+	exp = hold(Qvoid);
+	die(0); /* The expression had undefined symbols. */
+	return exp;
 	}
 
 /* (evaluate form) Evaluate the form if it is fully resolved, otherwise report
@@ -160,7 +247,7 @@ value type_evaluate(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_form)
-		f = check_undef(hold(form_exp(x)));
+		f = check_undef(form_exp(x));
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -176,7 +263,7 @@ value type_resolved(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_form)
-		f = A(Q(type_later),check_undef(hold(form_exp(x))));
+		f = A(Q(type_later),check_undef(form_exp(x)));
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -211,10 +298,9 @@ value type_define(value f)
 		value form = arg(f->R);
 		if (form->T == type_form)
 			{
-			value def = hold(f->L->R);
-			value exp = hold(form_exp(form));
-			exp = lambda(get_str(name),exp);
-			f = Qform(app(exp,def));
+			value def = f->L->R;
+			value exp = define(get_str(name),def,form_exp(form));
+			f = Qform(exp);
 			}
 		else
 			f = hold(Qvoid);

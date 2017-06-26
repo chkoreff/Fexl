@@ -20,9 +20,9 @@ Grammar:
 exp    => empty
 exp    => term exp
 exp    => ; exp
-exp    => \ sym exp
-exp    => \ sym = term exp
-exp    => \ ; exp
+exp    => \ name exp
+exp    => \ name = term exp
+exp    => \; exp
 
 term   => ( exp )
 term   => [ list ]
@@ -139,17 +139,7 @@ static value parse_name(void)
 		}
 
 	if (!buf.top) return 0;
-	{
-	string name = buf_clear(&buf);
-	value num = Qnum_str0(name->data);
-	if (num)
-		{
-		str_free(name);
-		return num;
-		}
-	else
-		return Qsym(name,first_line,hold(label));
-	}
+	return Qsym(buf_clear(&buf),first_line,hold(label));
 	}
 
 /* Collect a string up to an ending terminator. */
@@ -320,8 +310,6 @@ static value parse_lambda(unsigned long first_line)
 	sym = parse_name();
 	if (sym == 0)
 		syntax_error("Missing symbol after '\\'", first_line);
-	if (sym->T == type_num)
-		syntax_error("Number used as a lambda symbol", first_line);
 
 	/* Parse the optional definition of the symbol. */
 	skip_filler();

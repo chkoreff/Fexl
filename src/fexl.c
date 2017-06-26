@@ -27,6 +27,10 @@
 #include <memory.h>
 #endif
 
+static value Qparse_file;
+static value Quse_standard;
+static value Qevaluate;
+
 static const char *cur_name;
 
 static int match(const char *other)
@@ -34,10 +38,23 @@ static int match(const char *other)
 	return strcmp(cur_name,other) == 0;
 	}
 
-/* Define standard symbols. */
-static value define_standard(const char *name)
+/* Resolve numeric literals. */
+static value resolve_number(value name)
 	{
-	cur_name = name;
+	return Qnum_str0(get_str(name)->data);
+	}
+
+/* Resolve standard symbols. */
+static value resolve_standard(value name)
+	{
+	{
+	/* Resolve numeric literals. */
+	value def = resolve_number(name);
+	if (def) return def;
+	}
+
+	/* Resolve other names. */
+	cur_name = get_str(name)->data;
 
 	if (match("put")) return hold(Qput);
 	if (match("nl")) return hold(Qnl);
@@ -115,15 +132,17 @@ static value define_standard(const char *name)
 	if (match("seed_rand")) return Q(type_seed_rand);
 	if (match("rand")) return Q(type_rand);
 
-	if (match("use_standard")) return Q(type_use_standard);
-	if (match("evaluate")) return Q(type_evaluate);
+	if (match("use_standard")) return hold(Quse_standard);
+	if (match("use_numbers")) return Q(type_use_numbers);
+	if (match("use")) return Q(type_use);
+
+	if (match("evaluate")) return hold(Qevaluate);
 	if (match("resolved")) return Q(type_resolved);
 	if (match("is_resolved")) return Q(type_is_resolved);
 	if (match("define")) return Q(type_define);
-	if (match("use")) return Q(type_use);
 
 	if (match("parse")) return Q(type_parse);
-	if (match("parse_file")) return Q(type_parse_file);
+	if (match("parse_file")) return hold(Qparse_file);
 
 	if (match("buf_new")) return Q(type_buf_new);
 	if (match("buf_put")) return Q(type_buf_put);
@@ -144,55 +163,24 @@ static value define_standard(const char *name)
 	return 0;
 	}
 
-/* Return an expression where each symbol in the original is replaced with its
-standard definition.  If a symbol has no definition, it remains unchanged in
-the result. */
-static value resolve(value exp)
-	{
-	if (exp->T != type_sym)
-		return exp;
-	else if (exp->L == 0)
-		{
-		const char *name = sym_name(exp)->data;
-		value def = define_standard(name);
-		if (!def) def = hold(exp);
-		drop(exp);
-		return def;
-		}
-	else
-		{
-		value L = resolve(hold(exp->L));
-		value R = resolve(hold(exp->R));
-		drop(exp);
-		return app(L,R);
-		}
-	}
-
-/* (use_standard exp) Define standard symbols in the expression. */
+/* (use_standard form) Resolve standard symbols in the form. */
 value type_use_standard(value f)
 	{
-	if (!f->L) return 0;
-	{
-	value x = arg(f->R);
-	if (x->T == type_form)
-		{
-		value exp = hold(form_exp(x));
-		exp = resolve(exp);
-		f = Qform(exp);
-		}
-	else
-		f = hold(Qvoid);
-	drop(x);
-	return f;
+	return op_resolve(resolve_standard,f);
 	}
+
+/* (use_numbers form) Resolve numeric literals in the form. */
+value type_use_numbers(value f)
+	{
+	return op_resolve(resolve_number,f);
 	}
 
 static value eval_file(value name)
 	{
 	value f;
-	f = A(Q(type_parse_file),name);
-	f = A(Q(type_use_standard),f);
-	f = A(Q(type_evaluate),f);
+	f = A(hold(Qparse_file),name);
+	f = A(hold(Quse_standard),f);
+	f = A(hold(Qevaluate),f);
 	f = eval(f);
 	return f;
 	}
@@ -241,6 +229,9 @@ int main(int argc, char *argv[])
 
 	beg_basic();
 	beg_output();
+	Qparse_file = Q(type_parse_file);
+	Quse_standard = Q(type_use_standard);
+	Qevaluate = Q(type_evaluate);
 
 	drop(eval_file(Qstr0(name)));
 
@@ -256,6 +247,9 @@ int main(int argc, char *argv[])
 
 	end_basic();
 	end_output();
+	drop(Qparse_file);
+	drop(Quse_standard);
+	drop(Qevaluate);
 	end_value();
 
 	return 0;
