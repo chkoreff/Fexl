@@ -50,6 +50,13 @@ value type_null(value f)
 	return type_T(f);
 	}
 
+/* (tuple data handler) = (data handler) */
+value type_tuple(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	return A(hold(f->L->R),hold(f->R));
+	}
+
 /* (eval x next) = (next y), where y is the final value of x. */
 value type_eval(value f)
 	{
@@ -102,6 +109,11 @@ value type_is_void(value f)
 	return op_is_type(f,type_void);
 	}
 
+value type_is_tuple(value f)
+	{
+	return op_is_type(f,type_tuple);
+	}
+
 static value op_predicate(value f, int op(value x))
 	{
 	if (!f->L) return 0;
@@ -145,6 +157,7 @@ value QY;
 value Qvoid;
 value Qcons;
 value Qnull;
+value Qtuple;
 value Qeval;
 
 void beg_basic(void)
@@ -156,6 +169,7 @@ void beg_basic(void)
 	Qvoid = Q(type_void);
 	Qcons = Q(type_cons);
 	Qnull = Q(type_null);
+	Qtuple = Q(type_tuple);
 	Qeval = Q(type_eval);
 	}
 
@@ -168,5 +182,6 @@ void end_basic(void)
 	drop(Qvoid);
 	drop(Qcons);
 	drop(Qnull);
+	drop(Qtuple);
 	drop(Qeval);
 	}

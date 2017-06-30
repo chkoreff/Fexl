@@ -582,34 +582,56 @@ say (is_void void)
 say (is_void ( (\; f x) 3) )
 
 # Test tuples
-div
+say "== tuples"
 (
-\show=
-	(@\loop\keys
-	keys () \key\keys
-	\val
-	put [key "=" val " "]
-	loop keys
+\show_args=
+	(@\loop\n
+	eq n 0 ();
+	\x
+	put [x" "]
+	\n=(- n 1)
+	loop n
 	)
 
+\show_tuple=
+	(\data
+	put "{ "
+	\n=(arity data)
+	data (show_args n)
+	say "}"
+	)
+
+show_tuple {}
+show_tuple {"a"}
+show_tuple {"a" "b"}
+show_tuple {"a" "b" "c"}
+show_tuple {"a" "b" "c" "d"}
+)
+(
 \try=
-	(\keys\vals
-	vals (show keys) nl
+	(\list
+	each list
+		(\pair
+		pair \key\val
+		put [key "=" val " "]
+		)
+	nl
 	)
 
-try [] {}
-try ["x"] {(+ 1 2)}
-try ["x" "y"] {3 4}
-try ["x" "y" "z"] {"ab" (. "cd" "efg") (^ 4 8)}
-try ["x" "y"] {(+ 1 2) (* 3 4)}
+try []
+try [ {"x" (+ 1 2)} ]
+
+try [ {"x" 3} {"y" 4} ]
+try [ {"x" "ab" } {"y" (. "cd" "efg") } {"z" (^ 4 8) }]
+try [ {"x" (+ 1 2)} {"y" (* 3 4)} ]
 
 (
 \x=(+ 1 2)
 \y=(* x 4)
-try ["x" "y" "z"] {x y (* x y)}
+try [ {"x" x} {"y" y} {"z" (* x y)} ]
 )
 
-try ["a""b""c""d""e""f""g"] {1 2 3 4 5 6 7}
+try [ {"a" 1} {"b" 2} {"c" 3} {"d" 4} {"e" 5} {"f" 6} {"g" 7} ]
 )
 
 div

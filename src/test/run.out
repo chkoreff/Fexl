@@ -591,7 +591,12 @@ F
 F
 T
 T
-==
+== tuples
+{ }
+{ a }
+{ a b }
+{ a b c }
+{ a b c d }
 
 x=3 
 x=3 y=4 

@@ -58,6 +58,30 @@ value type_num_str(value f)
 	}
 	}
 
+/* (arity type) Return the number of elements in the tuple. */
+value type_arity(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_tuple)
+		{
+		value pattern = x->R->L->R;
+		unsigned long arity = 0;
+		while (pattern != QT)
+			{
+			arity++;
+			pattern = pattern->L;
+			}
+		f = Qnum(num_new_ulong(arity));
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
+	}
+
 value type_is_num(value f)
 	{
 	return op_is_type(f,type_num);

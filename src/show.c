@@ -70,11 +70,13 @@ void put_type(type t)
 	else if (t == type_void) put("void");
 	else if (t == type_cons) put("cons");
 	else if (t == type_null) put("null");
+	else if (t == type_tuple) put("tuple");
 	else if (t == type_eval) put("eval");
 	else if (t == type_O) put_ch('O');
 	else if (t == type_once) put("once");
 	else if (t == type_later) put("later");
 	else if (t == type_is_void) put("is_void");
+	else if (t == type_is_tuple) put("is_tuple");
 	else if (t == type_is_good) put("is_good");
 	else if (t == type_is_bool) put("is_bool");
 	else if (t == type_is_list) put("is_list");
@@ -92,6 +94,7 @@ void put_type(type t)
 
 	else if (t == type_num) put("num");
 	else if (t == type_num_str) put("num_str");
+	else if (t == type_arity) put("arity");
 	else if (t == type_is_num) put("is_num");
 
 	else if (t == type_file) put("file");

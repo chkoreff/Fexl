@@ -263,7 +263,7 @@ static value parse_tuple(void)
 		pattern = A(pattern,hold(QF));
 		exp = app(exp,term);
 		}
-	return Qsubst(pattern,exp);
+	return app(hold(Qtuple),Qsubst(pattern,exp));
 	}
 
 static value parse_term(void)

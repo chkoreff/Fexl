@@ -97,6 +97,7 @@ static value resolve_standard(value name)
 	if (match("once")) return Q(type_once);
 	if (match("later")) return Q(type_later);
 	if (match("is_void")) return Q(type_is_void);
+	if (match("is_tuple")) return Q(type_is_tuple);
 	if (match("is_good")) return Q(type_is_good);
 	if (match("is_bool")) return Q(type_is_bool);
 	if (match("is_list")) return Q(type_is_list);
@@ -112,6 +113,7 @@ static value resolve_standard(value name)
 	if (match("is_str")) return Q(type_is_str);
 
 	if (match("num_str")) return Q(type_num_str);
+	if (match("arity")) return Q(type_arity);
 	if (match("is_num")) return Q(type_is_num);
 
 	if (match("stdin")) return Qfile(stdin);
