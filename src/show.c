@@ -4,10 +4,10 @@
 #include <value.h>
 
 #include <basic.h>
-#include <fexl.h>
 #include <output.h>
 #include <output2.h>
 #include <show.h>
+#include <standard.h>
 #include <type_buf.h>
 #include <type_cmp.h>
 #include <type_file.h>
@@ -22,6 +22,7 @@
 #include <type_run.h>
 #include <type_str.h>
 #include <type_sym.h>
+#include <type_tuple.h>
 #include <type_var.h>
 
 void put_type(type t)
@@ -76,7 +77,6 @@ void put_type(type t)
 	else if (t == type_once) put("once");
 	else if (t == type_later) put("later");
 	else if (t == type_is_void) put("is_void");
-	else if (t == type_is_tuple) put("is_tuple");
 	else if (t == type_is_good) put("is_good");
 	else if (t == type_is_bool) put("is_bool");
 	else if (t == type_is_list) put("is_list");
@@ -94,8 +94,12 @@ void put_type(type t)
 
 	else if (t == type_num) put("num");
 	else if (t == type_num_str) put("num_str");
-	else if (t == type_arity) put("arity");
 	else if (t == type_is_num) put("is_num");
+
+	else if (t == type_is_tuple) put("is_tuple");
+	else if (t == type_arity) put("arity");
+	else if (t == type_split_tuple) put("split_tuple");
+	else if (t == type_join_tuple) put("join_tuple");
 
 	else if (t == type_file) put("file");
 	else if (t == type_fopen) put("fopen");

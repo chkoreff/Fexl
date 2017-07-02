@@ -1,6 +1,7 @@
 #include <value.h>
 
 #include <basic.h>
+#include <standard.h>
 
 /* (I x) = x */
 value type_I(value f)
@@ -48,13 +49,6 @@ value type_cons(value f)
 value type_null(value f)
 	{
 	return type_T(f);
-	}
-
-/* (tuple data handler) = (data handler) */
-value type_tuple(value f)
-	{
-	if (!f->L || !f->L->L) return 0;
-	return A(hold(f->L->R),hold(f->R));
 	}
 
 /* (eval x next) = (next y), where y is the final value of x. */
@@ -109,11 +103,6 @@ value type_is_void(value f)
 	return op_is_type(f,type_void);
 	}
 
-value type_is_tuple(value f)
-	{
-	return op_is_type(f,type_tuple);
-	}
-
 static value op_predicate(value f, int op(value x))
 	{
 	if (!f->L) return 0;
@@ -148,40 +137,4 @@ value type_is_list(value f) { return op_predicate(f,op_is_list); }
 value boolean(int x)
 	{
 	return hold(x ? QT : QF);
-	}
-
-value QI;
-value QT;
-value QF;
-value QY;
-value Qvoid;
-value Qcons;
-value Qnull;
-value Qtuple;
-value Qeval;
-
-void beg_basic(void)
-	{
-	QI = Q(type_I);
-	QT = Q(type_T);
-	QF = Q(type_F);
-	QY = Q(type_Y);
-	Qvoid = Q(type_void);
-	Qcons = Q(type_cons);
-	Qnull = Q(type_null);
-	Qtuple = Q(type_tuple);
-	Qeval = Q(type_eval);
-	}
-
-void end_basic(void)
-	{
-	drop(QI);
-	drop(QT);
-	drop(QF);
-	drop(QY);
-	drop(Qvoid);
-	drop(Qcons);
-	drop(Qnull);
-	drop(Qtuple);
-	drop(Qeval);
 	}

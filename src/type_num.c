@@ -4,6 +4,7 @@
 
 #include <basic.h>
 #include <convert.h>
+#include <standard.h>
 #include <type_num.h>
 #include <type_str.h>
 
@@ -51,30 +52,6 @@ value type_num_str(value f)
 	value x = arg(f->R);
 	if (x->T == type_num)
 		f = Qstr(num_str(get_num(x)));
-	else
-		f = hold(Qvoid);
-	drop(x);
-	return f;
-	}
-	}
-
-/* (arity type) Return the number of elements in the tuple. */
-value type_arity(value f)
-	{
-	if (!f->L) return 0;
-	{
-	value x = arg(f->R);
-	if (x->T == type_tuple)
-		{
-		value pattern = x->R->L->R;
-		unsigned long arity = 0;
-		while (pattern != QT)
-			{
-			arity++;
-			pattern = pattern->L;
-			}
-		f = Qnum(num_new_ulong(arity));
-		}
 	else
 		f = hold(Qvoid);
 	drop(x);

@@ -5,6 +5,7 @@
 
 #include <basic.h>
 #include <memory.h>
+#include <standard.h>
 #include <type_input.h>
 #include <type_istr.h>
 #include <type_str.h>

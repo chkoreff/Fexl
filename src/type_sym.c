@@ -5,6 +5,7 @@
 #include <die.h>
 #include <memory.h>
 #include <report.h>
+#include <standard.h>
 #include <type_form.h>
 #include <type_str.h>
 #include <type_sym.h>

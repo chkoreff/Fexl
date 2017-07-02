@@ -584,28 +584,26 @@ say (is_void ( (\; f x) 3) )
 # Test tuples
 say "== tuples"
 (
-\show_args=
-	(@\loop\n
-	eq n 0 ();
-	\x
-	put [x" "]
-	\n=(- n 1)
-	loop n
-	)
-
 \show_tuple=
 	(\data
 	put "{ "
-	\n=(arity data)
-	data (show_args n)
+	(@\loop\data
+	split_tuple data () \left\x
+	loop left
+	put [x" "]
+	) data
 	say "}"
 	)
 
-show_tuple {}
-show_tuple {"a"}
-show_tuple {"a" "b"}
-show_tuple {"a" "b" "c"}
-show_tuple {"a" "b" "c" "d"}
+\join_items=
+	(@\loop\data\xs
+	show_tuple data
+	xs () \x\xs
+	\data=(join_tuple data x)
+	loop data xs
+	)
+
+join_items {} (map (\x chr; + x 96); range 1 6)
 )
 (
 \try=

@@ -6,6 +6,7 @@
 #include <basic.h>
 #include <file.h>
 #include <file2.h>
+#include <standard.h>
 #include <type_file.h>
 #include <type_num.h>
 #include <type_output.h>
@@ -105,25 +106,4 @@ value type_fflush(value f)
 	drop(out);
 	return f;
 	}
-	}
-
-value Qput;
-value Qnl;
-value Qfput;
-value Qfnl;
-
-void beg_output(void)
-	{
-	Qput = Q(type_put);
-	Qnl = Q(type_nl);
-	Qfput = Q(type_fput);
-	Qfnl = Q(type_fnl);
-	}
-
-void end_output(void)
-	{
-	drop(Qput);
-	drop(Qnl);
-	drop(Qfput);
-	drop(Qfnl);
 	}

@@ -1,4 +1,2 @@
-extern int main_argc;
-extern char **main_argv;
 extern value type_die(value f);
 extern value type_argv(value f);

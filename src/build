@@ -17,6 +17,7 @@ make memory
 make num
 make parse
 make report
+make standard
 make str
 make type_buf
 make type_cmp
@@ -33,6 +34,7 @@ make type_rand
 make type_run
 make type_str
 make type_sym
+make type_tuple
 make type_var
 make value
 if [ $DEV -eq 1 ]; then

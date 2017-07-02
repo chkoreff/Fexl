@@ -1,0 +1,16 @@
+extern value type_use_standard(value f);
+extern value type_use_numbers(value f);
+extern value type_use(value f);
+extern value QI;
+extern value QT;
+extern value QF;
+extern value Qvoid;
+extern value Qcons;
+extern value Qnull;
+extern value Qeval;
+extern value Qput;
+extern value Qnl;
+extern value Qfput;
+extern value Qfnl;
+extern value Qtuple;
+extern void eval_standard(const char *name);

@@ -4,15 +4,16 @@
 #include <num.h>
 #include <value.h>
 
-#include <basic.h>
 #include <buffer.h>
 #include <ctype.h> /* isspace iscntrl */
 #include <parse.h>
 #include <report.h>
+#include <standard.h>
 #include <type_form.h>
 #include <type_num.h>
 #include <type_str.h>
 #include <type_sym.h>
+#include <type_tuple.h>
 
 /*
 Grammar:

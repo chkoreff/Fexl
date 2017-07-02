@@ -8,6 +8,7 @@
 #include <basic.h>
 #include <die.h>
 #include <sys/file.h> /* flock */
+#include <standard.h>
 #include <type_file.h>
 #include <type_input.h>
 #include <type_num.h>

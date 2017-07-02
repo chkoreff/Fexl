@@ -4,10 +4,10 @@
 #include <stdio.h>
 #include <value.h>
 
-#include <basic.h>
 #include <die.h>
 #include <file.h>
 #include <parse.h>
+#include <standard.h>
 #include <type_file.h>
 #include <type_istr.h>
 #include <type_parse.h>

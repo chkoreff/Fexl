@@ -3,6 +3,7 @@
 
 #include <basic.h>
 #include <buffer.h>
+#include <standard.h>
 #include <type_buf.h>
 #include <type_str.h>
 

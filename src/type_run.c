@@ -2,14 +2,12 @@
 #include <str.h>
 #include <value.h>
 
-#include <basic.h>
 #include <die.h>
+#include <fexl.h>
+#include <standard.h>
 #include <type_num.h>
 #include <type_run.h>
 #include <type_str.h>
-
-int main_argc;
-char **main_argv;
 
 value type_die(value f)
 	{
