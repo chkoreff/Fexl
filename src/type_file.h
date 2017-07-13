@@ -6,6 +6,7 @@ extern value type_fclose(value f);
 extern value type_fgetc(value f);
 extern value type_fget(value f);
 extern value type_remove(value f);
+extern value type_is_newer(value f);
 extern value type_flock_ex(value f);
 extern value type_flock_sh(value f);
 extern value type_flock_un(value f);

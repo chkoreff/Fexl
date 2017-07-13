@@ -7,8 +7,9 @@
 
 #include <basic.h>
 #include <die.h>
-#include <sys/file.h> /* flock */
 #include <standard.h>
+#include <sys/file.h> /* flock */
+#include <sys/stat.h> /* stat */
 #include <type_file.h>
 #include <type_input.h>
 #include <type_num.h>
@@ -103,6 +104,47 @@ value type_remove(value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
+	return f;
+	}
+	}
+
+/* Return true if file1 is newer than file2.  If either file is missing, return
+true.  That makes the most sense for caching operations. */
+static int is_newer(const char *file1, const char *file2)
+	{
+	int ret;
+	struct stat status_1;
+	struct stat status_2;
+
+	ret = stat(file1,&status_1);
+	if (ret != 0) return 1;
+
+	ret = stat(file2,&status_2);
+	if (ret != 0) return 1;
+
+	if (status_1.st_mtim.tv_sec > status_2.st_mtim.tv_sec)
+		return 1;
+
+	if (status_1.st_mtim.tv_sec == status_2.st_mtim.tv_sec &&
+		status_1.st_mtim.tv_nsec > status_2.st_mtim.tv_nsec)
+		return 1;
+
+	return 0;
+	}
+
+value type_is_newer(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	{
+	value x = arg(f->L->R);
+	value y = arg(f->R);
+	if (x->T == type_str && y->T == type_str)
+		f = boolean(is_newer(str_data(x),str_data(y)));
+	else
+		f = hold(Qvoid);
+
+	drop(x);
+	drop(y);
 	return f;
 	}
 	}

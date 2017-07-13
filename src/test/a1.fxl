@@ -1168,5 +1168,22 @@ try "fput" (fput stdout)
 try "fsay" (fsay stdout)
 )
 
+# Test comparison of file modification times.
+(
+\try=(\f1\f2 say ["is_newer "f1" "f2" = "(is_newer f1 f2)])
+
+\try=
+	(\f1\f2
+	try f1 f2
+	try f2 f1
+	nl
+	)
+
+try "fexl.c" "../bin/fexl"
+try "test/a1.fxl" "missing"
+try "test/a1.fxl" "test/a1.fxl"
+try "missing" "missing"
+)
+
 \\
 Extra stuff not parsed.

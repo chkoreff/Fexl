@@ -107,6 +107,7 @@ void put_type(type t)
 	else if (t == type_fgetc) put("fgetc");
 	else if (t == type_fget) put("fget");
 	else if (t == type_remove) put("remove");
+	else if (t == type_is_newer) put("is_newer");
 	else if (t == type_flock_ex) put("flock_ex");
 	else if (t == type_flock_sh) put("flock_sh");
 	else if (t == type_flock_un) put("flock_un");

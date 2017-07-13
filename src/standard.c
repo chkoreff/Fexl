@@ -124,6 +124,7 @@ static value resolve_standard(value name)
 	if (match("fgetc")) return Q(type_fgetc);
 	if (match("fget")) return Q(type_fget);
 	if (match("remove")) return Q(type_remove);
+	if (match("is_newer")) return Q(type_is_newer);
 	if (match("flock_ex")) return Q(type_flock_ex);
 	if (match("flock_sh")) return Q(type_flock_sh);
 	if (match("flock_un")) return Q(type_flock_un);

@@ -1035,6 +1035,18 @@ F
 
 ABCD
 ]
+is_newer fexl.c ../bin/fexl = F
+is_newer ../bin/fexl fexl.c = T
+
+is_newer test/a1.fxl missing = T
+is_newer missing test/a1.fxl = T
+
+is_newer test/a1.fxl test/a1.fxl = F
+is_newer test/a1.fxl test/a1.fxl = F
+
+is_newer missing missing = T
+is_newer missing missing = T
+
 exit 0
 ==== test/a2.fxl
 Hello
