@@ -9,11 +9,14 @@
 #include <die.h>
 #include <standard.h>
 #include <sys/file.h> /* flock */
-#include <sys/stat.h> /* stat */
 #include <type_file.h>
 #include <type_input.h>
 #include <type_num.h>
 #include <type_str.h>
+
+#include <sys/types.h>
+#include <sys/stat.h> /* stat */
+#include <unistd.h>
 
 value type_file(value f)
 	{
@@ -109,7 +112,19 @@ value type_remove(value f)
 	}
 
 /* Return true if file1 is newer than file2.  If either file is missing, return
-true.  That makes the most sense for caching operations. */
+true.  That makes the most sense for caching operations.
+
+NOTE: Formerly I included the nanosecond resolution using the following code,
+but that doesn't compile on older machines so I'm sticking with whole second
+resolution.
+
+	if (status_1.st_mtim.tv_sec > status_2.st_mtim.tv_sec)
+		return 1;
+
+	if (status_1.st_mtim.tv_sec == status_2.st_mtim.tv_sec &&
+		status_1.st_mtim.tv_nsec > status_2.st_mtim.tv_nsec)
+		return 1;
+*/
 static int is_newer(const char *file1, const char *file2)
 	{
 	int ret;
@@ -122,14 +137,7 @@ static int is_newer(const char *file1, const char *file2)
 	ret = stat(file2,&status_2);
 	if (ret != 0) return 1;
 
-	if (status_1.st_mtim.tv_sec > status_2.st_mtim.tv_sec)
-		return 1;
-
-	if (status_1.st_mtim.tv_sec == status_2.st_mtim.tv_sec &&
-		status_1.st_mtim.tv_nsec > status_2.st_mtim.tv_nsec)
-		return 1;
-
-	return 0;
+	return status_1.st_mtime > status_2.st_mtime;
 	}
 
 value type_is_newer(value f)
