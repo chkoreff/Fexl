@@ -13,7 +13,7 @@ use "test/common.fxl" \;
 		void
 		)
 	say "(resolving)"
-	resolved (use_standard form)
+	evaluate_later (use_standard form)
 	)
 
 \parse=

@@ -580,6 +580,12 @@ say (is_void [])
 say (is_void void)
 # Symbolic form applied to anything is void.
 say (is_void ( (\; f x) 3) )
+# evaluate_later can only be applied to forms.
+say (is_void (evaluate_later 36.3))
+say (is_void (evaluate_later (\x\y y x)))
+
+say (is_resolved; \; say "hi")
+say (is_resolved; define "say" say; \; say "hi")
 
 # Test tuples
 say "== tuples"

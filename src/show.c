@@ -123,7 +123,7 @@ void put_type(type t)
 	else if (t == type_use) put("use");
 
 	else if (t == type_evaluate) put("evaluate");
-	else if (t == type_resolved) put("resolved");
+	else if (t == type_evaluate_later) put("evaluate_later");
 	else if (t == type_is_resolved) put("is_resolved");
 	else if (t == type_define) put("define");
 
@@ -152,10 +152,10 @@ void put_type(type t)
 	else put_ch('?');
 	}
 
-static void put_quote(string x)
+static void put_quote(const char *x)
 	{
 	put_ch('"');
-	put_str(x);
+	put(x);
 	put_ch('"');
 	}
 
@@ -188,7 +188,7 @@ static void limit_show(value f)
 		if (f->T == type_num)
 			put_num(get_num(f));
 		else if (f->T == type_str)
-			put_quote(get_str(f));
+			put_quote(str_data(f));
 		else if (f->T == type_sym)
 			{
 			put_quote(sym_name(f));
@@ -196,12 +196,13 @@ static void limit_show(value f)
 			{
 			put_ch(' ');
 			put_ulong(sym_line(f));
-			put_ch(' ');
-			put_quote(sym_label(f));
 			}
 			}
 		else if (f->T == type_form)
+			{
+			put_quote(form_label(f));
 			limit_show(form_exp(f));
+			}
 		else if (f->T == type_var)
 			limit_show(f->R);
 		else if (f->T == type_buf || f->T == type_istr)

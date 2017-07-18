@@ -140,7 +140,7 @@ static value parse_name(void)
 		}
 
 	if (!buf.top) return 0;
-	return Qsym(buf_clear(&buf),first_line,hold(label));
+	return Qsym(buf_clear(&buf),first_line);
 	}
 
 /* Collect a string up to an ending terminator. */
@@ -340,7 +340,7 @@ static value parse_lambda(unsigned long first_line)
 static value parse_form(void)
 	{
 	value exp = parse_exp();
-	return Qform(exp);
+	return Qform(exp,hold(label));
 	}
 
 /* Parse the next factor of an expression.  Return 0 if no factor found. */
@@ -411,7 +411,7 @@ value parse_input(input _get, void *_source, value _label)
 	if (ch != -1)
 		syntax_error("Extraneous input", line);
 
-	exp = Qform(exp);
+	exp = Qform(exp,hold(label));
 	return exp;
 	}
 	}

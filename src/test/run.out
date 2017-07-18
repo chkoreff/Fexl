@@ -591,6 +591,10 @@ F
 F
 T
 T
+T
+T
+F
+T
 == tuples
 { }
 { a }
@@ -1386,12 +1390,22 @@ exit 1
 Undefined symbol a on line 2
 Undefined symbol b on line 2
 Undefined symbol c on line 2
+Undefined symbol b on line 2
+Undefined symbol c on line 2
 Undefined symbol d on line 2
-Undefined symbol x on line 8
+Undefined symbol a on line 3
+Undefined symbol b on line 3
+Undefined symbol c on line 3
+Undefined symbol b on line 3
+Undefined symbol c on line 3
+Undefined symbol d on line 3
+Undefined symbol x on line 5
 exit 1
 ====
 Undefined symbol a on line 1
+Undefined symbol a on line 2
 Undefined symbol c on line 2
+Undefined symbol c on line 3
 exit 1
 ==== missing.fxl
 Could not open source file missing.fxl

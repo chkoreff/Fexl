@@ -110,9 +110,6 @@ cat <<"EOF"
 say (+ 4 6)
 ( a b c ) ( b c d )
 ( a b c ) ( b c d )
-( a b c ) ( b c d )
-( a b c ) ( b c d )
-( a b c ) ( b c d )
 put (- 12 7.2) nl
 x
 EOF

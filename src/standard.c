@@ -35,23 +35,17 @@ static int match(const char *other)
 	return strcmp(cur_name,other) == 0;
 	}
 
-/* Resolve numeric literals. */
-static value resolve_number(value name)
-	{
-	return Qnum_str0(get_str(name)->data);
-	}
-
 /* Resolve standard symbols. */
-static value resolve_standard(value name)
+static value resolve_standard(const char *name)
 	{
 	{
 	/* Resolve numeric literals. */
-	value def = resolve_number(name);
+	value def = Qnum_str0(name);
 	if (def) return def;
 	}
 
 	/* Resolve other names. */
-	cur_name = get_str(name)->data;
+	cur_name = name;
 
 	if (match("put")) return hold(Qput);
 	if (match("nl")) return hold(Qnl);
@@ -92,7 +86,7 @@ static value resolve_standard(value name)
 	if (match("cons")) return hold(Qcons);
 	if (match("null")) return hold(Qnull);
 	if (match("once")) return Q(type_once);
-	if (match("later")) return Q(type_later);
+	if (match("later")) return hold(Qlater);
 	if (match("is_void")) return Q(type_is_void);
 	if (match("is_good")) return Q(type_is_good);
 	if (match("is_bool")) return Q(type_is_bool);
@@ -140,7 +134,7 @@ static value resolve_standard(value name)
 	if (match("use")) return Q(type_use);
 
 	if (match("evaluate")) return hold(Qevaluate);
-	if (match("resolved")) return Q(type_resolved);
+	if (match("evaluate_later")) return Q(type_evaluate_later);
 	if (match("is_resolved")) return Q(type_is_resolved);
 	if (match("define")) return Q(type_define);
 
@@ -175,7 +169,7 @@ value type_use_standard(value f)
 /* (use_numbers form) Resolve numeric literals in the form. */
 value type_use_numbers(value f)
 	{
-	return op_resolve(resolve_number,f);
+	return op_resolve(Qnum_str0,f);
 	}
 
 static value eval_file(value name)
@@ -229,6 +223,7 @@ value Qvoid;
 value Qcons;
 value Qnull;
 value Qeval;
+value Qlater;
 value Qput;
 value Qnl;
 value Qfput;
@@ -245,6 +240,7 @@ static void beg_const(void)
 	Qcons = Q(type_cons);
 	Qnull = Q(type_null);
 	Qeval = Q(type_eval);
+	Qlater = Q(type_later);
 	Quse_standard = Q(type_use_standard);
 	Qput = Q(type_put);
 	Qnl = Q(type_nl);
@@ -265,6 +261,7 @@ static void end_const(void)
 	drop(Qcons);
 	drop(Qnull);
 	drop(Qeval);
+	drop(Qlater);
 	drop(Quse_standard);
 	drop(Qput);
 	drop(Qnl);
