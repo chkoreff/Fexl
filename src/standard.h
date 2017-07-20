@@ -1,6 +1,5 @@
 extern value type_use_standard(value f);
 extern value type_use_numbers(value f);
-extern value type_use(value f);
 extern value QI;
 extern value QT;
 extern value QF;
@@ -14,4 +13,4 @@ extern value Qnl;
 extern value Qfput;
 extern value Qfnl;
 extern value Qtuple;
-extern void eval_standard(const char *name);
+extern void eval_standard(void);

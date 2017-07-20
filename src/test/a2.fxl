@@ -1,6 +1,7 @@
 #
 evaluate;
-use "test/common.fxl" \;
+use "test.fxl";
+\;
 
 # Echo the characters from the input.
 \echo=

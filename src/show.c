@@ -90,6 +90,8 @@ void put_type(type t)
 	else if (t == type_ord) put("ord");
 	else if (t == type_chr) put("chr");
 	else if (t == type_char_width) put("char_width");
+	else if (t == type_dirname) put("dirname");
+	else if (t == type_basename) put("basename");
 	else if (t == type_is_str) put("is_str");
 
 	else if (t == type_num) put("num");
@@ -111,6 +113,7 @@ void put_type(type t)
 	else if (t == type_flock_ex) put("flock_ex");
 	else if (t == type_flock_sh) put("flock_sh");
 	else if (t == type_flock_un) put("flock_un");
+	else if (t == type_readlink) put("readlink");
 
 	else if (t == type_die) put("die");
 	else if (t == type_argv) put("argv");
@@ -120,7 +123,6 @@ void put_type(type t)
 
 	else if (t == type_use_standard) put("use_standard");
 	else if (t == type_use_numbers) put("use_numbers");
-	else if (t == type_use) put("use");
 
 	else if (t == type_evaluate) put("evaluate");
 	else if (t == type_evaluate_later) put("evaluate_later");

@@ -1,6 +1,4 @@
 #
-evaluate;
-use "test/common.fxl" \;
 say "hello"
 \x=(+ 4 3)
 

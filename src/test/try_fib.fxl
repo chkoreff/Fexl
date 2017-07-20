@@ -1,8 +1,6 @@
 # I put this code in a separate file to test multiple use calls.
 evaluate;
-use "test/test.fxl";
-use "test/list.fxl";
-use_standard;
+use "test.fxl";
 \;
 
 # (fib n) returns the nth Fibonacci number starting at 0.

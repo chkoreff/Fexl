@@ -113,3 +113,37 @@ unsigned long str_search(string x, string y, unsigned long offset)
 		}
 	}
 	}
+
+/* Strip the last component from a file name.  See dirname(1). */
+string dirname(string path)
+	{
+	char *buf = path->data;
+	unsigned long len = path->len;
+
+	while (len > 0 && buf[len-1] == '/') len--;
+	while (len > 0 && buf[len-1] != '/') len--;
+	while (len > 1 && buf[len-1] == '/') len--;
+
+	if (len == 0)
+		return str_new_data(".",1);
+	else
+		return str_new_data(buf,len);
+	}
+
+/* Strip the directory from a file name.  See basename(1). */
+string basename(string path)
+	{
+	char *buf = path->data;
+	unsigned long len = path->len;
+ 
+	while (len > 1 && buf[len-1] == '/') len--;
+
+	if (len > 0 && buf[len-1] == '/')
+		return str_new_data("/",1);
+	else
+		{
+		unsigned long pos = len;
+		while (pos > 0 && buf[pos-1] != '/') pos--;
+		return str_new_data(buf+pos,len-pos);
+		}
+	}

@@ -1,6 +1,9 @@
 #
-\NL="
-"
+evaluate;
+use "list.fxl";
+use "bool.fxl";
+use_standard;
+\;
 
 \format_num=
 (
@@ -58,13 +61,11 @@ format_num
 )
 
 \format_money=(format_num 2 ",")
-\format_pct=(\amount . (format_num 4 "," (* 100 amount)) "%")
 
 # Quote a string, enclosing it within terminators to make it suitable for
 # reading as a Fexl string.
 \fexl_quote=
 	(\x
-	\QU=~ "~
 	\term=
 		(
 		\check=(\y is_void (search x y 0) y)
@@ -79,10 +80,79 @@ format_num
 	. term; . (eq term QU "" " "); . x; term
 	)
 
+# Convert string to upper-case.  Only works with ASCII characters though.
+# LATER 20160331 Make it work with full utf8.
+\uc=
+	(
+	str_map \ch
+	\n=(ord ch)
+	and (ge n 97) (le n 122) (chr; - n 32) ;
+	ch
+	)
+
+\nearly_zero=(\x lt (abs x) 1e-8)
+
+\fput_data=
+	(\fh
+	\put=(fput fh)
+
+	@\put_data\x
+
+	is_str x (put (fexl_quote x));
+	is_num x (put (nearly_zero x "0" x));
+	is_tuple x
+		(
+		put "{"
+
+		(@\loop\space\xs
+		split_tuple xs () \xs\x
+		loop T xs
+		put_data x
+		if space (put " ")
+		) F x
+
+		put "}"
+		);
+	is_list x
+		(
+		put "["
+
+		(@\loop\space\xs
+		xs () \x\xs
+		if space (put " ")
+		put_data x
+		loop T xs
+		) F x
+
+		put "]"
+		);
+	is_bool x (put x);
+	is_void x (put "void");
+	put "()"
+	)
+
+\fput_list=
+	(\fh\xs
+
+	\say=(fsay fh)
+	\nl=(later; fnl fh)
+	\show_data=(fput_data fh)
+
+	say "["
+	each xs (\x show_data x nl)
+	say "]"
+	)
+
+\put_data=(fput_data stdout)
+\put_list=(fput_list stdout)
+
 \form
-define "fexl_quote" fexl_quote;
-define "format_money" format_money;
 define "format_num" format_num;
-define "format_pct" format_pct;
-define "NL" NL;
+define "format_money" format_money;
+define "fexl_quote" fexl_quote;
+define "uc" uc;
+define "fput_data" fput_data;
+define "fput_list" fput_list;
+define "put_data" put_data;
+define "put_list" put_list;
 form

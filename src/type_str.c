@@ -224,6 +224,23 @@ value type_char_width(value f)
 	}
 	}
 
+static value op_str_str(value f, string op(string))
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_str)
+		f = Qstr(op(get_str(x)));
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
+	}
+
+value type_dirname(value f) { return op_str_str(f,dirname); }
+value type_basename(value f) { return op_str_str(f,basename); }
+
 value type_is_str(value f)
 	{
 	return op_is_type(f,type_str);

@@ -1,0 +1,321 @@
+#
+evaluate;
+use "list.fxl";
+use "math.fxl";
+use_standard;
+\;
+
+\long_month_names=
+[
+"January"
+"February"
+"March"
+"April"
+"May"
+"June"
+"July"
+"August"
+"September"
+"October"
+"November"
+"December"
+]
+
+\short_month_names=(map (\name slice name 0 3) long_month_names)
+
+\long_month_name=(\n list_at long_month_names (- n 1))
+\short_month_name=(\n list_at short_month_names (- n 1))
+
+\date_year=(\date slice date 0 4)
+\date_month=(\date slice date 0 6)
+
+\date_ymd =
+	(\date
+	\year=(date_year date)
+	\month=(slice date 4 2)
+	\day=(slice date 6 2)
+	{year month day}
+	)
+
+\date_normal=
+	(\date
+	eq date "" "";
+	date_ymd date \year\month\day
+	[month "/" day "/" year]
+	)
+
+\date_quarter=
+	(\date
+	eq date "" "";
+	date_ymd date \year\month\day
+	\month=(str_num month)
+	\quarter=(+ 1; trunc; / (- month 1) 3)
+	\quarter=(. year; num_str quarter)
+	quarter
+	)
+
+\month_ym=
+	(\month
+	\y=(str_num; slice month 0 4)
+	\m=(str_num; slice month 4 2)
+	{y m}
+	)
+
+\two_digits=(\x lt x 10 (. "0") (); num_str x)
+
+\ym_month=
+	(\y\m
+	. (num_str y) (two_digits m)
+	)
+
+\ymd_date=
+	(\y\m\d
+	. (ym_month y m) (two_digits d)
+	)
+
+\month_before=
+	(\month
+	month_ym month \y\m
+	eq m 1 {(- y 1) 12} {y (- m 1)} ym_month
+	)
+
+\month_after=
+	(\month
+	month_ym month \y\m
+	eq m 12 {(+ y 1) 1} {y (+ m 1)} ym_month
+	)
+
+# Compute the number of days for a given year and month.
+# I note that "cal 2 1700" shows 29 days, even though according to these rules
+# it should only have 28.
+#
+# Test cases:
+# try 1700 2 28
+# try 1900 2 28
+# try 2000 2 29
+# try 2001 2 28
+# try 2004 2 29
+# try 2015 2 28
+# try 2015 3 31
+
+\ym_num_days=
+	(\y\m
+	\case=(eq m)
+	case 1 31 ;
+	case 2
+		(
+		\case=(\n ne 0 (mod y n))
+		case 4 28 ;
+		case 100 29 ;
+		case 400 28 ;
+		29
+		);
+	case 3 31 ;
+	case 4 30 ;
+	case 5 31 ;
+	case 6 30 ;
+	case 7 31 ;
+	case 8 31 ;
+	case 9 30 ;
+	case 10 31 ;
+	case 11 30 ;
+	case 12 31 ;
+	void
+	)
+
+# If the day is missing, fill in the last day of the month.
+\fill_day=
+	(\date
+	eq (length date) 6
+		(
+		\y=(str_num; slice date 0 4)
+		\m=(str_num; slice date 4 2)
+		\d=(ym_num_days y m)
+		ymd_date y m d
+		);
+	date
+	)
+
+\day_after=
+	(\date
+	date_ymd date \y\m\d
+	\y=(str_num y)
+	\m=(str_num m)
+	\d=(str_num d)
+
+	\max=(ym_num_days y m)
+
+	\d=(+ d 1)
+
+	\ymd=
+		(
+		le d max { y m d };
+		\m=(+ m 1)
+		\d=1
+		le m 12 { y m d };
+		\y=(+ y 1)
+		\m=1
+		{ y m d }
+		)
+
+	ymd ymd_date
+	)
+
+\date_end_prev_month=
+	(\date
+	eq date "" "";
+	fill_day; month_before; date_month; date
+	)
+
+\date_end_prev_quarter=
+	(\date
+	eq date "" "";
+	date_ymd date \y\m\d
+	\y=(str_num y)
+	\m=(str_num m)
+	\q=(+ 1; trunc; / (- m 1) 3)
+	eq q 1
+		{ (- y 1) 4 }
+		{ y (- q 1) }
+	\y\q
+	\m=(* q 3)
+	\d=(ym_num_days y m)
+	ymd_date y m d
+	)
+
+\date_end_prev_year=
+	(\date
+	eq date "" "";
+	date_ymd date \y\m\d
+	\y=(str_num y)
+	ymd_date (- y 1) 12 31
+	)
+
+\same_quarter=
+	(\x\y
+	eq x y T;
+	eq (date_quarter x) (date_quarter y)
+	)
+
+# LATER 20170427 Use a faster method.
+\count_days=
+	(\beg\end
+	\end_month=(date_month end)
+
+	(@\loop\beg\total
+
+	gt beg end total;
+
+	\beg_month=(date_month beg)
+
+	date_ymd beg \y\m\d
+	\y=(str_num y)
+	\m=(str_num m)
+	\d=(str_num d)
+
+	eq beg_month end_month
+		(
+		\max=(str_num (slice end 6 2))
+		\n=(- max d)
+		\total=(+ total n)
+		total
+		)
+		(
+		\max=(ym_num_days y m)
+		\n=(+ 1; - max d)
+		\total=(+ total n)
+		\next=(. (month_after beg) "01")
+		loop next total
+		)
+	) beg 0
+	)
+
+# Count the days from the begin date to the end date.  Return negative if
+# end date is less than the begin date.
+\count_days=
+	(\beg\end
+	ge end beg
+		(count_days beg end)
+		(neg; count_days end beg)
+	)
+
+# 1:Mon 2:Tue 3:Wed 4:Thu 5:Fri 6:Sat 7:Sun
+\day_of_week=
+	(\date
+	\ref_date="20160104" # a Monday
+	\count=(count_days ref_date date)
+	\n=(mod count 7)
+	\n=(+ 1; lt n 0 (+ 7 n) n)
+	n
+	)
+
+# Add count days to the begin date.
+# LATER 20170427 Use a faster method.
+\add_days=
+	(@\loop\beg\count
+	date_ymd beg \y\m\d
+	\y=(str_num y)
+	\m=(str_num m)
+	\d=(str_num d)
+	lt count 0
+		(
+		\count=(+ d count)
+		ge count 1
+			(ymd_date y m count)
+			(
+			\beg=(fill_day (month_before beg))
+			loop beg count
+			)
+		)
+		(
+		\count=(+ d count)
+		\max=(ym_num_days y m)
+		le count max
+			(ymd_date y m count)
+			(
+			\beg=(. (month_after beg) "01")
+			\count=(- count (+ 1 max))
+			loop beg count
+			)
+		)
+	)
+
+# Add one year to the date.
+# LATER 20170719 Address the 20160229 case.
+\add_year=
+	(\date
+	date_ymd date \y\m\d
+	\y=(str_num y)
+	\m=(str_num m)
+	\d=(str_num d)
+	\y=(+ y 1)
+	ymd_date y m d
+	)
+
+\form
+define "long_month_names" long_month_names;
+define "short_month_names" short_month_names;
+define "long_month_name" long_month_name;
+define "short_month_name" short_month_name;
+define "date_year" date_year;
+define "date_month" date_month;
+define "date_ymd" date_ymd;
+define "date_normal" date_normal;
+define "date_quarter" date_quarter;
+define "month_ym" month_ym;
+define "ym_month" ym_month;
+define "ymd_date" ymd_date;
+define "month_before" month_before;
+define "month_after" month_after;
+define "ym_num_days" ym_num_days;
+define "fill_day" fill_day;
+define "day_after" day_after;
+define "date_end_prev_month" date_end_prev_month;
+define "date_end_prev_quarter" date_end_prev_quarter;
+define "date_end_prev_year" date_end_prev_year;
+define "same_quarter" same_quarter;
+define "count_days" count_days;
+define "day_of_week" day_of_week;
+define "add_days" add_days;
+define "add_year" add_year;
+form

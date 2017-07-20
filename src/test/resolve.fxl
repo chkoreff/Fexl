@@ -1,6 +1,4 @@
 # Test fancy extended standard context.
-evaluate;
-use "test/common.fxl" \;
 
 \use_standard=
 (

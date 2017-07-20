@@ -25,11 +25,10 @@ char **main_argv;
 name designates a directory it behaves like an empty file. */
 int main(int argc, char *argv[])
 	{
-	const char *name = argc > 1 ? argv[1] : "";
 	main_argc = argc;
 	main_argv = argv;
 
-	eval_standard(name);
+	eval_standard();
 
 	#if DEV
 	if (0) show_stats();

@@ -1,0 +1,132 @@
+# Run the user's script given by argv[1] in the enhanced standard context.
+
+# (check x y) = x if x is good, otherwise y.
+\check=(\x \x=x is_good x x)
+
+\if=(\x\y x y I)
+
+\error=
+	(\msg
+	fsay stderr msg
+	die
+	)
+
+\path_under=(\dir\name . (. dir "/") name)
+
+\dir_base=(dirname; dirname; argv 0)
+\dir_share=(path_under dir_base "src")
+
+\script_name=(check (argv 1) "")
+\dir_local=(dirname script_name)
+
+\cached=
+	(\cache\key\val
+
+	\lookup=(var_get cache)
+	\old=(lookup key)
+	is_good old old;
+
+	\val=val
+
+	\lookup=
+		(\x
+		eq x key val;
+		lookup x
+		)
+
+	var_put cache lookup
+	val
+	)
+
+\NL="
+"
+
+\QU=~ "~
+
+\resolve_enhanced=
+	(
+	\form
+	define "dirname" dirname;
+	define "basename" basename;
+	define "path_under" path_under;
+	define "dir_base" dir_base;
+	define "dir_local" dir_local;
+
+	define "NL" NL;
+	define "QU" QU;
+	define "cached" cached;
+	define "error" error;
+	define "check" check;
+	define "if" if;
+	use_standard;
+	form
+	)
+
+\use_standard=
+	(
+	\parse_file=
+		(
+		\modules=var_new
+		\name
+		cached modules name;
+		#fsay stderr ["*** use "name]
+		parse_file name
+		)
+
+	\make_use=
+		(\dir\resolve_file
+
+		@\use
+
+		\name\form
+
+		\form=form
+		is_resolved form form;
+
+		\resolve=
+			(
+			\name=(path_under dir name)
+
+			evaluate;
+			resolve_file;
+			define "use" use;
+			parse_file name
+			)
+
+		resolve form
+		)
+
+	\cx_share=
+		(@\cx_share
+		\form
+		resolve_enhanced;
+		define "use_standard" cx_share;
+		form
+		)
+
+	\use=(make_use dir_share cx_share)
+
+	\cx_local=
+		(@\cx_local
+		\form
+
+		use "hex.fxl";
+		use "html.fxl";
+		use "format.fxl";
+		use "date.fxl";
+		use "list.fxl";
+		use "math.fxl";
+		use "bool.fxl";
+
+		resolve_enhanced;
+		define "use" (make_use dir_local cx_local);
+		define "use_standard" cx_local;
+		form
+		)
+
+	cx_local
+	)
+
+evaluate;
+use_standard;
+parse_file script_name

@@ -1,7 +1,3 @@
-#
-evaluate;
-use "test/common.fxl" \;
-
 # Return the (lazy) list of bytes read from the file handle.
 \file_bytes=
 	(\fh @\loop
@@ -12,11 +8,18 @@ use "test/common.fxl" \;
 	)
 
 \fh_entropy=
-	(
+	(once;
 	\source="/dev/urandom" # Normally you'd use this.
 	\source="/dev/zero" # Tests all zeroes.
-	\source="test/chars.fxl" # Testing with fixed file contents.
-	\fh=(once; fopen source "r")
+
+	# Testing with fixed file contents.
+	\source=(path_under dir_base "src/test/chars.fxl")
+
+	\fh=(
+		\fh=(fopen source "r")
+		if (is_void fh) (error ["Could not open "source])
+		fh
+		)
 	fh
 	)
 

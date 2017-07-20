@@ -1,7 +1,4 @@
 #
-evaluate;
-use "test/common.fxl" \;
-
 \bottles=
 	(\n\wall
 	\s=(eq n 1 "" "s")

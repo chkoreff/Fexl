@@ -780,8 +780,8 @@ Let's parse.
 7.2 21.6
 -1.3 -3.9
 ==
-Write test/tmp.txt:
-Read test/tmp.txt:
+Write tmp.txt:
+Read tmp.txt:
 ch T
 ch e
 ch s
@@ -810,12 +810,12 @@ ch 包
 ch 子
 ch 
 
-Removed test/tmp.txt
+Removed tmp.txt
 ==
 This should go to stdout.
 This goes to the file.
 This also goes to the file.
-Removed test/tmp.txt
+Removed tmp.txt
 ==
 put a
 get a
@@ -832,7 +832,7 @@ get f
 get g
 get h
 get void
-Removed test/tmp.txt
+Removed tmp.txt
 ==
 Passed var test of 20150907.
 The first 16 Fibonacci numbers:
@@ -858,10 +858,6 @@ The first 5 Fibonacci numbers:
 2
 3
 5
-==
-../bin/fexl
-test/a1.fxl
-
 ==
 set x = 3
   add: 0 => 1
@@ -1039,14 +1035,14 @@ F
 
 ABCD
 ]
-is_newer fexl.c ../bin/fexl = F
-is_newer ../bin/fexl fexl.c = T
+is_newer src/fexl.c bin/fexl = F
+is_newer bin/fexl src/fexl.c = T
 
-is_newer test/a1.fxl missing = T
-is_newer missing test/a1.fxl = T
+is_newer src/test/a1.fxl missing = T
+is_newer missing src/test/a1.fxl = T
 
-is_newer test/a1.fxl test/a1.fxl = F
-is_newer test/a1.fxl test/a1.fxl = F
+is_newer src/test/a1.fxl src/test/a1.fxl = F
+is_newer src/test/a1.fxl src/test/a1.fxl = F
 
 is_newer missing missing = T
 is_newer missing missing = T
@@ -1276,6 +1272,119 @@ get get get get get get get get get get get get get get get get 7475767778797a0a
 7475767778797a0a2361626364656667
 
 exit 0
+==== test/b11.fxl
+path a
+dir  .
+
+path a/b/c
+dir  a/b
+
+path a/b/c///
+dir  a/b
+
+path ../////
+dir  .
+
+path ////b/////
+dir  /
+
+path a/b////c///
+dir  a/b
+
+path aaa/bbb////ccc///
+dir  aaa/bbb
+
+path a/b/c
+base c
+
+path a/b/c///
+base c
+
+path a/b/cde///
+base cde
+
+path a
+base a
+
+path 
+base 
+
+path /a
+base a
+
+path ////a
+base a
+
+path /
+base /
+
+hi
+F
+0
+a
+b
+07/19/2017
+&lt;b&gt;x;&quot;y&quot;&lt;/b&gt;
+3,874,511.37
+e
+["<b>a</b>" {1.2 3.8 "xxx"} T F]
+[
+"<b>a</b>"
+{1.2 3.8 "xxx"}
+T
+F
+]
+
+["&lt;b&gt;a&lt;/b&gt;" {1.2 3.8 "xxx"} T F]
+[
+"&lt;b&gt;a&lt;/b&gt;"
+{1.2 3.8 "xxx"}
+T
+F
+]
+
+key c color orange qty 2
+key a color red qty 42
+key d color  qty 
+key b color blue qty 93
+
+sep   "/"
+str   ~1 /a/b/"hi"///d/e/~1
+list  ["" "a" "b" ~1 "hi"~1 "" "" "d" "e" ""]
+
+sep   "[XYZ]"
+str   ~1 [XYZ]a[XYZ]b[XYZ]"hi"[XYZ][XYZ][XYZ]d[XYZ]e[XYZ]~1
+list  ["" "a" "b" ~1 "hi"~1 "" "" "d" "e" ""]
+
+sep   "/"
+str   "a/b/c"
+list  ["a" "b" "c"]
+
+sep   "."
+str   "a.b.c"
+list  ["a" "b" "c"]
+
+sep   ""
+str   "a"
+list  ["a"]
+
+sep   ""
+str   ""
+list  [""]
+
+sep   ""
+str   ""
+list  [""]
+
+sep   "/"
+str   "/"
+list  ["" ""]
+
+sep   "//"
+str   "////"
+list  ["" "" ""]
+
+exit 0
 ==== test/chars.fxl
 ==
 封封aa小小
@@ -1301,6 +1410,125 @@ e5b08161e5b08f 封a小 e5b08161e5b08f
 2
 
 6600f
+exit 0
+==== test/date.fxl
+count_days 20160208 20160301 = 22
+count_days 20160301 20160208 = -22
+count_days 20160208 20160229 = 21
+count_days 20160229 20160208 = -21
+count_days 20160229 20160229 = 0
+count_days 20160229 20160229 = 0
+count_days 20160228 20170228 = 366
+count_days 20170228 20160228 = -366
+count_days 20170228 20180228 = 365
+count_days 20180228 20170228 = -365
+count_days 20160229 20160208 = -21
+count_days 20160208 20160229 = 21
+add_days 20160208 0 = 20160208  check 0  good
+add_days 20160208 7 = 20160215  check 7  good
+add_days 20160208 21 = 20160229  check 21  good
+add_days 20160208 22 = 20160301  check 22  good
+add_days 20160208 23 = 20160302  check 23  good
+add_days 20160208 365 = 20170207  check 365  good
+add_days 20160101 365 = 20161231  check 365  good
+add_days 20170101 365 = 20180101  check 365  good
+add_days 20160301 -1 = 20160229  check -1  good
+add_days 20160302 -1 = 20160301  check -1  good
+add_days 20160302 -2 = 20160229  check -2  good
+add_days 20160302 -3 = 20160228  check -3  good
+add_days 20160302 -23 = 20160208  check -23  good
+add_days 20160302 -28 = 20160203  check -28  good
+add_days 20160302 -29 = 20160202  check -29  good
+add_days 20160302 -30 = 20160201  check -30  good
+add_days 20160302 -365 = 20150303  check -365  good
+dow 20160101 = 5
+dow 20160104 = 1
+dow 20160108 = 5
+dow 20160115 = 5
+dow 20160121 = 4
+dow 20160129 = 5
+dow 20160205 = 5
+dow 20160212 = 5
+dow 20160219 = 5
+dow 20160226 = 5
+dow 20160304 = 5
+dow 20160311 = 5
+dow 19631117 = 7
+dow 19631118 = 1
+dow 19631119 = 2
+dow 19631120 = 3
+dow 19631121 = 4
+dow 19631122 = 5
+dow 19631123 = 6
+dow 19631124 = 7
+
+dow 23000225 = 7
+dow 23000226 = 1
+dow 23000227 = 2
+dow 23000228 = 3
+dow 23000301 = 4
+
+dow 23040225 = 4
+dow 23040226 = 5
+dow 23040227 = 6
+dow 23040228 = 7
+dow 23040229 = 1
+dow 23040301 = 2
+dow 23040302 = 3
+dow 23040303 = 4
+dow 23040306 = 7
+
+add_year 20000228 = 20010228
+add_year 20000229 = 20010229
+add_year 20150228 = 20160228
+add_year 20150301 = 20160301
+
+exit 0
+==== test/sat.fxl
+SAT 0 T
+[
+[]
+]
+
+SAT 0 F
+[
+]
+
+SAT 2 (\a\b and a b)
+[
+[TT]
+]
+
+SAT 2 (\a\b or a b)
+[
+[TT]
+[TF]
+[FT]
+]
+
+SAT 2 (\a\b or (not a) b)
+[
+[TT]
+[FT]
+[FF]
+]
+
+SAT 4 (\a\b\c\d (and (or (and a d) c) (not (and b d))))
+[
+[TTTF]
+[TFTT]
+[TFTF]
+[TFFT]
+[FTTF]
+[FFTT]
+[FFTF]
+]
+
+SAT 17 ...
+[
+[TTFTTFTTFTFTTTTTT]
+]
+
 exit 0
 ==== test/get_byte.fxl
 [

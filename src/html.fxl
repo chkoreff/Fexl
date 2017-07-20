@@ -1,0 +1,78 @@
+#
+evaluate;
+use "format.fxl";
+use "list.fxl";
+use_standard;
+\;
+
+# Quote a character for embedding in HTML.
+\quote_ch=
+	(\ch
+	eq ch "&" "&amp;" ;
+	eq ch ~ "~ "&quot;" ;
+	eq ch "<" "&lt;" ;
+	eq ch ">" "&gt;" ;
+	ch
+	)
+
+# Quote a string for embedding in HTML.
+\quote_str=(str_map quote_ch)
+
+# Quote arbitrary data.
+\quote=
+	(
+	@\quote\x \x=x
+	is_str x (quote_str x);
+	is_num x x;
+	is_tuple x
+		(
+		(@\quote_tuple\xs
+		split_tuple xs {} \xs\x
+		\xs=(quote_tuple xs)
+		\x=(quote x)
+		join_tuple xs x
+		) x
+		);
+	is_list x (map quote x);
+	is_bool x x;
+	void
+	)
+
+\colgroup=
+	(\widths
+	say "<colgroup>"
+	each widths (\width say ["<col width=" width ">"])
+	say "</colgroup>"
+	)
+
+\tag=
+	(\wrap\body
+	\wrap=(to_str wrap)
+	\pos=(search wrap " " 0)
+	\type=(is_good pos (slice wrap 0 pos) wrap)
+	put ["<" wrap ">"]
+	(
+	eq type "td" I;
+	eq type "th" I;
+	eq type "a" I;
+	nl
+	)
+	body
+	put ["</" type ">"]
+	nl
+	)
+
+\tr=(tag "tr")
+
+\put_quote_data=(\x fput_data stdout (quote x))
+\put_quote_list=(\xs fput_list stdout (quote xs))
+
+\form
+define "quote_ch" quote_ch;
+define "quote" quote;
+define "colgroup" colgroup;
+define "tag" tag;
+define "tr" tr;
+define "put_quote_data" put_quote_data;
+define "put_quote_list" put_quote_list;
+form

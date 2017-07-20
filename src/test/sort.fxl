@@ -1,6 +1,6 @@
 #
 evaluate;
-use "test/common.fxl";
+use "test.fxl";
 \;
 
 # (tower f n x) is the result of applying f to x n times.

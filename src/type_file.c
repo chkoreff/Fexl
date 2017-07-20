@@ -1,4 +1,5 @@
 #include <str.h>
+#include <sys/types.h>
 
 #include <input.h>
 #include <num.h>
@@ -7,16 +8,15 @@
 
 #include <basic.h>
 #include <die.h>
+#include <memory.h>
 #include <standard.h>
 #include <sys/file.h> /* flock */
+#include <sys/stat.h> /* stat */
 #include <type_file.h>
 #include <type_input.h>
 #include <type_num.h>
 #include <type_str.h>
-
-#include <sys/types.h>
-#include <sys/stat.h> /* stat */
-#include <unistd.h>
+#include <unistd.h> /* readlink */
 
 value type_file(value f)
 	{
@@ -190,6 +190,48 @@ value type_flock_sh(value f) { return op_flock(f,LOCK_SH); }
 /* (flock_un fh) Unlock the file handle. */
 value type_flock_un(value f) { return op_flock(f,LOCK_UN); }
 
-/* LATER strerror */
 /* LATER fdopen */
 /* LATER pipe dup2 close fork wait */
+
+/* Call readlink, returning a string. */
+static string safe_readlink(const char *path)
+	{
+	char *buf;
+	long len;
+	long size = 256;
+
+	while (1)
+		{
+		buf = new_memory(size);
+		len = readlink(path, buf, size);
+
+		if (len == size)
+			{
+			/* Used all available space, so the result might be truncated. */
+			free_memory(buf, size);
+			size = 2 * size;
+			}
+		else
+			{
+			/* Used less than available space, so the result fits just fine.
+			A system error yields len == -1, but that works robustly. */
+			string result = str_new_data(buf,len);
+			free_memory(buf, size);
+			return result;
+			}
+		}
+	}
+
+value type_readlink(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_str)
+		f = Qstr(safe_readlink(str_data(x)));
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
+	}

@@ -10,3 +10,4 @@ extern value type_is_newer(value f);
 extern value type_flock_ex(value f);
 extern value type_flock_sh(value f);
 extern value type_flock_un(value f);
+extern value type_readlink(value f);

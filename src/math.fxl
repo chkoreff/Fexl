@@ -8,10 +8,13 @@
 
 \tau=(* 2 pi)
 
+\round2=(\x / (round (* 100 x)) 100)
+
 \form
+define "neg" neg;
 define "max" max;
 define "min" min;
 define "mod" mod;
-define "neg" neg;
 define "tau" tau;
+define "round2" round2;
 form

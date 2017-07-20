@@ -100,6 +100,8 @@ static value resolve_standard(const char *name)
 	if (match("ord")) return Q(type_ord);
 	if (match("chr")) return Q(type_chr);
 	if (match("char_width")) return Q(type_char_width);
+	if (match("dirname")) return Q(type_dirname);
+	if (match("basename")) return Q(type_basename);
 	if (match("is_str")) return Q(type_is_str);
 
 	if (match("num_str")) return Q(type_num_str);
@@ -122,6 +124,7 @@ static value resolve_standard(const char *name)
 	if (match("flock_ex")) return Q(type_flock_ex);
 	if (match("flock_sh")) return Q(type_flock_sh);
 	if (match("flock_un")) return Q(type_flock_un);
+	if (match("readlink")) return Q(type_readlink);
 
 	if (match("die")) return Q(type_die);
 	if (match("argv")) return Q(type_argv);
@@ -131,7 +134,6 @@ static value resolve_standard(const char *name)
 
 	if (match("use_standard")) return hold(Quse_standard);
 	if (match("use_numbers")) return Q(type_use_numbers);
-	if (match("use")) return Q(type_use);
 
 	if (match("evaluate")) return hold(Qevaluate);
 	if (match("evaluate_later")) return Q(type_evaluate_later);
@@ -170,50 +172,6 @@ value type_use_standard(value f)
 value type_use_numbers(value f)
 	{
 	return op_resolve(Qnum_str0,f);
-	}
-
-static value eval_file(value name)
-	{
-	value f;
-	f = A(hold(Qparse_file),name);
-	f = A(hold(Quse_standard),f);
-	f = A(hold(Qevaluate),f);
-	f = eval(f);
-	return f;
-	}
-
-/* (use name form)
-If the form has symbols, read the function from the named file and apply it to
-the form.  The usual purpose of the function is to define some of the symbols
-which occur in the form.
-
-If the form has no symbols, the file is not read, and the form is returned
-unchanged.
-*/
-value type_use(value f)
-	{
-	if (!f->L || !f->L->L) return 0;
-	{
-	value name = arg(f->L->R);
-	if (name->T == type_str)
-		{
-		value form = arg(f->R);
-		if (form->T == type_form)
-			{
-			if (form_exp(form)->T == type_sym)
-				f = A(eval_file(hold(name)),hold(form));
-			else
-				f = hold(form);
-			}
-		else
-			f = hold(Qvoid);
-		drop(form);
-		}
-	else
-		f = hold(Qvoid);
-	drop(name);
-	return f;
-	}
 	}
 
 value QI;
@@ -272,10 +230,30 @@ static void end_const(void)
 	drop(Qtuple);
 	}
 
-void eval_standard(const char *name)
+/* Evaluate main.fxl located relative to the executable given by argv[0].  The
+main.fxl script then evaluates the user's script given by argv[1]. */
+static value eval_script(void)
+	{
+	value f;
+	/* Get argv[0]. */
+	f = A(Q(type_argv),Qnum(num_new_ulong(0)));
+	/* Go two directories up to get above the bin directory. */
+	f = A(Q(type_dirname),f);
+	f = A(Q(type_dirname),f);
+	/* Concatenate the name of the main script. */
+	f = A(A(Q(type_concat),f),Qstr0("/src/main.fxl"));
+	/* Now evaluate the main script. */
+	f = A(hold(Qparse_file),f);
+	f = A(hold(Quse_standard),f);
+	f = A(hold(Qevaluate),f);
+	f = eval(f);
+	return f;
+	}
+
+void eval_standard(void)
 	{
 	beg_const();
-	drop(eval_file(Qstr0(name)));
+	drop(eval_script());
 	end_const();
 	end_value();
 	}

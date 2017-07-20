@@ -1,0 +1,68 @@
+# (SAT n f) return a list of solutions for function f with n variables.
+\SAT=
+	(@\SAT\n\f
+	\n=n \f=f
+	le n 0 (f [[]] []);
+	\try=(\x map (cons x) (SAT (- n 1) (f x)))
+	append (try T) (try F)
+	)
+
+# Print the solutions.
+\show_solutions=
+	(\list
+	say "["
+	each list
+		(\vars
+		put "[" (each vars put) put "]" nl
+		)
+	say "]"
+	)
+
+# Demo function.
+\SAT=
+	(\n\f
+	\list=(SAT n f)
+	show_solutions list
+	nl
+	)
+
+say "SAT 0 T"
+SAT 0 T
+
+say "SAT 0 F"
+SAT 0 F
+
+say "SAT 2 (\a\b and a b)"
+SAT 2 (\a\b and a b)
+
+say "SAT 2 (\a\b or a b)"
+SAT 2 (\a\b or a b)
+
+say "SAT 2 (\a\b or (not a) b)"
+SAT 2 (\a\b or (not a) b)
+
+say "SAT 4 (\a\b\c\d (and (or (and a d) c) (not (and b d))))"
+SAT 4 (\a\b\c\d (and (or (and a d) c) (not (and b d))))
+
+say "SAT 17 ..."
+SAT 17
+	(\1\2\3\4\5\6\7\8\9\10\11\12\13\14\15\16\17
+	and (1);
+	and (2);
+	and (not 3);
+	and (4);
+	and (5);
+	and (not 6);
+	and (7);
+	and (8);
+	and (not 9);
+	and (10);
+	and (not 11);
+	and (12);
+	and (13);
+	and (14);
+	and (15);
+	and (16);
+	and (17);
+	T
+	)

@@ -38,7 +38,10 @@ run_fexl test/a7.fxl
 run_fexl test/a8.fxl
 run_fexl test/a9.fxl
 run_fexl test/b10.fxl
+run_fexl test/b11.fxl
 run_fexl test/chars.fxl
+run_fexl test/date.fxl
+run_fexl test/sat.fxl
 
 (
 cat <<"EOF"

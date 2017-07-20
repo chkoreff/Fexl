@@ -3,7 +3,8 @@
 #abcdefghijklmnopqrstuvwxyz
 # ^ Those characters used by test/b10.fxl.
 evaluate;
-use "test/common.fxl" \;
+use "test.fxl";
+\;
 
 \try=
 	(\str

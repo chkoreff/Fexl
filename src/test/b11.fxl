@@ -1,0 +1,120 @@
+#
+(
+\try=
+	(\path
+	say ["path "path]
+	say ["dir  "(dirname path)]
+	nl
+	)
+try "a"
+try "a/b/c"
+try "a/b/c///"
+try "../////"
+try "////b/////"
+try "a/b////c///"
+try "aaa/bbb////ccc///"
+)
+
+(
+\try=
+	(\path
+	say ["path "path]
+	say ["base "(basename path)]
+	nl
+	)
+try "a/b/c"
+try "a/b/c///"
+try "a/b/cde///"
+try "a"
+try ""
+try "/a"
+try "////a"
+try "/"
+)
+
+(
+if F (say (readlink "/proc/self/exe"))
+
+if T (say "hi")
+say (and T F)
+say (mod 48 3)
+each ["a" "b"] say
+say (date_normal "20170719")
+say (quote ~ <b>x;"y"</b>~)
+say (format_money 3874511.37)
+say (hex_digit 14)
+
+put_data ["<b>a</b>" { 1.2 3.8 "xxx"} T F] nl
+put_list ["<b>a</b>" { 1.2 3.8 "xxx"} T F] nl
+put_quote_data ["<b>a</b>" { 1.2 3.8 "xxx"} T F] nl
+put_quote_list ["<b>a</b>" { 1.2 3.8 "xxx"} T F] nl
+)
+
+(
+\rows=
+[
+["a" "red" 42]
+["b" "blue" 93]
+["c" "orange" 2]
+]
+
+\get_color=(match_column 0 1 rows)
+\get_qty=(match_column 0 2 rows)
+
+\try=
+	(\key
+	\color=(get_color key)
+	\qty=(get_qty key)
+	say ["key "key" color "color" qty "qty]
+	)
+
+try "c"
+try "a"
+try "d"
+try "b"
+nl
+)
+
+(
+\try=
+	(\sep\list
+
+	\str=(join sep list)
+
+	put "sep   " put_data sep nl
+	put "str   " put_data str nl
+
+	\list=(split sep str)
+	put "list  "put_data list nl
+
+	\_str=(join sep list)
+	if (ne str _str) (say ["BAD   "_str])
+	nl
+	)
+
+\list=
+[
+""
+"a"
+"b"
+~ "hi"~
+""
+""
+"d"
+"e"
+""
+]
+
+try "/" list
+try "[XYZ]" list
+
+try "/" ["a" "b" "c"]
+try "." ["a" "b" "c"]
+
+try "" ["a"]
+try "" []
+try "" ["" ""]
+
+try "/" ["" ""]
+try "//" ["" "" ""]
+)

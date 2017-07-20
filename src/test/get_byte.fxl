@@ -1,7 +1,4 @@
 #
-evaluate;
-use "test/common.fxl" \;
-
 \echo=
 	(later; @\echo
 	\ch=(fgetc stdin)

@@ -25,6 +25,16 @@
 	[x;tail]
 	)
 
+# Apply f to each element in list xs, but only keep the good results.
+\map_good=
+	(\fn @\loop \xs
+	xs [] \x\xs
+	\y=(fn x)
+	\tail=(once; loop xs)
+	is_good y (cons y) ();
+	tail
+	)
+
 # (filter f xs) is the list of items x in xs for which (f x) is true.
 \filter=
 	(\f @\loop \xs
@@ -39,6 +49,14 @@
 	# Push all entries in list xs onto list ys.
 	(@\loop\xs\ys xs ys \x\xs loop xs [x;ys])
 	xs []
+	)
+
+# Append a list of lists together.
+\append_all=
+	(@\loop\list
+	list [] \top\list
+	append top;
+	loop list
 	)
 
 # (g_sort lt eq gt unique xs) Generic sort routine.
@@ -126,6 +144,27 @@
 # Shift the first item off a list.
 \shift=(\xs xs {void []} \x\xs {x xs})
 
+# Return a function where the key is redefined as val.
+\put_key=
+	(\key\val\fn
+	\x
+	eq x key val;
+	fn x
+	)
+
+# Given a list of rows, return a function which maps the key at key_pos to the
+# value at val_pos.
+\match_column=
+	(\key_pos\val_pos @\loop \rows
+	rows void \row\rows
+	\fn=(loop rows)
+
+	\key=(list_at row key_pos)
+	\val=(list_at row val_pos)
+
+	put_key key val fn
+	)
+
 # (stream_values fn) is the infinite list of values of function fn.  This is
 # useful for generating streams of random values.
 \stream_values=
@@ -204,30 +243,74 @@
 # Apply a function to each logical character of a string.
 \str_map=(\f\str list_str; map f; str_chars str)
 
+# Insert separators between elements of a list.
+\join=
+	(\sep\xs
+	to_str;
+	(
+	@\loop\slash\xs
+	xs [] \x\xs
+	slash (cons sep) ();
+	cons x;
+	loop T xs
+	) F xs
+
+	)
+
+\join_path=(join "/")
+
+\split=
+	(\sep\str
+	\len_sep=(length sep)
+	eq len_sep 0 [str];
+
+	(@\loop\offset
+	\pos=(search str sep offset)
+	is_void pos
+		(
+		\len_str=(length str)
+		\top=(slice str offset (- len_str offset))
+		[top]
+		);
+
+	\top=(slice str offset (- pos offset))
+	cons top;
+	\pos=(+ pos len_sep)
+	loop pos
+	) 0
+	)
+
 \form
 define "append" append;
-define "column" column;
 define "each" each;
+define "map" map;
+define "map_good" map_good;
 define "filter" filter;
-define "first" first;
-define "fold" fold;
-define "get_list" get_list;
-define "get_str" get_str;
+define "reverse" reverse;
+define "append_all" append_all;
 define "g_sort" g_sort;
+define "unique" unique;
+define "sort" sort;
+define "fold" fold;
+define "first" first;
+define "list_sum" list_sum;
+define "list_length" list_length;
+define "range" range;
 define "list_at" list_at;
 define "list_combine" list_combine;
-define "list_length" list_length;
-define "list_str" list_str;
-define "list_sum" list_sum;
-define "map" map;
-define "range" range;
-define "reverse" reverse;
+define "column" column;
 define "shift" shift;
-define "sort" sort;
+define "put_key" put_key;
+define "match_column" match_column;
+define "stream_values" stream_values;
+define "get_list" get_list;
+define "to_str" to_str;
+define "get_str" get_str;
+define "list_str" list_str;
 define "str_bytes" str_bytes;
 define "str_chars" str_chars;
 define "str_map" str_map;
-define "stream_values" stream_values;
-define "to_str" to_str;
-define "unique" unique;
+define "join" join;
+define "join_path" join_path;
+define "split" split;
 form

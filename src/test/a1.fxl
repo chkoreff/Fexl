@@ -1,6 +1,7 @@
 #
 evaluate;
-use "test/common.fxl" \;
+use "test.fxl";
+\;
 
 \show=
 	(\x
@@ -13,7 +14,13 @@ use "test/common.fxl" \;
 	say "other"
 	)
 
-\eval_file=(\name evaluate; use_standard; parse_file name)
+\eval_file=
+	(\name
+	evaluate;
+	use_standard;
+	parse_file (path_under dir_local name)
+	)
+
 \eval_str=(\str evaluate; use_standard; parse str "")
 
 (
@@ -344,13 +351,13 @@ say s7
 )
 
 div
-eval_file "test/hello.fxl"
+eval_file "hello.fxl"
 div
-eval_file "test/utf8.fxl"
+eval_file "utf8.fxl"
 div
-eval_file "test/beer.fxl"
+eval_file "beer.fxl"
 div
-eval_file "test/hailstone.fxl"
+eval_file "hailstone.fxl"
 
 div
 eval_str ~END
@@ -361,7 +368,7 @@ say ["x = " x]
 div
 (
 evaluate;
-use "test/try_fib.fxl";
+use "try_fib.fxl";
 define "show" show;
 use_standard;
 \;
@@ -518,27 +525,29 @@ show_list [1 2]
 show_list (cons 1; cons 2; null)
 
 # Test rand.
-
-\demo_rand=
+(
+\try=
 	(\list
-	\list=(once list)
 	div
 	show_list (first 5 list)
 	show_list (first 5 list)
 	)
 
-seed_rand 0.1964
-
 \list_rand=(later; stream_values rand)
 
-demo_rand list_rand
-demo_rand list_rand
+\list_1=list_rand
+\list_2=list_rand
+
+seed_rand 0.1964
+try list_1
+try list_2
+)
 
 div
-eval_file "test/stats.fxl"
+eval_file "stats.fxl"
 
 div
-eval_file "test/resolve.fxl"
+eval_file "resolve.fxl"
 
 div
 \x=T say (is_bool x)
@@ -639,8 +648,6 @@ try [ {"a" 1} {"b" 2} {"c" 3} {"d" 4} {"e" 5} {"f" 6} {"g" 7} ]
 )
 
 div
-\NL="
-"
 
 say []
 say [""]
@@ -687,8 +694,8 @@ talk
 talk
 )
 
-eval_file "test/sort.fxl"
-eval_file "test/mf.fxl"
+eval_file "sort.fxl"
+eval_file "mf.fxl"
 
 \test_context=
 (
@@ -776,7 +783,7 @@ div
 \try=
 (later;
 notify
-eval_file "test/hello.fxl"
+eval_file "hello.fxl"
 )
 
 try
@@ -805,7 +812,8 @@ try -1.3
 
 \test_file=
 (later;
-\tmp_file="test/tmp.txt"
+\tmp_name="tmp.txt"
+\tmp_file=(path_under dir_local tmp_name)
 
 \write_file=
 	(\content
@@ -829,20 +837,20 @@ try -1.3
 \remove_file=
 	(later;
 	\code=(remove tmp_file)
-	say [(eq code 0 "Removed" "Could not remove") " " tmp_file]
+	say [(eq code 0 "Removed" "Could not remove") " " tmp_name]
 	)
 
 \test_1=
 	(later;
 	div
-	say ["Write " tmp_file ":"]
+	say ["Write " tmp_name ":"]
 	write_file
 ~
 Test data
 here
 üä 1≠0 包子
 ~
-	say ["Read " tmp_file ":"]
+	say ["Read " tmp_name ":"]
 	show_chars (\ch say ["ch " ch])
 	remove_file
 	)
@@ -955,12 +963,7 @@ say "Passed var test of 20150907."
 test_var
 
 div
-say (argv 0)
-say (argv 1)
-say (argv 2)
-
-div
-eval_file "test/var.fxl"
+eval_file "var.fxl"
 
 # Test evaluation order.
 (
@@ -1126,7 +1129,7 @@ div
 # Here I test the existence of the flock_ and limit_ function calls, though I'm
 # not yet testing their effects.
 
-\fh=(fopen "test/hello.fxl" "r")
+\fh=(fopen (path_under dir_local "hello.fxl") "r")
 say (is_good fh)
 say (is_good; flock_ex fh)
 say (is_good; flock_sh fh)
@@ -1176,7 +1179,11 @@ try "fsay" (fsay stdout)
 
 # Test comparison of file modification times.
 (
-\try=(\f1\f2 say ["is_newer "f1" "f2" = "(is_newer f1 f2)])
+\try=
+	(\f1\f2
+	\base=(path_under dir_base)
+	say ["is_newer "f1" "f2" = "(is_newer (base f1) (base f2))]
+	)
 
 \try=
 	(\f1\f2
@@ -1185,9 +1192,9 @@ try "fsay" (fsay stdout)
 	nl
 	)
 
-try "fexl.c" "../bin/fexl"
-try "test/a1.fxl" "missing"
-try "test/a1.fxl" "test/a1.fxl"
+try "src/fexl.c" "bin/fexl"
+try "src/test/a1.fxl" "missing"
+try "src/test/a1.fxl" "src/test/a1.fxl"
 try "missing" "missing"
 )
 

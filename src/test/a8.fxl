@@ -1,7 +1,4 @@
 #
-evaluate;
-use "test/common.fxl" \;
-
 \show3=
 	(\xs
 	say "["
