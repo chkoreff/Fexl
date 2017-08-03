@@ -1,6 +1,6 @@
 #
-\test_1=
-(later;
+\test_1==
+(
 say "== test_1" # says PING 1 time
 \ping=(once; say "PING")
 I
@@ -9,33 +9,33 @@ ping
 ping
 )
 
-\test_2=
-(later;
+\test_2==
+(
 say "== test_2" # says PING 5 times
-\ping=(later; say "PING")
+\ping==(say "PING")
 \other=(once ping)
-\talk=(later; ping other)
-\talk=(later; talk talk)
-\talk=(later; talk talk)
+\talk==(ping other)
+\talk==(talk talk)
+\talk==(talk talk)
 talk
 )
 
-\test_3=
-(later;
+\test_3==
+(
 say "== test_3" # says PING 3 times
-\ping=(later; say "PING")
-\talk=(later; \x=ping x)
+\ping==(say "PING")
+\talk==(\x=ping x)
 talk talk talk
 )
 
-\test_4=
-(later;
+\test_4==
+(
 say "== test_4" # says PING pong PING PING PING
-\ping=(later; say "PING")
+\ping==(say "PING")
 \pong=(once; say "pong")
-\talk=(later; ping pong)
-\talk=(later; talk talk)
-\talk=(later; talk talk)
+\talk==(ping pong)
+\talk==(talk talk)
+\talk==(talk talk)
 talk
 )
 

@@ -1,6 +1,6 @@
 #
-\test_count_days=
-	(later;
+\test_count_days==
+	(
 	\try=
 		(\beg\end
 		\count=(count_days beg end)
@@ -20,8 +20,8 @@
 	try "20160229" "20160208" # -21
 	)
 
-\test_add_days=
-	(later;
+\test_add_days==
+	(
 	\try=
 		(\beg\count
 		\date=(add_days beg count)
@@ -50,8 +50,8 @@
 	try "20160302" -365
 	)
 
-\test_day_of_week=
-	(later;
+\test_day_of_week==
+	(
 	\try=
 		(\date
 		\n=(day_of_week date)
@@ -99,8 +99,8 @@
 	nl
 	)
 
-\test_add_year=
-	(later;
+\test_add_year==
+	(
 	\try=
 		(\date
 		\x=(add_year date)

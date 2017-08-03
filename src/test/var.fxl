@@ -21,8 +21,8 @@ var_put v_map void
 	update v (cons x)
 	)
 
-\pairs=(later; var_get v_list)
-\count=(later; var_get v_count)
+\pairs==(var_get v_list)
+\count==(var_get v_count)
 
 \update_map=
 	(\v\key\val
@@ -52,12 +52,12 @@ var_put v_map void
 	update_map v_map key val
 	)
 
-\get=(later; var_get v_map)
+\get==(var_get v_map)
 
 ## Now do some operations.
 
-\show_pairs=
-(later;
+\show_pairs==
+(
 \show_pair=(\pair pair \key\val say ["{ " key " " val " }"])
 say "["
 each pairs show_pair
@@ -70,15 +70,15 @@ say "]"
 	)
 
 (
-\set_xyz=
-(later;
+\set_xyz==
+(
 set "x" "3"
 set "y" "4"
 set "z" "5"
 )
 
-\set_q=
-(later;
+\set_q==
+(
 set "q" "0"
 )
 

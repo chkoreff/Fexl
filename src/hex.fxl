@@ -38,7 +38,7 @@ use_standard;
 	(\str
 	\in=(readstr str)
 	get_str;
-	\nibble=(later; \x=(sgetc in) hex_digit_to_dec x)
+	\nibble==(\x=(sgetc in) hex_digit_to_dec x)
 	\x=nibble
 	\y=nibble
 	chr; + (* 16 x) y

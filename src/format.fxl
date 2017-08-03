@@ -66,6 +66,7 @@ format_num
 # reading as a Fexl string.
 \fexl_quote=
 	(\x
+	\x=x
 	\term=
 		(
 		\check=(\y is_void (search x y 0) y)
@@ -90,6 +91,15 @@ format_num
 	ch
 	)
 
+# Convert string to lower-case.
+\lc=
+	(
+	str_map \ch
+	\n=(ord ch)
+	and (ge n 65) (le n 90) (chr; + n 32) ;
+	ch
+	)
+
 \nearly_zero=(\x lt (abs x) 1e-8)
 
 \fput_data=
@@ -98,6 +108,7 @@ format_num
 
 	@\put_data\x
 
+	\x=x
 	is_str x (put (fexl_quote x));
 	is_num x (put (nearly_zero x "0" x));
 	is_tuple x
@@ -135,7 +146,7 @@ format_num
 	(\fh\xs
 
 	\say=(fsay fh)
-	\nl=(later; fnl fh)
+	\nl==(fnl fh)
 	\show_data=(fput_data fh)
 
 	say "["
@@ -151,6 +162,7 @@ define "format_num" format_num;
 define "format_money" format_money;
 define "fexl_quote" fexl_quote;
 define "uc" uc;
+define "lc" lc;
 define "fput_data" fput_data;
 define "fput_list" fput_list;
 define "put_data" put_data;

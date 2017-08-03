@@ -24,24 +24,24 @@ use "test.fxl";
 \eval_str=(\str evaluate; use_standard; parse str "")
 
 (
-\ping=(later; say "ping")
+\ping==(say "ping")
 div
 ping
 div
 I ping
 
 div
-\talk=(later; ping)
-\talk=(later; talk talk talk)
-\talk=(later; talk talk)
-\talk=(later; talk talk)
+\talk==(ping)
+\talk==(talk talk talk)
+\talk==(talk talk)
+\talk==(talk talk)
 talk
 
 div
 # Should say PING six times.
-\ping=(later; say "ping")
+\ping==(say "ping")
 \other=(once ping)
-\talk=(later; ping other)
+\talk==(ping other)
 talk
 talk
 talk
@@ -205,7 +205,7 @@ each list (\ch say ["ch " ch])
 say "== test buf"
 \buf=buf_new
 \put=(buf_put buf)
-\get=(later; say [": " (buf_get buf)])
+\get==(say [": " (buf_get buf)])
 put "abc"
 put "defg"
 get
@@ -309,9 +309,8 @@ And the world is mine to win. ..."
 (
 div
 \notify=(once; say "(CALC)")
-\show_x=
+\show_x==
 	(
-	later;
 	notify
 	\x=(* 5 6)
 	say ["x = " x]
@@ -326,7 +325,7 @@ say "]"
 
 (
 \notify=(once; put "(CALC)")
-\x=(later; notify + 2 (* 7 6))
+\x==(notify + 2 (* 7 6))
 
 \make_square=
 	(\x
@@ -533,7 +532,7 @@ show_list (cons 1; cons 2; null)
 	show_list (first 5 list)
 	)
 
-\list_rand=(later; stream_values rand)
+\list_rand==(stream_values rand)
 
 \list_1=list_rand
 \list_2=list_rand
@@ -688,7 +687,7 @@ put list
 (
 # Demonstrate the repetition of side effects.
 div
-\talk=(later; say (^ (put "(L)" (+ 1 1)) (say "(R)" (- 8 5))))
+\talk==(say (^ (put "(L)" (+ 1 1)) (say "(R)" (- 8 5))))
 talk
 talk
 talk
@@ -699,8 +698,8 @@ eval_file "mf.fxl"
 
 \test_context=
 (
-\case_1=
-	(later;
+\case_1==
+	(
 	say "["
 	say "== resolve"
 
@@ -727,8 +726,8 @@ eval_file "mf.fxl"
 	say "]"
 	)
 
-\case_2=
-	(later;
+\case_2==
+	(
 	say "["
 	\form=(parse "say (+ 7 8)" "")
 
@@ -751,8 +750,8 @@ eval_file "mf.fxl"
 	say "]"
 	)
 
-\case_3=
-	(later;
+\case_3==
+	(
 	\run=
 		(
 		\form=
@@ -780,8 +779,8 @@ test_context
 (
 div
 \notify=(once; say "Let's parse.")
-\try=
-(later;
+\try==
+(
 notify
 eval_file "hello.fxl"
 )
@@ -794,8 +793,8 @@ try
 (
 div
 \notify=(once; say "Let's parse.")
-\try=
-(later;
+\try==
+(
 \source=
 ~~
 \x say [x " " (* 3 x)]
@@ -810,8 +809,8 @@ try 7.2
 try -1.3
 )
 
-\test_file=
-(later;
+\test_file==
+(
 \tmp_name="tmp.txt"
 \tmp_file=(path_under dir_local tmp_name)
 
@@ -834,14 +833,14 @@ try -1.3
 	fclose fh
 	)
 
-\remove_file=
-	(later;
+\remove_file==
+	(
 	\code=(remove tmp_file)
 	say [(eq code 0 "Removed" "Could not remove") " " tmp_name]
 	)
 
-\test_1=
-	(later;
+\test_1==
+	(
 	div
 	say ["Write " tmp_name ":"]
 	write_file
@@ -855,8 +854,8 @@ here
 	remove_file
 	)
 
-\test_2=
-	(later;
+\test_2==
+	(
 	div
 	write_file
 	[
@@ -875,11 +874,11 @@ This also goes to the file.
 
 # Here I test interleaved writes and reads to the same file, which acts like a
 # queue.
-\test_3=
-	(later;
+\test_3==
+	(
 	div
 
-	\open=(later; fopen tmp_file)
+	\open==(fopen tmp_file)
 	\fh_w=(once; open "w")
 	\fh_r=(once; open "r")
 
@@ -890,8 +889,8 @@ This also goes to the file.
 		fflush fh_w  # You must do this.
 		)
 
-	\get=
-		(later;
+	\get==
+		(
 		\ch=(fget fh_r)
 		say ["get " (is_void ch "void" ch)]
 		)
@@ -917,13 +916,13 @@ test_3
 
 test_file
 
-\test_var=
-(later;
+\test_var==
+(
 # In this test I created a little "assembly language" where I hide all the var
 # operations in one place.
 
 # The "!" function creates a read and write pair.
-\!=(later; \v=var_new {(\x=(var_get v) {x}) (var_put v)})
+\!==(\v=var_new {(\x=(var_get v) {x}) (var_put v)})
 
 \fib=
 	(\max
@@ -970,7 +969,7 @@ eval_file "var.fxl"
 (
 div
 put "("
-\x=(later; put "x=" 3)
+\x==(put "x=" 3)
 put ")"
 say x
 say x
@@ -987,7 +986,7 @@ say x
 )
 (
 div
-\x=(later; say "hi" 3)
+\x==(say "hi" 3)
 \x=x # The effect only happens once.
 \x=x
 \x=x
@@ -1021,14 +1020,14 @@ try 3 "," 0.159265
 
 (
 div
-\talk=(later; say "Hi")
+\talk==(say "Hi")
 talk
 talk
 )
 
 (
 div
-\talk=(later; say "Hi")
+\talk==(say "Hi")
 \x=talk
 \x=talk
 )
@@ -1104,14 +1103,14 @@ buf_put buf "x"
 )
 
 # Now test redirecting output to a buffer.
-\result=
-(later;
+\result==
+(
 \buf=buf_new
 \put=(\x buf_put buf; to_str x)
-\nl=(later; buf_put buf NL)
+\nl==(buf_put buf NL)
 \say=(\x put x nl)
 (
-\hello=(later; say "Hello")
+\hello==(say "Hello")
 hello
 say ["line " 1]
 say "line 2"

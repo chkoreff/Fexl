@@ -33,10 +33,10 @@ use "test.fxl";
 	f
 	)
 
-\test_1=(later; do_test; parse "file" "hello.fxl")
-\test_2=(later; do_test; parse "string" ~ say "HI"~)
-\test_3=
-(later;
+\test_1==(do_test; parse "file" "hello.fxl")
+\test_2==(do_test; parse "string" ~ say "HI"~)
+\test_3==
+(
 div
 \program=
 ~

@@ -1,6 +1,6 @@
 # Normal distribution with mean 0 and standard deviation 1.
-\rand_normal=
-	(later;
+\rand_normal==
+	(
 	\r1=rand
 	\r2=rand
 	* (sqrt; * -2 (log r1)) (cos; * tau r2)
@@ -61,7 +61,7 @@
 
 \put_sharpe=(\sharpe put (format_num 4 "" sharpe))
 \put_ror=(\ror put (format_num 4 "" ror) put "%")
-\p=(later; say "<p>")
+\p==(say "<p>")
 
 (
 say "Average Fund vs. Risk-Free Return"

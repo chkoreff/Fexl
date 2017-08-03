@@ -16,9 +16,8 @@ use "test.fxl";
 	) 0 1
 	)
 
-\try_fib=
+\try_fib==
 (
-later;
 div
 
 \try=

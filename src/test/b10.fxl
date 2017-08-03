@@ -26,12 +26,12 @@
 \get_bytes=
 	(\n
 	\bytes=(once; file_bytes fh_entropy)
-	\bytes=(later; first 16 bytes)
+	\bytes==(first 16 bytes)
 	later bytes
 	)
 
-\get_random_id=
-	(later;
+\get_random_id==
+	(
 	\bytes=(get_bytes 16)
 	\bytes=(map (\ch hex_byte (ord ch)) bytes)
 	to_str bytes
@@ -44,8 +44,8 @@
 	say "]"
 	)
 
-\show_bytes=
-	(later;
+\show_bytes==
+	(
 	\bytes=(get_bytes 16)
 	show bytes
 	show bytes
@@ -53,8 +53,8 @@
 	nl
 	)
 
-\show_id=
-	(later;
+\show_id==
+	(
 	\x=get_random_id
 	say x
 	say x

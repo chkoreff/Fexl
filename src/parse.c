@@ -23,6 +23,7 @@ exp    => term exp
 exp    => ; exp
 exp    => \ name exp
 exp    => \ name = term exp
+exp    => \ name == term exp
 exp    => \; exp
 
 term   => ( exp )
@@ -305,6 +306,7 @@ static value parse_term(void)
 static value parse_lambda(unsigned long first_line)
 	{
 	value sym, def=0, exp;
+	int eager = 1;
 
 	/* Parse the symbol. */
 	skip_white();
@@ -318,6 +320,11 @@ static value parse_lambda(unsigned long first_line)
 	if (ch == '=')
 		{
 		skip();
+		if (ch == '=')
+			{
+			eager = 0;
+			skip();
+			}
 		skip_filler();
 		def = parse_term();
 		if (def == 0)
@@ -332,8 +339,10 @@ static value parse_lambda(unsigned long first_line)
 	/* Apply the definition if any. */
 	if (def == 0)
 		return exp;
-	else
+	else if (eager)
 		return app(app(hold(Qeval),def),exp);
+	else
+		return app(exp,def);
 	}
 
 /* Parse a form (unresolved symbolic expression). */

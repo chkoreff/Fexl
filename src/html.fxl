@@ -1,5 +1,6 @@
 #
 evaluate;
+use "hex.fxl";
 use "format.fxl";
 use "list.fxl";
 use_standard;
@@ -45,20 +46,34 @@ use_standard;
 	say "</colgroup>"
 	)
 
+\tag_enclosure=
+	(\desc
+	\beg=(to_str desc)
+	\pos=(search beg " " 0)
+	\end=(is_good pos (slice beg 0 pos) beg)
+	{ beg end }
+	)
+
+\_tag=
+	(\desc\body
+	tag_enclosure desc \beg\end
+	put ["<" beg ">"]
+	body
+	put ["</" end ">"]
+	)
+
 \tag=
-	(\wrap\body
-	\wrap=(to_str wrap)
-	\pos=(search wrap " " 0)
-	\type=(is_good pos (slice wrap 0 pos) wrap)
-	put ["<" wrap ">"]
+	(\desc\body
+	tag_enclosure desc \beg\end
+	put ["<" beg ">"]
 	(
-	eq type "td" I;
-	eq type "th" I;
-	eq type "a" I;
+	eq end "td" I;
+	eq end "th" I;
+	eq end "a" I;
 	nl
 	)
 	body
-	put ["</" type ">"]
+	put ["</" end ">"]
 	nl
 	)
 
@@ -67,12 +82,67 @@ use_standard;
 \put_quote_data=(\x fput_data stdout (quote x))
 \put_quote_list=(\xs fput_list stdout (quote xs))
 
+# https://en.wikipedia.org/wiki/Percent-encoding
+\encode_percent=
+	(str_map \ch
+	\is_reserved=
+		(
+		eq ch "!" T;
+		eq ch "*" T;
+		eq ch "'" T;
+		eq ch "(" T;
+		eq ch ")" T;
+		eq ch ";" T;
+		eq ch ":" T;
+		eq ch "@" T;
+		eq ch "&" T;
+		eq ch "=" T;
+		eq ch "+" T;
+		eq ch "$" T;
+		eq ch "," T;
+		eq ch "/" T;
+		eq ch "?" T;
+		eq ch "#" T;
+		eq ch "[" T;
+		eq ch "]" T;
+		eq ch "%" T;
+		F
+		)
+
+	is_reserved
+		(. "%" (hex_byte (ord ch)))
+		ch
+	)
+
+# LATER 20170802 Note that QU isn't considered reserved.  Test that on a real
+# web site.
+\make_url=
+	(\params
+	\params=
+		(map_good
+			(\pair pair \key\val
+			\val=(is_num val (num_str val) val)
+			eq val "" void;
+			\q_key=(encode_percent key)
+			\q_val=(encode_percent val)
+			[q_key"="q_val]
+			)
+			params)
+
+	\url=(join "&amp;" params)
+	\url=(eq url "" "." (. "?" url))
+	url
+	)
+
 \form
 define "quote_ch" quote_ch;
 define "quote" quote;
 define "colgroup" colgroup;
+define "_tag" _tag;
 define "tag" tag;
 define "tr" tr;
 define "put_quote_data" put_quote_data;
 define "put_quote_list" put_quote_list;
+define "encode_percent" encode_percent;
+define "make_url" make_url;
 form

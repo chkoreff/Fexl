@@ -135,7 +135,7 @@ string basename(string path)
 	{
 	char *buf = path->data;
 	unsigned long len = path->len;
- 
+
 	while (len > 1 && buf[len-1] == '/') len--;
 
 	if (len > 0 && buf[len-1] == '/')

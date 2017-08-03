@@ -118,3 +118,68 @@ try "" ["" ""]
 try "/" ["" ""]
 try "//" ["" "" ""]
 )
+
+(
+# Demonstrate the equivalence of:
+#   \x=D F
+#   eval D \x F
+
+( \x=(put "!" 4) say (+ x x) )
+( eval (put "!" 4) \x say (+ x x) )
+
+# Demonstrate the equivalence of:
+#   \x==D F
+#   (\x F) D
+
+( \x==(put "!" 4) say (+ x x) )
+( (\x say (+ x x)) (put "!" 4) )
+)
+
+(
+tag ["td align=" "right"] (put "X")
+tag "div class=a" (say "X")
+_tag "div class=a" (put "X") nl
+)
+
+put_data (skip 4 (range 1 7)) nl
+
+say (format_num 2 "," (put "!" 12345.67))
+say (fexl_quote (put "!" "hello"))
+say (uc (put "!" "abc"))
+put_data (put "!" { 1 2 3 }) nl
+put_list (put "!" ["a" "b" "c"])
+
+say (make_url [])
+say (make_url [{"color" "red"}])
+say (make_url [{"color" "red"} {"other" ""} {"shape" "circle"}])
+say (make_url
+	[
+	{ "color" "blue" }
+	{
+	~ key"!*'();:@&=+$,/?#[]%"1~
+	~ val"!*'();:@&=+$,/?#[]%"1~
+	}
+	{ "=" "=" }
+	]
+	)
+
+\x=
+	(
+	\alpha="abcdefghijklmnopqrstuvwxyz"
+	to_str
+	[
+	":"
+	alpha
+	(uc alpha)
+	"0123456789"
+	]
+	)
+
+say x
+say (uc x)
+say (lc x)
+
+say ["TAB "(ord TAB)]
+say ["NL "(ord NL)]
+say ["CR "(ord CR)]
+say ["QU "(ord QU)]

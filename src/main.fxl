@@ -38,9 +38,10 @@
 	val
 	)
 
+\TAB="	"
 \NL="
 "
-
+\CR=(chr 13)
 \QU=~ "~
 
 \resolve_enhanced=
@@ -52,7 +53,9 @@
 	define "dir_base" dir_base;
 	define "dir_local" dir_local;
 
-	define "NL" NL;
+	define "TAB" TAB;
+	define "NL" NL; # aka LF
+	define "CR" CR;
 	define "QU" QU;
 	define "cached" cached;
 	define "error" error;

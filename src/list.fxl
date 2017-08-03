@@ -102,6 +102,15 @@
 	[x;loop (- n 1) xs]
 	)
 
+# (skip n xs) Skip the first n items in list xs.
+\skip=
+	(@\loop\n\xs
+	\n=n
+	le n 0 xs;
+	xs [] \x\xs
+	loop (- n 1) xs
+	)
+
 \list_sum=(fold + 0)
 \list_length=(fold (\n\_ + 1 n) 0)
 
@@ -144,25 +153,28 @@
 # Shift the first item off a list.
 \shift=(\xs xs {void []} \x\xs {x xs})
 
-# Return a function where the key is redefined as val.
-\put_key=
-	(\key\val\fn
+# Return an object where the key is redefined as val.
+\with=
+	(\key\val\obj
+	\obj=obj
 	\x
 	eq x key val;
-	fn x
+	obj x
 	)
+
+\put_key=with  # deprecated
 
 # Given a list of rows, return a function which maps the key at key_pos to the
 # value at val_pos.
 \match_column=
 	(\key_pos\val_pos @\loop \rows
 	rows void \row\rows
-	\fn=(loop rows)
 
 	\key=(list_at row key_pos)
 	\val=(list_at row val_pos)
 
-	put_key key val fn
+	with key val;
+	loop rows
 	)
 
 # (stream_values fn) is the infinite list of values of function fn.  This is
@@ -293,6 +305,7 @@ define "unique" unique;
 define "sort" sort;
 define "fold" fold;
 define "first" first;
+define "skip" skip;
 define "list_sum" list_sum;
 define "list_length" list_length;
 define "range" range;
@@ -300,6 +313,7 @@ define "list_at" list_at;
 define "list_combine" list_combine;
 define "column" column;
 define "shift" shift;
+define "with" with;
 define "put_key" put_key;
 define "match_column" match_column;
 define "stream_values" stream_values;

@@ -1,5 +1,5 @@
 #
-\div=(later; say "==")
+\div==(say "==")
 \show_list=(\xs say "[" (each xs say) say "]")
 
 \form

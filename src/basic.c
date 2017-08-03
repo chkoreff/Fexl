@@ -17,7 +17,7 @@ value type_T(value f)
 	return hold(f->L->R);
 	}
 
-/* (F x) = I */
+/* (F x y) = y */
 value type_F(value f)
 	{
 	if (!f->L || !f->L->L) return 0;

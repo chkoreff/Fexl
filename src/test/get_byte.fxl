@@ -1,6 +1,6 @@
 #
-\echo=
-	(later; @\echo
+\echo==
+	(@\echo
 	\ch=(fgetc stdin)
 	is_void ch ();
 	say ["ch " (hex_byte; ord ch)]

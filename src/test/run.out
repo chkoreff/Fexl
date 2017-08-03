@@ -1384,6 +1384,36 @@ sep   "//"
 str   "////"
 list  ["" "" ""]
 
+!8
+!8
+!!8
+!!8
+<td align=right>X</td>
+<div class=a>
+X
+</div>
+<div class=a>X</div>
+[5 6 7]
+!12,345.67
+!"hello"
+!ABC
+!{1 2 3}
+[
+!"a"
+"b"
+"c"
+]
+.
+?color=red
+?color=red&amp;shape=circle
+?color=blue&amp;key"%21%2a%27%28%29%3b%3a%40%26%3d%2b%24%2c%2f%3f%23%5b%5d%25"1=val"%21%2a%27%28%29%3b%3a%40%26%3d%2b%24%2c%2f%3f%23%5b%5d%25"1&amp;%3d=%3d
+:abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+:ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+:abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz0123456789
+TAB 9
+NL 10
+CR 13
+QU 34
 exit 0
 ==== test/chars.fxl
 ==

@@ -85,6 +85,7 @@ static value resolve_standard(const char *name)
 	if (match("void")) return hold(Qvoid);
 	if (match("cons")) return hold(Qcons);
 	if (match("null")) return hold(Qnull);
+	if (match("eval")) return hold(Qeval);
 	if (match("once")) return Q(type_once);
 	if (match("later")) return hold(Qlater);
 	if (match("is_void")) return Q(type_is_void);
