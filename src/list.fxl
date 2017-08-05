@@ -113,6 +113,7 @@
 
 \list_sum=(fold + 0)
 \list_length=(fold (\n\_ + 1 n) 0)
+\is_null=(\xs xs T \_\_ F)
 
 # Produce the list of values in the range x through y.
 \range=
@@ -292,6 +293,15 @@
 	) 0
 	)
 
+# Return the (lazy) list of bytes read from the file handle.
+\file_bytes=
+	(\fh @\loop
+	\ch=(once; fgetc fh)
+	\tail=(once loop)
+	is_void ch [];
+	cons ch tail
+	)
+
 \form
 define "append" append;
 define "each" each;
@@ -308,6 +318,7 @@ define "first" first;
 define "skip" skip;
 define "list_sum" list_sum;
 define "list_length" list_length;
+define "is_null" is_null;
 define "range" range;
 define "list_at" list_at;
 define "list_combine" list_combine;
@@ -327,4 +338,5 @@ define "str_map" str_map;
 define "join" join;
 define "join_path" join_path;
 define "split" split;
+define "file_bytes" file_bytes;
 form

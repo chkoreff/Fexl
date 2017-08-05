@@ -42,6 +42,7 @@
 \NL="
 "
 \CR=(chr 13)
+\LF=NL
 \QU=~ "~
 
 \resolve_enhanced=
@@ -54,8 +55,9 @@
 	define "dir_local" dir_local;
 
 	define "TAB" TAB;
-	define "NL" NL; # aka LF
+	define "NL" NL;
 	define "CR" CR;
+	define "LF" LF;
 	define "QU" QU;
 	define "cached" cached;
 	define "error" error;
@@ -113,6 +115,7 @@
 		(@\cx_local
 		\form
 
+		use "read.fxl";
 		use "hex.fxl";
 		use "html.fxl";
 		use "format.fxl";
