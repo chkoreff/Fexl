@@ -1,11 +1,30 @@
-# Test reading CSV data.
+# Test reading CSV and SSV data.
+
+\try_chars=
+	(\read\in
+	\rows=(read in)
+	put_list rows
+	)
+
+\try_file=
+	(\read\name
+	\rows=(read (path_under dir_local name))
+	put_list rows
+	)
+
+\test_csv==
 (
-\chars=
+say "== test_csv"
+
+(
+\try=(try_chars read_csv_chars)
+try []
+try
 [
 " " "-" "1" "1" "." "3" "6" "," "1" "2" CR LF
 "2" "1" "," "2" "2" CR LF
 "3" "1" "," "3" "2" LF
-"4" "1" "," "4" "2" "," "," CR
+"4" "1" "," "4" "2" "," "," "," CR
 "5" "1" "," "5" "2" LF
 CR # blank row
 "a" " " "b" "," "c" "d" CR LF
@@ -16,12 +35,72 @@ LF
 
 LF # blank row
 "6" LF
+"3" "3" # no terminating LF
 ]
-\rows=(read_csv_chars chars)
-put_list rows
+
+try ["x" LF]
 )
 
 (
-\rows=(read_csv_file (path_under dir_local "test.csv"))
-put_list rows
+\try=(try_file read_csv_file)
+try "test.csv"
 )
+)
+
+\test_ssv==
+(
+say "== test_ssv"
+
+(
+\try=(try_chars read_ssv_chars)
+try []
+try ["a" "b" " " "x" "z" "z" " " "d" " " "e" " " "f" " " CR LF "g" " " "h" "i"]
+try ["a" "b" " " "c" " " "q" " " LF "d"]
+try [" " " " "a" "b" " " "c" LF CR TAB "x" TAB " " "y" LF LF "z"]
+
+try [" " "a" " " "x" TAB LF " " "b" "c" CR "d" "e" " " "f"]
+try [" " "a" "b" "c" "d" ]
+try ["a" " " "b" " " "x" "y" " " "z" LF "d" " " "d" ]
+
+try ["a" " " "b" "c" LF LF LF "d" CR LF CR LF]
+
+# Test jamming quoted strings back-to-back, though not recommended.
+# a b "c d" ~ e~~ f"gh"~ij ~END k"l"m~1n~ENDo~| p~|q"r"s
+# tuv
+try
+[
+"a" "b"
+" "
+QU "c" " " "d" QU
+" "
+"~" " " "e" "~"
+"~" " " "f" QU "g" QU "h" "~"
+"i" "j"
+" "
+"~" "E" "N" "D" " " "k" QU "l" QU "m" "~" "1" "n" "~" "E" "N" "D"
+"o"
+"~" "|" " " "p" "~" "|"
+"q" QU "r" QU "s"
+LF
+"t" "u" "v"
+]
+
+try ["a" QU "b" QU]
+try ["~" "E" "N" "D" " " "a" "~" "E" "N" "D"]
+
+# Test missing terminators.
+try ["a" QU "b"]
+try ["~"]
+try ["~" "E" "N" "D"]
+try ["~" "E" "N" "D" " "]
+try ["~" "E" "N" "D" " " "a" "~" "E" "N"]
+)
+
+(
+\try=(try_file read_ssv_file)
+try "test.ssv"
+)
+)
+
+test_csv
+test_ssv

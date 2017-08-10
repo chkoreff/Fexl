@@ -1,0 +1,63 @@
+# Parse the SSV (space-separated value) format.
+# This is the "command line" syntax I use to specify event histories.
+
+evaluate;
+use "read.fxl";
+use "list.fxl"; # str_bytes
+use_standard;
+\;
+
+\is_white=(\ch lt (ord ch) 33)
+
+# Skip over the prefix if it appears at the start of the input.
+\skip_prefix=
+	(@\skip_prefix \prefix\in
+	prefix {T in} \prefix_ch\prefix
+	get in \ch\tail
+	ne ch prefix_ch {F in};
+	skip_prefix prefix tail \found\tail
+	\tail=(found tail in)
+	{found tail}
+	)
+
+# Collect characters up to the given terminator string.
+\collect_to_term=
+	(\term
+	\term=(str_bytes term)
+
+	\buf=buf_new
+	@\loop \in
+	skip_prefix term in \found\in
+	found (\item=(buf_get buf) {item in});
+
+	get in \ch\tail
+	eq ch "" void;  # terminator not found
+	buf_put buf ch
+	loop tail
+	)
+
+\get_plain_item=(collect_to \ch eq ch QU T; eq ch "~" T; is_white ch)
+
+\get_item=
+	(\in
+	get in \ch\tail
+	eq ch QU (collect_to_term QU tail);
+	eq ch "~"
+		(
+		collect_to is_white tail \term\tail
+		get tail \_\tail
+		collect_to_term (. ch term) tail
+		);
+	get_plain_item in
+	)
+
+\get_row=(get_seq get_item (\ch is_eol ch F; is_white ch) is_eol)
+\get_rows=(get_seq get_row is_white (\ch F))
+
+\read_ssv_chars=(read_chars get_rows)
+\read_ssv_file=(read_file get_rows)
+
+\form
+define "read_ssv_chars" read_ssv_chars;
+define "read_ssv_file" read_ssv_file;
+form

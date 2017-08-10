@@ -144,10 +144,13 @@ format_num
 
 \fput_list=
 	(\fh\xs
+	\xs=xs
 
 	\say=(fsay fh)
 	\nl==(fnl fh)
 	\show_data=(fput_data fh)
+
+	not (is_list xs) (show_data xs nl);
 
 	say "["
 	each xs (\x show_data x nl)

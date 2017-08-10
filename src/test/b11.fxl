@@ -149,6 +149,12 @@ say (uc (put "!" "abc"))
 put_data (put "!" { 1 2 3 }) nl
 put_list (put "!" ["a" "b" "c"])
 
+\list=(str_chars "abc")
+put_list list
+put_list list
+put_list void
+put_list 32.8
+
 say (make_url [])
 say (make_url [{"color" "red"}])
 say (make_url [{"color" "red"} {"other" ""} {"shape" "circle"}])

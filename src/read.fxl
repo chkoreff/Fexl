@@ -1,142 +1,77 @@
-#
+# Common functions for reading file formats.
 evaluate;
-use "list.fxl";
+use "list.fxl"; # file_bytes
 use_standard;
 \;
-# A general parse function acts like this:
-#   (parse next chars) = (next result tail)
 
-# Get the next character.
-\get=(\next\chars chars (next "" []) next)
-
-# Look at the current character.
-\look=(\next\chars chars (next "" []) \ch\tail next ch chars)
-
-# Skip the current character.
-\skip=(\next \chars chars (next []) \ch next)
-
-# Skip a specific character.
-\skip_if=
-	(\x\next
-	look \ch
-	(eq ch x skip;)
-	next
-	)
-
-# Parse the CSV (comma-separated value) format.
-\use_csv=
-(
-# Get a plain item.
-\get_plain_item=
-	(
-	\buf=buf_new
-	@\loop \next
-	look \ch
-	\done=(eq ch "," T; eq ch CR T; eq ch LF T; eq ch "" T; F)
-	done (\item=(buf_get buf) next item);
-	skip;
-	buf_put buf ch
-	loop next
-	)
-
-# Get a char inside a quoted string.  A single QU char is treated as end of
-# string.  Two QU chars in a row are treated as a single QU character which
-# appears in the string.
-\get_quote_char=
-	(\next
-	get \ch
-	eq ch QU
-		(
-		look \ch
-		eq ch QU (skip; next QU);
-		next ""
-		);
-	next ch
-	)
-
-# Get a quoted item.
-\get_quote_item=
-	(
-	\buf=buf_new
-	@\loop \next
-	get_quote_char \ch
-	eq ch "" (\item=(buf_get buf) next item);
-	buf_put buf ch
-	loop next
-	)
-
-# Get an item.
-\get_item=
-	(\next
-	look \ch
-	eq ch QU (skip; get_quote_item; next);
-	get_plain_item \item
-	# Convert to number if possible.
-	\n=(str_num item)
-	\item=(is_good n n item)
-	next item
-	)
-
-# Get a row.
-\get_row=
-	(@\get_row \next
-	get_item \item
-	look \ch
-	eq ch ""
-		(
-		\row=(eq item "" [] [item])
-		next row
-		);
-	ne ch ","
-		(
-		\row=[item]
-		next row
-		);
-	skip;
-	get_row \row
-	\row=[item;row]
-	next row
-	)
-
-# Get a list of rows.
-\get_rows=
-	(@\get_rows \next
-	get_row \row
-	look \ch
-	eq ch ""
-		(
-		\rows=(is_null row [] [row])
-		next rows
-		);
-	skip_if CR;
-	skip_if LF;
-	get_rows \rows
-	\rows=[row;rows]
-	next rows
-	)
-
-\read_csv_chars=
-	(
-	get_rows \rows\chars
+# Read a list of characters.
+\read_chars=
+	(\read\in
+	read in \rows\tail
 	rows
 	)
 
-\read_csv_file=
-	(\name
+# Read a named file.
+\read_file=
+	(\read\name
 	\fh=(fopen name "r")
 	if (is_void fh) (error ["Could not open "name])
 	\chars=(file_bytes fh)
-	\rows=(read_csv_chars chars)
+	\rows=(read_chars read chars)
 	fclose fh
 	rows
 	)
 
-\form
-define "read_csv_chars" read_csv_chars;
-define "read_csv_file" read_csv_file;
-form
-)
+# Get the next character and the tail of the input.
+\get=(\in in {"" []} \ch\tail {ch tail})
+
+# Look at the current character.
+\look=(\in get in \ch\_ {ch})
+
+\is_eol=(\ch eq ch CR T; eq ch LF T; F)
+
+# Skip matching characters.
+\skip_match=
+	(\match
+	@\loop \in
+	get in \ch\tail
+	\go=(eq ch "" F; match ch)
+	go (loop tail) {in}
+	)
+
+# Collect characters up to an ending condition.
+\collect_to=
+	(\end
+	\buf=buf_new
+	@\loop \in
+	get in \ch\tail
+	end ch (\item=(buf_get buf) {item in});
+	eq ch "" void;  # end condition not found
+	buf_put buf ch
+	loop tail
+	)
+
+# Get a sequence of items with a given separator and end condition.
+\get_seq=
+	(\read\sep\end
+	@\loop \in
+	skip_match sep in \in
+	look in \ch
+	\done=(eq ch "" T; end ch)
+	done {[] in};
+	read in \x\in
+	loop in \xs\in
+	\xs=[x;xs]
+	{xs in}
+	)
 
 \form
-use_csv;
+define "read_chars" read_chars;
+define "read_file" read_file;
+define "get" get;
+define "look" look;
+define "is_eol" is_eol;
+define "skip_match" skip_match;
+define "collect_to" collect_to;
+define "get_seq" get_seq;
 form

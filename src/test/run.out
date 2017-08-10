@@ -1398,11 +1398,23 @@ X
 !"hello"
 !ABC
 !{1 2 3}
-[
-!"a"
+![
+"a"
 "b"
 "c"
 ]
+[
+"a"
+"b"
+"c"
+]
+[
+"a"
+"b"
+"c"
+]
+void
+32.8
 .
 ?color=red
 ?color=red&amp;shape=circle
@@ -1416,26 +1428,94 @@ CR 13
 QU 34
 exit 0
 ==== test/b12.fxl
+== test_csv
+[
+]
 [
 [-11.36 12]
 [21 22]
 [31 32]
-[41 42 "" ""]
+[41 42 "" "" ""]
 [51 52]
-[""]
 ["a b" "cd"]
 [~1 ab c"hi"~1 "3.14"]
-[""]
 [6]
+[33]
+]
+[
+["x"]
 ]
 [
 [12 3 "" 4]
 [5 6 7]
-[""]
 [~1 a b
 "hi"
 cd~1 "3.14" -48.7]
 [~1 abc,def"ghi"jklmnopqrstuvwxyz~1]
+["    "]
+]
+== test_ssv
+[
+]
+[
+["ab" "xzz" "d" "e" "f"]
+["g" "hi"]
+]
+[
+["ab" "c" "q"]
+["d"]
+]
+[
+["ab" "c"]
+["x" "y"]
+["z"]
+]
+[
+["a" "x"]
+["bc"]
+["de" "f"]
+]
+[
+["abcd"]
+]
+[
+["a" "b" "xy" "z"]
+["d" "d"]
+]
+[
+["a" "bc"]
+["d"]
+]
+[
+["ab" "c d" "e" ~1 f"g"h~1 "ij" ~2 k"l"m~1n~2 "o" "p" "q" "r" "s"]
+["tuv"]
+]
+[
+["a" "b"]
+]
+[
+["a"]
+]
+void
+void
+void
+void
+void
+[
+["ab" "xzz" "d" "e" "f"]
+["g" "hi"]
+["ab" "c"]
+["x" "y"]
+["z"]
+["a" "x"]
+["a" "b" "c d" "e" ~1 f"gh"~1 "ij" ~2 k"l"m~1n~2 "o" "p" "q" "r" "s"]
+["tuv"]
+["a bb c" ~1 x"y"z~1 "21" "38.3" "-44"]
+["aaaa" "Block of text here.
+Second line.
+" "another block
+second line"]
+["1" "2" "3"]
 ]
 exit 0
 ==== test/chars.fxl

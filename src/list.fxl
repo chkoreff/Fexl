@@ -192,7 +192,8 @@
 	(\get @\loop
 	\x=get
 	is_void x [];
-	cons x; loop
+	\xs=(once loop)
+	[x;xs]
 	)
 
 # Flatten a piece of data (string, number, or list) into a string.

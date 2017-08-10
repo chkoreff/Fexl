@@ -1,0 +1,65 @@
+# Parse the CSV (comma-separated value) format.
+# NOTE: https://www.ietf.org/rfc/rfc4180.txt
+# "Spaces are considered part of a field and should not be ignored."
+
+evaluate;
+use "read.fxl";
+use_standard;
+\;
+
+\get_plain_item=(collect_to \ch eq ch "," T; is_eol ch T; eq ch "")
+
+# Get a char inside a quoted string.  A single QU char is treated as end of
+# string.  Two QU chars in a row are treated as a single QU character which
+# appears in the string.
+\get_quote_char=
+	(\in
+	get in \ch\in
+	ne ch QU {ch in};
+	get in \ch\tail
+	eq ch QU {QU tail};
+	{"" in}
+	)
+
+# Get a quoted item.
+\get_quote_item=
+	(
+	\buf=buf_new
+	@\loop \in
+	get_quote_char in \ch\tail
+	eq ch "" (\item=(buf_get buf) {item tail});
+	buf_put buf ch
+	loop tail
+	)
+
+\get_item=
+	(\in
+	get in \ch\tail
+	eq ch QU (get_quote_item tail);
+	get_plain_item in \item\in
+	# Convert to number if possible.
+	\n=(str_num item)
+	\item=(is_good n n item)
+	{item in}
+	)
+
+# Get a row.
+\get_row=
+	(@\loop \in
+	get_item in \x\in
+	get in \ch\in
+	ne ch "," {[x] in};
+	loop in \xs\in
+	\xs=[x;xs]
+	{xs in}
+	)
+
+\get_rows=(get_seq get_row is_eol (\ch F))
+
+\read_csv_chars=(read_chars get_rows)
+\read_csv_file=(read_file get_rows)
+
+\form
+define "read_csv_chars" read_csv_chars;
+define "read_csv_file" read_csv_file;
+form
