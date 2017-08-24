@@ -1724,10 +1724,10 @@ exit 1
 Incomplete string terminator on line 1
 exit 1
 ====
-Missing symbol declaration before '=' on line 1
+Missing name declaration before '=' on line 1
 exit 1
 ====
-Missing symbol after '\' on line 1
+Missing name after '\' on line 1
 exit 1
 ====
 Missing definition on line 1

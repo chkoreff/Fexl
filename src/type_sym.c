@@ -12,17 +12,28 @@ struct symbol
 	{
 	value name;
 	unsigned long line;
+	value source;
 	};
 
-static struct symbol *get_sym(value x)
+static struct symbol *sym_new(string name, unsigned long line, value source)
 	{
-	return (struct symbol *)x->R;
+	struct symbol *x = new_memory(sizeof(struct symbol));
+	x->name = Qstr(name);
+	x->line = line;
+	x->source = source;
+	return x;
 	}
 
-static void sym_free(struct symbol *sym)
+static void sym_free(struct symbol *x)
 	{
-	drop(sym->name);
-	free_memory(sym,sizeof(struct symbol));
+	drop(x->name);
+	drop(x->source);
+	free_memory(x,sizeof(struct symbol));
+	}
+
+static struct symbol *get_sym(value f)
+	{
+	return (struct symbol *)f->R;
 	}
 
 value type_sym(value f)
@@ -35,22 +46,24 @@ value type_sym(value f)
 	return type_void(f);
 	}
 
-value Qsym(string name, unsigned long line)
+value Qsym(string name, unsigned long line, value source)
 	{
-	struct symbol *sym = new_memory(sizeof(struct symbol));
-	sym->name = Qstr(name);
-	sym->line = line;
-	return D(type_sym,sym);
+	return D(type_sym,sym_new(name,line,source));
 	}
 
-const char *sym_name(value x)
+value sym_name(value f)
 	{
-	return str_data(get_sym(x)->name);
+	return get_sym(f)->name;
 	}
 
-unsigned long sym_line(value x)
+unsigned long sym_line(value f)
 	{
-	return get_sym(x)->line;
+	return get_sym(f)->line;
+	}
+
+value sym_source(value f)
+	{
+	return get_sym(f)->source;
 	}
 
 /* Apply f to g, where either can be a symbolic form. */
@@ -79,7 +92,7 @@ static void abstract(const char *name, value exp, value *p, value *e)
 		}
 	else if (exp->L == 0)
 		{
-		if (strcmp(name,sym_name(exp)) == 0)
+		if (strcmp(name,str_data(sym_name(exp))) == 0)
 			{
 			*p = hold(QT);
 			*e = hold(QI);

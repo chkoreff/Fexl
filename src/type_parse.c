@@ -75,7 +75,6 @@ static value parse_file(value name)
 		}
 	exp = parse_fh(fh,name);
 	if (fh != stdin) fclose(fh);
-	drop(name);
 	return exp;
 	}
 
@@ -86,7 +85,7 @@ value type_parse_file(value f)
 	{
 	value name = arg(f->R);
 	if (name->T == type_str)
-		f = parse_file(hold(name));
+		f = parse_file(name);
 	else
 		f = hold(Qvoid);
 	drop(name);

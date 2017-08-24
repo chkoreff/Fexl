@@ -1,20 +1,33 @@
 # Run the user's script given by argv[1] in the enhanced standard context.
+\TAB="	"
+\NL="
+"
+\CR=(chr 13)
+\LF=NL
+\QU=~ "~
+
+# (if x y) = y if x is true, other I.
+\if=(\x\y x y I)
 
 # (check x y) = x if x is good, otherwise y.
 \check=(\x \x=x is_good x x)
 
-\if=(\x\y x y I)
-
-\error=
-	(\msg
-	fsay stderr msg
-	die
-	)
+\error=(\msg fsay stderr msg die)
 
 \path_under=(\dir\name . (. dir "/") name)
 
+# Return an object where the key is redefined as val.
+\with=
+	(\key\val\obj
+	\obj=obj
+	\x
+	eq x key val;
+	obj x
+	)
+
+# Establish paths based on command arguments.
 \dir_base=(dirname; dirname; argv 0)
-\dir_share=(path_under dir_base "src")
+\dir_lib=(path_under dir_base "src/lib")
 
 \script_name=(check (argv 1) "")
 \dir_local=(dirname script_name)
@@ -38,18 +51,9 @@
 	val
 	)
 
-\TAB="	"
-\NL="
-"
-\CR=(chr 13)
-\LF=NL
-\QU=~ "~
-
 \resolve_enhanced=
 	(
 	\form
-	define "dirname" dirname;
-	define "basename" basename;
 	define "path_under" path_under;
 	define "dir_base" dir_base;
 	define "dir_local" dir_local;
@@ -63,6 +67,7 @@
 	define "error" error;
 	define "check" check;
 	define "if" if;
+	define "with" with;
 	use_standard;
 	form
 	)
@@ -109,7 +114,7 @@
 		form
 		)
 
-	\use=(make_use dir_share cx_share)
+	\use=(make_use dir_lib cx_share)
 
 	\cx_local=
 		(@\cx_local

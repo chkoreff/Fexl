@@ -1,7 +1,6 @@
 #include <str.h>
 
 #include <input.h>
-#include <num.h>
 #include <value.h>
 
 #include <buffer.h>
@@ -10,10 +9,8 @@
 #include <report.h>
 #include <standard.h>
 #include <type_form.h>
-#include <type_num.h>
 #include <type_str.h>
 #include <type_sym.h>
-#include <type_tuple.h>
 
 /*
 Grammar:
@@ -116,10 +113,9 @@ static void syntax_error(const char *code, unsigned long line)
 A name may contain just about anything, except for white space and a few other
 special characters.  This is the simplest rule that can work.
 */
-static value parse_name(void)
+static string parse_name(void)
 	{
 	struct buffer buf = {0};
-	unsigned long first_line = line;
 
 	while (1)
 		{
@@ -141,7 +137,7 @@ static value parse_name(void)
 		}
 
 	if (!buf.top) return 0;
-	return Qsym(buf_clear(&buf),first_line);
+	return buf_clear(&buf);
 	}
 
 /* Collect a string up to an ending terminator. */
@@ -179,13 +175,6 @@ static string collect_string(
 	return buf_clear(&buf);
 	}
 
-static value parse_quote_string(void)
-	{
-	unsigned long first_line = line;
-	skip();
-	return Qstr(collect_string("\"",1,first_line));
-	}
-
 /* Parse a tilde string terminator. */
 static string parse_terminator(unsigned long first_line)
 	{
@@ -213,22 +202,26 @@ static string parse_content(string end, unsigned long first_line)
 	return content;
 	}
 
-static value parse_tilde_string(void)
-	{
-	unsigned long first_line = line;
-	string end = parse_terminator(first_line);
-	string content = parse_content(end,first_line);
-	return Qstr(content);
-	}
-
 static value parse_symbol(void)
 	{
+	unsigned long first_line = line;
 	if (ch == '"')
-		return parse_quote_string();
+		{
+		skip();
+		return Qstr(collect_string("\"",1,first_line));
+		}
 	else if (ch == '~')
-		return parse_tilde_string();
+		{
+		string end = parse_terminator(first_line);
+		string content = parse_content(end,first_line);
+		return Qstr(content);
+		}
 	else
-		return parse_name();
+		{
+		string name = parse_name();
+		if (name == 0) return 0;
+		return Qsym(name,first_line,hold(label));
+		}
 	}
 
 static value parse_term(void);
@@ -305,16 +298,18 @@ static value parse_term(void)
 /* Parse a lambda form following the initial '\' character. */
 static value parse_lambda(unsigned long first_line)
 	{
-	value sym, def=0, exp;
+	string name;
+	value def=0, exp;
 	int eager = 1;
 
-	/* Parse the symbol. */
+	/* Parse the name. */
 	skip_white();
-	sym = parse_name();
-	if (sym == 0)
-		syntax_error("Missing symbol after '\\'", first_line);
+	name = parse_name();
 
-	/* Parse the optional definition of the symbol. */
+	if (name == 0)
+		syntax_error("Missing name after '\\'", first_line);
+
+	/* Parse the optional definition of the name. */
 	skip_filler();
 	first_line = line;
 	if (ch == '=')
@@ -331,10 +326,9 @@ static value parse_lambda(unsigned long first_line)
 			syntax_error("Missing definition", first_line);
 		}
 
-	/* Parse the body of the function. */
-	exp = parse_exp();
-	exp = lambda(sym_name(sym),exp);
-	drop(sym);
+	/* Parse the body of the function and abstract the name out. */
+	exp = lambda(name->data,parse_exp());
+	str_free(name);
 
 	/* Apply the definition if any. */
 	if (def == 0)
@@ -349,7 +343,7 @@ static value parse_lambda(unsigned long first_line)
 static value parse_form(void)
 	{
 	value exp = parse_exp();
-	return Qform(exp,hold(label));
+	return Qform(exp);
 	}
 
 /* Parse the next factor of an expression.  Return 0 if no factor found. */
@@ -384,7 +378,7 @@ static value parse_factor(void)
 		{
 		value factor = parse_term();
 		if (ch == '=')
-			syntax_error("Missing symbol declaration before '='", line);
+			syntax_error("Missing name declaration before '='", line);
 		return factor;
 		}
 	}
@@ -419,8 +413,7 @@ value parse_input(input _get, void *_source, value _label)
 	value exp = parse_exp();
 	if (ch != -1)
 		syntax_error("Extraneous input", line);
-
-	exp = Qform(exp,hold(label));
+	exp = Qform(exp);
 	return exp;
 	}
 	}

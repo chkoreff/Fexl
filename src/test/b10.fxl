@@ -1,9 +1,9 @@
 # Return the (lazy) list of bytes read from the file handle.
 \file_bytes=
 	(\fh @\loop
-	\ch=(once; put "get " fgetc fh)
-	\tail=(once loop)
+	\ch=(put "get " fgetc fh)
 	is_void ch [];
+	\tail=(once loop)
 	cons ch tail
 	)
 
@@ -26,7 +26,7 @@
 \get_bytes=
 	(\n
 	\bytes=(once; file_bytes fh_entropy)
-	\bytes==(first 16 bytes)
+	\bytes==(first n bytes)
 	later bytes
 	)
 

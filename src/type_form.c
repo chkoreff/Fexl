@@ -14,19 +14,24 @@
 struct form
 	{
 	value exp;
-	value label;
 	};
+
+static struct form *form_new(value exp)
+	{
+	struct form *x = new_memory(sizeof(struct form));
+	x->exp = exp;
+	return x;
+	}
+
+static void form_free(struct form *x)
+	{
+	drop(x->exp);
+	free_memory(x,sizeof(struct form));
+	}
 
 static struct form *get_form(value x)
 	{
 	return (struct form *)x->R;
-	}
-
-static void form_free(struct form *form)
-	{
-	drop(form->exp);
-	drop(form->label);
-	free_memory(form,sizeof(struct form));
 	}
 
 value type_form(value f)
@@ -39,22 +44,14 @@ value type_form(value f)
 	return type_void(f);
 	}
 
-value Qform(value exp, value label)
+value Qform(value exp)
 	{
-	struct form *form = new_memory(sizeof(struct form));
-	form->exp = exp;
-	form->label = label;
-	return D(type_form,form);
+	return D(type_form,form_new(exp));
 	}
 
 value form_exp(value f)
 	{
 	return get_form(f)->exp;
-	}
-
-const char *form_label(value f)
-	{
-	return str_data(get_form(f)->label);
 	}
 
 /* Resolve all the symbols in the expression which have a definition given by
@@ -65,7 +62,7 @@ static value resolve(value exp, value resolve_name(const char *name))
 		return hold(exp);
 	else if (exp->L == 0)
 		{
-		value def = resolve_name(sym_name(exp));
+		value def = resolve_name(str_data(sym_name(exp)));
 		if (def)
 			return def;
 		else
@@ -92,10 +89,7 @@ value op_resolve(value resolve_name(const char *name), value f)
 	{
 	value form = arg(f->R);
 	if (form->T == type_form)
-		{
-		value exp = resolve(form_exp(form),resolve_name);
-		f = Qform(exp,hold(get_form(form)->label));
-		}
+		f = Qform(resolve(form_exp(form),resolve_name));
 	else
 		f = hold(Qvoid);
 	drop(form);
@@ -110,7 +104,7 @@ static value define(const char *name, value def, value exp)
 		return hold(exp);
 	else if (exp->L == 0)
 		{
-		if (strcmp(name,sym_name(exp)) == 0)
+		if (strcmp(name,str_data(sym_name(exp))) == 0)
 			return hold(def);
 		else
 			return hold(exp);
@@ -142,8 +136,7 @@ value type_define(value f)
 		if (form->T == type_form)
 			{
 			value def = f->L->R;
-			value exp = define(str_data(name),def,form_exp(form));
-			f = Qform(exp,hold(get_form(form)->label));
+			f = Qform(define(str_data(name),def,form_exp(form)));
 			}
 		else
 			f = hold(Qvoid);
@@ -173,16 +166,17 @@ value type_is_resolved(value f)
 	}
 
 /* Report all symbols as undefined. */
-static void report_undef(value exp, const char *label)
+static void report_undef(value exp)
 	{
 	if (exp->T != type_sym)
 		;
 	else if (exp->L == 0)
-		undefined_symbol(sym_name(exp),sym_line(exp),label);
+		undefined_symbol(str_data(sym_name(exp)),sym_line(exp),
+			str_data(sym_source(exp)));
 	else
 		{
-		report_undef(exp->L,label);
-		report_undef(exp->R,label);
+		report_undef(exp->L);
+		report_undef(exp->R);
 		}
 	}
 
@@ -198,7 +192,7 @@ value type_evaluate(value f)
 		f = hold(form_exp(form));
 		if (f->T == type_sym)
 			{
-			report_undef(f,form_label(form));
+			report_undef(f);
 			die(0); /* The expression had undefined symbols. */
 			}
 		}

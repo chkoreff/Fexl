@@ -23,11 +23,6 @@
 #include <type_tuple.h>
 #include <type_var.h>
 
-static value QY;
-static value Quse_standard;
-static value Qparse_file;
-static value Qevaluate;
-
 static const char *cur_name;
 
 static int match(const char *other)
@@ -35,11 +30,11 @@ static int match(const char *other)
 	return strcmp(cur_name,other) == 0;
 	}
 
-/* Resolve standard symbols. */
+/* Resolve standard names. */
 static value resolve_standard(const char *name)
 	{
-	{
 	/* Resolve numeric literals. */
+	{
 	value def = Qnum_str0(name);
 	if (def) return def;
 	}
@@ -178,6 +173,7 @@ value type_use_numbers(value f)
 value QI;
 value QT;
 value QF;
+value QY;
 value Qvoid;
 value Qcons;
 value Qnull;
@@ -188,6 +184,9 @@ value Qnl;
 value Qfput;
 value Qfnl;
 value Qtuple;
+value Qparse_file;
+value Qevaluate;
+value Quse_standard;
 
 static void beg_const(void)
 	{
@@ -200,14 +199,14 @@ static void beg_const(void)
 	Qnull = Q(type_null);
 	Qeval = Q(type_eval);
 	Qlater = Q(type_later);
-	Quse_standard = Q(type_use_standard);
 	Qput = Q(type_put);
 	Qnl = Q(type_nl);
 	Qfput = Q(type_fput);
 	Qfnl = Q(type_fnl);
+	Qtuple = Q(type_tuple);
 	Qparse_file = Q(type_parse_file);
 	Qevaluate = Q(type_evaluate);
-	Qtuple = Q(type_tuple);
+	Quse_standard = Q(type_use_standard);
 	}
 
 static void end_const(void)
@@ -221,24 +220,24 @@ static void end_const(void)
 	drop(Qnull);
 	drop(Qeval);
 	drop(Qlater);
-	drop(Quse_standard);
 	drop(Qput);
 	drop(Qnl);
 	drop(Qfput);
 	drop(Qfnl);
+	drop(Qtuple);
 	drop(Qparse_file);
 	drop(Qevaluate);
-	drop(Qtuple);
+	drop(Quse_standard);
 	}
 
 /* Evaluate main.fxl located relative to the executable given by argv[0].  The
 main.fxl script then evaluates the user's script given by argv[1]. */
-static value eval_script(void)
+static void eval_script(void)
 	{
 	value f;
-	/* Get argv[0]. */
-	f = A(Q(type_argv),Qnum(num_new_ulong(0)));
-	/* Go two directories up to get above the bin directory. */
+	/* Get the name of the currently running executable. */
+	f = Qstr0(main_argv[0]);
+	/* Go two directories up, right above the bin directory. */
 	f = A(Q(type_dirname),f);
 	f = A(Q(type_dirname),f);
 	/* Concatenate the name of the main script. */
@@ -248,13 +247,15 @@ static value eval_script(void)
 	f = A(hold(Quse_standard),f);
 	f = A(hold(Qevaluate),f);
 	f = eval(f);
-	return f;
+	drop(f);
 	}
 
-void eval_standard(void)
+void eval_standard(int argc, char *argv[])
 	{
+	main_argc = argc;
+	main_argv = argv;
 	beg_const();
-	drop(eval_script());
+	eval_script();
 	end_const();
 	end_value();
 	}

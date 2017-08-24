@@ -154,15 +154,6 @@
 # Shift the first item off a list.
 \shift=(\xs xs {void []} \x\xs {x xs})
 
-# Return an object where the key is redefined as val.
-\with=
-	(\key\val\obj
-	\obj=obj
-	\x
-	eq x key val;
-	obj x
-	)
-
 \put_key=with  # deprecated
 
 # Given a list of rows, return a function which maps the key at key_pos to the
@@ -268,7 +259,6 @@
 	cons x;
 	loop T xs
 	) F xs
-
 	)
 
 \join_path=(join "/")
@@ -297,9 +287,9 @@
 # Return the (lazy) list of bytes read from the file handle.
 \file_bytes=
 	(\fh @\loop
-	\ch=(once; fgetc fh)
-	\tail=(once loop)
+	\ch=(fgetc fh)
 	is_void ch [];
+	\tail=(once loop)
 	cons ch tail
 	)
 
@@ -325,7 +315,6 @@ define "list_at" list_at;
 define "list_combine" list_combine;
 define "column" column;
 define "shift" shift;
-define "with" with;
 define "put_key" put_key;
 define "match_column" match_column;
 define "stream_values" stream_values;
