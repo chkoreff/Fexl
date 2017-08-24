@@ -1,11 +1,3 @@
-#
-evaluate;
-use "hex.fxl";
-use "format.fxl";
-use "list.fxl";
-use_standard;
-\;
-
 # Quote a character for embedding in HTML.
 \quote_ch=
 	(\ch
@@ -134,7 +126,6 @@ use_standard;
 	url
 	)
 
-\form
 define "quote_ch" quote_ch;
 define "quote" quote;
 define "colgroup" colgroup;
@@ -145,4 +136,4 @@ define "put_quote_data" put_quote_data;
 define "put_quote_list" put_quote_list;
 define "encode_percent" encode_percent;
 define "make_url" make_url;
-form
+standard

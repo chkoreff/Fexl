@@ -1,11 +1,10 @@
 # Parse the SSV (space-separated value) format.
 # This is the "command line" syntax I use to specify event histories.
-
-evaluate;
-use "read.fxl";
-use "list.fxl"; # str_bytes
-use_standard;
-\;
+evaluate
+(
+use_lib "read.fxl";
+standard
+) \;
 
 \is_white=(\ch lt (ord ch) 33)
 
@@ -57,7 +56,6 @@ use_standard;
 \read_ssv_chars=(read_chars get_rows)
 \read_ssv_file=(read_file get_rows)
 
-\form
 define "read_ssv_chars" read_ssv_chars;
 define "read_ssv_file" read_ssv_file;
-form
+standard

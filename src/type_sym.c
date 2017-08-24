@@ -2,7 +2,9 @@
 #include <value.h>
 
 #include <basic.h>
+#include <die.h>
 #include <memory.h>
+#include <report.h>
 #include <standard.h>
 #include <string.h> /* strcmp */
 #include <type_str.h>
@@ -39,11 +41,8 @@ static struct symbol *get_sym(value f)
 value type_sym(value f)
 	{
 	if (f->N == 0)
-		{
 		sym_free(get_sym(f));
-		return 0;
-		}
-	return type_void(f);
+	return 0;
 	}
 
 value Qsym(string name, unsigned long line, value source)
@@ -135,6 +134,78 @@ value lambda(const char *name, value exp)
 	abstract(name,exp,&p,&e);
 	f = Qsubst(p,e);
 	drop(exp);
+	return f;
+	}
+
+static value define_name(value name)
+	{
+	value def = eval(A(hold(Qstandard),hold(name)));
+	if (def->T == type_void) /* undefined */
+		{
+		drop(def);
+		return 0;
+		}
+	else if (def->T == type_I && def->L)
+		{
+		/* Optimize (I x) returned by "later" to x. */
+		value x = hold(def->R);
+		drop(def);
+		return x;
+		}
+	else
+		return def;
+	}
+
+static value resolve(value exp)
+	{
+	if (exp->T != type_sym)
+		return exp;
+	else if (exp->L == 0)
+		{
+		value name = sym_name(exp);
+		value def = define_name(name);
+		if (def)
+			{
+			drop(exp);
+			return def;
+			}
+		undefined_symbol(str_data(name),sym_line(exp),
+			str_data(sym_source(exp)));
+		return exp;
+		}
+	else
+		{
+		value L = resolve(hold(exp->L));
+		value R = resolve(hold(exp->R));
+		drop(exp);
+		return app(L,R);
+		}
+	return exp;
+	}
+
+/* (evaluate context exp) Evaluate the expression in the context. */
+value type_evaluate(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	{
+	value exp = arg(f->R);
+	value save = Qstandard;
+	Qstandard = arg(f->L->R);
+	f = resolve(exp);
+	drop(Qstandard);
+	Qstandard = save;
+	if (f->T == type_sym)
+		die(0); /* The expression had undefined symbols. */
+	return f;
+	}
+	}
+
+/* (resolve context exp) Resolve the expression in the context for later
+evaluation. */
+value type_resolve(value f)
+	{
+	f = type_evaluate(f);
+	if (f) f = A(hold(Qlater),f);
 	return f;
 	}
 

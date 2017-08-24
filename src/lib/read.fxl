@@ -1,8 +1,4 @@
 # Common functions for reading file formats.
-evaluate;
-use "list.fxl"; # file_bytes
-use_standard;
-\;
 
 # Read a list of characters.
 \read_chars=
@@ -65,7 +61,6 @@ use_standard;
 	{xs in}
 	)
 
-\form
 define "read_chars" read_chars;
 define "read_file" read_file;
 define "get" get;
@@ -74,4 +69,4 @@ define "is_eol" is_eol;
 define "skip_match" skip_match;
 define "collect_to" collect_to;
 define "get_seq" get_seq;
-form
+standard

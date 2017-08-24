@@ -1,7 +1,9 @@
 #
-evaluate;
+evaluate
+(
 use "test.fxl";
-\;
+standard
+) \;
 
 \parse=
 	(\type\source
@@ -14,7 +16,7 @@ use "test.fxl";
 		void
 		)
 	say "(resolving)"
-	evaluate_later (use_standard form)
+	resolve standard form
 	)
 
 \parse=

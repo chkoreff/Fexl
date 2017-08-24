@@ -1,5 +1,5 @@
 #
-\hello=(evaluate_later; use_standard \; xsay "Hello")
+\hello=(resolve standard \; xsay "Hello")
 say "beg"
 hello
 hello

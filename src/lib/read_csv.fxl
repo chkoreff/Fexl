@@ -1,11 +1,11 @@
 # Parse the CSV (comma-separated value) format.
 # NOTE: https://www.ietf.org/rfc/rfc4180.txt
 # "Spaces are considered part of a field and should not be ignored."
-
-evaluate;
-use "read.fxl";
-use_standard;
-\;
+evaluate
+(
+use_lib "read.fxl";
+standard
+) \;
 
 \get_plain_item=(collect_to \ch eq ch "," T; is_eol ch T; eq ch "")
 
@@ -59,7 +59,6 @@ use_standard;
 \read_csv_chars=(read_chars get_rows)
 \read_csv_file=(read_file get_rows)
 
-\form
 define "read_csv_chars" read_csv_chars;
 define "read_csv_file" read_csv_file;
-form
+standard

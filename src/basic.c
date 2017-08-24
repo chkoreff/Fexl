@@ -87,6 +87,12 @@ value type_later(value f)
 	return 0;
 	}
 
+value type_is_defined(value f)
+	{
+	if (!f->L) return 0;
+	return boolean(f->R->T != type_void);
+	}
+
 value op_is_type(value f, type t)
 	{
 	if (!f->L) return 0;

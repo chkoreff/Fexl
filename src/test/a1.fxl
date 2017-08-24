@@ -1,7 +1,11 @@
 #
-evaluate;
+evaluate
+(
 use "test.fxl";
-\;
+use_lib "html.fxl";
+use_lib "date.fxl";
+standard
+) \;
 
 \show=
 	(\x
@@ -16,12 +20,11 @@ use "test.fxl";
 
 \eval_file=
 	(\name
-	evaluate;
-	use_standard;
+	evaluate standard;
 	parse_file (path_under dir_local name)
 	)
 
-\eval_str=(\str evaluate; use_standard; parse str "")
+\eval_str=(\str evaluate standard; parse str "")
 
 (
 \ping==(say "ping")
@@ -366,11 +369,12 @@ say ["x = " x]
 
 div
 (
-evaluate;
+evaluate
+(
 use "try_fib.fxl";
 define "show" show;
-use_standard;
-\;
+standard
+) \;
 show "x"
 show (+ 2 3)
 try_fib
@@ -378,7 +382,8 @@ try_fib
 
 div
 (
-evaluate;
+evaluate
+(
 define "say" say;
 define "put" put;
 define "nl" nl;
@@ -391,8 +396,8 @@ define "exp" exp;
 define "log" log;
 define "sin" sin;
 define "fred" (say "I am Fred.");
-use_numbers;
-\;
+str_num
+) \;
 say "hi"
 fred
 say (+ 42.8 -7.6)
@@ -586,14 +591,8 @@ say (is_void 2)
 say (is_void (say "hi"))
 say (is_void [])
 say (is_void void)
-# Symbolic form applied to anything is void.
+# If you apply a form to something else, it just propagates as a form.
 say (is_void ( (\; f x) 3) )
-# evaluate_later can only be applied to forms.
-say (is_void (evaluate_later 36.3))
-say (is_void (evaluate_later (\x\y y x)))
-
-say (is_resolved; \; say "hi")
-say (is_resolved; define "say" say; \; say "hi")
 
 # Test tuples
 say "== tuples"
@@ -703,20 +702,18 @@ eval_file "mf.fxl"
 	say "["
 	say "== resolve"
 
-	\define=
-		(\x\def\form
-		say ["symbol "x]
-		define x def form
-		)
+	\define=(\x say ["symbol "x] define x)
 
-	evaluate;
+	evaluate
+	(
 	define "say" say;
 	define "fred" (say "I am Fred.");
 	define "wilma" (say "I am Wilma.");
 	define "is_void" is_void;
 	define "void" void;
 	define "barney" (say "I am Barney.");
-	\;
+	void
+	) \;
 	say "== run"
 	fred
 	wilma
@@ -733,17 +730,17 @@ eval_file "mf.fxl"
 
 	say "Run in standard context."
 	(
-	evaluate;
-	use_standard;
-	form
+	evaluate standard form
 	)
 
 	say "Run in weird context."
 	(
-	evaluate;
+	evaluate
+	(
 	define "say" say;
 	define "+" *;
-	use_numbers;
+	str_num
+	)
 	form
 	)
 
@@ -752,16 +749,7 @@ eval_file "mf.fxl"
 
 \case_3==
 	(
-	\run=
-		(
-		\form=
-			(use_standard \;
-			say "PING"
-			)
-		later;
-		evaluate form
-		)
-
+	\run=(resolve standard \; say "PING")
 	say "["
 	run
 	run

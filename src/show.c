@@ -11,7 +11,6 @@
 #include <type_buf.h>
 #include <type_cmp.h>
 #include <type_file.h>
-#include <type_form.h>
 #include <type_istr.h>
 #include <type_limit.h>
 #include <type_math.h>
@@ -31,8 +30,6 @@ void put_type(type t)
 
 	else if (t == type_sym) put("sym");
 	else if (t == type_subst) put("subst");
-
-	else if (t == type_form) put("form");
 
 	else if (t == type_put) put("put");
 	else if (t == type_nl) put("nl");
@@ -75,6 +72,7 @@ void put_type(type t)
 	else if (t == type_O) put_ch('O');
 	else if (t == type_once) put("once");
 	else if (t == type_later) put("later");
+	else if (t == type_is_defined) put("is_defined");
 	else if (t == type_is_void) put("is_void");
 	else if (t == type_is_good) put("is_good");
 	else if (t == type_is_bool) put("is_bool");
@@ -121,16 +119,11 @@ void put_type(type t)
 	else if (t == type_seed_rand) put("seed_rand");
 	else if (t == type_rand) put("rand");
 
-	else if (t == type_use_standard) put("use_standard");
-	else if (t == type_use_numbers) put("use_numbers");
-
-	else if (t == type_evaluate) put("evaluate");
-	else if (t == type_evaluate_later) put("evaluate_later");
-	else if (t == type_is_resolved) put("is_resolved");
-	else if (t == type_define) put("define");
-
 	else if (t == type_parse) put("parse");
 	else if (t == type_parse_file) put("parse_file");
+	else if (t == type_standard) put("standard");
+	else if (t == type_evaluate) put("evaluate");
+	else if (t == type_resolve) put("resolve");
 
 	else if (t == type_buf) put("buf");
 	else if (t == type_buf_new) put("buf_new");
@@ -202,8 +195,6 @@ static void limit_show(value f)
 			put_quote(get_str(sym_source(f)));
 			}
 			}
-		else if (f->T == type_form)
-			limit_show(form_exp(f));
 		else if (f->T == type_var)
 			limit_show(f->R);
 		else if (f->T == type_buf || f->T == type_istr)

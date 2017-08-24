@@ -9,7 +9,6 @@
 #include <type_buf.h>
 #include <type_cmp.h>
 #include <type_file.h>
-#include <type_form.h>
 #include <type_istr.h>
 #include <type_limit.h>
 #include <type_math.h>
@@ -31,17 +30,17 @@ static int match(const char *other)
 	}
 
 /* Resolve standard names. */
-static value resolve_standard(const char *name)
+static value standard(value name)
 	{
+	cur_name = str_data(name);
+
 	/* Resolve numeric literals. */
 	{
-	value def = Qnum_str0(name);
+	value def = Qnum_str0(cur_name);
 	if (def) return def;
 	}
 
 	/* Resolve other names. */
-	cur_name = name;
-
 	if (match("put")) return hold(Qput);
 	if (match("nl")) return hold(Qnl);
 	if (match("say")) return Q(type_say);
@@ -83,6 +82,7 @@ static value resolve_standard(const char *name)
 	if (match("eval")) return hold(Qeval);
 	if (match("once")) return Q(type_once);
 	if (match("later")) return hold(Qlater);
+	if (match("is_defined")) return Q(type_is_defined);
 	if (match("is_void")) return Q(type_is_void);
 	if (match("is_good")) return Q(type_is_good);
 	if (match("is_bool")) return Q(type_is_bool);
@@ -128,16 +128,11 @@ static value resolve_standard(const char *name)
 	if (match("seed_rand")) return Q(type_seed_rand);
 	if (match("rand")) return Q(type_rand);
 
-	if (match("use_standard")) return hold(Quse_standard);
-	if (match("use_numbers")) return Q(type_use_numbers);
-
-	if (match("evaluate")) return hold(Qevaluate);
-	if (match("evaluate_later")) return Q(type_evaluate_later);
-	if (match("is_resolved")) return Q(type_is_resolved);
-	if (match("define")) return Q(type_define);
-
 	if (match("parse")) return Q(type_parse);
 	if (match("parse_file")) return hold(Qparse_file);
+	if (match("standard")) return hold(Qstandard);
+	if (match("evaluate")) return hold(Qevaluate);
+	if (match("resolve")) return Q(type_resolve);
 
 	if (match("buf_new")) return Q(type_buf_new);
 	if (match("buf_put")) return Q(type_buf_put);
@@ -158,16 +153,24 @@ static value resolve_standard(const char *name)
 	return 0;
 	}
 
-/* (use_standard form) Resolve standard symbols in the form. */
-value type_use_standard(value f)
+value type_standard(value f)
 	{
-	return op_resolve(resolve_standard,f);
+	if (!f->L) return 0;
+	{
+	value name = arg(f->R);
+	if (name->T == type_str)
+		{
+		value def = standard(name);
+		if (def)
+			f = A(hold(Qlater),def);
+		else
+			f = hold(Qvoid);
+		}
+	else
+		f = hold(Qvoid);
+	drop(name);
+	return f;
 	}
-
-/* (use_numbers form) Resolve numeric literals in the form. */
-value type_use_numbers(value f)
-	{
-	return op_resolve(Qnum_str0,f);
 	}
 
 value QI;
@@ -186,7 +189,7 @@ value Qfnl;
 value Qtuple;
 value Qparse_file;
 value Qevaluate;
-value Quse_standard;
+value Qstandard;
 
 static void beg_const(void)
 	{
@@ -206,7 +209,7 @@ static void beg_const(void)
 	Qtuple = Q(type_tuple);
 	Qparse_file = Q(type_parse_file);
 	Qevaluate = Q(type_evaluate);
-	Quse_standard = Q(type_use_standard);
+	Qstandard = Q(type_standard);
 	}
 
 static void end_const(void)
@@ -227,7 +230,7 @@ static void end_const(void)
 	drop(Qtuple);
 	drop(Qparse_file);
 	drop(Qevaluate);
-	drop(Quse_standard);
+	drop(Qstandard);
 	}
 
 /* Evaluate main.fxl located relative to the executable given by argv[0].  The
@@ -244,8 +247,7 @@ static void eval_script(void)
 	f = A(A(Q(type_concat),f),Qstr0("/src/main.fxl"));
 	/* Now evaluate the main script. */
 	f = A(hold(Qparse_file),f);
-	f = A(hold(Quse_standard),f);
-	f = A(hold(Qevaluate),f);
+	f = A(A(hold(Qevaluate),hold(Qstandard)),f);
 	f = eval(f);
 	drop(f);
 	}

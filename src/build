@@ -22,7 +22,6 @@ make str
 make type_buf
 make type_cmp
 make type_file
-make type_form
 make type_input
 make type_istr
 make type_limit

@@ -1,5 +1,4 @@
-extern value type_use_standard(value f);
-extern value type_use_numbers(value f);
+extern value type_standard(value f);
 extern value QI;
 extern value QT;
 extern value QF;
@@ -16,5 +15,5 @@ extern value Qfnl;
 extern value Qtuple;
 extern value Qparse_file;
 extern value Qevaluate;
-extern value Quse_standard;
+extern value Qstandard;
 extern void eval_standard(int argc, char *argv[]);

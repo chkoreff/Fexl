@@ -1,6 +1,7 @@
 #
-evaluate;
+evaluate
+(
 use "try_fib.fxl";
-use_standard;
-\;
+standard
+) \;
 each (range 1 1000) \n try_fib

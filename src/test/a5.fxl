@@ -1,8 +1,9 @@
 #
-evaluate;
+evaluate
+(
 define "talk" (say "TALK");
-use_standard;
-\;
+standard
+) \;
 say "begin"
 talk
 talk

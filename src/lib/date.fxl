@@ -1,10 +1,4 @@
 #
-evaluate;
-use "list.fxl";
-use "math.fxl";
-use_standard;
-\;
-
 \long_month_names=
 [
 "January"
@@ -292,7 +286,6 @@ use_standard;
 	ymd_date y m d
 	)
 
-\form
 define "long_month_names" long_month_names;
 define "short_month_names" short_month_names;
 define "long_month_name" long_month_name;
@@ -318,4 +311,4 @@ define "count_days" count_days;
 define "day_of_week" day_of_week;
 define "add_days" add_days;
 define "add_year" add_year;
-form
+standard

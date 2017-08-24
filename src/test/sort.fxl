@@ -1,7 +1,9 @@
 #
-evaluate;
+evaluate
+(
 use "test.fxl";
-\;
+standard
+) \;
 
 # (tower f n x) is the result of applying f to x n times.
 \tower=
@@ -13,14 +15,15 @@ use "test.fxl";
 	)
 
 # Test restricted evaluation by defining only the necessary functions.
-evaluate;
+evaluate
+(
 define "append" append;
 define "show_list" show_list;
 define "sort" sort;
 define "tower" tower;
 define "unique" unique;
-use_numbers;
-\;
+str_num
+) \;
 # Here I test the sort.
 
 # A list of 30 random words from diceware.com.

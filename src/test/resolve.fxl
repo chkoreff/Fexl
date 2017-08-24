@@ -1,32 +1,22 @@
 # Test fancy extended standard context.
 
-\use_standard=
+# Define a few extra functions.
+evaluate
 (
+say "Evaluating the context."
 \speaker=(\name \x put name put " says " say x)
-\form
 define "fred" (speaker "Fred");
 define "wilma" (speaker "Wilma");
 define "goodbye" (say "Goodbye");
-use_standard;
-form
-)
+standard
+) \;
 
-\use_standard=
-(\form
-use_standard;
-define "use_standard" use_standard;
-form
-)
-
-evaluate;
-say "Evaluating the context."
-use_standard;
-\;
-
-evaluate;
-use_standard;
+# Now override one of the definitions.
+evaluate
+(
 define "fred" (put "HEY: " fred);
-\;
+standard
+) \;
 
 # Now run this program in the enhanced context.
 say "Hi"

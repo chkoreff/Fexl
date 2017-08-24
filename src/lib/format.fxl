@@ -1,10 +1,4 @@
 #
-evaluate;
-use "list.fxl";
-use "bool.fxl";
-use_standard;
-\;
-
 \format_num=
 (
 # Repeat string x n times
@@ -160,7 +154,6 @@ format_num
 \put_data=(fput_data stdout)
 \put_list=(fput_list stdout)
 
-\form
 define "format_num" format_num;
 define "format_money" format_money;
 define "fexl_quote" fexl_quote;
@@ -170,4 +163,4 @@ define "fput_data" fput_data;
 define "fput_list" fput_list;
 define "put_data" put_data;
 define "put_list" put_list;
-form
+standard

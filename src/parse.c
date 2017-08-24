@@ -8,7 +8,6 @@
 #include <parse.h>
 #include <report.h>
 #include <standard.h>
-#include <type_form.h>
 #include <type_str.h>
 #include <type_sym.h>
 
@@ -343,7 +342,7 @@ static value parse_lambda(unsigned long first_line)
 static value parse_form(void)
 	{
 	value exp = parse_exp();
-	return Qform(exp);
+	return A(hold(QI),exp);
 	}
 
 /* Parse the next factor of an expression.  Return 0 if no factor found. */
@@ -413,7 +412,6 @@ value parse_input(input _get, void *_source, value _label)
 	value exp = parse_exp();
 	if (ch != -1)
 		syntax_error("Extraneous input", line);
-	exp = Qform(exp);
 	return exp;
 	}
 	}

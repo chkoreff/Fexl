@@ -10,7 +10,7 @@
 \if=(\x\y x y I)
 
 # (check x y) = x if x is good, otherwise y.
-\check=(\x \x=x is_good x x)
+\check=(\x \x=x is_defined x x)
 
 \error=(\msg fsay stderr msg die)
 
@@ -25,6 +25,13 @@
 	obj x
 	)
 
+# Return a context where key is defined as (later val).  This defers
+# evaluation of a definition returned by a context.
+\define=(\key\val with key (later val))
+
+# Use a file given by a direct path.
+\use_file=(\name\context evaluate context; parse_file name)
+
 # Establish paths based on command arguments.
 \dir_base=(dirname; dirname; argv 0)
 \dir_lib=(path_under dir_base "src/lib")
@@ -32,113 +39,39 @@
 \script_name=(check (argv 1) "")
 \dir_local=(dirname script_name)
 
-\cached=
-	(\cache\key\val
+# Use a file in the Fexl library directory.
+\use_lib=(\name use_file (path_under dir_lib name))
 
-	\lookup=(var_get cache)
-	\old=(lookup key)
-	is_good old old;
+# Use a file in the directory which contains the user's script.
+\use=(\name use_file (path_under dir_local name))
 
-	\val=val
+# Evaluate the user's script.
+use_file script_name;
 
-	\lookup=
-		(\x
-		eq x key val;
-		lookup x
-		)
+use_lib "format.fxl";
+use_lib "hex.fxl";
+use_lib "list.fxl";
+use_lib "math.fxl";
+use_lib "bool.fxl";
 
-	var_put cache lookup
-	val
-	)
+define "define" define;
+define "if" if;
+define "with" with;
 
-\resolve_enhanced=
-	(
-	\form
-	define "path_under" path_under;
-	define "dir_base" dir_base;
-	define "dir_local" dir_local;
+define "TAB" TAB;
+define "NL" NL;
+define "CR" CR;
+define "LF" LF;
+define "QU" QU;
 
-	define "TAB" TAB;
-	define "NL" NL;
-	define "CR" CR;
-	define "LF" LF;
-	define "QU" QU;
-	define "cached" cached;
-	define "error" error;
-	define "check" check;
-	define "if" if;
-	define "with" with;
-	use_standard;
-	form
-	)
+define "check" check;
+define "use_file" use_file;
+define "use_lib" use_lib;
+define "use" use;
 
-\use_standard=
-	(
-	\parse_file=
-		(
-		\modules=var_new
-		\name
-		cached modules name;
-		#fsay stderr ["*** use "name]
-		parse_file name
-		)
+define "path_under" path_under;
+define "dir_base" dir_base;
+define "dir_local" dir_local;
 
-	\make_use=
-		(\dir\resolve_file
-
-		@\use
-
-		\name\form
-
-		\form=form
-		is_resolved form form;
-
-		\resolve=
-			(
-			\name=(path_under dir name)
-
-			evaluate;
-			resolve_file;
-			define "use" use;
-			parse_file name
-			)
-
-		resolve form
-		)
-
-	\cx_share=
-		(@\cx_share
-		\form
-		resolve_enhanced;
-		define "use_standard" cx_share;
-		form
-		)
-
-	\use=(make_use dir_lib cx_share)
-
-	\cx_local=
-		(@\cx_local
-		\form
-
-		use "read_csv.fxl";
-		use "read_ssv.fxl";
-		use "hex.fxl";
-		use "html.fxl";
-		use "format.fxl";
-		use "date.fxl";
-		use "list.fxl";
-		use "math.fxl";
-		use "bool.fxl";
-
-		resolve_enhanced;
-		define "use" (make_use dir_local cx_local);
-		define "use_standard" cx_local;
-		form
-		)
-
-	cx_local
-	)
-
-evaluate;
-use_standard;
-parse_file script_name
+define "error" error;
+standard

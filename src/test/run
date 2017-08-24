@@ -40,6 +40,7 @@ run_fexl test/a9.fxl
 run_fexl test/b10.fxl
 run_fexl test/b11.fxl
 run_fexl test/b12.fxl
+run_fexl test/b13.fxl
 run_fexl test/chars.fxl
 run_fexl test/date.fxl
 run_fexl test/sat.fxl
@@ -121,7 +122,7 @@ EOF
 
 (
 cat <<"EOF"
-evaluate; define "b" (say "b"); \; a b
+evaluate (define "b" (say "b"); void) \; a b
 a c
 c
 EOF

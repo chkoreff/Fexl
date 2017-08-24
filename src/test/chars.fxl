@@ -2,9 +2,11 @@
 #abcdefghijklmnopqrstuvwxyz
 #abcdefghijklmnopqrstuvwxyz
 # ^ Those characters used by test/b10.fxl.
-evaluate;
+evaluate
+(
 use "test.fxl";
-\;
+standard
+) \;
 
 \try=
 	(\str

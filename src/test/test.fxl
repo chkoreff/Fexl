@@ -2,8 +2,6 @@
 \div==(say "==")
 \show_list=(\xs say "[" (each xs say) say "]")
 
-\form
-use_standard;
 define "div" div;
 define "show_list" show_list;
-form
+standard

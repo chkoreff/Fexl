@@ -1,4 +1,10 @@
 #
+evaluate
+(
+use_lib "html.fxl";
+use_lib "date.fxl";
+standard
+) \;
 (
 \try=
 	(\path
@@ -38,6 +44,10 @@ if F (say (readlink "/proc/self/exe"))
 if T (say "hi")
 say (and T F)
 say (mod 48 3)
+say (mod 396398872 181115)
+say (exp 1)
+say pi
+say tau
 each ["a" "b"] say
 say (date_normal "20170719")
 say (quote ~ <b>x;"y"</b>~)

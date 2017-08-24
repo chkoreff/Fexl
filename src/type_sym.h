@@ -6,4 +6,6 @@ extern value sym_source(value f);
 extern value app(value f, value g);
 extern value Qsubst(value p, value e);
 extern value lambda(const char *name, value exp);
+extern value type_evaluate(value f);
+extern value type_resolve(value f);
 extern value type_subst(value f);

@@ -154,8 +154,6 @@
 # Shift the first item off a list.
 \shift=(\xs xs {void []} \x\xs {x xs})
 
-\put_key=with  # deprecated
-
 # Given a list of rows, return a function which maps the key at key_pos to the
 # value at val_pos.
 \match_column=
@@ -293,7 +291,6 @@
 	cons ch tail
 	)
 
-\form
 define "append" append;
 define "each" each;
 define "map" map;
@@ -315,7 +312,6 @@ define "list_at" list_at;
 define "list_combine" list_combine;
 define "column" column;
 define "shift" shift;
-define "put_key" put_key;
 define "match_column" match_column;
 define "stream_values" stream_values;
 define "get_list" get_list;
@@ -329,4 +325,4 @@ define "join" join;
 define "join_path" join_path;
 define "split" split;
 define "file_bytes" file_bytes;
-form
+standard

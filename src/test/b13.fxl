@@ -1,0 +1,50 @@
+# Test standard context.
+evaluate
+(
+use "test.fxl";
+use_lib "date.fxl";
+
+use_lib "read_ssv.fxl";
+use_lib "read_csv.fxl";
+
+use_lib "read_ssv.fxl";
+use_lib "read_csv.fxl";
+
+use_lib "html.fxl";
+
+standard
+) \;
+
+\try=
+	(\name
+	\f=(standard name)
+	say ["name "name" : "(is_defined f)]
+	)
+
+# defined
+try "say"
+try "+"
+try "@"
+try "define"
+try "if"
+try "each"
+try "div"
+try "show_list"
+try "use_file"
+try "use_lib"
+try "use"
+try "void"
+try "standard"
+try "dirname"
+try "hex_digit"
+try "read_ssv_file"
+try "read_csv_file"
+try "2.5"
+try "0"
+try "-3.56"
+try "-3.56e-4"
+
+nl
+# undefined
+try "-3.56e-4x"
+try "x"

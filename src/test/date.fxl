@@ -1,4 +1,9 @@
 #
+evaluate
+(
+use_lib "date.fxl";
+standard
+) \;
 \test_count_days==
 	(
 	\try=

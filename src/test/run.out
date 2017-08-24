@@ -590,11 +590,7 @@ hi
 F
 F
 T
-T
-T
-T
 F
-T
 == tuples
 { }
 { a }
@@ -1321,6 +1317,10 @@ base /
 hi
 F
 0
+119252
+2.71828182845905
+3.14159265358979
+6.28318530717959
 a
 b
 07/19/2017
@@ -1517,6 +1517,32 @@ Second line.
 second line"]
 ["1" "2" "3"]
 ]
+exit 0
+==== test/b13.fxl
+name say : T
+name + : T
+name @ : T
+name define : T
+name if : T
+name each : T
+name div : T
+name show_list : T
+name use_file : T
+name use_lib : T
+name use : T
+name void : T
+name standard : T
+name dirname : T
+name hex_digit : T
+name read_ssv_file : T
+name read_csv_file : T
+name 2.5 : T
+name 0 : T
+name -3.56 : T
+name -3.56e-4 : T
+
+name -3.56e-4x : F
+name x : F
 exit 0
 ==== test/chars.fxl
 ==
