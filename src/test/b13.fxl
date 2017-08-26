@@ -1,28 +1,18 @@
 # Test standard context.
-evaluate
-(
-use "test.fxl";
-use_lib "date.fxl";
 
-use_lib "read_ssv.fxl";
-use_lib "read_csv.fxl";
+\test_context==
+(\context
 
-use_lib "read_ssv.fxl";
-use_lib "read_csv.fxl";
-
-use_lib "html.fxl";
-
-standard
-) \;
-
+evaluate context \;
 \try=
 	(\name
 	\f=(standard name)
 	say ["name "name" : "(is_defined f)]
 	)
 
-# defined
 try "say"
+try "is_defined"
+try "standard"
 try "+"
 try "@"
 try "define"
@@ -34,7 +24,6 @@ try "use_file"
 try "use_lib"
 try "use"
 try "void"
-try "standard"
 try "dirname"
 try "hex_digit"
 try "read_ssv_file"
@@ -43,8 +32,31 @@ try "2.5"
 try "0"
 try "-3.56"
 try "-3.56e-4"
-
-nl
-# undefined
 try "-3.56e-4x"
 try "x"
+)
+
+say "== test_full_context"
+test_context
+	(
+	use "test.fxl";
+	use_lib "date.fxl";
+
+	use_lib "read_ssv.fxl";
+	use_lib "read_csv.fxl";
+
+	use_lib "read_ssv.fxl";
+	use_lib "read_csv.fxl";
+
+	use_lib "html.fxl";
+
+	standard
+	)
+
+say "== test_restricted_context"
+test_context
+	(
+	define "say" say;
+	define "is_defined" is_defined;
+	void
+	)

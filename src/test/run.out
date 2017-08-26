@@ -1519,7 +1519,10 @@ second line"]
 ]
 exit 0
 ==== test/b13.fxl
+== test_full_context
 name say : T
+name is_defined : T
+name standard : T
 name + : T
 name @ : T
 name define : T
@@ -1531,7 +1534,6 @@ name use_file : T
 name use_lib : T
 name use : T
 name void : T
-name standard : T
 name dirname : T
 name hex_digit : T
 name read_ssv_file : T
@@ -1540,7 +1542,31 @@ name 2.5 : T
 name 0 : T
 name -3.56 : T
 name -3.56e-4 : T
-
+name -3.56e-4x : F
+name x : F
+== test_restricted_context
+name say : T
+name is_defined : T
+name standard : T
+name + : F
+name @ : F
+name define : F
+name if : F
+name each : F
+name div : F
+name show_list : F
+name use_file : F
+name use_lib : F
+name use : F
+name void : F
+name dirname : F
+name hex_digit : F
+name read_ssv_file : F
+name read_csv_file : F
+name 2.5 : F
+name 0 : F
+name -3.56 : F
+name -3.56e-4 : F
 name -3.56e-4x : F
 name x : F
 exit 0

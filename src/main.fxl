@@ -29,6 +29,14 @@
 # evaluation of a definition returned by a context.
 \define=(\key\val with key (later val))
 
+# Redefine evaluate so it points "standard" to the current context.
+\evaluate=
+	(\cx
+	\cx=cx
+	\cx=(@\this define "standard" this; cx)
+	evaluate cx
+	)
+
 # Use a file given by a direct path.
 \use_file=(\name\context evaluate context; parse_file name)
 
@@ -55,6 +63,7 @@ use_lib "math.fxl";
 use_lib "bool.fxl";
 
 define "define" define;
+define "evaluate" evaluate;
 define "if" if;
 define "with" with;
 

@@ -137,9 +137,9 @@ value lambda(const char *name, value exp)
 	return f;
 	}
 
-static value define_name(value name)
+static value define_name(value context, value name)
 	{
-	value def = eval(A(hold(Qstandard),hold(name)));
+	value def = eval(A(hold(context),hold(name)));
 	if (def->T == type_void) /* undefined */
 		{
 		drop(def);
@@ -156,31 +156,25 @@ static value define_name(value name)
 		return def;
 	}
 
-static value resolve(value exp)
+static value resolve(value context, value exp)
 	{
 	if (exp->T != type_sym)
-		return exp;
+		return hold(exp);
 	else if (exp->L == 0)
 		{
 		value name = sym_name(exp);
-		value def = define_name(name);
-		if (def)
-			{
-			drop(exp);
-			return def;
-			}
+		value def = define_name(context,name);
+		if (def) return def;
 		undefined_symbol(str_data(name),sym_line(exp),
 			str_data(sym_source(exp)));
-		return exp;
+		return hold(exp);
 		}
 	else
 		{
-		value L = resolve(hold(exp->L));
-		value R = resolve(hold(exp->R));
-		drop(exp);
+		value L = resolve(context,exp->L);
+		value R = resolve(context,exp->R);
 		return app(L,R);
 		}
-	return exp;
 	}
 
 /* (evaluate context exp) Evaluate the expression in the context. */
@@ -188,14 +182,13 @@ value type_evaluate(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	{
+	value context = arg(f->L->R);
 	value exp = arg(f->R);
-	value save = Qstandard;
-	Qstandard = arg(f->L->R);
-	f = resolve(exp);
-	drop(Qstandard);
-	Qstandard = save;
+	f = resolve(context,exp);
 	if (f->T == type_sym)
 		die(0); /* The expression had undefined symbols. */
+	drop(context);
+	drop(exp);
 	return f;
 	}
 	}
