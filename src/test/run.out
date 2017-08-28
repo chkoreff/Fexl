@@ -1522,7 +1522,7 @@ exit 0
 == test_full_context
 name say : T
 name is_defined : T
-name standard : T
+name standard : F
 name + : T
 name @ : T
 name define : T
@@ -1547,7 +1547,7 @@ name x : F
 == test_restricted_context
 name say : T
 name is_defined : T
-name standard : T
+name standard : F
 name + : F
 name @ : F
 name define : F

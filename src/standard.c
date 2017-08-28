@@ -130,7 +130,7 @@ static value standard(value name)
 
 	if (match("parse")) return Q(type_parse);
 	if (match("parse_file")) return hold(Qparse_file);
-	if (match("standard")) return hold(Qstandard);
+
 	if (match("evaluate")) return hold(Qevaluate);
 	if (match("resolve")) return Q(type_resolve);
 
@@ -189,7 +189,6 @@ value Qfnl;
 value Qtuple;
 value Qparse_file;
 value Qevaluate;
-value Qstandard;
 
 static void beg_const(void)
 	{
@@ -209,7 +208,6 @@ static void beg_const(void)
 	Qtuple = Q(type_tuple);
 	Qparse_file = Q(type_parse_file);
 	Qevaluate = Q(type_evaluate);
-	Qstandard = Q(type_standard);
 	}
 
 static void end_const(void)
@@ -230,7 +228,6 @@ static void end_const(void)
 	drop(Qtuple);
 	drop(Qparse_file);
 	drop(Qevaluate);
-	drop(Qstandard);
 	}
 
 /* Evaluate main.fxl located relative to the executable given by argv[0].  The
@@ -247,7 +244,7 @@ static void eval_script(void)
 	f = A(A(Q(type_concat),f),Qstr0("/src/main.fxl"));
 	/* Now evaluate the main script. */
 	f = A(hold(Qparse_file),f);
-	f = A(A(hold(Qevaluate),hold(Qstandard)),f);
+	f = A(A(hold(Qevaluate),Q(type_standard)),f);
 	f = eval(f);
 	drop(f);
 	}

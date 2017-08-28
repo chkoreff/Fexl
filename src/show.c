@@ -29,6 +29,8 @@ void put_type(type t)
 	if (t == type_A) put_ch('A');
 
 	else if (t == type_sym) put("sym");
+	else if (t == type_evaluate) put("evaluate");
+	else if (t == type_resolve) put("resolve");
 	else if (t == type_subst) put("subst");
 
 	else if (t == type_put) put("put");
@@ -121,9 +123,8 @@ void put_type(type t)
 
 	else if (t == type_parse) put("parse");
 	else if (t == type_parse_file) put("parse_file");
+
 	else if (t == type_standard) put("standard");
-	else if (t == type_evaluate) put("evaluate");
-	else if (t == type_resolve) put("resolve");
 
 	else if (t == type_buf) put("buf");
 	else if (t == type_buf_new) put("buf_new");

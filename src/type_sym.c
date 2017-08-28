@@ -143,7 +143,11 @@ static value define_name(value context, value name)
 	if (def->T == type_void) /* undefined */
 		{
 		drop(def);
-		return 0;
+		/* By default, "standard" refers to the current context. */
+		if (strcmp(str_data(name),"standard") == 0)
+			return hold(context);
+		else
+			return 0;
 		}
 	else if (def->T == type_I && def->L)
 		{

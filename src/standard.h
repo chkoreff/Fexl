@@ -15,5 +15,4 @@ extern value Qfnl;
 extern value Qtuple;
 extern value Qparse_file;
 extern value Qevaluate;
-extern value Qstandard;
 extern void eval_standard(int argc, char *argv[]);
