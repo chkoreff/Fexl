@@ -55,7 +55,6 @@ use_lib "math.fxl";
 use_lib "bool.fxl";
 
 define "define" define;
-define "evaluate" evaluate;
 define "if" if;
 define "with" with;
 
