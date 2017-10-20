@@ -1187,5 +1187,20 @@ try "missing" "missing"
 
 sleep 0
 
+say (oct "775")
+say (hex "af01A")
+
+(
+\local=(path_under dir_local)
+\mkdir=(\path mkdir (local path) (oct "755"))
+\rmdir=(\path rmdir (local path))
+
+\code=(mkdir "zzz")
+say ["mkdir : "code]
+
+\code=(rmdir "zzz")
+say ["rmdir : "code]
+)
+
 \\
 Extra stuff not parsed.

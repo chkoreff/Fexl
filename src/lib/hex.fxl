@@ -54,10 +54,46 @@
 	to_str zl
 	)
 
+\oct=
+	(\str
+	fold
+		(\z\byte
+		\digit=
+			(
+			\n=(ord byte)
+			and (ge n 48) (le n 57) (- n 48);
+			void
+			)
+		+ digit (* 8 z)
+		)
+		0
+		(str_bytes str)
+	)
+
+\hex=
+	(\str
+	fold
+		(\z\byte
+		\digit=
+			(
+			\n=(ord byte)
+			and (ge n 48) (le n 57) (- n 48);
+			and (ge n 97) (le n 102) (+ 10; - n 97);
+			and (ge n 65) (le n 70) (+ 10; - n 65);
+			void
+			)
+		+ digit (* 16 z)
+		)
+		0
+		(str_bytes str)
+	)
+
 define "hex_digit" hex_digit;
 define "hex_byte" hex_byte;
 define "hex_digit_to_dec" hex_digit_to_dec;
 define "map_hex_to_raw_bytes" map_hex_to_raw_bytes;
 define "map_raw_bytes_to_hex" map_raw_bytes_to_hex;
 define "xor_hex" xor_hex;
+define "oct" oct;
+define "hex" hex;
 standard

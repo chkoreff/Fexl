@@ -11,3 +11,5 @@ extern value type_flock_ex(value f);
 extern value type_flock_sh(value f);
 extern value type_flock_un(value f);
 extern value type_readlink(value f);
+extern value type_mkdir(value f);
+extern value type_rmdir(value f);

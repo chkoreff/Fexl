@@ -121,6 +121,8 @@ static value standard(value name)
 	if (match("flock_sh")) return Q(type_flock_sh);
 	if (match("flock_un")) return Q(type_flock_un);
 	if (match("readlink")) return Q(type_readlink);
+	if (match("mkdir")) return Q(type_mkdir);
+	if (match("rmdir")) return Q(type_rmdir);
 
 	if (match("die")) return Q(type_die);
 	if (match("argv")) return Q(type_argv);

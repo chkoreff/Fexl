@@ -234,3 +234,46 @@ value type_readlink(value f)
 	return f;
 	}
 	}
+
+/* \code=(mkdir path mode) Attempt to create a directory named path.
+See mkdir(2) for details. */
+value type_mkdir(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	{
+	value x = arg(f->L->R);
+	value y = arg(f->R);
+	if (x->T == type_str && y->T == type_num)
+		{
+		const char *path = str_data(x);
+		unsigned int mode = get_double(y);
+		int code = mkdir(path,mode);
+		f = Qnum0(code);
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	drop(y);
+	return f;
+	}
+	}
+
+/* \code=(rmdir path) Deletes a directory, which must be empty.
+See rmdir(2) for details. */
+value type_rmdir(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_str)
+		{
+		const char *path = str_data(x);
+		int code = rmdir(path);
+		f = Qnum0(code);
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
+	}

@@ -1043,6 +1043,10 @@ is_newer src/test/a1.fxl src/test/a1.fxl = F
 is_newer missing missing = T
 is_newer missing missing = T
 
+509
+716826
+mkdir : 0
+rmdir : 0
 exit 0
 ==== test/a2.fxl
 Hello
