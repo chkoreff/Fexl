@@ -44,6 +44,7 @@ value type_argv(value f)
 value type_sleep(value f)
 	{
 	if (!f->L) return 0;
+	{
 	value x = arg(f->R);
 	if (x->T == type_num)
 		{
@@ -56,4 +57,5 @@ value type_sleep(value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
+	}
 	}
