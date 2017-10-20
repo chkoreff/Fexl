@@ -1185,5 +1185,7 @@ try "src/test/a1.fxl" "src/test/a1.fxl"
 try "missing" "missing"
 )
 
+sleep 0
+
 \\
 Extra stuff not parsed.

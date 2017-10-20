@@ -190,8 +190,7 @@ value type_flock_sh(value f) { return op_flock(f,LOCK_SH); }
 /* (flock_un fh) Unlock the file handle. */
 value type_flock_un(value f) { return op_flock(f,LOCK_UN); }
 
-/* LATER fdopen */
-/* LATER pipe dup2 close fork wait */
+/* LATER fdopen pipe dup2 close fork wait alarm */
 
 /* Call readlink, returning a string. */
 static string safe_readlink(const char *path)
