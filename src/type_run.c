@@ -48,8 +48,7 @@ value type_sleep(value f)
 	value x = arg(f->R);
 	if (x->T == type_num)
 		{
-		int n = get_double(x);
-		if (n < 0) n = 0;
+		unsigned int n = get_ulong(x);
 		sleep(n);
 		f = hold(QI);
 		}

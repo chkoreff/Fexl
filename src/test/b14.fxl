@@ -1,0 +1,120 @@
+# NOTE If you fopen with "a+", you cannot seek, and output is always at end of
+# file.
+
+\show_base_dir=
+	(\path
+	say ["directory "path]
+	\path=(path_under dir_base path)
+	\names=(sort; dir_names path)
+	say "[" each names say say "]"
+	)
+
+\demo_seek=
+	(\path
+	\path=(path_under dir_local path)
+
+	\fh=
+		(
+		\fh=(mkfile path (oct "664")) # Create and open the file atomically.
+		is_good fh (say ["Created "path] fh);
+		\fh=(fopen path "r+") # Open the existing file.
+		is_good fh (say ["Opened "path] fh);
+		error ["Could not create or open "path]
+		)
+
+	flock_ex fh
+
+	\show_pos=
+		(\label
+		say [label" (pos "(ftell fh)")"]
+		)
+
+	\seek=
+		(\type\pos
+		\fn=
+			(
+			eq type "set" fseek_set;
+			eq type "cur" fseek_cur;
+			eq type "end" fseek_end;
+			void
+			)
+		\name=["seek_"type]
+		\code=(fn fh pos)
+		if (eq code -1) (error [name" failed"])
+		show_pos [name" "pos]
+		)
+
+	\seek_set=(seek "set")
+	\seek_cur=(seek "cur")
+	\seek_end=(seek "end")
+
+	\truncate=
+		(\size
+		\code=(ftruncate fh size)
+		\name="truncate"
+		if (eq code -1) (error [name" failed"])
+		show_pos [name" "size]
+		)
+
+	\write=
+		(\str
+		fput fh str
+		show_pos ["write "(length str)" bytes "(fexl_quote str)]
+		)
+
+	\read=
+		(\size
+		\str=(fread fh size)
+		show_pos ["read "(length str)" bytes "(fexl_quote str)]
+		)
+
+	\sleep=
+		(\n
+		put ["sleep "n" ..."] fflush stdout
+		sleep n
+		nl
+		)
+
+	\context=
+		(
+		define "show_pos" show_pos;
+		define "seek_set" seek_set;
+		define "seek_cur" seek_cur;
+		define "seek_end" seek_end;
+		define "truncate" truncate;
+		define "write" write;
+		define "read" read;
+		define "sleep" sleep;
+		standard
+		)
+
+	\form
+	evaluate context form
+	\code=(remove path)
+	say [(eq code 0 "Removed" "Could not remove")" "path]
+	fclose fh
+	)
+
+(
+show_base_dir "src/lib"
+#show_base_dir "src/test"
+#show_base_dir "src"
+)
+
+(
+demo_seek "vector" \;
+show_pos "open"
+seek_set 0
+truncate 100
+seek_set 10
+write "abcdefghijklmnopqrstuvwxyz"
+if F (sleep 5) # Use this to test locking.
+seek_cur -3
+write "XYZ"
+seek_end -20
+write "12345"
+seek_set 10
+read 16
+read 0
+read 10
+)

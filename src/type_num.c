@@ -45,6 +45,12 @@ double get_double(value x)
 	return *get_num(x);
 	}
 
+unsigned long get_ulong(value x)
+	{
+	double n = get_double(x);
+	return n >= 0 ? n : 0;
+	}
+
 value type_num_str(value f)
 	{
 	if (!f->L) return 0;

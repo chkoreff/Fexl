@@ -8,8 +8,10 @@
 
 #include <basic.h>
 #include <die.h>
+#include <dirent.h> /* opendir readdir closedir */
 #include <memory.h>
 #include <standard.h>
+#include <string.h> /* memset */
 #include <sys/file.h> /* flock */
 #include <sys/stat.h> /* stat */
 #include <type_file.h>
@@ -190,7 +192,7 @@ value type_flock_sh(value f) { return op_flock(f,LOCK_SH); }
 /* (flock_un fh) Unlock the file handle. */
 value type_flock_un(value f) { return op_flock(f,LOCK_UN); }
 
-/* LATER fdopen pipe dup2 close fork wait alarm */
+/* LATER pipe dup2 close fork wait alarm openat */
 
 /* Call readlink, returning a string. */
 static string safe_readlink(const char *path)
@@ -236,7 +238,7 @@ value type_readlink(value f)
 	}
 
 /* \code=(mkdir path mode) Attempt to create a directory named path.
-See mkdir(2) for details. */
+See mkdir(2) for details.  An example for mode is (oct "775"). */
 value type_mkdir(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
@@ -246,7 +248,7 @@ value type_mkdir(value f)
 	if (x->T == type_str && y->T == type_num)
 		{
 		const char *path = str_data(x);
-		unsigned int mode = get_double(y);
+		unsigned long mode = get_ulong(y);
 		int code = mkdir(path,mode);
 		f = Qnum0(code);
 		}
@@ -270,6 +272,155 @@ value type_rmdir(value f)
 		const char *path = str_data(x);
 		int code = rmdir(path);
 		f = Qnum0(code);
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
+	}
+
+/* \code=(ftruncate fh len) Truncate a file to the given length. */
+value type_ftruncate(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	{
+	value x = arg(f->L->R);
+	value y = arg(f->R);
+	if (x->T == type_file && y->T == type_num)
+		{
+		FILE *fh = get_fh(x);
+		unsigned long len = get_ulong(y);
+		int code = ftruncate(fileno(fh),len);
+		f = Qnum0(code);
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	drop(y);
+	return f;
+	}
+	}
+
+static value op_seek(value f, int whence)
+	{
+	if (!f->L || !f->L->L) return 0;
+	{
+	value x = arg(f->L->R);
+	value y = arg(f->R);
+	if (x->T == type_file && y->T == type_num)
+		{
+		FILE *fh = get_fh(x);
+		long offset = get_double(y);
+		int code = fseek(fh,offset,whence);
+		f = Qnum0(code);
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	drop(y);
+	return f;
+	}
+	}
+
+/* \code=(fseek_set fh offset) */
+value type_fseek_set(value f) { return op_seek(f,SEEK_SET); }
+value type_fseek_cur(value f) { return op_seek(f,SEEK_CUR); }
+value type_fseek_end(value f) { return op_seek(f,SEEK_END); }
+
+/* \offset=(ftell fh) */
+value type_ftell(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_file)
+		{
+		FILE *fh = get_fh(x);
+		long offset = ftell(fh);
+		f = Qnum0(offset);
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
+	}
+
+/* \str=(fread fh size) Reads size bytes from the file, padding with zeroes if
+reading past end of file.  The resulting string is always of length size. */
+value type_fread(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	{
+	value x = arg(f->L->R);
+	value y = arg(f->R);
+	if (x->T == type_file && y->T == type_num)
+		{
+		FILE *fh = get_fh(x);
+		unsigned long size = get_ulong(y);
+		string str = str_new(size);
+		size_t count = fread(str->data,1,size,fh);
+		memset(str->data+count,0,size-count+1);
+		f = Qstr(str);
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	drop(y);
+	return f;
+	}
+	}
+
+/* \fh=(mkfile path mode) Atomically create and open a file for reading and
+writing.  Returns void if the file already existed. */
+value type_mkfile(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	{
+	value x = arg(f->L->R);
+	value y = arg(f->R);
+	if (x->T == type_str && y->T == type_num)
+		{
+		const char *path = str_data(x);
+		unsigned int mode = get_ulong(y);
+		int fd = open(path, O_CREAT|O_RDWR|O_EXCL, mode);
+		FILE *fh = (fd != -1) ? fdopen(fd,"r+") : 0;
+		f = fh ? Qfile(fh) : hold(Qvoid);
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	drop(y);
+	return f;
+	}
+	}
+
+static value dir_names(DIR *dir)
+	{
+	struct dirent *entry = readdir(dir);
+	if (!entry) return hold(Qnull);
+	return A(A(hold(Qcons),Qstr0(entry->d_name)),dir_names(dir));
+	}
+
+/* \names=(dir_names path) Return the list of names in a directory.  The names
+are returned in arbitrary order and include the special files "." and "..". */
+value type_dir_names(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_str)
+		{
+		const char *path = str_data(x);
+		DIR *dir = opendir(path);
+		if (dir)
+			{
+			f = dir_names(dir);
+			closedir(dir);
+			}
+		else
+			f = hold(Qvoid);
 		}
 	else
 		f = hold(Qvoid);

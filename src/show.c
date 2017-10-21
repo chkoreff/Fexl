@@ -114,6 +114,16 @@ void put_type(type t)
 	else if (t == type_flock_sh) put("flock_sh");
 	else if (t == type_flock_un) put("flock_un");
 	else if (t == type_readlink) put("readlink");
+	else if (t == type_mkdir) put("mkdir");
+	else if (t == type_rmdir) put("rmdir");
+	else if (t == type_ftruncate) put("ftruncate");
+	else if (t == type_fseek_set) put("fseek_set");
+	else if (t == type_fseek_cur) put("fseek_cur");
+	else if (t == type_fseek_end) put("fseek_end");
+	else if (t == type_ftell) put("ftell");
+	else if (t == type_fread) put("fread");
+	else if (t == type_mkfile) put("mkfile");
+	else if (t == type_dir_names) put("dir_names");
 
 	else if (t == type_die) put("die");
 	else if (t == type_argv) put("argv");

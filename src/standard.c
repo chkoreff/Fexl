@@ -123,6 +123,14 @@ static value standard(value name)
 	if (match("readlink")) return Q(type_readlink);
 	if (match("mkdir")) return Q(type_mkdir);
 	if (match("rmdir")) return Q(type_rmdir);
+	if (match("ftruncate")) return Q(type_ftruncate);
+	if (match("fseek_set")) return Q(type_fseek_set);
+	if (match("fseek_cur")) return Q(type_fseek_cur);
+	if (match("fseek_end")) return Q(type_fseek_end);
+	if (match("ftell")) return Q(type_ftell);
+	if (match("fread")) return Q(type_fread);
+	if (match("mkfile")) return Q(type_mkfile);
+	if (match("dir_names")) return Q(type_dir_names);
 
 	if (match("die")) return Q(type_die);
 	if (match("argv")) return Q(type_argv);

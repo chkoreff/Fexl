@@ -1574,6 +1574,38 @@ name -3.56e-4 : F
 name -3.56e-4x : F
 name x : F
 exit 0
+==== test/b14.fxl
+directory src/lib
+[
+.
+..
+bool.fxl
+date.fxl
+format.fxl
+hex.fxl
+html.fxl
+list.fxl
+math.fxl
+read.fxl
+read_csv.fxl
+read_ssv.fxl
+]
+Created test/vector
+open (pos 0)
+seek_set 0 (pos 0)
+truncate 100 (pos 0)
+seek_set 10 (pos 10)
+write 26 bytes "abcdefghijklmnopqrstuvwxyz" (pos 36)
+seek_cur -3 (pos 33)
+write 3 bytes "XYZ" (pos 36)
+seek_end -20 (pos 80)
+write 5 bytes "12345" (pos 85)
+seek_set 10 (pos 10)
+read 16 bytes "abcdefghijklmnop" (pos 26)
+read 0 bytes "" (pos 26)
+read 10 bytes "qrstuvwXYZ" (pos 36)
+Removed test/vector
+exit 0
 ==== test/chars.fxl
 ==
 封封aa小小

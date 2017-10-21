@@ -13,7 +13,7 @@ static value op_limit(value f, void op(unsigned long))
 	value x = arg(f->R);
 	if (x->T == type_num)
 		{
-		op(get_double(x));
+		op(get_ulong(x));
 		f = hold(QI);
 		}
 	else
