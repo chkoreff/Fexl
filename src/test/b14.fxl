@@ -117,4 +117,8 @@ seek_set 10
 read 16
 read 0
 read 10
+seek_end -3
+write "ABC"
+seek_end -3
+read 10
 )

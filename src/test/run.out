@@ -1604,6 +1604,10 @@ seek_set 10 (pos 10)
 read 16 bytes "abcdefghijklmnop" (pos 26)
 read 0 bytes "" (pos 26)
 read 10 bytes "qrstuvwXYZ" (pos 36)
+seek_end -3 (pos 97)
+write 3 bytes "ABC" (pos 100)
+seek_end -3 (pos 97)
+read 3 bytes "ABC" (pos 100)
 Removed test/vector
 exit 0
 ==== test/chars.fxl

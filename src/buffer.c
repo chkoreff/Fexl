@@ -81,7 +81,6 @@ string buf_clear(buffer buf)
 	struct chunk *chunk = buf->top;
 	unsigned long offset = buf_length(buf);
 	string result = str_new(offset);
-	result->data[offset] = '\000'; /* Add trailing NUL byte. */
 
 	while (chunk)
 		{

@@ -11,7 +11,6 @@
 #include <dirent.h> /* opendir readdir closedir */
 #include <memory.h>
 #include <standard.h>
-#include <string.h> /* memset */
 #include <sys/file.h> /* flock */
 #include <sys/stat.h> /* stat */
 #include <type_file.h>
@@ -347,8 +346,8 @@ value type_ftell(value f)
 	}
 	}
 
-/* \str=(fread fh size) Reads size bytes from the file, padding with zeroes if
-reading past end of file.  The resulting string is always of length size. */
+/* \str=(fread fh size) Read at most size bytes from the file, clipping if it
+reaches end of file. */
 value type_fread(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
@@ -361,7 +360,12 @@ value type_fread(value f)
 		unsigned long size = get_ulong(y);
 		string str = str_new(size);
 		size_t count = fread(str->data,1,size,fh);
-		memset(str->data+count,0,size-count+1);
+		if (count < size)
+			{
+			string next = str_new_data(str->data,count);
+			str_free(str);
+			str = next;
+			}
 		f = Qstr(str);
 		}
 	else

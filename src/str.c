@@ -12,6 +12,7 @@ string str_new(unsigned long len)
 	{
 	string x = new_memory(sizeof(unsigned long) + 1 + len);
 	x->len = len;
+	x->data[len] = '\000'; /* Set trailing NUL byte. */
 	return x;
 	}
 
@@ -19,7 +20,6 @@ string str_new_data(const char *data, unsigned long len)
 	{
 	string x = str_new(len);
 	memcpy(x->data, data, len);
-	x->data[len] = '\000';
 	return x;
 	}
 
@@ -39,7 +39,6 @@ string str_concat(string x, string y)
 	string z = str_new(x->len + y->len);
 	memcpy(z->data, x->data, x->len);
 	memcpy(z->data + x->len, y->data, y->len);
-	z->data[z->len] = '\000'; /* add trailing NUL byte */
 	return z;
 	}
 
