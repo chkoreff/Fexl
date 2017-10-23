@@ -91,6 +91,7 @@ void put_type(type t)
 	else if (t == type_char_width) put("char_width");
 	else if (t == type_dirname) put("dirname");
 	else if (t == type_basename) put("basename");
+	else if (t == type_length_common) put("length_common");
 	else if (t == type_is_str) put("is_str");
 
 	else if (t == type_num) put("num");

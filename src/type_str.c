@@ -241,6 +241,24 @@ static value op_str_str(value f, string op(string))
 value type_dirname(value f) { return op_str_str(f,dirname); }
 value type_basename(value f) { return op_str_str(f,basename); }
 
+/* (length_common x y) Return the number of initial bytes which x and y have in
+common. */
+value type_length_common(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	{
+	value x = arg(f->L->R);
+	value y = arg(f->R);
+	if (x->T == type_str && y->T == type_str)
+		f = Qnum(num_new_ulong(length_common(get_str(x),get_str(y))));
+	else
+		f = hold(Qvoid);
+	drop(x);
+	drop(y);
+	return f;
+	}
+	}
+
 value type_is_str(value f)
 	{
 	return op_is_type(f,type_str);

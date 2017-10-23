@@ -17,3 +17,4 @@ extern string str_slice(string x, unsigned long pos, unsigned long len);
 extern unsigned long str_search(string x, string y, unsigned long offset);
 extern string dirname(string path);
 extern string basename(string path);
+extern unsigned long length_common(string x, string y);

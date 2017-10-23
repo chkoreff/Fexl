@@ -98,6 +98,7 @@ static value standard(value name)
 	if (match("char_width")) return Q(type_char_width);
 	if (match("dirname")) return Q(type_dirname);
 	if (match("basename")) return Q(type_basename);
+	if (match("length_common")) return Q(type_length_common);
 	if (match("is_str")) return Q(type_is_str);
 
 	if (match("num_str")) return Q(type_num_str);

@@ -1,0 +1,173 @@
+#
+evaluate
+(
+use_lib "index.fxl";
+standard
+) \;
+
+\test_index_put==
+(
+\try=
+	(\pairs
+	\index=(index_put_pairs void pairs)
+	\new_pairs=(index_pairs index)
+	say "\index="
+	show_index index
+	say "\pairs="
+	put_list new_pairs
+	nl
+	)
+
+\try_both=
+	(\pairs
+	try pairs
+	try (reverse pairs)
+	)
+
+try_both
+[
+{"123456" "v1_123456"}
+{"" "5763"}
+{"a" "4999"}
+{"a" "4999"}
+{"abc" "4113"}
+{"mnog" "0053"}
+{"mnof" "1285"}
+{"123456" "v2_123456"}
+{"def" "7249"}
+{"abcd" "2174"}
+{"xyz" "4113"}
+{"mnof" "1286"}
+{"xy" "2113"}
+{"fghj" "3674"}
+{"fghi" "5851"}
+]
+
+try_both
+[
+{"abcd" "2174"}
+{"abc" "4113"}
+{"a" "4998"}
+]
+
+# Test putting void values (deletion).
+(
+\pairs=
+[
+{"abc" "4113"}
+{"abe" "1210"}
+{"a" "4999"}
+{"a" void}
+{"abc" void}
+{"abe" void}
+]
+each (range 0 (list_length pairs)) \n
+say ["== "n]
+try (first n pairs)
+)
+
+(
+\pairs=
+[
+{"" "5763"}
+{"" "5764"}
+{"" "5765"}
+{"" void}
+]
+each (range 0 (list_length pairs)) \n
+say ["== "n]
+try (first n pairs)
+)
+
+)
+
+\test_index_get==
+(
+\try=
+	(\index\key
+	\val=(index_get index key)
+	put "get: "put_data {key val} nl
+	)
+
+\test_1==
+(
+\index=
+(index_put_pairs
+void
+[
+{"123456" "v1_123456"}
+{"" "5763"}
+{"a" "4999"}
+{"a" "4999"}
+{"abc" "4113"}
+{"mnog" "0053"}
+{"mnof" "1285"}
+{"123456" "v2_123456"}
+{"def" "7249"}
+{"abcd" "2174"}
+{"xyz" "4113"}
+{"mnof" "1286"}
+{"xy" "2113"}
+{"fghj" "3674"}
+{"fghi" "5851"}
+]
+)
+
+say "\index="
+show_index index
+say "\pairs="
+put_list (index_pairs index)
+
+\try=(try index)
+
+try ""
+try "abcxyz"
+try "abc"
+try "."
+try "a"
+try "ab"
+try "mno"
+try "mnof"
+try "mnofx"
+try "1234"
+try "mnog"
+try "mnOg"
+
+say "=="
+try ""
+try "123456"
+try "a"
+try "abc"
+try "abcd"
+try "def"
+try "fghi"
+try "fghj"
+try "mnof"
+try "mnog"
+try "xy"
+try "xyz"
+)
+
+\test_2==
+(
+\index=
+(
+index_put_pairs
+void
+[
+{"abc" "4113"}
+]
+)
+\try=(try index)
+
+show_index index
+try "abc"
+try ""
+)
+
+test_1
+test_2
+)
+
+test_index_put
+test_index_get
