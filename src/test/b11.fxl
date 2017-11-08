@@ -54,10 +54,49 @@ say (quote ~ <b>x;"y"</b>~)
 say (format_money 3874511.37)
 say (hex_digit 14)
 
-put_data ["<b>a</b>" { 1.2 3.8 "xxx"} T F] nl
-put_list ["<b>a</b>" { 1.2 3.8 "xxx"} T F] nl
-put_quote_data ["<b>a</b>" { 1.2 3.8 "xxx"} T F] nl
-put_quote_list ["<b>a</b>" { 1.2 3.8 "xxx"} T F] nl
+(
+\try=
+	(\x
+	put_data x nl
+	put_list x nl
+	)
+try ["<b>a</b>" { 1.2 3.8 "xxx"} T F]
+)
+
+(
+\try=
+	(\x
+	put_quote_data x nl
+	put_quote_list x nl
+	)
+try ["<b>a</b>" { 1.2 3.8 "xxx"} T F]
+try ["<b>a</b>" ~ tag "<br>"~ { 1.2 3.8 "xxx"} T F]
+put_quote_data ~ 1"2"3~ nl
+nl
+)
+
+# Test round-trip
+(
+\data=["a" QU (T 23 46) {1 2} [T F ~ "hi"~ void] -2.3]
+\data=(append data data)
+
+\str1=(data_to_str data)
+say str1
+
+\data=(str_to_data str1)
+\str2=(data_to_str data)
+say str2
+say (eq str1 str2)
+)
+)
+
+(
+say "= test file_content"
+\fh=(fopen (path_under dir_local "chars.fxl") "r")
+\str=(file_content fh)
+\str=(slice str 0 28)
+put str
+nl
 )
 
 (

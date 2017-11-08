@@ -185,7 +185,7 @@
 	[x;xs]
 	)
 
-# Flatten a piece of data (string, number, or list) into a string.
+# Flatten a piece of data (string, number, boolean, or list) into a string.
 \to_str=
 	(\x
 	\buf=buf_new
@@ -194,6 +194,7 @@
 	\x=x
 	is_str x (put x);
 	is_num x (put (num_str x));
+	is_bool x (put (x "T" "F"));
 	is_list x
 		(
 		x () \x\xs
@@ -291,6 +292,19 @@
 	cons ch tail
 	)
 
+# Return the entire string contained within a file.
+\file_content=
+	(\fh
+	\buf=buf_new
+	(@\loop
+	\ch=(fgetc fh)
+	is_void ch ();
+	buf_put buf ch
+	loop
+	)
+	buf_get buf
+	)
+
 define "append" append;
 define "each" each;
 define "map" map;
@@ -325,4 +339,5 @@ define "join" join;
 define "join_path" join_path;
 define "split" split;
 define "file_bytes" file_bytes;
+define "file_content" file_content;
 standard

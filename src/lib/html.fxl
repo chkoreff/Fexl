@@ -71,10 +71,20 @@
 
 \tr=(tag "tr")
 
-\put_quote_data=(\x fput_data stdout (quote x))
-\put_quote_list=(\xs fput_list stdout (quote xs))
+\put_quote_data=
+	(
+	\put=(\x put (quote x))
+	render_data put
+	)
+
+\put_quote_list=
+	(
+	\put=(\x put (quote x))
+	render_list put
+	)
 
 # https://en.wikipedia.org/wiki/Percent-encoding
+# LATER 20171108 accelerate this, perhaps in C.
 \encode_percent=
 	(str_map \ch
 	\is_reserved=

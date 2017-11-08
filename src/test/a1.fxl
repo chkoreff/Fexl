@@ -222,7 +222,7 @@ get
 put "tuvwxyz"
 get
 
-say (to_str [["ab" "c "] [[] [] ""] [2.3 " " -3.8] " defg"])
+say (to_str [T T F (F T F) ["ab" "c "] [[] [] ""] [2.3 " " -3.8] " defg"])
 )
 
 div

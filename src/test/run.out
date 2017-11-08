@@ -161,7 +161,7 @@ ch x
 : 
 : abcde
 : tuvwxyz
-abc 2.3 -3.8 defg
+TTFFabc 2.3 -3.8 defg
 ==
 bool F
 bool F
@@ -1339,13 +1339,30 @@ T
 F
 ]
 
-["&lt;b&gt;a&lt;/b&gt;" {1.2 3.8 "xxx"} T F]
+[&quot;&lt;b&gt;a&lt;/b&gt;&quot; {1.2 3.8 &quot;xxx&quot;} T F]
 [
-"&lt;b&gt;a&lt;/b&gt;"
-{1.2 3.8 "xxx"}
+&quot;&lt;b&gt;a&lt;/b&gt;&quot;
+{1.2 3.8 &quot;xxx&quot;}
 T
 F
 ]
+
+[&quot;&lt;b&gt;a&lt;/b&gt;&quot; ~1 tag &quot;&lt;br&gt;&quot;~1 {1.2 3.8 &quot;xxx&quot;} T F]
+[
+&quot;&lt;b&gt;a&lt;/b&gt;&quot;
+~1 tag &quot;&lt;br&gt;&quot;~1
+{1.2 3.8 &quot;xxx&quot;}
+T
+F
+]
+
+~1 1&quot;2&quot;3~1
+
+["a" ~1 "~1 23 {1 2} [T F ~1 "hi"~1 void] -2.3 "a" ~1 "~1 23 {1 2} [T F ~1 "hi"~1 void] -2.3]
+["a" ~1 "~1 23 {1 2} [T F ~1 "hi"~1 void] -2.3 "a" ~1 "~1 23 {1 2} [T F ~1 "hi"~1 void] -2.3]
+T
+= test file_content
+#abcdefghijklmnopqrstuvwxyz
 
 key c color orange qty 2
 key a color red qty 42
