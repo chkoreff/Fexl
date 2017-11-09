@@ -1447,6 +1447,13 @@ TAB 9
 NL 10
 CR 13
 QU 34
+= is_var
+T
+T
+F
+F
+F
+T
 exit 0
 ==== test/b12.fxl
 == test_csv

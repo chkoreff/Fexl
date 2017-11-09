@@ -59,3 +59,8 @@ value type_var_put(value f)
 	return f;
 	}
 	}
+
+value type_is_var(value f)
+	{
+	return op_is_type(f,type_var);
+	}

@@ -151,6 +151,7 @@ void put_type(type t)
 	else if (t == type_var_new) put("var_new");
 	else if (t == type_var_get) put("var_get");
 	else if (t == type_var_put) put("var_put");
+	else if (t == type_is_var) put("is_var");
 
 	else if (t == type_limit_time) put("limit_time");
 	else if (t == type_limit_stack) put("limit_stack");

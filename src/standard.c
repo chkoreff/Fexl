@@ -157,6 +157,7 @@ static value standard(value name)
 	if (match("var_new")) return Q(type_var_new);
 	if (match("var_get")) return Q(type_var_get);
 	if (match("var_put")) return Q(type_var_put);
+	if (match("is_var")) return Q(type_is_var);
 
 	if (match("limit_time")) return Q(type_limit_time);
 	if (match("limit_memory")) return Q(type_limit_memory);

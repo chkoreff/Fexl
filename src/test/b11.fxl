@@ -238,3 +238,15 @@ say ["TAB "(ord TAB)]
 say ["NL "(ord NL)]
 say ["CR "(ord CR)]
 say ["QU "(ord QU)]
+
+(
+say "= is_var"
+\v=var_new
+var_put v [1 2 3]
+say (is_var v)
+say (is_good v)
+say (is_void v)
+say (is_list v)
+say (is_num v)
+say (is_list (var_get v))
+)
