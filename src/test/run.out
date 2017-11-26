@@ -1454,6 +1454,18 @@ F
 F
 F
 T
+= str_bytes
+length is 10
+byte 251
+byte 252
+byte 253
+byte 254
+byte 255
+byte 0
+byte 1
+byte 2
+byte 3
+byte 4
 exit 0
 ==== test/b12.fxl
 == test_csv

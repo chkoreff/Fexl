@@ -29,7 +29,7 @@ static void istr_free(struct istr *in)
 int sgetc(struct istr *in)
 	{
 	string str = get_str(in->str);
-	return in->pos < str->len ? str->data[in->pos++] : -1;
+	return in->pos < str->len ? (unsigned char)str->data[in->pos++] : -1;
 	}
 
 value Qistr(value x)

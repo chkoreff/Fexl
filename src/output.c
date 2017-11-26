@@ -13,6 +13,11 @@ void put_ch(char ch)
 	fput_ch(stdout,ch);
 	}
 
+void put_long(long x)
+	{
+	fput_long(stdout,x);
+	}
+
 void put_ulong(unsigned long x)
 	{
 	fput_ulong(stdout,x);

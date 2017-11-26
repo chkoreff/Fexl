@@ -20,6 +20,11 @@ void fput_ch(FILE *fh, char ch)
 	fputd(fh,&ch,1);
 	}
 
+void fput_long(FILE *fh, long x)
+	{
+	fput(fh,format_long(x));
+	}
+
 void fput_ulong(FILE *fh, unsigned long x)
 	{
 	fput(fh,format_ulong(x));

@@ -3,6 +3,12 @@
 
 static char buf[100]; /* Being careful here. */
 
+const char *format_long(long x)
+	{
+	snprintf(buf, sizeof(buf), "%ld", x);
+	return buf;
+	}
+
 const char *format_ulong(unsigned long x)
 	{
 	snprintf(buf, sizeof(buf), "%lu", x);

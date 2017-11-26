@@ -250,3 +250,14 @@ say (is_list v)
 say (is_num v)
 say (is_list (var_get v))
 )
+
+(
+say "= str_bytes"
+\str=(list_str; map chr; range 251 260)
+say ["length is "(length str)]
+each (str_bytes str)
+	(\ch
+	\n=(ord ch)
+	say ["byte "n]
+	)
+)
