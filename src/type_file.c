@@ -158,6 +158,48 @@ value type_is_newer(value f)
 	}
 	}
 
+/* (is_file path) Return true if the path is a regular file. */
+value type_is_file(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_str)
+		{
+		const char *path = str_data(x);
+		struct stat status;
+		stat(path,&status);
+		f = boolean(S_ISREG(status.st_mode));
+		}
+	else
+		f = hold(Qvoid);
+
+	drop(x);
+	return f;
+	}
+	}
+
+/* (is_dir path) Return true if the path is a directory. */
+value type_is_dir(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_str)
+		{
+		const char *path = str_data(x);
+		struct stat status;
+		stat(path,&status);
+		f = boolean(S_ISDIR(status.st_mode));
+		}
+	else
+		f = hold(Qvoid);
+
+	drop(x);
+	return f;
+	}
+	}
+
 static value op_flock(value f, int operation)
 	{
 	if (!f->L) return 0;

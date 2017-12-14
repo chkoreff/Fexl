@@ -1185,6 +1185,29 @@ try "src/test/a1.fxl" "src/test/a1.fxl"
 try "missing" "missing"
 )
 
+# Test file types.
+(
+\try=
+	(\path
+	\q_path=(path_under dir_base path)
+	\type=
+		(
+		is_file q_path "f";
+		is_dir q_path "d";
+		""
+		)
+	say ["path "(fexl_quote path)" type "(fexl_quote type)]
+	)
+
+try "src"
+try "src/fexl.c"
+try "x/y"
+try ""
+try "."
+try "bin"
+try "bin/fexl"
+)
+
 sleep 0
 
 say (oct "775")

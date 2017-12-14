@@ -1043,6 +1043,13 @@ is_newer src/test/a1.fxl src/test/a1.fxl = F
 is_newer missing missing = T
 is_newer missing missing = T
 
+path "src" type "d"
+path "src/fexl.c" type "f"
+path "x/y" type ""
+path "" type "d"
+path "." type "d"
+path "bin" type "d"
+path "bin/fexl" type "f"
 509
 716826
 mkdir : 0
