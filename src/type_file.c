@@ -158,8 +158,7 @@ value type_is_newer(value f)
 	}
 	}
 
-/* (is_file path) Return true if the path is a regular file. */
-value type_is_file(value f)
+static value op_stat_type(value f, mode_t mask)
 	{
 	if (!f->L) return 0;
 	{
@@ -168,8 +167,12 @@ value type_is_file(value f)
 		{
 		const char *path = str_data(x);
 		struct stat status;
-		stat(path,&status);
-		f = boolean(S_ISREG(status.st_mode));
+		int result = stat(path,&status);
+		if (result == -1)
+			result = 0;
+		else
+			result = ((status.st_mode & S_IFMT) == mask);
+		f = boolean(result);
 		}
 	else
 		f = hold(Qvoid);
@@ -177,27 +180,18 @@ value type_is_file(value f)
 	drop(x);
 	return f;
 	}
+	}
+
+/* (is_file path) Return true if the path is a regular file. */
+value type_is_file(value f)
+	{
+	return op_stat_type(f,S_IFREG);
 	}
 
 /* (is_dir path) Return true if the path is a directory. */
 value type_is_dir(value f)
 	{
-	if (!f->L) return 0;
-	{
-	value x = arg(f->R);
-	if (x->T == type_str)
-		{
-		const char *path = str_data(x);
-		struct stat status;
-		stat(path,&status);
-		f = boolean(S_ISDIR(status.st_mode));
-		}
-	else
-		f = hold(Qvoid);
-
-	drop(x);
-	return f;
-	}
+	return op_stat_type(f,S_IFDIR);
 	}
 
 static value op_flock(value f, int operation)
