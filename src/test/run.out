@@ -1564,6 +1564,7 @@ Second line.
 " "another block
 second line"]
 ["1" "2" "3"]
+["~a~ab~abc~abcd"]
 ]
 exit 0
 ==== test/b13.fxl

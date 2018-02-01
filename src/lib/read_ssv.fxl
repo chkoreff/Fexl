@@ -40,7 +40,12 @@ standard
 \get_item=
 	(\in
 	get in \ch\tail
-	eq ch QU (collect_to_term QU tail);
+	eq ch QU
+		(
+		collect_to (eq QU) tail \term\tail
+		get tail \_\tail
+		{term tail}
+		);
 	eq ch "~"
 		(
 		collect_to is_white tail \term\tail
