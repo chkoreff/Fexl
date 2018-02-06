@@ -7,58 +7,76 @@ use_lib "read.fxl";
 standard
 ) \;
 
-\get_plain_item=(collect_to \ch eq ch "," T; is_eol ch T; eq ch "")
+\read=
+(\;
+
+\get_plain_item==
+	(
+	collect_to
+		(\ch eq ch "," T; is_eol ch T; eq ch "")
+	)
 
 # Get a char inside a quoted string.  A single QU char is treated as end of
 # string.  Two QU chars in a row are treated as a single QU character which
 # appears in the string.
-\get_quote_char=
-	(\in
-	get in \ch\in
-	ne ch QU {ch in};
-	get in \ch\tail
-	eq ch QU {QU tail};
-	{"" in}
+\get_quote_char==
+	(
+	\ch=peek
+	ne ch QU (skip ch);
+	skip
+	\ch=peek
+	eq ch QU (skip QU);
+	""
 	)
 
 # Get a quoted item.
-\get_quote_item=
+\get_quote_item==
 	(
 	\buf=buf_new
-	@\loop \in
-	get_quote_char in \ch\tail
-	eq ch "" (\item=(buf_get buf) {item tail});
+	@\loop
+	\ch=get_quote_char
+	eq ch "" (buf_get buf);
 	buf_put buf ch
-	loop tail
+	loop
 	)
 
-\get_item=
-	(\in
-	get in \ch\tail
-	eq ch QU (get_quote_item tail);
-	get_plain_item in \item\in
+\get_item==
+	(
+	\ch=peek
+	eq ch QU (skip get_quote_item);
+	\item=get_plain_item
 	# Convert to number if possible.
 	\n=(str_num item)
-	\item=(is_good n n item)
-	{item in}
+	is_good n n item
 	)
 
 # Get a row.
-\get_row=
-	(@\loop \in
-	get_item in \x\in
-	get in \ch\in
-	ne ch "," {[x] in};
-	loop in \xs\in
-	\xs=[x;xs]
-	{xs in}
+\get_row==
+	(@\loop
+	\x=get_item
+	\ch=peek
+	skip
+	ne ch "," [x];
+	\xs=loop
+	[x;xs]
 	)
 
-\get_rows=(get_seq get_row is_eol (\ch F))
+\get_rows==
+	(
+	get_seq
+		get_row
+		is_eol
+		(\ch F)
+	)
 
-\read_csv_chars=(read_chars get_rows)
-\read_csv_file=(read_file get_rows)
+get_rows
+)
 
+\read_csv_string=(read_string read)
+\read_csv_chars=(read_chars read)
+\read_csv_file=(read_file read)
+
+define "read_csv_string" read_csv_string;
 define "read_csv_chars" read_csv_chars;
 define "read_csv_file" read_csv_file;
 standard

@@ -1,72 +1,114 @@
-# Common functions for reading file formats.
-
-# Read a list of characters.
-\read_chars=
-	(\read\in
-	read in \rows\tail
-	rows
-	)
-
-# Read a named file.
-\read_file=
-	(\read\name
-	\fh=(fopen name "r")
-	if (is_void fh) (error ["Could not open "name])
-	\chars=(file_bytes fh)
-	\rows=(read_chars read chars)
-	fclose fh
-	rows
-	)
-
-# Get the next character and the tail of the input.
-\get=(\in in {"" []} \ch\tail {ch tail})
-
-# Look at the current character.
-\look=(\in get in \ch\_ {ch})
-
+#
 \is_eol=(\ch eq ch CR T; eq ch LF T; F)
+\is_white=(\ch lt (ord ch) 33)
+
+evaluate
+(
+define "is_eol" is_eol;
+define "is_white" is_white;
+standard
+) \;
+
+\make_context=
+(\get
+
+\v_ch=var_new
+
+\peek==(var_get v_ch)
+
+\get==
+	(
+	\ch=get
+	\ch=(is_defined ch ch "")
+	var_put v_ch ch
+	ch
+	)
+
+\skip==(\ch=get)
 
 # Skip matching characters.
 \skip_match=
 	(\match
-	@\loop \in
-	get in \ch\tail
-	\go=(eq ch "" F; match ch)
-	go (loop tail) {in}
+	@\loop
+	\ch=peek
+	not (match ch) ();
+	eq ch "" ();
+	skip
+	loop
 	)
 
 # Collect characters up to an ending condition.
 \collect_to=
 	(\end
 	\buf=buf_new
-	@\loop \in
-	get in \ch\tail
-	end ch (\item=(buf_get buf) {item in});
-	eq ch "" void;  # end condition not found
+	@\loop
+	\ch=peek
+	end ch (buf_get buf);
+	eq ch "" void; # end condition not found
 	buf_put buf ch
-	loop tail
+	skip
+	loop
 	)
 
 # Get a sequence of items with a given separator and end condition.
 \get_seq=
 	(\read\sep\end
-	@\loop \in
-	skip_match sep in \in
-	look in \ch
+	@\loop
+	skip_match sep
+
+	\ch=peek
+
 	\done=(eq ch "" T; end ch)
-	done {[] in};
-	read in \x\in
-	loop in \xs\in
-	\xs=[x;xs]
-	{xs in}
+	done [];
+
+	\x=read
+	is_void x void;
+
+	\xs=loop
+	is_void xs void;
+	[x;xs]
 	)
 
-define "read_chars" read_chars;
-define "read_file" read_file;
-define "get" get;
-define "look" look;
-define "is_eol" is_eol;
+skip
+
+define "peek" peek;
+define "skip" skip;
 define "skip_match" skip_match;
 define "collect_to" collect_to;
 define "get_seq" get_seq;
+standard
+)
+
+\read_stream=
+	(\read\get
+	\context=(make_context get)
+	evaluate context read
+	)
+
+\read_string=
+	(\read\str
+	\fh=(readstr str)
+	read_stream read (sgetc fh)
+	)
+
+\read_chars=
+	(\read\chars
+	\get=(list_iterate chars)
+	read_stream read get
+	)
+
+\read_file=
+	(\read\name
+
+	\fh=(fopen name "r")
+	if (is_void fh) (error ["Could not open "name])
+	\result=(read_stream read (fgetc fh))
+
+	fclose fh
+	result
+	)
+
+define "read_string" read_string;
+define "read_chars" read_chars;
+define "read_file" read_file;
 standard
