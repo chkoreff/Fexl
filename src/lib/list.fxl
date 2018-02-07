@@ -305,18 +305,6 @@
 	buf_get buf
 	)
 
-# Return a function that iterates through the list on each call.
-\list_iterate=
-	(\list
-	\v_list=var_new
-	var_put v_list list
-	later;
-	\list=(var_get v_list)
-	list void \ch\tail
-	var_put v_list tail
-	ch
-	)
-
 define "append" append;
 define "each" each;
 define "map" map;
@@ -352,5 +340,4 @@ define "join_path" join_path;
 define "split" split;
 define "file_bytes" file_bytes;
 define "file_content" file_content;
-define "list_iterate" list_iterate;
 standard

@@ -12,6 +12,7 @@ standard
 # Collect a string up to the next occurrence of the terminator string.
 \collect_string=
 	(\term
+	is_void term void;
 	\term=(str_bytes term)
 
 	\buf_result=buf_new
@@ -20,9 +21,8 @@ standard
 	\collect=
 		(@\collect\in_term\term_tail
 		term_tail (buf_get buf_result) \term_ch\term_tail
-		\ch=peek
 
-		eq ch "" void; # end of stream
+		\ch=look
 		eq ch term_ch
 			(
 			# Current char matches the next term char, so save it.
@@ -39,7 +39,7 @@ standard
 			buf_put buf_result matched
 			)
 			(
-			# Add current char to the result and skip forward.
+			# Add current char to the result and proceed.
 			buf_put buf_result ch
 			skip
 			)
@@ -52,12 +52,17 @@ standard
 \get_plain_item==
 	(
 	collect_to
-		(\ch eq ch QU T; eq ch "~" T; is_white ch)
+		(\ch
+		is_void ch T;
+		eq ch QU T;
+		eq ch "~" T;
+		is_white ch
+		)
 	)
 
 \get_item==
 	(
-	\ch=peek
+	\ch=look
 	eq ch QU
 		(
 		skip
@@ -79,7 +84,10 @@ standard
 	(
 	get_seq
 		get_item
-		(\ch is_eol ch F; is_white ch)
+		(\ch
+		is_eol ch F;
+		is_white ch
+		)
 		is_eol
 	)
 
@@ -88,7 +96,7 @@ standard
 	get_seq
 		get_row
 		is_white
-		(\ch F)
+		is_void
 	)
 
 get_rows

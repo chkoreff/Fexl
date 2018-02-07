@@ -10,19 +10,7 @@ standard
 ) \;
 
 \make_context=
-(\get
-
-\v_ch=var_new
-
-\peek==(var_get v_ch)
-
-\get==
-	(
-	\ch=get
-	\ch=(is_defined ch ch "")
-	var_put v_ch ch
-	ch
-	)
+(\get\look
 
 \skip==(\ch=get)
 
@@ -30,9 +18,8 @@ standard
 \skip_match=
 	(\match
 	@\loop
-	\ch=peek
+	\ch=look
 	not (match ch) ();
-	eq ch "" ();
 	skip
 	loop
 	)
@@ -42,9 +29,8 @@ standard
 	(\end
 	\buf=buf_new
 	@\loop
-	\ch=peek
+	\ch=look
 	end ch (buf_get buf);
-	eq ch "" void; # end condition not found
 	buf_put buf ch
 	skip
 	loop
@@ -53,25 +39,21 @@ standard
 # Get a sequence of items with a given separator and end condition.
 \get_seq=
 	(\read\sep\end
+
+	\sep=(\ch is_void ch F; sep ch)
+	\end=(\ch is_void ch T; end ch)
+
 	@\loop
 	skip_match sep
-
-	\ch=peek
-
-	\done=(eq ch "" T; end ch)
-	done [];
-
+	\ch=look
+	end ch [];
 	\x=read
-	is_void x void;
-
 	\xs=loop
-	is_void xs void;
 	[x;xs]
 	)
 
-skip
-
-define "peek" peek;
+define "get" get;
+define "look" look;
 define "skip" skip;
 define "skip_match" skip_match;
 define "collect_to" collect_to;
@@ -80,21 +62,21 @@ standard
 )
 
 \read_stream=
-	(\read\get
-	\context=(make_context get)
+	(\read\get\look
+	\context=(make_context get look)
 	evaluate context read
 	)
 
 \read_string=
 	(\read\str
 	\fh=(readstr str)
-	read_stream read (sgetc fh)
+	read_stream read (sgetc fh) (slook fh)
 	)
 
 \read_chars=
 	(\read\chars
-	\get=(list_iterate chars)
-	read_stream read get
+	\str=(to_str chars)
+	read_string read str
 	)
 
 \read_file=
@@ -102,7 +84,7 @@ standard
 
 	\fh=(fopen name "r")
 	if (is_void fh) (error ["Could not open "name])
-	\result=(read_stream read (fgetc fh))
+	\result=(read_stream read (fgetc fh) (flook fh))
 
 	fclose fh
 	result

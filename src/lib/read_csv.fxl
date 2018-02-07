@@ -13,7 +13,11 @@ standard
 \get_plain_item==
 	(
 	collect_to
-		(\ch eq ch "," T; is_eol ch T; eq ch "")
+		(\ch
+		is_void ch T;
+		eq ch "," T;
+		is_eol ch
+		)
 	)
 
 # Get a char inside a quoted string.  A single QU char is treated as end of
@@ -21,10 +25,9 @@ standard
 # appears in the string.
 \get_quote_char==
 	(
-	\ch=peek
-	ne ch QU (skip ch);
-	skip
-	\ch=peek
+	\ch=get
+	ne ch QU ch;
+	\ch=look
 	eq ch QU (skip QU);
 	""
 	)
@@ -42,7 +45,7 @@ standard
 
 \get_item==
 	(
-	\ch=peek
+	\ch=look
 	eq ch QU (skip get_quote_item);
 	\item=get_plain_item
 	# Convert to number if possible.
@@ -54,8 +57,7 @@ standard
 \get_row==
 	(@\loop
 	\x=get_item
-	\ch=peek
-	skip
+	\ch=get
 	ne ch "," [x];
 	\xs=loop
 	[x;xs]
@@ -66,7 +68,7 @@ standard
 	get_seq
 		get_row
 		is_eol
-		(\ch F)
+		is_void
 	)
 
 get_rows

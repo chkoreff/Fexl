@@ -1488,7 +1488,7 @@ exit 0
 ["a b" "cd"]
 [~1 ab c"hi"~1 "3.14"]
 [6]
-[33]
+void
 ]
 [
 ["x"]
@@ -1544,11 +1544,21 @@ cd~1 "3.14" -48.7]
 [
 ["a"]
 ]
-void
-void
-void
-void
-void
+[
+["a" void]
+]
+[
+[void]
+]
+[
+[void]
+]
+[
+[void]
+]
+[
+[void]
+]
 [
 ["ab" "xzz" "d" "e" "f"]
 ["g" "hi"]
