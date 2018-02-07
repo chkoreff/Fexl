@@ -116,6 +116,7 @@ static value standard(value name)
 	if (match("fclose")) return Q(type_fclose);
 	if (match("fgetc")) return Q(type_fgetc);
 	if (match("fget")) return Q(type_fget);
+	if (match("flook")) return Q(type_flook);
 	if (match("remove")) return Q(type_remove);
 	if (match("is_newer")) return Q(type_is_newer);
 	if (match("is_file")) return Q(type_is_file);
@@ -155,6 +156,7 @@ static value standard(value name)
 	if (match("readstr")) return Q(type_readstr);
 	if (match("sgetc")) return Q(type_sgetc);
 	if (match("sget")) return Q(type_sget);
+	if (match("slook")) return Q(type_slook);
 
 	if (match("var_new")) return Q(type_var_new);
 	if (match("var_get")) return Q(type_var_get);

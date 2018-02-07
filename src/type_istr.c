@@ -32,6 +32,12 @@ int sgetc(struct istr *in)
 	return in->pos < str->len ? (unsigned char)str->data[in->pos++] : -1;
 	}
 
+static int slook(struct istr *in)
+	{
+	string str = get_str(in->str);
+	return in->pos < str->len ? (unsigned char)str->data[in->pos] : -1;
+	}
+
 value Qistr(value x)
 	{
 	struct istr *in = istr_new(x);
@@ -79,4 +85,32 @@ value type_sgetc(value f)
 value type_sget(value f)
 	{
 	return op_get(f,type_istr,(input)sgetc);
+	}
+
+/* (slook in) returns the next byte from the string without consuming it. */
+value type_slook(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_istr)
+		{
+		int ch = slook(get_istr(x));
+		if (ch == -1)
+			{
+			f = hold(Qvoid);
+			}
+		else
+			{
+			char c = (char)ch;
+			f = Qstr(str_new_data(&c,1));
+			}
+		}
+	else
+		{
+		f = hold(Qvoid);
+		}
+	drop(x);
+	return f;
+	}
 	}

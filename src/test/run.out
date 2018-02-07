@@ -1655,6 +1655,36 @@ write 3 bytes "ABC" (pos 100)
 seek_end -3 (pos 97)
 read 3 bytes "ABC" (pos 100)
 Removed test/vector
+= file
+get #
+get a
+at  b
+at  b
+get b
+get c
+at  d
+get d
+at  e
+at  e
+get e
+get f
+get g
+at  h
+= str
+get #
+get a
+at  b
+at  b
+get b
+get c
+at  d
+get d
+at  e
+at  e
+get e
+get f
+get g
+at  h
 exit 0
 ==== test/b15.fxl
 \index=

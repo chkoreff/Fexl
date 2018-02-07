@@ -86,10 +86,36 @@ value type_fgetc(value f)
 	return op_getc(f,type_file,(input)fgetc);
 	}
 
-/* (fget in) returns the next UTF-8 character from the file, or void if none. */
+/* (fget fh) returns the next UTF-8 character from the file, or void if none. */
 value type_fget(value f)
 	{
 	return op_get(f,type_file,(input)fgetc);
+	}
+
+/* (flook fh) returns the next byte from the file without consuming it. */
+value type_flook(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_file)
+		{
+		FILE *fh = get_fh(x);
+		int ch = fgetc(fh);
+		if (ch == -1)
+			f = hold(Qvoid);
+		else
+			{
+			char c = (char)ch;
+			(void)ungetc(ch,fh);
+			f = Qstr(str_new_data(&c,1));
+			}
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
 	}
 
 /* (remove path) Remove path from file system; return 0 if successful or -1

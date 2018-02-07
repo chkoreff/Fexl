@@ -109,6 +109,7 @@ void put_type(type t)
 	else if (t == type_fclose) put("fclose");
 	else if (t == type_fgetc) put("fgetc");
 	else if (t == type_fget) put("fget");
+	else if (t == type_flook) put("flook");
 	else if (t == type_remove) put("remove");
 	else if (t == type_is_newer) put("is_newer");
 	else if (t == type_is_file) put("is_file");
@@ -148,6 +149,7 @@ void put_type(type t)
 	else if (t == type_readstr) put("readstr");
 	else if (t == type_sgetc) put("sgetc");
 	else if (t == type_sget) put("sget");
+	else if (t == type_slook) put("slook");
 
 	else if (t == type_var) put("var");
 	else if (t == type_var_new) put("var_new");
