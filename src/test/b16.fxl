@@ -1,0 +1,67 @@
+# Test run_filter.
+
+\get_date==(trim_end_spaces; run_filter ["/bin/date"] "")
+
+# Calculate the message digest with a given algorithm, e.g. MD5, SHA1, SHA256,
+# etc.
+\gpg_digest=
+	(\algo\str
+	trim_end_spaces;
+	run_filter
+		["/usr/bin/gpg" "--print-md" algo]
+		str
+	)
+
+\gpg_sha256=(gpg_digest "sha256")
+
+#say ["date "(as_str get_date)]
+#say (run_filter ["/usr/bin/gpg" "--print-mds"] "")
+
+\test_gpg_sha256==
+(
+say "= test_gpg_sha256"
+\try=
+	(\text\expect
+	\result=(gpg_sha256 text)
+	say ["result "(as_str result)]
+	if (ne result expect)
+		(
+		say ["expect "(as_str expect)]
+		nl
+		)
+	)
+
+try
+""
+"E3B0C442 98FC1C14 9AFBF4C8 996FB924 27AE41E4 649B934C A495991B 7852B855"
+
+try
+"a"
+"CA978112 CA1BBDCA FAC231B3 9A23DC4D A786EFF8 147C4E72 B9807785 AFEE48BB"
+
+try
+"abc"
+"BA7816BF 8F01CFEA 414140DE 5DAE2223 B00361A3 96177A9C B410FF61 F20015AD"
+
+try
+"abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"
+"248D6A61 D20638B8 E5C02693 0C3E6039 A33CE459 64FF2167 F6ECEDD4 19DB06C1"
+
+try
+(repeat_str "z" 127)
+"87CDEB38 0917879F CD4C3B86 9AD644CB C7CBC6FF 36B989CD 4FE0F812 3C13CA19"
+
+try
+(repeat_str "z" 128)
+"8169C725 EDD39F00 140FFCF5 7C45B9C5 143E2FFE 375869E4 CF280534 2715D2B1"
+
+try
+(repeat_str "z" 256)
+"FCC01087 70388F35 2679507F FCF73B79 716E81FF 5C20F9BF 5257AF73 7D001514"
+
+try
+(repeat_str "a" 1000000)
+"CDC76E5C 9914FB92 81A1C7E2 84D73E67 F1809A48 A497200E 046D39CC C7112CD0"
+)
+
+test_gpg_sha256

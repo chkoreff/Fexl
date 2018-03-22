@@ -139,6 +139,8 @@ static value standard(value name)
 	if (match("die")) return Q(type_die);
 	if (match("argv")) return Q(type_argv);
 	if (match("sleep")) return Q(type_sleep);
+	if (match("spawn")) return Q(type_spawn);
+	if (match("exec")) return Q(type_exec);
 
 	if (match("seed_rand")) return Q(type_seed_rand);
 	if (match("rand")) return Q(type_rand);

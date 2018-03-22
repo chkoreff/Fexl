@@ -1,0 +1,25 @@
+# Run a command with the given input, returning the output as a string.  If
+# there was any error, show that on stderr and die.
+\run_filter=
+	(\argv\input
+	spawn
+		(exec argv)
+		(\child_in\child_out\child_err
+
+		fput child_in input
+		fclose child_in
+
+		\status
+		if (ne status 0)
+			(
+			\msg=(file_content child_err);
+			fput stderr msg
+			die
+			)
+
+		file_content child_out
+		)
+	)
+
+define "run_filter" run_filter;
+standard

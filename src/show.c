@@ -131,6 +131,9 @@ void put_type(type t)
 
 	else if (t == type_die) put("die");
 	else if (t == type_argv) put("argv");
+	else if (t == type_sleep) put("sleep");
+	else if (t == type_spawn) put("spawn");
+	else if (t == type_exec) put("exec");
 
 	else if (t == type_seed_rand) put("seed_rand");
 	else if (t == type_rand) put("rand");

@@ -1,14 +1,17 @@
 #
-\format_num=
-(
 # Repeat string x n times
 \repeat_str=
-	(\x @\loop \n
+	(\x
+	\buf=buf_new
+	@\loop \n
 	\n=n
-	le n 0 "";
-	. x; loop (- n 1)
+	le n 0 (buf_get buf);
+	buf_put buf x
+	loop (- n 1)
 	)
 
+\format_num=
+(
 # Split string x into groups of three with the given separator.
 \split3=
 	(\sep @\loop \x
@@ -176,6 +179,30 @@ format_num
 	parse str ""
 	)
 
+# Trim all spaces at the end of the string.  A space is defined as any ASCII
+# character less than or equal to the space character, which includes all
+# control characters.
+\trim_end_spaces=
+	(\text
+	\text=text
+	\pos=(- (length text) 1)
+	(@\loop\pos
+	lt pos 0 "";
+	\ch=(slice text pos 1)
+	\is_space=(le ch " ")
+	is_space
+		(
+		\pos=(- pos 1)
+		loop pos
+		)
+		(
+		\len=(+ pos 1)
+		slice text 0 len
+		)
+	) pos
+	)
+
+define "repeat_str" repeat_str;
 define "format_num" format_num;
 define "format_money" format_money;
 define "fexl_quote" fexl_quote;
@@ -188,6 +215,8 @@ define "fput_list" fput_list;
 define "put_data" put_data;
 define "put_list" put_list;
 define "show_data" show_data;
+define "as_str" data_to_str; # handy synonym
 define "data_to_str" data_to_str;
 define "str_to_data" str_to_data;
+define "trim_end_spaces" trim_end_spaces;
 standard

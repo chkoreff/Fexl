@@ -80,7 +80,7 @@ nl
 \data=["a" QU (T 23 46) {1 2} [T F ~ "hi"~ void] -2.3]
 \data=(append data data)
 
-\str1=(data_to_str data)
+\str1=(as_str data)
 say str1
 
 \data=(str_to_data str1)

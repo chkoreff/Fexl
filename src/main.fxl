@@ -48,6 +48,7 @@
 # Evaluate the user's script.
 use_file script_name;
 
+use_lib "run.fxl";
 use_lib "format.fxl";
 use_lib "hex.fxl";
 use_lib "list.fxl";
