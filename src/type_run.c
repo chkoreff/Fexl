@@ -7,6 +7,7 @@
 #include <memory.h>
 #include <standard.h>
 #include <stdio.h>
+#include <sys/types.h> /* pid_t */
 #include <sys/wait.h> /* wait */
 #include <type_file.h>
 #include <type_num.h>
