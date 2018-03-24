@@ -2097,6 +2097,75 @@ result "8169C725 EDD39F00 140FFCF5 7C45B9C5 143E2FFE 375869E4 CF280534 2715D2B1"
 result "FCC01087 70388F35 2679507F FCF73B79 716E81FF 5C20F9BF 5257AF73 7D001514"
 result "CDC76E5C 9914FB92 81A1C7E2 84D73E67 F1809A48 A497200E 046D39CC C7112CD0"
 exit 0
+==== test/b17.fxl
+[ test_run_function
+out:
+[
+hello
+x = 123
+bye
+]
+err:
+[
+complain 1
+complain 2
+]
+status: good
+
+out:
+[
+]
+err:
+[
+]
+status: good
+
+out:
+[
+hello
+]
+err:
+[
+oops
+]
+status: fail
+
+out:
+[
+]
+err:
+[
+The program ran out of memory.
+]
+status: fail
+
+]
+[ test_run_program
+out:
+[
+hello
+x = 11703
+]
+err:
+[
+complain
+oops
+]
+status: fail
+
+out:
+[
+BEG
+END
+]
+err:
+[
+complain
+]
+status: good
+
+]
+exit 0
 ==== test/chars.fxl
 ==
 封封aa小小

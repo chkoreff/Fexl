@@ -21,5 +21,28 @@
 		)
 	)
 
+# Run a fexl function as a child process, passing in the given input.  Return
+# the child's stdout, stderr, and status.
+\run_function=
+	(\child_fn\input
+	spawn child_fn \child_in\child_out\child_err
+
+	fput child_in input
+	fclose child_in
+
+	\status
+	\out=(file_content child_out)
+	\err=(file_content child_err)
+	{ out err status }
+	)
+
+# Run the function (exec argv).
+\run_program=
+	(\argv
+	run_function (exec argv)
+	)
+
 define "run_filter" run_filter;
+define "run_function" run_function;
+define "run_program" run_program;
 standard

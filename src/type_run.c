@@ -7,6 +7,7 @@
 #include <memory.h>
 #include <standard.h>
 #include <stdio.h>
+#include <stdlib.h> /* exit */
 #include <sys/types.h> /* pid_t */
 #include <sys/wait.h> /* wait */
 #include <type_file.h>
@@ -154,12 +155,16 @@ value type_spawn(value f)
 		do_close(fd_err[0]);
 		do_close(fd_err[1]);
 
-		/* Evaluate the child function, which uses stdin, stdout, and stderr
-		normally.  Return void so it doesn't evaluate anything following the
-		spawn call.  I don't use exit(0) to do that, because I want the child
-		to finish normally with full memory leak detection. */
+		/* Evaluate the child function, which can now use stdin, stdout, and
+		stderr normally. */
+
 		drop(eval(hold(f->L->R)));
-		return hold(Qvoid);
+
+		/* Exit here to avoid continuing with evaluation.  This means that
+		memory leak detection does not occur for the child function.  If you
+		want that level of checking, you should exec with (argv 0) instead. */
+		exit(0);
+		return 0;
 		}
 	else
 		{
@@ -234,18 +239,18 @@ value type_exec(value f)
 	/* Allocate an array of pointers and store the stack entries there. */
 	unsigned long size = (len+1) * sizeof(char *);
 	const char **argv = new_memory(size);
+	value curr = stack;
 
 	argv[len] = 0; /* ending sentinel */
-	while (stack->T == type_A)
+	while (curr->T == type_A)
 		{
-		value next = hold(stack->L);
-		value item = stack->R;
+		value next = hold(curr->L);
+		value item = curr->R;
 
 		len--;
 		argv[len] = str_data(item);
 
-		drop(stack);
-		stack = next;
+		curr = next;
 		}
 
 	/* Call execv with the argument list. */

@@ -1,0 +1,114 @@
+#
+\show_result=
+	(
+	\show=
+		(\label\text
+		say label
+		say "["
+		put text
+		say "]"
+		)
+
+	\out\err\status
+	show "out:" out
+	show "err:" err
+	# Showing status more portably here.  Sometimes error codes on abnormal
+	# termination can vary between systems.
+	say ["status: "(eq status 0 "good" "fail")]
+	nl
+	)
+
+\run_test=
+	(\label\code
+	say ["[ "label]
+	code
+	say "]"
+	)
+
+\test_run_function==
+(
+run_test "test_run_function";
+
+\try=
+	(\child_fn\input
+	run_function child_fn input show_result
+	)
+
+try
+	(
+	say "hello"
+	fsay stderr "complain 1"
+	\x=(evaluate standard; parse stdin "")
+	say ["x = "(as_str x)]
+
+	fsay stderr "complain 2"
+	say "bye"
+	)
+	"123"
+
+try
+	(
+	)
+	""
+
+try
+	(
+	say "hello"
+	error "oops"
+	)
+	""
+
+# Test running out of memory.
+try
+	(
+	limit_memory 4000000
+	limit_stack  1000000
+	@ @
+	)
+	""
+
+if F
+(
+# Test running out of time.
+# This test is disabled to avoid slowing the test suite.
+try
+	(
+	limit_time 1
+	@ I
+	)
+	""
+)
+)
+
+\test_run_program==
+(
+run_test "test_run_program";
+
+\try=
+	(\code
+	run_program [(argv 0)] code show_result
+	)
+
+try
+~
+say "hello"
+\x=(evaluate standard; parse stdin "")
+say ["x = "(as_str x)]
+fsay stderr "complain"
+error "oops"
+\\
+\a=(+ 246 3)
+\b=47
+(* a b)
+~
+
+try 
+~
+say "BEG"
+fsay stderr "complain"
+say "END"
+~
+)
+
+test_run_function
+test_run_program
