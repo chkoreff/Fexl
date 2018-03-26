@@ -2165,6 +2165,9 @@ complain
 status: good
 
 ]
+[ test_big_output
+grabbed 200000 bytes
+]
 exit 0
 ==== test/chars.fxl
 ==

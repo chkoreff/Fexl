@@ -110,5 +110,13 @@ say "END"
 ~
 )
 
+\test_big_output==
+(
+run_test "test_big_output";
+\out=(grab_output; each (range 1 200000) (\_ put "x"))
+say ["grabbed "(length out)" bytes"]
+)
+
 test_run_function
 test_run_program
+test_big_output
