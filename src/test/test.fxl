@@ -2,6 +2,14 @@
 \div==(say "==")
 \show_list=(\xs say "[" (each xs say) say "]")
 
+\run_test=
+	(\label\code
+	say ["[ "label]
+	code
+	say "]"
+	)
+
 define "div" div;
 define "show_list" show_list;
+define "run_test" run_test;
 standard

@@ -1,4 +1,10 @@
 #
+evaluate
+(
+use "test.fxl";
+standard
+) \;
+
 \show_result=
 	(
 	\show=
@@ -16,13 +22,6 @@
 	# termination can vary between systems.
 	say ["status: "(eq status 0 "good" "fail")]
 	nl
-	)
-
-\run_test=
-	(\label\code
-	say ["[ "label]
-	code
-	say "]"
 	)
 
 \test_run_function==

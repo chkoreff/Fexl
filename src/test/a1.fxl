@@ -1226,5 +1226,26 @@ say ["mkdir : "code]
 say ["rmdir : "code]
 )
 
+(
+run_test "trim_spaces";
+\try=
+	(\x
+	say ["all "(as_str x)" = "(as_str (trim_spaces x))]
+	say ["beg "(as_str x)" = "(as_str (trim_beg_spaces x))]
+	say ["end "(as_str x)" = "(as_str (trim_end_spaces x))]
+	nl
+	)
+
+try ""
+try "a"
+try "a   "
+try "  ab"
+try "abc"
+try "   abc  "
+try ""
+try "   "
+try "  abcd   "
+)
+
 \\
 Extra stuff not parsed.

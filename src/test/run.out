@@ -1055,6 +1055,44 @@ path "x" type ""
 716826
 mkdir : 0
 rmdir : 0
+[ trim_spaces
+all "" = ""
+beg "" = ""
+end "" = ""
+
+all "a" = "a"
+beg "a" = "a"
+end "a" = "a"
+
+all "a   " = "a"
+beg "a   " = "a   "
+end "a   " = "a"
+
+all "  ab" = "ab"
+beg "  ab" = "ab"
+end "  ab" = "  ab"
+
+all "abc" = "abc"
+beg "abc" = "abc"
+end "abc" = "abc"
+
+all "   abc  " = "abc"
+beg "   abc  " = "abc  "
+end "   abc  " = "   abc"
+
+all "" = ""
+beg "" = ""
+end "" = ""
+
+all "   " = ""
+beg "   " = ""
+end "   " = ""
+
+all "  abcd   " = "abcd"
+beg "  abcd   " = "abcd   "
+end "  abcd   " = "  abcd"
+
+]
 exit 0
 ==== test/a2.fxl
 Hello

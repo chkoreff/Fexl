@@ -179,28 +179,41 @@ format_num
 	parse str ""
 	)
 
-# Trim all spaces at the end of the string.  A space is defined as any ASCII
-# character less than or equal to the space character, which includes all
-# control characters.
-\trim_end_spaces=
-	(\text
-	\text=text
-	\pos=(- (length text) 1)
-	(@\loop\pos
-	lt pos 0 "";
-	\ch=(slice text pos 1)
-	\is_space=(le ch " ")
-	is_space
-		(
-		\pos=(- pos 1)
-		loop pos
-		)
-		(
-		\len=(+ pos 1)
-		slice text 0 len
-		)
-	) pos
+# (count_match at_beg match str) Count the number of matching characters at
+# the start or end of the string.
+\count_match=
+	(\at_beg\match\str
+	\max=(- (length str) 1)
+	\index=(at_beg () (- max))
+	(@\loop\N
+	gt N max N;
+	\ch=(slice str (index N) 1)
+	match ch (\N=(+ N 1) loop N) N
+	) 0
 	)
+
+# Trim matching characters at the start and/or end of the string.
+\str_trim=
+	(\match\at_beg\at_end\str
+	\str=str
+	\beg=(at_beg (count_match T match str) 0)
+	\end=(at_end (count_match F match str) 0)
+	\len=(max 0; - (length str) (+ beg end))
+	slice str beg len
+	)
+
+\str_trim_spaces=(str_trim (\ch le ch " "))
+
+# Trim spaces at the start and end of the string.  A space is defined as any
+# ASCII character less than or equal to the space character, which includes all
+# control characters.
+\trim_spaces=(str_trim_spaces T T)
+
+# Trim spaces at the start of the string.
+\trim_beg_spaces=(str_trim_spaces T F)
+
+# Trim spaces at the end of the string.
+\trim_end_spaces=(str_trim_spaces F T)
 
 define "repeat_str" repeat_str;
 define "format_num" format_num;
@@ -218,5 +231,9 @@ define "show_data" show_data;
 define "as_str" data_to_str; # handy synonym
 define "data_to_str" data_to_str;
 define "str_to_data" str_to_data;
+define "count_match" count_match;
+define "str_trim" str_trim;
+define "trim_spaces" trim_spaces;
+define "trim_beg_spaces" trim_beg_spaces;
 define "trim_end_spaces" trim_end_spaces;
 standard
