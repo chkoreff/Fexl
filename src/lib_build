@@ -50,9 +50,6 @@ make()
 	# The next option enforces ISO C90 compatibility.  I use it only during
 	# development to ensure that I can compile with older versions of gcc.
 	options="$options -Wdeclaration-after-statement"
-
-	# The next option enables code used during development only.
-	options="$options -DDEV"
 	fi
 
 	run gcc -c $options $path $file_c -o $file_o

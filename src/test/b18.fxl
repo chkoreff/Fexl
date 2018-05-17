@@ -1,0 +1,34 @@
+#
+(
+say "== benchmark nested"
+fexl_benchmark
+	(
+	fexl_benchmark
+		(/ (+ (* 27 34) (- 48 8)) 2)
+		\val\steps\bytes
+	say ["inner: val "val" steps "steps" bytes "bytes]
+	val
+	)
+	\val\steps\bytes
+say ["outer: val "val" steps "steps" bytes "bytes]
+)
+
+(
+say "== benchmark large list"
+fexl_benchmark
+	(
+	\tower=
+		(@\loop\n\x
+		le n 0 x;
+		\x=(append x x)
+		\n=(- n 1)
+		loop n x
+		)
+
+	\x=["a"]
+	\x=(tower 15 x)
+	list_length x
+	)
+	\val\steps\bytes
+say ["result: val "val" steps "steps" bytes "bytes]
+)

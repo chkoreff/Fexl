@@ -98,9 +98,6 @@ value V(type T, value L, value R)
 	f->T = T;
 	f->L = L;
 	f->R = R;
-	#if DEV
-	count_V++;
-	#endif
 	return f;
 	}
 
@@ -129,31 +126,19 @@ value A(value x, value y)
 	return V(type_A,x,y);
 	}
 
-#if DEV
-unsigned long num_steps = 0;
-unsigned long count_V = 0;
-#endif
-
-static value step(value f)
-	{
-	#if DEV
-	if (0 && num_steps >= 40000000) return 0;
-	num_steps++;
-	#endif
-	return f->T(f);
-	}
-
 /* Reduce the value until done. */
-value eval(value f)
+static value eval_normal(value f)
 	{
 	while (1)
 		{
-		value g = step(f);
+		value g = f->T(f);
 		if (g == 0) return f;
 		drop(f);
 		f = g;
 		}
 	}
+
+value (*eval)(value f) = eval_normal;
 
 value arg(value f)
 	{

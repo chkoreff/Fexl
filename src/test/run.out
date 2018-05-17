@@ -2207,6 +2207,13 @@ status: good
 grabbed 200000 bytes
 ]
 exit 0
+==== test/b18.fxl
+== benchmark nested
+inner: val 479 steps 29 bytes 8
+outer: val 479 steps 154 bytes 8
+== benchmark large list
+result: val 32768 steps 3441900 bytes 1363784
+exit 0
 ==== test/chars.fxl
 ==
 封封aa小小

@@ -141,6 +141,7 @@ static value standard(value name)
 	if (match("sleep")) return Q(type_sleep);
 	if (match("spawn")) return Q(type_spawn);
 	if (match("exec")) return Q(type_exec);
+	if (match("fexl_benchmark")) return Q(type_fexl_benchmark);
 
 	if (match("seed_rand")) return Q(type_seed_rand);
 	if (match("rand")) return Q(type_rand);
