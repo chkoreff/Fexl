@@ -295,8 +295,8 @@ value type_fexl_benchmark(value f)
 
 	{
 	value x = arg(f->L->R);
-	unsigned long steps = num_steps - save_num_steps;
-	unsigned long bytes = cur_bytes - save_cur_bytes;
+	double steps = (double)num_steps - (double)save_num_steps;
+	double bytes = (double)cur_bytes - (double)save_cur_bytes;
 	f = A(A(A(hold(f->R),x),Qnum0(steps)),Qnum0(bytes));
 	}
 

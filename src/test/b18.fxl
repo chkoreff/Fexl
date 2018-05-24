@@ -32,3 +32,12 @@ fexl_benchmark
 	\val\steps\bytes
 say ["result: val "val" steps "steps" bytes "bytes]
 )
+
+(
+say "== benchmark negative memory usage"
+\v=var_new
+\x=""
+var_put v x
+fexl_benchmark (var_put v void) \val\steps\bytes
+say ["result: val "val" steps "steps" bytes "bytes]
+)

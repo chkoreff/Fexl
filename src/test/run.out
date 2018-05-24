@@ -2212,7 +2212,9 @@ exit 0
 inner: val 479 steps 29 bytes 8
 outer: val 479 steps 154 bytes 8
 == benchmark large list
-result: val 32768 steps 3441900 bytes 1363784
+result: val 32768 steps 3441900 bytes 1370440
+== benchmark negative memory usage
+result: val  steps 8 bytes -9
 exit 0
 ==== test/chars.fxl
 ==

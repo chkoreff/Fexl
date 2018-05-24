@@ -18,9 +18,9 @@ Build the code and test its validity:
 
 That runs the test/run script and compares its output with the reference output
 in test/run.out.  If everything works as expected, you should see no output.
-If you do see some output, it is likely due to a small incompatibility in
-floating point arithmetic on your machine.  However, I have tried to make even
-that as portable as possible.
+However, if you run on a 32-bit system you will see some inconsequential
+differences in the output of test/b18.fexl, which measures memory usage, and
+also test/b17.fexl, which deliberately tries to run out of memory.
 
 Installation
 ------------
