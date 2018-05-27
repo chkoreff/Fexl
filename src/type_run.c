@@ -267,18 +267,10 @@ value type_exec(value f)
 
 static unsigned long num_steps = 0;
 
-/* Reduce the value until done. */
-static value eval_count(value f)
+static value step_count(value f)
 	{
-	while (1)
-		{
-		value g;
-		num_steps++;
-		g = f->T(f);
-		if (g == 0) return f;
-		drop(f);
-		f = g;
-		}
+	num_steps++;
+	return f->T(f);
 	}
 
 /* (fexl_benchmark x next) Evaluate x and return (next val steps bytes), where
@@ -288,10 +280,10 @@ value type_fexl_benchmark(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	{
-	value (*save_eval)(value) = eval;
+	value (*save_step)(value) = step;
 	unsigned long save_num_steps = num_steps;
 	unsigned long save_cur_bytes = cur_bytes;
-	eval = eval_count;
+	step = step_count;
 
 	{
 	value x = arg(f->L->R);
@@ -300,8 +292,8 @@ value type_fexl_benchmark(value f)
 	f = A(A(A(hold(f->R),x),Qnum0(steps)),Qnum0(bytes));
 	}
 
-	eval = save_eval;
-	if (eval != eval_count)
+	step = save_step;
+	if (step != step_count)
 		num_steps = save_num_steps;
 	return f;
 	}

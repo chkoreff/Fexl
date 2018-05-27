@@ -126,19 +126,24 @@ value A(value x, value y)
 	return V(type_A,x,y);
 	}
 
+static value step_normal(value f)
+	{
+	return f->T(f);
+	}
+
+value (*step)(value f) = step_normal;
+
 /* Reduce the value until done. */
-static value eval_normal(value f)
+value eval(value f)
 	{
 	while (1)
 		{
-		value g = f->T(f);
+		value g = step(f);
 		if (g == 0) return f;
 		drop(f);
 		f = g;
 		}
 	}
-
-value (*eval)(value f) = eval_normal;
 
 value arg(value f)
 	{
