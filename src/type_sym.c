@@ -160,6 +160,8 @@ static value define_name(value context, value name)
 		return def;
 	}
 
+static int undefined = 0;
+
 static value resolve(value context, value exp)
 	{
 	if (exp->T != type_sym)
@@ -169,6 +171,7 @@ static value resolve(value context, value exp)
 		value name = sym_name(exp);
 		value def = define_name(context,name);
 		if (def) return def;
+		undefined = 1;
 		undefined_symbol(str_data(name),sym_line(exp),
 			str_data(sym_source(exp)));
 		return hold(exp);
@@ -177,7 +180,7 @@ static value resolve(value context, value exp)
 		{
 		value L = resolve(context,exp->L);
 		value R = resolve(context,exp->R);
-		return app(L,R);
+		return A(L,R);
 		}
 	}
 
@@ -189,7 +192,7 @@ value type_evaluate(value f)
 	value context = arg(f->L->R);
 	value exp = arg(f->R);
 	f = resolve(context,exp);
-	if (f->T == type_sym)
+	if (undefined)
 		die(0); /* The expression had undefined symbols. */
 	drop(context);
 	drop(exp);
