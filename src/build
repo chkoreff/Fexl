@@ -6,6 +6,7 @@ DEV=0
 make basic
 make buffer
 make convert
+make crypto
 make die
 make fexl
 make file
@@ -21,7 +22,9 @@ make standard
 make str
 make type_buf
 make type_cmp
+make type_crypto
 make type_file
+make type_hex
 make type_input
 make type_istr
 make type_limit

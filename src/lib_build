@@ -44,7 +44,8 @@ make()
 	stale $file_o $file_c || return 0
 	mkdir -p `dirname $file_o`
 
-	local options="-Wall -Werror -Wunused-parameter -pedantic -O3"
+	# I eliminated -pedantic to support the long long values in crypto.c.
+	local options="-Wall -Werror -Wunused-parameter -O3"
 
 	if [ $DEV -eq 1 ]; then
 	# The next option enforces ISO C90 compatibility.  I use it only during

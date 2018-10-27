@@ -24,26 +24,6 @@
 	void
 	)
 
-# Map a string specified in hexadecimal into the raw bytes.
-\map_hex_to_raw_bytes=
-	(\str
-	\in=(readstr str)
-	get_str;
-	\nibble==(\x=(sgetc in) hex_digit_to_dec x)
-	\x=nibble
-	\y=nibble
-	chr; + (* 16 x) y
-	)
-
-# Map raw bytes to their hexadecimal values.
-\map_raw_bytes_to_hex=
-	(\str
-	\in=(readstr str)
-	get_str;
-	\x=(sgetc in)
-	hex_byte; ord; x
-	)
-
 # XOR two hex digit strings together.
 \xor_hex=
 	(\x\y
@@ -91,8 +71,6 @@
 define "hex_digit" hex_digit;
 define "hex_byte" hex_byte;
 define "hex_digit_to_dec" hex_digit_to_dec;
-define "map_hex_to_raw_bytes" map_hex_to_raw_bytes;
-define "map_raw_bytes_to_hex" map_raw_bytes_to_hex;
 define "xor_hex" xor_hex;
 define "oct" oct;
 define "hex" hex;

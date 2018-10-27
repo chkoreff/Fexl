@@ -8,7 +8,9 @@
 #include <string.h> /* strcmp */
 #include <type_buf.h>
 #include <type_cmp.h>
+#include <type_crypto.h>
 #include <type_file.h>
+#include <type_hex.h>
 #include <type_istr.h>
 #include <type_limit.h>
 #include <type_math.h>
@@ -170,6 +172,21 @@ static value standard(value name)
 	if (match("limit_memory")) return Q(type_limit_memory);
 	if (match("limit_stack")) return Q(type_limit_stack);
 
+	if (match("map_raw_bytes_to_hex")) return Q(type_map_raw_bytes_to_hex);
+	if (match("map_hex_to_raw_bytes")) return Q(type_map_hex_to_raw_bytes);
+
+	if (match("random_bytes")) return Q(type_random_bytes);
+	if (match("random_nonce")) return Q(type_random_nonce);
+	if (match("random_secret_key")) return Q(type_random_secret_key);
+	if (match("crypto_box_public")) return Q(type_crypto_box_public);
+	if (match("crypto_box_prepare")) return Q(type_crypto_box_prepare);
+	if (match("crypto_box_seal")) return Q(type_crypto_box_seal);
+	if (match("crypto_box_open")) return Q(type_crypto_box_open);
+	if (match("crypto_sign_public")) return Q(type_crypto_sign_public);
+	if (match("crypto_sign_seal")) return Q(type_crypto_sign_seal);
+	if (match("crypto_sign_open")) return Q(type_crypto_sign_open);
+	if (match("crypto_hash")) return Q(type_crypto_hash);
+
 	return 0;
 	}
 
@@ -248,6 +265,7 @@ static void end_const(void)
 	drop(Qtuple);
 	drop(Qparse_file);
 	drop(Qevaluate);
+	close_random();
 	}
 
 /* Evaluate main.fxl located relative to the executable given by argv[0].  The

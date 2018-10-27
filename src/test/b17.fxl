@@ -101,7 +101,7 @@ error "oops"
 (* a b)
 ~
 
-try 
+try
 ~
 say "BEG"
 fsay stderr "complain"
