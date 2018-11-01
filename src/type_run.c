@@ -12,6 +12,7 @@
 #include <sys/socket.h>
 #include <sys/types.h> /* pid_t */
 #include <sys/wait.h> /* wait */
+#include <termios.h> /* tcgetattr etc. */
 #include <type_file.h>
 #include <type_num.h>
 #include <type_run.h>
@@ -549,6 +550,33 @@ value type_exec(value f)
 	}
 
 	return hold(QI);
+	}
+	}
+
+/* (receive_keystrokes fn)
+Run the function while receiving individual keystrokes. */
+value type_receive_keystrokes(value f)
+	{
+	if (!f->L) return 0;
+	{
+	struct termios attr;
+	tcflag_t save_c_lflag;
+
+	/* Set terminal to receive individual keystrokes. */
+	tcgetattr(0, &attr);
+	save_c_lflag = attr.c_lflag; /* Save original local modes. */
+
+	attr.c_lflag &= ~ICANON;
+	attr.c_lflag &= ~ECHO;
+	tcsetattr(0, TCSANOW, &attr);
+
+	f = arg(f->R);
+
+	/* Restore original local modes. */
+	attr.c_lflag = save_c_lflag;
+	tcsetattr(0, TCSANOW, &attr);
+
+	return f;
 	}
 	}
 

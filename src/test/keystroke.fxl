@@ -1,0 +1,23 @@
+# Echo the characters from the input.
+\echo=
+	(\get @\loop
+	\ch=get
+	is_void ch ();
+	eq (ord ch) 4 ();
+	say ["ch = "(map_raw_bytes_to_hex ch)]
+	loop
+	)
+
+\interact==
+	(
+	set_alarm 20
+	say "Press Ctrl-D to stop."
+	echo (fget stdin)
+	say "DONE"
+	)
+
+say "Press some keys and I'll show you what you typed."
+receive_keystrokes interact
+
+say "Enter some lines of input and I'll show you what you typed."
+interact

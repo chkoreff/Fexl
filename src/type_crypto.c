@@ -50,8 +50,7 @@ static string str_random_bytes(unsigned long num_bytes)
 	return str;
 	}
 
-static value op_public_key(value f, int op(u8 *pk, const u8 *sk)
-	)
+static value op_public_key(value f, int op(u8 *pk, const u8 *sk))
 	{
 	if (!f->L) return 0;
 	{

@@ -193,6 +193,7 @@ static value standard(value name)
 	if (match("start_server")) return Q(type_start_server);
 	if (match("kill")) return Q(type_kill);
 	if (match("connect")) return Q(type_connect);
+	if (match("receive_keystrokes")) return Q(type_receive_keystrokes);
 
 	return 0;
 	}

@@ -9,4 +9,5 @@ extern value type_start_server(value f);
 extern value type_kill(value f);
 extern value type_connect(value f);
 extern value type_exec(value f);
+extern value type_receive_keystrokes(value f);
 extern value type_fexl_benchmark(value f);
