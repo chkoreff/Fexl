@@ -19,6 +19,7 @@
 #include <type_parse.h>
 #include <type_rand.h>
 #include <type_run.h>
+#include <type_signal.h>
 #include <type_str.h>
 #include <type_sym.h>
 #include <type_tuple.h>
@@ -141,6 +142,7 @@ static value standard(value name)
 	if (match("die")) return Q(type_die);
 	if (match("argv")) return Q(type_argv);
 	if (match("sleep")) return Q(type_sleep);
+	if (match("usleep")) return Q(type_usleep);
 	if (match("spawn")) return Q(type_spawn);
 	if (match("exec")) return Q(type_exec);
 	if (match("fexl_benchmark")) return Q(type_fexl_benchmark);
@@ -186,6 +188,11 @@ static value standard(value name)
 	if (match("crypto_sign_seal")) return Q(type_crypto_sign_seal);
 	if (match("crypto_sign_open")) return Q(type_crypto_sign_open);
 	if (match("crypto_hash")) return Q(type_crypto_hash);
+
+	if (match("set_alarm")) return Q(type_set_alarm);
+	if (match("start_server")) return Q(type_start_server);
+	if (match("kill")) return Q(type_kill);
+	if (match("connect")) return Q(type_connect);
 
 	return 0;
 	}
@@ -245,6 +252,7 @@ static void beg_const(void)
 	Qtuple = Q(type_tuple);
 	Qparse_file = Q(type_parse_file);
 	Qevaluate = Q(type_evaluate);
+	init_signal();
 	}
 
 static void end_const(void)

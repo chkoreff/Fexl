@@ -1,0 +1,46 @@
+# Test assoc list.
+evaluate
+(
+use_lib "indent.fxl";
+use_lib "assoc.fxl";
+standard
+) \;
+
+\add_random_keys=
+	(@\loop\count\seed\obj
+	le count 0 obj;
+	\hash=(crypto_hash seed)
+	\key=(map_raw_bytes_to_hex; slice hash 0 8)
+	\val=(map_raw_bytes_to_hex; slice hash 32 8)
+	#\obj=(put_key key val obj)
+	\obj=(push_key key val obj)
+	\count=(- count 1)
+	loop count hash obj
+	)
+
+\obj=(add_random_keys 8192 "abcd" [])
+\obj=(sort_pairs obj)
+
+(
+\key="7d13f23fa2b9a6fd"
+\val=(get_key key obj)
+say_data {key val}
+\obj=(put_key key "ffff" obj)
+\val=(get_key key obj)
+say_data {key val}
+\obj=(update_key key (. "aaaa") obj)
+\val=(get_key key obj)
+say_data {key val}
+)
+
+(
+shift obj \pair\_
+put "first = "
+say_data pair
+)
+
+(
+shift (reverse obj) \pair\_
+put "last  = "
+say_data pair
+)

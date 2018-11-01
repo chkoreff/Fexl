@@ -44,9 +44,43 @@
 	run_function_filter child_fn ""
 	)
 
+\stop_server=
+	(\ip\port
+	\argv=["/usr/bin/lsof" (to_str ["-i4TCP@"ip":"port]) "-t"]
+	\out=(run_function (exec argv) "" \out\err\status out)
+	\list_pid=(map str_num; filter (ne ""); split NL out)
+
+	each list_pid
+		(\pid
+		kill pid 2 # SIGINT
+		)
+	)
+
+\run_server=
+	(\option\ip\port\error_log\interact
+
+	\start_server==(start_server ip port error_log interact)
+	\stop_server==(stop_server ip port)
+
+	\ok=
+		(
+		is_void option F;
+		eq option "start" T;
+		eq option "stop" T;
+		F
+		)
+
+	if (not ok) (error ~ Please specify either "start" or "stop".~)
+
+	stop_server
+	if (eq option "start") start_server
+	)
+
 define "run_function" run_function;
 define "run_program" run_program;
 define "run_function_filter" run_function_filter;
 define "run_filter" run_filter;
 define "grab_output" grab_output;
+define "stop_server" stop_server;
+define "run_server" run_server;
 standard

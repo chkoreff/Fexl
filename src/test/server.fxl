@@ -1,0 +1,15 @@
+# This server reads a single character, increments it, and sends that back to
+# the client.  You can connect to this using test/client.fxl.
+
+run_server (argv 2) "127.0.0.1" 2186 "test/error_log"
+	(@\loop
+	\ch=(fgetc stdin)
+	is_void ch ();
+	if (eq ch "a")
+		(
+		fsay stderr ["SAW: "(map_raw_bytes_to_hex ch)]
+		)
+	\ch=(chr; + 1; ord ch)
+	put ch
+	loop
+	)

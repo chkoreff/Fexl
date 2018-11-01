@@ -1,0 +1,92 @@
+# (Sat 2018-07-28 In memoriam, Charlie the cat, thank you little friend.)
+
+\get_key=
+	(\key @\loop \list
+	list void \pair\list
+	pair \this_key\this_val
+	eq key this_key this_val;
+	loop list
+	)
+
+\del_key=
+	(\key @\loop \list
+	list [] \pair\list
+	pair \this_key\this_val
+	eq key this_key list;
+	\list=(loop list)
+	cons pair list
+	)
+
+\put_key=
+	(\key\val
+	\val=val
+	@\loop \list
+	list [{key val}] \pair\list
+	pair \this_key\this_val
+	eq key this_key (cons {this_key val} list);
+	\list=(loop list)
+	cons pair list
+	)
+
+\push_key=
+	(\key\val\list
+	\val=val
+	\list=list
+	cons {key val} list
+	)
+
+\update_key=
+	(\key\update @\loop \list
+	list
+		(
+		\val=(update void)
+		[{key val}]
+		)
+	\pair\list
+	pair \this_key\this_val
+	eq key this_key
+		(
+		\val=(update this_val)
+		cons {this_key val} list
+		);
+	\list=(loop list)
+	cons pair list
+	)
+
+\add_key=
+	(\key\amount
+	update_key key
+		(\total
+		is_defined total (+ total amount) amount
+		)
+	)
+
+\update_values=
+	(\update
+	map
+		(\pair
+		pair \key\val
+		\val=(update key val)
+		{key val}
+		)
+	)
+
+# (sort_pairs list) Sort the list of pairs by key.
+\sort_pairs=
+	(
+	g_sort
+		(\x\y x \kx\_ y \ky\_ lt kx ky)
+		(\x\y x \kx\_ y \ky\_ eq kx ky)
+		(\x\y x \kx\_ y \ky\_ gt kx ky)
+		F
+	)
+
+define "get_key" get_key;
+define "del_key" del_key;
+define "put_key" put_key;
+define "push_key" push_key;
+define "update_key" update_key;
+define "add_key" add_key;
+define "update_values" update_values;
+define "sort_pairs" sort_pairs;
+standard

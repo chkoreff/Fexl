@@ -297,8 +297,8 @@
 	(\fh
 	\buf=buf_new
 	(@\loop
-	\ch=(fgetc fh)
-	is_void ch ();
+	\ch=(fread fh 8192)
+	eq ch "" ();
 	buf_put buf ch
 	loop
 	)

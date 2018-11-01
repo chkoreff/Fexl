@@ -1,0 +1,120 @@
+# Format data in a nested indented format.
+
+# Return true if the item is a scalar.
+\is_scalar=
+	(\x
+	is_str x T;
+	is_num x T;
+	is_bool x T;
+	is_void x T;
+	F
+	)
+
+\tuple_to_list=
+	(\data
+
+	# Optimize pairs and singletons.
+	\count=(arity data)
+	eq count 2 (data \key\val [key val]);
+	eq count 1 (data \key [key]);
+
+	# General case.
+	reverse;
+	(@\loop\data
+	split_tuple data [] \xs\x
+	cons x (loop xs)
+	) data
+	)
+
+# (render_data put prefix data)
+# Render the data in an indented format using the given "put" function and the
+# initial indentation prefix.
+\render_data=
+	(\put
+	\nl==(put NL)
+	@\render_data \prefix\data
+
+	\data=data
+
+	is_str data (put (fexl_quote data));
+	is_num data (put (num_str data));
+	is_bool data (put (data "T" "F"));
+	is_void data (put "void");
+
+	\show_items=
+		(@\show_items\is_first\is_nested\prefix\items
+		items {is_nested} \item\items
+
+		# Evaluation greatly accelerates when data has deferred values.
+		\item=item
+
+		# Indent one level when I first see a non-scalar.
+		\prefix=
+			(
+			is_first prefix;
+			is_nested prefix;
+			is_scalar item prefix;
+			. prefix "  "
+			)
+
+		# Track if this list has a non-scalar item.
+		\is_nested=
+			(
+			is_nested T;
+			is_scalar item F;
+			T
+			)
+
+		(
+		is_nested (nl put prefix);
+		is_first ();
+		put " "
+		)
+
+		render_data prefix item
+		show_items F is_nested prefix items
+		)
+
+	\show_items=
+		(\items
+		show_items T F prefix items \is_nested
+		is_nested (nl put prefix) ()
+		)
+
+	is_list data
+		(
+		put "["
+		show_items data
+		put "]"
+		);
+
+	is_tuple data
+		(
+		put "{"
+		\data=(tuple_to_list data)
+		show_items data
+		put "}"
+		);
+
+	put "?"
+	)
+
+# (stream_data put data) Stream the data with the given output function.
+\stream_data=(\put render_data put "")
+
+# (put_data data) Print data to stdout.
+\put_data=(stream_data put)
+
+\say_data=(\data put_data data nl)
+
+\trace_data=
+	(\data
+	stream_data (fput stderr) data
+	fnl stderr
+	)
+
+define "stream_data" stream_data;
+define "put_data" put_data;
+define "say_data" say_data;
+define "trace_data" trace_data;
+standard

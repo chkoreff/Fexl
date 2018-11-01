@@ -1,0 +1,33 @@
+# This client connects to the server created by test/server.fxl.
+
+# (inc_ch ch) Increments the character by calling the server.
+\inc_ch=
+	(
+	\fh=(connect "127.0.0.1" 2186)
+	if (is_void fh) (error "Could not connect")
+	\ch
+	\ch=(slice ch 0 1)
+	is_void ch void;
+	eq ch "" "";
+	fput fh ch
+	fgetc fh
+	)
+
+\unpack=map_raw_bytes_to_hex
+
+\try=
+	(\ch
+	\ch2=(inc_ch ch)
+	say ["inc "(unpack ch)" = "(unpack ch2)]
+	)
+
+say "Enter chars: (Ctrl-D to quit)"
+(@\loop
+set_alarm 30
+\ch=(fgetc stdin)
+is_void ch ();
+try ch
+loop
+)
+
+say "BYE"
