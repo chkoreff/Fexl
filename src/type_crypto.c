@@ -241,7 +241,7 @@ value type_crypto_box_seal(value f)
 	return op_box(f,crypto_box_seal,32,16);
 	}
 
-/* (crypto_box_open crypt_text nonce key) Encrypt the crypt text.  */
+/* (crypto_box_open crypt_text nonce key) Decrypt the crypt text.  */
 value type_crypto_box_open(value f)
 	{
 	return op_box(f,crypto_box_open,16,32);
