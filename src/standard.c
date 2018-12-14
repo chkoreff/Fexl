@@ -22,6 +22,7 @@
 #include <type_signal.h>
 #include <type_str.h>
 #include <type_sym.h>
+#include <type_time.h>
 #include <type_tuple.h>
 #include <type_var.h>
 
@@ -138,6 +139,11 @@ static value standard(value name)
 	if (match("fread")) return Q(type_fread);
 	if (match("mkfile")) return Q(type_mkfile);
 	if (match("dir_names")) return Q(type_dir_names);
+	if (match("mod_time")) return Q(type_mod_time);
+	if (match("file_size")) return Q(type_file_size);
+
+	if (match("time")) return Q(type_time);
+	if (match("localtime")) return Q(type_localtime);
 
 	if (match("die")) return Q(type_die);
 	if (match("argv")) return Q(type_argv);

@@ -492,3 +492,45 @@ value type_dir_names(value f)
 	return f;
 	}
 	}
+
+static unsigned long get_st_mtime(struct stat *status)
+	{ return status->st_mtime; }
+static unsigned long get_st_size(struct stat *status)
+	{ return status->st_size; }
+
+static value op_stat(value f, unsigned long op(struct stat *status))
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_str)
+		{
+		const char *path = str_data(x);
+		struct stat status;
+		int result = stat(path,&status);
+		if (result == -1)
+			f = hold(Qvoid);
+		else
+			{
+			unsigned long n = op(&status);
+			f = Qnum0(n);
+			}
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
+	}
+
+/* Return the modification time of a file in epoch seconds. */
+value type_mod_time(value f)
+	{
+	return op_stat(f,get_st_mtime);
+	}
+
+/* Return the size of a file. */
+value type_file_size(value f)
+	{
+	return op_stat(f,get_st_size);
+	}
