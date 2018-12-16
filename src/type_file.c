@@ -274,8 +274,8 @@ static string safe_readlink(const char *path)
 		else
 			{
 			/* Used less than available space, so the result fits just fine.
-			A system error yields len == -1, but that works robustly. */
-			string result = str_new_data(buf,len);
+			Return null string on system error (len == -1). */
+			string result = str_new_data(buf,(len < 0 ? 0 : len));
 			free_memory(buf, size);
 			return result;
 			}
