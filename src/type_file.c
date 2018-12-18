@@ -534,3 +534,21 @@ value type_file_size(value f)
 	{
 	return op_stat(f,get_st_size);
 	}
+
+/* (symlink target linkpath) Create a symbolic link named linkpath which points
+to target.  Return the numeric result of calling symlink(2). */
+value type_symlink(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	{
+	value x = arg(f->L->R);
+	value y = arg(f->R);
+	if (x->T == type_str && y->T == type_str)
+		f = Qnum0(symlink(str_data(x),str_data(y)));
+	else
+		f = hold(Qvoid);
+	drop(x);
+	drop(y);
+	return f;
+	}
+	}

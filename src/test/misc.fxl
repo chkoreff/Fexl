@@ -1,0 +1,18 @@
+#
+\n=time
+say ["time "n" "(localtime n)]
+
+\try=
+(\name
+say (as_str [name (readlink name) (file_size name) (localtime; mod_time name)])
+)
+
+\_=(remove "test/obj")
+\_=(symlink "../../obj" "test/obj")
+
+try "test/obj"
+try "test/var.fxl"
+try "nothing"
+try "value.c"
+
+\_=(remove "test/obj")
