@@ -73,8 +73,8 @@ define "QU" QU;
 
 define "check" check;
 define "default" default;
-define "pack" pack;
-define "unpack" unpack;
+define "map_hex_to_raw_bytes" pack;
+define "map_raw_bytes_to_hex" unpack;
 define "use_file" use_file;
 define "use_lib" use_lib;
 define "use" use;

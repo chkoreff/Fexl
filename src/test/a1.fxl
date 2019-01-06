@@ -1247,5 +1247,18 @@ try "   "
 try "  abcd   "
 )
 
+# Ensure availability of old and new names.
+if F
+(
+encode_percent
+map_hex_to_raw_bytes
+map_raw_bytes_to_hex
+
+uri_escape
+uri_unescape
+pack
+unpack
+)
+
 \\
 Extra stuff not parsed.
