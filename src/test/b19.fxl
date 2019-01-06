@@ -10,8 +10,8 @@ standard
 	(@\loop\count\seed\obj
 	le count 0 obj;
 	\hash=(crypto_hash seed)
-	\key=(map_raw_bytes_to_hex; slice hash 0 8)
-	\val=(map_raw_bytes_to_hex; slice hash 32 8)
+	\key=(unpack; slice hash 0 8)
+	\val=(unpack; slice hash 32 8)
 	#\obj=(put_key key val obj)
 	\obj=(push_key key val obj)
 	\count=(- count 1)

@@ -1073,7 +1073,7 @@ say (is_str x)
 (
 div
 \list=["a" "b" "c"]
-\try=(\n say [n " : " (check (list_at list n) "(void)")])
+\try=(\n say [n" : "(default "(void)" (list_at list n))])
 try -1
 try 0
 try 1

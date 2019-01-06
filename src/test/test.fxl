@@ -12,7 +12,7 @@
 \do_benchmark=
 	(\f
 	fexl_benchmark f \val\steps\bytes
-	fsay stderr ["steps "steps" bytes "bytes]
+	trace ["steps "steps" bytes "bytes]
 	val
 	)
 

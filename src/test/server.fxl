@@ -7,7 +7,7 @@ run_server (argv 2) "127.0.0.1" 2186 "test/error_log"
 	is_void ch ();
 	if (eq ch "a")
 		(
-		fsay stderr ["SAW: "(map_raw_bytes_to_hex ch)]
+		trace ["SAW: "(unpack ch)]
 		)
 	\ch=(chr; + 1; ord ch)
 	put ch

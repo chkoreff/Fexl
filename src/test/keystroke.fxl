@@ -4,7 +4,7 @@
 	\ch=get
 	is_void ch ();
 	eq (ord ch) 4 ();
-	say ["ch = "(map_raw_bytes_to_hex ch)]
+	say ["ch = "(unpack ch)]
 	loop
 	)
 

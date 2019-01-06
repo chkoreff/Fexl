@@ -4,6 +4,7 @@ extern value type_die(value f);
 extern value type_argv(value f);
 extern value type_sleep(value f);
 extern value type_usleep(value f);
+extern value type_run_process(value f);
 extern value type_spawn(value f);
 extern value type_start_server(value f);
 extern value type_kill(value f);

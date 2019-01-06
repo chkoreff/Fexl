@@ -297,9 +297,9 @@
 	(\fh
 	\buf=buf_new
 	(@\loop
-	\ch=(fread fh 8192)
-	eq ch "" ();
-	buf_put buf ch
+	\text=(fread fh 8192)
+	eq text "" ();
+	buf_put buf text
 	loop
 	)
 	buf_get buf

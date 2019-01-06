@@ -9,10 +9,16 @@
 # (if x y) = y if x is true, other I.
 \if=(\x\y x y I)
 
-# (check x y) = x if x is good, otherwise y.
+# (check x d) = x if x is good, otherwise d.
 \check=(\x \x=x is_defined x x)
+# (default d x) = x if x is good, otherwise d.
+\default=(\d\x \x=x is_defined x x d)
 
-\error=(\msg fsay stderr msg die)
+\map_hex_to_raw_bytes=pack
+\map_raw_bytes_to_hex=unpack
+
+\trace=(fsay stderr)
+\error=(\msg trace msg die)
 
 \path_under=(\dir\name . (. dir "/") name)
 
@@ -36,7 +42,7 @@
 \dir_base=(dirname; dirname; argv 0)
 \dir_lib=(path_under dir_base "src/lib")
 
-\script_name=(check (argv 1) "")
+\script_name=(default "" (argv 1))
 \dir_local=(dirname script_name)
 
 # Use a file in the Fexl library directory.
@@ -66,6 +72,9 @@ define "LF" LF;
 define "QU" QU;
 
 define "check" check;
+define "default" default;
+define "pack" pack;
+define "unpack" unpack;
 define "use_file" use_file;
 define "use_lib" use_lib;
 define "use" use;
@@ -74,5 +83,6 @@ define "path_under" path_under;
 define "dir_base" dir_base;
 define "dir_local" dir_local;
 
+define "trace" trace;
 define "error" error;
 standard

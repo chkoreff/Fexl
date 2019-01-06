@@ -84,8 +84,7 @@
 	)
 
 # https://en.wikipedia.org/wiki/Percent-encoding
-# LATER 20171108 accelerate this, perhaps in C.
-\encode_percent=
+\uri_escape=
 	(str_map \ch
 	\is_reserved=
 		(
@@ -108,6 +107,8 @@
 		eq ch "[" T;
 		eq ch "]" T;
 		eq ch "%" T;
+		eq ch QU T; # Need this for quotes in path names.
+		eq ch NL T;
 		F
 		)
 
@@ -116,8 +117,32 @@
 		ch
 	)
 
-# LATER 20170802 Note that QU isn't considered reserved.  Test that on a real
-# web site.
+\uri_unescape=
+	(\str
+	\buf=buf_new
+	\source=(readstr str)
+
+	@\loop
+	\ch=(sget source)
+	is_void ch (buf_get buf);
+	eq ch "+"
+		(
+		buf_put buf " "
+		loop
+		);
+	eq ch "%"
+		(
+		\x==(hex_digit_to_dec (sget source))
+		\y==(hex_digit_to_dec (sget source))
+		buf_put buf (chr; + (* 16 x) y)
+		loop
+		);
+	buf_put buf ch
+	loop
+	)
+
+\encode_percent=uri_escape # backward compatible
+
 \make_url=
 	(\params
 	\params=
@@ -125,8 +150,8 @@
 			(\pair pair \key\val
 			\val=(is_num val (num_str val) val)
 			eq val "" void;
-			\q_key=(encode_percent key)
-			\q_val=(encode_percent val)
+			\q_key=(uri_escape key)
+			\q_val=(uri_escape val)
 			[q_key"="q_val]
 			)
 			params)
@@ -144,6 +169,8 @@ define "tag" tag;
 define "tr" tr;
 define "put_quote_data" put_quote_data;
 define "put_quote_list" put_quote_list;
+define "uri_escape" uri_escape;
+define "uri_unescape" uri_unescape;
 define "encode_percent" encode_percent;
 define "make_url" make_url;
 standard

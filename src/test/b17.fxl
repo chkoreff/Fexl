@@ -36,11 +36,11 @@ run_test "test_run_function";
 try
 	(
 	say "hello"
-	fsay stderr "complain 1"
+	trace "complain 1"
 	\x=(evaluate standard; parse stdin "")
 	say ["x = "(as_str x)]
 
-	fsay stderr "complain 2"
+	trace "complain 2"
 	say "bye"
 	)
 	"123"
@@ -93,7 +93,7 @@ try
 say "hello"
 \x=(evaluate standard; parse stdin "")
 say ["x = "(as_str x)]
-fsay stderr "complain"
+trace "complain"
 error "oops"
 \\
 \a=(+ 246 3)
@@ -104,7 +104,7 @@ error "oops"
 try
 ~
 say "BEG"
-fsay stderr "complain"
+trace "complain"
 say "END"
 ~
 )

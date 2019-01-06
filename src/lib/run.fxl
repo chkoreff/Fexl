@@ -1,8 +1,6 @@
 # Run a child function with the given input.  Collect the stdout as it runs,
 # and collect the stderr after it terminates.  Return the output, error, and
 # status.
-# LATER 20180326 Use select(2) to multiplex between stdout and stderr, instead
-# of collecting stderr only after the child terminates.
 \run_function=
 	(\child_fn\input
 	spawn child_fn \child_in\child_out\child_err

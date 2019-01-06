@@ -113,10 +113,108 @@ static int do_wait(pid_t pid)
 	return status;
 	}
 
-/* \result=(spawn fn_child fn_parent) Spawn the child function as a separate
-process.  Pass handles to the child's stdin, stdout, and stderr to the parent
-function and evaluate that.  Then wait for the child to finish, and pass the
-child's exit code to that.  Return the result.
+/* \result=(run_process fn_child fn_parent)
+
+Spawn the child function as a separate process.  Get handles to the child's
+stdin and stdout and evaluate:
+
+	(fn_parent child_in child_out)
+
+That returns a handler.  Then wait for the child to finish, and pass its exit
+code to the handler.  Evaluate that and return the result.
+
+Note that this is a simpler version of spawn.  This version allows the child's
+stderr to go to the same destination as the parent's stderr.
+*/
+value type_run_process(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	{
+	/* Flush the parent's stdout and stderr to prevent any pending output from
+	being accidentally pushed into the child's input.  I've noticed this can
+	happen when the script output is sent to a file or pipe instead of a
+	console.
+	*/
+	fflush(stdout);
+	fflush(stderr);
+
+	{
+	/* Create a series of pipes, each with a read and write side. */
+	int fd_in[2];
+	int fd_out[2];
+
+	do_pipe(fd_in);
+	do_pipe(fd_out);
+
+	{
+	pid_t pid = fork();
+	if (pid == -1) die("fork failed");
+
+	if (pid == 0)
+		{
+		/* This is the child process. */
+
+		/* Duplicate read side of input pipe to stdin. */
+		do_dup2(fd_in[0],0);
+		/* Duplicate write side of output pipe to stdout. */
+		do_dup2(fd_out[1],1);
+
+		/* Close unused file handles.  They're actually all unused because I
+		duplicated the ones I still need.  At a minimum, I must close the write
+		side of the input pipe, otherwise the child hangs waiting for stdin to
+		close. */
+
+		do_close(fd_in[0]);
+		do_close(fd_in[1]); /* Must do this one to avoid hang. */
+
+		do_close(fd_out[0]);
+		do_close(fd_out[1]);
+
+		/* Evaluate the child function. */
+		drop(eval(hold(f->L->R)));
+
+		/* Exit here to avoid continuing with evaluation.  This means that
+		memory leak detection does not occur for the child function.  If you
+		want that level of checking, you should exec with (argv 0) instead. */
+		exit(0);
+		return 0;
+		}
+	else
+		{
+		/* This is the parent process. */
+
+		/* Open write side of input pipe as child input. */
+		FILE *child_in = do_fdopen(fd_in[1],"w");
+		/* Open read side of output pipe as child output. */
+		FILE *child_out = do_fdopen(fd_out[0],"r");
+
+		/* Close unused file handles.  I don't close the ones I just opened
+		because they are still in play (i.e. fdopen does not dup). */
+
+		do_close(fd_in[0]);  /* Close the read side of the input pipe. */
+		do_close(fd_out[1]); /* Close the write side of the output pipe. */
+
+		{
+		value result = eval(A(A(hold(f->R),Qfile(child_in)),Qfile(child_out)));
+		int status = do_wait(pid);
+		result = eval(A(result,Qnum0(status)));
+		return result;
+		}
+		}
+	}
+	}
+	}
+	}
+
+/* \result=(spawn fn_child fn_parent)
+
+Spawn the child function as a separate process.  Get handles to the child's
+stdin, stdout, and stderr and evaluate:
+
+	(fn_parent child_in child_out child_err)
+
+That returns a handler.  Then wait for the child to finish, and pass its exit
+code to the handler.  Evaluate that and return the result.
 */
 value type_spawn(value f)
 	{

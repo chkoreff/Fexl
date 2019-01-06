@@ -16,3 +16,29 @@ try "nothing"
 try "value.c"
 
 \_=(remove "test/obj")
+
+(
+run_process
+	(
+	trace "ERR 0"
+	put "abcdefghijklmnop"
+	fflush stdout
+	sleep 1
+	put "qrstuvwxyz"
+	fflush stdout
+	trace "ERR 1"
+	trace "ERR 2"
+	)
+
+\child_in\child_out
+
+(@\loop
+\text=(fread child_out 4)
+eq text "" ();
+say ["read: "(as_str text)]
+loop
+)
+
+\status
+say ["status = "(as_str status)]
+)

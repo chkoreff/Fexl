@@ -1485,7 +1485,7 @@ void
 .
 ?color=red
 ?color=red&amp;shape=circle
-?color=blue&amp;key"%21%2a%27%28%29%3b%3a%40%26%3d%2b%24%2c%2f%3f%23%5b%5d%25"1=val"%21%2a%27%28%29%3b%3a%40%26%3d%2b%24%2c%2f%3f%23%5b%5d%25"1&amp;%3d=%3d
+?color=blue&amp;key%22%21%2a%27%28%29%3b%3a%40%26%3d%2b%24%2c%2f%3f%23%5b%5d%25%221=val%22%21%2a%27%28%29%3b%3a%40%26%3d%2b%24%2c%2f%3f%23%5b%5d%25%221&amp;%3d=%3d
 :abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
 :ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
 :abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz0123456789
@@ -2214,7 +2214,7 @@ exit 0
 inner: val 479 steps 29 bytes 8
 outer: val 479 steps 154 bytes 8
 == benchmark large list
-result: val 32768 steps 3441900 bytes 1373416
+result: val 32768 steps 3441900 bytes 1371400
 == benchmark negative memory usage
 result: val  steps 8 bytes -9
 exit 0

@@ -10,8 +10,8 @@ standard
 
 \try=
 	(\str
-	\raw=(map_hex_to_raw_bytes str)
-	\test=(map_raw_bytes_to_hex raw)
+	\raw=(pack str)
+	\test=(unpack raw)
 	say [str " " raw " " test]
 	)
 

@@ -150,6 +150,7 @@ static value standard(value name)
 	if (match("argv")) return Q(type_argv);
 	if (match("sleep")) return Q(type_sleep);
 	if (match("usleep")) return Q(type_usleep);
+	if (match("run_process")) return Q(type_run_process);
 	if (match("spawn")) return Q(type_spawn);
 	if (match("exec")) return Q(type_exec);
 	if (match("fexl_benchmark")) return Q(type_fexl_benchmark);
@@ -181,8 +182,8 @@ static value standard(value name)
 	if (match("limit_memory")) return Q(type_limit_memory);
 	if (match("limit_stack")) return Q(type_limit_stack);
 
-	if (match("map_raw_bytes_to_hex")) return Q(type_map_raw_bytes_to_hex);
-	if (match("map_hex_to_raw_bytes")) return Q(type_map_hex_to_raw_bytes);
+	if (match("unpack")) return Q(type_unpack);
+	if (match("pack")) return Q(type_pack);
 
 	if (match("random_bytes")) return Q(type_random_bytes);
 	if (match("random_nonce")) return Q(type_random_nonce);

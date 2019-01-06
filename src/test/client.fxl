@@ -13,8 +13,6 @@
 	fgetc fh
 	)
 
-\unpack=map_raw_bytes_to_hex
-
 \try=
 	(\ch
 	\ch2=(inc_ch ch)

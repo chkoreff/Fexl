@@ -1,7 +1,3 @@
-#
-\pack=map_hex_to_raw_bytes
-\unpack=map_raw_bytes_to_hex
-
 # (repeat_str str n) Repeat str n times.
 \repeat_str=
 	(\str\n

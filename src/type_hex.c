@@ -27,7 +27,7 @@ static unsigned char hex_to_nibble(unsigned char n)
 		return 0;
 	}
 
-static string map_raw_bytes_to_hex(string str_raw)
+static string unpack(string str_raw)
 	{
 	string str_hex = str_new(2 * str_raw->len);
 	int pos;
@@ -40,7 +40,7 @@ static string map_raw_bytes_to_hex(string str_raw)
 	return str_hex;
 	}
 
-static string map_hex_to_raw_bytes(string str_hex)
+static string pack(string str_hex)
 	{
 	string str_raw = str_new(str_hex->len / 2);
 	int pos;
@@ -54,13 +54,13 @@ static string map_hex_to_raw_bytes(string str_hex)
 	}
 
 /* Map raw bytes to their hexadecimal values. */
-value type_map_raw_bytes_to_hex(value f)
+value type_unpack(value f)
 	{
 	if (!f->L) return 0;
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
-		f = Qstr(map_raw_bytes_to_hex(get_str(x)));
+		f = Qstr(unpack(get_str(x)));
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -69,13 +69,13 @@ value type_map_raw_bytes_to_hex(value f)
 	}
 
 /* Map a string specified in hexadecimal into the raw bytes. */
-value type_map_hex_to_raw_bytes(value f)
+value type_pack(value f)
 	{
 	if (!f->L) return 0;
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
-		f = Qstr(map_hex_to_raw_bytes(get_str(x)));
+		f = Qstr(pack(get_str(x)));
 	else
 		f = hold(Qvoid);
 	drop(x);
