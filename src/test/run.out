@@ -2211,12 +2211,12 @@ grabbed 200000 bytes
 exit 0
 ==== test/b18.fxl
 == benchmark nested
-inner: val 479 steps 29 bytes 8
-outer: val 479 steps 154 bytes 8
+inner: val 479 steps 29 bytes 264
+outer: val 479 steps 154 bytes 712
 == benchmark large list
-result: val 32768 steps 3441900 bytes 1371400
+result: val 32768 steps 3441900 bytes 1574280
 == benchmark negative memory usage
-result: val  steps 8 bytes -9
+result: val  steps 8 bytes 55
 exit 0
 ==== test/b19.fxl
 {"7d13f23fa2b9a6fd" "1ba471e78e7bc03a"}

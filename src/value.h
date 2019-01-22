@@ -11,6 +11,7 @@ struct value
 
 extern value hold(value f);
 extern void drop(value f);
+extern void clear_free_list(void);
 extern void end_value(void);
 extern value V(type T, value L, value R);
 extern value Q(type T);

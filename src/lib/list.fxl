@@ -59,30 +59,99 @@
 	loop list
 	)
 
-# (g_sort lt eq gt unique xs) Generic sort routine.
-# This returns the ordered list of elements in xs.  Elements in the list are
-# compared with the lt, eq, and gt functions.  Duplicate elements are discarded
-# if unique is true.
-\g_sort=
-	(\lt\eq\gt\unique @\sort \xs
+# Shift the first item off a list.
+\shift=(\xs xs {void []} \x\xs {x xs})
+
+# NOTE: Only used by deprecated g_sort.
+\group_items_by_cmp=
+	(\lt\eq\gt @\loop\xs
 	xs [] \x\xs
 
 	\ltx=(filter (gt x) xs)
 	\eqx=(filter (eq x) xs)
 	\gtx=(filter (lt x) xs)
 
-	append (sort ltx);
-	cons x;
-	unique () (append eqx);
-	sort gtx
+	append (loop ltx);
+	cons [x;eqx];
+	loop gtx
+	)
+
+# Return the ordered list of items in xs.  Discard duplicates if opt_unique is
+# true.  Use the given comparison functions to compare items.
+# NOTE 20180119 This is deprecated.  For arbitrary objects, using a single
+# key extraction function is far simpler than using three comparison functions,
+# and even more efficient.  This also still uses quicksort which gives bad
+# performance for lists with large numbers of items already in ascending or
+# descending order.
+\g_sort=
+	(\lt\eq\gt \opt_unique\xs
+	opt_unique (map (\row shift row \x\_ x)) append_all;
+	group_items_by_cmp lt eq gt xs
+	)
+
+# (group_items extract xs)
+# Group a list of items xs into a list of groups.  Use extract to get the key
+# from an item for comparison purposes.  Each group is {key list}, where list
+# is the list of all items with that common key, in the same order as they
+# appear in the original list (i.e. the grouping is stable).  The groups are
+# listed in ascending order of key.
+\group_items=
+	(
+	# Merge two segments together.  A segment is a list of groups.
+	\merge_segments=
+		(@\loop\xs\ys
+		xs ys \x\xt
+		ys xs \y\yt
+
+		x \kx\lx
+		y \ky\ly
+
+		lt kx ky (\tail=(loop xt ys) cons x tail);
+		gt kx ky (\tail=(loop xs yt) cons y tail);
+
+		\tail=(loop xt yt)
+		\lx==(append lx ly)
+		cons {kx lx} tail
+		)
+
+	# Merge each adjoining pair of segments in a list of segments.
+	\merge_adjoining_segments=
+		(@\loop\xs
+		xs [] \x\ys
+		ys xs \y\zs
+		\z=(merge_segments x y)
+		\zs=(loop zs)
+		cons z zs
+		)
+
+	# Merge all the segments in a list into a single segment.
+	\merge_all_segments=
+		(@\loop\xs
+		xs [] \x\ys
+		ys x \_\_
+		\xs=(merge_adjoining_segments xs)
+		loop xs
+		)
+
+	\extract\xs
+	\segments=(map (\x \k=(extract x) [{k [x]}]) xs)
+	merge_all_segments segments
+	)
+
+# Sort a list of items with a key extraction function.  If opt_unique is true,
+# only keep the first item with a given key.  Otherwise keep all duplicates.
+\sort_items=
+	(\extract\opt_unique\xs
+	\groups=(group_items extract xs)
+	opt_unique
+		(map (\pair pair \_\list list void \x\_ x) groups)
+		(append_all; map (\pair pair \_\list list) groups)
 	)
 
 # The sort and unique functions operate on lists whose elements are all either
 # strings or numbers.
-\sort_normal=(g_sort lt eq gt)
-
-\unique=(sort_normal T)
-\sort=(sort_normal F)
+\sort=(sort_items I F)
+\unique=(sort_items I T)
 
 # Using function f and starting value z, run the function forward for each
 # element in the list.
@@ -150,9 +219,6 @@
 
 # Get the nth column of a table.
 \column=(\n\xs map (\row list_at row n) xs)
-
-# Shift the first item off a list.
-\shift=(\xs xs {void []} \x\xs {x xs})
 
 # Given a list of rows, return a function which maps the key at key_pos to the
 # value at val_pos.
@@ -312,9 +378,11 @@ define "map_good" map_good;
 define "filter" filter;
 define "reverse" reverse;
 define "append_all" append_all;
-define "g_sort" g_sort;
-define "unique" unique;
+define "group_items" group_items;
+define "sort_items" sort_items;
 define "sort" sort;
+define "unique" unique;
+define "g_sort" g_sort;
 define "fold" fold;
 define "first" first;
 define "skip" skip;

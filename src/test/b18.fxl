@@ -34,6 +34,8 @@ say ["result: val "val" steps "steps" bytes "bytes]
 )
 
 (
+# NOTE that it can't be negative any more because I call clear_free_list in
+# the benchmark routine.
 say "== benchmark negative memory usage"
 \v=var_new
 \x=""

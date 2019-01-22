@@ -78,7 +78,7 @@ void drop(value f)
 		}
 	}
 
-static void clear_free_list(void)
+void clear_free_list(void)
 	{
 	while (free_list)
 		free_memory(pop_free(),sizeof(struct value));

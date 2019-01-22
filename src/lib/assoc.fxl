@@ -72,14 +72,7 @@
 	)
 
 # (sort_pairs list) Sort the list of pairs by key.
-\sort_pairs=
-	(
-	g_sort
-		(\x\y x \kx\_ y \ky\_ lt kx ky)
-		(\x\y x \kx\_ y \ky\_ eq kx ky)
-		(\x\y x \kx\_ y \ky\_ gt kx ky)
-		F
-	)
+\sort_pairs=(sort_items (\p p \k\_ k) F)
 
 define "get_key" get_key;
 define "del_key" del_key;

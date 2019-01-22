@@ -115,16 +115,18 @@ static int do_wait(pid_t pid)
 
 /* \result=(run_process fn_child fn_parent)
 
-Spawn the child function as a separate process.  Get handles to the child's
+Run the fn_child function as a separate process.  Get handles to the child's
 stdin and stdout and evaluate:
 
 	(fn_parent child_in child_out)
 
-That returns a handler.  Then wait for the child to finish, and pass its exit
-code to the handler.  Evaluate that and return the result.
+That performs an interaction using the file handles, and returns a handler
+function.  Then wait for the child to finish, and pass its exit status to the
+handler.  Evaluate that and return the result.
 
 Note that this is a simpler version of spawn.  This version allows the child's
-stderr to go to the same destination as the parent's stderr.
+stderr to go to the same destination as the parent's stderr, which is typically
+what you want when implementing a server with an error log.
 */
 value type_run_process(value f)
 	{
@@ -208,13 +210,14 @@ value type_run_process(value f)
 
 /* \result=(spawn fn_child fn_parent)
 
-Spawn the child function as a separate process.  Get handles to the child's
+Run the fn_child function as a separate process.  Get handles to the child's
 stdin, stdout, and stderr and evaluate:
 
 	(fn_parent child_in child_out child_err)
 
-That returns a handler.  Then wait for the child to finish, and pass its exit
-code to the handler.  Evaluate that and return the result.
+That performs an interaction using the file handles, and returns a handler
+function.  Then wait for the child to finish, and pass its exit status to the
+handler.  Evaluate that and return the result.
 */
 value type_spawn(value f)
 	{
@@ -688,10 +691,11 @@ static value step_count(value f)
 
 /* (fexl_benchmark x next) Evaluate x and return (next val steps bytes), where
 val is the value of x, steps is the number of reduction steps, and bytes is the
-number of additional memory bytes used. */
+number of memory bytes used. */
 value type_fexl_benchmark(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
+	clear_free_list();
 	{
 	value (*save_step)(value) = step;
 	unsigned long save_num_steps = num_steps;
