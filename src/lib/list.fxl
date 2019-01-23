@@ -89,29 +89,26 @@
 	group_items_by_cmp lt eq gt xs
 	)
 
-# (group_items extract xs)
-# Group a list of items xs into a list of groups.  Use extract to get the key
-# from an item for comparison purposes.  Each group is {key list}, where list
-# is the list of all items with that common key, in the same order as they
-# appear in the original list (i.e. the grouping is stable).  The groups are
-# listed in ascending order of key.
-\group_items=
-	(
+# Sort the list of {key val} pairs xs.  Use the combine function to combine
+# values with the same key.
+\combine_keys=
+	(\combine\xs
+
 	# Merge two segments together.  A segment is a list of groups.
 	\merge_segments=
 		(@\loop\xs\ys
 		xs ys \x\xt
 		ys xs \y\yt
 
-		x \kx\lx
-		y \ky\ly
+		x \kx\vx
+		y \ky\vy
 
 		lt kx ky (\tail=(loop xt ys) cons x tail);
 		gt kx ky (\tail=(loop xs yt) cons y tail);
 
+		\vx=(combine vx vy)
 		\tail=(loop xt yt)
-		\lx==(append lx ly)
-		cons {kx lx} tail
+		cons {kx vx} tail
 		)
 
 	# Merge each adjoining pair of segments in a list of segments.
@@ -133,19 +130,37 @@
 		loop xs
 		)
 
-	\extract\xs
-	\segments=(map (\x \k=(extract x) [{k [x]}]) xs)
+	\segments=(map (\x [x]) xs)
 	merge_all_segments segments
+	)
+
+# Group a list of items xs into a list of groups.  Use extract to get the key
+# from an item for comparison purposes.  Each group is {key list}, where list
+# is the list of all items with that common key, in the same order as they
+# appear in the original list (i.e. the grouping is stable).  The groups are
+# listed in ascending order of key.
+\group_items=
+	(\extract\xs
+	\xs=(map (\x \k=(extract x) {k [x]}) xs)
+	combine_keys append xs
 	)
 
 # Sort a list of items with a key extraction function.  If opt_unique is true,
 # only keep the first item with a given key.  Otherwise keep all duplicates.
 \sort_items=
-	(\extract\opt_unique\xs
-	\groups=(group_items extract xs)
+	(
+	\get_values=(map (\p p \_\v v))
+	\extract\opt_unique\xs
 	opt_unique
-		(map (\pair pair \_\list list void \x\_ x) groups)
-		(append_all; map (\pair pair \_\list list) groups)
+		(
+		\xs=(map (\x \k=(extract x) {k x}) xs)
+		\xs=(combine_keys (\x\_ x) xs) # Keep the first.
+		get_values xs
+		)
+		(
+		\xs=(group_items extract xs)
+		append_all; get_values xs
+		)
 	)
 
 # The sort and unique functions operate on lists whose elements are all either
@@ -378,11 +393,13 @@ define "map_good" map_good;
 define "filter" filter;
 define "reverse" reverse;
 define "append_all" append_all;
+define "shift" shift;
+define "g_sort" g_sort;
+define "combine_keys" combine_keys;
 define "group_items" group_items;
 define "sort_items" sort_items;
 define "sort" sort;
 define "unique" unique;
-define "g_sort" g_sort;
 define "fold" fold;
 define "first" first;
 define "skip" skip;
@@ -393,7 +410,6 @@ define "range" range;
 define "list_at" list_at;
 define "list_combine" list_combine;
 define "column" column;
-define "shift" shift;
 define "match_column" match_column;
 define "stream_values" stream_values;
 define "get_list" get_list;

@@ -2224,6 +2224,8 @@ exit 0
 {"7d13f23fa2b9a6fd" "aaaaffff"}
 first = {"0000c12dede9cee5" "594e7168faab41af"}
 last  = {"fff3334732f995ec" "d7a35717e00068d1"}
+xs = ["A" "b" "c" "b" "a" "a" "a" "B" "c" "d" "C" "b" "a" "a"]
+ys = [{"a" ["A" "a" "a" "a" "a" "a"]} {"b" ["b" "b" "B" "b"]} {"c" ["c" "c" "C"]} {"d" ["d"]}]
 exit 0
 ==== test/chars.fxl
 ==

@@ -44,3 +44,11 @@ shift (reverse obj) \pair\_
 put "last  = "
 say_data pair
 )
+
+(
+# Test group items by lower-case.
+\xs=["A" "b" "c" "b" "a" "a" "a" "B" "c" "d" "C" "b" "a" "a"]
+say ["xs = "(as_str xs)]
+\ys=(group_items lc xs)
+say ["ys = "(as_str ys)]
+)
