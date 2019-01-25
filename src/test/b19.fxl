@@ -47,8 +47,22 @@ say_data pair
 
 (
 # Test group items by lower-case.
+say "= group_items"
 \xs=["A" "b" "c" "b" "a" "a" "a" "B" "c" "d" "C" "b" "a" "a"]
 say ["xs = "(as_str xs)]
 \ys=(group_items lc xs)
 say ["ys = "(as_str ys)]
+)
+
+(
+say "= merge_keys"
+# Test merge_keys.
+\xs=[{"a" 1} {"b" 2} {"d" 4} {"g" 7}]
+\ys=[{"a" -1} {"c" -3} {"d" -4} {"e" -5} {"f" -6}]
+merge_keys (\x\y {x y}) xs ys \L\M\R
+say ["xs = "(as_str xs)]
+say ["ys = "(as_str ys)]
+say ["L  = "(as_str L)]
+say ["M  = "(as_str M)]
+say ["R  = "(as_str R)]
 )

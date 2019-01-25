@@ -134,6 +134,36 @@
 	merge_all_segments segments
 	)
 
+# (merge_keys combine xs ys)
+# Merge the two sorted lists of {key val} pairs xs and ys.  Return {L M R},
+# which in set theory terms are defined roughly as:
+#
+#   L = (subtract xs ys)
+#   M = (intersect xs ys)
+#   R = (subtract ys xs)
+#
+# L is the list of pairs in xs whose key does not appear in ys.
+# R is the list of pairs in ys whose key does not appear in xs.
+#
+# M is the list of pairs {key val} whose key appears in both xs and ys.  In
+# this case the val is (combine vx vy), where vx is the x value and vy is the
+# y value.
+\merge_keys=
+	(\combine @\loop\xs\ys
+	xs {[] [] ys} \x\xt
+	ys {xs [] []} \y\yt
+
+	x \kx\vx
+	y \ky\vy
+
+	lt kx ky (loop xt ys \L\M\R {[x;L] M R});
+	gt kx ky (loop xs yt \L\M\R {L M [y;R]});
+
+	loop xt yt \L\M\R
+	\v=(combine vx vy)
+	{L [{kx v};M] R}
+	)
+
 # Group a list of items xs into a list of groups.  Use extract to get the key
 # from an item for comparison purposes.  Each group is {key list}, where list
 # is the list of all items with that common key, in the same order as they
@@ -145,12 +175,13 @@
 	combine_keys append xs
 	)
 
+# Get the list of values from a list of pairs.
+\get_values=(map (\p p \_\v v))
+
 # Sort a list of items with a key extraction function.  If opt_unique is true,
 # only keep the first item with a given key.  Otherwise keep all duplicates.
 \sort_items=
-	(
-	\get_values=(map (\p p \_\v v))
-	\extract\opt_unique\xs
+	(\extract\opt_unique\xs
 	opt_unique
 		(
 		\xs=(map (\x \k=(extract x) {k x}) xs)
@@ -386,6 +417,22 @@
 	buf_get buf
 	)
 
+# True if the string starts with the given prefix.
+\starts_with=
+    (\prefix\str
+    eq (length_common prefix str) (length prefix)
+    )
+
+# True if the string ends with the given suffix.
+\ends_with=
+	(\suffix\str
+	eq "" suffix T;
+	\start=(- (length str) (length suffix))
+	\pos=(search str suffix start)
+	is_void pos F;
+	eq pos start
+	)
+
 define "append" append;
 define "each" each;
 define "map" map;
@@ -396,7 +443,9 @@ define "append_all" append_all;
 define "shift" shift;
 define "g_sort" g_sort;
 define "combine_keys" combine_keys;
+define "merge_keys" merge_keys;
 define "group_items" group_items;
+define "get_values" get_values;
 define "sort_items" sort_items;
 define "sort" sort;
 define "unique" unique;
@@ -424,4 +473,6 @@ define "join_path" join_path;
 define "split" split;
 define "file_bytes" file_bytes;
 define "file_content" file_content;
+define "starts_with" starts_with;
+define "ends_with" ends_with;
 standard

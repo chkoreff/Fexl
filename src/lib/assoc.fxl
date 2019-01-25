@@ -74,6 +74,27 @@
 # (sort_pairs list) Sort the list of pairs by key.
 \sort_pairs=(sort_items (\p p \k\_ k) F)
 
+\put_default=
+	(\key\dval\list
+	\val=(get_key key list)
+	is_defined val list;
+	cons {key dval} list
+	)
+
+\name_columns=
+	(@\loop\keys\vals
+	keys [] \key\keys
+	vals [] \val\vals
+	\tail=(loop keys vals)
+	cons {key val} tail
+	)
+
+\make_assoc=
+	(\extract\xs
+	\xs=(map (\x \k=(extract x) {k x}) xs)
+	combine_keys (\x\_ x) xs # Keep the first.
+	)
+
 define "get_key" get_key;
 define "del_key" del_key;
 define "put_key" put_key;
@@ -82,4 +103,7 @@ define "update_key" update_key;
 define "add_key" add_key;
 define "update_values" update_values;
 define "sort_pairs" sort_pairs;
+define "put_default" put_default;
+define "name_columns" name_columns;
+define "make_assoc" make_assoc;
 standard
