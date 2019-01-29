@@ -27,3 +27,4 @@ extern value type_dir_names(value f);
 extern value type_mod_time(value f);
 extern value type_file_size(value f);
 extern value type_symlink(value f);
+extern value type_rename(value f);

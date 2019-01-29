@@ -552,3 +552,21 @@ value type_symlink(value f)
 	return f;
 	}
 	}
+
+/* (rename source target) Rename source path as target path.  Return the
+numeric value of calling rename(2). */
+value type_rename(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	{
+	value x = arg(f->L->R);
+	value y = arg(f->R);
+	if (x->T == type_str && y->T == type_str)
+		f = Qnum0(rename(str_data(x),str_data(y)));
+	else
+		f = hold(Qvoid);
+	drop(x);
+	drop(y);
+	return f;
+	}
+	}

@@ -433,6 +433,26 @@
 	eq pos start
 	)
 
+# (map_bytes_to_double bytes)
+# Map the series of byte values (numbers in the range 0 to 255) into a double-
+# precision floating point value.
+#
+# Test vectors:
+# [0 0 0 0 0 0 0]               => 0
+# [255 255 255 255 255 255 63]  => 0.25
+# [255 255 255 255 255 255 127] => 0.5
+# [255 255 255 255 255 255 191] => 0.75
+# [255 255 255 255 255 255 255] => 1
+\map_bytes_to_double=(fold (\x\b / (+ x b) 256) 0)
+
+# Get a random double-precision floating point value in the range 0 to 1
+# inclusive.
+\random_double==
+	(
+	\bytes=(map ord; str_bytes; random_bytes 7)
+	map_bytes_to_double bytes
+	)
+
 define "append" append;
 define "each" each;
 define "map" map;
@@ -475,4 +495,6 @@ define "file_bytes" file_bytes;
 define "file_content" file_content;
 define "starts_with" starts_with;
 define "ends_with" ends_with;
+define "map_bytes_to_double" map_bytes_to_double;
+define "random_double" random_double;
 standard

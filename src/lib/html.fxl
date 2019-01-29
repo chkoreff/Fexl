@@ -107,6 +107,7 @@
 		eq ch "[" T;
 		eq ch "]" T;
 		eq ch "%" T;
+		eq ch "\" T; # Need this otherwise browser treats same as slash.
 		eq ch QU T; # Need this for quotes in path names.
 		eq ch NL T;
 		F

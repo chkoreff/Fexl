@@ -6,8 +6,6 @@ standard
 ) \;
 
 # (fib n) returns the nth Fibonacci number starting at 0.
-# LATER You could handle fib for negative n too:
-# (fib n) = (+ (fib; + n 2) (fib; + n 1))  # if n < 0
 \fib=
 	(
 	(@\loop\x\y\n

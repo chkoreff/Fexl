@@ -142,6 +142,7 @@ static value standard(value name)
 	if (match("mod_time")) return Q(type_mod_time);
 	if (match("file_size")) return Q(type_file_size);
 	if (match("symlink")) return Q(type_symlink);
+	if (match("rename")) return Q(type_rename);
 
 	if (match("time")) return Q(type_time);
 	if (match("localtime")) return Q(type_localtime);
