@@ -8,6 +8,8 @@
 	ch
 	)
 
+# LATER 20181230 Accelerate the quote_str function in C.
+
 # Quote a string for embedding in HTML.
 \quote_str=(str_map quote_ch)
 
@@ -86,6 +88,9 @@
 # https://en.wikipedia.org/wiki/Percent-encoding
 \uri_escape=
 	(str_map \ch
+
+	eq ch " " "+"; # Special rule for space
+
 	\is_reserved=
 		(
 		eq ch "!" T;
@@ -110,6 +115,7 @@
 		eq ch "\" T; # Need this otherwise browser treats same as slash.
 		eq ch QU T; # Need this for quotes in path names.
 		eq ch NL T;
+		eq ch CR T;
 		F
 		)
 

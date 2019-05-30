@@ -1512,6 +1512,30 @@ byte 1
 byte 2
 byte 3
 byte 4
+= uri_escape
+\x=""
+\y=""
+GOOD
+
+\x="abc"
+\y="abc"
+GOOD
+
+\x=~1 Hello (world) [\x="@"]!~1
+\y="Hello+%28world%29+%5b%5cx%3d%22%40%22%5d%21"
+GOOD
+
+\x="
+"
+\y="%0a"
+GOOD
+
+\x=~1 abc_  !*' ();:@&=+$,/?#[]%\"
+
+  _def~1
+\y="abc_++%21%2a%27+%28%29%3b%3a%40%26%3d%2b%24%2c%2f%3f%23%5b%5d%25%5c%22%0d%0a%0a++_def"
+GOOD
+
 exit 0
 ==== test/b12.fxl
 == test_csv

@@ -261,3 +261,62 @@ each (str_bytes str)
 	say ["byte "n]
 	)
 )
+(
+say "= uri_escape"
+\try=
+	(\x
+	\x=(to_str x)
+	\y=(uri_escape x)
+	\z=(uri_unescape y)
+
+	say ["\x="(as_str x)]
+	say ["\y="(as_str y)]
+	say (eq z x "GOOD" "BAD")
+	nl
+	)
+
+try ""
+try "abc"
+try ~ Hello (world) [\x="@"]!~
+try NL
+try
+[
+"a"
+"b"
+"c"
+"_"
+" "
+" "
+"!"
+"*"
+"'"
+" "
+"("
+")"
+";"
+":"
+"@"
+"&"
+"="
+"+"
+"$"
+","
+"/"
+"?"
+"#"
+"["
+"]"
+"%"
+"\"
+QU
+CR
+NL
+LF
+" "
+" "
+"_"
+"d"
+"e"
+"f"
+]
+)
