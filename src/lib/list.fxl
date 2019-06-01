@@ -9,6 +9,14 @@
 	xs
 	)
 
+# Flatten a nested list into a list of scalars.
+\flatten=
+	(@\flatten\xs
+	xs [] \x\xs
+	is_list x (append (flatten x)) (cons x);
+	flatten xs
+	)
+
 # Do f for each item in list xs.
 \each=
 	(\xs\f
@@ -419,9 +427,9 @@
 
 # True if the string starts with the given prefix.
 \starts_with=
-    (\prefix\str
-    eq (length_common prefix str) (length prefix)
-    )
+	(\prefix\str
+	eq (length_common prefix str) (length prefix)
+	)
 
 # True if the string ends with the given suffix.
 \ends_with=
@@ -454,6 +462,7 @@
 	)
 
 define "append" append;
+define "flatten" flatten;
 define "each" each;
 define "map" map;
 define "map_good" map_good;

@@ -1,4 +1,5 @@
 #include <num.h>
+#include <stdint.h>
 #include <str.h>
 
 #include <convert.h>

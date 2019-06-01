@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include <format.h>
 #include <stdio.h> /* snprintf */
 
@@ -10,6 +12,12 @@ const char *format_long(long x)
 	}
 
 const char *format_ulong(unsigned long x)
+	{
+	snprintf(buf, sizeof(buf), "%lu", x);
+	return buf;
+	}
+
+const char *format_uint64_t(uint64_t x)
 	{
 	snprintf(buf, sizeof(buf), "%lu", x);
 	return buf;

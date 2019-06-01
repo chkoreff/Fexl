@@ -44,7 +44,7 @@ make()
 	stale $file_o $file_c || return 0
 	mkdir -p `dirname $file_o`
 
-	# I eliminated -pedantic to support the long long values in crypto.c.
+	# I avoid -pedantic because I have two machines that don't recognize it.
 	local options="-Wall -Werror -Wunused-parameter -O3"
 
 	if [ $DEV -eq 1 ]; then

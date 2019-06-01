@@ -1,4 +1,3 @@
-extern void close_random(void);
 extern value type_random_bytes(value f);
 extern value type_random_nonce(value f);
 extern value type_random_secret_key(value f);
@@ -9,4 +8,4 @@ extern value type_crypto_box_open(value f);
 extern value type_crypto_sign_public(value f);
 extern value type_crypto_sign_seal(value f);
 extern value type_crypto_sign_open(value f);
-extern value type_crypto_hash(value f);
+extern value type_sha512(value f);

@@ -1,8 +1,11 @@
 #include <num.h>
+#include <stdint.h>
 #include <str.h>
 #include <value.h>
 
+#include <format.h>
 #include <standard.h>
+#include <sys/time.h>
 #include <time.h>
 #include <type_num.h>
 #include <type_str.h>
@@ -37,4 +40,19 @@ value type_localtime(value f)
 	drop(x);
 	return f;
 	}
+	}
+
+static string microtime(void)
+	{
+	uint64_t nonce;
+	struct timeval sys_time;
+	gettimeofday(&sys_time,0);
+	nonce = ((uint64_t)sys_time.tv_sec * 1000000) + sys_time.tv_usec;
+	return str_new_data0(format_uint64_t(nonce));
+	}
+
+value type_microtime(value f)
+	{
+	(void)f;
+	return Qstr(microtime());
 	}

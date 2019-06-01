@@ -3,6 +3,7 @@
 #include <value.h>
 
 #include <basic.h>
+#include <crypto.h>
 #include <standard.h>
 #include <stdio.h>
 #include <string.h> /* strcmp */
@@ -146,6 +147,7 @@ static value standard(value name)
 
 	if (match("time")) return Q(type_time);
 	if (match("localtime")) return Q(type_localtime);
+	if (match("microtime")) return Q(type_microtime);
 
 	if (match("die")) return Q(type_die);
 	if (match("argv")) return Q(type_argv);
@@ -196,7 +198,8 @@ static value standard(value name)
 	if (match("crypto_sign_public")) return Q(type_crypto_sign_public);
 	if (match("crypto_sign_seal")) return Q(type_crypto_sign_seal);
 	if (match("crypto_sign_open")) return Q(type_crypto_sign_open);
-	if (match("crypto_hash")) return Q(type_crypto_hash);
+	if (match("crypto_hash")) return Q(type_sha512);
+	if (match("sha512")) return Q(type_sha512);
 
 	if (match("set_alarm")) return Q(type_set_alarm);
 	if (match("start_server")) return Q(type_start_server);

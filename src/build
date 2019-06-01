@@ -15,6 +15,7 @@ make format
 make input
 make limit
 make memory
+make nacl
 make num
 make parse
 make report

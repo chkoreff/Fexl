@@ -30,7 +30,7 @@ static unsigned char hex_to_nibble(unsigned char n)
 static string unpack(string str_raw)
 	{
 	string str_hex = str_new(2 * str_raw->len);
-	int pos;
+	unsigned int pos;
 	for (pos = 0; pos < str_raw->len; pos++)
 		{
 		unsigned char ch = str_raw->data[pos];
@@ -43,7 +43,7 @@ static string unpack(string str_raw)
 static string pack(string str_hex)
 	{
 	string str_raw = str_new(str_hex->len / 2);
-	int pos;
+	unsigned int pos;
 	for (pos = 0; pos < str_raw->len; pos++)
 		{
 		unsigned char hi = hex_to_nibble(str_hex->data[2*pos]);

@@ -39,21 +39,78 @@ const char *str_data(value x)
 	return get_str(x)->data;
 	}
 
-/* (. x y) is the concatenation of strings x and y. */
-value type_concat(value f)
+value op_str(value f, string op(string))
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_str)
+		{
+		string result = op(get_str(x));
+		if (result)
+			f = Qstr(result);
+		else
+			f = hold(Qvoid);
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
+	}
+
+value op_str2(value f, string op(string,string))
 	{
 	if (!f->L || !f->L->L) return 0;
 	{
 	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_str)
-		f = Qstr(str_concat(get_str(x),get_str(y)));
+		{
+		string result = op(get_str(x),get_str(y));
+		if (result)
+			f = Qstr(result);
+		else
+			f = hold(Qvoid);
+		}
 	else
 		f = hold(Qvoid);
 	drop(x);
 	drop(y);
 	return f;
 	}
+	}
+
+value op_str3(value f, string op(string,string,string))
+	{
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	{
+	value x = arg(f->L->L->R);
+	value y = arg(f->L->R);
+	value z = arg(f->R);
+
+	if (x->T == type_str && y->T == type_str && z->T == type_str)
+		{
+		string result = op(get_str(x),get_str(y),get_str(z));
+		if (result)
+			f = Qstr(result);
+		else
+			f = hold(Qvoid);
+		}
+	else
+		f = hold(Qvoid);
+
+	drop(x);
+	drop(y);
+	drop(z);
+	return f;
+	}
+	}
+
+/* (. x y) is the concatenation of strings x and y. */
+value type_concat(value f)
+	{
+	return op_str2(f,str_concat);
 	}
 
 /* (length x) is the length of string x */
@@ -227,22 +284,8 @@ value type_char_width(value f)
 	}
 	}
 
-static value op_str_str(value f, string op(string))
-	{
-	if (!f->L) return 0;
-	{
-	value x = arg(f->R);
-	if (x->T == type_str)
-		f = Qstr(op(get_str(x)));
-	else
-		f = hold(Qvoid);
-	drop(x);
-	return f;
-	}
-	}
-
-value type_dirname(value f) { return op_str_str(f,dirname); }
-value type_basename(value f) { return op_str_str(f,basename); }
+value type_dirname(value f) { return op_str(f,dirname); }
+value type_basename(value f) { return op_str(f,basename); }
 
 /* (length_common x y) Return the number of initial bytes which x and y have in
 common. */
