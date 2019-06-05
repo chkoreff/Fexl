@@ -1,3 +1,8 @@
+/* Reference https://nacl.cr.yp.to/ */
+/* Reference https://tweetnacl.cr.yp.to/software.html */
+
+#include <stdint.h>
+
 #include <str.h>
 #include <types.h>
 
@@ -5,10 +10,21 @@
 #include <die.h>
 #include <memory.h>
 #include <nacl.h>
+#include <sha256.h>
+#include <sha512.h>
 #include <stdio.h> /* fopen */
 #include <string.h> /* memcpy memset */
 
 static FILE *fh_random;
+
+void close_random(void)
+	{
+	if (fh_random)
+		{
+		fclose(fh_random);
+		fh_random = 0;
+		}
+	}
 
 static void read_random_bytes(u8 *result, unsigned long num_bytes)
 	{
@@ -26,17 +42,8 @@ static void read_random_bytes(u8 *result, unsigned long num_bytes)
 	}
 	}
 
-void close_random(void)
-	{
-	if (fh_random)
-		{
-		fclose(fh_random);
-		fh_random = 0;
-		}
-	}
-
 /* Return a string of n random bytes. */
-string random_bytes(unsigned long num_bytes)
+string str_random_bytes(unsigned long num_bytes)
 	{
 	string str = str_new(num_bytes);
 	read_random_bytes((u8 *)str->data,num_bytes);
@@ -44,15 +51,15 @@ string random_bytes(unsigned long num_bytes)
 	}
 
 /* Return a string of 24 random bytes. */
-string random_nonce(void)
+string str_random_nonce(void)
 	{
-	return random_bytes(24);
+	return str_random_bytes(24);
 	}
 
 /* Return a string of 32 random bytes. */
-string random_secret_key(void)
+string str_random_secret_key(void)
 	{
-	return random_bytes(32);
+	return str_random_bytes(32);
 	}
 
 static string op_public(void op(u8 *pk, const u8 *sk), string secret_key)
@@ -69,19 +76,17 @@ static string op_public(void op(u8 *pk, const u8 *sk), string secret_key)
 	}
 
 /* Map the 32-byte secret_key to the corresponding 32-byte public box key.  */
-string crypto_box_public(string secret_key)
-	{
-	return op_public(nacl_box_public,secret_key);
-	}
+string str_nacl_box_public(string secret_key)
+	{ return op_public(nacl_box_public,secret_key); }
 
 /*
 Combine the 32-byte public and secret key into a 32-byte composite key which is
-used with crypto_box_seal and crypto_box_open.
+used with str_nacl_box_seal and str_nacl_box_open.
 
 When sending, use the recipient's public key and the sender's secret key.
 When receiving, use the sender's public key and the recipient's secret key.
 */
-string crypto_box_prepare(string public_key, string secret_key)
+string str_nacl_box_prepare(string public_key, string secret_key)
 	{
 	if (public_key->len != 32) return 0;
 	if (secret_key->len != 32) return 0;
@@ -122,7 +127,7 @@ static string op_box_pad
 	code = op(
 		(u8 *)buf_result,
 		(const u8 *)buf_text,
-		(u64)buf_len,
+		buf_len,
 		(const u8 *)nonce->data,
 		(const u8 *)key->data
 		);
@@ -141,22 +146,20 @@ static string op_box_pad
 	}
 
 /* Encrypt the plain text. */
-string crypto_box_seal(string text, string nonce, string key)
+string str_nacl_box_seal(string text, string nonce, string key)
 	{ return op_box_pad(nacl_box_seal,32,16,text,nonce,key); }
 
 /* Decrypt the crypt text. */
-string crypto_box_open(string crypt_text, string nonce, string key)
+string str_nacl_box_open(string crypt_text, string nonce, string key)
 	{ return op_box_pad(nacl_box_open,16,32,crypt_text,nonce,key); }
 
 /* Map the 32-byte secret_key to the corresponding 32-byte public sign key. */
-string crypto_sign_public(string secret_key)
-	{
-	return op_public(nacl_sign_public,secret_key);
-	}
+string str_nacl_sign_public(string secret_key)
+	{ return op_public(nacl_sign_public,secret_key); }
 
 /* Return the 64-byte signature of the text using the 32-byte public_key and
 32-byte secret_key. */
-string crypto_sign_seal(string text, string public_key, string secret_key)
+string str_nacl_sign_seal(string text, string public_key, string secret_key)
 	{
 	string result;
 	if (public_key->len == 32 && secret_key->len == 32)
@@ -166,8 +169,7 @@ string crypto_sign_seal(string text, string public_key, string secret_key)
 		nacl_sign_seal
 			(
 			(u8 *)sm,
-			(const u8 *)text->data,
-			(u64)text->len,
+			(const u8 *)text->data, text->len,
 			(const u8 *)public_key->data,
 			(const u8 *)secret_key->data
 			);
@@ -175,14 +177,12 @@ string crypto_sign_seal(string text, string public_key, string secret_key)
 		free_memory(sm,n);
 		}
 	else
-		{
 		result = 0;
-		}
 	return result;
 	}
 
 /* Validate the signature on the text and return 1 if valid or 0 if invalid. */
-int crypto_sign_open(string text, string public_key, string signature)
+int str_nacl_sign_open(string text, string public_key, string signature)
 	{
 	int ok;
 	if (public_key->len == 32 && signature->len == 64)
@@ -195,28 +195,68 @@ int crypto_sign_open(string text, string public_key, string signature)
 		memcpy(sm,signature->data,64);
 		memcpy(sm+64,text->data,text->len);
 
-		code = nacl_sign_open
-			(
-			(u8 *)m,
-			(const u8 *)sm,
-			(u64)n,
-			(const u8 *)public_key->data
-			);
+		code = nacl_sign_open((u8 *)m, (const u8 *)sm, n,
+			(const u8 *)public_key->data);
 		free_memory(sm,n);
 		free_memory(m,n);
 		ok = (code == 0);
 		}
 	else
-		{
 		ok = 0;
-		}
 	return ok;
 	}
 
+/* Return the 32 byte SHA-256 hash of the text. */
+string str_sha256(string text)
+	{
+	string hash = str_new(32);
+	sha256((u8 *)hash->data, (const u8 *)text->data, text->len);
+	return hash;
+	}
+
 /* Return the 64 byte SHA-512 hash of the text. */
-string sha512(string text)
+string str_sha512(string text)
 	{
 	string hash = str_new(64);
-	nacl_hash((u8 *)hash->data, (const u8 *)text->data, (u64)text->len);
+	sha512((u8 *)hash->data, (const u8 *)text->data, text->len);
 	return hash;
+	}
+
+/* Compute the HMAC-SHA512 value of the text using the key.  Note that if the
+key is longer than 128 bytes, only the first 128 bytes of the key are used.  If
+you want to use a key longer than 128 bytes, you should hash it first.
+*/
+string str_hmac_sha512(string text, string key)
+	{
+	string mac = str_new(64);
+
+	unsigned int len_ipad = 128 + text->len;
+	unsigned char *buf_ipad = new_memory(len_ipad);
+	unsigned char buf_opad[128+64];
+
+	unsigned int key_len = key->len;
+
+	unsigned int i;
+	unsigned int fill;
+
+	if (key_len > 128)
+		key_len = 128;
+
+	fill = 128 - key_len;
+
+	for (i = 0; i < key_len; i++)
+		{
+		buf_ipad[i] = key->data[i] ^ 0x36;
+		buf_opad[i] = key->data[i] ^ 0x5c;
+		}
+
+	memset(buf_ipad + key_len, 0x36, fill);
+	memset(buf_opad + key_len, 0x5c, fill);
+
+	memcpy(buf_ipad+128, text->data, text->len);
+	sha512(buf_opad+128, buf_ipad, len_ipad);
+	sha512((u8 *)mac->data, buf_opad, 128+64);
+
+	free_memory(buf_ipad,len_ipad);
+	return mac;
 	}

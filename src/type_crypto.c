@@ -15,7 +15,7 @@ value type_random_bytes(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
-		f = Qstr(random_bytes(get_ulong(x)));
+		f = Qstr(str_random_bytes(get_ulong(x)));
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -26,34 +26,34 @@ value type_random_bytes(value f)
 value type_random_nonce(value f)
 	{
 	(void)f;
-	return Qstr(random_nonce());
+	return Qstr(str_random_nonce());
 	}
 
 value type_random_secret_key(value f)
 	{
 	(void)f;
-	return Qstr(random_secret_key());
+	return Qstr(str_random_secret_key());
 	}
 
-value type_crypto_box_public(value f)
-	{ return op_str(f,crypto_box_public); }
+value type_nacl_box_public(value f)
+	{ return op_str(f,str_nacl_box_public); }
 
-value type_crypto_box_prepare(value f)
-	{ return op_str2(f,crypto_box_prepare); }
+value type_nacl_box_prepare(value f)
+	{ return op_str2(f,str_nacl_box_prepare); }
 
-value type_crypto_box_seal(value f)
-	{ return op_str3(f,crypto_box_seal); }
+value type_nacl_box_seal(value f)
+	{ return op_str3(f,str_nacl_box_seal); }
 
-value type_crypto_box_open(value f)
-	{ return op_str3(f,crypto_box_open); }
+value type_nacl_box_open(value f)
+	{ return op_str3(f,str_nacl_box_open); }
 
-value type_crypto_sign_public(value f)
-	{ return op_str(f,crypto_sign_public); }
+value type_nacl_sign_public(value f)
+	{ return op_str(f,str_nacl_sign_public); }
 
-value type_crypto_sign_seal(value f)
-	{ return op_str3(f,crypto_sign_seal); }
+value type_nacl_sign_seal(value f)
+	{ return op_str3(f,str_nacl_sign_seal); }
 
-value type_crypto_sign_open(value f)
+value type_nacl_sign_open(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 	{
@@ -65,7 +65,7 @@ value type_crypto_sign_open(value f)
 		string text = get_str(x);
 		string public_key = get_str(y);
 		string signature = get_str(z);
-		f = boolean(crypto_sign_open(text,public_key,signature));
+		f = boolean(str_nacl_sign_open(text,public_key,signature));
 		}
 	else
 		f = hold(Qvoid);
@@ -76,4 +76,6 @@ value type_crypto_sign_open(value f)
 	}
 	}
 
-value type_sha512(value f) { return op_str(f,sha512); }
+value type_sha256(value f) { return op_str(f,str_sha256); }
+value type_sha512(value f) { return op_str(f,str_sha512); }
+value type_hmac_sha512(value f) { return op_str2(f,str_hmac_sha512); }

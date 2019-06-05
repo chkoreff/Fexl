@@ -1,37 +1,25 @@
-# (repeat_str str n) Repeat str n times.
-\repeat_str=
-	(\str\n
-	\buf=buf_new
-	(@\loop\n
-	le n 0 ();
-	buf_put buf str
-	\n=(- n 1)
-	loop n
-	) n
-	buf_get buf
-	)
+#
+evaluate
+(
+use_lib "format.fxl";
+use "test.fxl";
+standard
+) \;
 
-\show_hex=
-	(\bytes
-	\bytes=bytes
-	is_void bytes (say "void");
-	say [(length bytes)":["(unpack bytes)"]"]
-	)
-
-\try_crypto_box_public=
+\try_nacl_box_public=
 	(\secret_key
-	\public_key=(crypto_box_public secret_key)
-	say "crypto_box_public"
+	\public_key=(nacl_box_public secret_key)
+	say "nacl_box_public"
 	put "secret_key = " show_hex secret_key
 	put "public_key = " show_hex public_key
 	nl
 	public_key
 	)
 
-\try_crypto_box_prepare=
+\try_nacl_box_prepare=
 	(\public_key\secret_key
-	\key=(crypto_box_prepare public_key secret_key)
-	say "crypto_box_prepare"
+	\key=(nacl_box_prepare public_key secret_key)
+	say "nacl_box_prepare"
 	put "public_key = " show_hex public_key
 	put "secret_key = " show_hex secret_key
 	put "key        = " show_hex key
@@ -39,13 +27,13 @@
 	key
 	)
 
-\try_crypto_box_seal=
+\try_nacl_box_seal=
 	(\plain_text\nonce\public_key\secret_key
 
-	\key=(try_crypto_box_prepare public_key secret_key)
-	\crypt_text=(crypto_box_seal plain_text nonce key)
+	\key=(try_nacl_box_prepare public_key secret_key)
+	\crypt_text=(nacl_box_seal plain_text nonce key)
 
-	say "crypto_box_seal"
+	say "nacl_box_seal"
 	put "plain_text = " show_hex plain_text
 	put "nonce      = " show_hex nonce
 	put "key        = " show_hex key
@@ -54,13 +42,13 @@
 	crypt_text
 	)
 
-\try_crypto_box_open=
+\try_nacl_box_open=
 	(\crypt_text\nonce\public_key\secret_key
 
-	\key=(try_crypto_box_prepare public_key secret_key)
-	\plain_text=(crypto_box_open crypt_text nonce key)
+	\key=(try_nacl_box_prepare public_key secret_key)
+	\plain_text=(nacl_box_open crypt_text nonce key)
 
-	say "crypto_box_open"
+	say "nacl_box_open"
 	put "crypt_text = " show_hex crypt_text
 	put "nonce      = " show_hex nonce
 	put "key        = " show_hex key
@@ -69,21 +57,21 @@
 	plain_text
 	)
 
-\try_crypto_sign_public=
+\try_nacl_sign_public=
 	(
 	\secret_key
-	\public_key=(crypto_sign_public secret_key)
-	say "crypto_sign_public"
+	\public_key=(nacl_sign_public secret_key)
+	say "nacl_sign_public"
 	put "secret_key = " show_hex secret_key
 	put "public_key = " show_hex public_key
 	nl
 	public_key
 	)
 
-\try_crypto_sign_seal=
+\try_nacl_sign_seal=
 	(\text\public_key\secret_key
-	\signature=(crypto_sign_seal text public_key secret_key)
-	say "crypto_sign_seal"
+	\signature=(nacl_sign_seal text public_key secret_key)
+	say "nacl_sign_seal"
 	put "text       = " show_hex text
 	put "public_key = " show_hex public_key
 	put "secret_key = " show_hex secret_key
@@ -92,10 +80,10 @@
 	signature
 	)
 
-\try_crypto_sign_open=
+\try_nacl_sign_open=
 	(\text\public_key\signature
-	\valid=(crypto_sign_open text public_key signature)
-	say "crypto_sign_open"
+	\valid=(nacl_sign_open text public_key signature)
+	say "nacl_sign_open"
 	put "text       = " show_hex text
 	put "public_key = " show_hex public_key
 	put "signature  = " show_hex signature
@@ -114,14 +102,14 @@ show_hex random_secret_key
 
 \test_box==
 (
-say "[ test_box"
+run_test "test_box";
 \secret_key_1=(pack
 "236162636465666768696a6b6c6d6e6f707172737475767778797a0a23616263")
-\public_key_1=(try_crypto_box_public secret_key_1)
+\public_key_1=(try_nacl_box_public secret_key_1)
 
 \secret_key_2=(pack
 "d236189ec7c5afdd8a6b0ea9d2ff65cf444a30f5ccfc058c3e735c9877236798")
-\public_key_2=(try_crypto_box_public secret_key_2)
+\public_key_2=(try_nacl_box_public secret_key_2)
 
 \nonce_1=(pack "6465666768696a6b6c6d6e6f707172737475767778797a0a")
 \nonce_2=(pack "8356ad3e116d685dd4b6a321fcf1ab80acd4720e855f2b17")
@@ -134,9 +122,9 @@ say "[ test_box"
 	\public_key_B\secret_key_B
 
 	\crypt_text=
-		(try_crypto_box_seal plain_text nonce public_key_B secret_key_A)
+		(try_nacl_box_seal plain_text nonce public_key_B secret_key_A)
 	\new_plain_text=
-		(try_crypto_box_open crypt_text nonce public_key_A secret_key_B)
+		(try_nacl_box_open crypt_text nonce public_key_A secret_key_B)
 	if (and (is_defined new_plain_text) (ne new_plain_text plain_text))
 		(say "ERROR: Round trip failed!")
 	)
@@ -175,7 +163,7 @@ say "= Test zero key and nonce."
 	\secret_key=(pack
 	"0000000000000000000000000000000000000000000000000000000000000000")
 
-	\public_key=(try_crypto_box_public secret_key)
+	\public_key=(try_nacl_box_public secret_key)
 
 	\nonce=(pack "000000000000000000000000000000000000000000000000")
 
@@ -197,7 +185,7 @@ say "= Test erroneous input."
 	\secret_key=(pack secret_key)
 	\nonce=(pack nonce)
 
-	\public_key=(try_crypto_box_public secret_key)
+	\public_key=(try_nacl_box_public secret_key)
 
 	test_send plain_text nonce
 	public_key secret_key
@@ -220,7 +208,7 @@ say "= Test making signing keys."
 \try=
 	(\secret_key
 	\secret_key=(pack secret_key)
-	\public_key=(try_crypto_sign_public secret_key)
+	\public_key=(try_nacl_sign_public secret_key)
 	)
 try "236162636465666768696a6b6c6d6e6f707172737475767778797a0a23205e20"
 try "0000000000000000000000000000000000000000000000000000000000000000"
@@ -229,7 +217,7 @@ try "a0b2"
 )
 
 (
-say "= Test specific cases of crypto_box_open."
+say "= Test specific cases of nacl_box_open."
 \try=
 	(\crypt_text\nonce\public_key\secret_key
 
@@ -238,7 +226,7 @@ say "= Test specific cases of crypto_box_open."
 	\public_key=(pack public_key)
 	\secret_key=(pack secret_key)
 
-	\plain_text=(try_crypto_box_open crypt_text nonce public_key secret_key)
+	\plain_text=(try_nacl_box_open crypt_text nonce public_key secret_key)
 	)
 try
 "b9d3961d2b57f14e1d235a5065fd5e102021f6d6ef40f45341a60bff5cebaf4b31e53962aa0b"
@@ -253,73 +241,80 @@ try
 "d07a6e764d2e78523e849b35f348458e4c3445676b705ee9c3d5dc56d6401636"
 "236162636465666768696a6b6c6d6e6f707172737475767778797a0a23616263"
 )
-say "]"
 )
 
-\test_hash==
-(
-say "[ test_hash"
-# Try SHA-512 hash.
-# Reference: https://www.di-mgt.com.au/sha_testvectors.html
-(
-\try=
-	(\text
-	\hash=(crypto_hash text)
-	say "crypto_hash"
-	put "text = " show_hex text
+\try_hash=
+	(\which\fn_hash\show_text\text
+	\hash=(fn_hash text)
+	say which
+	put "text = " show_text
 	put "hash = " show_hex hash
 	nl
 	)
 
-try "abc"
+\million_a=(repeat_str "a" 1000000)
+
+\test_sha512==
+(
+run_test "test_sha512";
+# Try SHA-512 hash.
+# Reference: https://www.di-mgt.com.au/sha_testvectors.html
+\try_hash=(try_hash "sha512" sha512)
+\try=(\text try_hash (show_hex text) text)
+\try_label=(\label\text try_hash (say label) text)
+
 try ""
+try "a"
+try "abc"
+
+# Largest string that fits in a single 1024-bit chunk.
+try_label "(111 'a')" (repeat_str "a" 111)
+# One past that.
+try_label "(112 'a')" (repeat_str "a" 112)
+
 try "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"
 try "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu"
+try_label "(1,000,000 'a')" million_a
+)
 
+\test_sha256==
 (
-# Test a million letter "a".
-\text=(repeat_str "a" 1000000)
-\hash=(crypto_hash text)
-say "crypto_hash"
-put "text = " say "(1,000,000 'a')"
-put "hash = " show_hex hash
-nl
-)
+run_test "test_sha256";
+# Try SHA-256 hash.
+# Reference: https://www.di-mgt.com.au/sha_testvectors.html
+\try_hash=(try_hash "sha256" sha256)
+\try=(\text try_hash (show_hex text) text)
+\try_label=(\label\text try_hash (say label) text)
 
-if F
-(
-# Test the extremely-long message.
-# This takes about 40 seconds.
-\text=(repeat_str
-"abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmno" 16777216)
-\hash=(crypto_hash text)
-say "crypto_hash"
-put "text = " say "(the extremely-long message)"
-put "hash = " show_hex hash
-nl
+try ""
+try "a"
+try "abc"
 
-# Output is:
-#crypto_hash
-#text = (the extremely-long message)
-#hash = 64:[b47c933421ea2db149ad6e10fce6c7f93d0752380180ffd7f4629a712134831d77be6091b819ed352c2967a2e2d4fa5050723c9630691f1a05a7281dbe6c1086]
-)
+# Largest string that fits in a single 512-bit chunk.
+try "1234567890123456789012345678901234567890123456789012345"
+# One past that.
+try "12345678901234567890123456789012345678901234567890123456"
+try "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"
 
-)
+try "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu"
 
-say "]"
+try_label "(127 'z')" (repeat_str "z" 127)
+try_label "(128 'z')" (repeat_str "z" 128)
+try_label "(256 'z')" (repeat_str "z" 256)
+try_label "(1,000,000 'a')" million_a
 )
 
 \test_sign==
 (
-say "[ test_sign"
+run_test "test_sign";
 (
 say "= Test seal and open."
 \try=
 	(\secret_key\text
 	\secret_key=(pack secret_key)
-	\public_key=(crypto_sign_public secret_key)
-	\signature=(try_crypto_sign_seal text public_key secret_key)
-	\valid=(try_crypto_sign_open text public_key signature)
+	\public_key=(nacl_sign_public secret_key)
+	\signature=(try_nacl_sign_seal text public_key secret_key)
+	\valid=(try_nacl_sign_open text public_key signature)
 	)
 
 try "236162636465666768696a6b6c6d6e6f707172737475767778797a0a23205e20"
@@ -339,14 +334,14 @@ try "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
 )
 
 (
-say "= Test specific cases of crypto_sign_seal."
+say "= Test specific cases of nacl_sign_seal."
 \try=
 	(\text\public_key\secret_key
 	\text=(pack text)
 	\public_key=(pack public_key)
 	\secret_key=(pack secret_key)
-	\signature=(try_crypto_sign_seal text public_key secret_key)
-	\valid=(try_crypto_sign_open text public_key signature)
+	\signature=(try_nacl_sign_seal text public_key secret_key)
+	\valid=(try_nacl_sign_open text public_key signature)
 	)
 
 say "== Good."
@@ -369,13 +364,13 @@ try
 )
 
 (
-say "= Test specific cases of crypto_sign_open."
+say "= Test specific cases of nacl_sign_open."
 \try=
 	(\text\public_key\signature
 	\text=(pack text)
 	\public_key=(pack public_key)
 	\signature=(pack signature)
-	\valid=(try_crypto_sign_open text public_key signature)
+	\valid=(try_nacl_sign_open text public_key signature)
 	)
 
 say "== Good"
@@ -414,10 +409,9 @@ try
 "c34ceaf901d5010541e4daf3958ee69a04a5064335709d33377204d60a2a0872"
 "e154f364ed7fa959ed814cd23d557901f6a581931399cdd415ff55cdad9b94da46503cc58aeac9f8b5f33ec5f944327356ba1c6ee2313e951d781c6fe1040a"
 )
-
-say "]"
 )
 
 test_box
 test_sign
-test_hash
+test_sha512
+test_sha256

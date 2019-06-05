@@ -1,7 +1,6 @@
 #!/bin/sh
 # Set this flag to enable development code.
 DEV=0
-
 . ./lib_build
 make basic
 make buffer
@@ -19,6 +18,8 @@ make nacl
 make num
 make parse
 make report
+make sha256
+make sha512
 make standard
 make str
 make type_buf

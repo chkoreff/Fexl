@@ -1,9 +1,9 @@
-/* Reference https://nacl.cr.yp.to/ */
-/* Reference https://tweetnacl.cr.yp.to/software.html */
+#include <stdint.h>
 
 #include <types.h>
 
 #include <nacl.h>
+#include <sha512.h>
 
 typedef i64 gf[16];
 
@@ -56,29 +56,10 @@ static u32 ld32(const u8 *x)
 	return (u<<8)|x[0];
 	}
 
-static u64 dl64(const u8 *x)
-	{
-	u64 u = 0;
-	int i;
-	for (i = 0; i < 8; ++i)
-		u = (u<<8) | x[i];
-	return u;
-	}
-
 static void st32(u8 *x, u32 u)
 	{
 	int i;
 	for (i = 0; i < 4; ++i)
-		{
-		x[i] = u;
-		u >>= 8;
-		}
-	}
-
-static void ts64(u8 *x, u64 u)
-	{
-	int i;
-	for (i = 7; i >= 0; --i)
 		{
 		x[i] = u;
 		u >>= 8;
@@ -95,12 +76,12 @@ static int vn(const u8 *x, const u8 *y, int n)
 	return (1 & ((d - 1) >> 8)) - 1;
 	}
 
-static int crypto_verify_16(const u8 *x, const u8 *y)
+static int verify_16(const u8 *x, const u8 *y)
 	{
 	return vn(x,y,16);
 	}
 
-static int crypto_verify_32(const u8 *x, const u8 *y)
+static int verify_32(const u8 *x, const u8 *y)
 	{
 	return vn(x,y,32);
 	}
@@ -159,20 +140,19 @@ static void core(u8 *out, const u8 *in, const u8 *k, const u8 *c, int h)
 			st32(out + 4 * i,x[i] + y[i]);
 	}
 
-static void crypto_core_salsa20(u8 *out, const u8 *in, const u8 *k, const u8 *c)
+static void core_salsa20(u8 *out, const u8 *in, const u8 *k, const u8 *c)
 	{
 	core(out,in,k,c,0);
 	}
 
-static void crypto_core_hsalsa20(u8 *out, const u8 *in, const u8 *k,
-	const u8 *c)
+static void core_hsalsa20(u8 *out, const u8 *in, const u8 *k, const u8 *c)
 	{
 	core(out,in,k,c,1);
 	}
 
 static const u8 sigma[16] = "expand 32-byte k";
 
-static void crypto_stream_salsa20_xor(u8 *c, const u8 *m, u64 b, const u8 *n,
+static void stream_salsa20_xor(u8 *c, const u8 *m, u64 b, const u8 *n,
 	const u8 *k)
 	{
 	u8 z[16],x[64];
@@ -187,7 +167,7 @@ static void crypto_stream_salsa20_xor(u8 *c, const u8 *m, u64 b, const u8 *n,
 
 	while (b >= 64)
 		{
-		crypto_core_salsa20(x,z,k,sigma);
+		core_salsa20(x,z,k,sigma);
 		for (i = 0; i < 64; ++i)
 			c[i] = (m?m[i]:0) ^ x[i];
 		u = 1;
@@ -204,30 +184,30 @@ static void crypto_stream_salsa20_xor(u8 *c, const u8 *m, u64 b, const u8 *n,
 
 	if (b)
 		{
-		crypto_core_salsa20(x,z,k,sigma);
+		core_salsa20(x,z,k,sigma);
 		for (i = 0; i < b; ++i)
 			c[i] = (m?m[i]:0) ^ x[i];
 		}
 	}
 
-static void crypto_stream_salsa20(u8 *c, u64 d, const u8 *n, const u8 *k)
+static void stream_salsa20(u8 *c, u64 d, const u8 *n, const u8 *k)
 	{
-	crypto_stream_salsa20_xor(c,0,d,n,k);
+	stream_salsa20_xor(c,0,d,n,k);
 	}
 
-static void crypto_stream(u8 *c, u64 d, const u8 *n, const u8 *k)
+static void stream(u8 *c, u64 d, const u8 *n, const u8 *k)
 	{
 	u8 s[32];
-	crypto_core_hsalsa20(s,n,k,sigma);
-	crypto_stream_salsa20(c,d,n+16,s);
+	core_hsalsa20(s,n,k,sigma);
+	stream_salsa20(c,d,n+16,s);
 	}
 
-static void crypto_stream_xor(u8 *c, const u8 *m, u64 d, const u8 *n,
+static void stream_xor(u8 *c, const u8 *m, u64 d, const u8 *n,
 	const u8 *k)
 	{
 	u8 s[32];
-	crypto_core_hsalsa20(s,n,k,sigma);
-	crypto_stream_salsa20_xor(c,m,d,n+16,s);
+	core_hsalsa20(s,n,k,sigma);
+	stream_salsa20_xor(c,m,d,n+16,s);
 	}
 
 static void add1305(u32 *h, const u32 *c)
@@ -244,7 +224,7 @@ static void add1305(u32 *h, const u32 *c)
 static const u32 minusp[17] =
 	{5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 252};
 
-static void crypto_onetimeauth(u8 *out, const u8 *m, u64 n, const u8 *k)
+static void onetimeauth(u8 *out, const u8 *m, u64 n, const u8 *k)
 	{
 	u32 s,i,j,u,x[17],r[17],h[17],c[17],g[17];
 
@@ -319,12 +299,12 @@ static void crypto_onetimeauth(u8 *out, const u8 *m, u64 n, const u8 *k)
 		out[j] = h[j];
 	}
 
-static int crypto_onetimeauth_verify(const u8 *h, const u8 *m, u64 n,
+static int onetimeauth_verify(const u8 *h, const u8 *m, u64 n,
 	const u8 *k)
 	{
 	u8 x[16];
-	crypto_onetimeauth(x,m,n,k);
-	return crypto_verify_16(h,x);
+	onetimeauth(x,m,n,k);
+	return verify_16(h,x);
 	}
 
 static void set25519(gf r, const gf a)
@@ -394,7 +374,7 @@ static int neq25519(const gf a, const gf b)
 	u8 c[32],d[32];
 	pack25519(c,a);
 	pack25519(d,b);
-	return crypto_verify_32(c,d);
+	return verify_32(c,d);
 	}
 
 static u8 par25519(const gf a)
@@ -486,7 +466,7 @@ static void pow2523(gf o, const gf i)
 		o[a] = c[a];
 	}
 
-static void crypto_scalarmult(u8 *q, const u8 *n, const u8 *p)
+static void curve_scalarmult(u8 *q, const u8 *n, const u8 *p)
 	{
 	u8 z[32];
 	i64 x[80],r;
@@ -544,29 +524,24 @@ static void crypto_scalarmult(u8 *q, const u8 *n, const u8 *p)
 	pack25519(q,x+16);
 	}
 
-static void crypto_scalarmult_base(u8 *q, const u8 *n)
-	{
-	crypto_scalarmult(q,n,_9);
-	}
-
 void nacl_box_public(u8 *pk, const u8 *sk)
 	{
-	crypto_scalarmult_base(pk,sk);
+	curve_scalarmult(pk,sk,_9);
 	}
 
 void nacl_box_prepare(u8 *k, const u8 *pk, const u8 *sk)
 	{
 	u8 s[32];
-	crypto_scalarmult(s,sk,pk);
-	crypto_core_hsalsa20(k,_0,s,sigma);
+	curve_scalarmult(s,sk,pk);
+	core_hsalsa20(k,_0,s,sigma);
 	}
 
 int nacl_box_seal(u8 *c, const u8 *m, u64 d, const u8 *n, const u8 *k)
 	{
 	int i;
 	if (d < 32) return -1;
-	crypto_stream_xor(c,m,d,n,k);
-	crypto_onetimeauth(c + 16,c + 32,d - 32,c);
+	stream_xor(c,m,d,n,k);
+	onetimeauth(c + 16,c + 32,d - 32,c);
 	for (i = 0; i < 16; ++i)
 		c[i] = 0;
 	return 0;
@@ -577,175 +552,13 @@ int nacl_box_open(u8 *m, const u8 *c, u64 d, const u8 *n, const u8 *k)
 	int i;
 	u8 x[32];
 	if (d < 32) return -1;
-	crypto_stream(x,32,n,k);
-	if (crypto_onetimeauth_verify(c + 16,c + 32,d - 32,x) != 0)
+	stream(x,32,n,k);
+	if (onetimeauth_verify(c + 16,c + 32,d - 32,x) != 0)
 		return -1;
-	crypto_stream_xor(m,c,d,n,k);
+	stream_xor(m,c,d,n,k);
 	for (i = 0; i < 32; ++i)
 		m[i] = 0;
 	return 0;
-	}
-
-static u64 R(u64 x,int c) { return (x >> c) | (x << (64 - c)); }
-static u64 Ch(u64 x,u64 y,u64 z) { return (x & y) ^ (~x & z); }
-static u64 Maj(u64 x,u64 y,u64 z) { return (x & y) ^ (x & z) ^ (y & z); }
-static u64 Sigma0(u64 x) { return R(x,28) ^ R(x,34) ^ R(x,39); }
-static u64 Sigma1(u64 x) { return R(x,14) ^ R(x,18) ^ R(x,41); }
-static u64 sigma0(u64 x) { return R(x, 1) ^ R(x, 8) ^ (x >> 7); }
-static u64 sigma1(u64 x) { return R(x,19) ^ R(x,61) ^ (x >> 6); }
-
-static const u64 K[80] =
-	{
-	0x428a2f98d728ae22ULL, 0x7137449123ef65cdULL,
-	0xb5c0fbcfec4d3b2fULL, 0xe9b5dba58189dbbcULL,
-
-	0x3956c25bf348b538ULL, 0x59f111f1b605d019ULL,
-	0x923f82a4af194f9bULL, 0xab1c5ed5da6d8118ULL,
-
-	0xd807aa98a3030242ULL, 0x12835b0145706fbeULL,
-	0x243185be4ee4b28cULL, 0x550c7dc3d5ffb4e2ULL,
-
-	0x72be5d74f27b896fULL, 0x80deb1fe3b1696b1ULL,
-	0x9bdc06a725c71235ULL, 0xc19bf174cf692694ULL,
-
-	0xe49b69c19ef14ad2ULL, 0xefbe4786384f25e3ULL,
-	0x0fc19dc68b8cd5b5ULL, 0x240ca1cc77ac9c65ULL,
-
-	0x2de92c6f592b0275ULL, 0x4a7484aa6ea6e483ULL,
-	0x5cb0a9dcbd41fbd4ULL, 0x76f988da831153b5ULL,
-
-	0x983e5152ee66dfabULL, 0xa831c66d2db43210ULL,
-	0xb00327c898fb213fULL, 0xbf597fc7beef0ee4ULL,
-
-	0xc6e00bf33da88fc2ULL, 0xd5a79147930aa725ULL,
-	0x06ca6351e003826fULL, 0x142929670a0e6e70ULL,
-
-	0x27b70a8546d22ffcULL, 0x2e1b21385c26c926ULL,
-	0x4d2c6dfc5ac42aedULL, 0x53380d139d95b3dfULL,
-
-	0x650a73548baf63deULL, 0x766a0abb3c77b2a8ULL,
-	0x81c2c92e47edaee6ULL, 0x92722c851482353bULL,
-
-	0xa2bfe8a14cf10364ULL, 0xa81a664bbc423001ULL,
-	0xc24b8b70d0f89791ULL, 0xc76c51a30654be30ULL,
-
-	0xd192e819d6ef5218ULL, 0xd69906245565a910ULL,
-	0xf40e35855771202aULL, 0x106aa07032bbd1b8ULL,
-
-	0x19a4c116b8d2d0c8ULL, 0x1e376c085141ab53ULL,
-	0x2748774cdf8eeb99ULL, 0x34b0bcb5e19b48a8ULL,
-
-	0x391c0cb3c5c95a63ULL, 0x4ed8aa4ae3418acbULL,
-	0x5b9cca4f7763e373ULL, 0x682e6ff3d6b2b8a3ULL,
-
-	0x748f82ee5defb2fcULL, 0x78a5636f43172f60ULL,
-	0x84c87814a1f0ab72ULL, 0x8cc702081a6439ecULL,
-
-	0x90befffa23631e28ULL, 0xa4506cebde82bde9ULL,
-	0xbef9a3f7b2c67915ULL, 0xc67178f2e372532bULL,
-
-	0xca273eceea26619cULL, 0xd186b8c721c0c207ULL,
-	0xeada7dd6cde0eb1eULL, 0xf57d4f7fee6ed178ULL,
-
-	0x06f067aa72176fbaULL, 0x0a637dc5a2c898a6ULL,
-	0x113f9804bef90daeULL, 0x1b710b35131c471bULL,
-
-	0x28db77f523047d84ULL, 0x32caab7b40c72493ULL,
-	0x3c9ebe0a15c9bebcULL, 0x431d67c49c100d4cULL,
-
-	0x4cc5d4becb3e42b6ULL, 0x597f299cfc657e2aULL,
-	0x5fcb6fab3ad6faecULL, 0x6c44198c4a475817ULL
-	};
-
-static void crypto_hashblocks(u8 *x, const u8 *m, u64 n)
-	{
-	u64 z[8],b[8],a[8],w[16],t;
-	int i,j;
-
-	for (i = 0; i < 8; ++i)
-		z[i] = a[i] = dl64(x + 8 * i);
-
-	while (n >= 128)
-		{
-		for (i = 0; i < 16; ++i)
-			w[i] = dl64(m + 8 * i);
-
-		for (i = 0; i < 80; ++i)
-			{
-			for (j = 0; j < 8; ++j)
-				b[j] = a[j];
-
-			t = a[7] + Sigma1(a[4]) + Ch(a[4],a[5],a[6]) + K[i] + w[i%16];
-			b[7] = t + Sigma0(a[0]) + Maj(a[0],a[1],a[2]);
-			b[3] += t;
-
-			for (j = 0;j < 8;++j)
-				a[(j+1)%8] = b[j];
-
-			if (i%16 == 15)
-				for (j = 0; j < 16; ++j)
-					w[j] +=
-						w[(j+9)%16]
-						+ sigma0(w[(j+1)%16])
-						+ sigma1(w[(j+14)%16]);
-			}
-
-		for (i = 0; i < 8; ++i)
-			{
-			a[i] += z[i];
-			z[i] = a[i];
-			}
-
-		m += 128;
-		n -= 128;
-		}
-
-	for (i = 0; i < 8; ++i)
-		ts64(x+8*i,z[i]);
-	}
-
-static const u8 iv[64] =
-	{
-	0x6a,0x09,0xe6,0x67,0xf3,0xbc,0xc9,0x08,
-	0xbb,0x67,0xae,0x85,0x84,0xca,0xa7,0x3b,
-	0x3c,0x6e,0xf3,0x72,0xfe,0x94,0xf8,0x2b,
-	0xa5,0x4f,0xf5,0x3a,0x5f,0x1d,0x36,0xf1,
-	0x51,0x0e,0x52,0x7f,0xad,0xe6,0x82,0xd1,
-	0x9b,0x05,0x68,0x8c,0x2b,0x3e,0x6c,0x1f,
-	0x1f,0x83,0xd9,0xab,0xfb,0x41,0xbd,0x6b,
-	0x5b,0xe0,0xcd,0x19,0x13,0x7e,0x21,0x79
-	};
-
-/* sha512 */
-void nacl_hash(u8 *out, const u8 *m, u64 n)
-	{
-	u8 h[64],x[256];
-	u64 i,b = n;
-
-	for (i = 0; i < 64; ++i)
-		h[i] = iv[i];
-
-	crypto_hashblocks(h,m,n);
-	m += n;
-	n &= 127;
-	m -= n;
-
-	for (i = 0; i < 256; ++i)
-		x[i] = 0;
-
-	for (i = 0; i < n; ++i)
-		x[i] = m[i];
-
-	x[n] = 128;
-
-	n = 256-128*(n<112);
-	x[n-9] = b >> 61;
-	ts64(x+n-8,b<<3);
-
-	crypto_hashblocks(h,x,n);
-
-	for (i = 0; i < 64; ++i)
-		out[i] = h[i];
 	}
 
 static void add(gf p[4], gf q[4])
@@ -822,7 +635,7 @@ void nacl_sign_public(u8 *pk, const u8 *sk)
 	u8 d[64];
 	gf p[4];
 
-	nacl_hash(d, sk, 32);
+	sha512(d, sk, 32);
 	d[0] &= 248;
 	d[31] &= 127;
 	d[31] |= 64;
@@ -894,7 +707,7 @@ void nacl_sign_seal(u8 *sm, const u8 *m, u64 n, const u8 *pk, const u8 *sk)
 	i64 x[64];
 	gf p[4];
 
-	nacl_hash(d, sk, 32);
+	sha512(d, sk, 32);
 
 	d[0] &= 248;
 	d[31] &= 127;
@@ -905,7 +718,7 @@ void nacl_sign_seal(u8 *sm, const u8 *m, u64 n, const u8 *pk, const u8 *sk)
 	for (i = 0; i < 32; ++i)
 		sm[32 + i] = d[32 + i];
 
-	nacl_hash(r, sm+32, n+32);
+	sha512(r, sm+32, n+32);
 	reduce(r);
 	scalarbase(p,r);
 	pack(sm,p);
@@ -913,7 +726,7 @@ void nacl_sign_seal(u8 *sm, const u8 *m, u64 n, const u8 *pk, const u8 *sk)
 	for (i = 0; i < 32; ++i)
 		sm[i+32] = pk[i];
 
-	nacl_hash(h,sm,n + 64);
+	sha512(h,sm,n + 64);
 	reduce(h);
 
 	for (i = 0; i < 64; ++i)
@@ -985,7 +798,7 @@ int nacl_sign_open(u8 *m, const u8 *sm, u64 n, const u8 *pk)
 	for (i = 0; i < 32; ++i)
 		m[i+32] = pk[i];
 
-	nacl_hash(h,m,n);
+	sha512(h,m,n);
 	reduce(h);
 	scalarmult(p,q,h);
 
@@ -993,7 +806,7 @@ int nacl_sign_open(u8 *m, const u8 *sm, u64 n, const u8 *pk)
 	add(p,q);
 	pack(t,p);
 
-	if (crypto_verify_32(sm, t))
+	if (verify_32(sm, t))
 		return -1;
 
 	return 0;

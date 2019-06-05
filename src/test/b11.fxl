@@ -3,6 +3,7 @@ evaluate
 (
 use_lib "html.fxl";
 use_lib "date.fxl";
+use_lib "time.fxl";
 standard
 ) \;
 (
@@ -319,4 +320,20 @@ LF
 "e"
 "f"
 ]
+)
+(
+say "= microtime"
+\try=
+	(\x\y
+	\elapse=(subtract_microtime x y)
+	say (as_str {x y elapse})
+	)
+\try=
+	(\x\y
+	try x y
+	try y x
+	)
+
+try "1559751185778257" "1559751174778281"
+try "1559751185778257" "1559751185778257"
 )

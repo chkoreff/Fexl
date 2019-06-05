@@ -1,0 +1,36 @@
+#
+# Split a microtime value into {s u}, where s is the whole number of seconds
+# and u is the whole number of microseconds.
+\split_microtime=
+	(\x
+	\s_len=(- (length x) 6)
+	\s=(str_num; slice x 0 s_len)
+	\u=(str_num; slice x s_len 6)
+	{s u}
+	)
+
+# Compute x minus y, where those are microtime values, returning the result
+# in microseconds.
+\subtract_microtime=
+	(\x\y
+	split_microtime x \xs\xu
+	split_microtime y \yx\yu
+	+ (* 1000000 (- xs yx)) (- xu yu)
+	)
+
+# Show elapsed time on a function evaluation.
+\show_microtime=
+	(\label\fn
+	\t0=microtime
+	put ["time "label" = "] fflush stdout
+	\v=fn
+	\t1=microtime
+	\elapse=(subtract_microtime t1 t0)
+	say [elapse" us"]
+	v
+	)
+
+define "split_microtime" split_microtime;
+define "subtract_microtime" subtract_microtime;
+define "show_microtime" show_microtime;
+standard

@@ -16,8 +16,16 @@
 	val
 	)
 
+\show_hex=
+	(\bytes
+	\bytes=bytes
+	is_void bytes (say "void");
+	say [(length bytes)":["(unpack bytes)"]"]
+	)
+
 define "div" div;
 define "show_list" show_list;
 define "run_test" run_test;
 define "do_benchmark" do_benchmark;
+define "show_hex" show_hex;
 standard

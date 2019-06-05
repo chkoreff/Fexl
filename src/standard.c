@@ -188,18 +188,30 @@ static value standard(value name)
 	if (match("unpack")) return Q(type_unpack);
 	if (match("pack")) return Q(type_pack);
 
+	/* crypto functions */
 	if (match("random_bytes")) return Q(type_random_bytes);
 	if (match("random_nonce")) return Q(type_random_nonce);
 	if (match("random_secret_key")) return Q(type_random_secret_key);
-	if (match("crypto_box_public")) return Q(type_crypto_box_public);
-	if (match("crypto_box_prepare")) return Q(type_crypto_box_prepare);
-	if (match("crypto_box_seal")) return Q(type_crypto_box_seal);
-	if (match("crypto_box_open")) return Q(type_crypto_box_open);
-	if (match("crypto_sign_public")) return Q(type_crypto_sign_public);
-	if (match("crypto_sign_seal")) return Q(type_crypto_sign_seal);
-	if (match("crypto_sign_open")) return Q(type_crypto_sign_open);
-	if (match("crypto_hash")) return Q(type_sha512);
+	if (match("nacl_box_public")) return Q(type_nacl_box_public);
+	if (match("nacl_box_prepare")) return Q(type_nacl_box_prepare);
+	if (match("nacl_box_seal")) return Q(type_nacl_box_seal);
+	if (match("nacl_box_open")) return Q(type_nacl_box_open);
+	if (match("nacl_sign_public")) return Q(type_nacl_sign_public);
+	if (match("nacl_sign_seal")) return Q(type_nacl_sign_seal);
+	if (match("nacl_sign_open")) return Q(type_nacl_sign_open);
+	if (match("sha256")) return Q(type_sha256);
 	if (match("sha512")) return Q(type_sha512);
+	if (match("hmac_sha512")) return Q(type_hmac_sha512);
+
+	/* Alternative names for nacl functions */
+	if (match("crypto_box_public")) return Q(type_nacl_box_public);
+	if (match("crypto_box_prepare")) return Q(type_nacl_box_prepare);
+	if (match("crypto_box_seal")) return Q(type_nacl_box_seal);
+	if (match("crypto_box_open")) return Q(type_nacl_box_open);
+	if (match("crypto_sign_public")) return Q(type_nacl_sign_public);
+	if (match("crypto_sign_seal")) return Q(type_nacl_sign_seal);
+	if (match("crypto_sign_open")) return Q(type_nacl_sign_open);
+	if (match("crypto_hash")) return Q(type_sha512);
 
 	if (match("set_alarm")) return Q(type_set_alarm);
 	if (match("start_server")) return Q(type_start_server);

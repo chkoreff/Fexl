@@ -44,11 +44,11 @@ value type_localtime(value f)
 
 static string microtime(void)
 	{
-	uint64_t nonce;
+	uint64_t n;
 	struct timeval sys_time;
 	gettimeofday(&sys_time,0);
-	nonce = ((uint64_t)sys_time.tv_sec * 1000000) + sys_time.tv_usec;
-	return str_new_data0(format_uint64_t(nonce));
+	n = ((uint64_t)sys_time.tv_sec * 1000000) + sys_time.tv_usec;
+	return str_new_data0(format_uint64_t(n));
 	}
 
 value type_microtime(value f)
