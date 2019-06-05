@@ -72,7 +72,7 @@ static void process_chunk(const u8 chunk[64], u32 h[8], u32 w[64])
 
 	/* Copy 512-bit chunk into first 16 words of schedule. */
 	for (i = 0; i < 16; i++)
-		w[i] = roll_bytes((const u8 *)chunk+i*4,4);
+		w[i] = roll_bytes(chunk+i*4,4);
 
 	/* Extend the first 16 words into the remaining 48 words of schedule. */
 	for (i = 16; i < 64; i++)
@@ -152,7 +152,7 @@ void sha256(u8 digest[32], const u8 *data, u64 n_data_byte)
 
 	/* Add any data bytes which remain after any full blocks. */
 	for (i = 0; i < n_remain; i++)
-		x[i] = (u8)data[64*n_data_chunk+i];
+		x[i] = data[64*n_data_chunk+i];
 
 	/* Add padding. */
 	x[n_remain] = 0x80;
