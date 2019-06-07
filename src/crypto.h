@@ -12,4 +12,6 @@ extern string str_nacl_sign_seal(string text, string public_key,
 extern int str_nacl_sign_open(string text, string public_key, string signature);
 extern string str_sha256(string text);
 extern string str_sha512(string text);
+extern string str_pack64(string text);
+extern string str_unpack64(string text);
 extern string str_hmac_sha512(string text, string key);

@@ -2,6 +2,7 @@
 # Set this flag to enable development code.
 DEV=0
 . ./lib_build
+make base64
 make basic
 make buffer
 make convert

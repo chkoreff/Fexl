@@ -2908,6 +2908,150 @@ text = (1,000,000 'a')
 hash = 32:[cdc76e5c9914fb9281a1c7e284d73e67f1809a48a497200e046d39ccc7112cd0]
 
 ]
+[ base64
+[ base64 unpack/pack
+text   0:""
+u_text 0:""
+
+text   1:"M"
+u_text 4:"TQ=="
+
+text   2:"Ma"
+u_text 4:"TWE="
+
+text   2:"Ma"
+u_text 4:"TWE="
+
+text   3:"Man"
+u_text 4:"TWFu"
+
+text   1:"f"
+u_text 4:"Zg=="
+
+text   2:"fo"
+u_text 4:"Zm8="
+
+text   3:"foo"
+u_text 4:"Zm9v"
+
+text   4:"foob"
+u_text 8:"Zm9vYg=="
+
+text   5:"fooba"
+u_text 8:"Zm9vYmE="
+
+text   6:"foobar"
+u_text 8:"Zm9vYmFy"
+
+text   269:"Man is distinguished, not only by his reason, but by this singular passion from other animals, which is a lust of the mind, that by a perseverance of delight in the continued and indefatigable generation of knowledge, exceeds the short vehemence of any carnal pleasure."
+u_text 360:"TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlzIHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2YgdGhlIG1pbmQsIHRoYXQgYnkgYSBwZXJzZXZlcmFuY2Ugb2YgZGVsaWdodCBpbiB0aGUgY29udGludWVkIGFuZCBpbmRlZmF0aWdhYmxlIGdlbmVyYXRpb24gb2Yga25vd2xlZGdlLCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4="
+
+text   0:""
+u_text 0:""
+
+text   1:"1"
+u_text 4:"MQ=="
+
+text   2:"12"
+u_text 4:"MTI="
+
+text   3:"123"
+u_text 4:"MTIz"
+
+text   4:"1234"
+u_text 8:"MTIzNA=="
+
+text   5:"12345"
+u_text 8:"MTIzNDU="
+
+text   6:"123456"
+u_text 8:"MTIzNDU2"
+
+text   7:"1234567"
+u_text 12:"MTIzNDU2Nw=="
+
+text   8:"12345678"
+u_text 12:"MTIzNDU2Nzg="
+
+text   1:[ff]
+u_text 4:"/w=="
+
+text   1:[00]
+u_text 4:"AA=="
+
+text   2:[0000]
+u_text 4:"AAA="
+
+text   3:[000000]
+u_text 4:"AAAA"
+
+text   7:[00010203040506]
+u_text 12:"AAECAwQFBg=="
+
+text   3:[ff00fe]
+u_text 4:"/wD+"
+
+]
+[ base64 pack
+u_text 0:""
+text   0:[]
+
+u_text 4:"AA=="
+text   1:[00]
+
+u_text 12:"MTIzNDU2Nzg="
+text   8:"12345678"
+
+u_text 12:"AAECAwQFBg=="
+text   7:[00010203040506]
+
+= Try without padding.
+u_text 3:"AA="
+text   1:[00]
+
+u_text 2:"AA"
+text   1:[00]
+
+u_text 11:"MTIzNDU2Nzg"
+text   8:"12345678"
+
+u_text 11:"AAECAwQFBg="
+text   7:[00010203040506]
+
+u_text 10:"AAECAwQFBg"
+text   7:[00010203040506]
+
+= Try strange length.
+u_text 10:"MTIzNDU2Nz"
+text   7:"1234567"
+
+u_text 9:"MTIzNDU2N"
+text   6:"123456"
+
+u_text 8:"MTIzNDU2"
+text   6:"123456"
+
+u_text 7:"MTIzNDU"
+text   5:"12345"
+
+u_text 6:"MTIzND"
+text   4:"1234"
+
+= Try chars out of range.
+u_text 1:"_"
+text   0:[]
+
+u_text 2:"_^"
+text   1:[00]
+
+u_text 6:"_^=-()"
+text   4:[00000000]
+
+u_text 2:"=="
+text   0:[]
+
+]
+]
 exit 0
 ==== test/get_byte.fxl
 [

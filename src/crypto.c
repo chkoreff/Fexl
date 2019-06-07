@@ -6,6 +6,7 @@
 #include <str.h>
 #include <types.h>
 
+#include <base64.h>
 #include <crypto.h>
 #include <die.h>
 #include <memory.h>
@@ -220,6 +221,32 @@ string str_sha512(string text)
 	string hash = str_new(64);
 	sha512((u8 *)hash->data, (const u8 *)text->data, text->len);
 	return hash;
+	}
+
+/* Pack a base 64 format string into raw bytes. */
+string str_pack64(string text)
+	{
+	u64 n = text->len;
+	u64 n_out;
+	string out;
+
+	if (text->data[n-1] == '=') n--;
+	if (text->data[n-1] == '=') n--;
+	n_out = 3*(n/4) + (n%4 == 0 ? 0 : n%4-1);
+
+	out = str_new(n_out);
+	pack64((u8 *)out->data,(const u8 *)text->data,n);
+	return out;
+	}
+
+/* Unpack raw bytes into a base 64 format string. */
+string str_unpack64(string text)
+	{
+	u64 n = text->len;
+	u64 n_out = 4*(n/3) + (n%3 == 0 ? 0 : 4);
+	string out = str_new(n_out);
+	unpack64((u8 *)out->data,(const u8 *)text->data,text->len);
+	return out;
 	}
 
 /* Compute the HMAC-SHA512 value of the text using the key.  Note that if the

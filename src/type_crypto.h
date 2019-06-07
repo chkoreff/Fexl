@@ -10,4 +10,6 @@ extern value type_nacl_sign_seal(value f);
 extern value type_nacl_sign_open(value f);
 extern value type_sha256(value f);
 extern value type_sha512(value f);
+extern value type_pack64(value f);
+extern value type_unpack64(value f);
 extern value type_hmac_sha512(value f);

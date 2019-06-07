@@ -78,4 +78,6 @@ value type_nacl_sign_open(value f)
 
 value type_sha256(value f) { return op_str(f,str_sha256); }
 value type_sha512(value f) { return op_str(f,str_sha512); }
+value type_pack64(value f) { return op_str(f,str_pack64); }
+value type_unpack64(value f) { return op_str(f,str_unpack64); }
 value type_hmac_sha512(value f) { return op_str2(f,str_hmac_sha512); }

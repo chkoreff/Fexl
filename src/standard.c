@@ -201,6 +201,8 @@ static value standard(value name)
 	if (match("nacl_sign_open")) return Q(type_nacl_sign_open);
 	if (match("sha256")) return Q(type_sha256);
 	if (match("sha512")) return Q(type_sha512);
+	if (match("pack64")) return Q(type_pack64);
+	if (match("unpack64")) return Q(type_unpack64);
 	if (match("hmac_sha512")) return Q(type_hmac_sha512);
 
 	/* Alternative names for nacl functions */

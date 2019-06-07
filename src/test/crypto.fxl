@@ -411,7 +411,118 @@ try
 )
 )
 
+\test_base64==
+(
+run_test "base64";
+run_test "base64 unpack/pack"
+(
+# Test unpack text and pack it back.
+\try_with=
+	(\show\text
+	\u_text=(unpack64 text)
+	put "text   "show text
+	put "u_text "show_str u_text
+	\p_u_text=(pack64 u_text)
+	if (ne p_u_text text) (put "FAIL   "show_str p_u_text)
+	nl
+	)
+
+\try=(try_with show_str)
+\tryh=
+	(\text
+	\text=(pack text)
+	try_with show_hex text
+	)
+
+try ""
+try "M"
+try "Ma"
+try "Ma"
+try "Man"
+try "f"
+try "fo"
+try "foo"
+try "foob"
+try "fooba"
+try "foobar"
+
+try
+(
+to_str
+[
+"Man is distinguished, not only by his reason, but by this singular passion "
+"from other animals, which is a lust of the mind, that by a perseverance of "
+"delight in the continued and indefatigable generation of knowledge, exceeds "
+"the short vehemence of any carnal pleasure."
+]
+)
+
+try ""
+try "1"
+try "12"
+try "123"
+try "1234"
+try "12345"
+try "123456"
+try "1234567"
+try "12345678"
+
+# Try some hexadecimal strings.
+tryh "ff"
+tryh "00"
+tryh "0000"
+tryh "000000"
+tryh "00010203040506"
+tryh "ff00fe"
+)
+
+run_test "base64 pack"
+(
+# Test pack text.
+
+\try_with=
+	(\show
+	\u_text
+	\text=(pack64 u_text)
+	put "u_text "show_str u_text
+	put "text   "show text
+	nl
+	)
+
+\try=(try_with show_hex)
+\trys=(try_with show_str)
+
+try ""
+try "AA=="
+trys "MTIzNDU2Nzg="
+try "AAECAwQFBg=="
+
+say "= Try without padding."
+try "AA="
+try "AA"
+trys "MTIzNDU2Nzg"
+try "AAECAwQFBg="
+try "AAECAwQFBg"
+
+say "= Try strange length."
+
+trys "MTIzNDU2Nz"
+trys "MTIzNDU2N"
+trys "MTIzNDU2"
+trys "MTIzNDU"
+trys "MTIzND"
+
+say "= Try chars out of range."
+try "_"
+try "_^"
+try "_^=-()"
+try "=="
+
+)
+)
+
 test_box
 test_sign
 test_sha512
 test_sha256
+test_base64

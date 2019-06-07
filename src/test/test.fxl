@@ -16,6 +16,12 @@
 	val
 	)
 
+\show_str=
+	(\text
+	is_void text (say "void");
+	say [(length text)":"(as_str text)]
+	)
+
 \show_hex=
 	(\bytes
 	\bytes=bytes
@@ -27,5 +33,6 @@ define "div" div;
 define "show_list" show_list;
 define "run_test" run_test;
 define "do_benchmark" do_benchmark;
+define "show_str" show_str;
 define "show_hex" show_hex;
 standard
