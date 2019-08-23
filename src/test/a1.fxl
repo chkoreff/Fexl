@@ -507,6 +507,21 @@ say (trunc 7.2)
 say (trunc -7.2)
 say (trunc 7.8)
 say (trunc -7.8)
+
+# Test ceil
+(
+\try=(\x \y=(ceil x) say ["ceil "x" = "y])
+\try=(\x try x try (neg x))
+try 0
+try 0.1
+try 0.5
+try 14.8
+try (* 1.85 2.63)
+try 125867.2
+try 7.2
+try 7.8
+)
+
 say (^ 10 4)
 say (^ 2.71828182845905 1.09861228866811)  # (^ e (ln 3))
 say (exp; log 3) # more exact

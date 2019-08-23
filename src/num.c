@@ -35,6 +35,7 @@ number num_xor(number x, number y)
 	}
 
 number num_round(number x) { return num_new_double(round(*x)); }
+number num_ceil(number x) { return num_new_double(ceil(*x)); }
 number num_trunc(number x) { return num_new_double(trunc(*x)); }
 number num_abs(number x) { return num_new_double(fabs(*x)); }
 number num_sqrt(number x) { return num_new_double(sqrt(*x)); }

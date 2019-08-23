@@ -61,6 +61,7 @@ static value standard(value name)
 	if (match("^")) return Q(type_pow);
 	if (match("xor")) return Q(type_xor);
 	if (match("round")) return Q(type_round);
+	if (match("ceil")) return Q(type_ceil);
 	if (match("trunc")) return Q(type_trunc);
 	if (match("abs")) return Q(type_abs);
 	if (match("sqrt")) return Q(type_sqrt);
