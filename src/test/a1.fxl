@@ -1275,5 +1275,62 @@ pack
 unpack
 )
 
+\run_test=
+	(\label\handle\list_case
+
+	\list_error=
+		(
+		map_good
+			(\case
+			handle case \ok\result
+			ok void {case result}
+			)
+			list_case
+		)
+	is_null list_error ();
+
+	trace ["ERRORS in "label":"]
+	trace "["
+	each list_error (\row trace (as_str row))
+	trace "]"
+
+	die
+	)
+
+\test_eq_data==
+(
+run_test "eq_data"
+(\case
+case \x\y\expect
+\result=(eq_data x y)
+\ok=(is_bool result (result expect (not expect)) F)
+{ok result}
+)
+[
+{ "a" "b"  F }
+{ "a" "a"  T }
+{ pi pi  T }
+{ F F  T }
+{ F T  F }
+{ T F  F }
+{ T T  T }
+{ void 32  F }
+{ void void  T }
+{ ["a" "b"] ["a"]  F }
+{ ["a" ["b" "c"]] ["a" ["b" "c"]]  T }
+{ {"a" {"b" "c"}} {"a" {"b" "c"}}  T }
+{ {"a" {"b" "x"}} {"a" {"b" "c"}}  F }
+{ {"a" {"b"}} {"a" {"b" "c"}}  F }
+{ {} {}  T }
+{ {} 3  F }
+{ "a" (\x x)  F }
+{ (\x x) {"a" "b"}  F }
+{ (\x x) (\x\y x)  F }
+]
+
+)
+
+test_eq_data
+
 \\
 Extra stuff not parsed.

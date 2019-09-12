@@ -33,6 +33,15 @@
 	[x;tail]
 	)
 
+# Eagerly apply f to each element in list xs.
+\map_eager=
+	(\f @\loop \xs
+	xs [] \x\xs
+	\x=(f x)
+	\tail=(loop xs)
+	[x;tail]
+	)
+
 # Apply f to each element in list xs, but only keep the good results.
 \map_good=
 	(\fn @\loop \xs
@@ -183,8 +192,11 @@
 	combine_keys append xs
 	)
 
+# Get the list of keys from a list of pairs.
+\get_keys=(map_eager (\p p \k\_ k))
+
 # Get the list of values from a list of pairs.
-\get_values=(map (\p p \_\v v))
+\get_values=(map_eager (\p p \_\v v))
 
 # Sort a list of items with a key extraction function.  If opt_unique is true,
 # only keep the first item with a given key.  Otherwise keep all duplicates.
@@ -461,10 +473,41 @@
 	map_bytes_to_double bytes
 	)
 
+# Return true if data items x and y are equal.
+\eq_data=
+	(@\eq_data\x\y
+	\x=x
+	\y=y
+
+	\check_type=
+		(\is_type\compare\next
+		is_type x (is_type y compare F);
+		is_type y F;
+		next
+		)
+
+	check_type is_str (eq x y);
+	check_type is_num (eq x y);
+	check_type is_bool (x y (not y));
+	check_type is_void T;
+
+	\eq_pair=
+		(\split_value
+		split_value x (split_value y T \_\_ F) \xh\xt
+		split_value y F \yh\yt
+		eq_data xh yh (eq_data xt yt) F
+		)
+
+	check_type is_list (eq_pair I);
+	check_type is_tuple (eq_pair split_tuple);
+	F
+	)
+
 define "append" append;
 define "flatten" flatten;
 define "each" each;
 define "map" map;
+define "map_eager" map_eager;
 define "map_good" map_good;
 define "filter" filter;
 define "reverse" reverse;
@@ -474,6 +517,7 @@ define "g_sort" g_sort;
 define "combine_keys" combine_keys;
 define "merge_keys" merge_keys;
 define "group_items" group_items;
+define "get_keys" get_keys;
 define "get_values" get_values;
 define "sort_items" sort_items;
 define "sort" sort;
@@ -506,4 +550,5 @@ define "starts_with" starts_with;
 define "ends_with" ends_with;
 define "map_bytes_to_double" map_bytes_to_double;
 define "random_double" random_double;
+define "eq_data" eq_data;
 standard

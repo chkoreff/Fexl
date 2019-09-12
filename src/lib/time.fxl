@@ -30,7 +30,18 @@
 	v
 	)
 
+\trace_elapsed=
+	(\fn
+	\t0=microtime
+	\v=fn
+	\t1=microtime
+	\elapse=(/ (subtract_microtime t1 t0) 1000000)
+	trace ["elapsed "elapse" s"]
+	v
+	)
+
 define "split_microtime" split_microtime;
 define "subtract_microtime" subtract_microtime;
 define "show_microtime" show_microtime;
+define "trace_elapsed" trace_elapsed;
 standard
