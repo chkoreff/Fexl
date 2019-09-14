@@ -126,24 +126,21 @@ value A(value x, value y)
 	return V(type_A,x,y);
 	}
 
-static value step_normal(value f)
-	{
-	return f->T(f);
-	}
-
-value (*step)(value f) = step_normal;
-
 /* Reduce the value until done. */
-value eval(value f)
+static value eval_normal(value f)
 	{
 	while (1)
 		{
-		value g = step(f);
+		value g = f->T(f);
 		if (g == 0) return f;
 		drop(f);
 		f = g;
 		}
 	}
+
+/* The eval routine is a pointer, allowing me to swap it out for special
+purposes such as counting evaluation steps in fexl_benchmark. */
+value (*eval)(value f) = eval_normal;
 
 value arg(value f)
 	{

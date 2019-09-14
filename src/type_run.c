@@ -113,113 +113,22 @@ static int do_wait(pid_t pid)
 	return status;
 	}
 
-/* \result=(run_process fn_child fn_parent)
+/* Interact with the fn_child function as a separate process.
 
-Run the fn_child function as a separate process.  Get handles to the child's
-stdin and stdout and evaluate:
-
-	(fn_parent child_in child_out)
-
-That performs an interaction using the file handles, and returns a handler
-function.  Then wait for the child to finish, and pass its exit status to the
-handler.  Evaluate that and return the result.
-
-Note that this is a simpler version of spawn.  This version allows the child's
-stderr to go to the same destination as the parent's stderr, which is typically
-what you want when implementing a server with an error log.
-*/
-value type_run_process(value f)
-	{
-	if (!f->L || !f->L->L) return 0;
-	{
-	/* Flush the parent's stdout and stderr to prevent any pending output from
-	being accidentally pushed into the child's input.  I've noticed this can
-	happen when the script output is sent to a file or pipe instead of a
-	console.
-	*/
-	fflush(stdout);
-	fflush(stderr);
-
-	{
-	/* Create a series of pipes, each with a read and write side. */
-	int fd_in[2];
-	int fd_out[2];
-
-	do_pipe(fd_in);
-	do_pipe(fd_out);
-
-	{
-	pid_t pid = fork();
-	if (pid == -1) die("fork failed");
-
-	if (pid == 0)
-		{
-		/* This is the child process. */
-
-		/* Duplicate read side of input pipe to stdin. */
-		do_dup2(fd_in[0],0);
-		/* Duplicate write side of output pipe to stdout. */
-		do_dup2(fd_out[1],1);
-
-		/* Close unused file handles.  They're actually all unused because I
-		duplicated the ones I still need.  At a minimum, I must close the write
-		side of the input pipe, otherwise the child hangs waiting for stdin to
-		close. */
-
-		do_close(fd_in[0]);
-		do_close(fd_in[1]); /* Must do this one to avoid hang. */
-
-		do_close(fd_out[0]);
-		do_close(fd_out[1]);
-
-		/* Evaluate the child function. */
-		drop(eval(hold(f->L->R)));
-
-		/* Exit here to avoid continuing with evaluation.  This means that
-		memory leak detection does not occur for the child function.  If you
-		want that level of checking, you should exec with (argv 0) instead. */
-		exit(0);
-		return 0;
-		}
-	else
-		{
-		/* This is the parent process. */
-
-		/* Open write side of input pipe as child input. */
-		FILE *child_in = do_fdopen(fd_in[1],"w");
-		/* Open read side of output pipe as child output. */
-		FILE *child_out = do_fdopen(fd_out[0],"r");
-
-		/* Close unused file handles.  I don't close the ones I just opened
-		because they are still in play (i.e. fdopen does not dup). */
-
-		do_close(fd_in[0]);  /* Close the read side of the input pipe. */
-		do_close(fd_out[1]); /* Close the write side of the output pipe. */
-
-		{
-		value result = eval(A(A(hold(f->R),Qfile(child_in)),Qfile(child_out)));
-		int status = do_wait(pid);
-		result = eval(A(result,Qnum0(status)));
-		return result;
-		}
-		}
-	}
-	}
-	}
-	}
-
-/* \result=(spawn fn_child fn_parent)
-
-Run the fn_child function as a separate process.  Get handles to the child's
-stdin, stdout, and stderr and evaluate:
-
+If catch_stderr is true, evaluate:
 	(fn_parent child_in child_out child_err)
 
-That performs an interaction using the file handles, and returns a handler
-function.  Then wait for the child to finish, and pass its exit status to the
-handler.  Evaluate that and return the result.
+If catch_stderr is false, evaluate:
+	(fn_parent child_in child_out)
+
+The child_in, child_out, and child_err are file handles for the child's stdin,
+stdout, and stderr respectively.
+
+That evaluation performs an interaction using the file handles, returning a
+handler function which receives the child's exit status when the child process
+terminates.
 */
-value type_spawn(value f)
+static value op_process(value f, int catch_stderr)
 	{
 	if (!f->L || !f->L->L) return 0;
 	{
@@ -239,7 +148,8 @@ value type_spawn(value f)
 
 	do_pipe(fd_in);
 	do_pipe(fd_out);
-	do_pipe(fd_err);
+	if (catch_stderr)
+		do_pipe(fd_err);
 
 	{
 	pid_t pid = fork();
@@ -253,8 +163,11 @@ value type_spawn(value f)
 		do_dup2(fd_in[0],0);
 		/* Duplicate write side of output pipe to stdout. */
 		do_dup2(fd_out[1],1);
-		/* Duplicate write side of error pipe to stderr. */
-		do_dup2(fd_err[1],2);
+		if (catch_stderr)
+			{
+			/* Duplicate write side of error pipe to stderr. */
+			do_dup2(fd_err[1],2);
+			}
 
 		/* Close unused file handles.  They're actually all unused because I
 		duplicated the ones I still need.  At a minimum, I must close the write
@@ -267,12 +180,13 @@ value type_spawn(value f)
 		do_close(fd_out[0]);
 		do_close(fd_out[1]);
 
-		do_close(fd_err[0]);
-		do_close(fd_err[1]);
+		if (catch_stderr)
+			{
+			do_close(fd_err[0]);
+			do_close(fd_err[1]);
+			}
 
-		/* Evaluate the child function, which can now use stdin, stdout, and
-		stderr normally. */
-
+		/* Evaluate the child function. */
 		drop(eval(hold(f->L->R)));
 
 		/* Exit here to avoid continuing with evaluation.  This means that
@@ -289,27 +203,57 @@ value type_spawn(value f)
 		FILE *child_in = do_fdopen(fd_in[1],"w");
 		/* Open read side of output pipe as child output. */
 		FILE *child_out = do_fdopen(fd_out[0],"r");
-		/* Open read side of error pipe as child error. */
-		FILE *child_err = do_fdopen(fd_err[0],"r");
+		FILE *child_err;
+		if (catch_stderr)
+			{
+			/* Open read side of error pipe as child error. */
+			child_err = do_fdopen(fd_err[0],"r");
+			}
 
 		/* Close unused file handles.  I don't close the ones I just opened
 		because they are still in play (i.e. fdopen does not dup). */
 
 		do_close(fd_in[0]);  /* Close the read side of the input pipe. */
 		do_close(fd_out[1]); /* Close the write side of the output pipe. */
-		do_close(fd_err[1]); /* Close the write side of the error pipe. */
+		if (catch_stderr)
+			do_close(fd_err[1]); /* Close the write side of the error pipe. */
 
 		{
-		value result = eval(A(A(A(hold(f->R),Qfile(child_in)),
-			Qfile(child_out)),Qfile(child_err)));
+		value handler = A(A(hold(f->R),Qfile(child_in)),Qfile(child_out));
+		if (catch_stderr)
+			handler = A(handler,Qfile(child_err));
+
+		handler = eval(handler);
 		int status = do_wait(pid);
-		result = eval(A(result,Qnum0(status)));
-		return result;
+		return A(handler,Qnum0(status));
 		}
 		}
 	}
 	}
 	}
+	}
+
+/* (run_process fn_child fn_parent)
+
+Interact with the fn_child function as a separate process, with the fn_parent
+receiving handles to the child's stdin and stdout.
+
+The child's stderr goes to the same destination as the parent's stderr, which
+is typically what you want when implementing a server with an error log.
+*/
+value type_run_process(value f)
+	{
+	return op_process(f,0);
+	}
+
+/* (spawn fn_child fn_parent)
+
+Interact with the fn_child function as a separate process, with the fn_parent
+receiving handles to the child's stdin, stdout, and stderr.
+*/
+value type_spawn(value f)
+	{
+	return op_process(f,1);
 	}
 
 static void die_perror(const char *msg)
@@ -683,10 +627,17 @@ value type_receive_keystrokes(value f)
 
 static unsigned long num_steps = 0;
 
-static value step_count(value f)
+/* Reduce the value until done, counting each step along the way. */
+static value eval_count(value f)
 	{
-	num_steps++;
-	return f->T(f);
+	while (1)
+		{
+		value g = f->T(f);
+		num_steps++;
+		if (g == 0) return f;
+		drop(f);
+		f = g;
+		}
 	}
 
 /* (fexl_benchmark x next) Evaluate x and return (next val steps bytes), where
@@ -697,10 +648,10 @@ value type_fexl_benchmark(value f)
 	if (!f->L || !f->L->L) return 0;
 	clear_free_list();
 	{
-	value (*save_step)(value) = step;
+	value (*save_eval)(value) = eval;
 	unsigned long save_num_steps = num_steps;
 	unsigned long save_cur_bytes = cur_bytes;
-	step = step_count;
+	eval = eval_count;
 
 	{
 	value x = arg(f->L->R);
@@ -709,8 +660,8 @@ value type_fexl_benchmark(value f)
 	f = A(A(A(hold(f->R),x),Qnum0(steps)),Qnum0(bytes));
 	}
 
-	step = save_step;
-	if (step != step_count)
+	eval = save_eval;
+	if (eval != eval_count)
 		num_steps = save_num_steps;
 	return f;
 	}

@@ -18,6 +18,5 @@ extern value Q(type T);
 extern value D(type T, void *data);
 extern value type_A(value f);
 extern value A(value x, value y);
-extern value (*step)(value f);
-extern value eval(value f);
+extern value (*eval)(value f);
 extern value arg(value f);
