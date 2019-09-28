@@ -220,11 +220,12 @@ static value op_process(value f, int catch_stderr)
 
 		{
 		value handler = A(A(hold(f->R),Qfile(child_in)),Qfile(child_out));
+		int status;
 		if (catch_stderr)
 			handler = A(handler,Qfile(child_err));
 
 		handler = eval(handler);
-		int status = do_wait(pid);
+		status = do_wait(pid);
 		return A(handler,Qnum0(status));
 		}
 		}
