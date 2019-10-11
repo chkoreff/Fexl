@@ -23,12 +23,3 @@ do_diff()
 	doing $prog
 	do_time "$prog | diff - $out"
 	}
-
-do_diff_fexl()
-	{
-	local name="$1"
-	local prog="../bin/fexl test/$name.fxl"
-	local out="test/$name.out"
-	doing $name
-	do_time "$prog | diff - $out"
-	}

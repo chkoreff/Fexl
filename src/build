@@ -50,3 +50,4 @@ make output2
 make show
 fi
 link fexl
+ln -fs ../bin/fexl ../bin/fexl0

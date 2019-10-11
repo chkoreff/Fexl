@@ -304,19 +304,41 @@ static void end_const(void)
 	close_random();
 	}
 
-/* Evaluate main.fxl located relative to the executable given by argv[0].  The
-main.fxl script then evaluates the user's script given by argv[1]. */
+/*
+The user's script is given by argv[1], or if that is missing, the script is
+read from stdin.
+
+If this program is running as "fexl0", it runs the user's script directly.  If
+it is running as "fexl", it first runs the local script "src/main.fxl".  That
+script defines an extended context, reading in some library files, and then
+runs the user's script in that context.
+
+The purpose of "fexl0" is to give the user the option of bypassing src/main.fxl
+altogether, defining any extensions beyond the built-in C standard context as
+the user pleases.
+*/
 static void eval_script(void)
 	{
 	value f;
-	/* Get the name of the currently running executable. */
-	f = Qstr0(main_argv[0]);
-	/* Go two directories up, right above the bin directory. */
-	f = A(Q(type_dirname),f);
-	f = A(Q(type_dirname),f);
-	/* Concatenate the name of the main script. */
-	f = A(A(Q(type_concat),f),Qstr0("/src/main.fxl"));
-	/* Now evaluate the main script. */
+	unsigned long len = strlen(main_argv[0]);
+	if (len >= 5 && strcmp(main_argv[0]+len-5,"fexl0") == 0)
+		{
+		/* Running as fexl0, so run the user's script directly. */
+		char *name = main_argc > 1 ? main_argv[1] : "";
+		f = Qstr0(name);
+		}
+	else
+		{
+		/* Get the name of the currently running executable. */
+		f = Qstr0(main_argv[0]);
+		/* Go two directories up, right above the bin directory. */
+		f = A(Q(type_dirname),f);
+		f = A(Q(type_dirname),f);
+		/* Concatenate the name of the main script. */
+		f = A(A(Q(type_concat),f),Qstr0("/src/main.fxl"));
+		}
+
+	/* Now evaluate the script. */
 	f = A(hold(Qparse_file),f);
 	f = A(A(hold(Qevaluate),Q(type_standard)),f);
 	f = eval(f);
