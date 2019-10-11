@@ -203,7 +203,7 @@ static value op_process(value f, int catch_stderr)
 		FILE *child_in = do_fdopen(fd_in[1],"w");
 		/* Open read side of output pipe as child output. */
 		FILE *child_out = do_fdopen(fd_out[0],"r");
-		FILE *child_err;
+		FILE *child_err = 0;
 		if (catch_stderr)
 			{
 			/* Open read side of error pipe as child error. */
