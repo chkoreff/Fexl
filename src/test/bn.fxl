@@ -1,0 +1,89 @@
+# Big number calculations
+
+# The maximum safe value for base_digits is 7.  Anything greater can yield
+# incorrect results due to overflow in multiplication.
+\base_digits=7
+\base=(^ 10 base_digits)
+
+# Add two numbers.
+\bn_add=
+	(@\bn_add\x\y
+	x y \xh\xt
+	y [xh;xt] \yh\yt
+
+	\zh=(+ xh yh)
+	\zt=(bn_add xt yt)
+
+	lt zh base (cons zh zt);
+
+	\zh=(- zh base)
+	\zt=(bn_add [1] zt)
+	cons zh zt
+	)
+
+# Multiply two numbers.
+\bn_mul=
+	(@\bn_mul\x\y
+	x [] \xh\xt
+	y [] \yh\yt
+
+	\zh=(* xh yh)
+	\zt=
+		(
+		bn_add (bn_mul [xh] yt);
+		bn_add (bn_mul [yh] xt);
+		\xt=(bn_mul xt yt)
+		is_null xt [];
+		cons 0 xt
+		)
+
+	lt zh base (cons zh zt);
+
+	\carry=(trunc; / zh base)
+	\zh=(- zh; * base carry)
+	\zt=(bn_add [carry] zt)
+	cons zh zt
+	)
+
+# Convert a number to a string of decimal digits.
+\bn_str=
+	(
+	\pad0=(\s . (repeat_str "0"; - base_digits (length s)) s)
+	@\bn_str\x
+	x "0" \xh\xt
+	is_null xt
+		(num_str xh)
+		(.  (bn_str xt) (pad0; num_str xh))
+	)
+
+# Convert a string of decimal digits to a number.
+\str_bn=
+	(
+	\bn_new=
+		(\xh\xt
+		is_void xh void;
+		is_void xt void;
+		and (is_null xt) (eq 0 xh) [] (cons xh xt)
+		)
+
+	@\str_bn\x
+	\len=(length x)
+	le len base_digits
+		(
+		\xh=(str_num x)
+		bn_new xh []
+		)
+		(
+		\pos=(- len base_digits)
+		\xh=(str_num; slice x pos base_digits)
+		\xp=(slice x 0 pos)
+		\xt=(str_bn xp)
+		bn_new xh xt
+		)
+	)
+
+define "bn_add" bn_add;
+define "bn_mul" bn_mul;
+define "bn_str" bn_str;
+define "str_bn" str_bn;
+standard
