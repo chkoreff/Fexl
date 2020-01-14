@@ -1,16 +1,19 @@
-#include <num.h>
 #include <stdio.h>
 #include <str.h>
 #include <value.h>
 
 #include <basic.h>
 #include <file.h>
-#include <file2.h>
 #include <standard.h>
 #include <type_file.h>
 #include <type_num.h>
 #include <type_output.h>
 #include <type_str.h>
+
+void fput_str(FILE *fh, string x)
+	{
+	fputd(fh,x->data,x->len);
+	}
 
 static value op_put(FILE *fh, value f)
 	{
@@ -22,7 +25,7 @@ static value op_put(FILE *fh, value f)
 		if (x->T == type_str)
 			fput_str(fh,get_str(x));
 		else if (x->T == type_num)
-			fput_num(fh,get_num(x));
+			fput_double(fh,get_double(x));
 		else if (x->T == type_T && !x->L)
 			fput_ch(fh,'T');
 		else if (x->T == type_F && !x->L)

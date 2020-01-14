@@ -1,2 +1,1 @@
-extern string num_str(number x);
-extern number str0_num(const char *str);
+extern int str0_double(const char *str, double *val);

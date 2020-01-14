@@ -1,4 +1,3 @@
-#include <num.h>
 #include <str.h>
 #include <value.h>
 
@@ -120,7 +119,7 @@ value type_length(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
-		f = Qnum(num_new_ulong(get_str(x)->len));
+		f = Qnum((double)get_str(x)->len);
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -175,7 +174,7 @@ value type_search(value f)
 			string ys = get_str(y);
 			unsigned long pos = str_search(xs,ys,zn);
 			if (pos < xs->len)
-				f = Qnum(num_new_ulong(pos));
+				f = Qnum((double)pos);
 			else
 				f = hold(Qvoid);
 			}
@@ -199,9 +198,9 @@ value type_str_num(value f)
 	value x = arg(f->R);
 	if (x->T == type_str)
 		{
-		number n = str0_num(str_data(x));
-		if (n)
-			f = Qnum(n);
+		double val;
+		if (str0_double(str_data(x),&val))
+			f = Qnum(val);
 		else
 			f = hold(Qvoid);
 		}
@@ -221,8 +220,7 @@ value type_ord(value f)
 	if (x->T == type_str)
 		{
 		string xs = get_str(x);
-		f = Qnum(num_new_ulong(xs->len == 0 ? 0 :
-			(unsigned char)xs->data[0]));
+		f = Qnum((double) (xs->len == 0 ? 0 : (unsigned char)xs->data[0]) );
 		}
 	else
 		f = hold(Qvoid);
@@ -268,7 +266,7 @@ value type_char_width(value f)
 			if (pos < xs->len)
 				{
 				char n = char_width(xs->data[pos]);
-				f = Qnum(num_new_ulong(n));
+				f = Qnum((double)n);
 				}
 			else
 				f = hold(Qvoid);
@@ -296,7 +294,7 @@ value type_length_common(value f)
 	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_str)
-		f = Qnum(num_new_ulong(length_common(get_str(x),get_str(y))));
+		f = Qnum((double)length_common(get_str(x),get_str(y)));
 	else
 		f = hold(Qvoid);
 	drop(x);

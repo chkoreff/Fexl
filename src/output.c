@@ -23,6 +23,11 @@ void put_ulong(unsigned long x)
 	fput_ulong(stdout,x);
 	}
 
+void put_double(double x)
+	{
+	fput_double(stdout,x);
+	}
+
 void nl(void)
 	{
 	fnl(stdout);

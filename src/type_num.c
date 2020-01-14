@@ -1,9 +1,11 @@
-#include <num.h>
+#include <stdint.h>
 #include <str.h>
 #include <value.h>
 
 #include <basic.h>
 #include <convert.h>
+#include <format.h>
+#include <memory.h>
 #include <standard.h>
 #include <type_num.h>
 #include <type_str.h>
@@ -12,37 +14,31 @@ value type_num(value f)
 	{
 	if (f->N == 0)
 		{
-		num_free(get_num(f));
+		free_memory(f->R,sizeof(double));
 		return 0;
 		}
 	return type_void(f);
 	}
 
-value Qnum(number x)
+value Qnum(double x)
 	{
-	return D(type_num,x);
-	}
-
-value Qnum0(double x)
-	{
-	return Qnum(num_new_double(x));
+	double *p = new_memory(sizeof(double));
+	*p = x;
+	return D(type_num,p);
 	}
 
 value Qnum_str0(const char *name)
 	{
-	number n = str0_num(name);
-	if (n) return Qnum(n);
-	return 0;
-	}
-
-number get_num(value x)
-	{
-	return (number)x->R;
+	double x;
+	if (str0_double(name,&x))
+		return Qnum(x);
+	else
+		return 0;
 	}
 
 double get_double(value x)
 	{
-	return *get_num(x);
+	return *((double *)x->R);
 	}
 
 unsigned long get_ulong(value x)
@@ -57,7 +53,7 @@ value type_num_str(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
-		f = Qstr(num_str(get_num(x)));
+		f = Qstr(str_new_data0(format_double(get_double(x))));
 	else
 		f = hold(Qvoid);
 	drop(x);

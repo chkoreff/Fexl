@@ -1,4 +1,3 @@
-#include <num.h>
 #include <str.h>
 #include <value.h>
 
@@ -8,6 +7,13 @@
 #include <type_num.h>
 #include <type_str.h>
 
+static int num_cmp(double x, double y)
+	{
+	if (x < y) return -1;
+	if (x > y) return 1;
+	return 0;
+	}
+
 static value op_cmp(value f, int op(int))
 	{
 	if (!f->L || !f->L->L) return 0;
@@ -15,7 +21,7 @@ static value op_cmp(value f, int op(int))
 	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_num && y->T == type_num)
-		f = boolean(op(num_cmp(get_num(x),get_num(y))));
+		f = boolean(op(num_cmp(get_double(x),get_double(y))));
 	else if (x->T == type_str && y->T == type_str)
 		f = boolean(op(str_cmp(get_str(x),get_str(y))));
 	else

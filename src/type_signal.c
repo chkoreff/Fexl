@@ -1,4 +1,3 @@
-#include <num.h>
 #include <value.h>
 
 #include <signal.h> /* sigaction etc. */

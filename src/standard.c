@@ -1,4 +1,3 @@
-#include <num.h>
 #include <str.h>
 #include <value.h>
 
@@ -69,7 +68,7 @@ static value standard(value name)
 	if (match("log")) return Q(type_log);
 	if (match("sin")) return Q(type_sin);
 	if (match("cos")) return Q(type_cos);
-	if (match("pi")) return Qnum(num_pi());
+	if (match("pi")) return Qnum(num_pi);
 
 	if (match("lt")) return Q(type_lt);
 	if (match("le")) return Q(type_le);

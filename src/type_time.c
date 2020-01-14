@@ -1,4 +1,3 @@
-#include <num.h>
 #include <stdint.h>
 #include <str.h>
 #include <value.h>
@@ -18,7 +17,7 @@ value type_time(value f)
 	time_t n;
 	(void)f;
 	time(&n);
-	return Qnum0(n);
+	return Qnum(n);
 	}
 
 /* Format an epoch time as "YYYY-MM-DD HH:MM:SS". */

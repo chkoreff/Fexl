@@ -10,13 +10,11 @@ make crypto
 make die
 make fexl
 make file
-make file2
 make format
 make input
 make limit
 make memory
 make nacl
-make num
 make parse
 make report
 make sha256
@@ -46,7 +44,6 @@ make type_var
 make value
 if [ $DEV -eq 1 ]; then
 make output
-make output2
 make show
 fi
 link fexl

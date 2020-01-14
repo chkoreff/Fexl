@@ -1,4 +1,3 @@
-#include <num.h>
 #include <str.h>
 #include <value.h>
 
@@ -35,7 +34,7 @@ value type_arity(value f)
 			arity++;
 			pattern = pattern->L;
 			}
-		f = Qnum(num_new_ulong(arity));
+		f = Qnum((double)arity);
 		}
 	else
 		f = hold(Qvoid);

@@ -1,4 +1,3 @@
-#include <num.h>
 #include <str.h>
 #include <value.h>
 
@@ -226,7 +225,7 @@ static value op_process(value f, int catch_stderr)
 
 		handler = eval(handler);
 		status = do_wait(pid);
-		return A(handler,Qnum0(status));
+		return A(handler,Qnum(status));
 		}
 		}
 	}
@@ -658,7 +657,7 @@ value type_fexl_benchmark(value f)
 	value x = arg(f->L->R);
 	double steps = (double)num_steps - (double)save_num_steps;
 	double bytes = (double)cur_bytes - (double)save_cur_bytes;
-	f = A(A(A(hold(f->R),x),Qnum0(steps)),Qnum0(bytes));
+	f = A(A(A(hold(f->R),x),Qnum(steps)),Qnum(bytes));
 	}
 
 	eval = save_eval;

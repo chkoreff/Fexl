@@ -1,11 +1,9 @@
-#include <num.h>
 #include <stdio.h>
 #include <str.h>
 #include <value.h>
 
 #include <basic.h>
 #include <output.h>
-#include <output2.h>
 #include <show.h>
 #include <standard.h>
 #include <type_buf.h>
@@ -167,6 +165,11 @@ void put_type(type t)
 	else put_ch('?');
 	}
 
+static void put_str(string x)
+	{
+	fput_str(stdout,x);
+	}
+
 static void put_quote(string x)
 	{
 	put_ch('"');
@@ -201,7 +204,7 @@ static void limit_show(value f)
 		{
 		put_ch(' ');
 		if (f->T == type_num)
-			put_num(get_num(f));
+			put_double(get_double(f));
 		else if (f->T == type_str)
 			put_quote(get_str(f));
 		else if (f->T == type_sym)

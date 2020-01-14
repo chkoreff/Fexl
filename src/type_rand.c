@@ -1,4 +1,3 @@
-#include <num.h>
 #include <value.h>
 
 #include <standard.h>
@@ -31,5 +30,5 @@ value type_rand(value f)
 	{
 	double x = ((double)rand()) / ((double)RAND_MAX);
 	(void)f;
-	return Qnum0(x);
+	return Qnum(x);
 	}

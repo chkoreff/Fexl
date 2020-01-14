@@ -2,7 +2,6 @@
 #include <sys/types.h>
 
 #include <input.h>
-#include <num.h>
 #include <stdio.h>
 #include <value.h>
 
@@ -129,7 +128,7 @@ value type_remove(value f)
 		{
 		const char *path = str_data(x);
 		int code = remove(path);
-		f = Qnum0(code);
+		f = Qnum(code);
 		}
 	else
 		f = hold(Qvoid);
@@ -309,7 +308,7 @@ value type_mkdir(value f)
 		const char *path = str_data(x);
 		unsigned long mode = get_ulong(y);
 		int code = mkdir(path,mode);
-		f = Qnum0(code);
+		f = Qnum(code);
 		}
 	else
 		f = hold(Qvoid);
@@ -330,7 +329,7 @@ value type_rmdir(value f)
 		{
 		const char *path = str_data(x);
 		int code = rmdir(path);
-		f = Qnum0(code);
+		f = Qnum(code);
 		}
 	else
 		f = hold(Qvoid);
@@ -351,7 +350,7 @@ value type_ftruncate(value f)
 		FILE *fh = get_fh(x);
 		unsigned long len = get_ulong(y);
 		int code = ftruncate(fileno(fh),len);
-		f = Qnum0(code);
+		f = Qnum(code);
 		}
 	else
 		f = hold(Qvoid);
@@ -372,7 +371,7 @@ static value op_seek(value f, int whence)
 		FILE *fh = get_fh(x);
 		long offset = get_double(y);
 		int code = fseek(fh,offset,whence);
-		f = Qnum0(code);
+		f = Qnum(code);
 		}
 	else
 		f = hold(Qvoid);
@@ -397,7 +396,7 @@ value type_ftell(value f)
 		{
 		FILE *fh = get_fh(x);
 		long offset = ftell(fh);
-		f = Qnum0(offset);
+		f = Qnum(offset);
 		}
 	else
 		f = hold(Qvoid);
@@ -513,7 +512,7 @@ static value op_stat(value f, unsigned long op(struct stat *status))
 		else
 			{
 			unsigned long n = op(&status);
-			f = Qnum0(n);
+			f = Qnum(n);
 			}
 		}
 	else
@@ -544,7 +543,7 @@ value type_symlink(value f)
 	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_str)
-		f = Qnum0(symlink(str_data(x),str_data(y)));
+		f = Qnum(symlink(str_data(x),str_data(y)));
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -562,7 +561,7 @@ value type_rename(value f)
 	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_str)
-		f = Qnum0(rename(str_data(x),str_data(y)));
+		f = Qnum(rename(str_data(x),str_data(y)));
 	else
 		f = hold(Qvoid);
 	drop(x);
