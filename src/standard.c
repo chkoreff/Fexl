@@ -323,7 +323,7 @@ static void eval_script(void)
 	if (len >= 5 && strcmp(main_argv[0]+len-5,"fexl0") == 0)
 		{
 		/* Running as fexl0, so run the user's script directly. */
-		char *name = main_argc > 1 ? main_argv[1] : "";
+		const char *name = main_argc > 1 ? main_argv[1] : "";
 		f = Qstr0(name);
 		}
 	else
@@ -344,7 +344,7 @@ static void eval_script(void)
 	drop(f);
 	}
 
-void eval_standard(int argc, char *argv[])
+void eval_standard(int argc, const char *argv[])
 	{
 	main_argc = argc;
 	main_argv = argv;

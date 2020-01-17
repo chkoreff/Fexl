@@ -19,7 +19,7 @@
 #include <unistd.h> /* exec fork sleep */
 
 int main_argc;
-char **main_argv;
+const char **main_argv;
 
 value type_die(value f)
 	{
