@@ -1,10 +1,12 @@
 #include <str.h>
 #include <value.h>
 
-#include <arpa/inet.h> /* IPPROTO_TCP INADDR_ANY */
+#include <arpa/inet.h> /* inet_addr */
 #include <basic.h>
 #include <die.h>
 #include <memory.h>
+#include <netinet/in.h> /* IPPROTO_TCP INADDR_ANY (BSD) */
+#include <signal.h> /* kill (BSD) */
 #include <standard.h>
 #include <stdio.h>
 #include <stdlib.h> /* exit */

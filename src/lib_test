@@ -1,13 +1,15 @@
 #!/bin/sh
 # These are common shell routines used by test scripts, sourced with ".".
 
+bash_exe=$(which bash)
+
 do_time()
 	{
 	local usr_cmd="$1"
 	local cmd="\
 TIMEFORMAT=\"time %2Rs\"
 time $usr_cmd"
-	/bin/bash -c "$cmd" 2>&1
+	$bash_exe -c "$cmd" 2>&1
 	}
 
 doing()

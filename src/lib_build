@@ -42,7 +42,7 @@ make()
 	local file_c=$name.c
 	need $file_o
 	stale $file_o $file_c || return 0
-	mkdir -p `dirname $file_o`
+	mkdir -p $(dirname $file_o)
 
 	# I avoid -pedantic because I have two machines that don't recognize it.
 	local options="-Wall -Werror -Wunused-parameter -O3"
@@ -62,7 +62,7 @@ link()
 	local name="$1"
 	local file_e=../bin/$name
 	stale $file_e $objects || return 0
-	mkdir -p `dirname $file_e`
+	mkdir -p $(dirname $file_e)
 	run gcc -s $objects -o $file_e -lm
 	}
 
