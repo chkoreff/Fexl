@@ -7,11 +7,22 @@
 #include <type_sym.h>
 #include <type_tuple.h>
 
-/* (tuple data handler) = (data handler) */
+static value subst_tuple(value args, value handler)
+	{
+	if (args->T == type_I)
+		return hold(handler);
+	else
+		return A(subst_tuple(args->R,handler),hold(args->L));
+	}
+
 value type_tuple(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
-	return A(hold(f->L->R),hold(f->R));
+	if (!f->L)
+		{
+		if (f->N == 0) drop(f->R);
+		return 0;
+		}
+	return subst_tuple(f->L->R,f->R);
 	}
 
 value type_is_tuple(value f)
@@ -27,12 +38,12 @@ value type_arity(value f)
 	value x = arg(f->R);
 	if (x->T == type_tuple)
 		{
-		value pattern = x->R->L->R;
 		unsigned long arity = 0;
-		while (pattern != QT)
+		value args = x->R;
+		while (args->T != type_I)
 			{
 			arity++;
-			pattern = pattern->L;
+			args = args->R;
 			}
 		f = Qnum((double)arity);
 		}
@@ -43,13 +54,8 @@ value type_arity(value f)
 	}
 	}
 
-static value make_tuple(value pattern, value exp)
-	{
-	return A(hold(Qtuple),Qsubst(pattern,exp));
-	}
-
-/* (split_tuple xs A B)
-Return A if tuple xs is empty, otherwise return (B left item), where left is
+/* (split_tuple x A B)
+Return A if tuple x is empty, otherwise return (B left item), where left is
 the left part of the tuple, and item is the last item in the tuple.
 */
 value type_split_tuple(value f)
@@ -59,14 +65,13 @@ value type_split_tuple(value f)
 	value x = arg(f->L->L->R);
 	if (x->T == type_tuple)
 		{
-		value pattern = x->R->L->R;
-		if (pattern == QT)
+		value args = x->R;
+		if (args->T == type_I)
 			f = hold(f->L->R);
 		else
 			{
-			value exp = x->R->R;
-			value left = make_tuple(hold(pattern->L),hold(exp->L));
-			value item = hold(exp->R);
+			value left = D(type_tuple,hold(args->R));
+			value item = hold(args->L);
 			f = A(A(hold(f->R),left),item);
 			}
 		}
@@ -77,21 +82,15 @@ value type_split_tuple(value f)
 	}
 	}
 
-/* (join_tuple xs x) Form a new tuple by combining tuple xs on the left with
-item x on the right. */
+/* (join_tuple x y) Form a new tuple by combining tuple x on the left with
+item y on the right. */
 value type_join_tuple(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	{
 	value x = arg(f->L->R);
 	if (x->T == type_tuple)
-		{
-		value pattern = x->R->L->R;
-		value exp = x->R->R;
-		pattern = A(hold(pattern),hold(QF));
-		exp = A(hold(exp),hold(f->R));
-		f = make_tuple(pattern,exp);
-		}
+		f = D(type_tuple,A(hold(f->R),hold(x->R)));
 	else
 		f = hold(Qvoid);
 	drop(x);

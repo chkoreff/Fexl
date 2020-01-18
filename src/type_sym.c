@@ -68,15 +68,10 @@ value sym_source(value f)
 /* Apply f to g, where either can be a symbolic form. */
 value app(value f, value g)
 	{
-	type t = (f->T == type_sym || g->T == type_sym) ? type_sym : type_A;
-	return V(t,f,g);
-	}
-
-/* Return a function that calls subst(p,e,x) when applied to x. */
-value Qsubst(value p, value e)
-	{
-	type t = (e->T == type_sym ? type_sym : type_subst);
-	return V(t,V(type_subst,hold(QI),p),e);
+	if (f->T == type_sym || g->T == type_sym)
+		return V(type_sym,f,g);
+	else
+		return A(f,g);
 	}
 
 /* Abstract a name from an expression.  Sets *p to the pattern where the name
@@ -132,7 +127,7 @@ value lambda(const char *name, value exp)
 	{
 	value p,e,f;
 	abstract(name,exp,&p,&e);
-	f = Qsubst(p,e);
+	f = V(type_sym,V(type_subst,hold(QI),p),e);
 	drop(exp);
 	return f;
 	}
@@ -221,6 +216,6 @@ static value subst(value p, value e, value x)
 /* (subst p e x) Calls substitute. */
 value type_subst(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	if (!f->L->L || !f->L->L->L) return 0;
 	return subst(f->L->L->R,f->L->R,f->R);
 	}

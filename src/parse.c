@@ -10,6 +10,7 @@
 #include <standard.h>
 #include <type_str.h>
 #include <type_sym.h>
+#include <type_tuple.h>
 
 /*
 Grammar:
@@ -246,18 +247,15 @@ static value parse_list(void)
 
 static value parse_tuple(void)
 	{
-	value pattern = hold(QT);
-	value exp = hold(QI);
+	value exp = D(type_tuple,hold(QI));
 	while (1)
 		{
 		value term;
 		skip_filler();
 		term = parse_term();
-		if (term == 0) break;
-		pattern = A(pattern,hold(QF));
-		exp = app(exp,term);
+		if (term == 0) return exp;
+		exp = app(app(hold(Qjoin_tuple),exp),term);
 		}
-	return app(hold(Qtuple),Qsubst(pattern,exp));
 	}
 
 static value parse_term(void)
