@@ -4,7 +4,6 @@
 #include <basic.h>
 #include <standard.h>
 #include <type_num.h>
-#include <type_sym.h>
 #include <type_tuple.h>
 
 static value subst_tuple(value args, value handler)

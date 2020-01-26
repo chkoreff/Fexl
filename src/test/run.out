@@ -607,6 +607,8 @@ F
 F
 T
 F
+x = 7
+x = 7
 == tuples
 { }
 { a }

@@ -10,6 +10,7 @@ make crypto
 make die
 make fexl
 make file
+make file_str
 make format
 make input
 make limit
@@ -44,6 +45,7 @@ make type_var
 make value
 if [ $DEV -eq 1 ]; then
 make output
+make output_str
 make show
 fi
 link fexl

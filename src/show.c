@@ -4,6 +4,7 @@
 
 #include <basic.h>
 #include <output.h>
+#include <output_str.h>
 #include <show.h>
 #include <standard.h>
 #include <type_buf.h>
@@ -163,11 +164,6 @@ void put_type(type t)
 	else if (t == type_limit_memory) put("limit_memory");
 
 	else put_ch('?');
-	}
-
-static void put_str(string x)
-	{
-	fput_str(stdout,x);
 	}
 
 static void put_quote(string x)

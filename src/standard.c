@@ -5,7 +5,7 @@
 #include <crypto.h>
 #include <standard.h>
 #include <stdio.h>
-#include <string.h> /* strcmp */
+#include <string.h> /* strcmp strlen */
 #include <type_buf.h>
 #include <type_cmp.h>
 #include <type_crypto.h>
@@ -163,7 +163,6 @@ static value standard(value name)
 
 	if (match("parse")) return Q(type_parse);
 	if (match("parse_file")) return hold(Qparse_file);
-
 	if (match("evaluate")) return hold(Qevaluate);
 	if (match("resolve")) return Q(type_resolve);
 

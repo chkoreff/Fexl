@@ -62,7 +62,16 @@ try
 	(
 	limit_memory 4000000
 	limit_stack  1000000
-	@ @
+
+	# Make a nasty function that consumes an unbounded amount of memory.
+	\inf==
+		(
+		\S=(\x\y\z x z; y z)  # define the "fusion" operator
+		@ S S S  # Apply fixpoint to the fusion operator in a weird way.
+		)
+
+	# Invoke that function.
+	inf
 	)
 	""
 

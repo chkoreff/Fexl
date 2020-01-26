@@ -608,6 +608,16 @@ say (is_void [])
 say (is_void void)
 # If you apply a form to something else, it just propagates as a form.
 say (is_void ( (\; f x) 3) )
+# Evaluate a form.
+(
+\x=(evaluate standard (\; + 3 4))
+say ["x = "(as_str x)]
+)
+# Evaluate a non-form.
+(
+\x=(evaluate standard (+ 3 4))
+say ["x = "(as_str x)]
+)
 
 # Test tuples
 say "== tuples"

@@ -4,16 +4,12 @@
 
 #include <basic.h>
 #include <file.h>
+#include <file_str.h>
 #include <standard.h>
 #include <type_file.h>
 #include <type_num.h>
 #include <type_output.h>
 #include <type_str.h>
-
-void fput_str(FILE *fh, string x)
-	{
-	fputd(fh,x->data,x->len);
-	}
 
 static value op_put(FILE *fh, value f)
 	{
