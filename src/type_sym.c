@@ -9,174 +9,269 @@
 #include <string.h> /* strcmp */
 #include <type_str.h>
 #include <type_sym.h>
+#include <type_tuple.h>
 
-struct symbol
+static void sym_free(struct symbol *sym)
 	{
-	value name;
-	unsigned long line;
-	value source;
-	};
-
-static struct symbol *sym_new(string name, unsigned long line, value source)
-	{
-	struct symbol *x = new_memory(sizeof(struct symbol));
-	x->name = Qstr(name);
-	x->line = line;
-	x->source = source;
-	return x;
+	str_free(sym->name);
+	drop(sym->pattern);
+	free_memory(sym,sizeof(struct symbol));
 	}
 
-static void sym_free(struct symbol *x)
+static struct form *form_new(struct symbol *sym, value exp)
 	{
-	drop(x->name);
-	drop(x->source);
-	free_memory(x,sizeof(struct symbol));
+	struct form *form = new_memory(sizeof(struct form));
+	form->sym = sym;
+	form->exp = exp;
+	form->label = 0;
+	return form;
 	}
 
-static struct symbol *get_sym(value f)
+static void form_discard(struct form *form)
 	{
-	return (struct symbol *)f->R;
+	free_memory(form,sizeof(struct form));
 	}
 
-value type_sym(value f)
+void form_free(struct form *form)
+	{
+	struct symbol *sym = form->sym;
+	while (sym)
+		{
+		struct symbol *next = sym->next;
+		sym_free(sym);
+		sym = next;
+		}
+	drop(form->exp);
+	if (form->label)
+		drop(form->label);
+	form_discard(form);
+	}
+
+/* Make a reference to a fixed value with no symbols. */
+struct form *form_val(value exp)
+	{
+	return form_new(0,exp);
+	}
+
+/* Make a reference to a symbol on a given line. */
+struct form *form_ref(string name, unsigned long line)
+	{
+	struct symbol *sym = new_memory(sizeof(struct symbol));
+	sym->next = 0;
+	sym->name = name;
+	sym->line = line;
+	sym->pattern = hold(QT);
+	return form_new(sym,hold(QI));
+	}
+
+/* Merge the symbol lists and combine patterns where they intersect. */
+static struct symbol *sym_merge(struct symbol *fun, struct symbol *arg)
+	{
+	int cmp;
+	if (!fun)
+		{
+		if (!arg) return 0;
+		cmp = 1;
+		}
+	else if (!arg)
+		cmp = -1;
+	else
+		cmp = strcmp(fun->name->data,arg->name->data);
+
+	if (cmp < 0)
+		{
+		fun->pattern = A(fun->pattern,hold(QF));
+		fun->next = sym_merge(fun->next,arg);
+		return fun;
+		}
+	else if (cmp > 0)
+		{
+		arg->pattern = A(hold(QF),arg->pattern);
+		arg->next = sym_merge(fun,arg->next);
+		return arg;
+		}
+	else
+		{
+		fun->pattern = A(fun->pattern,hold(arg->pattern));
+		fun->next = sym_merge(fun->next,arg->next);
+		sym_free(arg);
+		return fun;
+		}
+	}
+
+/* Make an applicative form with the given type. */
+static struct form *form_join(type t, struct form *fun, struct form *arg)
+	{
+	fun->sym = sym_merge(fun->sym,arg->sym);
+	fun->exp = V(t,fun->exp,arg->exp);
+	form_discard(arg);
+	return fun;
+	}
+
+/* Apply function to argument. */
+struct form *form_app(struct form *fun, struct form *arg)
+	{
+	return form_join(type_A,fun,arg);
+	}
+
+/* Delete the symbol with the given name and return the associated pattern. */
+static struct symbol *sym_pop(const char *name, struct symbol *sym,
+	value *pattern)
+	{
+	int cmp;
+	if (!sym)
+		cmp = -1;
+	else
+		cmp = strcmp(name,sym->name->data);
+
+	if (cmp < 0)
+		{
+		*pattern = hold(QF); /* not found */
+		return sym;
+		}
+	else if (cmp > 0)
+		{
+		sym->next = sym_pop(name,sym->next,pattern);
+		return sym;
+		}
+	else
+		{
+		struct symbol *next = sym->next;
+		*pattern = hold(sym->pattern);
+		sym_free(sym);
+		return next;
+		}
+	}
+
+/* Equivalent to (void)sym_merge(0,sym).  Used when no syms on left side. */
+static void sym_merge0(struct symbol *sym)
+	{
+	struct symbol *cur = sym;
+	while (cur)
+		{
+		cur->pattern = A(hold(QF),cur->pattern);
+		cur = cur->next;
+		}
+	}
+
+/* Abstract the name from the body. */
+struct form *form_lam(const char *name, struct form *body)
+	{
+	value pattern;
+	struct symbol *sym = sym_pop(name,body->sym,&pattern);
+	sym_merge0(sym);
+	body->sym = sym;
+	body->exp = V(type_subst,V(type_subst,hold(QI),pattern),body->exp);
+	return body;
+	}
+
+/* Make a list with the head and tail. */
+struct form *form_cons(struct form *head, struct form *tail)
+	{
+	return form_join(type_cons,
+		form_join(type_cons,form_val(hold(QI)),head),tail);
+	}
+
+/* Make a tuple from the given arguments. */
+struct form *form_tuple(struct form *args)
+	{
+	sym_merge0(args->sym);
+	args->exp = V(type_tuple,hold(QI),args->exp);
+	return args;
+	}
+
+/* Evaluate def and apply exp to that value. */
+struct form *form_eval(struct form *def, struct form *exp)
+	{
+	return form_join(type_eval,
+		form_join(type_eval,form_val(hold(Qeval)),def),exp);
+	}
+
+/* Make a quoted (unresolved form). */
+struct form *form_quo(struct form *form)
+	{
+	return form_val(D(type_form,form));
+	}
+
+value type_form(value f)
 	{
 	if (f->N == 0)
-		sym_free(get_sym(f));
-	return 0;
-	}
-
-value Qsym(string name, unsigned long line, value source)
-	{
-	return D(type_sym,sym_new(name,line,source));
-	}
-
-value sym_name(value f)
-	{
-	return get_sym(f)->name;
-	}
-
-unsigned long sym_line(value f)
-	{
-	return get_sym(f)->line;
-	}
-
-value sym_source(value f)
-	{
-	return get_sym(f)->source;
-	}
-
-/* Apply f to g, where either can be a symbolic form. */
-value app(value f, value g)
-	{
-	if (f->T == type_sym || g->T == type_sym)
-		return V(type_sym,f,g);
-	else
-		return A(f,g);
-	}
-
-/* Abstract a name from an expression.  Sets *p to the pattern where the name
-appears in the expression.  Sets *e to the expression with QI substituted
-wherever the name occurred. */
-static void abstract(const char *name, value exp, value *p, value *e)
-	{
-	if (exp->T != type_sym)
 		{
-		*p = hold(QF);
-		*e = hold(exp);
+		form_free((struct form *)f->R);
+		return 0;
 		}
-	else if (exp->L == 0)
+	return type_void(f);
+	}
+
+/* Use pattern p to make a copy of expression e with argument x substituted in
+the places designated by the pattern. */
+static value subst(value p, value e, value x)
+	{
+	if (p == QF) return hold(e);
+	if (p == QT) return hold(x);
+	return V(e->T,subst(p->L,e->L,x),subst(p->R,e->R,x));
+	}
+
+/* (subst p e x) Calls substitute. */
+value type_subst(value f)
+	{
+	if (!f->L->L->L) return 0;
+	return subst(f->L->L->R,f->L->R,f->R);
+	}
+
+static value resolve(value context, struct form *form)
+	{
+	struct symbol *sym = form->sym;
+	value exp = hold(form->exp);
+	const char *label = str_data(form->label);
+	int undefined = 0;
+
+	while (sym)
 		{
-		if (strcmp(name,str_data(sym_name(exp))) == 0)
+		value key = Qstr(sym->name);
+		value val = eval(A(hold(context),hold(key)));
+
+		if (val->T == type_void) /* undefined */
 			{
-			*p = hold(QT);
-			*e = hold(QI);
+			/* By default, "standard" refers to the current context. */
+			if (strcmp(sym->name->data,"standard") == 0)
+				{
+				drop(val);
+				val = hold(context);
+				}
+			else
+				{
+				undefined = 1;
+				undefined_symbol(sym->name->data,sym->line,label);
+				}
 			}
 		else
 			{
-			*p = hold(QF);
-			*e = hold(exp);
+			/* Optimize (I x) returned by "later" to x. */
+			if (val->T == type_I && val->L)
+				{
+				value x = hold(val->R);
+				drop(val);
+				val = x;
+				}
 			}
-		}
-	else
+
 		{
-		value xp, xe;
-		value yp, ye;
-
-		abstract(name,exp->L,&xp,&xe);
-		abstract(name,exp->R,&yp,&ye);
-
-		if (xp == QF && yp == QF)
-			{
-			drop(xe);
-			drop(ye);
-			drop(yp);
-
-			*p = QF;
-			*e = hold(exp);
-			}
-		else
-			{
-			*p = A(xp,yp);
-			*e = app(xe,ye);
-			}
+		value next = subst(sym->pattern,exp,val);
+		drop(exp);
+		exp = next;
 		}
-	}
 
-/* Abstract the name from the expression and return a substitution form. */
-value lambda(const char *name, value exp)
-	{
-	value p,e,f;
-	abstract(name,exp,&p,&e);
-	f = V(type_sym,V(type_subst,hold(QI),p),e);
-	drop(exp);
-	return f;
-	}
+		key->R = 0;
+		drop(key);
+		drop(val);
+		sym = sym->next;
+		}
 
-static value define_name(value context, value name)
-	{
-	value def = eval(A(hold(context),hold(name)));
-	if (def->T == type_void) /* undefined */
-		{
-		drop(def);
-		/* By default, "standard" refers to the current context. */
-		if (strcmp(str_data(name),"standard") == 0)
-			return hold(context);
-		else
-			return 0;
-		}
-	else if (def->T == type_I && def->L)
-		{
-		/* Optimize (I x) returned by "later" to x. */
-		value x = hold(def->R);
-		drop(def);
-		return x;
-		}
-	else
-		return def;
-	}
+	if (undefined)
+		die(0); /* The expression had undefined symbols. */
 
-static int undefined = 0;
-
-static value resolve(value context, value exp)
-	{
-	if (exp->T != type_sym)
-		return hold(exp);
-	else if (exp->L == 0)
-		{
-		value name = sym_name(exp);
-		value def = define_name(context,name);
-		if (def) return def;
-		undefined = 1;
-		undefined_symbol(str_data(name),sym_line(exp),
-			str_data(sym_source(exp)));
-		return hold(exp);
-		}
-	else
-		{
-		value L = resolve(context,exp->L);
-		value R = resolve(context,exp->R);
-		return A(L,R);
-		}
+	return exp;
 	}
 
 /* (evaluate context exp) Evaluate the expression in the context. */
@@ -186,9 +281,13 @@ value type_evaluate(value f)
 	{
 	value context = arg(f->L->R);
 	value exp = arg(f->R);
-	f = resolve(context,exp);
-	if (undefined)
-		die(0); /* The expression had undefined symbols. */
+	if (exp->T == type_form)
+		{
+		struct form *form = (struct form *)exp->R;
+		f = resolve(context,form);
+		}
+	else
+		f = hold(Qvoid);
 	drop(context);
 	drop(exp);
 	return f;
@@ -202,20 +301,4 @@ value type_resolve(value f)
 	f = type_evaluate(f);
 	if (f) f = A(hold(Qlater),f);
 	return f;
-	}
-
-/* Use pattern p to make a copy of expression e with argument x substituted in
-the places designated by the pattern. */
-static value subst(value p, value e, value x)
-	{
-	if (p == QF) return hold(e);
-	if (p == QT) return hold(x);
-	return A(subst(p->L,e->L,x),subst(p->R,e->R,x));
-	}
-
-/* (subst p e x) Calls substitute. */
-value type_subst(value f)
-	{
-	if (!f->L->L || !f->L->L->L) return 0;
-	return subst(f->L->L->R,f->L->R,f->R);
 	}

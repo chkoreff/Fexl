@@ -27,7 +27,6 @@ void put_type(type t)
 	{
 	if (t == type_A) put_ch('A');
 
-	else if (t == type_sym) put("sym");
 	else if (t == type_evaluate) put("evaluate");
 	else if (t == type_resolve) put("resolve");
 	else if (t == type_subst) put("subst");
@@ -163,6 +162,8 @@ void put_type(type t)
 	else if (t == type_limit_stack) put("limit_stack");
 	else if (t == type_limit_memory) put("limit_memory");
 
+	else if (t == type_form) put("form");
+
 	else put_ch('?');
 	}
 
@@ -171,6 +172,31 @@ static void put_quote(string x)
 	put_ch('"');
 	put_str(x);
 	put_ch('"');
+	}
+
+static void show_sym(struct symbol *sym)
+	{
+	put("[");nl();
+	while (sym)
+		{
+		put("sym");nl();
+		put("  name ");put_str(sym->name);nl();
+		put("  line ");put_ulong(sym->line);nl();
+		put("  patt ");show(sym->pattern);nl();
+		sym = sym->next;
+		}
+	put("]");nl();
+	}
+
+static void show_form(struct form *form)
+	{
+	if (form->label)
+		{
+		put("label = ");show(form->label);nl();
+		}
+	put("syms =");nl();
+	show_sym(form->sym);
+	put("exp = ");show(form->exp);nl();
 	}
 
 static unsigned long max_depth;
@@ -203,23 +229,14 @@ static void limit_show(value f)
 			put_double(get_double(f));
 		else if (f->T == type_str)
 			put_quote(get_str(f));
-		else if (f->T == type_sym)
-			{
-			put_quote(get_str(sym_name(f)));
-			if (0)
-			{
-			put_ch(' ');
-			put_ulong(sym_line(f));
-			put_ch(' ');
-			put_quote(get_str(sym_source(f)));
-			}
-			}
 		else if (f->T == type_var)
 			limit_show(f->R);
 		else if (f->T == type_buf || f->T == type_istr)
 			put("...");
 		else if (f->T == type_file)
 			put_ulong(fileno(get_fh(f)));
+		else if (f->T == type_form)
+			show_form((struct form *)f->R);
 		else
 			put_ch('?');
 		}

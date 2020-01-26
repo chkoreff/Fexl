@@ -606,9 +606,9 @@ hi
 F
 F
 T
-F
+T
 x = 7
-x = 7
+x = void
 == tuples
 { }
 { a }
@@ -2260,9 +2260,9 @@ exit 0
 ==== test/b18.fxl
 == benchmark nested
 inner: val 479 steps 29 bytes 264
-outer: val 479 steps 154 bytes 712
+outer: val 479 steps 124 bytes 712
 == benchmark large list
-result: val 32768 steps 3441900 bytes 1574280
+result: val 32768 steps 2196346 bytes 1574184
 == benchmark negative memory usage
 result: val  steps 8 bytes 55
 exit 0
@@ -3243,22 +3243,12 @@ exit 1
 Undefined symbol a on line 2
 Undefined symbol b on line 2
 Undefined symbol c on line 2
-Undefined symbol b on line 2
-Undefined symbol c on line 2
 Undefined symbol d on line 2
-Undefined symbol a on line 3
-Undefined symbol b on line 3
-Undefined symbol c on line 3
-Undefined symbol b on line 3
-Undefined symbol c on line 3
-Undefined symbol d on line 3
 Undefined symbol x on line 5
 exit 1
 ====
 Undefined symbol a on line 1
-Undefined symbol a on line 2
 Undefined symbol c on line 2
-Undefined symbol c on line 3
 exit 1
 ==== missing.fxl
 Could not open source file missing.fxl

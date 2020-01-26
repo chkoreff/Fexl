@@ -256,7 +256,6 @@ value Qput;
 value Qnl;
 value Qfput;
 value Qfnl;
-value Qjoin_tuple;
 value Qparse_file;
 value Qevaluate;
 
@@ -275,7 +274,6 @@ static void beg_const(void)
 	Qnl = Q(type_nl);
 	Qfput = Q(type_fput);
 	Qfnl = Q(type_fnl);
-	Qjoin_tuple = Q(type_join_tuple);
 	Qparse_file = Q(type_parse_file);
 	Qevaluate = Q(type_evaluate);
 	init_signal();
@@ -296,7 +294,6 @@ static void end_const(void)
 	drop(Qnl);
 	drop(Qfput);
 	drop(Qfnl);
-	drop(Qjoin_tuple);
 	drop(Qparse_file);
 	drop(Qevaluate);
 	close_random();

@@ -10,7 +10,6 @@
 #include <standard.h>
 #include <type_str.h>
 #include <type_sym.h>
-#include <type_tuple.h>
 
 /*
 Grammar:
@@ -202,32 +201,32 @@ static string parse_content(string end, unsigned long first_line)
 	return content;
 	}
 
-static value parse_symbol(void)
+static struct form *parse_symbol(void)
 	{
 	unsigned long first_line = line;
 	if (ch == '"')
 		{
 		skip();
-		return Qstr(collect_string("\"",1,first_line));
+		return form_val(Qstr(collect_string("\"",1,first_line)));
 		}
 	else if (ch == '~')
 		{
 		string end = parse_terminator(first_line);
 		string content = parse_content(end,first_line);
-		return Qstr(content);
+		return form_val(Qstr(content));
 		}
 	else
 		{
 		string name = parse_name();
 		if (name == 0) return 0;
-		return Qsym(name,first_line,hold(label));
+		return form_ref(name,first_line);
 		}
 	}
 
-static value parse_term(void);
-static value parse_exp(void);
+static struct form *parse_term(void);
+static struct form *parse_exp(void);
 
-static value parse_list(void)
+static struct form *parse_list(void)
 	{
 	skip_filler();
 	if (ch == ';')
@@ -237,30 +236,30 @@ static value parse_list(void)
 		}
 	else
 		{
-		value term = parse_term();
+		struct form *term = parse_term();
 		if (term == 0)
-			return hold(Qnull);
+			return form_val(hold(Qnull));
 		else
-			return app(app(hold(Qcons),term),parse_list());
+			return form_cons(term,parse_list());
 		}
 	}
 
-static value parse_tuple(void)
+static struct form *parse_tuple(void)
 	{
-	value exp = V(type_tuple,hold(QI),hold(QI));
+	struct form *args = form_val(hold(QI));
 	while (1)
 		{
-		value term;
+		struct form *term;
 		skip_filler();
 		term = parse_term();
-		if (term == 0) return exp;
-		exp = app(app(hold(Qjoin_tuple),exp),term);
+		if (term == 0) return form_tuple(args);
+		args = form_app(term,args);
 		}
 	}
 
-static value parse_term(void)
+static struct form *parse_term(void)
 	{
-	value exp;
+	struct form *exp;
 	unsigned long first_line = line;
 	if (ch == '(') /* parenthesized expression */
 		{
@@ -293,10 +292,11 @@ static value parse_term(void)
 	}
 
 /* Parse a lambda form following the initial '\' character. */
-static value parse_lambda(unsigned long first_line)
+static struct form *parse_lambda(unsigned long first_line)
 	{
 	string name;
-	value def=0, exp;
+	struct form *def = 0;
+	struct form *exp;
 	int eager = 1;
 
 	/* Parse the name. */
@@ -324,27 +324,28 @@ static value parse_lambda(unsigned long first_line)
 		}
 
 	/* Parse the body of the function and abstract the name out. */
-	exp = lambda(name->data,parse_exp());
+	exp = form_lam(name->data,parse_exp());
 	str_free(name);
 
 	/* Apply the definition if any. */
 	if (def == 0)
 		return exp;
 	else if (eager)
-		return app(app(hold(Qeval),def),exp);
+		return form_eval(def,exp);
 	else
-		return app(exp,def);
+		return form_app(exp,def);
 	}
 
 /* Parse a form (unresolved symbolic expression). */
-static value parse_form(void)
+static struct form *parse_form(void)
 	{
-	value exp = parse_exp();
-	return A(hold(QI),exp);
+	struct form *exp = parse_exp();
+	exp->label = hold(label);
+	return form_quo(exp);
 	}
 
 /* Parse the next factor of an expression.  Return 0 if no factor found. */
-static value parse_factor(void)
+static struct form *parse_factor(void)
 	{
 	skip_filler();
 	if (ch == -1)
@@ -373,7 +374,7 @@ static value parse_factor(void)
 		}
 	else
 		{
-		value factor = parse_term();
+		struct form *factor = parse_term();
 		if (ch == '=')
 			syntax_error("Missing name declaration before '='", line);
 		return factor;
@@ -381,19 +382,19 @@ static value parse_factor(void)
 	}
 
 /* Parse an expression. */
-static value parse_exp(void)
+static struct form *parse_exp(void)
 	{
-	value exp = 0;
+	struct form *exp = 0;
 	while (1)
 		{
-		value factor = parse_factor();
+		struct form *factor = parse_factor();
 		if (factor == 0) break;
 		if (exp == 0)
 			exp = factor;
 		else
-			exp = app(exp,factor);
+			exp = form_app(exp,factor);
 		}
-	if (exp == 0) exp = hold(QI);
+	if (exp == 0) exp = form_val(hold(QI));
 	return exp;
 	}
 
@@ -407,9 +408,10 @@ value parse_input(input _get, void *_source, value _label)
 	line = 1;
 
 	{
-	value exp = parse_exp();
+	struct form *exp = parse_exp();
 	if (ch != -1)
 		syntax_error("Extraneous input", line);
-	return exp;
+	exp->label = hold(label);
+	return D(type_form,exp);
 	}
 	}
