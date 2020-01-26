@@ -203,8 +203,6 @@ static void limit_show(value f)
 			put_double(get_double(f));
 		else if (f->T == type_str)
 			put_quote(get_str(f));
-		else if (f->T == type_tuple)
-			limit_show(f->R);
 		else if (f->T == type_sym)
 			{
 			put_quote(get_str(sym_name(f)));

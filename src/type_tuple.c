@@ -16,11 +16,7 @@ static value subst_tuple(value args, value handler)
 
 value type_tuple(value f)
 	{
-	if (!f->L)
-		{
-		if (f->N == 0) drop(f->R);
-		return 0;
-		}
+	if (f->L->T == type_I) return 0;
 	return subst_tuple(f->L->R,f->R);
 	}
 
@@ -69,7 +65,7 @@ value type_split_tuple(value f)
 			f = hold(f->L->R);
 		else
 			{
-			value left = D(type_tuple,hold(args->R));
+			value left = V(type_tuple,hold(QI),hold(args->R));
 			value item = hold(args->L);
 			f = A(A(hold(f->R),left),item);
 			}
@@ -89,7 +85,7 @@ value type_join_tuple(value f)
 	{
 	value x = arg(f->L->R);
 	if (x->T == type_tuple)
-		f = D(type_tuple,A(hold(f->R),hold(x->R)));
+		f = V(type_tuple,hold(QI),A(hold(f->R),hold(x->R)));
 	else
 		f = hold(Qvoid);
 	drop(x);

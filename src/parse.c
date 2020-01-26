@@ -247,7 +247,7 @@ static value parse_list(void)
 
 static value parse_tuple(void)
 	{
-	value exp = D(type_tuple,hold(QI));
+	value exp = V(type_tuple,hold(QI),hold(QI));
 	while (1)
 		{
 		value term;
