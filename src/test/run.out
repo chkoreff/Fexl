@@ -1246,6 +1246,7 @@ x = 7
 ==== test/a4.fxl
 [
 ]
+steps 31000022 bytes 608
 exit 0
 ==== test/a5.fxl
 begin
