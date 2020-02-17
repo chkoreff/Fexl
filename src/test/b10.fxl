@@ -1,7 +1,14 @@
+# Testing with a version that prints "get " when it reads a char.
+\fgetc=
+	(\fh
+	put "get "
+	fgetc fh
+	)
+
 # Return the (lazy) list of bytes read from the file handle.
 \file_bytes=
 	(\fh @\loop
-	\ch=(put "get " fgetc fh)
+	\ch=(fgetc fh)
 	is_void ch [];
 	\tail=(once loop)
 	cons ch tail
@@ -15,19 +22,15 @@
 	# Testing with fixed file contents.
 	\source=(path_under dir_base "src/test/chars.fxl")
 
-	\fh=(
-		\fh=(fopen source "r")
-		if (is_void fh) (error ["Could not open "source])
-		fh
-		)
+	\fh=(fopen source "r")
+	is_void fh (error ["Could not open "source]);
 	fh
 	)
 
 \get_bytes=
 	(\n
 	\bytes=(once; file_bytes fh_entropy)
-	\bytes==(first n bytes)
-	later bytes
+	once; first n bytes
 	)
 
 \get_random_id==
