@@ -36,7 +36,7 @@ CR # blank row
 "a" " " "b" "," "c" "d" CR LF
 
 QU "a" "b" " " "c" QU QU "h" "i" QU QU QU ","
-QU "3" "." "1" "4" QU  # not converted to number
+QU "3" "." "1" "4" QU
 LF
 
 LF # blank row

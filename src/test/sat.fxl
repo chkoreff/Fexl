@@ -46,23 +46,23 @@ SAT 4 (\a\b\c\d (and (or (and a d) c) (not (and b d))))
 
 say "SAT 17 ..."
 SAT 17
-	(\1\2\3\4\5\6\7\8\9\10\11\12\13\14\15\16\17
-	and (1);
-	and (2);
-	and (not 3);
-	and (4);
-	and (5);
-	and (not 6);
-	and (7);
-	and (8);
-	and (not 9);
-	and (10);
-	and (not 11);
-	and (12);
-	and (13);
-	and (14);
-	and (15);
-	and (16);
-	and (17);
+	(\_1\_2\_3\_4\_5\_6\_7\_8\_9\_10\_11\_12\_13\_14\_15\_16\_17
+	and (_1);
+	and (_2);
+	and (not _3);
+	and (_4);
+	and (_5);
+	and (not _6);
+	and (_7);
+	and (_8);
+	and (not _9);
+	and (_10);
+	and (not _11);
+	and (_12);
+	and (_13);
+	and (_14);
+	and (_15);
+	and (_16);
+	and (_17);
 	T
 	)

@@ -38,13 +38,6 @@ static value standard(value name)
 	{
 	cur_name = str_data(name);
 
-	/* Resolve numeric literals. */
-	{
-	value def = Qnum_str0(cur_name);
-	if (def) return def;
-	}
-
-	/* Resolve other names. */
 	if (match("put")) return hold(Qput);
 	if (match("nl")) return hold(Qnl);
 	if (match("say")) return Q(type_say);

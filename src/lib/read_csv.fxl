@@ -45,11 +45,7 @@ standard
 	(
 	\x=look
 	eq x QU (skip get_quote_item);
-	\item=get_plain_item
-	# LATER 20200225 Deprecate auto convert to number.
-	# Convert to number if possible.
-	\n=(str_num item)
-	is_good n n item
+	get_plain_item
 	)
 
 # Get a row.

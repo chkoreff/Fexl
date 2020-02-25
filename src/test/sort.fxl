@@ -24,7 +24,7 @@ define "show_list" show_list;
 define "sort" sort;
 define "tower" tower;
 define "unique" unique;
-str_num
+void
 ) \;
 # Here I test the sort.
 

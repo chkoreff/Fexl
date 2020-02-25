@@ -174,7 +174,7 @@ format_num
 		define "T" T;
 		define "F" F;
 		define "void" void;
-		str_num
+		void
 		);
 	parse str ""
 	)

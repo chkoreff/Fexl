@@ -48,6 +48,7 @@ run_fexl test/b17.fxl
 run_fexl test/b18.fxl
 run_fexl test/b19.fxl
 run_fexl test/b20.fxl
+run_fexl test/b21.fxl
 run_fexl test/chars.fxl
 run_fexl test/date.fxl
 run_fexl test/sat.fxl
@@ -72,6 +73,8 @@ EOF
 ) | run_fexl
 
 # Test some syntax errors.
+
+echo -n "\\\3.14=pi say x3.14" | run_fexl
 
 echo -n "\"" | run_fexl
 

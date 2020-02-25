@@ -1,0 +1,59 @@
+#
+say "=== Test new rules for numeric constants"
+
+\try=
+	(\x
+	\n=(str_num x)
+	say ["str_num "QU x QU" = "(is_void n "void" n)]
+	)
+
+say "= test good"
+try "0"
+try "-0"
+try "123.4567"
+try "0123.4567"
+try "00123.4567"
+try "-00123.4567"
+try "0.5"
+try ".5"
+try "-.5"
+try "+.5"
+try "-.5e-2"
+try "-.567E-2"
+try "-.567E+2"
+try "-.567E2"
+try "+.567E2"
+
+try "-3.6"
+try "+3.6"
+try "+3." # weird but whatever
+try "+3"
+try "+0"
+nl
+
+say "= test bad"
+try ""
+try "."
+try "-"
+try "+"
+try "--"
+try "-+"
+try "+-"
+try "+."
+
+try "4.8 5"
+try " 4.8"
+try "4.8 "
+
+try "-+3.6"
+try "+-3.6"
+try "-2.3x"
+try "3.6x"
+try "3.6 "
+try "inf"
+try "nan"
+
+# The worst.
+try "-inf"
+try "-nan"
+nl

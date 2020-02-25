@@ -170,8 +170,9 @@ bool T
 bool F
 bool T
 bool T
+==
 bool T
-bool T
+bool F
 bool F
 bool F
 bool T
@@ -352,7 +353,7 @@ I am Fred.
 -0.996164608835841
 bye
 ==
-45.87
+53.54
 ==
 length is 16777216
 ==
@@ -752,7 +753,7 @@ than
 ur
 when
 ]
-steps 33087748 bytes 29498464
+steps 33087588 bytes 29498432
 female
 1 1 2 2 3 3 4 5 5 6 6 7 8 8 9 9 10 11 11 12 13 13 14 14 15 16 16 17 17 18 19 19 20 21 21 22 
 male
@@ -1567,34 +1568,34 @@ exit 0
 [
 ]
 [
-[-11.36 12]
-[21 22]
-[31 32]
-[41 42 "" "" ""]
-[51 52]
+[" -11.36" "12"]
+["21" "22"]
+["31" "32"]
+["41" "42" "" "" ""]
+["51" "52"]
 ["a b" "cd"]
 [~1 ab c"hi"~1 "3.14"]
-[6]
-[33]
+["6"]
+["33"]
 ]
 [
 ["x"]
 ]
 [
-[12 3 "" 4]
-[5 6 7]
+["12" "3" "" "4"]
+["5" "6" "7"]
 [~1 a b
 "hi"
-cd~1 "3.14" -48.7]
+cd~1 "3.14" "-48.7"]
 [~1 abc,def"ghi"jklmnopqrstuvwxyz~1]
 ["    "]
 ]
 [
-[12 3 "" 4]
-[5 6 7]
+["12" "3" "" "4"]
+["5" "6" "7"]
 [~1 a b
 "hi"
-cd~1 "3.14" -48.7]
+cd~1 "3.14" "-48.7"]
 [~1 abc,def"ghi"jklmnopqrstuvwxyz~1]
 ["    "]
 ]
@@ -1710,10 +1711,10 @@ name dirname : T
 name hex_digit : T
 name read_ssv_file : T
 name read_csv_file : T
-name 2.5 : T
-name 0 : T
-name -3.56 : T
-name -3.56e-4 : T
+name 2.5 : F
+name 0 : F
+name -3.56 : F
+name -3.56e-4 : F
 name -3.56e-4x : F
 name x : F
 == test_restricted_context
@@ -2398,6 +2399,53 @@ z = 1234567901234567901234567901234567901234567901234320987654320987654320987654
 "x" void
 "x1234" void
 "12345abc90123456789012" void
+
+exit 0
+==== test/b21.fxl
+=== Test new rules for numeric constants
+= test good
+str_num "0" = 0
+str_num "-0" = -0
+str_num "123.4567" = 123.4567
+str_num "0123.4567" = 123.4567
+str_num "00123.4567" = 123.4567
+str_num "-00123.4567" = -123.4567
+str_num "0.5" = 0.5
+str_num ".5" = 0.5
+str_num "-.5" = -0.5
+str_num "+.5" = 0.5
+str_num "-.5e-2" = -0.005
+str_num "-.567E-2" = -0.00567
+str_num "-.567E+2" = -56.7
+str_num "-.567E2" = -56.7
+str_num "+.567E2" = 56.7
+str_num "-3.6" = -3.6
+str_num "+3.6" = 3.6
+str_num "+3." = 3
+str_num "+3" = 3
+str_num "+0" = 0
+
+= test bad
+str_num "" = void
+str_num "." = void
+str_num "-" = void
+str_num "+" = void
+str_num "--" = void
+str_num "-+" = void
+str_num "+-" = void
+str_num "+." = void
+str_num "4.8 5" = void
+str_num " 4.8" = void
+str_num "4.8 " = void
+str_num "-+3.6" = void
+str_num "+-3.6" = void
+str_num "-2.3x" = void
+str_num "3.6x" = void
+str_num "3.6 " = void
+str_num "inf" = void
+str_num "nan" = void
+str_num "-inf" = void
+str_num "-nan" = void
 
 exit 0
 ==== test/chars.fxl
@@ -3219,6 +3267,9 @@ ch 0a
 exit 0
 ====
 hi
+exit 1
+====
+Lambda name cannot be a number on line 1
 exit 1
 ====
 Unclosed string on line 1
