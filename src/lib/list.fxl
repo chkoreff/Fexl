@@ -317,6 +317,16 @@
 	[x;xs]
 	)
 
+# LATER 20200224 Use stream_list instead of get_list.
+\stream_list=
+	(\get @\loop
+	once;
+	\x=get
+	is_void x [];
+	\xs=loop
+	[x;xs]
+	)
+
 # Flatten a piece of data (string, number, boolean, or list) into a string.
 \to_str=
 	(\x
@@ -535,6 +545,7 @@ define "column" column;
 define "match_column" match_column;
 define "stream_values" stream_values;
 define "get_list" get_list;
+define "stream_list" stream_list;
 define "to_str" to_str;
 define "get_str" get_str;
 define "list_str" list_str;

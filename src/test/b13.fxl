@@ -45,9 +45,6 @@ test_context
 	use_lib "read_ssv.fxl";
 	use_lib "read_csv.fxl";
 
-	use_lib "read_ssv.fxl";
-	use_lib "read_csv.fxl";
-
 	use_lib "html.fxl";
 
 	standard

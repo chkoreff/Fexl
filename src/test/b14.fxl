@@ -5,8 +5,11 @@
 	(\path
 	say ["directory "path]
 	\path=(path_under dir_base path)
-	\names=(sort; dir_names path)
-	say "[" each names say say "]"
+	# Exclude hidden files.
+	\names=(sort; filter (\x not; starts_with "." x); dir_names path)
+	say "["
+	each names say
+	say "]"
 	)
 
 \demo_seek=

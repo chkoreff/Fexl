@@ -1,4 +1,4 @@
-#
+# LATER 20200225 Deprecated.
 \is_eol=(\ch eq ch CR T; eq ch LF T; F)
 \is_white=(\ch lt (ord ch) 33)
 

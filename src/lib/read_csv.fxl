@@ -3,20 +3,18 @@
 # "Spaces are considered part of a field and should not be ignored."
 evaluate
 (
-use_lib "read.fxl";
+define "save_standard" standard;
+use_lib "_read.fxl";
 standard
 ) \;
-
-\read=
-(\;
 
 \get_plain_item==
 	(
 	collect_to
-		(\ch
-		is_void ch T;
-		eq ch "," T;
-		is_eol ch
+		(\x
+		is_void x T;
+		eq x "," T;
+		is_eol x
 		)
 	)
 
@@ -25,10 +23,10 @@ standard
 # appears in the string.
 \get_quote_char==
 	(
-	\ch=get
-	ne ch QU ch;
-	\ch=look
-	eq ch QU (skip QU);
+	\x=get
+	ne x QU x;
+	\x=look
+	eq x QU (skip QU);
 	""
 	)
 
@@ -37,17 +35,18 @@ standard
 	(
 	\buf=buf_new
 	@\loop
-	\ch=get_quote_char
-	eq ch "" (buf_get buf);
-	buf_put buf ch
+	\x=get_quote_char
+	eq x "" (buf_get buf);
+	buf_put buf x
 	loop
 	)
 
 \get_item==
 	(
-	\ch=look
-	eq ch QU (skip get_quote_item);
+	\x=look
+	eq x QU (skip get_quote_item);
 	\item=get_plain_item
+	# LATER 20200225 Deprecate auto convert to number.
 	# Convert to number if possible.
 	\n=(str_num item)
 	is_good n n item
@@ -56,29 +55,30 @@ standard
 # Get a row.
 \get_row==
 	(@\loop
-	\x=get_item
-	\ch=get
-	ne ch "," [x];
-	\xs=loop
-	[x;xs]
+	\item=get_item
+	is_void item [];
+	\x=get
+	is_void x [item];
+	ne x "," [item];
+	\list=loop
+	[item;list]
 	)
 
 \get_rows==
-	(
-	get_seq
-		get_row
-		is_eol
-		is_void
+	(@\loop
+	skip_match is_eol
+	\x=look
+	is_void x [];
+	\row=get_row
+	\list=loop
+	[row;list]
 	)
 
-get_rows
-)
-
-\read_csv_string=(read_string read)
-\read_csv_chars=(read_chars read)
-\read_csv_file=(read_file read)
+\read_csv_string=(read_string get_rows)
+\read_csv_chars=(read_chars get_rows)
+\read_csv_file=(read_file get_rows)
 
 define "read_csv_string" read_csv_string;
 define "read_csv_chars" read_csv_chars;
 define "read_csv_file" read_csv_file;
-standard
+save_standard

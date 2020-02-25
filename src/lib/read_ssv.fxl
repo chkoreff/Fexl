@@ -2,12 +2,10 @@
 # This is the "command line" syntax I use to specify event histories.
 evaluate
 (
-use_lib "read.fxl";
+define "save_standard" standard;
+use_lib "_read.fxl";
 standard
 ) \;
-
-\read=
-(\;
 
 # Collect a string up to the next occurrence of the terminator string.
 \collect_string=
@@ -22,11 +20,11 @@ standard
 		(@\collect\in_term\term_tail
 		term_tail (buf_get buf_result) \term_ch\term_tail
 
-		\ch=look
-		eq ch term_ch
+		\x=look
+		eq x term_ch
 			(
 			# Current char matches the next term char, so save it.
-			buf_put buf_match ch
+			buf_put buf_match x
 			skip
 			collect T term_tail
 			);
@@ -40,7 +38,7 @@ standard
 			)
 			(
 			# Add current char to the result and proceed.
-			buf_put buf_result ch
+			buf_put buf_result x
 			skip
 			)
 		collect F term
@@ -52,61 +50,61 @@ standard
 \get_plain_item==
 	(
 	collect_to
-		(\ch
-		is_void ch T;
-		eq ch QU T;
-		eq ch "~" T;
-		is_white ch
+		(\x
+		is_void x T;
+		eq x QU T;
+		eq x "~" T;
+		is_white x
 		)
 	)
 
 \get_item==
 	(
-	\ch=look
-	eq ch QU
+	\x=look
+	eq x QU
 		(
 		skip
 		\str=(collect_to (eq QU))
 		skip
 		str
 		);
-	eq ch "~"
+	eq x "~"
 		(
 		skip
 		\term=(collect_to is_white)
 		skip
-		collect_string (. ch term)
+		collect_string (. x term)
 		);
 	get_plain_item
 	)
 
 \get_row==
-	(
-	get_seq
-		get_item
-		(\ch
-		is_eol ch F;
-		is_white ch
-		)
-		is_eol
+	(@\loop
+	skip_match (\x is_eol x F; is_white x)
+	\x=look
+	is_void x [];
+	is_eol x [];
+	\item=get_item
+	is_void item [];
+	\list=loop
+	[item;list]
 	)
 
 \get_rows==
-	(
-	get_seq
-		get_row
-		is_white
-		is_void
+	(@\loop
+	skip_match is_white
+	\x=look
+	is_void x [];
+	\row=get_row
+	\list=loop
+	[row;list]
 	)
 
-get_rows
-)
-
-\read_ssv_string=(read_string read)
-\read_ssv_chars=(read_chars read)
-\read_ssv_file=(read_file read)
+\read_ssv_string=(read_string get_rows)
+\read_ssv_chars=(read_chars get_rows)
+\read_ssv_file=(read_file get_rows)
 
 define "read_ssv_string" read_ssv_string;
 define "read_ssv_chars" read_ssv_chars;
 define "read_ssv_file" read_ssv_file;
-standard
+save_standard

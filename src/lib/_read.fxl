@@ -1,0 +1,106 @@
+#
+\is_eol=(\x eq x LF T; eq x CR)
+\is_white=(ge " ")
+
+\v_in=var_new
+\get_in==(var_get v_in)
+\put_in=(var_put v_in)
+
+\look==
+	(
+	get_in void \x\_ x
+	)
+
+\skip==
+	(
+	get_in () \_\in
+	put_in in
+	)
+
+\get==
+	(
+	get_in void \x\in
+	put_in in
+	x
+	)
+
+# Skip matching characters.
+\skip_match=
+	(\is_match
+	@\loop
+	\x=look
+	is_void x ();
+	is_match x (skip loop) ()
+	)
+
+# Collect characters up to an ending condition.  Return void if not found.
+\collect_to=
+	(\is_end
+	\buf=buf_new
+	@\loop
+	\x=look
+	is_end x (buf_get buf);
+	buf_put buf x
+	skip
+	loop
+	)
+
+# Collect characters up to an ending condition.  Return void if not found.
+\collect_to=
+	(\is_end
+	\buf=buf_new
+	@\loop
+	\x=look
+	is_end x (buf_get buf);
+	buf_put buf x
+	skip
+	loop
+	)
+
+\use_stream=
+	(\in\read
+	\save_in=get_in
+	put_in in
+	\val=read
+	put_in save_in
+	val
+	)
+
+\read_string=
+	(\read\str
+	\fh=(readstr str)
+	\in=(stream_list (sgetc fh))
+	use_stream in read
+	)
+
+\read_chars=
+	(\read\chars
+	use_stream chars read
+	)
+
+\read_file=
+	(\read\name
+
+	\fh=(fopen name "r")
+	if (is_void fh) (error ["Could not open "name])
+	\result=
+		(
+		\in=(stream_list (fgetc fh))
+		use_stream in read
+		)
+
+	fclose fh
+	result
+	)
+
+define "is_eol" is_eol;
+define "is_white" is_white;
+define "look" look;
+define "skip" skip;
+define "get" get;
+define "skip_match" skip_match;
+define "collect_to" collect_to;
+define "read_string" read_string;
+define "read_chars" read_chars;
+define "read_file" read_file;
+standard

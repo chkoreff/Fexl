@@ -1,5 +1,4 @@
 # Test reading CSV and SSV data.
-
 evaluate
 (
 use_lib "read_csv.fxl";
@@ -46,6 +45,23 @@ LF # blank row
 ]
 
 try ["x" LF]
+)
+
+(
+\try=(try_chars read_csv_string)
+
+try
+~
+12,3,,4
+5,6,7
+
+"a b
+""hi""
+cd","3.14",-48.7
+"abc,def""ghi""jklmnopqrstuvwxyz"
+
+    
+~
 )
 
 (
@@ -101,6 +117,35 @@ try ["~"]
 try ["~" "E" "N" "D"]
 try ["~" "E" "N" "D" " "]
 try ["~" "E" "N" "D" " " "a" "~" "E" "N"]
+)
+
+(
+\try=(try_chars read_ssv_string)
+try
+~TEST
+ab xzz d e f
+g hi
+      ab c   
+	x	y
+
+
+z
+          
+	
+a x	
+a b "c d" ~ e~~ f"gh"~ij ~END k"l"m~1n~ENDo~| p~|q"r"s
+tuv
+"a bb c" ~ x"y"z~ 21 38.3 -44 
+"aaaa" ~
+Block of text here.
+Second line.
+~ ~END another block
+second line~END
+1 2 3
+
+
+~abcde ~a~ab~abc~abcd~abcde
+~TEST
 )
 
 (
