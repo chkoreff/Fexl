@@ -1745,7 +1745,6 @@ exit 0
 ==== test/b14.fxl
 directory src/lib
 [
-_read.fxl
 assoc.fxl
 bool.fxl
 date.fxl

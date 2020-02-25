@@ -1,82 +1,81 @@
-# LATER 20200225 Deprecated.
-\is_eol=(\ch eq ch CR T; eq ch LF T; F)
-\is_white=(\ch lt (ord ch) 33)
+#
+\is_eol=(\x eq x LF T; eq x CR)
+\is_white=(ge " ")
 
-evaluate
-(
-define "is_eol" is_eol;
-define "is_white" is_white;
-standard
-) \;
+\v_in=var_new
+\get_in==(var_get v_in)
+\put_in=(var_put v_in)
 
-\make_context=
-(\get\look
+\look==
+	(
+	get_in void \x\_ x
+	)
 
-\skip==(\ch=get)
+\skip==
+	(
+	get_in () \_\in
+	put_in in
+	)
+
+\get==
+	(
+	get_in void \x\in
+	put_in in
+	x
+	)
 
 # Skip matching characters.
 \skip_match=
-	(\match
+	(\is_match
 	@\loop
-	\ch=look
-	not (match ch) ();
-	skip
-	loop
+	\x=look
+	is_void x ();
+	is_match x (skip loop) ()
 	)
 
-# Collect characters up to an ending condition.
+# Collect characters up to an ending condition.  Return void if not found.
 \collect_to=
-	(\end
+	(\is_end
 	\buf=buf_new
 	@\loop
-	\ch=look
-	end ch (buf_get buf);
-	buf_put buf ch
+	\x=look
+	is_end x (buf_get buf);
+	buf_put buf x
 	skip
 	loop
 	)
 
-# Get a sequence of items with a given separator and end condition.
-\get_seq=
-	(\read\sep\end
-
-	\sep=(\ch is_void ch F; sep ch)
-	\end=(\ch is_void ch T; end ch)
-
+# Collect characters up to an ending condition.  Return void if not found.
+\collect_to=
+	(\is_end
+	\buf=buf_new
 	@\loop
-	skip_match sep
-	\ch=look
-	end ch [];
-	\x=read
-	\xs=loop
-	[x;xs]
+	\x=look
+	is_end x (buf_get buf);
+	buf_put buf x
+	skip
+	loop
 	)
 
-define "get" get;
-define "look" look;
-define "skip" skip;
-define "skip_match" skip_match;
-define "collect_to" collect_to;
-define "get_seq" get_seq;
-standard
-)
-
-\read_stream=
-	(\read\get\look
-	\context=(make_context get look)
-	evaluate context read
+\use_stream=
+	(\in\read
+	\save_in=get_in
+	put_in in
+	\val=read
+	put_in save_in
+	val
 	)
 
 \read_string=
 	(\read\str
 	\fh=(readstr str)
-	read_stream read (sgetc fh) (slook fh)
+	\in=(stream_list (sgetc fh))
+	use_stream in read
 	)
 
 \read_chars=
 	(\read\chars
-	\str=(to_str chars)
-	read_string read str
+	use_stream chars read
 	)
 
 \read_file=
@@ -84,12 +83,23 @@ standard
 
 	\fh=(fopen name "r")
 	if (is_void fh) (error ["Could not open "name])
-	\result=(read_stream read (fgetc fh) (flook fh))
+	\result=
+		(
+		\in=(stream_list (fgetc fh))
+		use_stream in read
+		)
 
 	fclose fh
 	result
 	)
 
+define "is_eol" is_eol;
+define "is_white" is_white;
+define "look" look;
+define "skip" skip;
+define "get" get;
+define "skip_match" skip_match;
+define "collect_to" collect_to;
 define "read_string" read_string;
 define "read_chars" read_chars;
 define "read_file" read_file;

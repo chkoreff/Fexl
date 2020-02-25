@@ -3,7 +3,7 @@
 evaluate
 (
 define "save_standard" standard;
-use_lib "_read.fxl";
+use_lib "read.fxl";
 standard
 ) \;
 
