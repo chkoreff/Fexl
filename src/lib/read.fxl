@@ -69,7 +69,7 @@
 \read_string=
 	(\read\str
 	\fh=(readstr str)
-	\in=(stream_list (sgetc fh))
+	\in=(get_list (sgetc fh))
 	use_stream in read
 	)
 
@@ -85,7 +85,7 @@
 	if (is_void fh) (error ["Could not open "name])
 	\result=
 		(
-		\in=(stream_list (fgetc fh))
+		\in=(get_list (fgetc fh))
 		use_stream in read
 		)
 

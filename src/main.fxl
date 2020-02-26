@@ -38,9 +38,9 @@
 	obj x
 	)
 
-# Return a context where key is defined as (later val).  This defers
-# evaluation of a definition returned by a context.
-\define=(\key\val with key (later val))
+# Return a context where key is defined as (\== val).  This defers evaluation
+# of a definition returned by a context.
+\define=(\key\val with key (\== val))
 
 # Use a file given by a direct path.
 \use_file=(\name\context evaluate context; parse_file name)

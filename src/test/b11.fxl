@@ -99,6 +99,15 @@ say "= test file_content"
 put str
 nl
 )
+(
+say "= test file_bytes"
+\source=(path_under dir_base "src/test/hello.fxl")
+\fh=(fopen source "r")
+\bytes=(file_bytes fh)
+say (as_str bytes)
+say (as_str bytes)
+nl
+)
 
 (
 \rows=

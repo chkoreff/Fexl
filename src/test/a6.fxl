@@ -24,7 +24,7 @@ standard
 	say "["
 	\f=(parse type source)
 	say "]"
-	later f
+	\== f
 	)
 
 \do_test=

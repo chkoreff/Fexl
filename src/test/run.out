@@ -753,7 +753,7 @@ than
 ur
 when
 ]
-steps 33517735 bytes 33430592
+steps 31795868 bytes 29498432
 female
 1 1 2 2 3 3 4 5 5 6 6 7 8 8 9 9 10 11 11 12 13 13 14 14 15 16 16 17 17 18 19 19 20 21 21 22 
 male
@@ -1286,8 +1286,11 @@ Undefined symbol xsay on line 2 of test/a7.fxl
 exit 1
 ==== test/a8.fxl
 [
+get
 0.927291684284476
+get
 0.471201063818858
+get
 0.677796232364046
 ]
 [
@@ -1430,6 +1433,12 @@ F
 T
 = test file_content
 #abcdefghijklmnopqrstuvwxyz
+
+= test file_bytes
+["s" "a" "y" " " ~1 "~1 "H" "e" "l" "l" "o" " " "w" "o" "r" "l" "d" "!" ~1 "~1 "
+"]
+["s" "a" "y" " " ~1 "~1 "H" "e" "l" "l" "o" " " "w" "o" "r" "l" "d" "!" ~1 "~1 "
+"]
 
 key c color orange qty 2
 key a color red qty 42
@@ -2289,7 +2298,7 @@ exit 0
 inner: val 479 steps 29 bytes 264
 outer: val 479 steps 124 bytes 712
 == benchmark large list
-result: val 32768 steps 2294632 bytes 2098472
+result: val 32768 steps 1966977 bytes 1574120
 == benchmark negative memory usage
 result: val  steps 8 bytes 55
 exit 0

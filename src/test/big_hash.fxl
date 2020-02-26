@@ -10,14 +10,14 @@ standard
 # Reference: https://www.di-mgt.com.au/sha_testvectors.html
 # Test the extremely-long message.
 
-# About 12.0s to buffer.
+# About 9.9s to buffer.
 \text=(show_microtime "buffer";
 repeat_str
 "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmno" 16777216)
 
 # Test sha512.
 (
-# About 4.4s to hash.
+# About 4.0s to hash.
 \hash=(show_microtime "sha512"; sha512 text)
 say "sha512"
 put "text = " say "(the extremely-long message)"
@@ -26,7 +26,7 @@ nl
 )
 # Test sha256.
 (
-# About 7.2s to hash.
+# About 6.3s to hash.
 \hash=(show_microtime "sha256"; sha256 text)
 say "sha256"
 put "text = " say "(the extremely-long message)"

@@ -84,7 +84,6 @@ put_ror fund_m2 nl
 
 say "Sharpe Ratio of Fund vs. Benchmark"
 put_sharpe excess_sharpe nl
-
 )
 )
 
@@ -93,7 +92,7 @@ put_sharpe excess_sharpe nl
 	(\pct_mean\pct_stddev
 	\mean=(/ pct_mean 100)
 	\stddev=(/ pct_stddev 100)
-	later;
+	\==
 	\x=rand_normal
 	\factor=(+ (+ 1 mean) (* stddev x))
 	\ror=(* 100 (- factor 1))
@@ -177,10 +176,10 @@ put_sharpe excess_sharpe nl
 0.827713059473001
 ]
 
+seed_rand 0.1964
 \rand_ror=(make_rand_ror 1.4 6.0)
 \list_rand_ror=(stream_values rand_ror)
 
-seed_rand 0.1964
 \len=(list_length benchmark_list_ror)
 \fund_list_ror=(first len list_rand_ror)
 

@@ -43,7 +43,7 @@ talk
 div
 # Should say PING six times.
 \ping==(say "ping")
-\other=(once ping)
+\other==(\= ping)
 \talk==(ping other)
 talk
 talk
@@ -310,30 +310,27 @@ And the world is mine to win. ..."
 # Test single evaluation.
 (
 div
-\notify=(once; say "(CALC)")
-\show_x==
+\show==
 	(
-	notify
+	(\=say "(CALC)")
 	\x=(* 5 6)
 	say ["x = " x]
 	)
 
 say "["
-show_x
-show_x
-show_x
-show_x
+show
+show
+show
+show
 say "]"
 
 (
-\notify=(once; put "(CALC)")
-\x==(notify + 2 (* 7 6))
+\x==(\=put "(CALC)" + 2 (* 7 6))
 
 \make_square=
 	(\x
-	\notify=(once; put ["square " x "="])
-	later;
-	notify
+	\==
+	(\=put ["square " x "="])
 	* x x
 	)
 
@@ -546,7 +543,7 @@ show_list (cons 1; cons 2; null)
 	show_list (first 5 list)
 	)
 
-\list_rand==(stream_values rand)
+\list_rand==(stream_values (once rand))
 
 \list_1=list_rand
 \list_2=list_rand
@@ -785,10 +782,9 @@ test_context
 
 (
 div
-\notify=(once; say "Let's parse.")
 \try==
 (
-notify
+(\=say "Let's parse.")
 eval_file "hello.fxl"
 )
 
@@ -799,7 +795,6 @@ try
 
 (
 div
-\notify=(once; say "Let's parse.")
 \try==
 (
 \source=
@@ -807,7 +802,7 @@ div
 \x say [x " " (* 3 x)]
 ~~
 
-notify
+(\=say "Let's parse.")
 eval_str source
 )
 
@@ -886,8 +881,8 @@ This also goes to the file.
 	div
 
 	\open==(fopen tmp_file)
-	\fh_w=(once; open "w")
-	\fh_r=(once; open "r")
+	\fh_w==(\= open "w")
+	\fh_r==(\= open "r")
 
 	\put=
 		(\x

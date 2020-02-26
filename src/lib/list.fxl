@@ -3,8 +3,7 @@
 	(\xs\ys
 	(@\loop\xs
 	xs ys \x\xs
-	\tail=(once; loop xs)
-	[x;tail]
+	[x;\=loop xs]
 	)
 	xs
 	)
@@ -29,8 +28,7 @@
 	(\f @\loop \xs
 	xs [] \x\xs
 	\x=(f x)
-	\tail=(once; loop xs)
-	[x;tail]
+	[x;\=loop xs]
 	)
 
 # Eagerly apply f to each element in list xs.
@@ -47,17 +45,16 @@
 	(\fn @\loop \xs
 	xs [] \x\xs
 	\y=(fn x)
-	\tail=(once; loop xs)
 	is_good y (cons y) ();
-	tail
+	\=loop xs
 	)
 
 # (filter f xs) is the list of items x in xs for which (f x) is true.
 \filter=
 	(\f @\loop \xs
 	xs [] \x\xs
-	\tail=(once; loop xs)
-	f x [x;tail] tail
+	f x (cons x) ();
+	\=loop xs
 	)
 
 # Reverse list xs.
@@ -299,33 +296,25 @@
 	loop rows
 	)
 
-# (stream_values fn) is the infinite list of values of function fn.  This is
+# (stream_values get) is the infinite list of values of function get.  This is
 # useful for generating streams of random values.
 \stream_values=
-	(\fn @\loop
-	\x=(once fn)
-	\xs=(once loop)
-	[x;xs]
+	(\get @\loop
+	\x=get
+	[x;\=loop]
 	)
 
-# Gather input items into a list.
+# Gather input items into a list.  This is equivalent to stream_values except
+# that it terminates when it sees a void value.
 \get_list=
 	(\get @\loop
 	\x=get
 	is_void x [];
-	\xs=(once loop)
-	[x;xs]
+	[x;\=loop]
 	)
 
-# LATER 20200224 Use stream_list instead of get_list.
-\stream_list=
-	(\get @\loop
-	once;
-	\x=get
-	is_void x [];
-	\xs=loop
-	[x;xs]
-	)
+# LATER 20200226 Deprecate stream_list.
+\stream_list==get_list
 
 # Flatten a piece of data (string, number, boolean, or list) into a string.
 \to_str=
@@ -426,13 +415,7 @@
 	)
 
 # Return the (lazy) list of bytes read from the file handle.
-\file_bytes=
-	(\fh @\loop
-	\ch=(fgetc fh)
-	is_void ch [];
-	\tail=(once loop)
-	cons ch tail
-	)
+\file_bytes=(\fh get_list (fgetc fh))
 
 # Return the entire string contained within a file.
 \file_content=

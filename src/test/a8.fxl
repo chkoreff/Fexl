@@ -1,18 +1,20 @@
-#
-\show3=
-	(\xs
-	say "["
+# This is an infinite list of random values, but it says "get" every time it
+# gets the next value.  Note that I use == to avoid getting the first value
+# right away.
+\xs==(stream_values (say "get" rand))
+
+# This is the first three items of the infinite list.  Note again that I use ==
+# to avoid getting the first value right away.
+\xs==(\= first 3 xs)
+
+\show==
 	(
-	xs () \x\xs say x
-	xs () \x\xs say x
-	xs () \x\xs say x
-	)
+	say "["
+	each xs say
 	say "]"
 	)
 
-\xs=(stream_values rand)
-
 seed_rand 0.1964
-show3 xs
-show3 xs
-show3 xs
+show
+show
+show

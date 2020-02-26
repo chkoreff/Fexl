@@ -5,17 +5,8 @@
 	fgetc fh
 	)
 
-# Return the (lazy) list of bytes read from the file handle.
-\file_bytes=
-	(\fh @\loop
-	\ch=(fgetc fh)
-	is_void ch [];
-	\tail=(once loop)
-	cons ch tail
-	)
-
-\fh_entropy=
-	(once;
+\fh_entropy==
+	(\=
 	\source="/dev/urandom" # Normally you'd use this.
 	\source="/dev/zero" # Tests all zeroes.
 
@@ -27,11 +18,15 @@
 	fh
 	)
 
-\get_bytes=
-	(\n
-	\bytes=(once; file_bytes fh_entropy)
-	once; first n bytes
-	)
+\list_entropy==(stream_values (fgetc fh_entropy))
+
+# Get the next n bytes from the entropy source.  The "\==" is so it doesn't
+# read the first byte immediately.  I only care about that because I want the
+# first "get" to happen AFTER I print the opening bracket.  The "\=" is so I
+# return a *fixed* list of the next n bytes, so it shows me the same thing when
+# I print the list multiple times, instead of reading new entropy bytes every
+# time I print it.
+\get_bytes=(\n \== \= first n; list_entropy)
 
 \get_random_id==
 	(
