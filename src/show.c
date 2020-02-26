@@ -2,6 +2,8 @@
 #include <str.h>
 #include <value.h>
 
+#include <type_sym.h>
+
 #include <basic.h>
 #include <output.h>
 #include <output_str.h>
@@ -19,7 +21,6 @@
 #include <type_rand.h>
 #include <type_run.h>
 #include <type_str.h>
-#include <type_sym.h>
 #include <type_tuple.h>
 #include <type_var.h>
 
@@ -188,7 +189,7 @@ static void show_sym(struct symbol *sym)
 	put("]");nl();
 	}
 
-static void show_form(struct form *form)
+void show_form(struct form *form)
 	{
 	if (form->label)
 		{

@@ -3,6 +3,7 @@
 #include <input.h>
 #include <value.h>
 
+#include <basic.h>
 #include <buffer.h>
 #include <ctype.h> /* isspace iscntrl */
 #include <parse.h>
@@ -22,6 +23,8 @@ exp    => \ name exp
 exp    => \ name = term exp
 exp    => \ name == term exp
 exp    => \; exp
+exp    => \= exp
+exp    => \== exp
 
 term   => ( exp )
 term   => [ list ]
@@ -382,6 +385,21 @@ static struct form *parse_factor(void)
 			{
 			skip();
 			return parse_form();
+			}
+		else if (ch == '=')
+			{
+			skip();
+			if (ch == '=')
+				{
+				skip();
+				/* Return a form which evaluates later. */
+				return form_join(type_later,form_val(hold(QI)),parse_exp());
+				}
+			else
+				{
+				/* Return a form which evaluates once on demand. */
+				return form_join(type_O,form_val(hold(QI)),parse_exp());
+				}
 			}
 		else
 			return parse_lambda(first_line);

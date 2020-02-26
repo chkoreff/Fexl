@@ -753,7 +753,7 @@ than
 ur
 when
 ]
-steps 33087588 bytes 29498432
+steps 33517735 bytes 33430592
 female
 1 1 2 2 3 3 4 5 5 6 6 7 8 8 9 9 10 11 11 12 13 13 14 14 15 16 16 17 17 18 19 19 20 21 21 22 
 male
@@ -2289,7 +2289,7 @@ exit 0
 inner: val 479 steps 29 bytes 264
 outer: val 479 steps 124 bytes 712
 == benchmark large list
-result: val 32768 steps 2196346 bytes 1574184
+result: val 32768 steps 2294632 bytes 2098472
 == benchmark negative memory usage
 result: val  steps 8 bytes 55
 exit 0

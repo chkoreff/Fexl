@@ -78,8 +78,13 @@ static value standard(value name)
 	if (match("cons")) return hold(Qcons);
 	if (match("null")) return hold(Qnull);
 	if (match("eval")) return hold(Qeval);
-	if (match("once")) return Q(type_once);
-	if (match("later")) return hold(Qlater);
+
+	/* LATER 20200226 These names are now defined in main.fxl, but I'm keeping
+	them here so fexl0 still works until I eliminate the names and just use the
+	new syntax features. */
+	if (match("once")) return Q(type_once);  /* Same as (\x \== \= x) */
+	if (match("later")) return hold(Qlater); /* Same as (\x \== x) */
+
 	if (match("is_defined")) return Q(type_is_defined);
 	if (match("is_void")) return Q(type_is_void);
 	if (match("is_good")) return Q(type_is_good);

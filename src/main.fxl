@@ -1,4 +1,11 @@
 # Run the user's script given by argv[1] in the enhanced standard context.
+
+# LATER 20200226 I redefine once and later here to show how they are equivalent
+# to the new syntax features "\=" and "\==".  In the next version I'll expand
+# them inline in the tests to show how concise the new syntax is.
+\once=(\x \== \= x)
+\later=(\x \== x)
+
 \TAB="	"
 \NL="
 "
@@ -85,4 +92,6 @@ define "dir_local" dir_local;
 
 define "trace" trace;
 define "error" error;
+define "later" later; # LATER 20200226 Deprecate.
+define "once" once; # LATER 20200226 Deprecate.
 standard

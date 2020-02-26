@@ -100,7 +100,7 @@ static struct symbol *sym_merge(struct symbol *fun, struct symbol *arg)
 	}
 
 /* Make an applicative form with the given type. */
-static struct form *form_join(type t, struct form *fun, struct form *arg)
+struct form *form_join(type t, struct form *fun, struct form *arg)
 	{
 	fun->sym = sym_merge(fun->sym,arg->sym);
 	fun->exp = V(t,fun->exp,arg->exp);
