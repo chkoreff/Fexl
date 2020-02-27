@@ -2457,6 +2457,10 @@ str_num "-inf" = void
 str_num "-nan" = void
 
 exit 0
+==== test/b22.fxl
+BEG
+END
+exit 0
 ==== test/chars.fxl
 ==
 封封aa小小
