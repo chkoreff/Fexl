@@ -463,7 +463,7 @@ static value dir_names(DIR *dir)
 	{
 	struct dirent *entry = readdir(dir);
 	if (!entry) return hold(Qnull);
-	return A(A(hold(Qcons),Qstr0(entry->d_name)),dir_names(dir));
+	return AV(AV(hold(Qcons),Qstr0(entry->d_name)),dir_names(dir));
 	}
 
 /* \names=(dir_names path) Return the list of names in a directory.  The names

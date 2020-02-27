@@ -230,7 +230,7 @@ value type_standard(value f)
 		{
 		value def = standard(name);
 		if (def)
-			f = A(hold(Qlater),def);
+			f = AV(hold(Qlater),def);
 		else
 			f = hold(Qvoid);
 		}
@@ -325,15 +325,15 @@ static void eval_script(void)
 		/* Get the name of the currently running executable. */
 		f = Qstr0(main_argv[0]);
 		/* Go two directories up, right above the bin directory. */
-		f = A(Q(type_dirname),f);
-		f = A(Q(type_dirname),f);
+		f = AV(Q(type_dirname),f);
+		f = AV(Q(type_dirname),f);
 		/* Concatenate the name of the main script. */
-		f = A(A(Q(type_concat),f),Qstr0("/src/main.fxl"));
+		f = AV(AV(Q(type_concat),f),Qstr0("/src/main.fxl"));
 		}
 
 	/* Now evaluate the script. */
-	f = A(hold(Qparse_file),f);
-	f = A(A(hold(Qevaluate),Q(type_standard)),f);
+	f = AV(hold(Qparse_file),f);
+	f = AV(AV(hold(Qevaluate),Q(type_standard)),f);
 	f = eval(f);
 	drop(f);
 	}

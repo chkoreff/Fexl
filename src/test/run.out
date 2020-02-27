@@ -753,7 +753,7 @@ than
 ur
 when
 ]
-steps 31795883 bytes 29498432
+steps 31795695 bytes 29498432
 female
 1 1 2 2 3 3 4 5 5 6 6 7 8 8 9 9 10 11 11 12 13 13 14 14 15 16 16 17 17 18 19 19 20 21 21 22 
 male
@@ -1248,7 +1248,7 @@ x = 7
 ==== test/a4.fxl
 [
 ]
-steps 31000022 bytes 608
+steps 31000018 bytes 608
 exit 0
 ==== test/a5.fxl
 begin
@@ -2296,7 +2296,7 @@ exit 0
 ==== test/b18.fxl
 == benchmark nested
 inner: val 479 steps 29 bytes 264
-outer: val 479 steps 124 bytes 712
+outer: val 479 steps 98 bytes 712
 == benchmark large list
 result: val 32768 steps 1966977 bytes 1574120
 == benchmark negative memory usage

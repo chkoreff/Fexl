@@ -299,6 +299,6 @@ evaluation. */
 value type_resolve(value f)
 	{
 	f = type_evaluate(f);
-	if (f) f = A(hold(Qlater),f);
+	if (f) f = AV(hold(Qlater),f);
 	return f;
 	}

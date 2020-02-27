@@ -113,11 +113,16 @@ value D(type T, void *data)
 	return V(T,0,data);
 	}
 
+/* Apply x to y where x is known to be already evaluated. */
+value AV(value x, value y)
+	{
+	return V(x->T,x,y);
+	}
+
 /* The type for function application */
 value type_A(value f)
 	{
-	value x = arg(f->L);
-	return V(x->T,x,hold(f->R));
+	return AV(arg(f->L),hold(f->R));
 	}
 
 /* Apply x to y. */
