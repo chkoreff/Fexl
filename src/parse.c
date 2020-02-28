@@ -392,14 +392,10 @@ static struct form *parse_factor(void)
 			if (ch == '=')
 				{
 				skip();
-				/* Return a form which evaluates later. */
-				return form_join(type_later,form_val(hold(QI)),parse_exp());
+				return form_later(parse_exp());
 				}
 			else
-				{
-				/* Return a form which evaluates once on demand. */
-				return form_join(type_O,form_val(hold(QI)),parse_exp());
-				}
+				return form_once(parse_exp());
 			}
 		else
 			return parse_lambda(first_line);

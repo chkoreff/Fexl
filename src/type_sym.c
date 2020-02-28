@@ -100,12 +100,18 @@ static struct symbol *sym_merge(struct symbol *fun, struct symbol *arg)
 	}
 
 /* Make an applicative form with the given type. */
-struct form *form_join(type t, struct form *fun, struct form *arg)
+static struct form *form_join(type t, struct form *fun, struct form *arg)
 	{
 	fun->sym = sym_merge(fun->sym,arg->sym);
 	fun->exp = V(t,fun->exp,arg->exp);
 	form_discard(arg);
 	return fun;
+	}
+
+/* Apply function to argument, keeping the type of the function. */
+static struct form *form_appv(struct form *fun, struct form *arg)
+	{
+	return form_join(fun->exp->T,fun,arg);
 	}
 
 /* Apply function to argument. */
@@ -168,8 +174,19 @@ struct form *form_lam(const char *name, struct form *body)
 /* Make a list with the head and tail. */
 struct form *form_cons(struct form *head, struct form *tail)
 	{
-	return form_join(type_cons,
-		form_join(type_cons,form_val(hold(QI)),head),tail);
+	return form_appv(form_appv(form_val(hold(Qcons)),head),tail);
+	}
+
+/* Make a form which evaluates its argument later. */
+struct form *form_later(struct form *exp)
+	{
+	return form_appv(form_val(hold(Qlater)),exp);
+	}
+
+/* Make a form which evaluates its argument once on demand. */
+struct form *form_once(struct form *exp)
+	{
+	return form_appv(form_val(hold(QO)),exp);
 	}
 
 /* Make a tuple from the given arguments. */
@@ -183,14 +200,13 @@ struct form *form_tuple(struct form *args)
 /* Evaluate def and apply exp to that value. */
 struct form *form_eval(struct form *def, struct form *exp)
 	{
-	return form_join(type_eval,
-		form_join(type_eval,form_val(hold(Qeval)),def),exp);
+	return form_appv(form_appv(form_val(hold(Qeval)),def),exp);
 	}
 
 /* Make a quoted (unresolved form). */
-struct form *form_quo(struct form *form)
+struct form *form_quo(struct form *exp)
 	{
-	return form_val(D(type_form,form));
+	return form_val(D(type_form,exp));
 	}
 
 value type_form(value f)

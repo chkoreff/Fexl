@@ -252,6 +252,7 @@ value Qcons;
 value Qnull;
 value Qeval;
 value Qlater;
+value QO;
 value Qput;
 value Qnl;
 value Qfput;
@@ -272,6 +273,7 @@ static void beg_const(void)
 	Qnull = Q(type_null);
 	Qeval = Q(type_eval);
 	Qlater = Q(type_later);
+	QO = Q(type_O);
 	Qput = Q(type_put);
 	Qnl = Q(type_nl);
 	Qfput = Q(type_fput);
@@ -294,6 +296,7 @@ static void end_const(void)
 	drop(Qnull);
 	drop(Qeval);
 	drop(Qlater);
+	drop(QO);
 	drop(Qput);
 	drop(Qnl);
 	drop(Qfput);

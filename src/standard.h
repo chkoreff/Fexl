@@ -10,6 +10,7 @@ extern value Qcons;
 extern value Qnull;
 extern value Qeval;
 extern value Qlater;
+extern value QO;
 extern value Qput;
 extern value Qnl;
 extern value Qfput;
