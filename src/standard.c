@@ -241,6 +241,8 @@ value type_standard(value f)
 	}
 	}
 
+value Qsubst;
+value Qtuple;
 value QI;
 value QT;
 value QF;
@@ -259,6 +261,8 @@ value Qevaluate;
 
 static void beg_const(void)
 	{
+	Qsubst = Q(type_subst);
+	Qtuple = Q(type_tuple);
 	QI = Q(type_I);
 	QT = Q(type_T);
 	QF = Q(type_F);
@@ -279,6 +283,8 @@ static void beg_const(void)
 
 static void end_const(void)
 	{
+	drop(Qsubst);
+	drop(Qtuple);
 	drop(QI);
 	drop(QT);
 	drop(QF);

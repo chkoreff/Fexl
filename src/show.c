@@ -177,27 +177,34 @@ static void put_quote(string x)
 
 static void show_sym(struct symbol *sym)
 	{
-	put("[");nl();
+	put_ch('[');
 	while (sym)
 		{
-		put("sym");nl();
-		put("  name ");put_str(sym->name);nl();
-		put("  line ");put_ulong(sym->line);nl();
-		put("  patt ");show(sym->pattern);nl();
+		put_ch('[');
+		put("sym"); put_ch(' ');
+		put_str(sym->name); put_ch(' ');
+		put_ulong(sym->line); put_ch(' ');
+		show(sym->pattern);
+		put_ch(']');
 		sym = sym->next;
 		}
-	put("]");nl();
+	put_ch(']');
 	}
 
 void show_form(struct form *form)
 	{
+	put_ch('[');
+	put("form");
+	put_ch(' ');
 	if (form->label)
-		{
-		put("label = ");show(form->label);nl();
-		}
-	put("syms =");nl();
+		show(form->label);
+	else
+		put("void");
+	put_ch(' ');
 	show_sym(form->sym);
-	put("exp = ");show(form->exp);nl();
+	put_ch(' ');
+	show(form->exp);
+	put_ch(']');
 	}
 
 static unsigned long max_depth;
@@ -256,4 +263,11 @@ void show(value f)
 void show_line(const char *name, value f)
 	{
 	put(name);show(f);nl();
+	}
+
+value type_show(value f)
+	{
+	if (!f->R) return 0;
+	show(f->R);nl();
+	return hold(QI);
 	}

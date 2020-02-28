@@ -1,4 +1,6 @@
 extern value type_standard(value f);
+extern value Qsubst;
+extern value Qtuple;
 extern value QI;
 extern value QT;
 extern value QF;

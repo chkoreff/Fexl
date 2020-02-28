@@ -161,7 +161,7 @@ struct form *form_lam(const char *name, struct form *body)
 	struct symbol *sym = sym_pop(name,body->sym,&pattern);
 	sym_merge0(sym);
 	body->sym = sym;
-	body->exp = V(type_subst,V(type_subst,hold(QI),pattern),body->exp);
+	body->exp = AV(AV(hold(Qsubst),pattern),body->exp);
 	return body;
 	}
 
@@ -176,7 +176,7 @@ struct form *form_cons(struct form *head, struct form *tail)
 struct form *form_tuple(struct form *args)
 	{
 	sym_merge0(args->sym);
-	args->exp = V(type_tuple,hold(QI),args->exp);
+	args->exp = AV(hold(Qtuple),args->exp);
 	return args;
 	}
 
