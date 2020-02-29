@@ -186,11 +186,10 @@ seed_rand 0.1964
 \show_returns=
 	(\xs\ys
 	\show_lists=
-		(@\loop\xs\ys
-		xs () \x\xs
-		ys () \y\ys
+		(\xs\ys
+		each (list_combine (\x\y {x y}) xs ys) \p
+		p \x\y
 		put x put " " put y nl
-		loop xs ys
 		)
 	say "Returns (Fund vs. Benchmark)"
 	say "["
