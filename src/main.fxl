@@ -1,11 +1,5 @@
 # Run the user's script given by argv[1] in the enhanced standard context.
 
-# LATER 20200226 I redefine once and later here to show how they are equivalent
-# to the new syntax features "\=" and "\==".  In the next version I'll expand
-# them inline in the tests to show how concise the new syntax is.
-\once=(\x \== \= x)
-\later=(\x \== x)
-
 \TAB="	"
 \NL="
 "
@@ -29,7 +23,7 @@
 
 \path_under=(\dir\name . (. dir "/") name)
 
-# Return an object where the key is redefined as val.
+# Return an object with key defined as val.
 \with=
 	(\key\val\obj
 	\obj=obj
@@ -38,9 +32,8 @@
 	obj x
 	)
 
-# Return a context where key is defined as (later val).  This defers evaluation
-# of a definition returned by a context.
-\define=(\key\val with key (later val))
+# Return a context with key defined as val.
+\define=(\key\val with key {val})
 
 # Use a file given by a direct path.
 \use_file=(\name\context evaluate context; parse_file name)
@@ -92,6 +85,4 @@ define "dir_local" dir_local;
 
 define "trace" trace;
 define "error" error;
-define "later" later; # LATER 20200226 Deprecate.
-define "once" once; # LATER 20200226 Deprecate.
 standard

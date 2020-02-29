@@ -61,8 +61,8 @@ value type_eval(value f)
 	}
 	}
 
-/* (O x) Evaluate x once, replacing the right side with the final value. */
-value type_O(value f)
+/* Evaluate x once, replacing the right side with the final value. */
+value type_once(value f)
 	{
 	value x = arg(f->R);
 	drop(f->R);
@@ -71,20 +71,18 @@ value type_O(value f)
 	return x;
 	}
 
-/* (once x) Return a value which will evaluate x at most once. */
-value type_once(value f)
+/* Catch arguments but do nothing.  Used internally for symbol resolution. */
+value type_catch(value f)
 	{
-	if (!f->L) return 0;
-	f->T = type_O;
+	(void)f;
 	return 0;
 	}
 
-/* (later x) Return x without evaluating it. */
-value type_later(value f)
+/* (\x\f f x) */
+value type_yield(value f)
 	{
-	if (!f->L) return 0;
-	f->T = type_I;
-	return 0;
+	if (!f->L || !f->L->L) return 0;
+	return A(hold(f->R),hold(f->L->R));
 	}
 
 value type_is_defined(value f)

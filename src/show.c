@@ -70,9 +70,9 @@ void put_type(type t)
 	else if (t == type_cons) put("cons");
 	else if (t == type_null) put("null");
 	else if (t == type_eval) put("eval");
-	else if (t == type_O) put_ch('O');
+	else if (t == type_catch) put("catch");
+	else if (t == type_yield) put("yield");
 	else if (t == type_once) put("once");
-	else if (t == type_later) put("later");
 	else if (t == type_is_defined) put("is_defined");
 	else if (t == type_is_void) put("is_void");
 	else if (t == type_is_good) put("is_good");

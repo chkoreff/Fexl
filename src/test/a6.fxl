@@ -22,15 +22,15 @@ standard
 \parse=
 	(\type\source
 	say "["
-	\f=(parse type source)
+	parse type source \f
 	say "]"
-	\== f
+	yield f
 	)
 
 \do_test=
 	(\parse
 	div
-	\f=parse
+	parse \f
 	f
 	f
 	)
@@ -45,7 +45,7 @@ div
 say ["x = " (+ 3 4)]
 ~
 \get=(readstr program)
-\fn=(parse "stream" get)
+parse "stream" get \fn
 say "got it"
 fn
 )

@@ -24,7 +24,6 @@ exp    => \ name = term exp
 exp    => \ name == term exp
 exp    => \; exp
 exp    => \= exp
-exp    => \== exp
 
 term   => ( exp )
 term   => [ list ]
@@ -389,13 +388,7 @@ static struct form *parse_factor(void)
 		else if (ch == '=')
 			{
 			skip();
-			if (ch == '=')
-				{
-				skip();
-				return form_later(parse_exp());
-				}
-			else
-				return form_once(parse_exp());
+			return form_once(parse_exp());
 			}
 		else
 			return parse_lambda(first_line);

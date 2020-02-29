@@ -78,12 +78,7 @@ static value standard(value name)
 	if (match("cons")) return hold(Qcons);
 	if (match("null")) return hold(Qnull);
 	if (match("eval")) return hold(Qeval);
-
-	/* LATER 20200226 These names are now defined in main.fxl, but I'm keeping
-	them here so fexl0 still works until I eliminate the names and just use the
-	new syntax features. */
-	if (match("once")) return Q(type_once);  /* Same as (\x \== \= x) */
-	if (match("later")) return hold(Qlater); /* Same as (\x \== x) */
+	if (match("yield")) return hold(Qyield);
 
 	if (match("is_defined")) return Q(type_is_defined);
 	if (match("is_void")) return Q(type_is_void);
@@ -202,16 +197,6 @@ static value standard(value name)
 	if (match("unpack64")) return Q(type_unpack64);
 	if (match("hmac_sha512")) return Q(type_hmac_sha512);
 
-	/* Alternative names for nacl functions */
-	if (match("crypto_box_public")) return Q(type_nacl_box_public);
-	if (match("crypto_box_prepare")) return Q(type_nacl_box_prepare);
-	if (match("crypto_box_seal")) return Q(type_nacl_box_seal);
-	if (match("crypto_box_open")) return Q(type_nacl_box_open);
-	if (match("crypto_sign_public")) return Q(type_nacl_sign_public);
-	if (match("crypto_sign_seal")) return Q(type_nacl_sign_seal);
-	if (match("crypto_sign_open")) return Q(type_nacl_sign_open);
-	if (match("crypto_hash")) return Q(type_sha512);
-
 	if (match("set_alarm")) return Q(type_set_alarm);
 	if (match("start_server")) return Q(type_start_server);
 	if (match("kill")) return Q(type_kill);
@@ -230,7 +215,7 @@ value type_standard(value f)
 		{
 		value def = standard(name);
 		if (def)
-			f = AV(hold(Qlater),def);
+			f = AV(hold(Qyield),def);
 		else
 			f = hold(Qvoid);
 		}
@@ -251,8 +236,9 @@ value Qvoid;
 value Qcons;
 value Qnull;
 value Qeval;
-value Qlater;
-value QO;
+value Qyield;
+value Qcatch;
+value Qonce;
 value Qput;
 value Qnl;
 value Qfput;
@@ -272,8 +258,9 @@ static void beg_const(void)
 	Qcons = Q(type_cons);
 	Qnull = Q(type_null);
 	Qeval = Q(type_eval);
-	Qlater = Q(type_later);
-	QO = Q(type_O);
+	Qyield = Q(type_yield);
+	Qcatch = Q(type_catch);
+	Qonce = Q(type_once);
 	Qput = Q(type_put);
 	Qnl = Q(type_nl);
 	Qfput = Q(type_fput);
@@ -295,8 +282,9 @@ static void end_const(void)
 	drop(Qcons);
 	drop(Qnull);
 	drop(Qeval);
-	drop(Qlater);
-	drop(QO);
+	drop(Qyield);
+	drop(Qcatch);
+	drop(Qonce);
 	drop(Qput);
 	drop(Qnl);
 	drop(Qfput);

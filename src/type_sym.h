@@ -19,7 +19,6 @@ extern struct form *form_ref(string name, unsigned long line);
 extern struct form *form_lam(const char *name, struct form *body);
 extern struct form *form_app(struct form *fun, struct form *arg);
 extern struct form *form_cons(struct form *head, struct form *tail);
-extern struct form *form_later(struct form *exp);
 extern struct form *form_once(struct form *exp);
 extern struct form *form_tuple(struct form *args);
 extern struct form *form_eval(struct form *def, struct form *exp);

@@ -49,7 +49,6 @@ run_fexl test/b18.fxl
 run_fexl test/b19.fxl
 run_fexl test/b20.fxl
 run_fexl test/b21.fxl
-run_fexl test/b22.fxl
 run_fexl test/chars.fxl
 run_fexl test/date.fxl
 run_fexl test/sat.fxl

@@ -9,7 +9,7 @@ standard
 \add_random_keys=
 	(@\loop\count\seed\obj
 	le count 0 obj;
-	\hash=(crypto_hash seed)
+	\hash=(sha512 seed)
 	\key=(unpack; slice hash 0 8)
 	\val=(unpack; slice hash 32 8)
 	#\obj=(put_key key val obj)

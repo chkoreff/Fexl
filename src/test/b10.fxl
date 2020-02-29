@@ -20,17 +20,14 @@
 
 \list_entropy==(stream_values (fgetc fh_entropy))
 
-# Get the next n bytes from the entropy source.  The "\==" is so it doesn't
-# read the first byte immediately.  I only care about that because I want the
-# first "get" to happen AFTER I print the opening bracket.  The "\=" is so I
-# return a *fixed* list of the next n bytes, so it shows me the same thing when
-# I print the list multiple times, instead of reading new entropy bytes every
-# time I print it.
-\get_bytes=(\n \== \= first n; list_entropy)
+# Yield the next n bytes from the entropy source.  The list is created only on
+# demand, and is also a _fixed_ list, so I can print it repeatedly and see the
+# same thing each time.
+\get_bytes=(\n yield; \= first n; list_entropy)
 
 \get_random_id==
 	(
-	\bytes=(get_bytes 16)
+	get_bytes 16 \bytes
 	\bytes=(map (\ch hex_byte (ord ch)) bytes)
 	to_str bytes
 	)
@@ -44,7 +41,7 @@
 
 \show_bytes==
 	(
-	\bytes=(get_bytes 16)
+	get_bytes 16 \bytes
 	show bytes
 	show bytes
 	show bytes

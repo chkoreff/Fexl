@@ -177,16 +177,10 @@ struct form *form_cons(struct form *head, struct form *tail)
 	return form_appv(form_appv(form_val(hold(Qcons)),head),tail);
 	}
 
-/* Make a form which evaluates its argument later. */
-struct form *form_later(struct form *exp)
-	{
-	return form_appv(form_val(hold(Qlater)),exp);
-	}
-
 /* Make a form which evaluates its argument once on demand. */
 struct form *form_once(struct form *exp)
 	{
-	return form_appv(form_val(hold(QO)),exp);
+	return form_appv(form_val(hold(Qonce)),exp);
 	}
 
 /* Make a tuple from the given arguments. */
@@ -245,17 +239,13 @@ static value resolve(value context, struct form *form)
 	while (sym)
 		{
 		value key = Qstr(sym->name);
-		value val = eval(A(hold(context),hold(key)));
+		value val = eval(A(A(hold(context),hold(key)),hold(Qcatch)));
 
-		if (val->T != type_void)
+		if (val->T == type_catch && val->L && !val->L->R)
 			{
-			/* Optimize (I x) returned by "later" to x. */
-			if (val->T == type_I && val->L)
-				{
-				value x = hold(val->R);
-				drop(val);
-				val = x;
-				}
+			value x = hold(val->R);
+			drop(val);
+			val = x;
 			}
 		else if (strcmp(sym->name->data,"standard") == 0)
 			{
@@ -307,11 +297,10 @@ value type_evaluate(value f)
 	}
 	}
 
-/* (resolve context exp) Resolve the expression in the context for later
-evaluation. */
+/* (resolve context exp) Resolve the expression in the context and yield it. */
 value type_resolve(value f)
 	{
 	f = type_evaluate(f);
-	if (f) f = AV(hold(Qlater),f);
+	if (f) f = AV(hold(Qyield),f);
 	return f;
 	}

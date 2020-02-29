@@ -76,33 +76,6 @@
 # Shift the first item off a list.
 \shift=(\xs xs {void []} \x\xs {x xs})
 
-# NOTE: Only used by deprecated g_sort.
-\group_items_by_cmp=
-	(\lt\eq\gt @\loop\xs
-	xs [] \x\xs
-
-	\ltx=(filter (gt x) xs)
-	\eqx=(filter (eq x) xs)
-	\gtx=(filter (lt x) xs)
-
-	append (loop ltx);
-	cons [x;eqx];
-	loop gtx
-	)
-
-# Return the ordered list of items in xs.  Discard duplicates if opt_unique is
-# true.  Use the given comparison functions to compare items.
-# NOTE 20180119 This is deprecated.  For arbitrary objects, using a single
-# key extraction function is far simpler than using three comparison functions,
-# and even more efficient.  This also still uses quicksort which gives bad
-# performance for lists with large numbers of items already in ascending or
-# descending order.
-\g_sort=
-	(\lt\eq\gt \opt_unique\xs
-	opt_unique (map (\row shift row \x\_ x)) append_all;
-	group_items_by_cmp lt eq gt xs
-	)
-
 # Sort the list of {key val} pairs xs.  Use the combine function to combine
 # values with the same key.
 \combine_keys=
@@ -313,9 +286,6 @@
 	[x;\=loop]
 	)
 
-# LATER 20200226 Deprecate stream_list.
-\stream_list==get_list
-
 # Flatten a piece of data (string, number, boolean, or list) into a string.
 \to_str=
 	(\x
@@ -506,7 +476,6 @@ define "filter" filter;
 define "reverse" reverse;
 define "append_all" append_all;
 define "shift" shift;
-define "g_sort" g_sort;
 define "combine_keys" combine_keys;
 define "merge_keys" merge_keys;
 define "group_items" group_items;
@@ -528,7 +497,6 @@ define "column" column;
 define "match_column" match_column;
 define "stream_values" stream_values;
 define "get_list" get_list;
-define "stream_list" stream_list;
 define "to_str" to_str;
 define "get_str" get_str;
 define "list_str" list_str;

@@ -329,7 +329,7 @@ say "]"
 
 \make_square=
 	(\x
-	\==
+	yield;
 	(\=put ["square " x "="])
 	* x x
 	)
@@ -338,8 +338,8 @@ div
 
 say (* x x)
 say (+ x x)
-\s4=(make_square 4)
-\s7=(make_square 7)
+make_square 4 \s4
+make_square 7 \s7
 
 say s4
 say s7
@@ -536,21 +536,30 @@ show_list (cons 1; cons 2; null)
 
 # Test rand.
 (
-\try=
-	(\list
-	div
-	show_list (first 5 list)
+# Show the first 5 items of a list.
+\show=
+	(\label\list
+	say [label" :"]
 	show_list (first 5 list)
 	)
 
-\list_rand==(stream_values (once rand))
+# The list_rand function returns a distinct fixed list of random numbers which
+# are read only on demand.  For subtle reasons I cannot use stream_values for
+# this.
+\list_rand==
+	(@\loop
+	\x==rand
+	[(\= x);\=loop]
+	)
 
 \list_1=list_rand
 \list_2=list_rand
 
 seed_rand 0.1964
-try list_1
-try list_2
+show "list_1" list_1
+show "list_2" list_2
+show "list_1" list_1
+show "list_2" list_2
 )
 
 div
@@ -765,7 +774,7 @@ eval_file "mf.fxl"
 
 \case_3==
 	(
-	\run=(resolve standard \; say "PING")
+	resolve standard (\; say "PING") \run
 	say "["
 	run
 	run
