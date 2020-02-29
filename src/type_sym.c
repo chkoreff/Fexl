@@ -247,21 +247,7 @@ static value resolve(value context, struct form *form)
 		value key = Qstr(sym->name);
 		value val = eval(A(hold(context),hold(key)));
 
-		if (val->T == type_void) /* undefined */
-			{
-			/* By default, "standard" refers to the current context. */
-			if (strcmp(sym->name->data,"standard") == 0)
-				{
-				drop(val);
-				val = hold(context);
-				}
-			else
-				{
-				undefined = 1;
-				undefined_symbol(sym->name->data,sym->line,label);
-				}
-			}
-		else
+		if (val->T != type_void)
 			{
 			/* Optimize (I x) returned by "later" to x. */
 			if (val->T == type_I && val->L)
@@ -270,6 +256,17 @@ static value resolve(value context, struct form *form)
 				drop(val);
 				val = x;
 				}
+			}
+		else if (strcmp(sym->name->data,"standard") == 0)
+			{
+			/* By default, "standard" refers to the current context. */
+			drop(val);
+			val = hold(context);
+			}
+		else
+			{
+			undefined = 1;
+			undefined_symbol(sym->name->data,sym->line,label);
 			}
 
 		{
