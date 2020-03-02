@@ -1,11 +1,26 @@
 # https://en.wikipedia.org/wiki/Hofstadter_sequence#Hofstadter_Female_and_Male_sequences
 
+evaluate
+(
+use "test.fxl";
+use_lib "time.fxl";
+standard
+) \;
+
+#do_benchmark;
+#trace_elapsed;
+
 \create=
-	(\base\other
-	@\this\n
-	le n 0 base ;
-	\x=(this (- n 1))
-	- n (other x)
+	(
+	\cache_0=cache_loop
+	\cache_1=cache_loop
+
+	\base\other
+	\cache_loop=(eq base 0 cache_0 cache_1)
+
+	cache_loop \this\n
+	le n 0 base;
+	- n; other; this; - n 1
 	)
 
 \male   = (@\this create 0 (create 1 this))

@@ -28,7 +28,8 @@ exp    => \= exp
 term   => ( exp )
 term   => [ list ]
 term   => { tuple }
-term   => sym
+term   => name
+term   => string
 
 list   => empty
 list   => term list
@@ -36,9 +37,6 @@ list   => ; exp
 
 tuple  => empty
 tuple  => term tuple
-
-sym    => name
-sym    => string
 
 string => quote_string
 string => tilde_string
