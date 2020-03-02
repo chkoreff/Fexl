@@ -10,23 +10,27 @@ standard
 #do_benchmark;
 #trace_elapsed;
 
+# Splice two functions f and g into a feedback loop.
+\splice=(\f\g @\loop f; g loop)
+
+# Create the base of a male/female function.
 \create=
-	(
-	\cache_0=cache_loop
-	\cache_1=cache_loop
-
-	\base\other
-	\cache_loop=(eq base 0 cache_0 cache_1)
-
-	cache_loop \this\n
+	(\base
+	\@=cache_loop
+	\other
+	@\this\n
 	le n 0 base;
 	- n; other; this; - n 1
 	)
 
-\male   = (@\this create 0 (create 1 this))
-\female = (@\this create 1 (create 0 this))
+\create_0=(create 0)
+\create_1=(create 1)
+
+\male   = (splice create_0 create_1)
+\female = (splice create_1 create_0)
 
 \max=35
+#\max=1000
 
 \show_sequence=
 	(\label\f
