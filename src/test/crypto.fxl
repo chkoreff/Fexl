@@ -521,8 +521,49 @@ try "=="
 )
 )
 
+# Test hmac functions.
+\test_hmac==
+(
+# https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program
+# https://www.freeformatter.com/hmac-generator.html
+
+\run_test=
+(\label\hmac
+
+say ["= "label]
+\try=
+	(\msg\key
+	\mac=(hmac msg key)
+	say ["msg = "(as_str msg)]
+	say ["key = "(as_str key)]
+	say ["mac = "(unpack mac)]
+	nl
+	)
+
+try
+""
+""
+
+try
+"a"
+"a"
+
+try
+"abcdefghijklmnopqrstuvwxyz"
+"906278"
+
+try
+"The quick brown fox jumps over the lazy dog"
+"key"
+)
+
+run_test "hmac_sha256" hmac_sha256
+run_test "hmac_sha512" hmac_sha512
+)
+
 test_box
 test_sign
 test_sha512
 test_sha256
 test_base64
+test_hmac

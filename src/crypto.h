@@ -15,3 +15,4 @@ extern string str_sha512(string text);
 extern string str_pack64(string text);
 extern string str_unpack64(string text);
 extern string str_hmac_sha512(string text, string key);
+extern string str_hmac_sha256(string text, string key);

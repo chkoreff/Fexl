@@ -249,27 +249,35 @@ string str_unpack64(string text)
 	return out;
 	}
 
-/* Compute the HMAC-SHA512 value of the text using the key.  Note that if the
-key is longer than 128 bytes, only the first 128 bytes of the key are used.  If
-you want to use a key longer than 128 bytes, you should hash it first.
+/* Compute the HMAC value of the text using the key, using the given hash
+function and blocksize.  If the key is longer than blocksize, only the first
+blocksize bytes of the key are used.  If you want to use a key longer than
+blocksize bytes, you should hash it first.
 */
-string str_hmac_sha512(string text, string key)
+static string str_hmac
+	(
+	void (*hash)(u8 digest[], const u8 *data, u64 n_data_byte),
+	unsigned long blocksize,
+	string text,
+	string key
+	)
 	{
-	string mac = str_new(64);
+	unsigned long outsize = blocksize / 2;
+	string mac = str_new(outsize);
 
-	unsigned int len_ipad = 128 + text->len;
+	unsigned int len_ipad = blocksize + text->len;
 	unsigned char *buf_ipad = new_memory(len_ipad);
-	unsigned char buf_opad[128+64];
+	unsigned char buf_opad[blocksize+outsize];
 
 	unsigned int key_len = key->len;
 
 	unsigned int i;
 	unsigned int fill;
 
-	if (key_len > 128)
-		key_len = 128;
+	if (key_len > blocksize)
+		key_len = blocksize;
 
-	fill = 128 - key_len;
+	fill = blocksize - key_len;
 
 	for (i = 0; i < key_len; i++)
 		{
@@ -280,10 +288,22 @@ string str_hmac_sha512(string text, string key)
 	memset(buf_ipad + key_len, 0x36, fill);
 	memset(buf_opad + key_len, 0x5c, fill);
 
-	memcpy(buf_ipad+128, text->data, text->len);
-	sha512(buf_opad+128, buf_ipad, len_ipad);
-	sha512((u8 *)mac->data, buf_opad, 128+64);
+	memcpy(buf_ipad+blocksize, text->data, text->len);
+	hash(buf_opad+blocksize, buf_ipad, len_ipad);
+	hash((u8 *)mac->data, buf_opad, blocksize+outsize);
 
 	free_memory(buf_ipad,len_ipad);
 	return mac;
+	}
+
+/* Compute the HMAC-SHA512 value of the text using the key. */
+string str_hmac_sha512(string text, string key)
+	{
+	return str_hmac(sha512,128,text,key);
+	}
+
+/* Compute the HMAC-SHA256 value of the text using the key. */
+string str_hmac_sha256(string text, string key)
+	{
+	return str_hmac(sha256,64,text,key);
 	}

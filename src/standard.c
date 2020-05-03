@@ -196,6 +196,7 @@ static value standard(value name)
 	if (match("pack64")) return Q(type_pack64);
 	if (match("unpack64")) return Q(type_unpack64);
 	if (match("hmac_sha512")) return Q(type_hmac_sha512);
+	if (match("hmac_sha256")) return Q(type_hmac_sha256);
 
 	if (match("set_alarm")) return Q(type_set_alarm);
 	if (match("start_server")) return Q(type_start_server);

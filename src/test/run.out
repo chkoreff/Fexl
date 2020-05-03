@@ -3244,6 +3244,40 @@ text   0:[]
 
 ]
 ]
+= hmac_sha256
+msg = ""
+key = ""
+mac = b613679a0814d9ec772f95d778c35fc5ff1697c493715653c6c712144292c5ad
+
+msg = "a"
+key = "a"
+mac = 3ecf5388e220da9e0f919485deb676d8bee3aec046a779353b463418511ee622
+
+msg = "abcdefghijklmnopqrstuvwxyz"
+key = "906278"
+mac = e0d9b7d98d04450c52ddb49b8cdf9d26bc13d35f92b87eb34eec9a41ae1fadc5
+
+msg = "The quick brown fox jumps over the lazy dog"
+key = "key"
+mac = f7bc83f430538424b13298e6aa6fb143ef4d59a14946175997479dbc2d1a3cd8
+
+= hmac_sha512
+msg = ""
+key = ""
+mac = b936cee86c9f87aa5d3c6f2e84cb5a4239a5fe50480a6ec66b70ab5b1f4ac6730c6c515421b327ec1d69402e53dfb49ad7381eb067b338fd7b0cb22247225d47
+
+msg = "a"
+key = "a"
+mac = fc8c80e6b943cd07eccecf01bc6038bae68ebb6fa2e1e62b44753d7c177af7a46b089df349a19f7622a22312c76906ca9c984e1446d3ab86a98fdfa1425341c5
+
+msg = "abcdefghijklmnopqrstuvwxyz"
+key = "906278"
+mac = ed9d49ba1284ee860f9eaffb305e0d168a6e8c8d80768f02de000870c4e9f6c17e38d30ef08cfb084be9c2cf8954092c5fa5a3d95073ac531044f283d6ce22d0
+
+msg = "The quick brown fox jumps over the lazy dog"
+key = "key"
+mac = b42af09057bac1e2d41708e48a902e09b5ff7f12ab428a4fe86653c73dd248fb82f948a549f7b791a5b41915ee4d1ec3935357e4e2317250d0372afa2ebeeb3a
+
 exit 0
 ==== test/get_byte.fxl
 [
