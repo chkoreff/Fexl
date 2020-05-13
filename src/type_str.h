@@ -1,7 +1,7 @@
+extern string get_str(value x);
 extern value type_str(value f);
 extern value Qstr(string x);
 extern value Qstr0(const char *data);
-extern string get_str(value x);
 extern const char *str_data(value x);
 extern value op_str(value f, string op(string));
 extern value op_str2(value f, string op(string,string));

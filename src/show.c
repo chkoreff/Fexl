@@ -186,16 +186,14 @@ static void show_sym(struct symbol *sym)
 		put_ulong(sym->line); put_ch(' ');
 		show(sym->pattern);
 		put_ch(']');
+		put_ch(' ');
 		sym = sym->next;
 		}
 	put_ch(']');
 	}
 
-void show_form(struct form *form)
+static void show_form(struct form *form)
 	{
-	put_ch('[');
-	put("form");
-	put_ch(' ');
 	if (form->label)
 		show(form->label);
 	else
@@ -204,7 +202,6 @@ void show_form(struct form *form)
 	show_sym(form->sym);
 	put_ch(' ');
 	show(form->exp);
-	put_ch(']');
 	}
 
 static unsigned long max_depth;

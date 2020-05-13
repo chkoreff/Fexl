@@ -9,7 +9,6 @@
 #include <string.h> /* strcmp */
 #include <type_str.h>
 #include <type_sym.h>
-#include <type_tuple.h>
 
 static void sym_free(struct symbol *sym)
 	{
@@ -197,12 +196,6 @@ struct form *form_eval(struct form *def, struct form *exp)
 	return form_appv(form_appv(form_val(hold(Qeval)),def),exp);
 	}
 
-/* Make a quoted (unresolved form). */
-struct form *form_quo(struct form *exp)
-	{
-	return form_val(D(type_form,exp));
-	}
-
 value type_form(value f)
 	{
 	if (f->N == 0)
@@ -211,6 +204,12 @@ value type_form(value f)
 		return 0;
 		}
 	return type_void(f);
+	}
+
+/* Make a quoted (unresolved form). */
+struct form *form_quo(struct form *exp)
+	{
+	return form_val(D(type_form,exp));
 	}
 
 /* Use pattern p to make a copy of expression e with argument x substituted in
@@ -240,6 +239,8 @@ static value resolve(value context, struct form *form)
 		{
 		value key = Qstr(sym->name);
 		value val = eval(A(A(hold(context),hold(key)),hold(Qcatch)));
+		key->R = 0;
+		drop(key);
 
 		if (val->T == type_catch && val->L && !val->L->R)
 			{
@@ -261,13 +262,11 @@ static value resolve(value context, struct form *form)
 
 		{
 		value next = subst(sym->pattern,exp,val);
+		drop(val);
 		drop(exp);
 		exp = next;
 		}
 
-		key->R = 0;
-		drop(key);
-		drop(val);
 		sym = sym->next;
 		}
 

@@ -85,6 +85,11 @@ value type_yield(value f)
 	return A(hold(f->R),hold(f->L->R));
 	}
 
+value boolean(int x)
+	{
+	return hold(x ? QT : QF);
+	}
+
 value type_is_defined(value f)
 	{
 	if (!f->L) return 0;
@@ -137,8 +142,3 @@ static int op_is_list(value x)
 value type_is_good(value f) { return op_predicate(f,op_is_good); }
 value type_is_bool(value f) { return op_predicate(f,op_is_bool); }
 value type_is_list(value f) { return op_predicate(f,op_is_list); }
-
-value boolean(int x)
-	{
-	return hold(x ? QT : QF);
-	}

@@ -8,6 +8,11 @@
 #include <type_num.h>
 #include <type_str.h>
 
+string get_str(value x)
+	{
+	return (string)x->R;
+	}
+
 value type_str(value f)
 	{
 	if (f->N == 0)
@@ -26,11 +31,6 @@ value Qstr(string x)
 value Qstr0(const char *data)
 	{
 	return Qstr(str_new_data0(data));
-	}
-
-string get_str(value x)
-	{
-	return (string)x->R;
 	}
 
 const char *str_data(value x)
