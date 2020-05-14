@@ -114,7 +114,7 @@
 	)
 
 define "stream_data" stream_data;
-define "put_data" put_data;
+define "i_put_data" put_data; # Avoid conflict with put_data in format.fxl.
 define "say_data" say_data;
 define "trace_data" trace_data;
 standard
