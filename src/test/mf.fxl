@@ -16,9 +16,11 @@ standard
 # Create the base of a male/female function.
 \create=
 	(\base
-	\@=cache_loop
+	\cache=new_cache
 	\other
 	@\this\n
+	\n=n
+	cache n;
 	le n 0 base;
 	- n; other; this; - n 1
 	)

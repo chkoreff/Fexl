@@ -51,6 +51,24 @@
 # Use a file in the directory which contains the user's script.
 \use=(\name use_file (path_under dir_local name))
 
+# Return (f x) if defined, otherwise (g x).
+\chain=(\f\g\x \v=(f x) is_defined v v; g x)
+
+# Create a cache that evaluates a function and stores the value at a given key.
+# Subsequent calls with the same key return the originally stored value.
+\new_cache==
+	(
+	\table=var_new
+	\key\fn
+
+	\val=(var_get table key)
+	is_defined val val;
+
+	\val=fn
+	var_put table (with key val; var_get table)
+	val
+	)
+
 # Evaluate the user's script.
 use_file script_name;
 
@@ -85,4 +103,7 @@ define "dir_local" dir_local;
 
 define "trace" trace;
 define "error" error;
+
+define "chain" chain;
+define "new_cache" new_cache;
 standard
