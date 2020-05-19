@@ -1,8 +1,9 @@
 # I put this code in a separate file to test multiple use calls.
 evaluate
 (
-use "test.fxl";
-standard
+: standard;
+: (use "test.fxl");
+void
 ) \;
 
 # (fib n) returns the nth Fibonacci number starting at 0.
@@ -35,5 +36,5 @@ div
 try 11.2 20.5
 )
 
-define "try_fib" try_fib;
-standard
+def "try_fib" try_fib;
+void

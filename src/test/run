@@ -133,7 +133,7 @@ EOF
 
 (
 cat <<"EOF"
-evaluate (define "b" (say "b"); void) \; a b
+evaluate (def "b" (say "b"); void) \; a b
 a c
 c
 EOF

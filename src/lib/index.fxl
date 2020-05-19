@@ -132,9 +132,9 @@
 	say "}"
 	)
 
-define "index_put" index_put;
-define "index_get" index_get;
-define "index_put_pairs" index_put_pairs;
-define "index_pairs" index_pairs;
-define "show_index" show_index;
-standard
+def "index_put" index_put;
+def "index_get" index_get;
+def "index_put_pairs" index_put_pairs;
+def "index_pairs" index_pairs;
+def "show_index" show_index;
+void

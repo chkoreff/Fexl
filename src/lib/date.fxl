@@ -291,32 +291,32 @@
 	ymd_date y m d
 	)
 
-define "long_month_names" long_month_names;
-define "short_month_names" short_month_names;
-define "long_month_name" long_month_name;
-define "short_month_name" short_month_name;
-define "date_year" date_year;
-define "date_month" date_month;
-define "date_ymd" date_ymd;
-define "split_date" split_date;
-define "date_normal" date_normal;
-define "date_quarter" date_quarter;
-define "month_ym" month_ym;
-define "ym_month" ym_month;
-define "ymd_date" ymd_date;
-define "month_before" month_before;
-define "month_after" month_after;
-define "ym_num_days" ym_num_days;
-define "fill_day" fill_day;
-define "day_after" day_after;
-define "date_end_prev_month" date_end_prev_month;
-define "date_end_prev_quarter" date_end_prev_quarter;
-define "date_end_prev_year" date_end_prev_year;
-define "same_quarter" same_quarter;
-define "year_num_days" year_num_days;
-define "day_in_year" day_in_year;
-define "count_days" count_days;
-define "day_of_week" day_of_week;
-define "add_days" add_days;
-define "add_year" add_year;
-standard
+def "long_month_names" long_month_names;
+def "short_month_names" short_month_names;
+def "long_month_name" long_month_name;
+def "short_month_name" short_month_name;
+def "date_year" date_year;
+def "date_month" date_month;
+def "date_ymd" date_ymd;
+def "split_date" split_date;
+def "date_normal" date_normal;
+def "date_quarter" date_quarter;
+def "month_ym" month_ym;
+def "ym_month" ym_month;
+def "ymd_date" ymd_date;
+def "month_before" month_before;
+def "month_after" month_after;
+def "ym_num_days" ym_num_days;
+def "fill_day" fill_day;
+def "day_after" day_after;
+def "date_end_prev_month" date_end_prev_month;
+def "date_end_prev_quarter" date_end_prev_quarter;
+def "date_end_prev_year" date_end_prev_year;
+def "same_quarter" same_quarter;
+def "year_num_days" year_num_days;
+def "day_in_year" day_in_year;
+def "count_days" count_days;
+def "day_of_week" day_of_week;
+def "add_days" add_days;
+def "add_year" add_year;
+void

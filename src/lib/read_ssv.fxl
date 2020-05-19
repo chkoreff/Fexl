@@ -2,9 +2,9 @@
 # This is the "command line" syntax I use to specify event histories.
 evaluate
 (
-define "save_standard" standard;
-use_lib "read.fxl";
-standard
+: (lib "read.fxl");
+: standard;
+void
 ) \;
 
 # Collect a string up to the next occurrence of the terminator string.
@@ -104,7 +104,7 @@ standard
 \read_ssv_chars=(read_chars get_rows)
 \read_ssv_file=(read_file get_rows)
 
-define "read_ssv_string" read_ssv_string;
-define "read_ssv_chars" read_ssv_chars;
-define "read_ssv_file" read_ssv_file;
-save_standard
+def "read_ssv_string" read_ssv_string;
+def "read_ssv_chars" read_ssv_chars;
+def "read_ssv_file" read_ssv_file;
+void

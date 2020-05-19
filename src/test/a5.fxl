@@ -1,7 +1,7 @@
 #
 evaluate
 (
-define "talk" (say "TALK");
+def "talk" (say "TALK");
 standard
 ) \;
 say "begin"

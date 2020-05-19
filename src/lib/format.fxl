@@ -171,9 +171,9 @@ format_num
 	(\str
 	evaluate
 		(
-		define "T" T;
-		define "F" F;
-		define "void" void;
+		def "T" T;
+		def "F" F;
+		def "void" void;
 		void
 		);
 	parse str ""
@@ -215,25 +215,25 @@ format_num
 # Trim spaces at the end of the string.
 \trim_end_spaces=(str_trim_spaces F T)
 
-define "repeat_str" repeat_str;
-define "format_num" format_num;
-define "format_money" format_money;
-define "fexl_quote" fexl_quote;
-define "uc" uc;
-define "lc" lc;
-define "render_data" render_data;
-define "render_list" render_list;
-define "fput_data" fput_data;
-define "fput_list" fput_list;
-define "put_data" put_data;
-define "put_list" put_list;
-define "show_data" show_data;
-define "as_str" data_to_str; # handy synonym
-define "data_to_str" data_to_str;
-define "str_to_data" str_to_data;
-define "count_match" count_match;
-define "str_trim" str_trim;
-define "trim_spaces" trim_spaces;
-define "trim_beg_spaces" trim_beg_spaces;
-define "trim_end_spaces" trim_end_spaces;
-standard
+def "repeat_str" repeat_str;
+def "format_num" format_num;
+def "format_money" format_money;
+def "fexl_quote" fexl_quote;
+def "uc" uc;
+def "lc" lc;
+def "render_data" render_data;
+def "render_list" render_list;
+def "fput_data" fput_data;
+def "fput_list" fput_list;
+def "put_data" put_data;
+def "put_list" put_list;
+def "show_data" show_data;
+def "as_str" data_to_str; # handy synonym
+def "data_to_str" data_to_str;
+def "str_to_data" str_to_data;
+def "count_match" count_match;
+def "str_trim" str_trim;
+def "trim_spaces" trim_spaces;
+def "trim_beg_spaces" trim_beg_spaces;
+def "trim_end_spaces" trim_end_spaces;
+void

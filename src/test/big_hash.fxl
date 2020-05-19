@@ -1,10 +1,10 @@
 #
 evaluate
 (
-use_lib "format.fxl";
-use_lib "time.fxl";
-use "test.fxl";
-standard
+: standard;
+: (lib "time.fxl");
+: (use "test.fxl");
+void
 ) \;
 
 # Reference: https://www.di-mgt.com.au/sha_testvectors.html

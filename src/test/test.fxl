@@ -32,11 +32,11 @@
 	say [(length bytes)":["(unpack bytes)"]"]
 	)
 
-define "div" div;
-define "show_list" show_list;
-define "run_test" run_test;
-define "do_benchmark" do_benchmark;
-define "show_benchmark" show_benchmark;
-define "show_str" show_str;
-define "show_hex" show_hex;
-standard
+def "div" div;
+def "show_list" show_list;
+def "run_test" run_test;
+def "do_benchmark" do_benchmark;
+def "show_benchmark" show_benchmark;
+def "show_str" show_str;
+def "show_hex" show_hex;
+void

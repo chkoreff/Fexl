@@ -1,8 +1,9 @@
 #
 evaluate
 (
-use "test.fxl";
-standard
+: standard;
+: (use "test.fxl");
+void
 ) \;
 
 \show_result=
@@ -66,7 +67,7 @@ try
 	# Make a nasty function that consumes an unbounded amount of memory.
 	\inf==
 		(
-		\S=(\x\y\z x z; y z)  # define the "fusion" operator
+		\S=(\x\y\z x z; y z)  # Define the "fusion" operator.
 		@ S S S  # Apply fixpoint to the fusion operator in a weird way.
 		)
 

@@ -113,8 +113,8 @@
 	fnl stderr
 	)
 
-define "stream_data" stream_data;
-define "i_put_data" put_data; # Avoid conflict with put_data in format.fxl.
-define "say_data" say_data;
-define "trace_data" trace_data;
-standard
+def "stream_data" stream_data;
+def "i_put_data" put_data; # Avoid conflict with put_data in format.fxl.
+def "say_data" say_data;
+def "trace_data" trace_data;
+void

@@ -1,9 +1,10 @@
 # Test reading CSV and SSV data.
 evaluate
 (
-use_lib "read_csv.fxl";
-use_lib "read_ssv.fxl";
-standard
+: standard;
+: (lib "read_csv.fxl");
+: (lib "read_ssv.fxl");
+void
 ) \;
 
 \try_chars=

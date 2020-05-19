@@ -15,9 +15,6 @@
 # (default d x) = x if x is good, otherwise d.
 \default=(\d\x \x=x is_defined x x d)
 
-\map_hex_to_raw_bytes=pack
-\map_raw_bytes_to_hex=unpack
-
 \trace=(fsay stderr)
 \error=(\msg trace msg die)
 
@@ -33,7 +30,7 @@
 	)
 
 # Return a context with key defined as val.
-\define=(\key\val with key {val})
+\def=(\key\val with key {val})
 
 # Use a file given by a direct path.
 \use_file=(\name\context evaluate context; parse_file name)
@@ -45,14 +42,8 @@
 \script_name=(default "" (argv 1))
 \dir_local=(dirname script_name)
 
-# Use a file in the Fexl library directory.
-\use_lib=(\name use_file (path_under dir_lib name))
-
-# Use a file in the directory which contains the user's script.
-\use=(\name use_file (path_under dir_local name))
-
 # Return (f x) if defined, otherwise (g x).
-\chain=(\f\g\x \v=(f x) is_defined v v; g x)
+\:=(\f\g\x \v=(f x) is_defined v v; g x)
 
 # Create a cache that evaluates a function and stores the value at a given key.
 # Subsequent calls with the same key return the originally stored value.
@@ -72,38 +63,59 @@
 # Evaluate the user's script.
 use_file script_name;
 
-use_lib "run.fxl";
-use_lib "format.fxl";
-use_lib "hex.fxl";
-use_lib "list.fxl";
-use_lib "math.fxl";
-use_lib "bool.fxl";
+\cache_use_lib=new_cache
+\cache_use=new_cache
 
-define "define" define;
-define "if" if;
-define "with" with;
+@\context
 
-define "TAB" TAB;
-define "NL" NL;
-define "CR" CR;
-define "LF" LF;
-define "QU" QU;
+\lib==
+	(\name
+	cache_use_lib name;
+	use_file (path_under dir_lib name) context
+	)
 
-define "check" check;
-define "default" default;
-define "map_hex_to_raw_bytes" pack;
-define "map_raw_bytes_to_hex" unpack;
-define "use_file" use_file;
-define "use_lib" use_lib;
-define "use" use;
+\use==
+	(\name
+	cache_use name;
+	use_file (path_under dir_local name) context
+	)
 
-define "path_under" path_under;
-define "dir_base" dir_base;
-define "dir_local" dir_local;
+def "standard" context;
 
-define "trace" trace;
-define "error" error;
+: standard;
 
-define "chain" chain;
-define "new_cache" new_cache;
-standard
+def "def" def;
+def "if" if;
+
+def "lib" lib;
+def "use" use;
+
+def "with" with;
+
+def "TAB" TAB;
+def "NL" NL;
+def "CR" CR;
+def "LF" LF;
+def "QU" QU;
+
+def "check" check;
+def "default" default;
+def "use_file" use_file;
+
+def "path_under" path_under;
+def "dir_base" dir_base;
+def "dir_local" dir_local;
+
+def "trace" trace;
+def "error" error;
+
+def ":" :;
+def "new_cache" new_cache;
+
+: (lib "bool.fxl");
+: (lib "math.fxl");
+: (lib "list.fxl");
+: (lib "format.fxl");
+: (lib "hex.fxl");
+: (lib "run.fxl");
+void

@@ -1,9 +1,9 @@
 #
 evaluate
 (
-use_lib "format.fxl";
-use "test.fxl";
-standard
+: standard;
+: (use "test.fxl");
+void
 ) \;
 
 \try_nacl_box_public=

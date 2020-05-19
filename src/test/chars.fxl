@@ -4,8 +4,9 @@
 # ^ Those characters used by test/b10.fxl.
 evaluate
 (
-use "test.fxl";
-standard
+: standard;
+: (use "test.fxl");
+void
 ) \;
 
 \try=

@@ -148,8 +148,6 @@
 	loop
 	)
 
-\encode_percent=uri_escape # backward compatible
-
 \make_url=
 	(\params
 	\params=
@@ -168,16 +166,15 @@
 	url
 	)
 
-define "quote_ch" quote_ch;
-define "quote" quote;
-define "colgroup" colgroup;
-define "_tag" _tag;
-define "tag" tag;
-define "tr" tr;
-define "put_quote_data" put_quote_data;
-define "put_quote_list" put_quote_list;
-define "uri_escape" uri_escape;
-define "uri_unescape" uri_unescape;
-define "encode_percent" encode_percent;
-define "make_url" make_url;
-standard
+def "quote_ch" quote_ch;
+def "quote" quote;
+def "colgroup" colgroup;
+def "_tag" _tag;
+def "tag" tag;
+def "tr" tr;
+def "put_quote_data" put_quote_data;
+def "put_quote_list" put_quote_list;
+def "uri_escape" uri_escape;
+def "uri_unescape" uri_unescape;
+def "make_url" make_url;
+void

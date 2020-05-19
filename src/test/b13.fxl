@@ -3,10 +3,9 @@
 \test_context==
 (\context
 
-evaluate context \;
 \try=
 	(\name
-	\f=(standard name)
+	\f=(context name)
 	say ["name "name" : "(is_defined f)]
 	)
 
@@ -15,13 +14,13 @@ try "is_defined"
 try "standard"
 try "+"
 try "@"
-try "define"
+try "def"
 try "if"
 try "each"
 try "div"
 try "show_list"
 try "use_file"
-try "use_lib"
+try "lib"
 try "use"
 try "void"
 try "dirname"
@@ -39,22 +38,20 @@ try "x"
 say "== test_full_context"
 test_context
 	(
-	use "test.fxl";
-	use_lib "date.fxl";
-
-	use_lib "read_ssv.fxl";
-	use_lib "read_csv.fxl";
-
-	use_lib "html.fxl";
-
-	standard
+	: standard;
+	: (lib "date.fxl");
+	: (lib "read_ssv.fxl");
+	: (lib "read_csv.fxl");
+	: (lib "html.fxl");
+	: (use "test.fxl");
+	void
 	)
 
 say "== test_restricted_context"
 test_context
 	(
-	define "say" say;
-	define "is_defined" is_defined;
+	def "say" say;
+	def "is_defined" is_defined;
 	void
 	)
 
@@ -64,29 +61,27 @@ say "== test_dynamic_context"
 # This context defines 5 available functions.
 \context=
 	(
-	define "say" say;
-	define "seed_rand" seed_rand;
-	define "rand" rand;
-	define "fred" (say "I am Fred.");
-	define "wilma" (say "I am Wilma.");
+	def "say" say;
+	def "seed_rand" seed_rand;
+	def "rand" rand;
+	def "fred" (say "I am Fred.");
+	def "wilma" (say "I am Wilma.");
 	void
 	)
 
 # The get function looks up a key in the context and dies if not defined.
 \get=
 	(\key
-	\def=(context key)
-	is_void def (error ["Undefined symbol "key]);
-	def
+	\val=(context key)
+	is_void val (error ["Undefined symbol "key]);
+	val
 	)
 
 # Now I evaluate some code in a context which defines only the "get" function.
-# Not even "standard" is defined.  The code must explicitly get every single
-# function it wants to use.
+# The code must explicitly get every single function it wants to use.
 evaluate
 (
-define "get" get;
-with "standard" (error "Undefined symbol standard");
+def "get" get;
 void
 ) \;
 
@@ -96,8 +91,6 @@ get "rand" \rand
 #get "barney" \barney # This would be an error.
 get "fred" \fred
 get "wilma" \wilma
-
-#\x==standard # Can't refer to standard here.
 
 seed_rand 0.1964
 fred

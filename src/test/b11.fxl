@@ -1,10 +1,11 @@
 #
 evaluate
 (
-use_lib "html.fxl";
-use_lib "date.fxl";
-use_lib "time.fxl";
-standard
+: standard;
+: (lib "html.fxl");
+: (lib "date.fxl");
+: (lib "time.fxl");
+void
 ) \;
 (
 \try=

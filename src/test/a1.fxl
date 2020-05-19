@@ -1,10 +1,11 @@
 #
 evaluate
 (
-use "test.fxl";
-use_lib "html.fxl";
-use_lib "date.fxl";
-standard
+: standard;
+: (lib "html.fxl");
+: (lib "date.fxl");
+: (use "test.fxl");
+void
 ) \;
 
 \show=
@@ -367,9 +368,10 @@ div
 (
 evaluate
 (
-use "try_fib.fxl";
-define "show" show;
-standard
+: standard;
+def "show" show;
+: (use "try_fib.fxl");
+void
 ) \;
 show "x"
 show (+ 2 3)
@@ -380,18 +382,18 @@ div
 (
 evaluate
 (
-define "say" say;
-define "put" put;
-define "nl" nl;
-define "+" +;
-define "round" round;
-define "trunc" trunc;
-define "abs" abs;
-define "sqrt" sqrt;
-define "exp" exp;
-define "log" log;
-define "sin" sin;
-define "fred" (say "I am Fred.");
+def "say" say;
+def "put" put;
+def "nl" nl;
+def "+" +;
+def "round" round;
+def "trunc" trunc;
+def "abs" abs;
+def "sqrt" sqrt;
+def "exp" exp;
+def "log" log;
+def "sin" sin;
+def "fred" (say "I am Fred.");
 void
 ) \;
 say "hi"
@@ -727,16 +729,16 @@ eval_file "mf.fxl"
 	say "["
 	say "== resolve"
 
-	\define=(\x say ["symbol "x] define x)
+	\def=(\x say ["symbol "x] def x)
 
 	evaluate
 	(
-	define "say" say;
-	define "fred" (say "I am Fred.");
-	define "wilma" (say "I am Wilma.");
-	define "is_void" is_void;
-	define "void" void;
-	define "barney" (say "I am Barney.");
+	def "say" say;
+	def "fred" (say "I am Fred.");
+	def "wilma" (say "I am Wilma.");
+	def "is_void" is_void;
+	def "void" void;
+	def "barney" (say "I am Barney.");
 	void
 	) \;
 	say "== run"
@@ -762,8 +764,8 @@ eval_file "mf.fxl"
 	(
 	evaluate
 	(
-	define "say" say;
-	define "+" *;
+	def "say" say;
+	def "+" *;
 	void
 	)
 	form
@@ -1268,19 +1270,6 @@ try "   abc  "
 try ""
 try "   "
 try "  abcd   "
-)
-
-# Ensure availability of old and new names.
-if F
-(
-encode_percent
-map_hex_to_raw_bytes
-map_raw_bytes_to_hex
-
-uri_escape
-uri_unescape
-pack
-unpack
 )
 
 \run_test=

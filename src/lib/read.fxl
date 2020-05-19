@@ -93,14 +93,14 @@
 	result
 	)
 
-define "is_eol" is_eol;
-define "is_white" is_white;
-define "look" look;
-define "skip" skip;
-define "get" get;
-define "skip_match" skip_match;
-define "collect_to" collect_to;
-define "read_string" read_string;
-define "read_chars" read_chars;
-define "read_file" read_file;
-standard
+def "is_eol" is_eol;
+def "is_white" is_white;
+def "look" look;
+def "skip" skip;
+def "get" get;
+def "skip_match" skip_match;
+def "collect_to" collect_to;
+def "read_string" read_string;
+def "read_chars" read_chars;
+def "read_file" read_file;
+void

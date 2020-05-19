@@ -1,8 +1,9 @@
 #
 evaluate
 (
-use "test.fxl";
-standard
+: standard;
+: (use "test.fxl");
+void
 ) \;
 
 show_benchmark;
@@ -19,11 +20,11 @@ show_benchmark;
 # Test restricted evaluation by defining only the necessary functions.
 evaluate
 (
-define "append" append;
-define "show_list" show_list;
-define "sort" sort;
-define "tower" tower;
-define "unique" unique;
+def "append" append;
+def "show_list" show_list;
+def "sort" sort;
+def "tower" tower;
+def "unique" unique;
 void
 ) \;
 # Here I test the sort.

@@ -1706,16 +1706,16 @@ exit 0
 == test_full_context
 name say : T
 name is_defined : T
-name standard : F
+name standard : T
 name + : T
 name @ : T
-name define : T
+name def : T
 name if : T
 name each : T
 name div : T
 name show_list : T
 name use_file : T
-name use_lib : T
+name lib : T
 name use : T
 name void : T
 name dirname : T
@@ -1734,13 +1734,13 @@ name is_defined : T
 name standard : F
 name + : F
 name @ : F
-name define : F
+name def : F
 name if : F
 name each : F
 name div : F
 name show_list : F
 name use_file : F
-name use_lib : F
+name lib : F
 name use : F
 name void : F
 name dirname : F

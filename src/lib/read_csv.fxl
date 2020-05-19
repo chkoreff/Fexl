@@ -3,9 +3,9 @@
 # "Spaces are considered part of a field and should not be ignored."
 evaluate
 (
-define "save_standard" standard;
-use_lib "read.fxl";
-standard
+: (lib "read.fxl");
+: standard;
+void
 ) \;
 
 \get_plain_item==
@@ -74,7 +74,7 @@ standard
 \read_csv_chars=(read_chars get_rows)
 \read_csv_file=(read_file get_rows)
 
-define "read_csv_string" read_csv_string;
-define "read_csv_chars" read_csv_chars;
-define "read_csv_file" read_csv_file;
-save_standard
+def "read_csv_string" read_csv_string;
+def "read_csv_chars" read_csv_chars;
+def "read_csv_file" read_csv_file;
+void
