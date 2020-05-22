@@ -1,11 +1,10 @@
 #
 evaluate
 (
-: standard;
-: (lib "html.fxl");
-: (lib "date.fxl");
-: (use "test.fxl");
-void
+:: (use "test.fxl");
+:: (use_lib "html.fxl");
+:: (use_lib "date.fxl");
+standard
 ) \;
 
 \show=
@@ -368,10 +367,9 @@ div
 (
 evaluate
 (
-: standard;
+:: (use "try_fib.fxl");
 def "show" show;
-: (use "try_fib.fxl");
-void
+standard
 ) \;
 show "x"
 show (+ 2 3)

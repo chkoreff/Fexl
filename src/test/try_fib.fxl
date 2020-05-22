@@ -1,9 +1,8 @@
 # I put this code in a separate file to test multiple use calls.
 evaluate
 (
-: standard;
-: (use "test.fxl");
-void
+:: (use "test.fxl");
+standard
 ) \;
 
 # (fib n) returns the nth Fibonacci number starting at 0.

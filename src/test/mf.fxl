@@ -2,10 +2,9 @@
 
 evaluate
 (
-: standard;
-: (lib "time.fxl");
-: (use "test.fxl");
-void
+:: (use "test.fxl");
+:: (use_lib "time.fxl");
+standard
 ) \;
 
 #do_benchmark;

@@ -3,9 +3,8 @@
 # "Spaces are considered part of a field and should not be ignored."
 evaluate
 (
-: (lib "read.fxl");
-: standard;
-void
+:: (use_lib "read.fxl");
+standard
 ) \;
 
 \get_plain_item==

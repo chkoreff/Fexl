@@ -1,9 +1,8 @@
 #
 evaluate
 (
-: standard;
-: (lib "index.fxl");
-void
+:: (use_lib "index.fxl");
+standard
 ) \;
 
 \test_index_put==

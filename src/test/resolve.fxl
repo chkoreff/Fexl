@@ -1,12 +1,10 @@
-# Test fancy extended context.
+# Test fancy extended standard context.
 
 # Define a few extra functions.
 evaluate
 (
 say "Evaluating the context."
 \speaker=(\name \x put name put " says " say x)
-@\context
-def "standard" context;
 def "fred" (speaker "Fred");
 def "wilma" (speaker "Wilma");
 def "goodbye" (say "Goodbye");

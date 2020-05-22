@@ -1,9 +1,8 @@
 #
 evaluate
 (
-: standard;
-: (lib "date.fxl");
-void
+:: (use_lib "date.fxl");
+standard
 ) \;
 \test_count_days==
 	(

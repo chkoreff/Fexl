@@ -204,8 +204,6 @@ static value standard(value name)
 	if (match("connect")) return Q(type_connect);
 	if (match("receive_keystrokes")) return Q(type_receive_keystrokes);
 
-	if (match("standard")) return Q(type_standard);
-
 	return 0;
 	}
 

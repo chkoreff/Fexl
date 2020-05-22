@@ -2,9 +2,8 @@
 # This is the "command line" syntax I use to specify event histories.
 evaluate
 (
-: (lib "read.fxl");
-: standard;
-void
+:: (use_lib "read.fxl");
+standard
 ) \;
 
 # Collect a string up to the next occurrence of the terminator string.

@@ -248,6 +248,12 @@ static value resolve(value context, struct form *form)
 			drop(val);
 			val = x;
 			}
+		else if (strcmp(sym->name->data,"standard") == 0)
+			{
+			/* By default, "standard" refers to the current context. */
+			drop(val);
+			val = hold(context);
+			}
 		else
 			{
 			undefined = 1;

@@ -1,10 +1,9 @@
 # Test assoc list.
 evaluate
 (
-: standard;
-: (lib "indent.fxl");
-: (lib "assoc.fxl");
-void
+:: (use_lib "indent.fxl");
+:: (use_lib "assoc.fxl");
+standard
 ) \;
 
 \add_random_keys=

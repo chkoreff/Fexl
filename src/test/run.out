@@ -1706,7 +1706,7 @@ exit 0
 == test_full_context
 name say : T
 name is_defined : T
-name standard : T
+name standard : F
 name + : T
 name @ : T
 name def : T
@@ -1715,7 +1715,7 @@ name each : T
 name div : T
 name show_list : T
 name use_file : T
-name lib : T
+name use_lib : T
 name use : T
 name void : T
 name dirname : T
@@ -1740,7 +1740,7 @@ name each : F
 name div : F
 name show_list : F
 name use_file : F
-name lib : F
+name use_lib : F
 name use : F
 name void : F
 name dirname : F

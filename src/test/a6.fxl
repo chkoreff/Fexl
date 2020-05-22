@@ -1,9 +1,8 @@
 #
 evaluate
 (
-: standard;
-: (use "test.fxl");
-void
+:: (use "test.fxl");
+standard
 ) \;
 
 \parse=

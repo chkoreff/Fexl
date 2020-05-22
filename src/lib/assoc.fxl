@@ -95,6 +95,7 @@
 	combine_keys (\x\_ x) xs # Keep the first.
 	)
 
+def ":" get_key; # Handy synonym
 def "get_key" get_key;
 def "del_key" del_key;
 def "put_key" put_key;

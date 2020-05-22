@@ -3,9 +3,10 @@
 \test_context==
 (\context
 
+evaluate context \;
 \try=
 	(\name
-	\f=(context name)
+	\f=(standard name)
 	say ["name "name" : "(is_defined f)]
 	)
 
@@ -20,7 +21,7 @@ try "each"
 try "div"
 try "show_list"
 try "use_file"
-try "lib"
+try "use_lib"
 try "use"
 try "void"
 try "dirname"
@@ -38,13 +39,15 @@ try "x"
 say "== test_full_context"
 test_context
 	(
-	: standard;
-	: (lib "date.fxl");
-	: (lib "read_ssv.fxl");
-	: (lib "read_csv.fxl");
-	: (lib "html.fxl");
-	: (use "test.fxl");
-	void
+	:: (use "test.fxl");
+	:: (use_lib "date.fxl");
+
+	:: (use_lib "read_ssv.fxl");
+	:: (use_lib "read_csv.fxl");
+
+	:: (use_lib "html.fxl");
+
+	standard
 	)
 
 say "== test_restricted_context"
@@ -78,10 +81,12 @@ say "== test_dynamic_context"
 	)
 
 # Now I evaluate some code in a context which defines only the "get" function.
-# The code must explicitly get every single function it wants to use.
+# Not even "standard" is defined.  The code must explicitly get every single
+# function it wants to use.
 evaluate
 (
 def "get" get;
+with "standard" (error "Undefined symbol standard");
 void
 ) \;
 
@@ -91,6 +96,8 @@ get "rand" \rand
 #get "barney" \barney # This would be an error.
 get "fred" \fred
 get "wilma" \wilma
+
+#\x==standard # Can't refer to standard here.
 
 seed_rand 0.1964
 fred
