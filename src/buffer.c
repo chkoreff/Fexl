@@ -6,7 +6,7 @@
 
 buffer buf_new(void)
 	{
-	struct buffer *buf = new_memory(sizeof(struct buffer));
+	buffer buf = new_memory(sizeof(struct buffer));
 	buf->top = 0;
 	return buf;
 	}

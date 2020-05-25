@@ -346,3 +346,33 @@ say "= microtime"
 try "1559751185778257" "1559751174778281"
 try "1559751185778257" "1559751185778257"
 )
+
+(
+say "= convert time"
+
+\run=
+	(
+	\str_to_num
+	\num_to_str
+
+	\try=
+		(\x
+		\x=x
+		\n=(str_to_num x)
+		\y=(num_to_str n)
+
+		say (as_str [x n y])
+		)
+
+	try "1970-01-01 00:00:00"
+	try "1970-01-01 00:01:23"
+	try "2020-05-31 23:59:59"
+	try "2020-04-30 23:59:59"
+	try "2020-04-30 23:59:59xyz"
+	try "2020-04-30 23:59:69"
+	)
+
+run timegm gmtime
+
+if F (run timelocal localtime) # Result depends on your local time zone.
+)

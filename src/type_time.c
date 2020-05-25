@@ -5,7 +5,11 @@
 #include <format.h>
 #include <standard.h>
 #include <sys/time.h>
+
+/* The define ensures that strptime is accessible. */
+#define __USE_XOPEN
 #include <time.h>
+
 #include <type_num.h>
 #include <type_str.h>
 #include <type_time.h>
@@ -20,8 +24,10 @@ value type_time(value f)
 	return Qnum(n);
 	}
 
+static const char *time_format = "%Y-%m-%d %H:%M:%S";
+
 /* Format an epoch time as "YYYY-MM-DD HH:MM:SS". */
-value type_localtime(value f)
+static value op_strftime(value f, struct tm *(*convert)(const time_t *))
 	{
 	if (!f->L) return 0;
 	{
@@ -29,9 +35,9 @@ value type_localtime(value f)
 	if (x->T == type_num)
 		{
 		time_t n = get_double(x);
-		struct tm *tm = localtime(&n);
+		struct tm *tm = convert(&n);
 		char buf[32];
-		strftime(buf,32,"%Y-%m-%d %H:%M:%S",tm);
+		strftime(buf,32,time_format,tm);
 		f = Qstr0(buf);
 		}
 	else
@@ -39,6 +45,53 @@ value type_localtime(value f)
 	drop(x);
 	return f;
 	}
+	}
+
+/* Convert "YYYY-MM-DD HH:MM:SS" to an epoch time. */
+static value op_strptime(value f, time_t (*convert)(struct tm *tm))
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_str)
+		{
+		const char *str = str_data(x);
+		struct tm tm;
+		char *result = strptime(str,time_format,&tm);
+		if (result)
+			f = Qnum(convert(&tm));
+		else
+			f = hold(Qvoid);
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
+	}
+
+/* Convert epoch to string in local time zone. */
+value type_localtime(value f)
+	{
+	return op_strftime(f,localtime);
+	}
+
+/* Convert epoch to string in UTC time zone. */
+value type_gmtime(value f)
+	{
+	return op_strftime(f,gmtime);
+	}
+
+/* Convert string to epoch in local time zone. */
+value type_timelocal(value f)
+	{
+	return op_strptime(f,timelocal);
+	}
+
+/* Convert string to epoch in UTC time zone. */
+value type_timegm(value f)
+	{
+	return op_strptime(f,timegm);
 	}
 
 static string microtime(void)

@@ -140,6 +140,9 @@ static value standard(value name)
 
 	if (match("time")) return Q(type_time);
 	if (match("localtime")) return Q(type_localtime);
+	if (match("gmtime")) return Q(type_gmtime);
+	if (match("timelocal")) return Q(type_timelocal);
+	if (match("timegm")) return Q(type_timegm);
 	if (match("microtime")) return Q(type_microtime);
 
 	if (match("die")) return Q(type_die);
