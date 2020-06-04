@@ -1,9 +1,5 @@
 #
-evaluate
-(
-:: (use "test.fxl");
-standard
-) \;
+evaluate (use "test.fxl" standard) \;
 
 \try_nacl_box_public=
 	(\secret_key

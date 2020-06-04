@@ -39,4 +39,4 @@ def "do_benchmark" do_benchmark;
 def "show_benchmark" show_benchmark;
 def "show_str" show_str;
 def "show_hex" show_hex;
-void
+standard

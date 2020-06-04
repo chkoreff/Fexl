@@ -1,11 +1,5 @@
 #
-evaluate
-(
-:: (use "test.fxl");
-:: (use_lib "html.fxl");
-:: (use_lib "date.fxl");
-standard
-) \;
+evaluate (use "test.fxl" standard) \;
 
 \show=
 	(\x
@@ -367,13 +361,11 @@ div
 (
 evaluate
 (
-:: (use "try_fib.fxl");
 def "show" show;
 standard
 ) \;
 show "x"
 show (+ 2 3)
-try_fib
 )
 
 div
@@ -754,20 +746,16 @@ eval_file "mf.fxl"
 	\form=(parse "say (+ 7 8)" "")
 
 	say "Run in standard context."
-	(
 	evaluate standard form
-	)
 
 	say "Run in weird context."
-	(
 	evaluate
-	(
-	def "say" say;
-	def "+" *;
-	void
-	)
-	form
-	)
+		(
+		def "say" say;
+		def "+" *;
+		void
+		)
+		form
 
 	say "]"
 	)

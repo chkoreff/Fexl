@@ -1,11 +1,4 @@
 # Test assoc list.
-evaluate
-(
-:: (use_lib "indent.fxl");
-:: (use_lib "assoc.fxl");
-standard
-) \;
-
 \add_random_keys=
 	(@\loop\count\seed\obj
 	le count 0 obj;

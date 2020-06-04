@@ -72,7 +72,7 @@
 	)
 
 # (sort_pairs list) Sort the list of pairs by key.
-\sort_pairs=(sort_items (\p p \k\_ k) F)
+\sort_pairs=(sort_all (\p p \k\_ k))
 
 \put_default=
 	(\key\dval\list

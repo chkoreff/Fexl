@@ -1,0 +1,25 @@
+#
+evaluate (use "test.fxl" standard) \;
+say "== test Fibonacci"
+
+# (fib n) returns the nth Fibonacci number starting at 0.
+\fib=
+	(
+	\cache=new_cache
+	@\fib\n \n=n
+	cache n;
+	gt n 1 (+ (fib (- n 1)) (fib (- n 2)));
+	eq n 1 1;
+	0
+	)
+
+\try=
+	(\x\y
+	div
+	each (range x y) \n
+	say ["fib " n " = " (fib n)]
+	)
+
+show_benchmark;
+try 8 0
+try 54 73 # Show the last 20 that don't use "e" notation.

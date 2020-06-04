@@ -1,35 +1,34 @@
 # https://en.wikipedia.org/wiki/Hofstadter_sequence#Hofstadter_Female_and_Male_sequences
+evaluate (use "test.fxl" standard) \;
 
-evaluate
-(
-:: (use "test.fxl");
-:: (use_lib "time.fxl");
-standard
-) \;
-
-#do_benchmark;
-#trace_elapsed;
-
-# Splice two functions f and g into a feedback loop.
-\splice=(\f\g @\loop f; g loop)
-
-# Create the base of a male/female function.
-\create=
-	(\base
+\female=
+	(
 	\cache=new_cache
-	\other
-	@\this\n
-	\n=n
+	\male
+	@\female
+
+	\n \n=n
 	cache n;
-	le n 0 base;
-	- n; other; this; - n 1
+	le n 0 1;
+	- n (male (female (- n 1)))
 	)
 
-\create_0=(create 0)
-\create_1=(create 1)
+\male=
+	(
+	\cache=new_cache
+	@\male
+	\female==(female male)
 
-\male   = (splice create_0 create_1)
-\female = (splice create_1 create_0)
+	\n \n=n
+	cache n;
+	le n 0 0;
+	- n (female (male (- n 1)))
+	)
+
+\female=(female male)
+
+#trace_elapsed;
+show_benchmark;
 
 \max=35
 #\max=1000

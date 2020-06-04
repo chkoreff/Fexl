@@ -1,0 +1,19 @@
+# Ensure automatic loading of libraries.  Each of these symbols triggers the
+# load of the next library file in the standard search order.
+if F
+(
+and
+neg
+map
+as_str
+say_data
+get_key
+oct
+tag
+trace_elapsed
+split_date
+grab_output
+read_csv_file
+read_ssv_file
+index_put
+)

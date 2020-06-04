@@ -1,9 +1,5 @@
 #
-evaluate
-(
-:: (use "test.fxl");
-standard
-) \;
+evaluate (use "test.fxl" standard) \;
 
 show_benchmark;
 

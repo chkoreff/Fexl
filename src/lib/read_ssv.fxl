@@ -1,10 +1,5 @@
 # Parse the SSV (space-separated value) format.
 # This is the "command line" syntax I use to specify event histories.
-evaluate
-(
-:: (use_lib "read.fxl");
-standard
-) \;
 
 # Collect a string up to the next occurrence of the terminator string.
 \collect_string=

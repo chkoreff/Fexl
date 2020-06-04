@@ -304,40 +304,6 @@ x = 81
 str x
 num 5
 ==
-fib 0 = 0
-fib 1 = 1
-fib 2 = 1
-fib 3 = 2
-fib 4 = 3
-fib 5 = 5
-fib 6 = 8
-fib 7 = 13
-fib 8 = 21
-==
-fib 8 = 21
-fib 7 = 13
-fib 6 = 8
-fib 5 = 5
-fib 4 = 3
-fib 3 = 2
-fib 2 = 1
-fib 1 = 1
-fib 0 = 0
-==
-fib 30 = 832040
-==
-fib 11 = 89
-fib 12 = 144
-fib 13 = 233
-fib 14 = 377
-fib 15 = 610
-fib 16 = 987
-fib 17 = 1597
-fib 18 = 2584
-fib 19 = 4181
-fib 20 = 6765
-fib 21 = 10946
-==
 hi
 I am Fred.
 35.2
@@ -755,13 +721,14 @@ than
 ur
 when
 ]
-steps 31795705 bytes 29498432
+steps 31795695 bytes 29498432
 female
 1 1 2 2 3 3 4 5 5 6 6 7 8 8 9 9 10 11 11 12 13 13 14 14 15 16 16 17 17 18 19 19 20 21 21 22 
 male
 0 0 1 2 2 3 4 4 5 6 6 7 7 8 9 9 10 11 11 12 12 13 14 14 15 16 16 17 17 18 19 19 20 20 21 22 
 diff
 1 1 1 0 1 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 
+steps 74497 bytes 20328
 [
 == resolve
 symbol say
@@ -1710,7 +1677,7 @@ second line"]
 ]
 exit 0
 ==== test/b13.fxl
-== test_full_context
+== test_full
 name say : T
 name is_defined : T
 name standard : F
@@ -1722,7 +1689,6 @@ name each : T
 name div : T
 name show_list : T
 name use_file : T
-name use_lib : T
 name use : T
 name void : T
 name dirname : T
@@ -1735,7 +1701,7 @@ name -3.56 : F
 name -3.56e-4 : F
 name -3.56e-4x : F
 name x : F
-== test_restricted_context
+== test_restricted
 name say : T
 name is_defined : T
 name standard : F
@@ -1747,7 +1713,6 @@ name each : F
 name div : F
 name show_list : F
 name use_file : F
-name use_lib : F
 name use : F
 name void : F
 name dirname : F
@@ -1760,7 +1725,7 @@ name -3.56 : F
 name -3.56e-4 : F
 name -3.56e-4x : F
 name x : F
-== test_dynamic_context
+== test_run_restricted
 I am Fred.
 0.927291684284476
 0.471201063818858
@@ -2479,6 +2444,43 @@ str_num "nan" = void
 str_num "-inf" = void
 str_num "-nan" = void
 
+exit 0
+==== test/b22.fxl
+== test Fibonacci
+==
+fib 8 = 21
+fib 7 = 13
+fib 6 = 8
+fib 5 = 5
+fib 4 = 3
+fib 3 = 2
+fib 2 = 1
+fib 1 = 1
+fib 0 = 0
+==
+fib 54 = 86267571272
+fib 55 = 139583862445
+fib 56 = 225851433717
+fib 57 = 365435296162
+fib 58 = 591286729879
+fib 59 = 956722026041
+fib 60 = 1548008755920
+fib 61 = 2504730781961
+fib 62 = 4052739537881
+fib 63 = 6557470319842
+fib 64 = 10610209857723
+fib 65 = 17167680177565
+fib 66 = 27777890035288
+fib 67 = 44945570212853
+fib 68 = 72723460248141
+fib 69 = 117669030460994
+fib 70 = 190392490709135
+fib 71 = 308061521170129
+fib 72 = 498454011879264
+fib 73 = 806515533049393
+steps 41523 bytes 45488
+exit 0
+==== test/b23.fxl
 exit 0
 ==== test/chars.fxl
 ==

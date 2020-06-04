@@ -1,24 +1,40 @@
 # Run the user's script given by argv[1] in the enhanced standard context.
 
-\TAB="	"
-\NL="
-"
-\CR=(chr 13)
-\LF=NL
-\QU=~ "~
-
-# (if x y) = y if x is true, other I.
-\if=(\x\y x y I)
+# Use a file given by a direct path.
+\use_file=(\name\context evaluate context; parse_file name)
 
 # (check x d) = x if x is good, otherwise d.
 \check=(\x \x=x is_defined x x)
 # (default d x) = x if x is good, otherwise d.
 \default=(\d\x \x=x is_defined x x d)
 
+# Chain prev and next.  Returns a context which tries prev first, then next.
+\::=
+	(\prev\next
+	\prev==(\= prev)
+	\next==(\= next)
+	\key
+	\val=(prev key)
+	is_defined val val;
+	next key
+	)
+
+\script_name=(default "" (argv 1))
+\dir_local=(dirname script_name)
+
+# Evaluate the user's script.
+use_file script_name;
+
+# Extend the standard context.
+evaluate
+(
+:: standard;
+
+# (if x y) = y if x is true, other I.
+\if=(\x\y x y I)
+
 \trace=(fsay stderr)
 \error=(\msg trace msg die)
-
-\path_under=(\dir\name . (. dir "/") name)
 
 # Return an object with key defined as val.
 \with=
@@ -32,15 +48,11 @@
 # Return a context with key defined as val.
 \def=(\key\val with key {val})
 
-# Use a file given by a direct path.
-\use_file=(\name\context evaluate context; parse_file name)
+\path_under=(\dir\name . (. dir "/") name)
 
 # Establish paths based on command arguments.
 \dir_base=(dirname; dirname; argv 0)
 \dir_lib=(path_under dir_base "src/lib")
-
-\script_name=(default "" (argv 1))
-\dir_local=(dirname script_name)
 
 # Use a file in the Fexl library directory.
 \use_lib=(\name use_file (path_under dir_lib name))
@@ -48,72 +60,17 @@
 # Use a file in the directory which contains the user's script.
 \use=(\name use_file (path_under dir_local name))
 
-# The :: function is used to chain contexts together.
-\::=
-	(\load\prev
-	\prev=prev
-	\next=(load prev)
-
-	\key
-	\val=(next key)
-	is_defined val val;
-	prev key
-	)
-
-# The ?:: function is like ::, except it loads only on demand.
-\?::=
-	(\load\prev
-	\prev=prev
-	\next==(\= load prev)
-
-	\key
-	\val=(prev key)
-	is_defined val val;
-	next key
-	)
-
-# Create a cache that evaluates a function and stores the value at a given key.
-# Subsequent calls with the same key return the originally stored value.
-\new_cache==
-	(
-	\table=var_new
-	\key\fn
-
-	\val=(var_get table key)
-	is_defined val val;
-
-	\val=fn
-	var_put table (with key val; var_get table)
-	val
-	)
-
-# Evaluate the user's script.
-use_file script_name;
-
-?:: (use_lib "run.fxl");
-?:: (use_lib "format.fxl");
-?:: (use_lib "hex.fxl");
-?:: (use_lib "list.fxl");
-?:: (use_lib "math.fxl");
-?:: (use_lib "bool.fxl");
-
 def "def" def;
 def "if" if;
 def "with" with;
 def "::" ::;
-def "?::" ?::;
 
-def "TAB" TAB;
-def "NL" NL;
-def "CR" CR;
-def "LF" LF;
-def "QU" QU;
+def "use" use;
+def "use_lib" use_lib;
+def "use_file" use_file;
 
 def "check" check;
 def "default" default;
-def "use_file" use_file;
-def "use_lib" use_lib;
-def "use" use;
 
 def "path_under" path_under;
 def "dir_base" dir_base;
@@ -122,5 +79,67 @@ def "dir_local" dir_local;
 def "trace" trace;
 def "error" error;
 
-def "new_cache" new_cache;
-standard
+\NL="
+"
+def "TAB" "	";
+def "NL" NL;
+def "CR" (chr 13);
+def "LF" NL;
+def "QU" ~ "~;
+
+void
+) \;
+
+# Chain the libraries so they load on demand.
+
+evaluate
+(
+:: standard;
+:: (use_lib "bool.fxl" standard);
+:: (use_lib "math.fxl" standard);
+void
+) \;
+
+evaluate
+(
+:: standard;
+:: (use_lib "list.fxl" standard);
+void
+) \;
+
+evaluate
+(
+:: standard;
+:: (use_lib "format.fxl" standard);
+void
+) \;
+
+evaluate
+(
+:: standard;
+:: (use_lib "indent.fxl" standard);
+:: (use_lib "assoc.fxl" standard);
+:: (use_lib "hex.fxl" standard);
+void
+) \;
+
+:: standard;
+:: (use_lib "html.fxl" standard);
+:: (use_lib "time.fxl" standard);
+:: (use_lib "date.fxl" standard);
+:: (use_lib "run.fxl" standard);
+::
+	(
+	evaluate
+	(
+	:: standard;
+	:: (use_lib "read.fxl" standard);
+	void
+	) \;
+
+	:: (use_lib "read_csv.fxl" standard);
+	:: (use_lib "read_ssv.fxl" standard);
+	void
+	);
+:: (use_lib "index.fxl" standard);
+void

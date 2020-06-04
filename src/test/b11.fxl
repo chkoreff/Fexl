@@ -1,11 +1,4 @@
 #
-evaluate
-(
-:: (use_lib "html.fxl");
-:: (use_lib "date.fxl");
-:: (use_lib "time.fxl");
-standard
-) \;
 (
 \try=
 	(\path
@@ -200,7 +193,7 @@ tag "div class=a" (say "X")
 _tag "div class=a" (put "X") nl
 )
 
-put_data (skip 4 (range 1 7)) nl
+put_data (drop 4 (range 1 7)) nl
 
 say (format_num 2 "," (put "!" 12345.67))
 say (fexl_quote (put "!" "hello"))

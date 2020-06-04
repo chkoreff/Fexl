@@ -1,11 +1,4 @@
 # Test reading CSV and SSV data.
-evaluate
-(
-:: (use_lib "read_csv.fxl");
-:: (use_lib "read_ssv.fxl");
-standard
-) \;
-
 \try_chars=
 	(\read\in
 	\rows=(read in)

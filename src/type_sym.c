@@ -228,6 +228,32 @@ value type_subst(value f)
 	return subst(f->L->L->R,f->L->R,f->R);
 	}
 
+static value resolve_name(value context, string name)
+	{
+	/* "standard" always refers to the current context. */
+	if (strcmp(name->data,"standard") == 0)
+		return hold(context);
+
+	{
+	value key = Qstr(name);
+	value val = eval(A(A(hold(context),hold(key)),hold(Qcatch)));
+	key->R = 0;
+	drop(key);
+
+	if (val->T == type_catch && val->L && !val->L->R)
+		{
+		value x = hold(val->R);
+		drop(val);
+		return x;
+		}
+	else
+		{
+		drop(val);
+		return 0;
+		}
+	}
+	}
+
 static value resolve(value context, struct form *form)
 	{
 	struct symbol *sym = form->sym;
@@ -237,27 +263,12 @@ static value resolve(value context, struct form *form)
 
 	while (sym)
 		{
-		value key = Qstr(sym->name);
-		value val = eval(A(A(hold(context),hold(key)),hold(Qcatch)));
-		key->R = 0;
-		drop(key);
-
-		if (val->T == type_catch && val->L && !val->L->R)
-			{
-			value x = hold(val->R);
-			drop(val);
-			val = x;
-			}
-		else if (strcmp(sym->name->data,"standard") == 0)
-			{
-			/* By default, "standard" refers to the current context. */
-			drop(val);
-			val = hold(context);
-			}
-		else
+		value val = resolve_name(context,sym->name);
+		if (val == 0)
 			{
 			undefined = 1;
 			undefined_symbol(sym->name->data,sym->line,label);
+			val = hold(Qvoid);
 			}
 
 		{

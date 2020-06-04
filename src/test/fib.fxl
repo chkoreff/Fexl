@@ -1,7 +1,0 @@
-#
-evaluate
-(
-:: (use "try_fib.fxl");
-standard
-) \;
-each (range 1 1000) \n try_fib

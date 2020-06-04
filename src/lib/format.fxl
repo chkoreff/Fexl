@@ -1,4 +1,3 @@
-#
 # Repeat string x n times
 \repeat_str=
 	(\x
