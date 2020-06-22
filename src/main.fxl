@@ -11,24 +11,11 @@
 # Chain prev and next.  Returns a context which tries prev first, then next.
 \::=
 	(\prev\next
-	\prev==(\= prev)
-	\next==(\= next)
 	\key
-	\val=(prev key)
+	\val=((\= prev) key)
 	is_defined val val;
-	next key
+	(\= next) key
 	)
-
-\script_name=(default "" (argv 1))
-\dir_local=(dirname script_name)
-
-# Evaluate the user's script.
-use_file script_name;
-
-# Extend the standard context.
-evaluate
-(
-:: standard;
 
 # (if x y) = y if x is true, other I.
 \if=(\x\y x y I)
@@ -54,11 +41,80 @@ evaluate
 \dir_base=(dirname; dirname; argv 0)
 \dir_lib=(path_under dir_base "src/lib")
 
+\script_name=(default "" (argv 1))
+\dir_local=(dirname script_name)
+
 # Use a file in the Fexl library directory.
 \use_lib=(\name use_file (path_under dir_lib name))
 
 # Use a file in the directory which contains the user's script.
 \use=(\name use_file (path_under dir_local name))
+
+# Cache a non-recursive function.
+\cache==
+	(
+	\table=var_new
+	\fn
+	\key
+
+	\key=key
+	\val=(var_get table key)
+	is_defined val val;
+
+	\val=(fn key)
+
+	var_put table (with key val; var_get table)
+	val
+	)
+
+# Cache a recursive function.
+\cache_loop==
+	(
+	\table=var_new
+	\fn
+	@\loop\key
+
+	\key=key
+	\val=(var_get table key)
+	is_defined val val;
+
+	\val=(fn loop key)
+	var_put table (with key val; var_get table)
+	val
+	)
+
+\NL=="
+"
+\TAB=="	"
+\CR==(chr 13)
+\LF==NL
+\QU==~ "~
+
+\import=(\cx\key with key (cx key))
+\import_as=(\cx\key\name with name (cx key))
+
+\load=
+	(
+	cache_loop \load\name
+	use_lib name;
+	:: standard;
+	def "def" def;
+	def "::" ::;
+	def "load" load;
+	def "if" if;
+	def "NL" NL;
+	def "QU" QU;
+	def "CR" CR;
+	def "LF" LF;
+	def "with" with;
+	def "trace" trace;
+	def "error" error;
+	void
+	)
+
+# Evaluate the user's script.
+use_file script_name;
+:: standard;
 
 def "def" def;
 def "if" if;
@@ -66,7 +122,6 @@ def "with" with;
 def "::" ::;
 
 def "use" use;
-def "use_lib" use_lib;
 def "use_file" use_file;
 
 def "check" check;
@@ -79,67 +134,30 @@ def "dir_local" dir_local;
 def "trace" trace;
 def "error" error;
 
-\NL="
-"
-def "TAB" "	";
+def "TAB" TAB;
 def "NL" NL;
-def "CR" (chr 13);
-def "LF" NL;
-def "QU" ~ "~;
+def "CR" CR;
+def "LF" LF;
+def "QU" QU;
 
-void
-) \;
+def "cache" cache;
+def "cache_loop" cache_loop;
+def "import" import;
+def "import_as" import_as;
 
-# Chain the libraries so they load on demand.
-
-evaluate
-(
-:: standard;
-:: (use_lib "bool.fxl" standard);
-:: (use_lib "math.fxl" standard);
-void
-) \;
-
-evaluate
-(
-:: standard;
-:: (use_lib "list.fxl" standard);
-void
-) \;
-
-evaluate
-(
-:: standard;
-:: (use_lib "format.fxl" standard);
-void
-) \;
-
-evaluate
-(
-:: standard;
-:: (use_lib "indent.fxl" standard);
-:: (use_lib "assoc.fxl" standard);
-:: (use_lib "hex.fxl" standard);
-void
-) \;
-
-:: standard;
-:: (use_lib "html.fxl" standard);
-:: (use_lib "time.fxl" standard);
-:: (use_lib "date.fxl" standard);
-:: (use_lib "run.fxl" standard);
-::
-	(
-	evaluate
-	(
-	:: standard;
-	:: (use_lib "read.fxl" standard);
-	void
-	) \;
-
-	:: (use_lib "read_csv.fxl" standard);
-	:: (use_lib "read_ssv.fxl" standard);
-	void
-	);
-:: (use_lib "index.fxl" standard);
+# Chain the libraries to load on demand.
+:: (load "bool.fxl");
+:: (load "math.fxl");
+:: (load "list.fxl");
+:: (load "format.fxl");
+:: (load "indent.fxl");
+:: (load "assoc.fxl");
+:: (load "hex.fxl");
+:: (load "html.fxl");
+:: (load "time.fxl");
+:: (load "date.fxl");
+:: (load "run.fxl");
+:: (load "read_csv.fxl");
+:: (load "read_ssv.fxl");
+:: (load "index.fxl");
 void

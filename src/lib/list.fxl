@@ -1,3 +1,11 @@
+#
+evaluate
+(
+:: standard;
+:: (load "bool.fxl");
+void
+) \;
+
 # Append lists xs and ys.
 \append=
 	(\xs\ys
@@ -32,7 +40,7 @@
 	)
 
 # Eagerly apply f to each element in list xs.
-\map_eager=
+\map_eager= # LATER deprecated 20200622
 	(\f @\loop \xs
 	xs [] \x\xs
 	\x=(f x)
@@ -163,10 +171,10 @@
 	)
 
 # Get the list of keys from a list of pairs.
-\get_keys=(map_eager (\p p \k\_ k))
+\get_keys=(map (\p p \k\_ k))
 
 # Get the list of values from a list of pairs.
-\get_values=(map_eager (\p p \_\v v))
+\get_values=(map (\p p \_\v v))
 
 # Sort all items with a key extraction function.
 \sort_all=
@@ -467,7 +475,7 @@
 
 # Create a cache that evaluates a function and stores the value at a given key.
 # Subsequent calls with the same key return the originally stored value.
-\new_cache==
+\new_cache== # LATER deprecated 20200622
 	(
 	\table=var_new
 	\key\fn
@@ -481,7 +489,7 @@
 	)
 
 # Wrap a prefix around a context.
-\with_prefix=
+\with_prefix= # LATER deprecated 20200622
 	(\prefix\context
 	\context==(\= context)
 	\len_prefix=(length prefix)

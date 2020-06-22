@@ -12,12 +12,7 @@ evaluate (use "test.fxl" standard) \;
 	say "other"
 	)
 
-\eval_file=
-	(\name
-	evaluate standard;
-	parse_file (path_under dir_local name)
-	)
-
+\eval_file=(\name use name standard)
 \eval_str=(\str evaluate standard; parse str "")
 
 (

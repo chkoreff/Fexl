@@ -1,28 +1,21 @@
 #
+evaluate
+(
+:: standard;
+:: (load "list.fxl");
+void
+) \;
+
+\v_ch=var_new
+\v_get=var_new
+
+\look==(var_get v_ch)
+\skip==(var_get v_get (var_put v_ch))
+\get==(\x=look skip x)
+\use_stream=(\get var_put v_get {get} skip)
+
 \is_eol=(\x eq x LF T; eq x CR)
 \is_white=(ge " ")
-
-\v_in=var_new
-\get_in==(var_get v_in)
-\put_in=(var_put v_in)
-
-\look==
-	(
-	get_in void \x\_ x
-	)
-
-\skip==
-	(
-	get_in () \_\in
-	put_in in
-	)
-
-\get==
-	(
-	get_in void \x\in
-	put_in in
-	x
-	)
 
 # Skip matching characters.
 \skip_match=
@@ -57,25 +50,17 @@
 	loop
 	)
 
-\use_stream=
-	(\in\read
-	\save_in=get_in
-	put_in in
-	\val=read
-	put_in save_in
-	val
-	)
-
 \read_string=
 	(\read\str
 	\fh=(readstr str)
-	\in=(get_list (sgetc fh))
-	use_stream in read
+	use_stream (sgetc fh)
+	read
 	)
 
 \read_chars=
 	(\read\chars
-	use_stream chars read
+	\str=(list_str chars)
+	read_string read str
 	)
 
 \read_file=
@@ -85,8 +70,8 @@
 	if (is_void fh) (error ["Could not open "name])
 	\result=
 		(
-		\in=(get_list (fgetc fh))
-		use_stream in read
+		use_stream (fgetc fh)
+		read
 		)
 
 	fclose fh

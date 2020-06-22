@@ -1,8 +1,9 @@
 #
 evaluate
 (
-:: (use "bn.fxl" standard);
-use "test.fxl" standard
+use "bn.fxl";
+#use "test.fxl";
+standard
 ) \;
 
 #do_benchmark;

@@ -721,14 +721,14 @@ than
 ur
 when
 ]
-steps 31795695 bytes 29498432
+steps 31795515 bytes 29498432
 female
 1 1 2 2 3 3 4 5 5 6 6 7 8 8 9 9 10 11 11 12 13 13 14 14 15 16 16 17 17 18 19 19 20 21 21 22 
 male
 0 0 1 2 2 3 4 4 5 6 6 7 7 8 9 9 10 11 11 12 12 13 14 14 15 16 16 17 17 18 19 19 20 20 21 22 
 diff
 1 1 1 0 1 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 
-steps 74497 bytes 20328
+steps 73729 bytes 20232
 [
 == resolve
 symbol say
@@ -1547,6 +1547,23 @@ GOOD
 ["2020-04-30 23:59:59" 1588291199 "2020-04-30 23:59:59"]
 ["2020-04-30 23:59:59xyz" 1588291199 "2020-04-30 23:59:59"]
 ["2020-04-30 23:59:69" void void]
+= cache
+[
+compute a b
+compute b a
+compute a c
+compute b c
+compute b d
+]
+[
+]
+compute b b
+= import
+==
+0:[]
+4:[61626364]
+3:[313233]
+4:"abcd"
 exit 0
 ==== test/b12.fxl
 == test_csv
@@ -1675,6 +1692,7 @@ second line"]
 ["1" "2" "3"]
 ["~a~ab~abc~abcd"]
 ]
+steps 162273 bytes 11808
 exit 0
 ==== test/b13.fxl
 == test_full
@@ -2478,7 +2496,7 @@ fib 70 = 190392490709135
 fib 71 = 308061521170129
 fib 72 = 498454011879264
 fib 73 = 806515533049393
-steps 41523 bytes 45488
+steps 40929 bytes 33264
 exit 0
 ==== test/b23.fxl
 exit 0

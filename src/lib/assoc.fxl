@@ -1,4 +1,10 @@
 # (Sat 2018-07-28 In memoriam, Charlie the cat, thank you little friend.)
+evaluate
+(
+:: standard;
+:: (load "list.fxl");
+void
+) \;
 
 \get_key=
 	(\key @\loop \list

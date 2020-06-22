@@ -5,9 +5,7 @@ say "== test Fibonacci"
 # (fib n) returns the nth Fibonacci number starting at 0.
 \fib=
 	(
-	\cache=new_cache
-	@\fib\n \n=n
-	cache n;
+	cache_loop \fib\n
 	gt n 1 (+ (fib (- n 1)) (fib (- n 2)));
 	eq n 1 1;
 	0

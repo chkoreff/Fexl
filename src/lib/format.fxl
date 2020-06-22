@@ -1,3 +1,13 @@
+#
+evaluate
+(
+:: standard;
+:: (load "bool.fxl");
+:: (load "math.fxl");
+:: (load "list.fxl");
+void
+) \;
+
 # Repeat string x n times
 \repeat_str=
 	(\x

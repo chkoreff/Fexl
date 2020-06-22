@@ -1,4 +1,12 @@
 #
+evaluate
+(
+:: standard;
+:: (load "list.fxl");
+:: (load "math.fxl");
+void
+) \;
+
 \long_month_names=
 [
 "January"

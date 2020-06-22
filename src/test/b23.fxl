@@ -2,16 +2,17 @@
 # load of the next library file in the standard search order.
 if F
 (
-and
-neg
-map
-as_str
+say standard use :: if
+and or not
+neg max
+map sort_all
+as_str trim_spaces
 say_data
-get_key
-oct
-tag
+get_key put_key
+oct hex
+tag tr
 trace_elapsed
-split_date
+split_date day_of_week
 grab_output
 read_csv_file
 read_ssv_file

@@ -369,3 +369,52 @@ run timegm gmtime
 
 if F (run timelocal localtime) # Result depends on your local time zone.
 )
+
+(
+say "= cache"
+
+\f=
+	(
+	cache \x
+	cache \y
+	say ["compute "x" "y]
+	)
+
+\run==
+(
+say "["
+f "a" "b"
+f "b" "a"
+f "a" "b"
+f "a" "c"
+f "b" "c"
+f "b" "c"
+f "b" "a"
+f "b" "d"
+say "]"
+)
+
+run
+run
+f "b" "b"
+f "a" "b"
+)
+
+# Test import.
+(
+say "= import"
+evaluate
+(
+\cx=(use "test.fxl" standard)
+import cx "div";
+import_as cx "show_hex" "test.show_hex";
+import_as cx "show_str" "test.show_str";
+standard
+) \;
+
+div
+test.show_hex ""
+test.show_hex "abcd"
+test.show_hex "123"
+test.show_str "abcd"
+)

@@ -8,6 +8,13 @@
 # An index value is either (void) or {key val child tail}.  The child is the
 # index of entries that start with key.  The tail is the index of entries
 # greater than key.  The index key and its tail key have no common prefix.
+evaluate
+(
+:: standard;
+:: (load "format.fxl");
+:: (load "list.fxl");
+void
+) \;
 
 \mk_index=
 	(\key\val\child\next

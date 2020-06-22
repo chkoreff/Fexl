@@ -86,4 +86,4 @@ def "bn_add" bn_add;
 def "bn_mul" bn_mul;
 def "bn_str" bn_str;
 def "str_bn" str_bn;
-void
+standard

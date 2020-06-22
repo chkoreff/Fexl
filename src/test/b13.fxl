@@ -2,8 +2,8 @@
 
 \test_context==
 (\context
-
 evaluate context \;
+
 \try=
 	(\name
 	\f=(standard name)
@@ -36,12 +36,7 @@ try "x"
 )
 
 say "== test_full"
-test_context
-	(
-	:: standard;
-	:: (use "test.fxl" standard);
-	void
-	)
+test_context (use "test.fxl" standard)
 
 say "== test_restricted"
 test_context
