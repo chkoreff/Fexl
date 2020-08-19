@@ -1,11 +1,4 @@
 #
-evaluate
-(
-:: standard;
-:: (load "list.fxl");
-void
-) \;
-
 \v_ch=var_new
 \v_get=var_new
 

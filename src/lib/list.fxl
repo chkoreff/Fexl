@@ -1,11 +1,3 @@
-#
-evaluate
-(
-:: standard;
-:: (load "bool.fxl");
-void
-) \;
-
 # Append lists xs and ys.
 \append=
 	(\xs\ys

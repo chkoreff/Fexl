@@ -1,13 +1,3 @@
-#
-evaluate
-(
-:: standard;
-:: (load "bool.fxl");
-:: (load "math.fxl");
-:: (load "list.fxl");
-void
-) \;
-
 # Map number 0-15 to one hex digit (lower-case).
 \hex_digit=
 	(\n

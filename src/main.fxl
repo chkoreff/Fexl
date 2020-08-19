@@ -93,14 +93,10 @@
 \import=(\cx\key with key (cx key))
 \import_as=(\cx\key\name with name (cx key))
 
-\load=
+\cx_lib=
 	(
-	cache_loop \load\name
-	use_lib name;
 	:: standard;
 	def "def" def;
-	def "::" ::;
-	def "load" load;
 	def "if" if;
 	def "NL" NL;
 	def "QU" QU;
@@ -109,6 +105,118 @@
 	def "with" with;
 	def "trace" trace;
 	def "error" error;
+	void
+	)
+
+\cx_bool==(\= use_lib "bool.fxl"; cx_lib)
+\cx_math==(\= use_lib "math.fxl"; cx_lib)
+
+\cx_list==
+	(\=
+	use_lib "list.fxl";
+	:: cx_lib;
+	:: cx_bool;
+	void
+	)
+
+\cx_format==
+	(\=
+	use_lib "format.fxl";
+	:: cx_lib;
+	:: cx_bool;
+	:: cx_math;
+	:: cx_list;
+	void
+	)
+
+\cx_indent==
+	(\=
+	use_lib "indent.fxl";
+	:: cx_lib;
+	:: cx_format;
+	:: cx_list;
+	void
+	)
+
+\cx_assoc==
+	(\=
+	use_lib "assoc.fxl";
+	:: cx_lib;
+	:: cx_list;
+	void
+	)
+
+\cx_hex==
+	(\=
+	use_lib "hex.fxl";
+	:: cx_lib;
+	:: cx_bool;
+	:: cx_math;
+	:: cx_list;
+	void
+	)
+
+\cx_html==
+	(\=
+	use_lib "html.fxl";
+	:: cx_lib;
+	:: cx_hex;
+	:: cx_list;
+	:: cx_format;
+	void
+	)
+
+\cx_time==(\= use_lib "time.fxl"; cx_lib)
+
+\cx_date==
+	(\=
+	use_lib "date.fxl";
+	:: cx_lib;
+	:: cx_math;
+	:: cx_list;
+	void
+	)
+
+\cx_run==
+	(\=
+	use_lib "run.fxl";
+	:: cx_lib;
+	:: cx_bool;
+	:: cx_list;
+	void
+	)
+
+\cx_read==
+	(\=
+	use_lib "read.fxl";
+	:: cx_lib;
+	:: cx_list;
+	void
+	)
+
+\cx_read_csv==
+	(\=
+	use_lib "read_csv.fxl";
+	:: cx_lib;
+	:: cx_read;
+	void
+	)
+
+\cx_read_ssv==
+	(\=
+	use_lib "read_ssv.fxl";
+	:: cx_lib;
+	:: cx_read;
+	:: cx_list;
+	void
+	)
+
+\cx_index==
+	(\=
+	use_lib "index.fxl";
+	:: cx_lib;
+	:: cx_format;
+	:: cx_list;
 	void
 	)
 
@@ -146,18 +254,18 @@ def "import" import;
 def "import_as" import_as;
 
 # Chain the libraries to load on demand.
-:: (load "bool.fxl");
-:: (load "math.fxl");
-:: (load "list.fxl");
-:: (load "format.fxl");
-:: (load "indent.fxl");
-:: (load "assoc.fxl");
-:: (load "hex.fxl");
-:: (load "html.fxl");
-:: (load "time.fxl");
-:: (load "date.fxl");
-:: (load "run.fxl");
-:: (load "read_csv.fxl");
-:: (load "read_ssv.fxl");
-:: (load "index.fxl");
+:: cx_bool;
+:: cx_math;
+:: cx_list;
+:: cx_format;
+:: cx_indent;
+:: cx_assoc;
+:: cx_hex;
+:: cx_html;
+:: cx_time;
+:: cx_date;
+:: cx_run;
+:: cx_read_csv;
+:: cx_read_ssv;
+:: cx_index;
 void
