@@ -107,7 +107,6 @@ run_test "test_box";
 \public_key_2=(try_nacl_box_public secret_key_2)
 
 \nonce_1=(pack "6465666768696a6b6c6d6e6f707172737475767778797a0a")
-\nonce_2=(pack "8356ad3e116d685dd4b6a321fcf1ab80acd4720e855f2b17")
 
 # Test sending an authenticated message from A to B.
 \test_send=

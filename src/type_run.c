@@ -387,7 +387,7 @@ the ip address and port.  Any error output from the server is redirected into
 the error_log file, unless error_log is "" in which case it goes to stderr.
 
 After starting the server process, this function returns immediately to the
-caller.  Meanwhile The server process loops forever listening for connections.
+caller.  Meanwhile the server process loops forever listening for connections.
 When a connection occurs, it runs the given interact function with stdin and
 stdout set up to communicate with the client connection like an ordinary
 filter.
