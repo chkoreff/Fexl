@@ -51,7 +51,7 @@
 \use=(\name use_file (path_under dir_local name))
 
 # Cache a non-recursive function.
-\cache==
+\cache== # deprecated
 	(
 	\table=var_new
 	\fn
@@ -68,7 +68,7 @@
 	)
 
 # Cache a recursive function.
-\cache_loop==
+\cache_loop== # deprecated
 	(
 	\table=var_new
 	\fn
@@ -81,6 +81,37 @@
 	\val=(fn loop key)
 	var_put table (with key val; var_get table)
 	val
+	)
+
+# Make a cache which remembers the values of a function with n arguments.
+\remember=
+	(
+	# Return the value at key k in index v.  If no value, store the value of x
+	# in the index so you get the same value next time.
+	\fetch=
+		(\v\k\x
+		\y=(var_get v k)
+		is_defined y y;
+		\x=x
+		var_put v (with k x; var_get v)
+		x
+		)
+
+	\n
+	\fn=
+		(
+		(@\loop\n
+		le n 1 fetch;
+		\n=(- n 1)
+		\fn=(loop n)
+		\v\k
+		\v=(fetch v k var_new)
+		fn v
+		) n
+		)
+
+	\v=var_new
+	fn v
 	)
 
 \NL=="
@@ -250,6 +281,7 @@ def "QU" QU;
 
 def "cache" cache;
 def "cache_loop" cache_loop;
+def "remember" remember;
 def "import" import;
 def "import_as" import_as;
 

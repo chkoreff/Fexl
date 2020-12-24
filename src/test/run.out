@@ -728,7 +728,7 @@ male
 0 0 1 2 2 3 4 4 5 6 6 7 7 8 9 9 10 11 11 12 12 13 14 14 15 16 16 17 17 18 19 19 20 20 21 22 
 diff
 1 1 1 0 1 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 
-steps 73729 bytes 20232
+steps 74559 bytes 19640
 [
 == resolve
 symbol say
@@ -1547,7 +1547,7 @@ GOOD
 ["2020-04-30 23:59:59" 1588291199 "2020-04-30 23:59:59"]
 ["2020-04-30 23:59:59xyz" 1588291199 "2020-04-30 23:59:59"]
 ["2020-04-30 23:59:69" void void]
-= cache
+= cache 2
 [
 compute a b
 compute b a
@@ -1558,6 +1558,20 @@ compute b d
 [
 ]
 compute b b
+= cache 3
+[
+compute 0 0 0
+compute 0 0 1
+compute 0 1 0
+compute 0 1 1
+compute 1 1 0
+compute 1 1 1
+]
+[
+]
+compute 1 0 0
+compute 1 0 1
+steps 13897 bytes 7392
 = import
 ==
 0:[]
@@ -2496,7 +2510,7 @@ fib 70 = 190392490709135
 fib 71 = 308061521170129
 fib 72 = 498454011879264
 fib 73 = 806515533049393
-steps 40929 bytes 33264
+steps 40295 bytes 33056
 exit 0
 ==== test/b23.fxl
 exit 0
@@ -3314,6 +3328,35 @@ msg = "The quick brown fox jumps over the lazy dog"
 key = "key"
 mac = b42af09057bac1e2d41708e48a902e09b5ff7f12ab428a4fe86653c73dd248fb82f948a549f7b791a5b41915ee4d1ec3935357e4e2317250d0372afa2ebeeb3a
 
+exit 0
+==== test/partition.fxl
+0 1
+1 1
+2 2
+3 3
+4 5
+5 7
+6 11
+7 15
+8 22
+9 30
+10 42
+11 56
+12 77
+13 101
+14 135
+15 176
+16 231
+17 297
+18 385
+19 490
+20 627
+100 190569292
+200 3972999029388
+269 974834369944625
+270 1050197489931117
+300 9253082936723602
+steps 63356283 bytes 8572432
 exit 0
 ==== test/get_byte.fxl
 [

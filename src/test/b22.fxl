@@ -5,10 +5,12 @@ say "== test Fibonacci"
 # (fib n) returns the nth Fibonacci number starting at 0.
 \fib=
 	(
-	cache_loop \fib\n
-	gt n 1 (+ (fib (- n 1)) (fib (- n 2)));
-	eq n 1 1;
-	0
+	\memo=(remember 1)
+	@\fib\n
+	\n=n
+	le n 1 (eq n 1 1 0);
+	memo n;
+	+ (fib (- n 1)) (fib (- n 2))
 	)
 
 \try=

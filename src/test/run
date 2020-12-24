@@ -55,6 +55,7 @@ run_fexl test/chars.fxl
 run_fexl test/date.fxl
 run_fexl test/sat.fxl
 run_fexl test/crypto.fxl
+run_fexl test/partition.fxl
 
 (
 cat <<"EOF"

@@ -1,4 +1,5 @@
 #
+evaluate (use "test.fxl" standard) \;
 (
 \try=
 	(\path
@@ -371,13 +372,15 @@ if F (run timelocal localtime) # Result depends on your local time zone.
 )
 
 (
-say "= cache"
-
+\test_2==
+(
+say "= cache 2"
 \f=
 	(
-	cache \x
-	cache \y
-	say ["compute "x" "y]
+	\memo=(remember 2)
+	\x\y
+	memo x y;
+	say ["compute "(join " " [x y])]
 	)
 
 \run==
@@ -398,6 +401,41 @@ run
 run
 f "b" "b"
 f "a" "b"
+)
+
+\test_3==
+(
+say "= cache 3"
+\f=
+	(
+	\memo=(remember 3)
+	\x\y\z
+	memo x y z;
+	say ["compute "(join " " [x y z])]
+	)
+
+\run==
+(
+say "["
+f 0 0 0
+f 0 0 1
+f 0 1 0
+f 0 1 1
+f 1 1 0
+f 1 1 1
+say "]"
+)
+
+run
+run
+f 1 0 0
+f 1 0 1
+f 0 0 0
+)
+
+show_benchmark;
+test_2
+test_3
 )
 
 # Test import.

@@ -1,0 +1,54 @@
+# This demo was inspired by the Mathologer on Youtube.
+evaluate (use "test.fxl" standard) \;
+
+\use_bn=T # Use big numbers if true.
+
+use_bn
+(
+evaluate (use "bn.fxl" standard) \;
+\add=bn_add
+\one=(str_bn "1")
+\rep=bn_str
+{add one rep}
+)
+(
+\add==+
+\one==1
+\rep==I
+{add one rep}
+)
+
+\add\one\rep
+
+\partition=
+	(
+	\memo=(remember 2)
+	@\partition \n\m
+	\n=n le n 1 one;
+	\m=m le m 1 one;
+	\m=(min n m)
+	memo n m;
+	add (partition (- n m) m) (partition n (- m 1))
+	)
+
+# Calculate the number of distinct ways to partition n into a sum of numbers.
+\partition=(\n partition n n)
+
+\show=
+	(\n
+	\v=(partition n)
+	say [n" "(rep v)]
+	)
+
+\show_range=(\i\j each (range i j) show)
+
+#trace_elapsed;
+show_benchmark;
+
+show_range 0 20
+show 100
+show 200
+show 269 # Max that gives exact result without big numbers.
+show 270
+show 300
+#show 600 # use_bn T 5.7s F 4.7s
