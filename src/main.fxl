@@ -50,68 +50,47 @@
 # Use a file in the directory which contains the user's script.
 \use=(\name use_file (path_under dir_local name))
 
+# Return the value at key k in index v.  If no value, store the value of x in
+# the index so you get the same value next time.
+\fetch=
+	(\v\k\x
+	\y=(var_get v k)
+	is_defined y y;
+	\x=x
+	var_put v (with k x; var_get v)
+	x
+	)
+
 # Cache a non-recursive function.
-\cache== # deprecated
+\cache==
 	(
-	\table=var_new
-	\fn
-	\key
-
-	\key=key
-	\val=(var_get table key)
-	is_defined val val;
-
-	\val=(fn key)
-
-	var_put table (with key val; var_get table)
-	val
+	\v=var_new
+	\f\k
+	\k=k
+	fetch v k (f k)
 	)
 
 # Cache a recursive function.
-\cache_loop== # deprecated
+\cache_loop== # LATER 20201224 deprecated
 	(
-	\table=var_new
-	\fn
-	@\loop\key
-
-	\key=key
-	\val=(var_get table key)
-	is_defined val val;
-
-	\val=(fn loop key)
-	var_put table (with key val; var_get table)
-	val
+	\v=var_new
+	\f @\loop \k
+	\k=k
+	fetch v k (f loop k)
 	)
 
 # Make a cache which remembers the values of a function with n arguments.
 \remember=
-	(
-	# Return the value at key k in index v.  If no value, store the value of x
-	# in the index so you get the same value next time.
-	\fetch=
-		(\v\k\x
-		\y=(var_get v k)
-		is_defined y y;
-		\x=x
-		var_put v (with k x; var_get v)
-		x
-		)
-
-	\n
-	\fn=
-		(
-		(@\loop\n
-		le n 1 fetch;
-		\n=(- n 1)
-		\fn=(loop n)
-		\v\k
-		\v=(fetch v k var_new)
-		fn v
-		) n
-		)
-
+	(\n
 	\v=var_new
-	fn v
+	(@\loop\n
+	le n 1 fetch;
+	\n=(- n 1)
+	\f=(loop n)
+	\v\k
+	\v=(fetch v k var_new)
+	f v
+	) n v
 	)
 
 \NL=="
@@ -279,6 +258,7 @@ def "CR" CR;
 def "LF" LF;
 def "QU" QU;
 
+def "fetch" fetch;
 def "cache" cache;
 def "cache_loop" cache_loop;
 def "remember" remember;

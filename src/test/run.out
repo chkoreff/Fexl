@@ -1547,31 +1547,46 @@ GOOD
 ["2020-04-30 23:59:59" 1588291199 "2020-04-30 23:59:59"]
 ["2020-04-30 23:59:59xyz" 1588291199 "2020-04-30 23:59:59"]
 ["2020-04-30 23:59:69" void void]
-= cache 2
-[
-compute a b
-compute b a
-compute a c
-compute b c
-compute b d
-]
-[
-]
-compute b b
-= cache 3
-[
-compute 0 0 0
-compute 0 0 1
-compute 0 1 0
-compute 0 1 1
-compute 1 1 0
-compute 1 1 1
-]
-[
-]
-compute 1 0 0
-compute 1 0 1
-steps 13897 bytes 7392
+= cache
+try ["a" "b" "c"]
+  1 : a
+  2 : b
+  3 : c
+try ["f" "e" "x"]
+  1 : f
+  2 : e
+  3 : x
+try ["s" "t" "e"]
+  1 : s
+  2 : t
+  3 : e
+try ["a" "b" "b"]
+  3 : b
+try ["a" "b" "c"]
+try ["s" "t" "e"]
+try ["a" "b" "c"]
+try ["d" "c" "b"]
+  1 : d
+  2 : c
+  3 : b
+try ["d" "c" "c"]
+  3 : c
+try ["d" "a" "c"]
+  2 : a
+  3 : c
+try ["d" "a" "d"]
+  3 : d
+try ["a" "b" "c"]
+try ["x" "y" "z"]
+  1 : x
+  2 : y
+  3 : z
+try ["d" "c" "b"]
+try ["d" "c" "b"]
+try ["a" "x" "e"]
+  2 : x
+  3 : e
+steps 13183 bytes 11904
 = import
 ==
 0:[]

@@ -372,70 +372,40 @@ if F (run timelocal localtime) # Result depends on your local time zone.
 )
 
 (
-\test_2==
-(
-say "= cache 2"
-\f=
+\try=
 	(
-	\memo=(remember 2)
-	\x\y
-	memo x y;
-	say ["compute "(join " " [x y])]
+	cache \a
+	say ["  1 : "a]
+	cache \b
+	say ["  2 : "b]
+	cache \c
+	say ["  3 : "c]
 	)
 
-\run==
-(
-say "["
-f "a" "b"
-f "b" "a"
-f "a" "b"
-f "a" "c"
-f "b" "c"
-f "b" "c"
-f "b" "a"
-f "b" "d"
-say "]"
-)
-
-run
-run
-f "b" "b"
-f "a" "b"
-)
-
-\test_3==
-(
-say "= cache 3"
-\f=
-	(
-	\memo=(remember 3)
-	\x\y\z
-	memo x y z;
-	say ["compute "(join " " [x y z])]
+\try=
+	(\a\b\c
+	say ["try "(as_str [a b c])]
+	try a b c
 	)
-
-\run==
-(
-say "["
-f 0 0 0
-f 0 0 1
-f 0 1 0
-f 0 1 1
-f 1 1 0
-f 1 1 1
-say "]"
-)
-
-run
-run
-f 1 0 0
-f 1 0 1
-f 0 0 0
-)
 
 show_benchmark;
-test_2
-test_3
+say "= cache"
+try "a" "b" "c"
+try "f" "e" "x"
+try "s" "t" "e"
+try "a" "b" "b"
+try "a" "b" "c"
+try "s" "t" "e"
+try "a" "b" "c"
+try "d" "c" "b"
+try "d" "c" "c"
+try "d" "a" "c"
+try "d" "a" "d"
+try "a" "b" "c"
+try "x" "y" "z"
+try "d" "c" "b"
+try "d" "c" "b"
+try "a" "x" "e"
 )
 
 # Test import.
