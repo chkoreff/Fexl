@@ -1,5 +1,0 @@
-#!/bin/sh
-. ./lib_test
-./build || exit
-ls -l ../bin/fexl
-do_diff test/run test/run.out

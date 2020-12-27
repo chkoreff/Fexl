@@ -1,0 +1,288 @@
+\out=
+~2
+path a
+dir  .
+
+path a/b/c
+dir  a/b
+
+path a/b/c///
+dir  a/b
+
+path ../////
+dir  .
+
+path ////b/////
+dir  /
+
+path a/b////c///
+dir  a/b
+
+path aaa/bbb////ccc///
+dir  aaa/bbb
+
+path a/b/c
+base c
+
+path a/b/c///
+base c
+
+path a/b/cde///
+base cde
+
+path a
+base a
+
+path 
+base 
+
+path /a
+base a
+
+path ////a
+base a
+
+path /
+base /
+
+hi
+F
+0
+119252
+2.71828182845905
+3.14159265358979
+6.28318530717959
+a
+b
+07/19/2017
+&lt;b&gt;x;&quot;y&quot;&lt;/b&gt;
+3,874,511.37
+e
+["<b>a</b>" {1.2 3.8 "xxx"} T F]
+[
+"<b>a</b>"
+{1.2 3.8 "xxx"}
+T
+F
+]
+
+[&quot;&lt;b&gt;a&lt;/b&gt;&quot; {1.2 3.8 &quot;xxx&quot;} T F]
+[
+&quot;&lt;b&gt;a&lt;/b&gt;&quot;
+{1.2 3.8 &quot;xxx&quot;}
+T
+F
+]
+
+[&quot;&lt;b&gt;a&lt;/b&gt;&quot; ~1 tag &quot;&lt;br&gt;&quot;~1 {1.2 3.8 &quot;xxx&quot;} T F]
+[
+&quot;&lt;b&gt;a&lt;/b&gt;&quot;
+~1 tag &quot;&lt;br&gt;&quot;~1
+{1.2 3.8 &quot;xxx&quot;}
+T
+F
+]
+
+~1 1&quot;2&quot;3~1
+
+["a" ~1 "~1 23 {1 2} [T F ~1 "hi"~1 void] -2.3 "a" ~1 "~1 23 {1 2} [T F ~1 "hi"~1 void] -2.3]
+["a" ~1 "~1 23 {1 2} [T F ~1 "hi"~1 void] -2.3 "a" ~1 "~1 23 {1 2} [T F ~1 "hi"~1 void] -2.3]
+T
+= test file_content
+#abcdefghijklmnopqrstuvwxyz
+
+= test file_bytes
+["s" "a" "y" " " ~1 "~1 "H" "e" "l" "l" "o" " " "w" "o" "r" "l" "d" "!" ~1 "~1 "
+"]
+["s" "a" "y" " " ~1 "~1 "H" "e" "l" "l" "o" " " "w" "o" "r" "l" "d" "!" ~1 "~1 "
+"]
+
+key c color orange qty 2
+key a color red qty 42
+key d color  qty 
+key b color blue qty 93
+
+sep   "/"
+str   ~1 /a/b/"hi"///d/e/~1
+list  ["" "a" "b" ~1 "hi"~1 "" "" "d" "e" ""]
+
+sep   "[XYZ]"
+str   ~1 [XYZ]a[XYZ]b[XYZ]"hi"[XYZ][XYZ][XYZ]d[XYZ]e[XYZ]~1
+list  ["" "a" "b" ~1 "hi"~1 "" "" "d" "e" ""]
+
+sep   "/"
+str   "a/b/c"
+list  ["a" "b" "c"]
+
+sep   "."
+str   "a.b.c"
+list  ["a" "b" "c"]
+
+sep   ""
+str   "a"
+list  ["a"]
+
+sep   ""
+str   ""
+list  [""]
+
+sep   ""
+str   ""
+list  [""]
+
+sep   "/"
+str   "/"
+list  ["" ""]
+
+sep   "//"
+str   "////"
+list  ["" "" ""]
+
+!8
+!8
+!!8
+!!8
+<td align=right>X</td>
+<div class=a>
+X
+</div>
+<div class=a>X</div>
+[5 6 7]
+!12,345.67
+!"hello"
+!ABC
+!{1 2 3}
+![
+"a"
+"b"
+"c"
+]
+[
+"a"
+"b"
+"c"
+]
+[
+"a"
+"b"
+"c"
+]
+void
+32.8
+.
+?color=red
+?color=red&amp;shape=circle
+?color=blue&amp;key%22%21%2a%27%28%29%3b%3a%40%26%3d%2b%24%2c%2f%3f%23%5b%5d%25%221=val%22%21%2a%27%28%29%3b%3a%40%26%3d%2b%24%2c%2f%3f%23%5b%5d%25%221&amp;%3d=%3d
+:abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+:ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+:abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz0123456789
+TAB 9
+NL 10
+CR 13
+QU 34
+= is_var
+T
+T
+F
+F
+F
+T
+= str_bytes
+length is 10
+byte 251
+byte 252
+byte 253
+byte 254
+byte 255
+byte 0
+byte 1
+byte 2
+byte 3
+byte 4
+= uri_escape
+\x=""
+\y=""
+GOOD
+
+\x="abc"
+\y="abc"
+GOOD
+
+\x=~1 Hello (world) [\x="@"]!~1
+\y="Hello+%28world%29+%5b%5cx%3d%22%40%22%5d%21"
+GOOD
+
+\x="
+"
+\y="%0a"
+GOOD
+
+\x=~1 abc_  !*' ();:@&=+$,/?#[]%\"
+
+  _def~1
+\y="abc_++%21%2a%27+%28%29%3b%3a%40%26%3d%2b%24%2c%2f%3f%23%5b%5d%25%5c%22%0d%0a%0a++_def"
+GOOD
+
+= microtime
+{"1559751185778257" "1559751174778281" 10999976}
+{"1559751174778281" "1559751185778257" -10999976}
+{"1559751185778257" "1559751185778257" 0}
+{"1559751185778257" "1559751185778257" 0}
+= convert time
+["1970-01-01 00:00:00" 0 "1970-01-01 00:00:00"]
+["1970-01-01 00:01:23" 83 "1970-01-01 00:01:23"]
+["2020-05-31 23:59:59" 1590969599 "2020-05-31 23:59:59"]
+["2020-04-30 23:59:59" 1588291199 "2020-04-30 23:59:59"]
+["2020-04-30 23:59:59xyz" 1588291199 "2020-04-30 23:59:59"]
+["2020-04-30 23:59:69" void void]
+= cache
+try ["a" "b" "c"]
+  1 : a
+  2 : b
+  3 : c
+try ["f" "e" "x"]
+  1 : f
+  2 : e
+  3 : x
+try ["s" "t" "e"]
+  1 : s
+  2 : t
+  3 : e
+try ["a" "b" "b"]
+  3 : b
+try ["a" "b" "c"]
+try ["s" "t" "e"]
+try ["a" "b" "c"]
+try ["d" "c" "b"]
+  1 : d
+  2 : c
+  3 : b
+try ["d" "c" "c"]
+  3 : c
+try ["d" "a" "c"]
+  2 : a
+  3 : c
+try ["d" "a" "d"]
+  3 : d
+try ["a" "b" "c"]
+try ["x" "y" "z"]
+  1 : x
+  2 : y
+  3 : z
+try ["d" "c" "b"]
+try ["d" "c" "b"]
+try ["a" "x" "e"]
+  2 : x
+  3 : e
+steps 13183 bytes 11904
+= import
+==
+0:[]
+4:[61626364]
+3:[313233]
+4:"abcd"
+~2
+\err=
+~1
+~1
+\status=0

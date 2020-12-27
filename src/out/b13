@@ -1,0 +1,60 @@
+\out=
+~1
+== test_full
+name say : T
+name is_defined : T
+name standard : F
+name + : T
+name @ : T
+name def : T
+name if : T
+name each : T
+name div : T
+name show_list : T
+name use_file : T
+name use : T
+name void : T
+name dirname : T
+name hex_digit : T
+name read_ssv_file : T
+name read_csv_file : T
+name 2.5 : F
+name 0 : F
+name -3.56 : F
+name -3.56e-4 : F
+name -3.56e-4x : F
+name x : F
+== test_restricted
+name say : T
+name is_defined : T
+name standard : F
+name + : F
+name @ : F
+name def : F
+name if : F
+name each : F
+name div : F
+name show_list : F
+name use_file : F
+name use : F
+name void : F
+name dirname : F
+name hex_digit : F
+name read_ssv_file : F
+name read_csv_file : F
+name 2.5 : F
+name 0 : F
+name -3.56 : F
+name -3.56e-4 : F
+name -3.56e-4x : F
+name x : F
+== test_run_restricted
+I am Fred.
+0.927291684284476
+0.471201063818858
+I am Wilma.
+~1
+\err=
+~1
+~1
+\status=0

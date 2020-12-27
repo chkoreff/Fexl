@@ -1,0 +1,900 @@
+\out=
+~7
+==
+ping
+==
+ping
+==
+ping
+ping
+ping
+ping
+ping
+ping
+ping
+ping
+ping
+ping
+ping
+ping
+==
+ping
+ping
+ping
+ping
+ping
+ping
+==
+str abc
+str abc
+void
+str abcde
+void
+str abcde
+void
+str abcde
+void
+num 3.14159265358979
+num 42
+num 5
+num 4
+str cdefg
+num 467.86
+num 1.61803398874989
+bool T
+bool F
+bool T
+bool F
+bool T
+bool T
+void
+void
+void
+==
+str 1.61803398874989
+num 1.61803398874989
+other
+void
+void
+str 5.8
+void
+num 3
+void
+void
+void
+num 3
+void
+num 42
+void
+num -7.8
+num 0
+num -0
+num 43.8
+==
+str 
+str 
+str 
+==
+str a
+str 
+str 
+==
+str 
+str a
+str ab
+str abc
+str abcd
+str abcd
+==
+str 
+str b
+str bc
+str bcd
+str bcd
+==
+str 
+str c
+str cd
+str cd
+==
+str 
+str d
+str d
+==
+void
+void
+void
+void
+==
+num 3
+num 2
+void
+num 2
+void
+num 3
+num 3
+void
+void
+void
+num 0
+num 7
+num 15
+void
+num 6
+num 12
+void
+num 15
+void
+num 0
+void
+void
+void
+num 0
+void
+void
+== test char_width
+str hej åabcüdef üä 1≠0 包子x
+ch h
+ch e
+ch j
+ch  
+ch å
+ch a
+ch b
+ch c
+ch ü
+ch d
+ch e
+ch f
+ch  
+ch ü
+ch ä
+ch  
+ch 1
+ch ≠
+ch 0
+ch  
+ch 包
+ch 子
+ch x
+== test buf
+: abcdefg
+: 
+: abcde
+: tuvwxyz
+TTFFabc 2.3 -3.8 defg
+==
+bool F
+bool F
+bool T
+bool T
+bool F
+bool T
+bool T
+==
+bool T
+bool F
+bool F
+bool F
+bool T
+bool F
+==
+void
+void
+void
+num 3
+void
+bool T
+void
+void
+void
+void
+num 4
+void
+void
+num 3
+void
+str 42
+void
+void
+bool T
+str abc
+void
+str abcde
+void
+void
+num 3
+void
+void
+str de
+str defg
+void
+void
+num 42
+void
+void
+==
+abcd~ABA
+AAB~ABC
+hello
+"hello"
+~(1) "hello"~(1)
+~(2) ~(1) "hello"~(1)~(2)
+"Ain't nothin' simple when you're doin' it for real." (Gus Baird)
+
+"My fathers sleep on the sunrise plains,
+And each one sleeps alone.
+Their trails may dim to the grass and rains,
+For I choose to make my own.
+I lay proud claim to their blood and name,
+But I lean on no dead kin;
+My name is mine, for the praise or scorn,
+And the world began when I was born
+And the world is mine to win. ..."
+
+  (Badger Clark, "The Westerner")
+
+==
+[
+(CALC)
+x = 30
+x = 30
+x = 30
+x = 30
+]
+==
+(CALC)1936
+88
+square 4=16
+square 7=49
+16
+49
+==
+Hello world!
+==
+f = hej
+åabcüdef
+ghij
+üä
+1≠0
+封
+
+åabcüdef = hej åabcüdef
+ghij = hej ghij
+üä = hej üä
+1≠0 = hej 1≠0
+vegetable grönsak
+dessert efterrätt
+==
+3 bottles of beer on the wall
+3 bottles of beer
+Take one down, pass it around
+2 bottles of beer on the wall
+
+2 bottles of beer on the wall
+2 bottles of beer
+Take one down, pass it around
+1 bottle of beer on the wall
+
+1 bottle of beer on the wall
+1 bottle of beer
+Take one down, pass it around
+0 bottles of beer on the wall
+
+==
+x = 23
+x = 70
+x = 35
+x = 106
+x = 53
+x = 160
+x = 80
+x = 40
+x = 20
+x = 10
+x = 5
+x = 16
+x = 8
+x = 4
+x = 2
+x = 1
+
+==
+x = 81
+==
+str x
+num 5
+==
+hi
+I am Fred.
+35.2
+74.5
+74.5
+74.5
+15
+14
+14.8
+3.84707681233427
+121.510417518735
+1.56861591791385
+-0.996164608835841
+bye
+==
+53.54
+==
+length is 16777216
+==
+Hello world.
+x = 42
+47
+37
+210
+8.4
+inf
+==
+T
+T
+T
+F
+T
+T
+F
+T
+T
+F
+F
+F
+F
+T
+T
+T
+F
+F
+T
+T
+F
+T
+F
+F
+T
+==
+-4.97
+210802.919995902
+4.8655
+5
+49.4600760456274
+100000000000.01
+285
+125867
+7
+-7
+8
+-8
+7
+-7
+7
+-7
+ceil 0 = 0
+ceil 0 = 0
+ceil 0.1 = 1
+ceil -0.1 = -0
+ceil 0.5 = 1
+ceil -0.5 = -0
+ceil 14.8 = 15
+ceil -14.8 = -14
+ceil 4.8655 = 5
+ceil -4.8655 = -4
+ceil 125867.2 = 125868
+ceil -125867.2 = -125867
+ceil 7.2 = 8
+ceil -7.2 = -7
+ceil 7.8 = 8
+ceil -7.8 = -7
+10000
+3.00000000000001
+3
+
+a
+ab
+a
+abcdefgh
+0
+1
+3
+3
+==
+[
+]
+[
+1
+2
+]
+[
+1
+2
+]
+list_1 :
+[
+0.927291684284476
+0.471201063818858
+0.677796232364046
+0.979630045117638
+0.0262161111581214
+]
+list_2 :
+[
+0.553374707956507
+0.316999953387771
+0.460828633727892
+0.243800594584924
+0.221772324397123
+]
+list_1 :
+[
+0.927291684284476
+0.471201063818858
+0.677796232364046
+0.979630045117638
+0.0262161111581214
+]
+list_2 :
+[
+0.553374707956507
+0.316999953387771
+0.460828633727892
+0.243800594584924
+0.221772324397123
+]
+==
+Evaluating the context.
+Hi
+57
+T
+HEY: Fred says a
+Wilma says b
+Goodbye
+==
+T
+T
+F
+F
+T
+T
+==
+T
+T
+T
+T
+T
+T
+T
+==
+F
+F
+F
+F
+F
+F
+F
+==
+T
+hi
+T
+T
+F
+==
+F
+hi
+F
+F
+T
+T
+x = 7
+x = void
+== tuples
+{ }
+{ a }
+{ a b }
+{ a b c }
+{ a b c d }
+{ a b c d e }
+{ a b c d e f }
+
+x=3 
+x=3 y=4 
+x=ab y=cdefg z=65536 
+x=3 y=12 
+x=3 y=12 z=36 
+a=1 b=2 c=3 d=4 e=5 f=6 g=7 
+==
+
+
+a
+ab
+ab3
+ab1.5
+x = 3388
+x = 3388, y = 3630
+
+a
+T
+F
+TTFTFF
+
+
+Hello 9
+Bye
+Hello 9
+Bye
+Hello 9
+Bye
+Hello 9
+Bye
+==
+x = 5
+y = 6
+==
+(L)(R)
+8
+(L)(R)
+8
+(L)(R)
+8
+[
+== resolve
+symbol say
+symbol fred
+symbol wilma
+symbol is_void
+symbol void
+symbol barney
+== run
+I am Fred.
+I am Wilma.
+test void: T
+I am Barney.
+]
+[
+Run in standard context.
+15
+Run in weird context.
+56
+]
+[
+PING
+PING
+PING
+]
+==
+Let's parse.
+Hello world!
+Hello world!
+Hello world!
+==
+Let's parse.
+5 15
+7.2 21.6
+-1.3 -3.9
+==
+Write tmp.txt:
+Read tmp.txt:
+ch T
+ch e
+ch s
+ch t
+ch  
+ch d
+ch a
+ch t
+ch a
+ch 
+
+ch h
+ch e
+ch r
+ch e
+ch 
+
+ch ü
+ch ä
+ch  
+ch 1
+ch ≠
+ch 0
+ch  
+ch 包
+ch 子
+ch 
+
+Removed tmp.txt
+==
+This should go to stdout.
+This goes to the file.
+This also goes to the file.
+Removed tmp.txt
+==
+put a
+get a
+get void
+put bc
+get b
+put d
+get c
+get d
+put efg
+get e
+put h
+get f
+get g
+get h
+get void
+Removed tmp.txt
+==
+Passed var test of 20150907.
+The first 16 Fibonacci numbers:
+1
+1
+2
+3
+5
+8
+13
+21
+34
+55
+89
+144
+233
+377
+610
+987
+The first 5 Fibonacci numbers:
+1
+1
+2
+3
+5
+==
+set x = 3
+  add: 0 => 1
+set y = 4
+  add: 1 => 2
+set z = 5
+  add: 2 => 3
+set x = 3
+  add: 3 => 4
+set y = 4
+  add: 4 => 5
+set z = 5
+  add: 5 => 6
+set q = 0
+  add: 6 => 7
+[
+{ q 0 }
+{ z 5 }
+{ y 4 }
+{ x 3 }
+{ z 5 }
+{ y 4 }
+{ x 3 }
+]
+count = 7
+get x = 3
+get y = 4
+get z = 5
+get q = 0
+get r = 
+bye
+==
+()x=3
+x=3
+x=3
+==
+(x=)3
+3
+3
+==
+hi
+==
+123,456.78901200
+-123,456.78901200
+123456.78901200
+
+123,456.7890120
+-123,456.7890120
+123456.7890120
+
+123,456.789012
+-123,456.789012
+123456.789012
+
+123|456.79
+-123|456.79
+123456.79
+
+12,345,678.78901
+-12,345,678.78901
+12345678.78901
+
+0.78901200
+-0.78901200
+0.78901200
+
+1
+-1
+1
+
+0
+0
+0
+
+0.000
+0.000
+0.000
+
+314.1590000
+-314.1590000
+314.1590000
+
+0.1590000
+-0.1590000
+0.1590000
+
+0.159
+-0.159
+0.159
+
+==
+Hi
+Hi
+==
+Hi
+Hi
+==
+Hi
+==
+c b a 
+==
+5 4 3 2 1 
+==
+                  "abc"
+               ~1 "abc"~1
+            ~2 ~1 "abc"~1~2
+         ~3 ~2 ~1 "abc"~1~2~3
+      ~4 ~3 ~2 ~1 "abc"~1~2~3~4
+   ~5 ~4 ~3 ~2 ~1 "abc"~1~2~3~4~5
+~6 ~5 ~4 ~3 ~2 ~1 "abc"~1~2~3~4~5~6
+
+      "ab~1c"
+   ~2 "ab~1c"~2
+~3 ~2 "ab~1c"~2~3
+
+         ~1 a"b"~2c~1
+      ~3 ~1 a"b"~2c~1~3
+   ~4 ~3 ~1 a"b"~2c~1~3~4
+~5 ~4 ~3 ~1 a"b"~2c~1~3~4~5
+
+==
+a & "b" 1<3
+a &amp; &quot;b&quot; 1&lt;3
+T
+==
+-1 : (void)
+0 : a
+1 : b
+2 : c
+3 : (void)
+==
+result:
+Hello
+line 1
+line 2
+line 3
+==
+T
+T
+T
+T
+F
+File handle is properly void after close.
+==
+Jan 31 January
+Feb 29 February
+Mar 31 March
+Apr 30 April
+May 31 May
+Jun 30 June
+Jul 31 July
+Aug 31 August
+Sep 30 September
+Oct 31 October
+Nov 30 November
+Dec 31 December
+==
+== put
+[abcdefg3.2TFABCD]
+== say
+[abcdefg
+3.2
+T
+F
+
+ABCD
+]
+== fput
+[abcdefg3.2TFABCD]
+== fsay
+[abcdefg
+3.2
+T
+F
+
+ABCD
+]
+is_newer src/fexl.c bin/fexl = F
+is_newer bin/fexl src/fexl.c = T
+
+is_newer src/test/a1.fxl missing = T
+is_newer missing src/test/a1.fxl = T
+
+is_newer src/test/a1.fxl src/test/a1.fxl = F
+is_newer src/test/a1.fxl src/test/a1.fxl = F
+
+is_newer missing missing = T
+is_newer missing missing = T
+
+path "src" type "d"
+path "src/fexl.c" type "f"
+path "x/y" type ""
+path "" type "d"
+path "." type "d"
+path "bin" type "d"
+path "bin/fexl" type "f"
+path "x" type ""
+509
+716826
+mkdir : 0
+rmdir : 0
+[ trim_spaces
+all "" = ""
+beg "" = ""
+end "" = ""
+
+all "a" = "a"
+beg "a" = "a"
+end "a" = "a"
+
+all "a   " = "a"
+beg "a   " = "a   "
+end "a   " = "a"
+
+all "  ab" = "ab"
+beg "  ab" = "ab"
+end "  ab" = "  ab"
+
+all "abc" = "abc"
+beg "abc" = "abc"
+end "abc" = "abc"
+
+all "   abc  " = "abc"
+beg "   abc  " = "abc  "
+end "   abc  " = "   abc"
+
+all "" = ""
+beg "" = ""
+end "" = ""
+
+all "   " = ""
+beg "   " = ""
+end "   " = ""
+
+all "  abcd   " = "abcd"
+beg "  abcd   " = "abcd   "
+end "  abcd   " = "  abcd"
+
+]
+~7
+\err=
+~1
+~1
+\status=0

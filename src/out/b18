@@ -1,0 +1,14 @@
+\out=
+~1
+== benchmark nested
+inner: val 479 steps 29 bytes 264
+outer: val 479 steps 98 bytes 712
+== benchmark large list
+result: val 32768 steps 1966977 bytes 1574120
+== benchmark negative memory usage
+result: val  steps 8 bytes 55
+~1
+\err=
+~1
+~1
+\status=0

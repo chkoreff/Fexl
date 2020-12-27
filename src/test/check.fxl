@@ -1,0 +1,96 @@
+#
+\test=
+	(
+	\name
+
+	put ["test "name" "]
+
+	\cmd=(to_str ["../bin/fexl test/show.fxl "name" | diff - out/"name])
+	\argv=["/bin/sh" "-c" cmd]
+
+	run_program argv ""
+	\out\err\status
+
+	eq 0 status
+		(
+		say "good"
+		)
+		(
+		say "failed"
+		put out
+		put err
+		)
+	)
+
+\list_all=
+[
+"a1"
+"a2"
+"a3"
+"a4"
+"a5"
+"a6"
+"a7"
+"a8"
+"a9"
+"b10"
+"b11"
+"b12"
+"b13"
+"b14"
+"b15"
+"b16"
+"b17"
+"b18"
+"b19"
+"b20"
+"b21"
+"b22"
+"b23"
+"b24"
+"b25"
+"b26"
+"b27"
+"b28"
+"b29"
+"b30"
+"b31"
+"b32"
+"b33"
+"b34"
+"b35"
+"b36"
+"b37"
+"b38"
+"b39"
+"b40"
+"b41"
+"b42"
+"b43"
+"chars"
+"crypto"
+"date"
+"get_byte"
+"mf"
+"missing"
+"partition"
+"sat"
+"sort"
+"stats"
+]
+
+# Gather any individually specified tests.
+\list=
+	(
+	(@\loop\n
+	\x=(argv n)
+	is_void x [];
+	\n=(+ 1 n)
+	[x;\=loop n]
+	) 2
+	)
+
+\list=(is_null list list_all list)
+
+trace_elapsed;
+each list test

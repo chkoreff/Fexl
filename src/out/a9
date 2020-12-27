@@ -1,0 +1,25 @@
+\out=
+~1
+== test_1
+PING
+== test_2
+PING
+PING
+PING
+PING
+PING
+== test_3
+PING
+PING
+PING
+== test_4
+PING
+pong
+PING
+PING
+PING
+~1
+\err=
+~1
+~1
+\status=0

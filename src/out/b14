@@ -1,0 +1,74 @@
+\out=
+~1
+directory src/lib
+[
+assoc.fxl
+bool.fxl
+date.fxl
+format.fxl
+hex.fxl
+html.fxl
+indent.fxl
+index.fxl
+list.fxl
+math.fxl
+read.fxl
+read_csv.fxl
+read_ssv.fxl
+run.fxl
+time.fxl
+]
+Created test/vector
+open (pos 0)
+seek_set 0 (pos 0)
+truncate 100 (pos 0)
+seek_set 10 (pos 10)
+write 26 bytes "abcdefghijklmnopqrstuvwxyz" (pos 36)
+seek_cur -3 (pos 33)
+write 3 bytes "XYZ" (pos 36)
+seek_end -20 (pos 80)
+write 5 bytes "12345" (pos 85)
+seek_set 10 (pos 10)
+read 16 bytes "abcdefghijklmnop" (pos 26)
+read 0 bytes "" (pos 26)
+read 10 bytes "qrstuvwXYZ" (pos 36)
+seek_end -3 (pos 97)
+write 3 bytes "ABC" (pos 100)
+seek_end -3 (pos 97)
+read 3 bytes "ABC" (pos 100)
+Removed test/vector
+= file
+get #
+get a
+at  b
+at  b
+get b
+get c
+at  d
+get d
+at  e
+at  e
+get e
+get f
+get g
+at  h
+= str
+get #
+get a
+at  b
+at  b
+get b
+get c
+at  d
+get d
+at  e
+at  e
+get e
+get f
+get g
+at  h
+~1
+\err=
+~1
+~1
+\status=0

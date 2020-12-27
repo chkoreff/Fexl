@@ -1,0 +1,124 @@
+\out=
+~1
+Hello
+Type some lines of input and I'll echo them back.
+Press Ctrl-D to stop.
+ch = 'a'
+ch = 'b'
+ch = 'c'
+ch = '
+'
+ch = 'd'
+ch = 'e'
+ch = 'f'
+ch = 'g'
+ch = '
+'
+ch = '
+'
+ch = 'h'
+ch = 'i'
+ch = 'j'
+ch = '
+'
+ch = 'å'
+ch = 'a'
+ch = 'b'
+ch = 'c'
+ch = 'ü'
+ch = 'd'
+ch = 'e'
+ch = 'f'
+ch = '
+'
+ch = 'ü'
+ch = 'ä'
+ch = ' '
+ch = '1'
+ch = '≠'
+ch = '0'
+ch = ' '
+ch = '包'
+ch = '子'
+ch = '
+'
+Get from string [abcåabcüdef封x]
+ch = 'a'
+ch = 'b'
+ch = 'c'
+ch = 'å'
+ch = 'a'
+ch = 'b'
+ch = 'c'
+ch = 'ü'
+ch = 'd'
+ch = 'e'
+ch = 'f'
+ch = '封'
+ch = 'x'
+String to list [abcåabcüdef封x]
+[
+a
+b
+c
+å
+a
+b
+c
+ü
+d
+e
+f
+封
+x
+]
+Show logical characters in [AOOab~åüää≠封小xyz]
+ch = 'A'
+ch = 'O'
+ch = 'O'
+ch = 'a'
+ch = 'b'
+ch = '~'
+ch = 'å'
+ch = 'ü'
+ch = 'ä'
+ch = 'ä'
+ch = '≠'
+ch = '封'
+ch = '小'
+ch = 'x'
+ch = 'y'
+ch = 'z'
+Show individual hex bytes in [AOOab~åüää≠封小xyz]
+ch = '41'
+ch = '4f'
+ch = '4f'
+ch = '61'
+ch = '62'
+ch = '7e'
+ch = 'c3'
+ch = 'a5'
+ch = 'c3'
+ch = 'bc'
+ch = 'c3'
+ch = 'a4'
+ch = 'c3'
+ch = 'a4'
+ch = 'e2'
+ch = '89'
+ch = 'a0'
+ch = 'e5'
+ch = 'b0'
+ch = '81'
+ch = 'e5'
+ch = 'b0'
+ch = '8f'
+ch = '78'
+ch = '79'
+ch = '7a'
+Good bye.
+~1
+\err=
+~1
+~1
+\status=0

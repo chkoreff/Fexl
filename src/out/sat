@@ -1,0 +1,51 @@
+\out=
+~1
+SAT 0 T
+[
+[]
+]
+
+SAT 0 F
+[
+]
+
+SAT 2 (\a\b and a b)
+[
+[TT]
+]
+
+SAT 2 (\a\b or a b)
+[
+[TT]
+[TF]
+[FT]
+]
+
+SAT 2 (\a\b or (not a) b)
+[
+[TT]
+[FT]
+[FF]
+]
+
+SAT 4 (\a\b\c\d (and (or (and a d) c) (not (and b d))))
+[
+[TTTF]
+[TFTT]
+[TFTF]
+[TFFT]
+[FTTF]
+[FFTT]
+[FFTF]
+]
+
+SAT 17 ...
+[
+[TTFTTFTTFTFTTTTTT]
+]
+
+~1
+\err=
+~1
+~1
+\status=0

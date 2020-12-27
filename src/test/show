@@ -1,0 +1,3 @@
+#!/bin/sh
+./build || exit
+../bin/fexl test/show.fxl $1

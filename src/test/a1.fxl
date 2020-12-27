@@ -550,9 +550,6 @@ show "list_2" list_2
 )
 
 div
-eval_file "stats.fxl"
-
-div
 eval_file "resolve.fxl"
 
 div
@@ -703,9 +700,6 @@ talk
 talk
 talk
 )
-
-eval_file "sort.fxl"
-eval_file "mf.fxl"
 
 \test_context=
 (

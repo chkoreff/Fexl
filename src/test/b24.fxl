@@ -1,0 +1,4 @@
+# Test the "die" function.
+say "hi"
+die
+say "bye"

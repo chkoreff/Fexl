@@ -16,11 +16,10 @@ Build the code and test its validity:
 
 	test/check
 
-That runs the test/run script and compares its output with the reference output
-in test/run.out.  If everything works as expected, you should see no output.
-However, if you run on a 32-bit system you will see some inconsequential
-differences in the output of test/b18.fexl, which measures memory usage, and
-also test/b17.fexl, which deliberately tries to run out of memory.
+That runs the test scripts, comparing their outputs with the reference files in
+the out directory.  They should all succeed, however, if you run on a 32-bit
+system you will see some inconsequential differences in tests which measure
+memory usage or deliberately try to run out of memory.
 
 Installation
 ------------
@@ -62,21 +61,21 @@ To build the code and run a fexl program:
 
 	./fexl [FILE]
 
-To build the code and see the test output:
-
-	test/run
-
-To build the code and check the test output:
+To build the code and check all the tests:
 
 	test/check
+
+You can also check a specific set of tests, e.g.:
+
+	test/check chars b10 sat crypto
+
+You can show the output of an individual test, e.g.:
+
+	test/show sat
 
 To source the handy shell aliases that I use for development:
 
 	. handy
-
-To time the test output:
-
-	test/checkt
 
 To see the current version number (http://semver.org):
 

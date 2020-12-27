@@ -1,4 +1,3 @@
 #!/bin/sh
 ./build || exit
-. ./safe
 exec ../bin/fexl "$@"

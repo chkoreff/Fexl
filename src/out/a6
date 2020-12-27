@@ -1,0 +1,28 @@
+\out=
+~1
+==
+[
+(parsing)
+(resolving)
+]
+Hello world!
+Hello world!
+==
+[
+(parsing)
+(resolving)
+]
+HI
+HI
+==
+[
+(parsing)
+(resolving)
+]
+got it
+x = 7
+~1
+\err=
+~1
+~1
+\status=0

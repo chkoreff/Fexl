@@ -1,2 +1,3 @@
 #!/bin/sh
-test/run | diff - test/run.out
+./build || exit
+../bin/fexl test/check.fxl $@

@@ -1,0 +1,23 @@
+\out=
+~1
+[ get 23 get 61 get 62 get 63 get 64 get 65 get 66 get 67 get 68 get 69 get 6a get 6b get 6c get 6d get 6e get 6f ]
+[ 23 61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f ]
+[ 23 61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f ]
+
+[ get 70 get 71 get 72 get 73 get 74 get 75 get 76 get 77 get 78 get 79 get 7a get 0a get 23 get 61 get 62 get 63 ]
+[ 70 71 72 73 74 75 76 77 78 79 7a 0a 23 61 62 63 ]
+[ 70 71 72 73 74 75 76 77 78 79 7a 0a 23 61 62 63 ]
+
+get get get get get get get get get get get get get get get get 6465666768696a6b6c6d6e6f70717273
+6465666768696a6b6c6d6e6f70717273
+6465666768696a6b6c6d6e6f70717273
+
+get get get get get get get get get get get get get get get get 7475767778797a0a2361626364656667
+7475767778797a0a2361626364656667
+7475767778797a0a2361626364656667
+
+~1
+\err=
+~1
+~1
+\status=0

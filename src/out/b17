@@ -1,0 +1,77 @@
+\out=
+~1
+[ test_run_function
+out:
+[
+hello
+x = 123
+bye
+]
+err:
+[
+complain 1
+complain 2
+]
+status: good
+
+out:
+[
+]
+err:
+[
+]
+status: good
+
+out:
+[
+hello
+]
+err:
+[
+oops
+]
+status: fail
+
+out:
+[
+]
+err:
+[
+The program ran out of memory.
+]
+status: fail
+
+]
+[ test_run_program
+out:
+[
+hello
+x = 11703
+]
+err:
+[
+complain
+oops
+]
+status: fail
+
+out:
+[
+BEG
+END
+]
+err:
+[
+complain
+]
+status: good
+
+]
+[ test_big_output
+grabbed 200000 bytes
+]
+~1
+\err=
+~1
+~1
+\status=0
