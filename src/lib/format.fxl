@@ -156,9 +156,7 @@ format_num
 \put_data=(fput_data stdout)
 \put_list=(fput_list stdout)
 
-\show_data=(\label\x put [label" "] put_data x nl)
-
-\data_to_str=
+\as_str=
 	(\data
 	\buf=buf_new
 	\put=(buf_put buf)
@@ -226,9 +224,7 @@ def "fput_data" fput_data;
 def "fput_list" fput_list;
 def "put_data" put_data;
 def "put_list" put_list;
-def "show_data" show_data;
-def "as_str" data_to_str; # handy synonym
-def "data_to_str" data_to_str;
+def "as_str" as_str;
 def "str_to_data" str_to_data;
 def "count_match" count_match;
 def "str_trim" str_trim;

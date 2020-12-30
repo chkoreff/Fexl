@@ -5,7 +5,7 @@ say "== test Fibonacci"
 # (fib n) returns the nth Fibonacci number starting at 0.
 \fib=
 	(
-	\memo=cache_1
+	\memo=cache
 	@\fib\n
 	\n=n
 	le n 1 (eq n 1 1 0);

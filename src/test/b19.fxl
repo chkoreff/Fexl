@@ -76,6 +76,6 @@ try [193 214 112 19 131 147 234] # 0.916313354727062
 try [255 255 255 255 255 255 255] # 1
 )
 (
-say "= i_put_data"
-i_put_data ["a" "b" "c" {2 4} 7 [1 {2 3} 4]] nl
+say "= stream_data"
+stream_data put ["a" "b" "c" {2 4} 7 [1 {2 3} 4]] nl
 )

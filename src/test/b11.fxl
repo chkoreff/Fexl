@@ -79,7 +79,7 @@ nl
 say str1
 
 \data=(str_to_data str1)
-\str2=(data_to_str data)
+\str2=(as_str data)
 say str2
 say (eq str1 str2)
 )
@@ -374,11 +374,11 @@ if F (run timelocal localtime) # Result depends on your local time zone.
 (
 \try=
 	(
-	\memo=cache_1 \a memo a;
+	\memo=cache \a memo a;
 	say ["  1 : "a]
-	\memo=cache_1 \b memo b;
+	\memo=cache \b memo b;
 	say ["  2 : "b]
-	\memo=cache_1 \c memo c;
+	\memo=cache \c memo c;
 	say ["  3 : "c]
 	)
 

@@ -1,4 +1,137 @@
+# INDEX CONCEPT
+# An index is a highly efficient structure for mapping string keys to arbitrary
+# values.  It uses the longest common prefix of keys to narrow the search
+# quickly and eliminate repeated initial key material.  To delete a key you map
+# it to a void value.
 #
+# INDEX REPRESENTATION
+# An index value is either (void) or {key val child tail}.  The child is the
+# index of entries that start with key.  The tail is the index of entries
+# greater than key.  The index key and its tail key have no common prefix.
+
+\mk_index=
+	(\key\val\child\next
+	\key=key
+	\val=val
+	is_defined val { key val child next };
+	is_defined child
+		(
+		child \c_key\c_val\c_child\c_next
+		is_defined c_next { key void child next };
+		# All child keys start with same suffix, so combine with upper key.
+		\new_key=(. key c_key)
+		{ new_key c_val c_child next }
+		);
+	next
+	)
+
+# (index_put index key val) Return a new index with key mapped to val.
+\index_put=
+	(@\index_put\index\new_key\new_val
+
+	is_void index (mk_index new_key new_val void void);
+	index \old_key\old_val\child\next
+
+	\len_common=(length_common new_key old_key)
+	\len_old_suffix=(- (length old_key) len_common)
+	\len_new_suffix=(- (length new_key) len_common)
+
+	eq len_new_suffix 0
+		(
+		eq len_old_suffix 0
+			# new_key and old_key are identical.
+			(mk_index new_key new_val child next);
+		eq len_common 0
+			# new_key is null and old_key is not.
+			(mk_index new_key new_val void index);
+
+		# new_key is a proper prefix of old_key.
+		\old_suffix=(slice old_key len_common len_old_suffix)
+		\child=(mk_index old_suffix old_val child void)
+		mk_index new_key new_val child next
+		);
+	eq len_common 0
+		(
+		# new_key and old_key have no prefix in common.
+		lt new_key old_key (mk_index new_key new_val void index);
+		\next=(index_put next new_key new_val)
+		mk_index old_key old_val child next
+		);
+
+	\prefix=(slice new_key 0 len_common)
+	\new_suffix=(slice new_key len_common len_new_suffix)
+	\child=(index_put child new_suffix new_val)
+
+	eq len_old_suffix 0
+		# old_key is a proper prefix of new_key.
+		(mk_index prefix old_val child next);
+
+	# new_key and old_key share a common prefix.
+	\old_suffix=(slice old_key len_common len_old_suffix)
+	\child=(index_put child old_suffix old_val)
+	mk_index prefix void child next
+	)
+
+# (index_get index key) Return the value associated with the key.
+\index_get=
+	(@\index_get\index\new_key
+	\new_key=new_key
+
+	is_void index void;
+	index \old_key\old_val\child\next
+
+	\len_common=(length_common new_key old_key)
+	\len_old_suffix=(- (length old_key) len_common)
+	\len_new_suffix=(- (length new_key) len_common)
+
+	eq len_new_suffix 0
+		(
+		eq len_old_suffix 0 old_val; # new_key and old_key are identical.
+		void
+		);
+	eq len_common 0
+		(
+		# new_key and old_key have no prefix in common.
+		lt new_key old_key void;
+		index_get next new_key
+		);
+	eq len_old_suffix 0
+		(
+		# old_key is a proper prefix of new_key.
+		\new_suffix=(slice new_key len_common len_new_suffix)
+		index_get child new_suffix
+		);
+	void
+	)
+
+# (index_put_pairs index pairs) Run through the list of {key val} pairs and put
+# them in the index.
+\index_put_pairs=(fold \index\pair pair; index_put index)
+
+# (index_pairs index) Return the list of {key val} pairs defined in the index.
+\index_pairs=
+	(
+	(@\index_pairs\prefix\index
+	is_void index [];
+	index \key\val\child\tail
+	\this_key=(. prefix key)
+	is_defined val (cons { this_key val }) ();
+	append (index_pairs this_key child);
+	index_pairs prefix tail
+	)
+	""
+	)
+
+\show_index=
+	(@\show_index\index
+	is_void index (say "void");
+	index \key\val\child\tail
+	put ["{"(fexl_quote key)" "] put_data val nl
+	show_index child
+	show_index tail
+	say "}"
+	)
+
 \test_index_put==
 (
 \try=

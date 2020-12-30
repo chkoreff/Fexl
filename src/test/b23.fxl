@@ -16,5 +16,4 @@ split_date day_of_week
 grab_output
 read_csv_file
 read_ssv_file
-index_put
 )

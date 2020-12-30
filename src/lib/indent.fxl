@@ -102,9 +102,7 @@
 # (stream_data put data) Stream the data with the given output function.
 \stream_data=(\put render_data put "")
 
-# (put_data data) Print data to stdout.
 \put_data=(stream_data put)
-
 \say_data=(\data put_data data nl)
 
 \trace_data=
@@ -114,7 +112,6 @@
 	)
 
 def "stream_data" stream_data;
-def "i_put_data" put_data; # Avoid conflict with put_data in format.fxl.
 def "say_data" say_data;
 def "trace_data" trace_data;
 void

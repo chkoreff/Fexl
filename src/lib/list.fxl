@@ -31,15 +31,6 @@
 	[x;\=loop xs]
 	)
 
-# Eagerly apply f to each element in list xs.
-\map_eager= # LATER deprecated 20200622
-	(\f @\loop \xs
-	xs [] \x\xs
-	\x=(f x)
-	\tail=(loop xs)
-	[x;tail]
-	)
-
 # Apply f to each element in list xs, but only keep the good results.
 \map_good=
 	(\fn @\loop \xs
@@ -465,25 +456,10 @@
 	F
 	)
 
-# Wrap a prefix around a context.
-\with_prefix= # LATER deprecated 20200622
-	(\prefix\context
-	\context==(\= context)
-	\len_prefix=(length prefix)
-	\key
-	eq len_prefix (length_common prefix key)
-		(
-		\suffix=(slice key len_prefix (- (length key) len_prefix))
-		context suffix
-		);
-	void
-	)
-
 def "append" append;
 def "flatten" flatten;
 def "each" each;
 def "map" map;
-def "map_eager" map_eager;
 def "map_good" map_good;
 def "filter" filter;
 def "reverse" reverse;
@@ -527,5 +503,4 @@ def "ends_with" ends_with;
 def "map_bytes_to_double" map_bytes_to_double;
 def "random_double" random_double;
 def "eq_data" eq_data;
-def "with_prefix" with_prefix;
 void

@@ -56,27 +56,7 @@
 	)
 
 # Equivalent to (remember 1).
-\cache_1==(\v=var_new fetch v)
-
-\new_cache==cache_1 # LATER deprecated 20200622
-
-# Cache a non-recursive function.
-\cache== # LATER 20201224 deprecated
-	(
-	\memo=cache_1
-	\f\k \k=k
-	memo k;
-	f k
-	)
-
-# Cache a recursive function.
-\cache_loop== # LATER 20201224 deprecated
-	(
-	\memo=cache_1
-	\f @\loop \k \k=k
-	memo k;
-	f loop k
-	)
+\cache==(\v=var_new fetch v)
 
 \NL=="
 "
@@ -205,15 +185,6 @@
 	void
 	)
 
-\cx_index==
-	(\=
-	use_lib "index.fxl";
-	:: cx_lib;
-	:: cx_format;
-	:: cx_list;
-	void
-	)
-
 # Evaluate the user's script.
 use_file script_name;
 :: standard;
@@ -242,10 +213,7 @@ def "LF" LF;
 def "QU" QU;
 
 def "remember" remember;
-def "cache_1" cache_1;
-def "new_cache" new_cache;
 def "cache" cache;
-def "cache_loop" cache_loop;
 def "import" import;
 def "import_as" import_as;
 
@@ -263,5 +231,4 @@ def "import_as" import_as;
 :: cx_run;
 :: cx_read_csv;
 :: cx_read_ssv;
-:: cx_index;
 void
