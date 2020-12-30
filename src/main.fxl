@@ -23,15 +23,6 @@
 \trace=(fsay stderr)
 \error=(\msg trace msg die)
 
-# Return an object with key defined as val.
-\with=
-	(\key\val\obj
-	\obj=obj
-	\x
-	eq x key val;
-	obj x
-	)
-
 # Return a context with key defined as val.
 \def=(\key\val with key {val})
 
@@ -50,35 +41,6 @@
 # Use a file in the directory which contains the user's script.
 \use=(\name use_file (path_under dir_local name))
 
-# Return the value at key k in index v.  If no value, store the value of x in
-# the index so you get the same value next time.
-\fetch=
-	(\v\k\x
-	\y=(var_get v k)
-	is_defined y y;
-	\x=x
-	var_put v (with k x; var_get v)
-	x
-	)
-
-# Cache a non-recursive function.
-\cache==
-	(
-	\v=var_new
-	\f\k
-	\k=k
-	fetch v k (f k)
-	)
-
-# Cache a recursive function.
-\cache_loop== # LATER 20201224 deprecated
-	(
-	\v=var_new
-	\f @\loop \k
-	\k=k
-	fetch v k (f loop k)
-	)
-
 # Make a cache which remembers the values of a function with n arguments.
 \remember=
 	(\n
@@ -91,6 +53,29 @@
 	\v=(fetch v k var_new)
 	f v
 	) n v
+	)
+
+# Equivalent to (remember 1).
+\cache_1==(\v=var_new fetch v)
+
+\new_cache==cache_1 # LATER deprecated 20200622
+
+# Cache a non-recursive function.
+\cache== # LATER 20201224 deprecated
+	(
+	\memo=cache_1
+	\f\k \k=k
+	memo k;
+	f k
+	)
+
+# Cache a recursive function.
+\cache_loop== # LATER 20201224 deprecated
+	(
+	\memo=cache_1
+	\f @\loop \k \k=k
+	memo k;
+	f loop k
 	)
 
 \NL=="
@@ -112,7 +97,6 @@
 	def "QU" QU;
 	def "CR" CR;
 	def "LF" LF;
-	def "with" with;
 	def "trace" trace;
 	def "error" error;
 	void
@@ -236,7 +220,6 @@ use_file script_name;
 
 def "def" def;
 def "if" if;
-def "with" with;
 def "::" ::;
 
 def "use" use;
@@ -258,10 +241,11 @@ def "CR" CR;
 def "LF" LF;
 def "QU" QU;
 
-def "fetch" fetch;
+def "remember" remember;
+def "cache_1" cache_1;
+def "new_cache" new_cache;
 def "cache" cache;
 def "cache_loop" cache_loop;
-def "remember" remember;
 def "import" import;
 def "import_as" import_as;
 

@@ -25,6 +25,7 @@
 #include <type_time.h>
 #include <type_tuple.h>
 #include <type_var.h>
+#include <type_with.h>
 
 static const char *cur_name;
 
@@ -98,6 +99,8 @@ static value standard(value name)
 	if (match("basename")) return Q(type_basename);
 	if (match("length_common")) return Q(type_length_common);
 	if (match("is_str")) return Q(type_is_str);
+	if (match("with")) return Q(type_with);
+	if (match("fetch")) return Q(type_fetch);
 
 	if (match("num_str")) return Q(type_num_str);
 	if (match("is_num")) return Q(type_is_num);

@@ -465,21 +465,6 @@
 	F
 	)
 
-# Create a cache that evaluates a function and stores the value at a given key.
-# Subsequent calls with the same key return the originally stored value.
-\new_cache== # LATER deprecated 20200622
-	(
-	\table=var_new
-	\key\fn
-
-	\val=(var_get table key)
-	is_defined val val;
-
-	\val=fn
-	var_put table (with key val; var_get table)
-	val
-	)
-
 # Wrap a prefix around a context.
 \with_prefix= # LATER deprecated 20200622
 	(\prefix\context
@@ -542,6 +527,5 @@ def "ends_with" ends_with;
 def "map_bytes_to_double" map_bytes_to_double;
 def "random_double" random_double;
 def "eq_data" eq_data;
-def "new_cache" new_cache;
 def "with_prefix" with_prefix;
 void

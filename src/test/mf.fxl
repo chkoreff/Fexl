@@ -7,7 +7,7 @@ evaluate (use "test.fxl" standard) \;
 # Create the base of a male/female function.
 \create=
 	(\base
-	\memo=(remember 1)
+	\memo=cache_1
 	\other
 	@\this\n
 	\n=n

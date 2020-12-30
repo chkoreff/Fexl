@@ -42,6 +42,7 @@ make type_sym
 make type_time
 make type_tuple
 make type_var
+make type_with
 make value
 if [ $DEV -eq 1 ]; then
 make output

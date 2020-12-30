@@ -374,11 +374,11 @@ if F (run timelocal localtime) # Result depends on your local time zone.
 (
 \try=
 	(
-	cache \a
+	\memo=cache_1 \a memo a;
 	say ["  1 : "a]
-	cache \b
+	\memo=cache_1 \b memo b;
 	say ["  2 : "b]
-	cache \c
+	\memo=cache_1 \c memo c;
 	say ["  3 : "c]
 	)
 
@@ -406,6 +406,35 @@ try "x" "y" "z"
 try "d" "c" "b"
 try "d" "c" "b"
 try "a" "x" "e"
+)
+
+(
+say "== fetch"
+\try=
+	(
+	\v=var_new
+	\v==(I v) # test eval of first arg
+	\k
+	say ["= try "(as_str k)]
+	\x=
+		(
+		fetch v k;
+		say "  compute"
+		to_str [k":"k]
+		)
+	say ["  x = "(as_str x)]
+	)
+
+try (I I "a")
+try "a"
+try "b"
+try "xyz"
+try "a"
+try "b"
+try "xyz"
+try 38.6
+try void
+try void
 )
 
 # Test import.

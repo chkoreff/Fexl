@@ -274,7 +274,34 @@ try ["d" "c" "b"]
 try ["a" "x" "e"]
   2 : x
   3 : e
-steps 13183 bytes 11904
+steps 10552 bytes 8928
+== fetch
+= try "a"
+  compute
+  x = "a:a"
+= try "a"
+  x = "a:a"
+= try "b"
+  compute
+  x = "b:b"
+= try "xyz"
+  compute
+  x = "xyz:xyz"
+= try "a"
+  x = "a:a"
+= try "b"
+  x = "b:b"
+= try "xyz"
+  x = "xyz:xyz"
+= try 38.6
+  compute
+  x = "38.6:38.6"
+= try void
+  compute
+  x = ":"
+= try void
+  compute
+  x = ":"
 = import
 ==
 0:[]
