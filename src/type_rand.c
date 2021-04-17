@@ -1,6 +1,6 @@
 #include <value.h>
 
-#include <standard.h>
+#include <basic.h>
 #include <stdlib.h> /* srand rand RAND_MAX */
 #include <type_num.h>
 #include <type_rand.h>
@@ -15,10 +15,10 @@ value type_seed_rand(value f)
 		{
 		double seed = get_double(x) * (double)RAND_MAX;
 		srand(seed);
-		f = hold(QI);
+		f = hold(&QI);
 		}
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}

@@ -2,7 +2,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <standard.h>
 #include <type_num.h>
 #include <type_str.h>
 #include <type_var.h>
@@ -108,7 +107,7 @@ value type_fetch(value f)
 			}
 		}
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(v);
 	drop(k);
 	drop(x);

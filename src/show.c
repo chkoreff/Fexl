@@ -8,7 +8,6 @@
 #include <output.h>
 #include <output_str.h>
 #include <show.h>
-#include <standard.h>
 #include <type_buf.h>
 #include <type_cmp.h>
 #include <type_file.h>
@@ -20,6 +19,7 @@
 #include <type_parse.h>
 #include <type_rand.h>
 #include <type_run.h>
+#include <type_standard.h>
 #include <type_str.h>
 #include <type_tuple.h>
 #include <type_var.h>
@@ -266,5 +266,5 @@ value type_show(value f)
 	{
 	if (!f->R) return 0;
 	show(f->R);nl();
-	return hold(QI);
+	return hold(&QI);
 	}

@@ -1,7 +1,15 @@
 #include <value.h>
 
 #include <basic.h>
-#include <standard.h>
+
+struct value QI = {1, type_I, 0, 0};
+struct value QT = {1, type_T, 0, 0};
+struct value QF = {1, type_F, 0, 0};
+struct value Qvoid = {1, type_void, 0, 0};
+struct value Qcons = {1, type_cons, 0, 0};
+struct value Qnull = {1, type_null, 0, 0};
+struct value Qeval = {1, type_eval, 0, 0};
+struct value Qyield = {1, type_yield, 0, 0};
 
 /* (I x) = x */
 value type_I(value f)
@@ -35,7 +43,7 @@ value type_Y(value f)
 value type_void(value f)
 	{
 	if (!f->L) return 0;
-	return hold(Qvoid);
+	return hold(&Qvoid);
 	}
 
 /* (cons x y A B) = (B x y) */
@@ -71,14 +79,7 @@ value type_once(value f)
 	return x;
 	}
 
-/* Catch arguments but do nothing.  Used internally for symbol resolution. */
-value type_catch(value f)
-	{
-	(void)f;
-	return 0;
-	}
-
-/* (\x\f f x) */
+/* (yield x f) = (f x)  Used for returning an unevaluated function. */
 value type_yield(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
@@ -87,7 +88,7 @@ value type_yield(value f)
 
 value boolean(int x)
 	{
-	return hold(x ? QT : QF);
+	return hold(x ? &QT : &QF);
 	}
 
 value type_is_defined(value f)

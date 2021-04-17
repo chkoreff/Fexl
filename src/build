@@ -20,7 +20,6 @@ make parse
 make report
 make sha256
 make sha512
-make standard
 make str
 make type_buf
 make type_cmp
@@ -37,6 +36,7 @@ make type_parse
 make type_rand
 make type_run
 make type_signal
+make type_standard
 make type_str
 make type_sym
 make type_time

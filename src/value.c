@@ -47,9 +47,12 @@ value hold(value f)
 	return f;
 	}
 
-/* Clear the content of a value going on the free list. */
-static void clear(value f)
+/* Decrement the reference count and recycle if it drops to zero. */
+void drop(value f)
 	{
+	if (f->N == 0) die("XDROP");
+	if (--f->N > 0) return;
+
 	if (f->L) /* Clear pair. */
 		{
 		drop(f->L);
@@ -60,22 +63,7 @@ static void clear(value f)
 		f->N = 0;
 		f->T(f);
 		}
-	f->T = 0;
-	f->L = 0;
-	f->R = 0;
-	}
-
-/* Decrement the reference count and recycle if it drops to zero. */
-void drop(value f)
-	{
-	if (f->N == 0)
-		die("XDROP");
-
-	if (--f->N == 0)
-		{
-		clear(f);
-		push_free(f);
-		}
+	push_free(f);
 	}
 
 void clear_free_list(void)

@@ -4,7 +4,6 @@
 #include <basic.h>
 #include <convert.h>
 #include <input.h>
-#include <standard.h>
 #include <type_num.h>
 #include <type_str.h>
 
@@ -49,10 +48,10 @@ value op_str(value f, string op(string))
 		if (result)
 			f = Qstr(result);
 		else
-			f = hold(Qvoid);
+			f = hold(&Qvoid);
 		}
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}
@@ -70,10 +69,10 @@ value op_str2(value f, string op(string,string))
 		if (result)
 			f = Qstr(result);
 		else
-			f = hold(Qvoid);
+			f = hold(&Qvoid);
 		}
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(x);
 	drop(y);
 	return f;
@@ -94,10 +93,10 @@ value op_str3(value f, string op(string,string,string))
 		if (result)
 			f = Qstr(result);
 		else
-			f = hold(Qvoid);
+			f = hold(&Qvoid);
 		}
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 
 	drop(x);
 	drop(y);
@@ -121,7 +120,7 @@ value type_length(value f)
 	if (x->T == type_str)
 		f = Qnum((double)get_str(x)->len);
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}
@@ -143,10 +142,10 @@ value type_slice(value f)
 		if (yn >= 0 && zn >= 0)
 			f = Qstr(str_slice(get_str(x),yn,zn));
 		else
-			f = hold(Qvoid);
+			f = hold(&Qvoid);
 		}
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(x);
 	drop(y);
 	drop(z);
@@ -176,13 +175,13 @@ value type_search(value f)
 			if (pos < xs->len)
 				f = Qnum((double)pos);
 			else
-				f = hold(Qvoid);
+				f = hold(&Qvoid);
 			}
 		else
-			f = hold(Qvoid);
+			f = hold(&Qvoid);
 		}
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(x);
 	drop(y);
 	drop(z);
@@ -202,10 +201,10 @@ value type_str_num(value f)
 		if (str0_double(str_data(x),&val))
 			f = Qnum(val);
 		else
-			f = hold(Qvoid);
+			f = hold(&Qvoid);
 		}
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}
@@ -223,7 +222,7 @@ value type_ord(value f)
 		f = Qnum((double) (xs->len == 0 ? 0 : (unsigned char)xs->data[0]) );
 		}
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}
@@ -242,7 +241,7 @@ value type_chr(value f)
 		f = Qstr(str_new_data(&ch,1));
 		}
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}
@@ -269,13 +268,13 @@ value type_char_width(value f)
 				f = Qnum((double)n);
 				}
 			else
-				f = hold(Qvoid);
+				f = hold(&Qvoid);
 			}
 		else
-			f = hold(Qvoid);
+			f = hold(&Qvoid);
 		}
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(x);
 	drop(y);
 	return f;
@@ -296,7 +295,7 @@ value type_length_common(value f)
 	if (x->T == type_str && y->T == type_str)
 		f = Qnum((double)length_common(get_str(x),get_str(y)));
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(x);
 	drop(y);
 	return f;

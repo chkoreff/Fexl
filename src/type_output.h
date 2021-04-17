@@ -1,3 +1,7 @@
+extern struct value Qput;
+extern struct value Qnl;
+extern struct value Qfput;
+extern struct value Qfnl;
 extern value type_put(value f);
 extern value type_nl(value f);
 extern value type_say(value f);

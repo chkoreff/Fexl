@@ -3,7 +3,6 @@
 
 #include <basic.h>
 #include <crypto.h>
-#include <standard.h>
 #include <stdio.h>
 #include <string.h> /* strcmp strlen */
 #include <type_buf.h>
@@ -20,12 +19,17 @@
 #include <type_rand.h>
 #include <type_run.h>
 #include <type_signal.h>
+#include <type_standard.h>
 #include <type_str.h>
 #include <type_sym.h>
 #include <type_time.h>
 #include <type_tuple.h>
 #include <type_var.h>
 #include <type_with.h>
+
+static struct value QY = {1, type_Y, 0, 0};
+static struct value Qparse_file = {1, type_parse_file, 0, 0};
+static struct value Qevaluate = {1, type_evaluate, 0, 0};
 
 static const char *cur_name;
 
@@ -39,11 +43,11 @@ static value standard(value name)
 	{
 	cur_name = str_data(name);
 
-	if (match("put")) return hold(Qput);
-	if (match("nl")) return hold(Qnl);
+	if (match("put")) return hold(&Qput);
+	if (match("nl")) return hold(&Qnl);
 	if (match("say")) return Q(type_say);
-	if (match("fput")) return hold(Qfput);
-	if (match("fnl")) return hold(Qfnl);
+	if (match("fput")) return hold(&Qfput);
+	if (match("fnl")) return hold(&Qfnl);
 	if (match("fsay")) return Q(type_fsay);
 	if (match("fflush")) return Q(type_fflush);
 
@@ -71,15 +75,15 @@ static value standard(value name)
 	if (match("ge")) return Q(type_ge);
 	if (match("gt")) return Q(type_gt);
 
-	if (match("I")) return hold(QI);
-	if (match("T")) return hold(QT);
-	if (match("F")) return hold(QF);
-	if (match("@")) return hold(QY);
-	if (match("void")) return hold(Qvoid);
-	if (match("cons")) return hold(Qcons);
-	if (match("null")) return hold(Qnull);
-	if (match("eval")) return hold(Qeval);
-	if (match("yield")) return hold(Qyield);
+	if (match("I")) return hold(&QI);
+	if (match("T")) return hold(&QT);
+	if (match("F")) return hold(&QF);
+	if (match("@")) return hold(&QY);
+	if (match("void")) return hold(&Qvoid);
+	if (match("cons")) return hold(&Qcons);
+	if (match("null")) return hold(&Qnull);
+	if (match("eval")) return hold(&Qeval);
+	if (match("yield")) return hold(&Qyield);
 
 	if (match("is_defined")) return Q(type_is_defined);
 	if (match("is_void")) return Q(type_is_void);
@@ -161,8 +165,8 @@ static value standard(value name)
 	if (match("rand")) return Q(type_rand);
 
 	if (match("parse")) return Q(type_parse);
-	if (match("parse_file")) return hold(Qparse_file);
-	if (match("evaluate")) return hold(Qevaluate);
+	if (match("parse_file")) return hold(&Qparse_file);
+	if (match("evaluate")) return hold(&Qevaluate);
 	if (match("resolve")) return Q(type_resolve);
 
 	if (match("buf_new")) return Q(type_buf_new);
@@ -222,83 +226,15 @@ value type_standard(value f)
 		{
 		value def = standard(name);
 		if (def)
-			f = AV(hold(Qyield),def);
+			f = AV(hold(&Qyield),def);
 		else
-			f = hold(Qvoid);
+			f = hold(&Qvoid);
 		}
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(name);
 	return f;
 	}
-	}
-
-value Qsubst;
-value Qtuple;
-value QI;
-value QT;
-value QF;
-value QY;
-value Qvoid;
-value Qcons;
-value Qnull;
-value Qeval;
-value Qyield;
-value Qcatch;
-value Qonce;
-value Qput;
-value Qnl;
-value Qfput;
-value Qfnl;
-value Qparse_file;
-value Qevaluate;
-
-static void beg_const(void)
-	{
-	Qsubst = Q(type_subst);
-	Qtuple = Q(type_tuple);
-	QI = Q(type_I);
-	QT = Q(type_T);
-	QF = Q(type_F);
-	QY = Q(type_Y);
-	Qvoid = Q(type_void);
-	Qcons = Q(type_cons);
-	Qnull = Q(type_null);
-	Qeval = Q(type_eval);
-	Qyield = Q(type_yield);
-	Qcatch = Q(type_catch);
-	Qonce = Q(type_once);
-	Qput = Q(type_put);
-	Qnl = Q(type_nl);
-	Qfput = Q(type_fput);
-	Qfnl = Q(type_fnl);
-	Qparse_file = Q(type_parse_file);
-	Qevaluate = Q(type_evaluate);
-	init_signal();
-	}
-
-static void end_const(void)
-	{
-	drop(Qsubst);
-	drop(Qtuple);
-	drop(QI);
-	drop(QT);
-	drop(QF);
-	drop(QY);
-	drop(Qvoid);
-	drop(Qcons);
-	drop(Qnull);
-	drop(Qeval);
-	drop(Qyield);
-	drop(Qcatch);
-	drop(Qonce);
-	drop(Qput);
-	drop(Qnl);
-	drop(Qfput);
-	drop(Qfnl);
-	drop(Qparse_file);
-	drop(Qevaluate);
-	close_random();
 	}
 
 /*
@@ -336,8 +272,8 @@ static void eval_script(void)
 		}
 
 	/* Now evaluate the script. */
-	f = AV(hold(Qparse_file),f);
-	f = AV(AV(hold(Qevaluate),Q(type_standard)),f);
+	f = AV(hold(&Qparse_file),f);
+	f = AV(AV(hold(&Qevaluate),Q(type_standard)),f);
 	f = eval(f);
 	drop(f);
 	}
@@ -346,8 +282,8 @@ void eval_standard(int argc, const char *argv[])
 	{
 	main_argc = argc;
 	main_argv = argv;
-	beg_const();
+	init_signal();
 	eval_script();
-	end_const();
+	close_random();
 	end_value();
 	}

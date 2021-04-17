@@ -5,10 +5,12 @@
 #include <die.h>
 #include <memory.h>
 #include <report.h>
-#include <standard.h>
 #include <string.h> /* strcmp */
 #include <type_str.h>
 #include <type_sym.h>
+#include <type_tuple.h>
+
+struct value Qsubst = {1, type_subst, 0, 0};
 
 static void sym_free(struct symbol *sym)
 	{
@@ -59,8 +61,8 @@ struct form *form_ref(string name, unsigned long line)
 	sym->next = 0;
 	sym->name = name;
 	sym->line = line;
-	sym->pattern = hold(QT);
-	return form_new(sym,hold(QI));
+	sym->pattern = hold(&QT);
+	return form_new(sym,hold(&QI));
 	}
 
 /* Merge the symbol lists and combine patterns where they intersect. */
@@ -79,13 +81,13 @@ static struct symbol *sym_merge(struct symbol *fun, struct symbol *arg)
 
 	if (cmp < 0)
 		{
-		fun->pattern = A(fun->pattern,hold(QF));
+		fun->pattern = A(fun->pattern,hold(&QF));
 		fun->next = sym_merge(fun->next,arg);
 		return fun;
 		}
 	else if (cmp > 0)
 		{
-		arg->pattern = A(hold(QF),arg->pattern);
+		arg->pattern = A(hold(&QF),arg->pattern);
 		arg->next = sym_merge(fun,arg->next);
 		return arg;
 		}
@@ -131,7 +133,7 @@ static struct symbol *sym_pop(const char *name, struct symbol *sym,
 
 	if (cmp < 0)
 		{
-		*pattern = hold(QF); /* not found */
+		*pattern = hold(&QF); /* not found */
 		return sym;
 		}
 	else if (cmp > 0)
@@ -154,7 +156,7 @@ static void sym_merge0(struct symbol *sym)
 	struct symbol *cur = sym;
 	while (cur)
 		{
-		cur->pattern = A(hold(QF),cur->pattern);
+		cur->pattern = A(hold(&QF),cur->pattern);
 		cur = cur->next;
 		}
 	}
@@ -166,34 +168,36 @@ struct form *form_lam(const char *name, struct form *body)
 	struct symbol *sym = sym_pop(name,body->sym,&pattern);
 	sym_merge0(sym);
 	body->sym = sym;
-	body->exp = AV(AV(hold(Qsubst),pattern),body->exp);
+	body->exp = AV(AV(hold(&Qsubst),pattern),body->exp);
 	return body;
 	}
 
 /* Make a list with the head and tail. */
 struct form *form_cons(struct form *head, struct form *tail)
 	{
-	return form_appv(form_appv(form_val(hold(Qcons)),head),tail);
+	return form_appv(form_appv(form_val(hold(&Qcons)),head),tail);
 	}
+
+static struct value Qonce = {1, type_once, 0, 0};
 
 /* Make a form which evaluates its argument once on demand. */
 struct form *form_once(struct form *exp)
 	{
-	return form_appv(form_val(hold(Qonce)),exp);
+	return form_appv(form_val(hold(&Qonce)),exp);
 	}
 
 /* Make a tuple from the given arguments. */
 struct form *form_tuple(struct form *args)
 	{
 	sym_merge0(args->sym);
-	args->exp = AV(hold(Qtuple),args->exp);
+	args->exp = AV(hold(&Qtuple),args->exp);
 	return args;
 	}
 
 /* Evaluate def and apply exp to that value. */
 struct form *form_eval(struct form *def, struct form *exp)
 	{
-	return form_appv(form_appv(form_val(hold(Qeval)),def),exp);
+	return form_appv(form_appv(form_val(hold(&Qeval)),def),exp);
 	}
 
 value type_form(value f)
@@ -216,8 +220,8 @@ struct form *form_quo(struct form *exp)
 the places designated by the pattern. */
 static value subst(value p, value e, value x)
 	{
-	if (p == QF) return hold(e);
-	if (p == QT) return hold(x);
+	if (p == &QF) return hold(e);
+	if (p == &QT) return hold(x);
 	return V(e->T,subst(p->L,e->L,x),subst(p->R,e->R,x));
 	}
 
@@ -228,6 +232,15 @@ value type_subst(value f)
 	return subst(f->L->L->R,f->L->R,f->R);
 	}
 
+/* Catch arguments but do nothing.  Used internally for symbol resolution. */
+value type_catch(value f)
+	{
+	(void)f;
+	return 0;
+	}
+
+static struct value Qcatch = {1, type_catch, 0, 0};
+
 static value resolve_name(value context, string name)
 	{
 	/* "standard" always refers to the current context. */
@@ -236,7 +249,7 @@ static value resolve_name(value context, string name)
 
 	{
 	value key = Qstr(name);
-	value val = eval(A(A(hold(context),hold(key)),hold(Qcatch)));
+	value val = eval(A(A(hold(context),hold(key)),hold(&Qcatch)));
 	key->R = 0;
 	drop(key);
 
@@ -268,7 +281,7 @@ static value resolve(value context, struct form *form)
 			{
 			undefined = 1;
 			undefined_symbol(sym->name->data,sym->line,label);
-			val = hold(Qvoid);
+			val = hold(&Qvoid);
 			}
 
 		{
@@ -300,7 +313,7 @@ value type_evaluate(value f)
 		f = resolve(context,form);
 		}
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(context);
 	drop(exp);
 	return f;
@@ -311,6 +324,6 @@ value type_evaluate(value f)
 value type_resolve(value f)
 	{
 	f = type_evaluate(f);
-	if (f) f = AV(hold(Qyield),f);
+	if (f) f = AV(hold(&Qyield),f);
 	return f;
 	}

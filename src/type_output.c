@@ -5,11 +5,15 @@
 #include <basic.h>
 #include <file.h>
 #include <file_str.h>
-#include <standard.h>
 #include <type_file.h>
 #include <type_num.h>
 #include <type_output.h>
 #include <type_str.h>
+
+struct value Qput = {1, type_put, 0, 0};
+struct value Qnl = {1, type_nl, 0, 0};
+struct value Qfput = {1, type_fput, 0, 0};
+struct value Qfnl = {1, type_fnl, 0, 0};
 
 static value op_put(FILE *fh, value f)
 	{
@@ -27,7 +31,7 @@ static value op_put(FILE *fh, value f)
 		else if (x->T == type_F && !x->L)
 			fput_ch(fh,'F');
 
-		f = hold(QI);
+		f = hold(&QI);
 		}
 	drop(x);
 	return f;
@@ -43,13 +47,13 @@ value type_nl(value f)
 	{
 	(void)f;
 	fnl(stdout);
-	return hold(QI);
+	return hold(&QI);
 	}
 
 value type_say(value f)
 	{
 	if (!f->L) return 0;
-	return A(AV(hold(Qput),hold(f->R)),hold(Qnl));
+	return A(AV(hold(&Qput),hold(f->R)),hold(&Qnl));
 	}
 
 value type_fput(value f)
@@ -60,7 +64,7 @@ value type_fput(value f)
 	if (out->T == type_file)
 		f = op_put(get_fh(out),f);
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(out);
 	return f;
 	}
@@ -74,10 +78,10 @@ value type_fnl(value f)
 	if (out->T == type_file)
 		{
 		fnl(get_fh(out));
-		f = hold(QI);
+		f = hold(&QI);
 		}
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(out);
 	return f;
 	}
@@ -86,8 +90,8 @@ value type_fnl(value f)
 value type_fsay(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
-	return A(A(AV(hold(Qfput),hold(f->L->R)),hold(f->R)),
-		AV(hold(Qfnl),hold(f->L->R)));
+	return A(A(AV(hold(&Qfput),hold(f->L->R)),hold(f->R)),
+		AV(hold(&Qfnl),hold(f->L->R)));
 	}
 
 value type_fflush(value f)
@@ -98,10 +102,10 @@ value type_fflush(value f)
 	if (out->T == type_file)
 		{
 		fflush(get_fh(out));
-		f = hold(QI);
+		f = hold(&QI);
 		}
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(out);
 	return f;
 	}

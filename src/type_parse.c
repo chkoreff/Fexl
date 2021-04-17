@@ -4,10 +4,10 @@
 #include <stdio.h>
 #include <value.h>
 
+#include <basic.h>
 #include <die.h>
 #include <file.h>
 #include <parse.h>
-#include <standard.h>
 #include <type_file.h>
 #include <type_istr.h>
 #include <type_parse.h>
@@ -50,10 +50,10 @@ value type_parse(value f)
 		else if (source->T == type_istr)
 			f = parse_istr(get_istr(source),label);
 		else
-			f = hold(Qvoid);
+			f = hold(&Qvoid);
 		}
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(source);
 	drop(label);
 	return f;
@@ -87,7 +87,7 @@ value type_parse_file(value f)
 	if (name->T == type_str)
 		f = parse_file(name);
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(name);
 	return f;
 	}

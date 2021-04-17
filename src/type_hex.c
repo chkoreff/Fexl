@@ -1,7 +1,7 @@
 #include <value.h>
 #include <str.h>
 
-#include <standard.h>
+#include <basic.h>
 #include <type_hex.h>
 #include <type_str.h>
 
@@ -62,7 +62,7 @@ value type_unpack(value f)
 	if (x->T == type_str)
 		f = Qstr(unpack(get_str(x)));
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}
@@ -77,7 +77,7 @@ value type_pack(value f)
 	if (x->T == type_str)
 		f = Qstr(pack(get_str(x)));
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}

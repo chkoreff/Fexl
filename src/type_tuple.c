@@ -2,9 +2,10 @@
 #include <value.h>
 
 #include <basic.h>
-#include <standard.h>
 #include <type_num.h>
 #include <type_tuple.h>
+
+struct value Qtuple = {1, type_tuple, 0, 0};
 
 static value subst_tuple(value args, value handler)
 	{
@@ -43,7 +44,7 @@ value type_arity(value f)
 		f = Qnum((double)arity);
 		}
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}
@@ -65,13 +66,13 @@ value type_split_tuple(value f)
 			f = hold(f->L->R);
 		else
 			{
-			value left = AV(hold(Qtuple),hold(args->R));
+			value left = AV(hold(&Qtuple),hold(args->R));
 			value item = hold(args->L);
 			f = A(A(hold(f->R),left),item);
 			}
 		}
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}
@@ -85,9 +86,9 @@ value type_join_tuple(value f)
 	{
 	value x = arg(f->L->R);
 	if (x->T == type_tuple)
-		f = AV(hold(Qtuple),A(hold(f->R),hold(x->R)));
+		f = AV(hold(&Qtuple),A(hold(f->R),hold(x->R)));
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}

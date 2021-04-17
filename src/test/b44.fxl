@@ -1,0 +1,16 @@
+#
+evaluate (use "test.fxl" standard) \;
+
+# Infinite list of null strings.
+\list==(@; cons "" )
+\list==(first 100000 list)
+
+(
+show_benchmark;
+say list
+)
+
+(
+show_benchmark;
+fsay stdout list
+)

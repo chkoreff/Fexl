@@ -1,15 +1,14 @@
+/* The define ensures that strptime is accessible. */
+#define _GNU_SOURCE
 #include <stdint.h>
+#include <sys/time.h>
+#include <time.h>
+
 #include <str.h>
 #include <value.h>
 
+#include <basic.h>
 #include <format.h>
-#include <standard.h>
-#include <sys/time.h>
-
-/* The define ensures that strptime is accessible. */
-#define __USE_XOPEN
-#include <time.h>
-
 #include <type_num.h>
 #include <type_str.h>
 #include <type_time.h>
@@ -41,7 +40,7 @@ static value op_strftime(value f, struct tm *(*convert)(const time_t *))
 		f = Qstr0(buf);
 		}
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}
@@ -61,10 +60,10 @@ static value op_strptime(value f, time_t (*convert)(struct tm *tm))
 		if (result)
 			f = Qnum(convert(&tm));
 		else
-			f = hold(Qvoid);
+			f = hold(&Qvoid);
 		}
 	else
-		f = hold(Qvoid);
+		f = hold(&Qvoid);
 	drop(x);
 	return f;
 	}
