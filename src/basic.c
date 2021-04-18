@@ -39,6 +39,12 @@ value type_Y(value f)
 	return A(hold(f->R),hold(f));
 	}
 
+value type_atom(value f)
+	{
+	if (!f->L->N) return 0;
+	return hold(&Qvoid);
+	}
+
 /* (void x) = void */
 value type_void(value f)
 	{

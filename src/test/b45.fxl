@@ -1,0 +1,34 @@
+# Demonstrate built-in "with".
+evaluate (use "test.fxl" standard) \;
+show_benchmark;
+
+\q="q"
+
+\f=
+	(
+	with "x" (+ 0 1);
+	with "y" 2;
+	with 3 "whatever";
+	with q (put "!" . q q);
+	(I I)
+	)
+
+\try=
+	(\x
+	\y=(f x)
+	say [x" => "y]
+	)
+
+\run==
+(
+try "x"
+try 3
+try "y"
+try q
+try "z"
+nl
+)
+
+run
+run
+run

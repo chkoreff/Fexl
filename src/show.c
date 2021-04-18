@@ -2,8 +2,6 @@
 #include <str.h>
 #include <value.h>
 
-#include <type_sym.h>
-
 #include <basic.h>
 #include <output.h>
 #include <output_str.h>
@@ -21,10 +19,12 @@
 #include <type_run.h>
 #include <type_standard.h>
 #include <type_str.h>
+#include <type_sym.h>
 #include <type_tuple.h>
 #include <type_var.h>
+#include <type_with.h>
 
-void put_type(type t)
+static void put_type(type t)
 	{
 	if (t == type_A) put_ch('A');
 
@@ -165,6 +165,10 @@ void put_type(type t)
 
 	else if (t == type_form) put("form");
 
+	else if (t == type_assoc) put("assoc");
+	else if (t == type_with) put("with");
+	else if (t == type_fetch) put("fetch");
+
 	else put_ch('?');
 	}
 
@@ -207,6 +211,26 @@ static void show_form(struct form *form)
 static unsigned long max_depth;
 static unsigned long max_call;
 
+static void limit_show(value f);
+
+static void show_atom(value f)
+	{
+	if (f->T == type_num)
+		put_double(get_double(f));
+	else if (f->T == type_str)
+		put_quote(get_str(f));
+	else if (f->T == type_var)
+		limit_show(f->R);
+	else if (f->T == type_buf || f->T == type_istr)
+		put("...");
+	else if (f->T == type_file)
+		put_ulong(fileno(get_fh(f)));
+	else if (f->T == type_form)
+		show_form((struct form *)f->R);
+	else
+		put_ch('?');
+	}
+
 static void limit_show(value f)
 	{
 	if (max_call == 0 || max_depth == 0)
@@ -223,27 +247,14 @@ static void limit_show(value f)
 	if (f->L)
 		{
 		put_ch(' ');
-		limit_show(f->L);
-		put_ch(' ');
-		limit_show(f->R);
-		}
-	else if (f->R)
-		{
-		put_ch(' ');
-		if (f->T == type_num)
-			put_double(get_double(f));
-		else if (f->T == type_str)
-			put_quote(get_str(f));
-		else if (f->T == type_var)
+		if (f->L->N)
+			{
+			limit_show(f->L);
+			put_ch(' ');
 			limit_show(f->R);
-		else if (f->T == type_buf || f->T == type_istr)
-			put("...");
-		else if (f->T == type_file)
-			put_ulong(fileno(get_fh(f)));
-		else if (f->T == type_form)
-			show_form((struct form *)f->R);
+			}
 		else
-			put_ch('?');
+			show_atom(f);
 		}
 	put_ch(']');
 

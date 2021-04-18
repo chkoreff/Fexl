@@ -33,7 +33,7 @@ static void form_discard(struct form *form)
 	free_memory(form,sizeof(struct form));
 	}
 
-void form_free(struct form *form)
+static void form_free(struct form *form)
 	{
 	struct symbol *sym = form->sym;
 	while (sym)
@@ -46,6 +46,17 @@ void form_free(struct form *form)
 	if (form->label)
 		drop(form->label);
 	form_discard(form);
+	}
+
+value type_form(value f)
+	{
+	return type_atom(f);
+	}
+
+value Qform(struct form *exp)
+	{
+	static struct value atom = {0, (type)form_free};
+	return V(type_form,&atom,(value)exp);
 	}
 
 /* Make a reference to a fixed value with no symbols. */
@@ -200,20 +211,10 @@ struct form *form_eval(struct form *def, struct form *exp)
 	return form_appv(form_appv(form_val(hold(&Qeval)),def),exp);
 	}
 
-value type_form(value f)
-	{
-	if (f->N == 0)
-		{
-		form_free((struct form *)f->R);
-		return 0;
-		}
-	return type_void(f);
-	}
-
 /* Make a quoted (unresolved form). */
 struct form *form_quo(struct form *exp)
 	{
-	return form_val(D(type_form,exp));
+	return form_val(Qform(exp));
 	}
 
 /* Use pattern p to make a copy of expression e with argument x substituted in
@@ -250,6 +251,8 @@ static value resolve_name(value context, string name)
 	{
 	value key = Qstr(name);
 	value val = eval(A(A(hold(context),hold(key)),hold(&Qcatch)));
+
+	key->L = 0;
 	key->R = 0;
 	drop(key);
 

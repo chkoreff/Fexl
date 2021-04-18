@@ -17,46 +17,36 @@ static int cmp_key(value x, value y)
 		return 0;
 	}
 
+/* Look up the value associated with a key. */
 value type_assoc(value f)
 	{
-	if (f->N == 0)
-		{
-		drop((value)f->R->T);
-		drop(f->R);
-		return 0;
-		}
-
-	if (!f->L) return 0;
+	if (!f->L->L->L->L) return 0;
 	{
+	value obj = f->L;
 	value x = arg(f->R);
-	value curr = f->L;
 	while (1)
 		{
-		value key = (value)curr->R->T;
-		if (cmp_key(x,key))
+		value key = obj->L->L->R;
+		if (cmp_key(key,x))
 			{
-			f = hold(curr->R->L);
-			break;
+			drop(x);
+			return hold(obj->L->R);
 			}
-		curr = curr->R->R;
-		if (curr->T != type_assoc)
-			{
-			f = A(hold(curr),hold(x));
-			break;
-			}
+
+		obj = obj->R;
+		if (obj->T != type_assoc)
+			return AV(hold(obj),x);
 		}
-	drop(x);
-	return f;
 	}
 	}
 
 static value Qassoc(value key, value val, value obj)
 	{
-	return D(type_assoc,V((type)key,val,obj));
+	return V(type_assoc,A(A(hold(&QI),key),val),obj);
 	}
 
 /* (with key val obj)
-Return an object like obj but with key defined as val.
+Return a function like obj but with key defined as val.
 Equivalent to:
 \with=(\key\val\obj \obj=obj \x eq x key val; obj x)
 */
@@ -73,8 +63,8 @@ value type_with(value f)
 
 /* (fetch v k x)
 Return the value at key k in index v.  If no value, store the value of x in
-the index so you get the same value next time.
-Equivalent to:
+the index so you get the same value next time.  Equivalent to:
+
 \fetch=
 	(\v\k\x
 	\y=(var_get v k)
@@ -89,28 +79,27 @@ value type_fetch(value f)
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 	{
 	value v = arg(f->L->L->R);
-	value k = arg(f->L->R);
-	value x = hold(f->R);
 	if (v->T == type_var)
 		{
+		value k = arg(f->L->R);
 		value y = eval(A(hold(v->R),hold(k)));
 		if (y->T != type_void)
 			f = y;
 		else
 			{
+			value x = hold(f->R);
 			drop(y);
 			x = eval(x);
 			y = Qassoc(hold(k),hold(x),hold(v->R));
 			drop(v->R);
 			v->R = y;
-			f = hold(x);
+			f = x;
 			}
+		drop(k);
 		}
 	else
 		f = hold(&Qvoid);
 	drop(v);
-	drop(k);
-	drop(x);
 	return f;
 	}
 	}

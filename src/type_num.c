@@ -9,21 +9,22 @@
 #include <type_num.h>
 #include <type_str.h>
 
+static void num_free(double *p)
+	{
+	free_memory(p,sizeof(double));
+	}
+
 value type_num(value f)
 	{
-	if (f->N == 0)
-		{
-		free_memory(f->R,sizeof(double));
-		return 0;
-		}
-	return type_void(f);
+	return type_atom(f);
 	}
 
 value Qnum(double x)
 	{
+	static struct value atom = {0, (type)num_free};
 	double *p = new_memory(sizeof(double));
 	*p = x;
-	return D(type_num,p);
+	return V(type_num,&atom,(value)p);
 	}
 
 value Qnum_str0(const char *name)

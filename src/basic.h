@@ -10,6 +10,7 @@ extern value type_I(value f);
 extern value type_T(value f);
 extern value type_F(value f);
 extern value type_Y(value f);
+extern value type_atom(value f);
 extern value type_void(value f);
 extern value type_cons(value f);
 extern value type_null(value f);

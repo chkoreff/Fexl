@@ -435,6 +435,6 @@ value parse_input(input _get, void *_source, value _label)
 	if (ch != -1)
 		syntax_error("Extraneous input", line);
 	exp->label = hold(label);
-	return D(type_form,exp);
+	return Qform(exp);
 	}
 	}

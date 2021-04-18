@@ -14,17 +14,13 @@ string get_str(value x)
 
 value type_str(value f)
 	{
-	if (f->N == 0)
-		{
-		str_free(get_str(f));
-		return 0;
-		}
-	return type_void(f);
+	return type_atom(f);
 	}
 
 value Qstr(string x)
 	{
-	return D(type_str,x);
+	static struct value atom = {0, (type)str_free};
+	return V(type_str,&atom,(value)x);
 	}
 
 value Qstr0(const char *data)

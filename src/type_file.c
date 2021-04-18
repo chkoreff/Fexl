@@ -19,14 +19,18 @@
 
 value type_file(value f)
 	{
-	if (f->N == 0)
-		return 0;
-	return type_void(f);
+	return type_atom(f);
+	}
+
+static void fh_free(FILE *fh)
+	{
+	(void)fh; /* We don't automatically close file handles */
 	}
 
 value Qfile(FILE *fh)
 	{
-	return D(type_file,fh);
+	static struct value atom = {0, (type)fh_free};
+	return V(type_file,&atom,(value)fh);
 	}
 
 FILE *get_fh(value x)

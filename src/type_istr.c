@@ -25,6 +25,12 @@ static void istr_free(struct istr *in)
 	free_memory(in,sizeof(struct istr));
 	}
 
+value Qistr(value x)
+	{
+	static struct value atom = {0, (type)istr_free};
+	return V(type_istr,&atom,(value)istr_new(x));
+	}
+
 int sgetc(struct istr *in)
 	{
 	string str = get_str(in->str);
@@ -37,12 +43,6 @@ static int slook(struct istr *in)
 	return in->pos < str->len ? (unsigned char)str->data[in->pos] : -1;
 	}
 
-value Qistr(value x)
-	{
-	struct istr *in = istr_new(x);
-	return D(type_istr,in);
-	}
-
 struct istr *get_istr(value x)
 	{
 	return (struct istr *)x->R;
@@ -50,12 +50,7 @@ struct istr *get_istr(value x)
 
 value type_istr(value f)
 	{
-	if (f->N == 0)
-		{
-		istr_free(get_istr(f));
-		return 0;
-		}
-	return type_void(f);
+	return type_atom(f);
 	}
 
 /* (readstr str) returns an iterator on the string. */

@@ -9,10 +9,17 @@ The N field is the reference count.
 
 The T field is the type, a C routine which steps the value during evaluation.
 
-The L and R fields are the left and right components of the value.
-If L != 0 and R != 0, the value represents the application of L to R.
-If L == 0 and R == 0, the value represents a primary function.
-If L == 0 and R != 0, the value represents an atom, and R points to the data.
+The L and R fields are the left and right components of the value, defined as
+follows:
+
+1. If L == 0, then R == 0 and the value is a primary function (combinator).
+
+2. If L != 0 and L->N == 0, the value is an atom.  R points to the data, and
+L->T points to the function that frees the data when N == 0.
+
+3. If L != 0 and L->N > 0, the value is the function application of L to R.
+
+See the "drop" routine below for a succinct example of those rules.
 
 The N field also serves to link values on the free list.  It is not strictly
 portable to store a pointer in an unsigned long field, but people have relied
@@ -52,16 +59,18 @@ void drop(value f)
 	{
 	if (f->N == 0) die("XDROP");
 	if (--f->N > 0) return;
-
-	if (f->L) /* Clear pair. */
+	if (f->L)
 		{
-		drop(f->L);
-		drop(f->R);
-		}
-	else if (f->R) /* Clear atom. */
-		{
-		f->N = 0;
-		f->T(f);
+		if (f->L->N)
+			{
+			drop(f->L);
+			drop(f->R);
+			}
+		else
+			{
+			void (*free)(void *) = (void *)f->L->T;
+			free(f->R);
+			}
 		}
 	push_free(f);
 	}
@@ -93,12 +102,6 @@ value V(type T, value L, value R)
 value Q(type T)
 	{
 	return V(T,0,0);
-	}
-
-/* Create an atom of type T with the given data. */
-value D(type T, void *data)
-	{
-	return V(T,0,data);
 	}
 
 /* Apply x to y where x is known to be already evaluated. */

@@ -13,19 +13,15 @@ static buffer get_buf(value x)
 
 value type_buf(value f)
 	{
-	if (f->N == 0)
-		{
-		buf_free(get_buf(f));
-		return 0;
-		}
-	return type_void(f);
+	return type_atom(f);
 	}
 
 /* buf_new returns a new empty character buffer. */
 value type_buf_new(value f)
 	{
+	static struct value atom = {0, (type)buf_free};
 	(void)f;
-	return D(type_buf,buf_new());
+	return V(type_buf,&atom,(value)buf_new());
 	}
 
 /* (buf_put buf str) Appends the string to the buffer. */
