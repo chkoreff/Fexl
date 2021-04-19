@@ -1,5 +1,4 @@
 # Demonstrate built-in "with".
-evaluate (use "test.fxl" standard) \;
 show_benchmark;
 
 \q="q"

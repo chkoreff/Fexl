@@ -1,5 +1,4 @@
 # Test reading CSV and SSV data.
-evaluate (use "test.fxl" standard) \;
 show_benchmark;
 
 \try_chars=

@@ -9,16 +9,6 @@
 	say "]"
 	)
 
-\run_benchmark=
-	(\show\f
-	fexl_benchmark f \val\steps\bytes
-	show ["steps "steps" bytes "bytes]
-	val
-	)
-
-\do_benchmark=(run_benchmark trace)
-\show_benchmark=(run_benchmark say)
-
 \show_str=
 	(\text
 	is_void text (say "void");
@@ -35,8 +25,6 @@
 def "div" div;
 def "show_list" show_list;
 def "run_test" run_test;
-def "do_benchmark" do_benchmark;
-def "show_benchmark" show_benchmark;
 def "show_str" show_str;
 def "show_hex" show_hex;
 standard

@@ -1,5 +1,4 @@
 #
-evaluate (use "test.fxl" standard) \;
 (
 \try=
 	(\path

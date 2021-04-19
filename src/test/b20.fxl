@@ -1,13 +1,8 @@
 #
-evaluate
-(
-use "bn.fxl";
-#use "test.fxl";
-standard
-) \;
+evaluate (use "bn.fxl"; standard) \;
 
-#do_benchmark;
-#trace_elapsed;
+##trace_elapsed;
+show_benchmark;
 
 \test_bn==
 (

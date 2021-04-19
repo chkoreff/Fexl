@@ -1,7 +1,6 @@
 #
 \test=
-	(
-	\name
+	(\name
 
 	put ["test "name" "]
 

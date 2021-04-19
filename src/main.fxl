@@ -68,19 +68,51 @@
 \import=(\cx\key with key (cx key))
 \import_as=(\cx\key\name with name (cx key))
 
-\cx_lib=
-	(
-	:: standard;
-	def "def" def;
-	def "if" if;
-	def "NL" NL;
-	def "QU" QU;
-	def "CR" CR;
-	def "LF" LF;
-	def "trace" trace;
-	def "error" error;
-	void
+\run_benchmark=
+	(\show\f
+	fexl_benchmark f \val\steps\bytes
+	show ["steps "steps" bytes "bytes]
+	val
 	)
+
+\do_benchmark=(run_benchmark trace)
+\show_benchmark=(run_benchmark say)
+
+\cx_lib=
+(
+:: standard;
+
+def "def" def;
+def "if" if;
+def "::" ::;
+
+def "use" use;
+def "use_file" use_file;
+
+def "check" check;
+def "default" default;
+
+def "path_under" path_under;
+def "dir_base" dir_base;
+def "dir_local" dir_local;
+
+def "trace" trace;
+def "error" error;
+
+def "TAB" TAB;
+def "NL" NL;
+def "CR" CR;
+def "LF" LF;
+def "QU" QU;
+
+def "remember" remember;
+def "cache" cache;
+def "import" import;
+def "import_as" import_as;
+def "do_benchmark" do_benchmark;
+def "show_benchmark" show_benchmark;
+void
+)
 
 \cx_bool==(\= use_lib "bool.fxl"; cx_lib)
 \cx_math==(\= use_lib "math.fxl"; cx_lib)
@@ -185,39 +217,9 @@
 	void
 	)
 
-# Evaluate the user's script.
+# Evaluate the user's script, chaining the libraries to load on demand.
 use_file script_name;
-:: standard;
-
-def "def" def;
-def "if" if;
-def "::" ::;
-
-def "use" use;
-def "use_file" use_file;
-
-def "check" check;
-def "default" default;
-
-def "path_under" path_under;
-def "dir_base" dir_base;
-def "dir_local" dir_local;
-
-def "trace" trace;
-def "error" error;
-
-def "TAB" TAB;
-def "NL" NL;
-def "CR" CR;
-def "LF" LF;
-def "QU" QU;
-
-def "remember" remember;
-def "cache" cache;
-def "import" import;
-def "import_as" import_as;
-
-# Chain the libraries to load on demand.
+:: cx_lib;
 :: cx_bool;
 :: cx_math;
 :: cx_list;

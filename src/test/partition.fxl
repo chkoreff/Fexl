@@ -1,5 +1,4 @@
 # This demo was inspired by the Mathologer on Youtube.
-evaluate (use "test.fxl" standard) \;
 
 \use_bn=T # Use big numbers if true.
 
