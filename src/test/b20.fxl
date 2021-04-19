@@ -1,7 +1,7 @@
 #
 evaluate (use "bn.fxl"; standard) \;
 
-##trace_elapsed;
+#trace_elapsed;
 show_benchmark;
 
 \test_bn==

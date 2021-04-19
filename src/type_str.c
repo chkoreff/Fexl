@@ -149,9 +149,6 @@ value type_slice(value f)
 	}
 	}
 
-/*LATER 20190102 a search_chars function where you give it a list of chars to
-search for. */
-
 /* (search haystack needle offset) calls str_search. */
 value type_search(value f)
 	{

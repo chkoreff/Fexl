@@ -25,5 +25,3 @@ static value op_limit(value f, void op(unsigned long))
 value type_limit_time(value f) { return op_limit(f,limit_time); }
 value type_limit_stack(value f) { return op_limit(f,limit_stack); }
 value type_limit_memory(value f) { return op_limit(f,limit_memory); }
-
-/* LATER RLIMIT_ FSIZE LOCKS NOFILE NPROC */

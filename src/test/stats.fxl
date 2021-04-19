@@ -53,7 +53,6 @@
 # Modigliani risk-adjusted performance
 \relative_stddev=(/ excess_stddev fund_stddev)
 
-# LATER add the mean "risk-free" rate of return, which I set at 0 for now.
 \fund_m2=(* fund_sharpe excess_stddev)
 
 # Sharpe Ratio of Fund vs. Benchmark Return

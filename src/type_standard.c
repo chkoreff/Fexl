@@ -4,7 +4,7 @@
 #include <basic.h>
 #include <crypto.h>
 #include <stdio.h>
-#include <string.h> /* strcmp strlen */
+#include <string.h> /* strcmp */
 #include <type_buf.h>
 #include <type_cmp.h>
 #include <type_crypto.h>
@@ -237,39 +237,19 @@ value type_standard(value f)
 	}
 	}
 
-/*
-The user's script is given by argv[1], or if that is missing, the script is
-read from stdin.
-
-If this program is running as "fexl0", it runs the user's script directly.  If
-it is running as "fexl", it first runs the local script "src/main.fxl".  That
-script defines an extended context, reading in some library files, and then
-runs the user's script in that context.
-
-The purpose of "fexl0" is to give the user the option of bypassing src/main.fxl
-altogether, defining any extensions beyond the built-in C standard context as
-the user pleases.
-*/
+/* Run "src/main.fxl" to evaluate the user's script in an enhanced context.
+The script name is argv[1], or if that is missing, the script is read from
+stdin. */
 static void eval_script(void)
 	{
 	value f;
-	unsigned long len = strlen(main_argv[0]);
-	if (len >= 5 && strcmp(main_argv[0]+len-5,"fexl0") == 0)
-		{
-		/* Running as fexl0, so run the user's script directly. */
-		const char *name = main_argc > 1 ? main_argv[1] : "";
-		f = Qstr0(name);
-		}
-	else
-		{
-		/* Get the name of the currently running executable. */
-		f = Qstr0(main_argv[0]);
-		/* Go two directories up, right above the bin directory. */
-		f = AV(Q(type_dirname),f);
-		f = AV(Q(type_dirname),f);
-		/* Concatenate the name of the main script. */
-		f = AV(AV(Q(type_concat),f),Qstr0("/src/main.fxl"));
-		}
+	/* Get the name of the currently running executable. */
+	f = Qstr0(main_argv[0]);
+	/* Go two directories up, right above the bin directory. */
+	f = AV(Q(type_dirname),f);
+	f = AV(Q(type_dirname),f);
+	/* Concatenate the name of the main script. */
+	f = AV(AV(Q(type_concat),f),Qstr0("/src/main.fxl"));
 
 	/* Now evaluate the script. */
 	f = AV(hold(&Qparse_file),f);

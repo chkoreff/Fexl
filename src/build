@@ -50,4 +50,3 @@ make output_str
 make show
 fi
 link fexl
-ln -fs ../bin/fexl ../bin/fexl0

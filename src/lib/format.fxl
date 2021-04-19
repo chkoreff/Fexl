@@ -77,8 +77,7 @@ format_num
 	. term; . (eq term QU "" " "); . x; term
 	)
 
-# Convert string to upper-case.  Only works with ASCII characters though.
-# LATER 20160331 Make it work with full utf8.
+# Convert ASCII string to upper-case.
 \uc=
 	(
 	str_map \ch
