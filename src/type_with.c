@@ -42,7 +42,7 @@ value type_assoc(value f)
 
 static value Qassoc(value key, value val, value obj)
 	{
-	return V(type_assoc,A(A(hold(&QI),key),val),obj);
+	return V(type_assoc,A(A(hold(QI),key),val),obj);
 	}
 
 /* (with key val obj)
@@ -98,7 +98,7 @@ value type_fetch(value f)
 		drop(k);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(v);
 	return f;
 	}

@@ -13,10 +13,10 @@ static value op_limit(value f, void op(unsigned long))
 	if (x->T == type_num)
 		{
 		op(get_ulong(x));
-		f = hold(&QI);
+		f = hold(QI);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}

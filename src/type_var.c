@@ -17,7 +17,7 @@ value type_var_new(value f)
 	{
 	static struct value atom = {0, (type)drop};
 	(void)f;
-	return V(type_var,&atom,hold(&Qvoid));
+	return V(type_var,&atom,hold(Qvoid));
 	}
 
 /* (var_get var) returns val, where val is the current value of var. */
@@ -29,7 +29,7 @@ value type_var_get(value f)
 	if (x->T == type_var)
 		f = hold(x->R);
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}
@@ -46,10 +46,10 @@ value type_var_put(value f)
 		value v = arg(f->R);
 		drop(x->R);
 		x->R = v;
-		f = hold(&QI);
+		f = hold(QI);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}

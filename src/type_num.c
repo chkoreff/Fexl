@@ -55,7 +55,7 @@ value type_num_str(value f)
 	if (x->T == type_num)
 		f = Qstr(str_new_data0(format_double(get_double(x))));
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}

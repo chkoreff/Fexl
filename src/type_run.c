@@ -41,10 +41,10 @@ value type_argv(value f)
 		if (i >= 0 && i < main_argc)
 			f = Qstr(str_new_data0(main_argv[i]));
 		else
-			f = hold(&Qvoid);
+			f = hold(Qvoid);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}
@@ -59,10 +59,10 @@ static value op_sleep(value f, unsigned int op(unsigned int))
 		{
 		unsigned int n = get_ulong(x);
 		op(n);
-		f = hold(&QI);
+		f = hold(QI);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}
@@ -447,12 +447,12 @@ value type_start_server(value f)
 			if (fh_log)
 				fclose(fh_log);
 			close(fd_listen);
-			f = hold(&QI);
+			f = hold(QI);
 			}
 		}
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 
 	drop(v_ip);
 	drop(v_port);
@@ -479,10 +479,10 @@ value type_kill(value f)
 		pid_t result = waitpid(pid,&status,0);
 		(void)result;
 		}
-		f = hold(&QI);
+		f = hold(QI);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(v_pid);
 	drop(v_sig);
 	return f;
@@ -503,7 +503,7 @@ value type_connect(value f)
 		{
 		int fd_remote = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 		if (fd_remote == -1)
-			f = hold(&Qvoid);
+			f = hold(Qvoid);
 		else
 			{
 			const char *ip = str_data(x);
@@ -517,13 +517,13 @@ value type_connect(value f)
 			retval = connect(fd_remote, (struct sockaddr *)&addr, sizeof(addr));
 
 			if (retval == -1)
-				f = hold(&Qvoid);
+				f = hold(Qvoid);
 			else
 				f = Qfile(do_fdopen(fd_remote,"r+"));
 			}
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 
 	drop(x);
 	drop(y);
@@ -545,7 +545,7 @@ value type_exec(value f)
 	if (!f->L) return 0;
 	{
 	/* Gather args onto a stack in reverse order. */
-	value stack = hold(&Qnull);
+	value stack = hold(Qnull);
 	value list = hold(f->R);
 	unsigned long len = 0;
 	while (1)
@@ -578,13 +578,9 @@ value type_exec(value f)
 	argv[len] = 0; /* ending sentinel */
 	while (curr->T == type_A)
 		{
-		value next = hold(curr->L);
-		value item = curr->R;
-
 		len--;
-		argv[len] = str_data(item);
-
-		curr = next;
+		argv[len] = str_data(curr->R);
+		curr = curr->L;
 		}
 
 	/* Call execv with the argument list. */
@@ -595,7 +591,7 @@ value type_exec(value f)
 	drop(stack);
 	}
 
-	return hold(&QI);
+	return hold(QI);
 	}
 	}
 

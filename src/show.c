@@ -277,5 +277,5 @@ value type_show(value f)
 	{
 	if (!f->R) return 0;
 	show(f->R);nl();
-	return hold(&QI);
+	return hold(QI);
 	}

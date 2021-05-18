@@ -24,7 +24,7 @@ static value op_cmp(value f, int op(int))
 	else if (x->T == type_str && y->T == type_str)
 		f = boolean(op(str_cmp(get_str(x),get_str(y))));
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	drop(y);
 	return f;

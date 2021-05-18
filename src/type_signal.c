@@ -53,10 +53,10 @@ value type_set_alarm(value f)
 	if (x->T == type_num)
 		{
 		alarm(get_ulong(x));
-		f = hold(&QI);
+		f = hold(QI);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}

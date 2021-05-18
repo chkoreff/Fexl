@@ -24,7 +24,7 @@ value type_file(value f)
 
 static void fh_free(FILE *fh)
 	{
-	(void)fh; /* We don't automatically close file handles */
+	(void)fh; /* I don't automatically close file handles */
 	}
 
 value Qfile(FILE *fh)
@@ -51,10 +51,10 @@ value type_fopen(value f)
 		const char *path = str_data(x);
 		const char *mode = str_data(y);
 		FILE *fh = fopen(path,mode);
-		f = fh ? Qfile(fh) : hold(&Qvoid);
+		f = fh ? Qfile(fh) : hold(Qvoid);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	drop(y);
 	return f;
@@ -73,10 +73,10 @@ value type_fclose(value f)
 		fclose(get_fh(out));
 		out->T = type_void;
 		out->R = 0;
-		f = hold(&QI);
+		f = hold(QI);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(out);
 	return f;
 	}
@@ -116,7 +116,7 @@ value type_flook(value f)
 		FILE *fh = get_fh(x);
 		int ch = patch_fgetc(fh);
 		if (ch == -1)
-			f = hold(&Qvoid);
+			f = hold(Qvoid);
 		else
 			{
 			char c = (char)ch;
@@ -125,7 +125,7 @@ value type_flook(value f)
 			}
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}
@@ -145,7 +145,7 @@ value type_remove(value f)
 		f = Qnum(code);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}
@@ -189,7 +189,7 @@ value type_is_newer(value f)
 	if (x->T == type_str && y->T == type_str)
 		f = boolean(is_newer(str_data(x),str_data(y)));
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 
 	drop(x);
 	drop(y);
@@ -214,7 +214,7 @@ static value op_stat_type(value f, mode_t mask)
 		f = boolean(result);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 
 	drop(x);
 	return f;
@@ -246,10 +246,10 @@ static value op_flock(value f, int operation)
 			perror("flock");
 			die(0);
 			}
-		f = hold(&QI);
+		f = hold(QI);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}
@@ -303,7 +303,7 @@ value type_readlink(value f)
 	if (x->T == type_str)
 		f = Qstr(safe_readlink(str_data(x)));
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}
@@ -325,7 +325,7 @@ value type_mkdir(value f)
 		f = Qnum(code);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	drop(y);
 	return f;
@@ -346,7 +346,7 @@ value type_rmdir(value f)
 		f = Qnum(code);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}
@@ -367,7 +367,7 @@ value type_ftruncate(value f)
 		f = Qnum(code);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	drop(y);
 	return f;
@@ -388,7 +388,7 @@ static value op_seek(value f, int whence)
 		f = Qnum(code);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	drop(y);
 	return f;
@@ -413,7 +413,7 @@ value type_ftell(value f)
 		f = Qnum(offset);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}
@@ -442,7 +442,7 @@ value type_fread(value f)
 		f = Qstr(str);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	drop(y);
 	return f;
@@ -463,10 +463,10 @@ value type_mkfile(value f)
 		unsigned int mode = get_ulong(y);
 		int fd = open(path, O_CREAT|O_RDWR|O_EXCL, mode);
 		FILE *fh = (fd != -1) ? fdopen(fd,"r+") : 0;
-		f = fh ? Qfile(fh) : hold(&Qvoid);
+		f = fh ? Qfile(fh) : hold(Qvoid);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	drop(y);
 	return f;
@@ -476,8 +476,8 @@ value type_mkfile(value f)
 static value dir_names(DIR *dir)
 	{
 	struct dirent *entry = readdir(dir);
-	if (!entry) return hold(&Qnull);
-	return AV(AV(hold(&Qcons),Qstr0(entry->d_name)),dir_names(dir));
+	if (!entry) return hold(Qnull);
+	return AV(AV(hold(Qcons),Qstr0(entry->d_name)),dir_names(dir));
 	}
 
 /* \names=(dir_names path) Return the list of names in a directory.  The names
@@ -497,10 +497,10 @@ value type_dir_names(value f)
 			closedir(dir);
 			}
 		else
-			f = hold(&Qvoid);
+			f = hold(Qvoid);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}
@@ -522,7 +522,7 @@ static value op_stat(value f, unsigned long op(struct stat *status))
 		struct stat status;
 		int result = stat(path,&status);
 		if (result == -1)
-			f = hold(&Qvoid);
+			f = hold(Qvoid);
 		else
 			{
 			unsigned long n = op(&status);
@@ -530,7 +530,7 @@ static value op_stat(value f, unsigned long op(struct stat *status))
 			}
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}
@@ -559,7 +559,7 @@ value type_symlink(value f)
 	if (x->T == type_str && y->T == type_str)
 		f = Qnum(symlink(str_data(x),str_data(y)));
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	drop(y);
 	return f;
@@ -577,7 +577,7 @@ value type_rename(value f)
 	if (x->T == type_str && y->T == type_str)
 		f = Qnum(rename(str_data(x),str_data(y)));
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	drop(y);
 	return f;

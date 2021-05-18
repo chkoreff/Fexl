@@ -13,6 +13,8 @@
 #include <type_parse.h>
 #include <type_str.h>
 
+value Qparse_file;
+
 static value parse_fh(FILE *fh, value label)
 	{
 	return parse_input((input)fgetc,fh,label);
@@ -50,10 +52,10 @@ value type_parse(value f)
 		else if (source->T == type_istr)
 			f = parse_istr(get_istr(source),label);
 		else
-			f = hold(&Qvoid);
+			f = hold(Qvoid);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(source);
 	drop(label);
 	return f;
@@ -87,7 +89,7 @@ value type_parse_file(value f)
 	if (name->T == type_str)
 		f = parse_file(name);
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(name);
 	return f;
 	}

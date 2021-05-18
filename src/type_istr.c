@@ -62,7 +62,7 @@ value type_readstr(value f)
 	if (x->T == type_str)
 		f = Qistr(hold(x));
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}
@@ -91,7 +91,7 @@ value type_slook(value f)
 		{
 		int ch = slook(get_istr(x));
 		if (ch == -1)
-			f = hold(&Qvoid);
+			f = hold(Qvoid);
 		else
 			{
 			char c = (char)ch;
@@ -99,7 +99,7 @@ value type_slook(value f)
 			}
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}

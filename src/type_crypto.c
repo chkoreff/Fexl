@@ -15,7 +15,7 @@ value type_random_bytes(value f)
 	if (x->T == type_num)
 		f = Qstr(str_random_bytes(get_ulong(x)));
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}
@@ -66,7 +66,7 @@ value type_nacl_sign_open(value f)
 		f = boolean(str_nacl_sign_open(text,public_key,signature));
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	drop(y);
 	drop(z);

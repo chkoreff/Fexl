@@ -249,7 +249,7 @@ static struct form *parse_list(void)
 		{
 		struct form *term = parse_term();
 		if (term == 0)
-			return form_val(hold(&Qnull));
+			return form_val(hold(Qnull));
 		else
 			return form_cons(term,parse_list());
 		}
@@ -257,7 +257,7 @@ static struct form *parse_list(void)
 
 static struct form *parse_tuple(void)
 	{
-	struct form *args = form_val(hold(&QI));
+	struct form *args = form_val(hold(QI));
 	while (1)
 		{
 		struct form *term;
@@ -417,7 +417,7 @@ static struct form *parse_exp(void)
 		else
 			exp = form_app(exp,factor);
 		}
-	if (exp == 0) exp = form_val(hold(&QI));
+	if (exp == 0) exp = form_val(hold(QI));
 	return exp;
 	}
 

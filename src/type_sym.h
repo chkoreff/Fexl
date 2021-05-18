@@ -13,7 +13,8 @@ struct form
 	value label;
 	};
 
-extern struct value Qsubst;
+extern value Qsubst;
+extern value Qevaluate;
 extern value type_form(value f);
 extern value Qform(struct form *exp);
 extern struct form *form_val(value exp);
@@ -26,6 +27,5 @@ extern struct form *form_tuple(struct form *args);
 extern struct form *form_eval(struct form *def, struct form *exp);
 extern struct form *form_quo(struct form *exp);
 extern value type_subst(value f);
-extern value type_catch(value f);
 extern value type_evaluate(value f);
 extern value type_resolve(value f);

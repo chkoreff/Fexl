@@ -1,5 +1,4 @@
 #include <memory.h>
-#include <die.h>
 #include <value.h>
 
 /*
@@ -57,22 +56,23 @@ value hold(value f)
 /* Decrement the reference count and recycle if it drops to zero. */
 void drop(value f)
 	{
-	if (f->N == 0) die("XDROP");
-	if (--f->N > 0) return;
-	if (f->L)
+	if (--f->N == 0)
 		{
-		if (f->L->N)
+		if (f->L)
 			{
-			drop(f->L);
-			drop(f->R);
+			if (f->L->N)
+				{
+				drop(f->L);
+				drop(f->R);
+				}
+			else
+				{
+				void (*free)(void *) = (void *)f->L->T;
+				free(f->R);
+				}
 			}
-		else
-			{
-			void (*free)(void *) = (void *)f->L->T;
-			free(f->R);
-			}
+		push_free(f);
 		}
-	push_free(f);
 	}
 
 void clear_free_list(void)

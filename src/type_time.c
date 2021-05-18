@@ -40,7 +40,7 @@ static value op_strftime(value f, struct tm *(*convert)(const time_t *))
 		f = Qstr0(buf);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}
@@ -60,10 +60,10 @@ static value op_strptime(value f, time_t (*convert)(struct tm *tm))
 		if (result)
 			f = Qnum(convert(&tm));
 		else
-			f = hold(&Qvoid);
+			f = hold(Qvoid);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(x);
 	return f;
 	}

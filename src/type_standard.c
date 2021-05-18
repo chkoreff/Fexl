@@ -27,10 +27,6 @@
 #include <type_var.h>
 #include <type_with.h>
 
-static struct value QY = {1, type_Y, 0, 0};
-static struct value Qparse_file = {1, type_parse_file, 0, 0};
-static struct value Qevaluate = {1, type_evaluate, 0, 0};
-
 static const char *cur_name;
 
 static int match(const char *other)
@@ -43,11 +39,11 @@ static value standard(value name)
 	{
 	cur_name = str_data(name);
 
-	if (match("put")) return hold(&Qput);
-	if (match("nl")) return hold(&Qnl);
+	if (match("put")) return hold(Qput);
+	if (match("nl")) return hold(Qnl);
 	if (match("say")) return Q(type_say);
-	if (match("fput")) return hold(&Qfput);
-	if (match("fnl")) return hold(&Qfnl);
+	if (match("fput")) return hold(Qfput);
+	if (match("fnl")) return hold(Qfnl);
 	if (match("fsay")) return Q(type_fsay);
 	if (match("fflush")) return Q(type_fflush);
 
@@ -75,15 +71,15 @@ static value standard(value name)
 	if (match("ge")) return Q(type_ge);
 	if (match("gt")) return Q(type_gt);
 
-	if (match("I")) return hold(&QI);
-	if (match("T")) return hold(&QT);
-	if (match("F")) return hold(&QF);
-	if (match("@")) return hold(&QY);
-	if (match("void")) return hold(&Qvoid);
-	if (match("cons")) return hold(&Qcons);
-	if (match("null")) return hold(&Qnull);
-	if (match("eval")) return hold(&Qeval);
-	if (match("yield")) return hold(&Qyield);
+	if (match("I")) return hold(QI);
+	if (match("T")) return hold(QT);
+	if (match("F")) return hold(QF);
+	if (match("@")) return hold(QY);
+	if (match("void")) return hold(Qvoid);
+	if (match("cons")) return hold(Qcons);
+	if (match("null")) return hold(Qnull);
+	if (match("eval")) return hold(Qeval);
+	if (match("yield")) return hold(Qyield);
 
 	if (match("is_defined")) return Q(type_is_defined);
 	if (match("is_void")) return Q(type_is_void);
@@ -165,8 +161,8 @@ static value standard(value name)
 	if (match("rand")) return Q(type_rand);
 
 	if (match("parse")) return Q(type_parse);
-	if (match("parse_file")) return hold(&Qparse_file);
-	if (match("evaluate")) return hold(&Qevaluate);
+	if (match("parse_file")) return hold(Qparse_file);
+	if (match("evaluate")) return hold(Qevaluate);
 	if (match("resolve")) return Q(type_resolve);
 
 	if (match("buf_new")) return Q(type_buf_new);
@@ -226,15 +222,84 @@ value type_standard(value f)
 		{
 		value def = standard(name);
 		if (def)
-			f = AV(hold(&Qyield),def);
+			f = AV(hold(Qyield),def);
 		else
-			f = hold(&Qvoid);
+			f = hold(Qvoid);
 		}
 	else
-		f = hold(&Qvoid);
+		f = hold(Qvoid);
 	drop(name);
 	return f;
 	}
+	}
+
+static void beg_const(void)
+	{
+	/* basic */
+	QI = Q(type_I);
+	QT = Q(type_T);
+	QF = Q(type_F);
+	QY = Q(type_Y);
+	Qvoid = Q(type_void);
+	Qcons = Q(type_cons);
+	Qnull = Q(type_null);
+	Qeval = Q(type_eval);
+	Qonce = Q(type_once);
+	Qcatch = Q(type_catch);
+	Qyield = Q(type_yield);
+
+	/* type_sym */
+	Qsubst = Q(type_subst);
+	Qevaluate = Q(type_evaluate);
+
+	/* type_parse */
+	Qparse_file = Q(type_parse_file);
+
+	/* type_output */
+	Qput = Q(type_put);
+	Qnl = Q(type_nl);
+	Qfput = Q(type_fput);
+	Qfnl = Q(type_fnl);
+
+	/* type_tuple */
+	Qtuple = Q(type_tuple);
+
+	/* type_signal */
+	init_signal();
+	}
+
+static void end_const(void)
+	{
+	/* basic */
+	drop(QI);
+	drop(QT);
+	drop(QF);
+	drop(QY);
+	drop(Qvoid);
+	drop(Qcons);
+	drop(Qnull);
+	drop(Qeval);
+	drop(Qonce);
+	drop(Qcatch);
+	drop(Qyield);
+
+	/* type_sym */
+	drop(Qsubst);
+	drop(Qevaluate);
+
+	/* type_parse */
+	drop(Qparse_file);
+
+	/* type_output */
+	drop(Qput);
+	drop(Qnl);
+	drop(Qfput);
+	drop(Qfnl);
+
+	/* type_tuple */
+	drop(Qtuple);
+
+	close_random();
 	}
 
 /* Run "src/main.fxl" to evaluate the user's script in an enhanced context.
@@ -252,8 +317,8 @@ static void eval_script(void)
 	f = AV(AV(Q(type_concat),f),Qstr0("/src/main.fxl"));
 
 	/* Now evaluate the script. */
-	f = AV(hold(&Qparse_file),f);
-	f = AV(AV(hold(&Qevaluate),Q(type_standard)),f);
+	f = AV(hold(Qparse_file),f);
+	f = AV(AV(hold(Qevaluate),Q(type_standard)),f);
 	f = eval(f);
 	drop(f);
 	}
@@ -262,8 +327,8 @@ void eval_standard(int argc, const char *argv[])
 	{
 	main_argc = argc;
 	main_argv = argv;
-	init_signal();
+	beg_const();
 	eval_script();
-	close_random();
+	end_const();
 	end_value();
 	}
