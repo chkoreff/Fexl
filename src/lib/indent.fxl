@@ -10,108 +10,77 @@
 	F
 	)
 
-\tuple_to_list=
-	(\data
+# (i_put_data put nl x)
+# Render x in an indented format using the given output functions.
+\i_put_data=
+	(\put\nl\x
+	\x=x
+	(@\render\prefix\x
 
-	# Optimize pairs and singletons.
-	\count=(arity data)
-	eq count 2 (data \key\val [key val]);
-	eq count 1 (data \key [key]);
+	is_str x (put (fexl_quote x));
+	is_num x (put (num_str x));
+	is_bool x (put (x "T" "F"));
+	is_void x (put "void");
 
-	# General case.
-	reverse;
-	(@\loop\data
-	split_tuple data [] \xs\x
-	cons x (loop xs)
-	) data
-	)
+	\loop==
+		(@\loop\is_first\is_nested\prefix\items
+		items {is_nested} \x\items
+		\x=x
 
-# (render_data put prefix data)
-# Render the data in an indented format using the given "put" function and the
-# initial indentation prefix.
-\render_data=
-	(\put
-	\nl==(put NL)
-	@\render_data \prefix\data
+		\continue==
+			(\is_nested\prefix
+			render prefix x
+			loop F is_nested prefix items
+			)
 
-	\data=data
-
-	is_str data (put (fexl_quote data));
-	is_num data (put (num_str data));
-	is_bool data (put (data "T" "F"));
-	is_void data (put "void");
-
-	\show_items=
-		(@\show_items\is_first\is_nested\prefix\items
-		items {is_nested} \item\items
-
-		# Evaluation greatly accelerates when data has deferred values.
-		\item=item
+		is_nested (nl put prefix continue T prefix);
+		is_scalar x (is_first () (put " ") continue F prefix);
 
 		# Indent one level when I first see a non-scalar.
-		\prefix=
-			(
-			is_first prefix;
-			is_nested prefix;
-			is_scalar item prefix;
-			. prefix "  "
-			)
-
-		# Track if this list has a non-scalar item.
-		\is_nested=
-			(
-			is_nested T;
-			is_scalar item F;
-			T
-			)
-
-		(
-		is_nested (nl put prefix);
-		is_first ();
-		put " "
+		\prefix=(is_first prefix (. prefix "  "))
+		nl put prefix
+		continue T prefix
 		)
 
-		render_data prefix item
-		show_items F is_nested prefix items
-		)
-
-	\show_items=
+	\show_items==
 		(\items
-		show_items T F prefix items \is_nested
+		loop T F prefix items \is_nested
 		is_nested (nl put prefix) ()
 		)
 
-	is_list data
-		(
-		put "["
-		show_items data
-		put "]"
-		);
-
-	is_tuple data
-		(
-		put "{"
-		\data=(tuple_to_list data)
-		show_items data
-		put "}"
-		);
+	is_tuple x (put "{" show_items (tuple_to_list x) put "}");
+	is_list x (put "[" show_items x put "]");
 
 	put "?"
+	) "" x
 	)
 
-# (stream_data put data) Stream the data with the given output function.
-\stream_data=(\put render_data put "")
-
-\put_data=(stream_data put)
-\say_data=(\data put_data data nl)
-
-\trace_data=
-	(\data
-	stream_data (fput stderr) data
-	fnl stderr
+\i_render_data=
+	(\put\nl\x
+	i_put_data put nl x
+	nl
 	)
 
-def "stream_data" stream_data;
+\say_data=(i_render_data put nl)
+
+\fsay_data=(\fh i_render_data (fput fh) (fnl fh))
+
+\trace_data=(fsay_data stderr)
+
+\i_as_str=
+	(\x
+	\buf=buf_new
+	\put==(buf_put buf)
+	i_render_data put (put NL) x
+	buf_get buf
+	)
+
+\stream_data=(\put i_put_data put (put NL))
+
+def "i_render_data" i_render_data;
 def "say_data" say_data;
+def "fsay_data" fsay_data;
 def "trace_data" trace_data;
+def "i_as_str" i_as_str;
+def "stream_data" stream_data; # LATER 20210519 deprecate
 void

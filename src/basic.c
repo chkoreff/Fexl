@@ -55,14 +55,14 @@ value type_void(value f)
 	return hold(Qvoid);
 	}
 
-/* (cons x y A B) = (B x y) */
+/* (cons x y a b) = (b x y) */
 value type_cons(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
 	return A(A(hold(f->R),hold(f->L->L->L->R)),hold(f->L->L->R));
 	}
 
-/* (null A B) = A */
+/* (null a b) = a */
 value type_null(value f)
 	{
 	return type_T(f);
@@ -150,10 +150,19 @@ static int op_is_bool(value x)
 	return (x->T == type_T || x->T == type_F) && !x->L;
 	}
 
+int is_null(value x)
+	{
+	return (x->T == type_null && !x->L);
+	}
+
+int is_cons(value x)
+	{
+	return (x->T == type_cons && x->L && x->L->L && !x->L->L->L);
+	}
+
 static int op_is_list(value x)
 	{
-	return (x->T == type_null && !x->L)
-		|| (x->T == type_cons && x->L && x->L->L);
+	return is_cons(x) || is_null(x);
 	}
 
 value type_is_good(value f) { return op_predicate(f,op_is_good); }

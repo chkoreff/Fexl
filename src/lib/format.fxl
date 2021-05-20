@@ -95,43 +95,31 @@ format_num
 	ch
 	)
 
-\nearly_zero=(\x lt (abs x) 1e-8)
-
+# (render_data put x)
+# Render x on a single line using the given output function.
 \render_data=
 	(\put
-	@\put_data\x
+	@\render\x
 	\x=x
 	is_str x (put (fexl_quote x));
-	is_num x (put (nearly_zero x "0" (num_str x)));
-	is_tuple x
+	is_num x (put (num_str x));
+
+	\show_items==
 		(
-		put "{"
-
-		(@\loop\space\xs
-		split_tuple xs () \xs\x
-		loop T xs
-		put_data x
-		if space (put " ")
-		) F x
-
-		put "}"
-		);
-	is_list x
-		(
-		put "["
-
 		(@\loop\space\xs
 		xs () \x\xs
 		if space (put " ")
-		put_data x
+		render x
 		loop T xs
-		) F x
+		) F
+		)
 
-		put "]"
-		);
+	is_tuple x (put "{" show_items (tuple_to_list x) put "}");
+	is_list x (put "[" show_items x put "]");
+
 	is_bool x (put (x "T" "F"));
 	is_void x (put "void");
-	put "()"
+	put "?"
 	)
 
 \render_list=
@@ -149,17 +137,17 @@ format_num
 	say "]"
 	)
 
-\fput_data=(\fh \put=(fput fh) render_data put)
-\fput_list=(\fh \put=(fput fh) render_list put)
+\put_data=(render_data put)
+\put_list=(render_list put)
 
-\put_data=(fput_data stdout)
-\put_list=(fput_list stdout)
+\fput_data=(\fh render_data (fput fh))
+\fput_list=(\fh render_list (fput fh))
 
 \as_str=
-	(\data
+	(\x
 	\buf=buf_new
 	\put=(buf_put buf)
-	render_data put data
+	render_data put x
 	buf_get buf
 	)
 
@@ -218,11 +206,11 @@ def "fexl_quote" fexl_quote;
 def "uc" uc;
 def "lc" lc;
 def "render_data" render_data;
-def "render_list" render_list;
+def "render_list" render_list; # LATER 20210519 deprecate
 def "fput_data" fput_data;
-def "fput_list" fput_list;
+def "fput_list" fput_list; # LATER 20210519 deprecate
 def "put_data" put_data;
-def "put_list" put_list;
+def "put_list" put_list; # LATER 20210519 deprecate
 def "as_str" as_str;
 def "str_to_data" str_to_data;
 def "count_match" count_match;

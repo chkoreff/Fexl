@@ -605,53 +605,27 @@ say ["x = "(as_str x)]
 
 # Test tuples
 say "== tuples"
-(
-\show_tuple=
-	(\data
-	put "{ "
-	(@\loop\data
-	split_tuple data () \left\x
-	loop left
-	put [x" "]
-	) data
-	say "}"
-	)
-
-\join_items=
-	(@\loop\data\xs
-	show_tuple data
-	xs () \x\xs
-	\data=(join_tuple data x)
-	loop data xs
-	)
-
-join_items {} (map (\x chr; + x 96); range 1 6)
-)
+say_data (list_to_tuple; map (\x chr; + x 96); range 1 6)
 (
 \try=
-	(\list
-	each list
-		(\pair
-		pair \key\val
-		put [key "=" val " "]
-		)
+	(\x
+	say_data x
+	\x=(list_to_tuple x)
+	say_data x
+	\x=(tuple_to_list x)
+	say_data x
 	nl
 	)
 
 try []
-try [ {"x" (+ 1 2)} ]
-
-try [ {"x" 3} {"y" 4} ]
-try [ {"x" "ab" } {"y" (. "cd" "efg") } {"z" (^ 4 8) }]
-try [ {"x" (+ 1 2)} {"y" (* 3 4)} ]
-
-(
-\x=(+ 1 2)
-\y=(* x 4)
-try [ {"x" x} {"y" y} {"z" (* x y)} ]
-)
-
-try [ {"a" 1} {"b" 2} {"c" 3} {"d" 4} {"e" 5} {"f" 6} {"g" 7} ]
+try ["a"]
+try ["a" "b" "c"]
+try 3
+try "a"
+try void
+try (cons 1; cons 2; null)
+try ([] 3)
+try (["a"] 3)
 )
 
 div
@@ -662,6 +636,8 @@ say ["a"]
 say ["a""b"]
 say ["a""b"3]
 say ["a""b"(/ 6 4)]
+say ([] 4)
+say (["a" "b"] 4)
 
 (\x=(* 77 44) say ["x = " x])
 
@@ -1271,6 +1247,8 @@ try "  abcd   "
 
 \test_eq_data==
 (
+say "= test_eq_data"
+show_benchmark;
 run_test "eq_data"
 (\case
 case \x\y\expect

@@ -50,10 +50,11 @@
 
 # Reverse list xs.
 \reverse=
-	(\xs
-	# Push all entries in list xs onto list ys.
-	(@\loop\xs\ys xs ys \x\xs loop xs [x;ys])
-	xs []
+	(
+	(@\loop\ys\xs
+	xs ys \x\xs
+	loop [x;ys] xs
+	) []
 	)
 
 # Append a list of lists together.
@@ -444,15 +445,15 @@
 	check_type is_bool (x y (not y));
 	check_type is_void T;
 
-	\eq_pair=
-		(\split_value
-		split_value x (split_value y T \_\_ F) \xh\xt
-		split_value y F \yh\yt
+	\eq_list==
+		(\x\y
+		x (y T \_\_ F) \xh\xt
+		y F \yh\yt
 		eq_data xh yh (eq_data xt yt) F
 		)
 
-	check_type is_list (eq_pair I);
-	check_type is_tuple (eq_pair split_tuple);
+	check_type is_list (eq_list x y);
+	check_type is_tuple (eq_list (tuple_to_list x) (tuple_to_list y));
 	F
 	)
 

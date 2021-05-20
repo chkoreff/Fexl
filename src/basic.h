@@ -25,6 +25,8 @@ extern value boolean(int x);
 extern value type_is_defined(value f);
 extern value op_is_type(value f, type t);
 extern value type_is_void(value f);
+extern int is_null(value x);
+extern int is_cons(value x);
 extern value type_is_good(value f);
 extern value type_is_bool(value f);
 extern value type_is_list(value f);

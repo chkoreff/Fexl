@@ -545,13 +545,13 @@ value type_exec(value f)
 	if (!f->L) return 0;
 	{
 	/* Gather args onto a stack in reverse order. */
-	value stack = hold(Qnull);
+	value stack = hold(QI);
 	value list = hold(f->R);
 	unsigned long len = 0;
 	while (1)
 		{
 		list = eval(list);
-		if (list->T == type_cons && list->L && list->L->L)
+		if (is_cons(list))
 			{
 			value item = arg(list->L->R);
 			value tail = hold(list->R);
@@ -562,7 +562,7 @@ value type_exec(value f)
 			drop(list);
 			list = tail;
 			}
-		else if (list->T == type_null)
+		else if (is_null(list))
 			break;
 		else
 			die("bad arg to exec");
@@ -588,9 +588,9 @@ value type_exec(value f)
 
 	/* Although execv doesn't return, here is the code to clean up memory. */
 	free_memory(argv,size);
-	drop(stack);
 	}
 
+	drop(stack);
 	return hold(QI);
 	}
 	}

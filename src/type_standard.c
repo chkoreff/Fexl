@@ -109,6 +109,8 @@ static value standard(value name)
 	if (match("arity")) return Q(type_arity);
 	if (match("split_tuple")) return Q(type_split_tuple);
 	if (match("join_tuple")) return Q(type_join_tuple);
+	if (match("tuple_to_list")) return Q(type_tuple_to_list);
+	if (match("list_to_tuple")) return Q(type_list_to_tuple);
 
 	if (match("stdin")) return Qfile(stdin);
 	if (match("stdout")) return Qfile(stdout);

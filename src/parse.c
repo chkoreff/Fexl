@@ -11,6 +11,7 @@
 #include <type_num.h>
 #include <type_str.h>
 #include <type_sym.h>
+#include <type_tuple.h>
 
 /*
 Grammar:
@@ -251,7 +252,8 @@ static struct form *parse_list(void)
 		if (term == 0)
 			return form_val(hold(Qnull));
 		else
-			return form_cons(term,parse_list());
+			return form_appv(form_appv(form_val(hold(Qcons)),term),
+				parse_list());
 		}
 	}
 
@@ -263,9 +265,10 @@ static struct form *parse_tuple(void)
 		struct form *term;
 		skip_filler();
 		term = parse_term();
-		if (term == 0) return form_tuple(args);
+		if (term == 0) break;
 		args = form_app(term,args);
 		}
+	return form_appv(form_val(hold(Qtuple)),args);
 	}
 
 static struct form *parse_term(void)
@@ -349,7 +352,7 @@ static struct form *parse_lambda(unsigned long first_line)
 	if (def == 0)
 		return exp;
 	else if (eager)
-		return form_eval(def,exp);
+		return form_appv(form_appv(form_val(hold(Qeval)),def),exp);
 	else
 		return form_app(exp,def);
 	}
@@ -359,7 +362,7 @@ static struct form *parse_form(void)
 	{
 	struct form *exp = parse_exp();
 	exp->label = hold(label);
-	return form_quo(exp);
+	return form_val(Qform(exp));
 	}
 
 /* Parse the next factor of an expression.  Return 0 if no factor found. */
@@ -385,7 +388,7 @@ static struct form *parse_factor(void)
 		else if (ch == '=')
 			{
 			skip();
-			return form_once(parse_exp());
+			return form_appv(form_val(hold(Qonce)),parse_exp());
 			}
 		else
 			return parse_lambda(first_line);

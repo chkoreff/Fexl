@@ -8,7 +8,6 @@
 #include <string.h> /* strcmp */
 #include <type_str.h>
 #include <type_sym.h>
-#include <type_tuple.h>
 
 value Qsubst;
 value Qevaluate;
@@ -122,7 +121,7 @@ static struct form *form_join(type t, struct form *fun, struct form *arg)
 	}
 
 /* Apply function to argument, keeping the type of the function. */
-static struct form *form_appv(struct form *fun, struct form *arg)
+struct form *form_appv(struct form *fun, struct form *arg)
 	{
 	return form_join(fun->exp->T,fun,arg);
 	}
@@ -182,38 +181,6 @@ struct form *form_lam(const char *name, struct form *body)
 	body->sym = sym;
 	body->exp = AV(AV(hold(Qsubst),pattern),body->exp);
 	return body;
-	}
-
-/* Make a list with the head and tail. */
-struct form *form_cons(struct form *head, struct form *tail)
-	{
-	return form_appv(form_appv(form_val(hold(Qcons)),head),tail);
-	}
-
-/* Make a form which evaluates its argument once on demand. */
-struct form *form_once(struct form *exp)
-	{
-	return form_appv(form_val(hold(Qonce)),exp);
-	}
-
-/* Make a tuple from the given arguments. */
-struct form *form_tuple(struct form *args)
-	{
-	sym_merge0(args->sym);
-	args->exp = AV(hold(Qtuple),args->exp);
-	return args;
-	}
-
-/* Evaluate def and apply exp to that value. */
-struct form *form_eval(struct form *def, struct form *exp)
-	{
-	return form_appv(form_appv(form_val(hold(Qeval)),def),exp);
-	}
-
-/* Make a quoted (unresolved form). */
-struct form *form_quo(struct form *exp)
-	{
-	return form_val(Qform(exp));
 	}
 
 /* Use pattern p to make a copy of expression e with argument x substituted in

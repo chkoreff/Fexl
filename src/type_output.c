@@ -18,7 +18,7 @@ value Qfnl;
 static value op_put(FILE *fh, value f)
 	{
 	value x = arg(f->R);
-	if (x->T == type_cons && x->L && x->L->L)
+	if (is_cons(x))
 		f = A(AV(hold(f->L),hold(x->L->R)),AV(hold(f->L),hold(x->R)));
 	else
 		{

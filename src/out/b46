@@ -1,0 +1,73 @@
+\out=
+~2
+[
+{"0793" F "1b03" -0.00626248}
+{"5ac2" F "8ea2" 354.786772998}
+[
+{"754b" F "5355" -298.39702075}
+{"93cf"
+  [T F "47fd"
+    {0.5 0.7}
+  ]
+}
+["a" "b"
+  ["44f0" F void 0.16087]
+  [
+  {"892a" T "b66f" 0.1509}
+  {"08c4" F "26cd" -277.02636296}
+  ]
+  {"3773" T "eaaf" 0.47}
+  {"f6c5" F "bbac" -862.881225}
+]
+{"da65" F "40c7" -271.33529785}
+{"1ab2" F "1a75" 0.14143}
+]
+{"04fc" F "9870" 0.08}
+{"5149" F "aec0" -146.35314}
+{"a"
+  ["b" "c"]
+  "d"
+}
+]
+T
+length = 442
+==
+[{"a<br>b&e" "c" 3 ~1 "hey"~1} {"409b" F "9f11" -0.00626248} {"f092" T "a9&5" 354.786772998} void ["a" "b" "c" {2 4} 7 [1 {2 3} 4]]]
+==
+[
+{"a&lt;br&gt;b&amp;e" "c" 3 "&quot;hey&quot;"}
+{"409b" F "9f11" -0.00626248}
+{"f092" T "a9&amp;5" 354.786772998}
+void
+["a" "b" "c"
+  {2 4}
+  7
+  [1
+    {2 3}
+    4
+  ]
+]
+]
+==
+[{&quot;a&lt;br&gt;b&amp;e&quot; &quot;c&quot; 3 ~1 &quot;hey&quot;~1} {&quot;409b&quot; F &quot;9f11&quot; -0.00626248} {&quot;f092&quot; T &quot;a9&amp;5&quot; 354.786772998} void [&quot;a&quot; &quot;b&quot; &quot;c&quot; {2 4} 7 [1 {2 3} 4]]]
+==
+[
+{&quot;a&lt;br&gt;b&amp;e&quot; &quot;c&quot; 3 ~1 &quot;hey&quot;~1}
+{&quot;409b&quot; F &quot;9f11&quot; -0.00626248}
+{&quot;f092&quot; T &quot;a9&amp;5&quot; 354.786772998}
+void
+[&quot;a&quot; &quot;b&quot; &quot;c&quot;
+  {2 4}
+  7
+  [1
+    {2 3}
+    4
+  ]
+]
+]
+steps 121169 bytes 14592
+~2
+\err=
+~1
+~1
+\status=0

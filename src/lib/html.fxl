@@ -21,12 +21,9 @@
 	is_num x x;
 	is_tuple x
 		(
-		(@\quote_tuple\xs
-		split_tuple xs {} \xs\x
-		\xs=(quote_tuple xs)
-		\x=(quote x)
-		join_tuple xs x
-		) x
+		list_to_tuple;
+		map quote;
+		tuple_to_list x
 		);
 	is_list x (map quote x);
 	is_bool x x;
@@ -73,17 +70,8 @@
 
 \tr=(tag "tr")
 
-\put_quote_data=
-	(
-	\put=(\x put (quote x))
-	render_data put
-	)
-
-\put_quote_list=
-	(
-	\put=(\x put (quote x))
-	render_list put
-	)
+\put_quote_data=(render_data (\x put (quote x)))
+\put_quote_list=(render_list (\x put (quote x)))
 
 # https://en.wikipedia.org/wiki/Percent-encoding
 \uri_escape=
@@ -173,7 +161,7 @@ def "_tag" _tag;
 def "tag" tag;
 def "tr" tr;
 def "put_quote_data" put_quote_data;
-def "put_quote_list" put_quote_list;
+def "put_quote_list" put_quote_list; # LATER 20210519 deprecate
 def "uri_escape" uri_escape;
 def "uri_unescape" uri_unescape;
 def "make_url" make_url;

@@ -1,0 +1,59 @@
+#
+\list=
+[
+{"0793" F "1b03" -0.00626248}
+{"5ac2" F "8ea2" 354.786772998}
+
+[
+{"754b" F "5355" -298.39702075}
+{"93cf" [T F "47fd" {0.5 0.7}]}
+
+["a" "b"
+["44f0" F void 0.16087]
+
+[
+{"892a" T "b66f" 0.1509}
+{"08c4" F "26cd" -277.02636296}
+]
+
+{"3773" T "eaaf" 0.47}
+{"f6c5" F "bbac" -862.881225}
+]
+
+{"da65" F "40c7" -271.33529785}
+{"1ab2" F "1a75" 0.14143}
+]
+
+{"04fc" F "9870" 0.08}
+{"5149" F "aec0" -146.35314}
+{"a" ["b" "c"] "d"}
+]
+
+show_benchmark;
+
+say_data list
+say (eq_data list list)
+
+\x=(i_as_str list)
+say ["length = "(length x)]
+
+\x=
+[
+{"a<br>b&e" "c" 3 ~ "hey"~}
+{"409b" F "9f11" -0.00626248}
+{"f092" T "a9&5" 354.786772998}
+void
+["a" "b" "c" {2 4} 7 [1 {2 3} 4]]
+]
+
+say "=="
+put_data x nl
+
+say "=="
+fsay_data stdout (quote x)
+
+say "=="
+put_quote_data x nl
+
+say "=="
+i_render_data (\x put (quote x)) nl x

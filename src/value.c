@@ -113,7 +113,15 @@ value AV(value x, value y)
 /* The type for function application */
 value type_A(value f)
 	{
-	return AV(arg(f->L),hold(f->R));
+	value x = arg(f->L);
+	if (x == f->L)
+		{
+		f->T = x->T;
+		drop(x);
+		return hold(f);
+		}
+	else
+		return AV(x,hold(f->R));
 	}
 
 /* Apply x to y. */

@@ -17,7 +17,7 @@ static value subst_tuple(value args, value handler)
 
 value type_tuple(value f)
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (!f->L->L) return 0;
 	return subst_tuple(f->L->R,f->R);
 	}
 
@@ -27,7 +27,7 @@ value type_is_tuple(value f)
 	}
 
 /* (arity type) Return the number of elements in the tuple. */
-value type_arity(value f)
+value type_arity(value f) /* LATER 20210519 deprecate */
 	{
 	if (!f->L) return 0;
 	{
@@ -54,7 +54,7 @@ value type_arity(value f)
 Return A if tuple x is empty, otherwise return (B left item), where left is
 the left part of the tuple, and item is the last item in the tuple.
 */
-value type_split_tuple(value f)
+value type_split_tuple(value f) /* LATER 20210519 deprecate */
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 	{
@@ -80,7 +80,7 @@ value type_split_tuple(value f)
 
 /* (join_tuple x y) Form a new tuple by combining tuple x on the left with
 item y on the right. */
-value type_join_tuple(value f)
+value type_join_tuple(value f) /* LATER 20210519 deprecate */
 	{
 	if (!f->L || !f->L->L) return 0;
 	{
@@ -89,6 +89,61 @@ value type_join_tuple(value f)
 		f = AV(hold(Qtuple),A(hold(f->R),hold(x->R)));
 	else
 		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
+	}
+
+value type_tuple_to_list(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_tuple)
+		{
+		value args = x->R;
+		f = hold(Qnull);
+		while (args->T == type_A)
+			{
+			f = AV(AV(hold(Qcons),hold(args->L)),f);
+			args = args->R;
+			}
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
+	}
+
+value type_list_to_tuple(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	value args = hold(QI);
+	while (1)
+		{
+		if (is_cons(x))
+			{
+			value head = hold(x->L->R);
+			value tail = arg(x->R);
+			args = A(head,args);
+			drop(x);
+			x = tail;
+			}
+		else if (is_null(x))
+			{
+			f = AV(hold(Qtuple),args);
+			break;
+			}
+		else
+			{
+			drop(args);
+			f = hold(Qvoid);
+			break;
+			}
+		}
 	drop(x);
 	return f;
 	}

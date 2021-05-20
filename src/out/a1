@@ -492,20 +492,43 @@ T
 x = 7
 x = void
 == tuples
-{ }
-{ a }
-{ a b }
-{ a b c }
-{ a b c d }
-{ a b c d e }
-{ a b c d e f }
+{"a" "b" "c" "d" "e" "f"}
+[]
+{}
+[]
 
-x=3 
-x=3 y=4 
-x=ab y=cdefg z=65536 
-x=3 y=12 
-x=3 y=12 z=36 
-a=1 b=2 c=3 d=4 e=5 f=6 g=7 
+["a"]
+{"a"}
+["a"]
+
+["a" "b" "c"]
+{"a" "b" "c"}
+["a" "b" "c"]
+
+3
+void
+void
+
+"a"
+void
+void
+
+void
+void
+void
+
+[1 2]
+{1 2}
+[1 2]
+
+?
+void
+void
+
+?
+void
+void
+
 ==
 
 
@@ -513,6 +536,8 @@ a
 ab
 ab3
 ab1.5
+
+
 x = 3388
 x = 3388, y = 3630
 
@@ -893,6 +918,8 @@ beg "  abcd   " = "abcd   "
 end "  abcd   " = "  abcd"
 
 ]
+= test_eq_data
+steps 8565 bytes 5792
 ~7
 \err=
 ~1
