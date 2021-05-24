@@ -7,18 +7,19 @@
 
 value Qtuple;
 
-static value subst_tuple(value args, value handler)
+/* Apply the expression to all the arguments. */
+static value apply(value exp, value args)
 	{
-	if (args->T == type_I)
-		return hold(handler);
+	if (args->T == type_A)
+		return AV(eval(apply(exp,args->R)),hold(args->L));
 	else
-		return A(subst_tuple(args->R,handler),hold(args->L));
+		return hold(exp);
 	}
 
 value type_tuple(value f)
 	{
 	if (!f->L->L) return 0;
-	return subst_tuple(f->L->R,f->R);
+	return apply(f->R,f->L->R);
 	}
 
 value type_is_tuple(value f)
@@ -26,72 +27,16 @@ value type_is_tuple(value f)
 	return op_is_type(f,type_tuple);
 	}
 
-/* (arity type) Return the number of elements in the tuple. */
-value type_arity(value f) /* LATER 20210519 deprecate */
+/* Convert tuple to list. */
+static value tuple_to_list(value curr)
 	{
-	if (!f->L) return 0;
-	{
-	value x = arg(f->R);
-	if (x->T == type_tuple)
+	value exp = hold(Qnull);
+	while (curr->T == type_A)
 		{
-		unsigned long arity = 0;
-		value args = x->R;
-		while (args->T != type_I)
-			{
-			arity++;
-			args = args->R;
-			}
-		f = Qnum((double)arity);
+		exp = AV(AV(hold(Qcons),hold(curr->L)),exp);
+		curr = curr->R;
 		}
-	else
-		f = hold(Qvoid);
-	drop(x);
-	return f;
-	}
-	}
-
-/* (split_tuple x A B)
-Return A if tuple x is empty, otherwise return (B left item), where left is
-the left part of the tuple, and item is the last item in the tuple.
-*/
-value type_split_tuple(value f) /* LATER 20210519 deprecate */
-	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
-	{
-	value x = arg(f->L->L->R);
-	if (x->T == type_tuple)
-		{
-		value args = x->R;
-		if (args->T == type_I)
-			f = hold(f->L->R);
-		else
-			{
-			value left = AV(hold(Qtuple),hold(args->R));
-			value item = hold(args->L);
-			f = A(A(hold(f->R),left),item);
-			}
-		}
-	else
-		f = hold(Qvoid);
-	drop(x);
-	return f;
-	}
-	}
-
-/* (join_tuple x y) Form a new tuple by combining tuple x on the left with
-item y on the right. */
-value type_join_tuple(value f) /* LATER 20210519 deprecate */
-	{
-	if (!f->L || !f->L->L) return 0;
-	{
-	value x = arg(f->L->R);
-	if (x->T == type_tuple)
-		f = AV(hold(Qtuple),A(hold(f->R),hold(x->R)));
-	else
-		f = hold(Qvoid);
-	drop(x);
-	return f;
-	}
+	return exp;
 	}
 
 value type_tuple_to_list(value f)
@@ -100,15 +45,7 @@ value type_tuple_to_list(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_tuple)
-		{
-		value args = x->R;
-		f = hold(Qnull);
-		while (args->T == type_A)
-			{
-			f = AV(AV(hold(Qcons),hold(args->L)),f);
-			args = args->R;
-			}
-		}
+		f = tuple_to_list(x->R);
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -116,35 +53,30 @@ value type_tuple_to_list(value f)
 	}
 	}
 
+/* Convert list to tuple. */
+static value list_to_tuple(value curr)
+	{
+	value args = hold(QI);
+	while (curr->T == type_cons)
+		{
+		args = A(hold(curr->L->R),args);
+		curr = curr->R;
+		}
+	return args;
+	}
+
 value type_list_to_tuple(value f)
 	{
 	if (!f->L) return 0;
 	{
-	value x = arg(f->R);
-	value args = hold(QI);
-	while (1)
+	f->R = eval(f->R);
+	if (is_list(f->R))
 		{
-		if (is_cons(x))
-			{
-			value head = hold(x->L->R);
-			value tail = arg(x->R);
-			args = A(head,args);
-			drop(x);
-			x = tail;
-			}
-		else if (is_null(x))
-			{
-			f = AV(hold(Qtuple),args);
-			break;
-			}
-		else
-			{
-			drop(args);
-			f = hold(Qvoid);
-			break;
-			}
+		expand(f);
+		f = AV(hold(Qtuple),list_to_tuple(f->R));
 		}
-	drop(x);
+	else
+		f = hold(Qvoid);
 	return f;
 	}
 	}

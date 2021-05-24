@@ -56,33 +56,14 @@ a
 b
 07/19/2017
 &lt;b&gt;x;&quot;y&quot;&lt;/b&gt;
+{"&lt;b&gt;x;&quot;y&quot;&lt;/b&gt;" "b" "c"}
+{"&lt;br&gt;" "a"}
+["&lt;br&gt;" "a"]
 3,874,511.37
 e
 ["<b>a</b>" {1.2 3.8 "xxx"} T F]
-[
-"<b>a</b>"
-{1.2 3.8 "xxx"}
-T
-F
-]
-
 [&quot;&lt;b&gt;a&lt;/b&gt;&quot; {1.2 3.8 &quot;xxx&quot;} T F]
-[
-&quot;&lt;b&gt;a&lt;/b&gt;&quot;
-{1.2 3.8 &quot;xxx&quot;}
-T
-F
-]
-
 [&quot;&lt;b&gt;a&lt;/b&gt;&quot; ~1 tag &quot;&lt;br&gt;&quot;~1 {1.2 3.8 &quot;xxx&quot;} T F]
-[
-&quot;&lt;b&gt;a&lt;/b&gt;&quot;
-~1 tag &quot;&lt;br&gt;&quot;~1
-{1.2 3.8 &quot;xxx&quot;}
-T
-F
-]
-
 ~1 1&quot;2&quot;3~1
 
 ["a" ~1 "~1 23 {1 2} [T F ~1 "hi"~1 void] -2.3 "a" ~1 "~1 23 {1 2} [T F ~1 "hi"~1 void] -2.3]
@@ -152,21 +133,9 @@ X
 !"hello"
 !ABC
 !{1 2 3}
-![
-"a"
-"b"
-"c"
-]
-[
-"a"
-"b"
-"c"
-]
-[
-"a"
-"b"
-"c"
-]
+!["a" "b" "c"]
+["a" "b" "c"]
+["a" "b" "c"]
 void
 32.8
 .

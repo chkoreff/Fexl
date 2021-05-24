@@ -10,9 +10,9 @@
 	F
 	)
 
-# (i_put_data put nl x)
+# (i_render_data put nl x)
 # Render x in an indented format using the given output functions.
-\i_put_data=
+\i_render_data=
 	(\put\nl\x
 	\x=x
 	(@\render\prefix\x
@@ -53,18 +53,11 @@
 
 	put "?"
 	) "" x
-	)
-
-\i_render_data=
-	(\put\nl\x
-	i_put_data put nl x
 	nl
 	)
 
 \say_data=(i_render_data put nl)
-
 \fsay_data=(\fh i_render_data (fput fh) (fnl fh))
-
 \trace_data=(fsay_data stderr)
 
 \i_as_str=
@@ -75,12 +68,9 @@
 	buf_get buf
 	)
 
-\stream_data=(\put i_put_data put (put NL))
-
 def "i_render_data" i_render_data;
 def "say_data" say_data;
 def "fsay_data" fsay_data;
 def "trace_data" trace_data;
 def "i_as_str" i_as_str;
-def "stream_data" stream_data; # LATER 20210519 deprecate
 void

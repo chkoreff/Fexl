@@ -141,8 +141,7 @@
 	say "\index="
 	show_index index
 	say "\pairs="
-	put_list new_pairs
-	nl
+	say_data new_pairs
 	)
 
 \try_both=
@@ -243,7 +242,7 @@ void
 say "\index="
 show_index index
 say "\pairs="
-put_list (index_pairs index)
+say_data (index_pairs index)
 
 \try=(try index)
 

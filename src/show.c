@@ -99,9 +99,6 @@ static void put_type(type t)
 
 	else if (t == type_tuple) put("tuple");
 	else if (t == type_is_tuple) put("is_tuple");
-	else if (t == type_arity) put("arity");
-	else if (t == type_split_tuple) put("split_tuple");
-	else if (t == type_join_tuple) put("join_tuple");
 	else if (t == type_tuple_to_list) put("tuple_to_list");
 	else if (t == type_list_to_tuple) put("list_to_tuple");
 

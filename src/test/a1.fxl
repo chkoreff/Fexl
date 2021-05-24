@@ -609,23 +609,51 @@ say_data (list_to_tuple; map (\x chr; + x 96); range 1 6)
 (
 \try=
 	(\x
+	\x=x
+	\y=(list_to_tuple x)
+	\z=(tuple_to_list y)
 	say_data x
-	\x=(list_to_tuple x)
-	say_data x
-	\x=(tuple_to_list x)
-	say_data x
+	say_data y
+	say_data z
 	nl
 	)
 
 try []
 try ["a"]
+try (cons "a" null)
 try ["a" "b" "c"]
+try ["a" "b"; cons "c" null]
+try (cons "a"; I; I; cons "b" null)
+try (cons 1; cons 2; null)
+try ["a" "b"; I; I; cons "c"; I null]
+# Test embedded once forms.
+try
+	(
+	(\x append x x);
+	[
+	(put "(1)" "a")
+	(\= put "(2)" I;I;"b")
+	(put "(3)" "c")
+	(\= put "(4)" "d")
+	]
+	)
+
+# Test non-list.
 try 3
 try "a"
 try void
-try (cons 1; cons 2; null)
 try ([] 3)
 try (["a"] 3)
+
+# Test non-list tail.
+try ["a";3]
+try [(I "a") (T "b" 4); I; I; cons "c"; I 3]
+try ["a" ; + 3 4]
+try ["a" "b"; + 3 4]
+
+# Test the "x=x" above.
+try (cons "a"; 3)
+try (cons "a"; I; cons "b"; I; I; 3)
 )
 
 div

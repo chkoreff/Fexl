@@ -544,44 +544,38 @@ value type_exec(value f)
 	{
 	if (!f->L) return 0;
 	{
-	/* Gather args onto a stack in reverse order. */
-	value stack = hold(QI);
-	value list = hold(f->R);
+	value list = arg(f->R);
+	value curr = list;
 	unsigned long len = 0;
-	while (1)
+
+	if (!is_list(list))
+		die("bad arg to exec");
+
+	expand(list);
+	while (curr->T == type_cons)
 		{
-		list = eval(list);
-		if (is_cons(list))
-			{
-			value item = arg(list->L->R);
-			value tail = hold(list->R);
-			if (item->T != type_str)
-				die("bad arg to exec");
-			stack = A(stack,item);
-			len++;
-			drop(list);
-			list = tail;
-			}
-		else if (is_null(list))
-			break;
-		else
+		value item = eval(curr->L->R);
+		if (item->T != type_str)
 			die("bad arg to exec");
+		curr->L->R = item;
+		curr = curr->R;
+		len++;
 		}
-	drop(list);
 
 	{
-	/* Allocate an array of pointers and store the stack entries there. */
+	/* Allocate an array of pointers and store the list entries there. */
 	unsigned long size = (len+1) * sizeof(char *);
 	const char **argv = new_memory(size);
-	value curr = stack;
+	unsigned long pos = 0;
 
-	argv[len] = 0; /* ending sentinel */
-	while (curr->T == type_A)
+	curr = list;
+	while (curr->T == type_cons)
 		{
-		len--;
-		argv[len] = str_data(curr->R);
-		curr = curr->L;
+		argv[pos] = str_data(curr->L->R);
+		curr = curr->R;
+		pos++;
 		}
+	argv[pos] = 0; /* ending sentinel */
 
 	/* Call execv with the argument list. */
 	do_execv(argv);
@@ -590,7 +584,7 @@ value type_exec(value f)
 	free_memory(argv,size);
 	}
 
-	drop(stack);
+	drop(list);
 	return hold(QI);
 	}
 	}

@@ -45,27 +45,22 @@ say tau
 each ["a" "b"] say
 say (date_normal "20170719")
 say (quote ~ <b>x;"y"</b>~)
+say_data (quote {~ <b>x;"y"</b>~ "b" "c"})
+say_data (quote {"<br>" "a"})
+say_data (quote ["<br>" "a"])
 say (format_money 3874511.37)
 say (hex_digit 14)
 
 (
-\try=
-	(\x
-	put_data x nl
-	put_list x nl
-	)
+\try=(\x put_data x nl)
 try ["<b>a</b>" { 1.2 3.8 "xxx"} T F]
 )
 
 (
-\try=
-	(\x
-	put_quote_data x nl
-	put_quote_list x nl
-	)
+\try=(\x put_quote_data x nl)
 try ["<b>a</b>" { 1.2 3.8 "xxx"} T F]
 try ["<b>a</b>" ~ tag "<br>"~ { 1.2 3.8 "xxx"} T F]
-put_quote_data ~ 1"2"3~ nl
+try ~ 1"2"3~
 nl
 )
 
@@ -199,13 +194,13 @@ say (format_num 2 "," (put "!" 12345.67))
 say (fexl_quote (put "!" "hello"))
 say (uc (put "!" "abc"))
 put_data (put "!" { 1 2 3 }) nl
-put_list (put "!" ["a" "b" "c"])
+say_data (put "!" ["a" "b" "c"])
 
 \list=(str_chars "abc")
-put_list list
-put_list list
-put_list void
-put_list 32.8
+say_data list
+say_data list
+say_data void
+say_data 32.8
 
 say (make_url [])
 say (make_url [{"color" "red"}])

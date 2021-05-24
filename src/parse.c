@@ -33,7 +33,7 @@ term   => string
 
 list   => empty
 list   => term list
-list   => ; exp
+list   => term ; exp
 
 tuple  => empty
 tuple  => term tuple
@@ -240,21 +240,13 @@ static struct form *parse_exp(void);
 
 static struct form *parse_list(void)
 	{
+	struct form *term;
 	skip_filler();
-	if (ch == ';')
-		{
-		skip();
-		return parse_exp();
-		}
-	else
-		{
-		struct form *term = parse_term();
-		if (term == 0)
-			return form_val(hold(Qnull));
-		else
-			return form_appv(form_appv(form_val(hold(Qcons)),term),
-				parse_list());
-		}
+	term = parse_term();
+	if (term == 0) return form_val(hold(Qnull));
+	skip_filler();
+	return form_appv(form_appv(form_val(hold(Qcons)),term),
+		(ch == ';') ? parse_exp() : parse_list());
 	}
 
 static struct form *parse_tuple(void)

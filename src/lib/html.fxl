@@ -71,7 +71,6 @@
 \tr=(tag "tr")
 
 \put_quote_data=(render_data (\x put (quote x)))
-\put_quote_list=(render_list (\x put (quote x)))
 
 # https://en.wikipedia.org/wiki/Percent-encoding
 \uri_escape=
@@ -161,7 +160,6 @@ def "_tag" _tag;
 def "tag" tag;
 def "tr" tr;
 def "put_quote_data" put_quote_data;
-def "put_quote_list" put_quote_list; # LATER 20210519 deprecate
 def "uri_escape" uri_escape;
 def "uri_unescape" uri_unescape;
 def "make_url" make_url;

@@ -140,31 +140,47 @@ static value op_predicate(value f, int op(value x))
 	}
 	}
 
-static int op_is_good(value x)
+static int is_good(value x)
 	{
 	return (x->T != type_void);
 	}
 
-static int op_is_bool(value x)
+static int is_bool(value x)
 	{
 	return (x->T == type_T || x->T == type_F) && !x->L;
 	}
 
-int is_null(value x)
+int is_list(value x)
 	{
-	return (x->T == type_null && !x->L);
+	return
+		(x->T == type_cons && x->L && x->L->L && !x->L->L->L) ||
+		(x->T == type_null && !x->L);
 	}
 
-int is_cons(value x)
-	{
-	return (x->T == type_cons && x->L && x->L->L && !x->L->L->L);
-	}
+value type_is_good(value f) { return op_predicate(f,is_good); }
+value type_is_bool(value f) { return op_predicate(f,is_bool); }
+value type_is_list(value f) { return op_predicate(f,is_list); }
 
-static int op_is_list(value x)
+/* Expand list data inline. */
+void expand(value curr)
 	{
-	return is_cons(x) || is_null(x);
+	while (1)
+		{
+		value data = curr->R;
+		if (data->T == type_cons)
+			curr = data;
+		else if (data->T == type_null)
+			break;
+		else
+			{
+			data = eval(data);
+			if (is_list(data))
+				curr->R = data;
+			else
+				{
+				curr->R = hold(Qnull);
+				drop(data);
+				}
+			}
+		}
 	}
-
-value type_is_good(value f) { return op_predicate(f,op_is_good); }
-value type_is_bool(value f) { return op_predicate(f,op_is_bool); }
-value type_is_list(value f) { return op_predicate(f,op_is_list); }

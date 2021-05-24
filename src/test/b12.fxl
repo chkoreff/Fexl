@@ -4,13 +4,13 @@ show_benchmark;
 \try_chars=
 	(\read\in
 	\rows=(read in)
-	put_list rows
+	say_data rows
 	)
 
 \try_file=
 	(\read\name
 	\rows=(read (path_under dir_local name))
-	put_list rows
+	say_data rows
 	)
 
 \test_csv==

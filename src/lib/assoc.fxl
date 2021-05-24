@@ -14,7 +14,7 @@
 	pair \this_key\this_val
 	eq key this_key list;
 	\list=(loop list)
-	cons pair list
+	[pair;list]
 	)
 
 \put_key=
@@ -23,16 +23,16 @@
 	@\loop \list
 	list [{key val}] \pair\list
 	pair \this_key\this_val
-	eq key this_key (cons {this_key val} list);
+	eq key this_key [{this_key val};list];
 	\list=(loop list)
-	cons pair list
+	[pair;list]
 	)
 
 \push_key=
 	(\key\val\list
 	\val=val
 	\list=list
-	cons {key val} list
+	[{key val};list]
 	)
 
 \update_key=
@@ -47,18 +47,15 @@
 	eq key this_key
 		(
 		\val=(update this_val)
-		cons {this_key val} list
+		[{this_key val};list]
 		);
 	\list=(loop list)
-	cons pair list
+	[pair;list]
 	)
 
 \add_key=
-	(\key\amount
-	update_key key
-		(\total
-		is_defined total (+ total amount) amount
-		)
+	(\key\val
+	update_key key (\total is_defined total (+ total val) val)
 	)
 
 \update_values=
@@ -78,7 +75,7 @@
 	(\key\dval\list
 	\val=(get_key key list)
 	is_defined val list;
-	cons {key dval} list
+	[{key dval};list]
 	)
 
 \name_columns=
@@ -86,7 +83,7 @@
 	keys [] \key\keys
 	vals [] \val\vals
 	\tail=(loop keys vals)
-	cons {key val} tail
+	[{key val};tail]
 	)
 
 \make_assoc=

@@ -4,8 +4,7 @@
 	(@\loop\xs
 	xs ys \x\xs
 	[x;\=loop xs]
-	)
-	xs
+	) xs
 	)
 
 # Flatten a nested list into a list of scalars.
@@ -82,12 +81,12 @@
 		x \kx\vx
 		y \ky\vy
 
-		lt kx ky (\tail=(loop xt ys) cons x tail);
-		gt kx ky (\tail=(loop xs yt) cons y tail);
+		lt kx ky (\tail=(loop xt ys) [x;tail]);
+		gt kx ky (\tail=(loop xs yt) [y;tail]);
 
 		\vx=(combine vx vy)
 		\tail=(loop xt yt)
-		cons {kx vx} tail
+		[{kx vx};tail]
 		)
 
 	# Merge each adjoining pair of segments in a list of segments.
@@ -97,7 +96,7 @@
 		ys xs \y\zs
 		\z=(merge_segments x y)
 		\zs=(loop zs)
-		cons z zs
+		[z;zs]
 		)
 
 	# Merge all the segments in a list into a single segment.
@@ -241,7 +240,7 @@
 	xs ys \x\xt
 	ys xs \y\yt
 	\z=(f x y)
-	cons z (loop xt yt)
+	[z;loop xt yt]
 	)
 
 # Get the nth column of a table.
@@ -343,12 +342,10 @@
 \join=
 	(\sep\xs
 	to_str;
-	(
-	@\loop\slash\xs
+	(@\loop\slash\xs
 	xs [] \x\xs
 	slash (cons sep) ();
-	cons x;
-	loop T xs
+	[x; loop T xs]
 	) F xs
 	)
 
