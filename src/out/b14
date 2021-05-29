@@ -17,6 +17,22 @@ read_ssv.fxl
 run.fxl
 time.fxl
 ]
+(1)(2)(3)(4).
+..
+assoc.fxl
+bool.fxl
+date.fxl
+format.fxl
+hex.fxl
+html.fxl
+indent.fxl
+list.fxl
+math.fxl
+read_csv.fxl
+read.fxl
+read_ssv.fxl
+run.fxl
+time.fxl
 Created test/vector
 open (pos 0)
 seek_set 0 (pos 0)

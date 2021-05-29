@@ -15,16 +15,10 @@
 
 # Quote arbitrary data.
 \quote=
-	(
-	@\quote\x \x=x
+	(@\quote\x \x=x
 	is_str x (quote_str x);
 	is_num x x;
-	is_tuple x
-		(
-		list_to_tuple;
-		map quote;
-		tuple_to_list x
-		);
+	is_tuple x (list_to_tuple; map quote; tuple_to_list x);
 	is_list x (map quote x);
 	is_bool x x;
 	void

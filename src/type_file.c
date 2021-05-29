@@ -72,6 +72,7 @@ value type_fclose(value f)
 		{
 		fclose(get_fh(out));
 		out->T = type_void;
+		out->L = 0;
 		out->R = 0;
 		f = hold(QI);
 		}

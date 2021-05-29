@@ -18,8 +18,10 @@ value Qfnl;
 static value op_put(FILE *fh, value f)
 	{
 	value x = arg(f->R);
-	if (x->T == type_cons && is_list(x))
+	if (x->T == type_cons && x->L && x->L->L && !x->L->L->L)
 		f = A(AV(hold(f->L),hold(x->L->R)),AV(hold(f->L),hold(x->R)));
+	else if (x->T == type_list && !x->L->L)
+		f = A(AV(hold(f->L),hold(x->R->L)),AV(hold(f->L),wrap(x->R->R)));
 	else
 		{
 		if (x->T == type_str)

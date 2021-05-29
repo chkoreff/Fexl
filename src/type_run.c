@@ -543,22 +543,17 @@ the full path of the executable program.  This call does not return. */
 value type_exec(value f)
 	{
 	if (!f->L) return 0;
+	expand(f);
 	{
-	value list = arg(f->R);
-	value curr = list;
 	unsigned long len = 0;
-
-	if (!is_list(list))
-		die("bad arg to exec");
-
-	expand(list);
-	while (curr->T == type_cons)
+	value p = f->R;
+	while (p->T == 0)
 		{
-		value item = eval(curr->L->R);
+		value item = eval(p->L);
 		if (item->T != type_str)
 			die("bad arg to exec");
-		curr->L->R = item;
-		curr = curr->R;
+		p->L = item;
+		p = p->R;
 		len++;
 		}
 
@@ -568,15 +563,16 @@ value type_exec(value f)
 	const char **argv = new_memory(size);
 	unsigned long pos = 0;
 
-	curr = list;
-	while (curr->T == type_cons)
+	p = f->R;
+	while (p->T == 0)
 		{
-		argv[pos] = str_data(curr->L->R);
-		curr = curr->R;
+		argv[pos] = str_data(p->L);
+		p = p->R;
 		pos++;
 		}
 	argv[pos] = 0; /* ending sentinel */
 
+	fflush(stdout); /* Flush any existing output. */
 	/* Call execv with the argument list. */
 	do_execv(argv);
 
@@ -584,7 +580,6 @@ value type_exec(value f)
 	free_memory(argv,size);
 	}
 
-	drop(list);
 	return hold(QI);
 	}
 	}

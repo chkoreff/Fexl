@@ -7,6 +7,7 @@ value QT;
 value QF;
 value QY;
 value Qvoid;
+value Qlist;
 value Qcons;
 value Qnull;
 value Qeval;
@@ -53,6 +54,23 @@ value type_void(value f)
 	{
 	if (!f->L) return 0;
 	return hold(Qvoid);
+	}
+
+/* Wrap list function around data if necessary. */
+value wrap(value x)
+	{
+	value y = hold(x);
+	if (y->T == 0)
+		return AV(hold(Qlist),y);
+	else
+		return y;
+	}
+
+/* ([x;y] a b) = (b x y) */
+value type_list(value f)
+	{
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	return A(A(hold(f->R),hold(f->L->L->R->L)),wrap(f->L->L->R->R));
 	}
 
 /* (cons x y a b) = (b x y) */
@@ -150,9 +168,10 @@ static int is_bool(value x)
 	return (x->T == type_T || x->T == type_F) && !x->L;
 	}
 
-int is_list(value x)
+static int is_list(value x)
 	{
 	return
+		(x->T == type_list && !x->L->L) ||
 		(x->T == type_cons && x->L && x->L->L && !x->L->L->L) ||
 		(x->T == type_null && !x->L);
 	}
@@ -162,25 +181,45 @@ value type_is_bool(value f) { return op_predicate(f,is_bool); }
 value type_is_list(value f) { return op_predicate(f,is_list); }
 
 /* Expand list data inline. */
-void expand(value curr)
+void expand(value p)
 	{
 	while (1)
 		{
-		value data = curr->R;
-		if (data->T == type_cons)
-			curr = data;
-		else if (data->T == type_null)
+		value x = p->R;
+		if (x->T == 0)
+			{
+			p = x;
+			continue;
+			}
+
+		x = (p->R = eval(x));
+
+		if (x->T == type_cons && x->L && x->L->L && !x->L->L->L)
+			{
+			/* Change x inline from type_cons to type_list. */
+			value data = V(0,hold(x->L->R),arg(x->R));
+			drop(x->L);
+			drop(x->R);
+			x->T = type_list;
+			x->L = hold(Qlist);
+			x->R = hold(data);
+			drop(x);
+			p->R = data;
+			}
+		else if (x->T == type_list && !x->L->L)
+			{
+			value data = hold(x->R);
+			drop(x);
+			p->R = data;
+			}
+		else if (x->T == type_null && !x->L)
 			break;
 		else
 			{
-			data = eval(data);
-			if (is_list(data))
-				curr->R = data;
-			else
-				{
-				curr->R = hold(Qnull);
-				drop(data);
-				}
+			/* Replace non-list tail with null. */
+			drop(x);
+			p->R = hold(Qnull);
+			break;
 			}
 		}
 	}

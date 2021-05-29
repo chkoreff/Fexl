@@ -240,27 +240,18 @@ static struct form *parse_exp(void);
 
 static struct form *parse_list(void)
 	{
-	struct form *term;
-	skip_filler();
-	term = parse_term();
+	struct form *term = parse_term();
 	if (term == 0) return form_val(hold(Qnull));
 	skip_filler();
-	return form_appv(form_appv(form_val(hold(Qcons)),term),
-		(ch == ';') ? parse_exp() : parse_list());
+	return form_join(0,term, (ch == ';' ? parse_exp() : parse_list()));
 	}
 
 static struct form *parse_tuple(void)
 	{
-	struct form *args = form_val(hold(QI));
-	while (1)
-		{
-		struct form *term;
-		skip_filler();
-		term = parse_term();
-		if (term == 0) break;
-		args = form_app(term,args);
-		}
-	return form_appv(form_val(hold(Qtuple)),args);
+	struct form *term = parse_term();
+	if (term == 0) return form_val(hold(Qnull));
+	skip_filler();
+	return form_join(0,term,parse_tuple());
 	}
 
 static struct form *parse_term(void)
@@ -278,7 +269,10 @@ static struct form *parse_term(void)
 	else if (ch == '[') /* list */
 		{
 		skip();
+		skip_filler();
 		exp = parse_list();
+		if (exp->exp->T != type_null)
+			exp = form_appv(form_val(hold(Qlist)),exp);
 		if (ch != ']')
 			syntax_error("Unclosed bracket", first_line);
 		skip();
@@ -286,7 +280,8 @@ static struct form *parse_term(void)
 	else if (ch == '{') /* tuple */
 		{
 		skip();
-		exp = parse_tuple();
+		skip_filler();
+		exp = form_appv(form_val(hold(Qtuple)),parse_tuple());
 		if (ch != '}')
 			syntax_error("Unclosed brace", first_line);
 		skip();

@@ -650,10 +650,10 @@ try ["a";3]
 try [(I "a") (T "b" 4); I; I; cons "c"; I 3]
 try ["a" ; + 3 4]
 try ["a" "b"; + 3 4]
-
-# Test the "x=x" above.
 try (cons "a"; 3)
 try (cons "a"; I; cons "b"; I; I; 3)
+# NOTE: The "\x=x" above allows this improper list to heal in place.
+try (append ["a" "b"] 3)
 )
 
 div

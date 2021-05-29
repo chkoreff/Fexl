@@ -1,26 +1,4 @@
 #
-\test=
-	(\name
-
-	put ["test "name" "]
-
-	\cmd=(to_str ["../bin/fexl test/show.fxl "name" | diff - out/"name])
-	\argv=["/bin/sh" "-c" cmd]
-
-	run_program argv ""
-	\out\err\status
-
-	eq 0 status
-		(
-		say "good"
-		)
-		(
-		say "failed"
-		put out
-		put err
-		)
-	)
-
 \list_all=
 [
 "a1"
@@ -89,11 +67,43 @@
 	\x=(argv n)
 	is_void x [];
 	\n=(+ 1 n)
-	[x;\=loop n]
+	[x;loop n]
 	) 2
 	)
 
 \list=(is_null list list_all list)
 
+# Run a shell command with no input.
+\sh=(\cmd run_program ["/bin/sh" "-c" (to_str cmd)] "")
+
+\refresh==
+	(
+	\_=(mkdir "new" (oct "775"))
+	each list
+		(\name
+		say ["refresh "name" "]
+		sh ["../bin/fexl test/show.fxl "name" >new/"name]
+		\out\err\status
+		)
+	)
+
+\check==
+	(
+	each list
+		(\name
+		put ["test "name" "]
+		sh ["../bin/fexl test/show.fxl "name" | diff - out/"name]
+		\out\err\status
+		eq 0 status
+			(say "good")
+			(
+			say "failed"
+			put out
+			put err
+			)
+		)
+	)
+
 trace_elapsed;
-each list test
+#refresh
+check

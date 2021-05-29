@@ -12,6 +12,24 @@
 	say "]"
 	)
 
+\test_ls==
+	(
+	\path="src/lib"
+	\path=(path_under dir_base path)
+	\cmd==
+		[
+		(put "(1)" "/bin/ls")
+		;
+		cons (put "(2)" I;I;"-1");
+		[
+		(put "(3)" "-a")
+		(put "(4)" path)
+		]
+		]
+	run_program cmd "" \out\err\status
+	put out
+	)
+
 \demo_seek=
 	(\path
 	\path=(path_under dir_local path)
@@ -102,6 +120,7 @@
 show_base_dir "src/lib"
 #show_base_dir "src/test"
 #show_base_dir "src"
+test_ls # Test fflush in type_exec.
 )
 
 (

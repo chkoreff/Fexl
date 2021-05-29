@@ -27,6 +27,7 @@
 static void put_type(type t)
 	{
 	if (t == type_A) put_ch('A');
+	else if (t == 0) put_ch('0');
 
 	else if (t == type_evaluate) put("evaluate");
 	else if (t == type_resolve) put("resolve");
@@ -67,6 +68,7 @@ static void put_type(type t)
 	else if (t == type_F) put_ch('F');
 	else if (t == type_Y) put_ch('@');
 	else if (t == type_void) put("void");
+	else if (t == type_list) put("list");
 	else if (t == type_cons) put("cons");
 	else if (t == type_null) put("null");
 	else if (t == type_eval) put("eval");

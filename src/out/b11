@@ -243,7 +243,7 @@ try ["d" "c" "b"]
 try ["a" "x" "e"]
   2 : x
   3 : e
-steps 10550 bytes 8512
+steps 10550 bytes 8480
 == fetch
 = try "a"
   compute
