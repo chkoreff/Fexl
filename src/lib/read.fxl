@@ -31,18 +31,6 @@
 	loop
 	)
 
-# Collect characters up to an ending condition.  Return void if not found.
-\collect_to=
-	(\is_end
-	\buf=buf_new
-	@\loop
-	\x=look
-	is_end x (buf_get buf);
-	buf_put buf x
-	skip
-	loop
-	)
-
 \read_string=
 	(\read\str
 	\fh=(readstr str)
