@@ -1,4 +1,7 @@
 # Test assoc list.
+
+show_benchmark;
+
 \add_random_keys=
 	(@\loop\count\seed\obj
 	le count 0 obj;

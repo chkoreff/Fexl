@@ -2,95 +2,78 @@
 
 # Collect a string up to the next occurrence of the terminator string.
 \collect_string=
-	(\term
-	is_void term void;
+	(\term\no\yes
+
 	\term=(str_bytes term)
 
 	\buf_result=buf_new
 	\buf_match=buf_new
 
-	\collect=
-		(@\collect\in_term\term_tail
-		term_tail (buf_get buf_result) \term_ch\term_tail
-
-		\x=look
-		eq x term_ch
-			(
-			# Current char matches the next term char, so save it.
-			buf_put buf_match x
-			skip
-			collect T term_tail
-			);
-
-		# Current char does not match the next term char.
-		in_term
-			(
-			# Add the previously matched terminator chars to the result.
-			\matched=(buf_get buf_match)
-			buf_put buf_result matched
-			)
-			(
-			# Add current char to the result and proceed.
-			buf_put buf_result x
-			skip
-			)
-		collect F term
+	(@\collect\in_term\term_tail
+	term_tail (\str=(buf_get buf_result) yes str)
+	\term_ch\term_tail
+	scan no \x
+	eq x term_ch
+		(
+		# Current char matches the next term char, so save it.
+		buf_put buf_match x
+		collect T term_tail
+		);
+	# Current char does not match the next term char.
+	in_term
+		(
+		# Add the previously matched terminator chars to the result.
+		buf_put buf_result (buf_get buf_match)
+		push x
 		)
-
+		(
+		# Add current char to the result and proceed.
+		buf_put buf_result x
+		);
 	collect F term
 	)
-
-\get_plain_item==
-	(
-	collect_to
-		(\x
-		is_void x T;
-		eq x QU T;
-		eq x "~" T;
-		is_white x
-		)
+	F term
 	)
 
-\get_item==
-	(
-	\x=look
-	eq x QU
-		(
-		skip
-		\str=(collect_to (eq QU))
-		skip
-		str
-		);
+\get_plain_item=
+	(\yes
+	\buf=buf_new
+	\done==(\str=(buf_get buf) yes str)
+	@\loop
+	scan done \x
+	is_white x (push x done);
+	# LATER 20210605 Don't allow juxtaposition; require white space.
+	eq x QU (push x done);
+	eq x "~" (push x done);
+	buf_put buf x loop
+	)
+
+\get_item=
+	(\no\yes
+	scan no \x
+	is_eol x no;
+	eq x QU (collect_to (eq QU) no yes);
 	eq x "~"
 		(
-		skip
-		\term=(collect_to is_white)
-		skip
-		collect_string (. x term)
+		collect_to is_white no \term
+		collect_string (. x term) no yes
 		);
-	get_plain_item
+	push x;
+	get_plain_item yes
 	)
 
-\get_row==
-	(@\loop
-	skip_match (\x is_eol x F; is_white x)
-	\x=look
-	is_void x [];
-	is_eol x [];
-	\item=get_item
-	is_void item [];
-	\list=loop
-	[item;list]
+\get_row=
+	(@\loop\no\yes
+	skip_match (\x is_eol x F; is_white x);
+	get_item no \item
+	loop (yes [item]) \row yes [item;row]
 	)
 
-\get_rows==
-	(@\loop
-	skip_match is_white
-	\x=look
-	is_void x [];
-	\row=get_row
-	\list=loop
-	[row;list]
+\get_rows=
+	(@\loop\yes
+	skip_match is_white;
+	get_row (yes []) \row
+	loop \rows yes [row;rows]
 	)
 
 \read_ssv_string=(read_string get_rows)

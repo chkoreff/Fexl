@@ -1,72 +1,57 @@
 #
-\v_ch=var_new
-\v_get=var_new
-
-\look==(var_get v_ch)
-\skip==(var_get v_get (var_put v_ch))
-\get==(\x=look skip x)
-\use_stream=(\get var_put v_get {get} skip)
+\scan=(\no\yes\xs xs (no []) yes)
+\push=(\x\yes\xs yes [x;xs])
 
 \is_eol=(\x eq x LF T; eq x CR)
 \is_white=(ge " ")
 
 # Skip matching characters.
 \skip_match=
-	(\is_match
-	@\loop
-	\x=look
-	is_void x ();
-	is_match x (skip loop) ()
+	(\is_match @\loop\yes
+	scan yes \x
+	is_match x
+		(loop yes)
+		(push x yes)
 	)
 
-# Collect characters up to an ending condition.  Return void if not found.
+# Collect characters up to an ending condition.
 \collect_to=
-	(\is_end
+	(\is_end\no\yes
 	\buf=buf_new
 	@\loop
-	\x=look
-	is_end x (buf_get buf);
-	buf_put buf x
-	skip
-	loop
+	scan no \x
+	is_end x
+		(\str=(buf_get buf) yes str)
+		(buf_put buf x loop)
 	)
+
+# Map a get function to a stream of characters.
+\stream=(\get @\loop \x=get is_undef x [] [x;loop])
+
+\read_chars=(\read read (\data\xt data))
 
 \read_string=
 	(\read\str
 	\fh=(readstr str)
-	use_stream (sgetc fh)
-	read
-	)
-
-\read_chars=
-	(\read\chars
-	\str=(list_str chars)
-	read_string read str
+	read_chars read (stream; sgetc fh)
 	)
 
 \read_file=
 	(\read\name
-
 	\fh=(fopen name "r")
-	if (is_void fh) (error ["Could not open "name])
-	\result=
-		(
-		use_stream (fgetc fh)
-		read
-		)
-
+	is_void fh void;
+	\data=(read_chars read (stream; fgetc fh))
 	fclose fh
-	result
+	data
 	)
 
+def "scan" scan;
+def "push" push;
 def "is_eol" is_eol;
 def "is_white" is_white;
-def "look" look;
-def "skip" skip;
-def "get" get;
 def "skip_match" skip_match;
 def "collect_to" collect_to;
-def "read_string" read_string;
 def "read_chars" read_chars;
+def "read_string" read_string;
 def "read_file" read_file;
 void

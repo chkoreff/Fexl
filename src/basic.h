@@ -26,6 +26,7 @@ extern value type_catch(value f);
 extern value type_yield(value f);
 extern value boolean(int x);
 extern value type_is_defined(value f);
+extern value type_is_undef(value f);
 extern value op_is_type(value f, type t);
 extern value type_is_void(value f);
 extern value type_is_good(value f);

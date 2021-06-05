@@ -131,6 +131,12 @@ value type_is_defined(value f)
 	return boolean(f->R->T != type_void);
 	}
 
+value type_is_undef(value f)
+	{
+	if (!f->L) return 0;
+	return boolean(f->R->T == type_void);
+	}
+
 value op_is_type(value f, type t)
 	{
 	if (!f->L) return 0;

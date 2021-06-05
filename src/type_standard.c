@@ -82,6 +82,7 @@ static value standard(value name)
 	if (match("yield")) return hold(Qyield);
 
 	if (match("is_defined")) return Q(type_is_defined);
+	if (match("is_undef")) return Q(type_is_undef);
 	if (match("is_void")) return Q(type_is_void);
 	if (match("is_good")) return Q(type_is_good);
 	if (match("is_bool")) return Q(type_is_bool);

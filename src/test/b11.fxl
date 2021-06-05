@@ -1,4 +1,5 @@
 #
+show_benchmark;
 (
 \try=
 	(\path
@@ -260,6 +261,13 @@ each (str_bytes str)
 	)
 )
 (
+say "= get_str"
+\str="abcdefg"
+\in=(readstr str)
+\x=(get_str (sgetc in))
+say_data x
+)
+(
 say "= uri_escape"
 \try=
 	(\x
@@ -382,7 +390,6 @@ if F (run timelocal localtime) # Result depends on your local time zone.
 	try a b c
 	)
 
-show_benchmark;
 say "= cache"
 try "a" "b" "c"
 try "f" "e" "x"

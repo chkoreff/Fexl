@@ -40,6 +40,21 @@ LF # blank row
 ]
 
 try ["x" LF]
+
+# Missing end quote
+try [QU]
+try [QU "a"]
+try ["a" "," QU "b"]
+
+# Embedded quote
+try ["a" QU "b"]
+try ["a" QU]
+
+# OK
+try [QU QU]
+try [QU "a" QU]
+try ["a" ","]
+try ["a" "b" "," "c" ","]
 )
 
 (

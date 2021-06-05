@@ -2,66 +2,65 @@
 # NOTE: https://www.ietf.org/rfc/rfc4180.txt
 # "Spaces are considered part of a field and should not be ignored."
 
-\get_plain_item==
-	(
-	collect_to
-		(\x
-		is_void x T;
-		eq x "," T;
-		is_eol x
-		)
+\get_plain_item=
+	(\yes
+	\buf=buf_new
+	\done==(\str=(buf_get buf) yes str)
+	@\loop
+	scan done \x
+	eq x "," (push x done);
+	is_eol x (push x done);
+	buf_put buf x loop
 	)
 
 # Get a char inside a quoted string.  A single QU char is treated as end of
 # string.  Two QU chars in a row are treated as a single QU character which
 # appears in the string.
-\get_quote_char==
-	(
-	\x=get
-	ne x QU x;
-	\x=look
-	eq x QU (skip QU);
-	""
+\get_quote_char=
+	(\fail\done\keep
+	scan fail \x
+	eq x QU
+		(
+		scan done \x
+		eq x QU
+			(keep QU)
+			(push x done)
+		)
+		(keep x)
 	)
 
 # Get a quoted item.
-\get_quote_item==
-	(
+\get_quote_item=
+	(\no\yes
 	\buf=buf_new
 	@\loop
-	\x=get_quote_char
-	eq x "" (buf_get buf);
-	buf_put buf x
-	loop
+	get_quote_char no
+		(\str=(buf_get buf) yes str)
+		(\x buf_put buf x loop)
 	)
 
-\get_item==
-	(
-	\x=look
-	eq x QU (skip get_quote_item);
-	get_plain_item
+\get_item=
+	(\no\yes
+	scan no \x
+	eq x QU (get_quote_item no yes);
+	push x;
+	get_plain_item yes
 	)
 
-# Get a row.
-\get_row==
-	(@\loop
-	\item=get_item
-	is_void item [];
-	\x=get
-	is_void x [item];
-	ne x "," [item];
-	\list=loop
-	[item;list]
+\get_row=
+	(@\loop\no\yes
+	get_item no \item
+	scan (yes [item]) \x
+	eq x ","
+		(loop (yes [item]) \row yes [item;row])
+		(yes [item])
 	)
 
-\get_rows==
-	(@\loop
-	skip_match is_eol
-	\x=look
-	is_void x [];
-	\row=get_row
-	\list=loop
-	[row;list]
+\get_rows=
+	(@\loop\yes
+	skip_match is_eol;
+	get_row (yes []) \row
+	loop \rows yes [row;rows]
 	)
 
 \read_csv_string=(read_string get_rows)

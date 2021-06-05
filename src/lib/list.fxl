@@ -48,13 +48,7 @@
 	)
 
 # Reverse list xs.
-\reverse=
-	(
-	(@\loop\ys\xs
-	xs ys \x\xs
-	loop [x;ys] xs
-	) []
-	)
+\reverse=((@\loop\ys\xs xs ys \x loop [x;ys]) [])
 
 # Append a list of lists together.
 \append_all=
@@ -272,8 +266,7 @@
 \get_list=
 	(\get @\loop
 	\x=get
-	is_void x [];
-	[x;\=loop]
+	is_undef x [] [x;\=loop]
 	)
 
 # Flatten a piece of data (string, number, boolean, or list) into a string.
@@ -300,26 +293,21 @@
 \get_str=
 	(\get
 	\buf=buf_new
-	(@\loop
+	@\loop
 	\x=get
-	is_void x ();
+	is_undef x (buf_get buf);
 	buf_put buf x
 	loop
 	)
-	buf_get buf
-	)
 
 # Gather a list of strings into a string.
-\list_str=
-	(\xs
+\list_str==
+	(
 	\buf=buf_new
-	(@\loop\xs
-	xs () \x\xs
+	@\loop\xs
+	xs (buf_get buf) \x\xs
 	buf_put buf x
 	loop xs
-	)
-	xs
-	buf_get buf
 	)
 
 # Convert a string to a list with a given function.
@@ -379,13 +367,11 @@
 \file_content=
 	(\fh
 	\buf=buf_new
-	(@\loop
+	@\loop
 	\text=(fread fh 8192)
-	eq text "" ();
+	eq text "" (buf_get buf);
 	buf_put buf text
 	loop
-	)
-	buf_get buf
 	)
 
 # True if the string starts with the given prefix.

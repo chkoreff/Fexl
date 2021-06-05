@@ -168,6 +168,8 @@ byte 1
 byte 2
 byte 3
 byte 4
+= get_str
+"abcdefg"
 = uri_escape
 \x=""
 \y=""
@@ -243,7 +245,6 @@ try ["d" "c" "b"]
 try ["a" "x" "e"]
   2 : x
   3 : e
-steps 10550 bytes 8480
 == fetch
 = try "a"
   compute
@@ -277,6 +278,7 @@ steps 10550 bytes 8480
 4:[61626364]
 3:[313233]
 4:"abcd"
+steps 187778 bytes 14464
 ~2
 \err=
 ~1
