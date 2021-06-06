@@ -42,7 +42,6 @@
 	@\loop
 	scan done \x
 	is_white x (push x done);
-	# LATER 20210605 Don't allow juxtaposition; require white space.
 	eq x QU (push x done);
 	eq x "~" (push x done);
 	buf_put buf x loop

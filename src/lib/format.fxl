@@ -82,8 +82,7 @@ format_num
 	(
 	str_map \ch
 	\n=(ord ch)
-	and (ge n 97) (le n 122) (chr; - n 32) ;
-	ch
+	and (ge n 97) (le n 122) (chr; - n 32) ch
 	)
 
 # Convert string to lower-case.
@@ -91,8 +90,7 @@ format_num
 	(
 	str_map \ch
 	\n=(ord ch)
-	and (ge n 65) (le n 90) (chr; + n 32) ;
-	ch
+	and (ge n 65) (le n 90) (chr; + n 32) ch
 	)
 
 # (render_data put x)
