@@ -18,7 +18,7 @@
 # Do f for each item in list xs.
 \each=
 	(\xs\f
-	(@\loop\xs xs () \x\xs f x loop xs)
+	(@\loop\xs xs () \x f x loop)
 	xs
 	)
 
@@ -177,9 +177,9 @@
 # element in the list.
 \fold=
 	(\f @\loop \z\xs
-	xs z \x\xs
+	xs z \x
 	\z=(f z x)
-	loop z xs
+	loop z
 	)
 
 # Return the first n items of a list.
@@ -196,8 +196,8 @@
 	(@\loop\n\xs
 	\n=n
 	le n 0 xs;
-	xs [] \x\xs
-	loop (- n 1) xs
+	xs [] \x
+	loop (- n 1)
 	)
 
 \list_sum=(fold + 0)
@@ -237,8 +237,8 @@
 	[z;loop xt yt]
 	)
 
-# Get the nth column of a table.
-\column=(\n\xs map (\row list_at row n) xs)
+# Get the nth column of a table, numbered from 0.
+\column=(\n map (\row list_at row n))
 
 # Given a list of rows, return a function which maps the key at key_pos to the
 # value at val_pos.
@@ -279,12 +279,7 @@
 	is_str x (put x);
 	is_num x (put (num_str x));
 	is_bool x (put (x "T" "F"));
-	is_list x
-		(
-		x () \x\xs
-		loop x
-		loop xs
-		);
+	is_list x (x () \x loop x loop);
 	) x
 	buf_get buf
 	)
@@ -305,9 +300,9 @@
 	(
 	\buf=buf_new
 	@\loop\xs
-	xs (buf_get buf) \x\xs
+	xs (buf_get buf) \x
 	buf_put buf x
-	loop xs
+	loop
 	)
 
 # Convert a string to a list with a given function.
