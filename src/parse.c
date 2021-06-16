@@ -227,7 +227,6 @@ static struct form *parse_symbol(void)
 			{
 			str_free(name);
 			return form_val(def);
-			drop(def);
 			}
 		else
 			return form_ref(name,first_line);
