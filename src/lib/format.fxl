@@ -1,5 +1,11 @@
 #
-depend [:base :bool :math :list] \;
+depend
+[
+:base
+(lib "bool.fxl")
+(lib "math.fxl")
+(lib "list.fxl")
+] \;
 
 # Repeat string x n times
 \repeat_str=

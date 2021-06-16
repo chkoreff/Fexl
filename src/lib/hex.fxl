@@ -1,5 +1,11 @@
 #
-depend [:base :bool :math :list] \;
+depend
+[
+:base
+(lib "list.fxl")
+(lib "bool.fxl")
+(lib "math.fxl")
+] \;
 
 # Map number 0-15 to one hex digit (lower-case).
 \hex_digit=

@@ -1,5 +1,10 @@
 # Parse the SSV (space-separated value) format.
-depend [:base :read :list] \;
+depend
+[
+:base
+(lib "read.fxl")
+(lib "list.fxl")
+] \;
 
 # Collect a string up to the next occurrence of the terminator string.
 \collect_string=

@@ -1,5 +1,9 @@
 # Format data in a nested indented format.
-depend [:base :format] \;
+depend
+[
+:base
+(lib "format.fxl")
+] \;
 
 # Return true if the item is a scalar.
 \is_scalar=

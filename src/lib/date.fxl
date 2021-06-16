@@ -1,5 +1,10 @@
 #
-depend [:base :math :list] \;
+depend
+[
+:base
+(lib "math.fxl")
+(lib "list.fxl")
+] \;
 
 \long_month_names=
 [

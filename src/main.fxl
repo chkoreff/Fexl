@@ -9,16 +9,13 @@
 \default=(\d\x \x=x is_defined x x d)
 
 # Chain prev and next.  Returns a context which tries prev first, then next.
-\chain=
+\::=
 	(\prev\next
 	\key
-	\val=(prev key)
+	\val=((\= prev) key)
 	is_defined val val;
-	next key
+	(\= next) key
 	)
-
-# Chain contexts but only evaluate them once. (LATER 20210616 deprecate)
-\::=(\prev\next chain (\= prev) (\= next))
 
 # (if x y) = y if x is true, other I.
 \if=(\x\y x y I)
@@ -37,15 +34,6 @@
 
 \script_name=(default "" (argv 1))
 \dir_local=(dirname script_name)
-
-# Use a file in the Fexl library directory.
-\use_lib=(\name use_file (path_under dir_lib name))
-
-\def_lib=
-	(\key\name\cx
-	\cx=cx
-	def key (\= use_lib name cx) cx
-	)
 
 # Use a file in the directory which contains the user's script.
 \use=(\name use_file (path_under dir_local name))
@@ -93,7 +81,7 @@
 		(
 		(@\loop\list
 		list void \cx\list
-		chain cx; \= loop list
+		:: cx; loop list
 		) list
 		)
 	evaluate cx exp
@@ -103,9 +91,9 @@
 (
 def "def" def;
 def "if" if;
-def "chain" chain;
-def "::" ::;
+def "if" if;
 def "depend" depend;
+def "::" ::;
 
 def "use" use;
 def "use_file" use_file;
@@ -135,29 +123,32 @@ def "show_benchmark" show_benchmark;
 standard
 )
 
-evaluate
-(
-def_lib ":read_csv" "read_csv.fxl";
-def_lib ":read_ssv" "read_ssv.fxl";
-def_lib ":read" "read.fxl";
-def_lib ":run" "run.fxl";
-def_lib ":date" "date.fxl";
-def_lib ":time" "time.fxl";
-def_lib ":html" "html.fxl";
-def_lib ":hex" "hex.fxl";
-def_lib ":assoc" "assoc.fxl";
-def_lib ":indent" "indent.fxl";
-def_lib ":format" "format.fxl";
-def_lib ":list" "list.fxl";
-def_lib ":math" "math.fxl";
-def_lib ":bool" "bool.fxl";
-def ":base" :base;
-:base
-) \;
+\lib=
+	(
+	\:base=(def ":base" :base; :base)
+	\memo=cache
+	@\lib\name
+	memo name;
+	evaluate (def "lib" lib; :base);
+	parse_file (path_under dir_lib name)
+	)
 
 # Evaluate the user's script, chaining the libraries to load on demand.
-\script_name==(default "" (argv 1))
-
-depend [:base :bool :math :list :format :indent :assoc :hex :html :time :date
-	:run :read_csv :read_ssv];
+depend
+[
+:base
+(lib "bool.fxl")
+(lib "math.fxl")
+(lib "list.fxl")
+(lib "format.fxl")
+(lib "indent.fxl")
+(lib "assoc.fxl")
+(lib "hex.fxl")
+(lib "html.fxl")
+(lib "time.fxl")
+(lib "date.fxl")
+(lib "run.fxl")
+(lib "read_csv.fxl")
+(lib "read_ssv.fxl")
+];
 parse_file script_name
