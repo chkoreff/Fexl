@@ -1,5 +1,5 @@
-# Ensure automatic loading of libraries.  Each of these symbols triggers the
-# load of the next library file in the standard search order.
+# Ensure automatic loading of libraries.  Each of these lines loads the next
+# library file in the standard search order.
 if F
 (
 say standard use :: if

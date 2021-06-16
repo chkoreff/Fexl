@@ -140,7 +140,6 @@ void
 	use_lib "indent.fxl";
 	:: cx_lib;
 	:: cx_format;
-	:: cx_list;
 	void
 	)
 
@@ -196,7 +195,6 @@ void
 	(\=
 	use_lib "read.fxl";
 	:: cx_lib;
-	:: cx_list;
 	void
 	)
 
