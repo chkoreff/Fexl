@@ -1,4 +1,5 @@
 # Format data in a nested indented format.
+depend [:base :format] \;
 
 # Return true if the item is a scalar.
 \is_scalar=

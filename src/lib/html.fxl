@@ -1,3 +1,6 @@
+#
+depend [:base :hex :list :format] \;
+
 # Quote a character for embedding in HTML.
 \quote_ch=
 	(\ch

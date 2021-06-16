@@ -1,3 +1,6 @@
+#
+depend [:base :bool :math :list] \;
+
 # Map number 0-15 to one hex digit (lower-case).
 \hex_digit=
 	(\n

@@ -9,13 +9,16 @@
 \default=(\d\x \x=x is_defined x x d)
 
 # Chain prev and next.  Returns a context which tries prev first, then next.
-\::=
+\chain=
 	(\prev\next
 	\key
-	\val=((\= prev) key)
+	\val=(prev key)
 	is_defined val val;
-	(\= next) key
+	next key
 	)
+
+# Chain contexts but only evaluate them once. (LATER 20210616 deprecate)
+\::=(\prev\next chain (\= prev) (\= next))
 
 # (if x y) = y if x is true, other I.
 \if=(\x\y x y I)
@@ -37,6 +40,12 @@
 
 # Use a file in the Fexl library directory.
 \use_lib=(\name use_file (path_under dir_lib name))
+
+\def_lib=
+	(\key\name\cx
+	\cx=cx
+	def key (\= use_lib name cx) cx
+	)
 
 # Use a file in the directory which contains the user's script.
 \use=(\name use_file (path_under dir_local name))
@@ -78,13 +87,25 @@
 \do_benchmark=(run_benchmark trace)
 \show_benchmark=(run_benchmark say)
 
-\cx_lib=
-(
-:: standard;
+\depend=
+	(\list\exp
+	\cx==
+		(
+		(@\loop\list
+		list void \cx\list
+		chain cx; \= loop list
+		) list
+		)
+	evaluate cx exp
+	)
 
+\:base=
+(
 def "def" def;
 def "if" if;
+def "chain" chain;
 def "::" ::;
+def "depend" depend;
 
 def "use" use;
 def "use_file" use_file;
@@ -111,124 +132,32 @@ def "import" import;
 def "import_as" import_as;
 def "do_benchmark" do_benchmark;
 def "show_benchmark" show_benchmark;
-void
+standard
 )
 
-\cx_bool==(\= use_lib "bool.fxl"; cx_lib)
-\cx_math==(\= use_lib "math.fxl"; cx_lib)
-
-\cx_list==
-	(\=
-	use_lib "list.fxl";
-	:: cx_lib;
-	:: cx_bool;
-	void
-	)
-
-\cx_format==
-	(\=
-	use_lib "format.fxl";
-	:: cx_lib;
-	:: cx_bool;
-	:: cx_math;
-	:: cx_list;
-	void
-	)
-
-\cx_indent==
-	(\=
-	use_lib "indent.fxl";
-	:: cx_lib;
-	:: cx_format;
-	void
-	)
-
-\cx_assoc==
-	(\=
-	use_lib "assoc.fxl";
-	:: cx_lib;
-	:: cx_list;
-	void
-	)
-
-\cx_hex==
-	(\=
-	use_lib "hex.fxl";
-	:: cx_lib;
-	:: cx_bool;
-	:: cx_math;
-	:: cx_list;
-	void
-	)
-
-\cx_html==
-	(\=
-	use_lib "html.fxl";
-	:: cx_lib;
-	:: cx_hex;
-	:: cx_list;
-	:: cx_format;
-	void
-	)
-
-\cx_time==(\= use_lib "time.fxl"; cx_lib)
-
-\cx_date==
-	(\=
-	use_lib "date.fxl";
-	:: cx_lib;
-	:: cx_math;
-	:: cx_list;
-	void
-	)
-
-\cx_run==
-	(\=
-	use_lib "run.fxl";
-	:: cx_lib;
-	:: cx_bool;
-	:: cx_list;
-	void
-	)
-
-\cx_read==
-	(\=
-	use_lib "read.fxl";
-	:: cx_lib;
-	void
-	)
-
-\cx_read_csv==
-	(\=
-	use_lib "read_csv.fxl";
-	:: cx_lib;
-	:: cx_read;
-	void
-	)
-
-\cx_read_ssv==
-	(\=
-	use_lib "read_ssv.fxl";
-	:: cx_lib;
-	:: cx_read;
-	:: cx_list;
-	void
-	)
+evaluate
+(
+def_lib ":read_csv" "read_csv.fxl";
+def_lib ":read_ssv" "read_ssv.fxl";
+def_lib ":read" "read.fxl";
+def_lib ":run" "run.fxl";
+def_lib ":date" "date.fxl";
+def_lib ":time" "time.fxl";
+def_lib ":html" "html.fxl";
+def_lib ":hex" "hex.fxl";
+def_lib ":assoc" "assoc.fxl";
+def_lib ":indent" "indent.fxl";
+def_lib ":format" "format.fxl";
+def_lib ":list" "list.fxl";
+def_lib ":math" "math.fxl";
+def_lib ":bool" "bool.fxl";
+def ":base" :base;
+:base
+) \;
 
 # Evaluate the user's script, chaining the libraries to load on demand.
-use_file script_name;
-:: cx_lib;
-:: cx_bool;
-:: cx_math;
-:: cx_list;
-:: cx_format;
-:: cx_indent;
-:: cx_assoc;
-:: cx_hex;
-:: cx_html;
-:: cx_time;
-:: cx_date;
-:: cx_run;
-:: cx_read_csv;
-:: cx_read_ssv;
-void
+\script_name==(default "" (argv 1))
+
+depend [:base :bool :math :list :format :indent :assoc :hex :html :time :date
+	:run :read_csv :read_ssv];
+parse_file script_name

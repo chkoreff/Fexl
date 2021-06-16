@@ -1,4 +1,6 @@
 #
+depend [:base :math :list] \;
+
 \long_month_names=
 [
 "January"

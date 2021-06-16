@@ -1,3 +1,6 @@
+#
+depend [:base :bool :math :list] \;
+
 # Repeat string x n times
 \repeat_str=
 	(\x

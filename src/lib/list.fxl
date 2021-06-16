@@ -1,3 +1,6 @@
+#
+depend [:base :bool] \;
+
 # Append lists xs and ys.
 \append=
 	(\xs\ys
