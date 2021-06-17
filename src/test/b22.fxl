@@ -1,5 +1,6 @@
 #
-evaluate (use "test.fxl" standard) \;
+using [(lib "test.fxl") standard] \;
+
 say "== test Fibonacci"
 
 # (fib n) returns the nth Fibonacci number starting at 0.

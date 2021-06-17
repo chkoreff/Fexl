@@ -1,11 +1,5 @@
 #
-depend
-[
-:base
-(lib "list.fxl")
-(lib "format.fxl")
-(lib "hex.fxl")
-] \;
+using [standard (lib "list.fxl") (lib "format.fxl") (lib "hex.fxl")] \;
 
 # Quote a character for embedding in HTML.
 \quote_ch=

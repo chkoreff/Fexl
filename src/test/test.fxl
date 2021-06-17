@@ -27,4 +27,4 @@ def "show_list" show_list;
 def "run_test" run_test;
 def "show_str" show_str;
 def "show_hex" show_hex;
-standard
+void

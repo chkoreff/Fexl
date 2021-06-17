@@ -1,5 +1,5 @@
 #
-evaluate (use "bn.fxl"; standard) \;
+using [(lib "bn.fxl") standard] \;
 
 #trace_elapsed;
 show_benchmark;

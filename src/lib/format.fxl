@@ -1,11 +1,5 @@
 #
-depend
-[
-:base
-(lib "bool.fxl")
-(lib "math.fxl")
-(lib "list.fxl")
-] \;
+using [standard (lib "bool.fxl") (lib "math.fxl") (lib "list.fxl")] \;
 
 # Repeat string x n times
 \repeat_str=

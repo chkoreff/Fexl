@@ -8,7 +8,8 @@
 # (default d x) = x if x is good, otherwise d.
 \default=(\d\x \x=x is_defined x x d)
 
-# Chain prev and next.  Returns a context which tries prev first, then next.
+# Returns a context which tries prev first, then next.
+# (LATER 20210617 deprecate "::")
 \::=
 	(\prev\next
 	\key
@@ -16,6 +17,18 @@
 	is_defined val val;
 	(\= next) key
 	)
+
+# Chain a list of contexts together, trying each one in turn.
+\chain=
+	(@\loop\list
+	list void \cx\list
+	\key
+	\val=((\= cx) key)
+	is_defined val val;
+	(\= loop list) key
+	)
+
+\using=(\list evaluate (chain list))
 
 # (if x y) = y if x is true, other I.
 \if=(\x\y x y I)
@@ -37,6 +50,9 @@
 
 # Use a file in the directory which contains the user's script.
 \use=(\name use_file (path_under dir_local name))
+
+# LATER 20210617 Deprecate current "use" and then rename "using" to "use".
+# LATER 20210617 Rename "standard" as "std".
 
 # Make a cache which remembers the values of a function with n arguments.
 \remember=
@@ -75,25 +91,27 @@
 \do_benchmark=(run_benchmark trace)
 \show_benchmark=(run_benchmark say)
 
-\depend=
-	(\list\exp
-	\cx==
-		(
-		(@\loop\list
-		list void \cx\list
-		:: cx; loop list
-		) list
-		)
-	evaluate cx exp
+# Define a function which maps a library name to its definition within a given
+# directory and base context.  This remembers definitions so they are not
+# loaded multiple times.
+\def_lib=
+	(\dir\cx
+	\memo=cache
+	@\lib\name
+	memo name;
+	evaluate (def "lib" lib; cx);
+	parse_file (path_under dir name)
 	)
 
-\:base=
+\std=
 (
 def "def" def;
 def "if" if;
 def "if" if;
-def "depend" depend;
 def "::" ::;
+def "chain" chain;
+def "using" using;
+def "def_lib" def_lib;
 
 def "use" use;
 def "use_file" use_file;
@@ -123,20 +141,13 @@ def "show_benchmark" show_benchmark;
 standard
 )
 
-\lib=
-	(
-	\:base=(def ":base" :base; :base)
-	\memo=cache
-	@\lib\name
-	memo name;
-	evaluate (def "lib" lib; :base);
-	parse_file (path_under dir_lib name)
-	)
-
-# Evaluate the user's script, chaining the libraries to load on demand.
-depend
+# Chain the libraries to load on demand.
+\std=
+(
+\lib=(def_lib dir_lib std)
+chain
 [
-:base
+std
 (lib "bool.fxl")
 (lib "math.fxl")
 (lib "list.fxl")
@@ -150,5 +161,11 @@ depend
 (lib "run.fxl")
 (lib "read_csv.fxl")
 (lib "read_ssv.fxl")
-];
+]
+)
+
+\lib=(def_lib dir_local std)
+
+# Evaluate the user's script.
+evaluate (def "lib" lib; std);
 parse_file script_name

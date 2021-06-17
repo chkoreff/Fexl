@@ -1,9 +1,5 @@
 #
-depend
-[
-:base
-(lib "bool.fxl")
-] \;
+using [standard (lib "bool.fxl")] \;
 
 # Append lists xs and ys.
 \append=

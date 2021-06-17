@@ -443,7 +443,7 @@ try void
 say "= import"
 evaluate
 (
-\cx=(use "test.fxl" standard)
+\cx=(lib "test.fxl")
 import cx "div";
 import_as cx "show_hex" "test.show_hex";
 import_as cx "show_str" "test.show_str";

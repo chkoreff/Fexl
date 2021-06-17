@@ -36,7 +36,7 @@ try "x"
 )
 
 say "== test_full"
-test_context (use "test.fxl" standard)
+test_context (chain [(lib "test.fxl") standard])
 
 say "== test_restricted"
 test_context

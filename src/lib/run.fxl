@@ -1,10 +1,5 @@
 #
-depend
-[
-:base
-(lib "list.fxl")
-(lib "bool.fxl")
-] \;
+using [standard (lib "list.fxl") (lib "bool.fxl")] \;
 
 # Run a child function with the given input.  Collect the stdout as it runs,
 # and collect the stderr after it terminates.  Return the output, error, and
