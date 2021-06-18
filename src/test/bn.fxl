@@ -14,11 +14,11 @@
 	\zh=(+ xh yh)
 	\zt=(bn_add xt yt)
 
-	lt zh base (cons zh zt);
+	lt zh base [zh;zt];
 
 	\zh=(- zh base)
 	\zt=(bn_add [1] zt)
-	cons zh zt
+	[zh;zt]
 	)
 
 # Multiply two numbers.
@@ -34,15 +34,15 @@
 		bn_add (bn_mul [yh] xt);
 		\xt=(bn_mul xt yt)
 		is_null xt [];
-		cons 0 xt
+		[0;xt]
 		)
 
-	lt zh base (cons zh zt);
+	lt zh base [zh;zt];
 
 	\carry=(trunc; / zh base)
 	\zh=(- zh; * base carry)
 	\zt=(bn_add [carry] zt)
-	cons zh zt
+	[zh;zt]
 	)
 
 # Convert a number to a string of decimal digits.
@@ -63,7 +63,7 @@
 		(\xh\xt
 		is_void xh void;
 		is_void xt void;
-		and (is_null xt) (eq 0 xh) [] (cons xh xt)
+		and (is_null xt) (eq 0 xh) [] [xh;xt]
 		)
 
 	@\str_bn\x
