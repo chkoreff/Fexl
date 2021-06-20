@@ -107,7 +107,6 @@
 (
 def "def" def;
 def "if" if;
-def "if" if;
 def "::" ::;
 def "chain" chain;
 def "using" using;
