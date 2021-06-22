@@ -113,7 +113,7 @@ static void syntax_error(const char *code, unsigned long line)
 A name may contain just about anything, except for white space and a few other
 special characters.  This is the simplest rule that can work.
 */
-static string parse_name(void)
+static value parse_name(void)
 	{
 	struct buffer buf = {0};
 
@@ -137,7 +137,7 @@ static string parse_name(void)
 		}
 
 	if (!buf.top) return 0;
-	return buf_clear(&buf);
+	return Qstr(buf_clear(&buf));
 	}
 
 /* Collect a string up to an ending terminator. */
@@ -202,7 +202,7 @@ static string parse_content(string end, unsigned long first_line)
 	return content;
 	}
 
-static struct form *parse_symbol(void)
+static value parse_symbol(void)
 	{
 	unsigned long first_line = line;
 	if (ch == '"')
@@ -218,14 +218,14 @@ static struct form *parse_symbol(void)
 		}
 	else
 		{
-		string name = parse_name();
+		value name = parse_name();
 		if (name == 0) return 0;
 		/* See if it's a numeric constant. */
 		{
-		value def = Qnum_str0(name->data);
+		value def = Qnum_str0(str_data(name));
 		if (def)
 			{
-			str_free(name);
+			drop(name);
 			return form_val(def);
 			}
 		else
@@ -234,28 +234,28 @@ static struct form *parse_symbol(void)
 		}
 	}
 
-static struct form *parse_term(void);
-static struct form *parse_exp(void);
+static value parse_term(void);
+static value parse_exp(void);
 
-static struct form *parse_list(void)
+static value parse_list(void)
 	{
-	struct form *term = parse_term();
+	value term = parse_term();
 	if (term == 0) return form_val(hold(Qnull));
 	skip_filler();
 	return form_join(0,term, (ch == ';' ? parse_exp() : parse_list()));
 	}
 
-static struct form *parse_tuple(void)
+static value parse_tuple(void)
 	{
-	struct form *term = parse_term();
+	value term = parse_term();
 	if (term == 0) return form_val(hold(Qnull));
 	skip_filler();
 	return form_join(0,term,parse_tuple());
 	}
 
-static struct form *parse_term(void)
+static value parse_term(void)
 	{
-	struct form *exp;
+	value exp;
 	unsigned long first_line = line;
 	if (ch == '(') /* parenthesized expression */
 		{
@@ -270,7 +270,7 @@ static struct form *parse_term(void)
 		skip();
 		skip_filler();
 		exp = parse_list();
-		if (exp->exp->T != type_null)
+		if (exp->R->T != type_null)
 			exp = form_appv(form_val(hold(Qlist)),exp);
 		if (ch != ']')
 			syntax_error("Unclosed bracket", first_line);
@@ -292,11 +292,11 @@ static struct form *parse_term(void)
 	}
 
 /* Parse a lambda form following the initial '\' character. */
-static struct form *parse_lambda(unsigned long first_line)
+static value parse_lambda(unsigned long first_line)
 	{
-	string name;
-	struct form *def = 0;
-	struct form *exp;
+	value name;
+	value def = 0;
+	value exp;
 	int eager = 1;
 
 	/* Parse the name. */
@@ -308,7 +308,7 @@ static struct form *parse_lambda(unsigned long first_line)
 
 	/* Lambda name cannot be a numeric constant. */
 	{
-	value def = Qnum_str0(name->data);
+	value def = Qnum_str0(str_data(name));
 	if (def)
 		syntax_error("Lambda name cannot be a number", first_line);
 	}
@@ -331,8 +331,7 @@ static struct form *parse_lambda(unsigned long first_line)
 		}
 
 	/* Parse the body of the function and abstract the name out. */
-	exp = form_lam(name->data,parse_exp());
-	str_free(name);
+	exp = form_lam(name,parse_exp());
 
 	/* Apply the definition if any. */
 	if (def == 0)
@@ -344,15 +343,13 @@ static struct form *parse_lambda(unsigned long first_line)
 	}
 
 /* Parse a form (unresolved symbolic expression). */
-static struct form *parse_form(void)
+static value parse_form(void)
 	{
-	struct form *exp = parse_exp();
-	exp->label = hold(label);
-	return form_val(Qform(exp));
+	return form_val(Qform(hold(label),parse_exp()));
 	}
 
 /* Parse the next factor of an expression.  Return 0 if no factor found. */
-static struct form *parse_factor(void)
+static value parse_factor(void)
 	{
 	skip_filler();
 	if (ch == -1)
@@ -386,7 +383,7 @@ static struct form *parse_factor(void)
 		}
 	else
 		{
-		struct form *factor = parse_term();
+		value factor = parse_term();
 		if (ch == '=')
 			syntax_error("Missing name declaration before '='", line);
 		return factor;
@@ -394,12 +391,12 @@ static struct form *parse_factor(void)
 	}
 
 /* Parse an expression. */
-static struct form *parse_exp(void)
+static value parse_exp(void)
 	{
-	struct form *exp = 0;
+	value exp = 0;
 	while (1)
 		{
-		struct form *factor = parse_factor();
+		value factor = parse_factor();
 		if (factor == 0) break;
 		if (exp == 0)
 			exp = factor;
@@ -420,10 +417,9 @@ value parse_input(input _get, void *_source, value _label)
 	line = 1;
 
 	{
-	struct form *exp = parse_exp();
+	value exp = parse_exp();
 	if (ch != -1)
 		syntax_error("Extraneous input", line);
-	exp->label = hold(label);
-	return Qform(exp);
+	return Qform(hold(label),exp);
 	}
 	}

@@ -12,40 +12,26 @@
 value Qsubst;
 value Qevaluate;
 
+value type_sym(value f)
+	{
+	return type_atom(f);
+	}
+
 static void sym_free(struct symbol *sym)
 	{
-	str_free(sym->name);
+	drop(sym->name);
 	drop(sym->pattern);
 	free_memory(sym,sizeof(struct symbol));
 	}
 
-static struct form *form_new(struct symbol *sym, value exp)
+value Qsym(value name, unsigned long line, value pattern)
 	{
-	struct form *form = new_memory(sizeof(struct form));
-	form->sym = sym;
-	form->exp = exp;
-	form->label = 0;
-	return form;
-	}
-
-static void form_discard(struct form *form)
-	{
-	free_memory(form,sizeof(struct form));
-	}
-
-static void form_free(struct form *form)
-	{
-	struct symbol *sym = form->sym;
-	while (sym)
-		{
-		struct symbol *next = sym->next;
-		sym_free(sym);
-		sym = next;
-		}
-	drop(form->exp);
-	if (form->label)
-		drop(form->label);
-	form_discard(form);
+	static struct value atom = {0, (type)sym_free};
+	struct symbol *sym = new_memory(sizeof(struct symbol));
+	sym->name = name;
+	sym->line = line;
+	sym->pattern = pattern;
+	return V(type_sym,&atom,(value)sym);
 	}
 
 value type_form(value f)
@@ -53,134 +39,132 @@ value type_form(value f)
 	return type_atom(f);
 	}
 
-value Qform(struct form *exp)
+value Qform(value label, value exp)
 	{
-	static struct value atom = {0, (type)form_free};
-	return V(type_form,&atom,(value)exp);
+	static struct value atom = {0, (type)drop};
+	return V(type_form,&atom,A(label,exp));
 	}
 
 /* Make a reference to a fixed value with no symbols. */
-struct form *form_val(value exp)
+value form_val(value exp)
 	{
-	return form_new(0,exp);
+	return V(0,hold(Qnull),exp);
 	}
 
 /* Make a reference to a symbol on a given line. */
-struct form *form_ref(string name, unsigned long line)
+value form_ref(value name, unsigned long line)
 	{
-	struct symbol *sym = new_memory(sizeof(struct symbol));
-	sym->next = 0;
-	sym->name = name;
-	sym->line = line;
-	sym->pattern = hold(QT);
-	return form_new(sym,hold(QI));
+	return V(0,V(0,Qsym(name,line,hold(QT)),hold(Qnull)),hold(QI));
+	}
+
+static struct symbol *top_sym(value x)
+	{
+	return (x->T == type_null) ? 0 : (struct symbol *)x->L->R;
 	}
 
 /* Merge the symbol lists and combine patterns where they intersect. */
-static struct symbol *sym_merge(struct symbol *fun, struct symbol *arg)
+static value sym_merge(value fun_list, value arg_list);
+
+static value combine(struct symbol *sym,
+	value lp, value rp,
+	value lt, value rt)
 	{
+	return V(0,
+		Qsym(hold(sym->name),sym->line,A(hold(lp),hold(rp))),
+		sym_merge(lt,rt));
+	}
+
+static value sym_merge(value fun_list, value arg_list)
+	{
+	struct symbol *fun_sym = top_sym(fun_list);
+	struct symbol *arg_sym = top_sym(arg_list);
 	int cmp;
-	if (!fun)
+
+	if (!fun_sym)
 		{
-		if (!arg) return 0;
+		if (!arg_sym) return hold(Qnull);
 		cmp = 1;
 		}
-	else if (!arg)
+	else if (!arg_sym)
 		cmp = -1;
 	else
-		cmp = strcmp(fun->name->data,arg->name->data);
+		cmp = strcmp(str_data(fun_sym->name),str_data(arg_sym->name));
 
 	if (cmp < 0)
-		{
-		fun->pattern = A(fun->pattern,hold(QF));
-		fun->next = sym_merge(fun->next,arg);
-		return fun;
-		}
+		return combine(fun_sym,
+			fun_sym->pattern,QF,
+			fun_list->R,arg_list);
 	else if (cmp > 0)
-		{
-		arg->pattern = A(hold(QF),arg->pattern);
-		arg->next = sym_merge(fun,arg->next);
-		return arg;
-		}
+		return combine(arg_sym,
+			QF,arg_sym->pattern,
+			fun_list,arg_list->R);
 	else
-		{
-		fun->pattern = A(fun->pattern,hold(arg->pattern));
-		fun->next = sym_merge(fun->next,arg->next);
-		sym_free(arg);
-		return fun;
-		}
+		return combine(fun_sym,
+			fun_sym->pattern,arg_sym->pattern,
+			fun_list->R,arg_list->R);
 	}
 
 /* Make an applicative form with the given type. */
-struct form *form_join(type t, struct form *fun, struct form *arg)
+value form_join(type t, value fun, value arg)
 	{
-	fun->sym = sym_merge(fun->sym,arg->sym);
-	fun->exp = V(t,fun->exp,arg->exp);
-	form_discard(arg);
-	return fun;
+	value result = V(0,
+		sym_merge(fun->L,arg->L),
+		V(t,hold(fun->R),hold(arg->R)));
+	drop(fun);
+	drop(arg);
+	return result;
 	}
 
 /* Apply function to argument, keeping the type of the function. */
-struct form *form_appv(struct form *fun, struct form *arg)
+value form_appv(value fun, value arg)
 	{
-	return form_join(fun->exp->T,fun,arg);
+	return form_join(fun->R->T,fun,arg);
 	}
 
 /* Apply function to argument. */
-struct form *form_app(struct form *fun, struct form *arg)
+value form_app(value fun, value arg)
 	{
 	return form_join(type_A,fun,arg);
 	}
 
 /* Delete the symbol with the given name and return the associated pattern. */
-static struct symbol *sym_pop(const char *name, struct symbol *sym,
-	value *pattern)
+static value sym_pop(const char *name, value list, value *pattern)
 	{
+	struct symbol *sym = top_sym(list);
 	int cmp;
+
 	if (!sym)
 		cmp = -1;
 	else
-		cmp = strcmp(name,sym->name->data);
+		cmp = strcmp(name,str_data(sym->name));
 
 	if (cmp < 0)
 		{
 		*pattern = hold(QF); /* not found */
-		return sym;
+		return hold(list);
 		}
 	else if (cmp > 0)
-		{
-		sym->next = sym_pop(name,sym->next,pattern);
-		return sym;
-		}
+		return V(0,hold(list->L),sym_pop(name,list->R,pattern));
 	else
 		{
-		struct symbol *next = sym->next;
 		*pattern = hold(sym->pattern);
-		sym_free(sym);
-		return next;
-		}
-	}
-
-/* Equivalent to (void)sym_merge(0,sym).  Used when no syms on left side. */
-static void sym_merge0(struct symbol *sym)
-	{
-	struct symbol *cur = sym;
-	while (cur)
-		{
-		cur->pattern = A(hold(QF),cur->pattern);
-		cur = cur->next;
+		return hold(list->R);
 		}
 	}
 
 /* Abstract the name from the body. */
-struct form *form_lam(const char *name, struct form *body)
+value form_lam(value name, value body)
 	{
 	value pattern;
-	struct symbol *sym = sym_pop(name,body->sym,&pattern);
-	sym_merge0(sym);
-	body->sym = sym;
-	body->exp = AV(AV(hold(Qsubst),pattern),body->exp);
-	return body;
+	value list = sym_pop(str_data(name),(body->L),&pattern);
+	value exp = V(0,
+		sym_merge(Qnull,list),
+		AV(AV(hold(Qsubst),pattern),hold(body->R)));
+
+	drop(list);
+	drop(name);
+	drop(body);
+	return exp;
 	}
 
 /* Use pattern p to make a copy of expression e with argument x substituted in
@@ -199,20 +183,14 @@ value type_subst(value f)
 	return subst(f->L->L->R,f->L->R,f->R);
 	}
 
-static value resolve_name(value context, string name)
+static value resolve_sym(value context, struct symbol *sym)
 	{
 	/* "standard" always refers to the current context. */
-	if (strcmp(name->data,"standard") == 0)
+	if (strcmp(str_data(sym->name),"standard") == 0)
 		return hold(context);
 
 	{
-	value key = Qstr(name);
-	value val = eval(A(A(hold(context),hold(key)),hold(Qcatch)));
-
-	key->L = 0;
-	key->R = 0;
-	drop(key);
-
+	value val = eval(A(A(hold(context),hold(sym->name)),hold(Qcatch)));
 	if (val->T == type_catch && val->L && !val->L->R)
 		{
 		value x = hold(val->R);
@@ -227,20 +205,21 @@ static value resolve_name(value context, string name)
 	}
 	}
 
-static value resolve(value context, struct form *form)
+static value resolve(value context, value form)
 	{
-	struct symbol *sym = form->sym;
-	value exp = hold(form->exp);
-	const char *label = str_data(form->label);
+	value list = form->R->L;
+	value exp = hold(form->R->R);
+	const char *label = str_data(form->L);
 	int undefined = 0;
 
-	while (sym)
+	while (list->T != type_null)
 		{
-		value val = resolve_name(context,sym->name);
+		struct symbol *sym = top_sym(list);
+		value val = resolve_sym(context,sym);
 		if (val == 0)
 			{
 			undefined = 1;
-			undefined_symbol(sym->name->data,sym->line,label);
+			undefined_symbol(str_data(sym->name),sym->line,label);
 			val = hold(Qvoid);
 			}
 
@@ -251,7 +230,7 @@ static value resolve(value context, struct form *form)
 		exp = next;
 		}
 
-		sym = sym->next;
+		list = list->R;
 		}
 
 	if (undefined)
@@ -268,10 +247,7 @@ value type_evaluate(value f)
 	value context = arg(f->L->R);
 	value exp = arg(f->R);
 	if (exp->T == type_form)
-		{
-		struct form *form = (struct form *)exp->R;
-		f = resolve(context,form);
-		}
+		f = resolve(context,exp->R);
 	else
 		f = hold(Qvoid);
 	drop(context);

@@ -164,6 +164,7 @@ static void put_type(type t)
 	else if (t == type_limit_stack) put("limit_stack");
 	else if (t == type_limit_memory) put("limit_memory");
 
+	else if (t == type_sym) put("sym");
 	else if (t == type_form) put("form");
 
 	else if (t == type_assoc) put("assoc");
@@ -182,31 +183,9 @@ static void put_quote(string x)
 
 static void show_sym(struct symbol *sym)
 	{
-	put_ch('[');
-	while (sym)
-		{
-		put_ch('[');
-		put("sym"); put_ch(' ');
-		put_str(sym->name); put_ch(' ');
-		put_ulong(sym->line); put_ch(' ');
-		show(sym->pattern);
-		put_ch(']');
-		put_ch(' ');
-		sym = sym->next;
-		}
-	put_ch(']');
-	}
-
-static void show_form(struct form *form)
-	{
-	if (form->label)
-		show(form->label);
-	else
-		put("void");
-	put_ch(' ');
-	show_sym(form->sym);
-	put_ch(' ');
-	show(form->exp);
+	put_quote(get_str(sym->name)); put_ch(' ');
+	put_ulong(sym->line); put_ch(' ');
+	show(sym->pattern);
 	}
 
 static unsigned long max_depth;
@@ -227,7 +206,9 @@ static void show_atom(value f)
 	else if (f->T == type_file)
 		put_ulong(fileno(get_fh(f)));
 	else if (f->T == type_form)
-		show_form((struct form *)f->R);
+		limit_show(f->R);
+	else if (f->T == type_sym)
+		show_sym((struct symbol *)f->R);
 	else
 		put_ch('?');
 	}

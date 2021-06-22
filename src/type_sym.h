@@ -1,28 +1,21 @@
 struct symbol
 	{
-	struct symbol *next;
-	string name;
+	value name;
 	unsigned long line;
 	value pattern;
 	};
 
-struct form
-	{
-	struct symbol *sym;
-	value exp;
-	value label;
-	};
-
+extern value type_sym(value f);
 extern value Qsubst;
 extern value Qevaluate;
 extern value type_form(value f);
-extern value Qform(struct form *exp);
-extern struct form *form_val(value exp);
-extern struct form *form_ref(string name, unsigned long line);
-extern struct form *form_join(type t, struct form *fun, struct form *arg);
-extern struct form *form_appv(struct form *fun, struct form *arg);
-extern struct form *form_app(struct form *fun, struct form *arg);
-extern struct form *form_lam(const char *name, struct form *body);
+extern value Qform(value label, value exp);
+extern value form_val(value exp);
+extern value form_ref(value name, unsigned long line);
+extern value form_join(type t, value fun, value arg);
+extern value form_appv(value fun, value arg);
+extern value form_app(value fun, value arg);
+extern value form_lam(value name, value body);
 extern value type_subst(value f);
 extern value type_evaluate(value f);
 extern value type_resolve(value f);
