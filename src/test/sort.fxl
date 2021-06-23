@@ -1,5 +1,5 @@
 #
-using [(lib "test.fxl") standard] \;
+evaluate (:: (use "test.fxl" standard); standard) \;
 
 show_benchmark;
 

@@ -2,7 +2,7 @@
 # library file in the standard search order.
 if F
 (
-say standard use chain if
+say standard use def if
 and or not
 neg max
 map sort_all

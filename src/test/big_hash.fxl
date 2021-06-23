@@ -1,5 +1,5 @@
 #
-using [(lib "test.fxl") standard] \;
+evaluate (:: (use "test.fxl" standard); standard) \;
 
 # Reference: https://www.di-mgt.com.au/sha_testvectors.html
 # Test the extremely-long message.

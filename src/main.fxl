@@ -9,7 +9,6 @@
 \default=(\d\x \x=x is_defined x x d)
 
 # Returns a context which tries prev first, then next.
-# (LATER 20210617 deprecate "::")
 \::=
 	(\prev\next
 	\key
@@ -19,6 +18,7 @@
 	)
 
 # Chain a list of contexts together, trying each one in turn.
+# LATER 20210623 Deprecate chain
 \chain=
 	(@\loop\list
 	list void \cx\list
@@ -29,6 +29,7 @@
 	)
 
 \using=(\list evaluate (chain list))
+# LATER 20210623 Deprecate using
 
 # (if x y) = y if x is true, other I.
 \if=(\x\y x y I)
@@ -51,7 +52,6 @@
 # Use a file in the directory which contains the user's script.
 \use=(\name use_file (path_under dir_local name))
 
-# LATER 20210617 Deprecate current "use" and then rename "using" to "use".
 # LATER 20210617 Rename "standard" as "std".
 
 # Make a cache which remembers the values of a function with n arguments.
@@ -94,6 +94,7 @@
 # Define a function which maps a library name to its definition within a given
 # directory and base context.  This remembers definitions so they are not
 # loaded multiple times.
+# LATER 20210623 Deprecate def_lib
 \def_lib=
 	(\dir\cx
 	\memo=cache
@@ -143,28 +144,38 @@ standard
 # Chain the libraries to load on demand.
 \std=
 (
-\lib=(def_lib dir_lib std)
-chain
-[
-std
-(lib "bool.fxl")
-(lib "math.fxl")
-(lib "list.fxl")
-(lib "format.fxl")
-(lib "indent.fxl")
-(lib "assoc.fxl")
-(lib "hex.fxl")
-(lib "html.fxl")
-(lib "time.fxl")
-(lib "date.fxl")
-(lib "run.fxl")
-(lib "read_csv.fxl")
-(lib "read_ssv.fxl")
-]
+\use=(\name use_file (path_under dir_lib name))
+
+\bool==(\= use "bool.fxl"; std)
+\math==(\= use "math.fxl"; std)
+\list==(\= use "list.fxl"; :: std; bool)
+\format==(\= use "format.fxl"; :: std; :: bool; :: math; list)
+\indent==(\= use "indent.fxl"; :: std; format)
+\assoc==(\= use "assoc.fxl"; :: std; list)
+\hex==(\= use "hex.fxl"; :: std; :: list; :: bool; math)
+\html==(\= use "html.fxl"; :: std; :: list; :: hex; format)
+\time==(\= use "time.fxl"; std)
+\date==(\= use "date.fxl"; :: std; :: math; list)
+\run==(\= use "run.fxl"; :: std; :: list; bool)
+\read==(\= use "read.fxl"; std)
+\read_csv==(\= use "read_csv.fxl"; :: std; read)
+\read_ssv==(\= use "read_ssv.fxl"; :: std; :: read; list)
+
+:: std;
+:: bool;
+:: math;
+:: list;
+:: format;
+:: indent;
+:: assoc;
+:: hex;
+:: html;
+:: time;
+:: date;
+:: run;
+:: read_csv;
+read_ssv
 )
 
-\lib=(def_lib dir_local std)
-
 # Evaluate the user's script.
-evaluate (def "lib" lib; std);
-parse_file script_name
+use_file script_name std

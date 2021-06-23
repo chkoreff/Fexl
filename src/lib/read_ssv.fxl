@@ -1,5 +1,4 @@
 # Parse the SSV (space-separated value) format.
-using [standard (lib "read.fxl") (lib "list.fxl")] \;
 
 # Collect a string up to the next occurrence of the terminator string.
 \collect_string=

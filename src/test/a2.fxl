@@ -1,5 +1,5 @@
 #
-using [(lib "test.fxl") standard] \;
+evaluate (:: (use "test.fxl" standard); standard) \;
 
 # Echo the characters from the input.
 \echo=
