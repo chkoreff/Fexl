@@ -164,11 +164,10 @@ static struct symbol *sym_pop(const char *name, struct symbol *sym,
 /* Equivalent to (void)sym_merge(0,sym).  Used when no syms on left side. */
 static void sym_merge0(struct symbol *sym)
 	{
-	struct symbol *cur = sym;
-	while (cur)
+	while (sym)
 		{
-		cur->pattern = A(hold(QF),cur->pattern);
-		cur = cur->next;
+		sym->pattern = A(hold(QF),sym->pattern);
+		sym = sym->next;
 		}
 	}
 
