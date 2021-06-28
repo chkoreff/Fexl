@@ -113,7 +113,7 @@ static void syntax_error(const char *code, unsigned long line)
 A name may contain just about anything, except for white space and a few other
 special characters.  This is the simplest rule that can work.
 */
-static string parse_name(void)
+static value parse_name(void)
 	{
 	struct buffer buf = {0};
 
@@ -137,7 +137,7 @@ static string parse_name(void)
 		}
 
 	if (!buf.top) return 0;
-	return buf_clear(&buf);
+	return Qstr(buf_clear(&buf));
 	}
 
 /* Collect a string up to an ending terminator. */
@@ -218,18 +218,18 @@ static struct form *parse_symbol(void)
 		}
 	else
 		{
-		string name = parse_name();
+		value name = parse_name();
 		if (name == 0) return 0;
 		/* See if it's a numeric constant. */
 		{
-		value def = Qnum_str0(name->data);
+		value def = Qnum_str0(str_data(name));
 		if (def)
 			{
-			str_free(name);
+			drop(name);
 			return form_val(def);
 			}
 		else
-			return form_ref(name,first_line);
+			return form_ref(name,first_line,hold(label));
 		}
 		}
 	}
@@ -270,7 +270,7 @@ static struct form *parse_term(void)
 		skip();
 		skip_filler();
 		exp = parse_list();
-		if (exp->exp->T != type_null)
+		if (exp->exp->T == 0)
 			exp = form_appv(form_val(hold(Qlist)),exp);
 		if (ch != ']')
 			syntax_error("Unclosed bracket", first_line);
@@ -294,7 +294,7 @@ static struct form *parse_term(void)
 /* Parse a lambda form following the initial '\' character. */
 static struct form *parse_lambda(unsigned long first_line)
 	{
-	string name;
+	value name;
 	struct form *def = 0;
 	struct form *exp;
 	int eager = 1;
@@ -308,7 +308,7 @@ static struct form *parse_lambda(unsigned long first_line)
 
 	/* Lambda name cannot be a numeric constant. */
 	{
-	value def = Qnum_str0(name->data);
+	value def = Qnum_str0(str_data(name));
 	if (def)
 		syntax_error("Lambda name cannot be a number", first_line);
 	}
@@ -331,8 +331,7 @@ static struct form *parse_lambda(unsigned long first_line)
 		}
 
 	/* Parse the body of the function and abstract the name out. */
-	exp = form_lam(name->data,parse_exp());
-	str_free(name);
+	exp = form_lam(name,parse_exp());
 
 	/* Apply the definition if any. */
 	if (def == 0)
@@ -346,9 +345,7 @@ static struct form *parse_lambda(unsigned long first_line)
 /* Parse a form (unresolved symbolic expression). */
 static struct form *parse_form(void)
 	{
-	struct form *exp = parse_exp();
-	exp->label = hold(label);
-	return form_val(Qform(exp));
+	return form_val(Qform(parse_exp()));
 	}
 
 /* Parse the next factor of an expression.  Return 0 if no factor found. */
@@ -418,12 +415,10 @@ value parse_input(input _get, void *_source, value _label)
 	label = _label;
 	ch = ' ';
 	line = 1;
-
 	{
 	struct form *exp = parse_exp();
 	if (ch != -1)
 		syntax_error("Extraneous input", line);
-	exp->label = hold(label);
 	return Qform(exp);
 	}
 	}

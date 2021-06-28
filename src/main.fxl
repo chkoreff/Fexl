@@ -52,8 +52,6 @@
 # Use a file in the directory which contains the user's script.
 \use=(\name use_file (path_under dir_local name))
 
-# LATER 20210617 Rename "standard" as "std".
-
 # Make a cache which remembers the values of a function with n arguments.
 \remember=
 	(\n

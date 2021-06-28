@@ -14,8 +14,9 @@ value Qevaluate;
 
 static void sym_free(struct symbol *sym)
 	{
-	str_free(sym->name);
+	drop(sym->name);
 	drop(sym->pattern);
+	drop(sym->source);
 	free_memory(sym,sizeof(struct symbol));
 	}
 
@@ -24,7 +25,6 @@ static struct form *form_new(struct symbol *sym, value exp)
 	struct form *form = new_memory(sizeof(struct form));
 	form->sym = sym;
 	form->exp = exp;
-	form->label = 0;
 	return form;
 	}
 
@@ -43,8 +43,6 @@ static void form_free(struct form *form)
 		sym = next;
 		}
 	drop(form->exp);
-	if (form->label)
-		drop(form->label);
 	form_discard(form);
 	}
 
@@ -66,13 +64,14 @@ struct form *form_val(value exp)
 	}
 
 /* Make a reference to a symbol on a given line. */
-struct form *form_ref(string name, unsigned long line)
+struct form *form_ref(value name, unsigned long line, value source)
 	{
 	struct symbol *sym = new_memory(sizeof(struct symbol));
 	sym->next = 0;
 	sym->name = name;
-	sym->line = line;
 	sym->pattern = hold(QT);
+	sym->line = line;
+	sym->source = source;
 	return form_new(sym,hold(QI));
 	}
 
@@ -88,7 +87,7 @@ static struct symbol *sym_merge(struct symbol *fun, struct symbol *arg)
 	else if (!arg)
 		cmp = -1;
 	else
-		cmp = strcmp(fun->name->data,arg->name->data);
+		cmp = strcmp(str_data(fun->name),str_data(arg->name));
 
 	if (cmp < 0)
 		{
@@ -140,7 +139,7 @@ static struct symbol *sym_pop(const char *name, struct symbol *sym,
 	if (!sym)
 		cmp = -1;
 	else
-		cmp = strcmp(name,sym->name->data);
+		cmp = strcmp(name,str_data(sym->name));
 
 	if (cmp < 0)
 		{
@@ -172,13 +171,14 @@ static void sym_merge0(struct symbol *sym)
 	}
 
 /* Abstract the name from the body. */
-struct form *form_lam(const char *name, struct form *body)
+struct form *form_lam(value name, struct form *body)
 	{
 	value pattern;
-	struct symbol *sym = sym_pop(name,body->sym,&pattern);
+	struct symbol *sym = sym_pop(str_data(name),body->sym,&pattern);
 	sym_merge0(sym);
 	body->sym = sym;
 	body->exp = AV(AV(hold(Qsubst),pattern),body->exp);
+	drop(name);
 	return body;
 	}
 
@@ -198,20 +198,12 @@ value type_subst(value f)
 	return subst(f->L->L->R,f->L->R,f->R);
 	}
 
-static value resolve_name(value context, string name)
+static value resolve_name(value context, value name)
 	{
-	/* "standard" always refers to the current context. */
-	if (strcmp(name->data,"standard") == 0)
-		return hold(context);
-
+	/* "standard" always refers to the current context. LATER: Deprecate */
+	if (strcmp(str_data(name),"standard") == 0) return hold(context);
 	{
-	value key = Qstr(name);
-	value val = eval(A(A(hold(context),hold(key)),hold(Qcatch)));
-
-	key->L = 0;
-	key->R = 0;
-	drop(key);
-
+	value val = eval(A(A(hold(context),hold(name)),hold(Qcatch)));
 	if (val->T == type_catch && val->L && !val->L->R)
 		{
 		value x = hold(val->R);
@@ -230,7 +222,6 @@ static value resolve(value context, struct form *form)
 	{
 	struct symbol *sym = form->sym;
 	value exp = hold(form->exp);
-	const char *label = str_data(form->label);
 	int undefined = 0;
 
 	while (sym)
@@ -239,7 +230,8 @@ static value resolve(value context, struct form *form)
 		if (val == 0)
 			{
 			undefined = 1;
-			undefined_symbol(sym->name->data,sym->line,label);
+			undefined_symbol(str_data(sym->name),sym->line,
+				str_data(sym->source));
 			val = hold(Qvoid);
 			}
 

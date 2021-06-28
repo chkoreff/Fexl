@@ -180,6 +180,8 @@ static void put_quote(string x)
 	put_ch('"');
 	}
 
+static void limit_show(value f);
+
 static void show_sym(struct symbol *sym)
 	{
 	put_ch('[');
@@ -187,9 +189,9 @@ static void show_sym(struct symbol *sym)
 		{
 		put_ch('[');
 		put("sym"); put_ch(' ');
-		put_str(sym->name); put_ch(' ');
+		put_quote(get_str(sym->name)); put_ch(' ');
 		put_ulong(sym->line); put_ch(' ');
-		show(sym->pattern);
+		limit_show(sym->pattern);
 		put_ch(']');
 		put_ch(' ');
 		sym = sym->next;
@@ -199,20 +201,10 @@ static void show_sym(struct symbol *sym)
 
 static void show_form(struct form *form)
 	{
-	if (form->label)
-		show(form->label);
-	else
-		put("void");
-	put_ch(' ');
 	show_sym(form->sym);
 	put_ch(' ');
-	show(form->exp);
+	limit_show(form->exp);
 	}
-
-static unsigned long max_depth;
-static unsigned long max_call;
-
-static void limit_show(value f);
 
 static void show_atom(value f)
 	{
@@ -231,6 +223,9 @@ static void show_atom(value f)
 	else
 		put_ch('?');
 	}
+
+static unsigned long max_depth;
+static unsigned long max_call;
 
 static void limit_show(value f)
 	{
