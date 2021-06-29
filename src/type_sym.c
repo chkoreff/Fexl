@@ -142,22 +142,17 @@ static struct symbol *sym_pop(const char *name, struct symbol *sym,
 		cmp = strcmp(name,str_data(sym->name));
 
 	if (cmp < 0)
-		{
 		*pattern = hold(QF); /* not found */
-		return sym;
-		}
 	else if (cmp > 0)
-		{
 		sym->next = sym_pop(name,sym->next,pattern);
-		return sym;
-		}
 	else
 		{
 		struct symbol *next = sym->next;
 		*pattern = hold(sym->pattern);
 		sym_free(sym);
-		return next;
+		sym = next;
 		}
+	return sym;
 	}
 
 /* Equivalent to (void)sym_merge(0,sym).  Used when no syms on left side. */
