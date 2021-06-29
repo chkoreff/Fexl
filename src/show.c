@@ -189,7 +189,7 @@ static void show_sym(struct symbol *sym)
 		{
 		put_ch('[');
 		put("sym"); put_ch(' ');
-		put_quote(get_str(sym->name)); put_ch(' ');
+		put_str(sym->name); put_ch(' ');
 		put_ulong(sym->line); put_ch(' ');
 		limit_show(sym->pattern);
 		put_ch(']');

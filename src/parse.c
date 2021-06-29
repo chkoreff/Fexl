@@ -113,7 +113,7 @@ static void syntax_error(const char *code, unsigned long line)
 A name may contain just about anything, except for white space and a few other
 special characters.  This is the simplest rule that can work.
 */
-static value parse_name(void)
+static string parse_name(void)
 	{
 	struct buffer buf = {0};
 
@@ -137,7 +137,7 @@ static value parse_name(void)
 		}
 
 	if (!buf.top) return 0;
-	return Qstr(buf_clear(&buf));
+	return buf_clear(&buf);
 	}
 
 /* Collect a string up to an ending terminator. */
@@ -218,14 +218,14 @@ static struct form *parse_symbol(void)
 		}
 	else
 		{
-		value name = parse_name();
+		string name = parse_name();
 		if (name == 0) return 0;
 		/* See if it's a numeric constant. */
 		{
-		value def = Qnum_str0(str_data(name));
+		value def = Qnum_str0(name->data);
 		if (def)
 			{
-			drop(name);
+			str_free(name);
 			return form_val(def);
 			}
 		else
@@ -294,7 +294,7 @@ static struct form *parse_term(void)
 /* Parse a lambda form following the initial '\' character. */
 static struct form *parse_lambda(unsigned long first_line)
 	{
-	value name;
+	string name;
 	struct form *def = 0;
 	struct form *exp;
 	int eager = 1;
@@ -308,7 +308,7 @@ static struct form *parse_lambda(unsigned long first_line)
 
 	/* Lambda name cannot be a numeric constant. */
 	{
-	value def = Qnum_str0(str_data(name));
+	value def = Qnum_str0(name->data);
 	if (def)
 		syntax_error("Lambda name cannot be a number", first_line);
 	}
