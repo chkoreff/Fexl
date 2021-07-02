@@ -39,6 +39,12 @@ static value standard(value name)
 	{
 	cur_name = str_data(name);
 
+	/* Resolve numeric symbols. */
+	{
+	value def = Qnum_str0(cur_name);
+	if (def) return def;
+	}
+
 	if (match("put")) return hold(Qput);
 	if (match("nl")) return hold(Qnl);
 	if (match("say")) return Q(type_say);
@@ -162,8 +168,10 @@ static value standard(value name)
 
 	if (match("parse")) return Q(type_parse);
 	if (match("parse_file")) return hold(Qparse_file);
+
 	if (match("evaluate")) return hold(Qevaluate);
 	if (match("resolve")) return Q(type_resolve);
+	if (match("std")) return Q(type_standard);
 
 	if (match("buf_new")) return Q(type_buf_new);
 	if (match("buf_put")) return Q(type_buf_put);

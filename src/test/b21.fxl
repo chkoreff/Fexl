@@ -29,6 +29,11 @@ try "+3.6"
 try "+3." # weird but whatever
 try "+3"
 try "+0"
+try " 4.8" # Only leading space is allowed.
+try "inf"
+try "nan"
+try "-inf"
+try "-nan"
 nl
 
 say "= test bad"
@@ -42,7 +47,6 @@ try "+-"
 try "+."
 
 try "4.8 5"
-try " 4.8"
 try "4.8 "
 
 try "-+3.6"
@@ -50,10 +54,4 @@ try "+-3.6"
 try "-2.3x"
 try "3.6x"
 try "3.6 "
-try "inf"
-try "nan"
-
-# The worst.
-try "-inf"
-try "-nan"
 nl

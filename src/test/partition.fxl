@@ -4,7 +4,7 @@
 
 use_bn
 (
-evaluate (:: (use "bn.fxl" standard); standard) \;
+evaluate (:: (use "bn.fxl" std); std) \;
 \add=bn_add
 \one=(str_bn "1")
 \rep=bn_str

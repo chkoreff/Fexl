@@ -2,7 +2,7 @@
 evaluate
 (
 def "talk" (say "TALK");
-standard
+std
 ) \;
 say "begin"
 talk

@@ -106,7 +106,7 @@
 		def "write" write;
 		def "read" read;
 		def "sleep" sleep;
-		standard
+		std
 		)
 
 	\form

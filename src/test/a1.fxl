@@ -1,5 +1,5 @@
 #
-evaluate (:: (use "test.fxl" standard); standard) \;
+evaluate (:: (use "test.fxl" std); std) \;
 
 \show=
 	(\x
@@ -12,8 +12,8 @@ evaluate (:: (use "test.fxl" standard); standard) \;
 	say "other"
 	)
 
-\eval_file=(\name use name standard)
-\eval_str=(\str evaluate standard; parse str "")
+\eval_file=(\name use name std)
+\eval_str=(\str evaluate std; parse str "")
 
 (
 \ping==(say "ping")
@@ -224,9 +224,8 @@ show (is_num 4.2)
 show (is_num (* 3.9 4.2))
 
 div
-# Numbers cannot have extraneous white space or other characters.
 show (is_num; str_num "4.87")
-show (is_num; str_num "  4.87")
+show (is_num; str_num "  4.87") # Only leading white space is allowed.
 show (is_num; str_num " 4.87 ")
 show (is_num; str_num "4.87x")
 show (is_num; str_num "-4.6")
@@ -357,7 +356,7 @@ div
 evaluate
 (
 def "show" show;
-standard
+std
 ) \;
 show "x"
 show (+ 2 3)
@@ -379,6 +378,7 @@ def "exp" exp;
 def "log" log;
 def "sin" sin;
 def "fred" (say "I am Fred.");
+def_num;
 void
 ) \;
 say "hi"
@@ -594,12 +594,12 @@ say (is_void void)
 say (is_void ( (\; f x) 3) )
 # Evaluate a form.
 (
-\x=(evaluate standard (\; + 3 4))
+\x=(evaluate std (\; + 3 4))
 say ["x = "(as_str x)]
 )
 # Evaluate a non-form.
 (
-\x=(evaluate standard (+ 3 4))
+\x=(evaluate std (+ 3 4))
 say ["x = "(as_str x)]
 )
 
@@ -739,13 +739,14 @@ talk
 	\form=(parse "say (+ 7 8)" "")
 
 	say "Run in standard context."
-	evaluate standard form
+	evaluate std form
 
 	say "Run in weird context."
 	evaluate
 		(
 		def "say" say;
 		def "+" *;
+		def_num;
 		void
 		)
 		form
@@ -755,7 +756,7 @@ talk
 
 \case_3==
 	(
-	resolve standard (\; say "PING") \run
+	resolve std (\; say "PING") \run
 	say "["
 	run
 	run

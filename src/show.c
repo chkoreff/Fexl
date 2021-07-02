@@ -141,7 +141,7 @@ static void put_type(type t)
 	else if (t == type_parse) put("parse");
 	else if (t == type_parse_file) put("parse_file");
 
-	else if (t == type_standard) put("standard");
+	else if (t == type_standard) put("std");
 
 	else if (t == type_buf) put("buf");
 	else if (t == type_buf_new) put("buf_new");

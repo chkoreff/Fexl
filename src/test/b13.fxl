@@ -1,18 +1,16 @@
-# Test standard context.
-
+#
 \test_context==
 (\context
-evaluate context \;
 
 \try=
 	(\name
-	\f=(standard name)
+	\f=(context name)
 	say ["name "name" : "(is_defined f)]
 	)
 
 try "say"
 try "is_defined"
-try "standard"
+try "std"
 try "+"
 try "@"
 try "def"
@@ -36,13 +34,14 @@ try "x"
 )
 
 say "== test_full"
-test_context (:: (use "test.fxl" standard) standard)
+test_context (:: (use "test.fxl" std) std)
 
 say "== test_restricted"
 test_context
 	(
 	def "say" say;
 	def "is_defined" is_defined;
+	def_num;
 	void
 	)
 
@@ -56,6 +55,7 @@ def "seed_rand" seed_rand;
 def "rand" rand;
 def "fred" (say "I am Fred.");
 def "wilma" (say "I am Wilma.");
+def_num;
 void
 ) \;
 

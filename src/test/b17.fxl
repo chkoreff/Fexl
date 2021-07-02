@@ -1,5 +1,5 @@
 #
-evaluate (:: (use "test.fxl" standard); standard) \;
+evaluate (:: (use "test.fxl" std); std) \;
 
 \show_result=
 	(
@@ -33,7 +33,7 @@ try
 	(
 	say "hello"
 	trace "complain 1"
-	\x=(evaluate standard; parse stdin "")
+	\x=(evaluate std; parse stdin "")
 	say ["x = "(as_str x)]
 
 	trace "complain 2"
@@ -96,7 +96,7 @@ run_test "test_run_program";
 try
 ~
 say "hello"
-\x=(evaluate standard; parse stdin "")
+\x=(evaluate std; parse stdin "")
 say ["x = "(as_str x)]
 trace "complain"
 error "oops"

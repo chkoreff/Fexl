@@ -1,5 +1,5 @@
 #
-evaluate (:: (use "test.fxl" standard); standard) \;
+evaluate (:: (use "test.fxl" std); std) \;
 
 \parse=
 	(\type\source
@@ -12,7 +12,7 @@ evaluate (:: (use "test.fxl" standard); standard) \;
 		void
 		)
 	say "(resolving)"
-	resolve standard form
+	resolve std form
 	)
 
 \parse=

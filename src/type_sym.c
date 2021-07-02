@@ -195,11 +195,6 @@ value type_subst(value f)
 
 static value resolve_name(value context, string name)
 	{
-	/* "standard" always refers to the current context. LATER: Deprecate */
-	if (strcmp(name->data,"standard") == 0)
-		return hold(context);
-
-	{
 	value key = Qstr(name);
 	value val = eval(A(A(hold(context),hold(key)),hold(Qcatch)));
 
@@ -218,7 +213,6 @@ static value resolve_name(value context, string name)
 		drop(val);
 		return 0;
 		}
-	}
 	}
 
 static value resolve(value context, struct form *form)

@@ -17,28 +17,31 @@
 	(\= next) key
 	)
 
-# Chain a list of contexts together, trying each one in turn.
-# LATER 20210623 Deprecate chain
-\chain=
-	(@\loop\list
-	list void \cx\list
-	\key
-	\val=((\= cx) key)
-	is_defined val val;
-	(\= loop list) key
-	)
-
-\using=(\list evaluate (chain list))
-# LATER 20210623 Deprecate using
-
 # (if x y) = y if x is true, other I.
 \if=(\x\y x y I)
 
 \trace=(fsay stderr)
 \error=(\msg trace msg die)
 
-# Return a context with key defined as val.
+# Define key as val.
 \def=(\key\val with key {val})
+
+# Define numeric constants.
+\def_num=
+	(\cx\key
+	\val=(str_num key)
+	is_defined val {val};
+	cx key
+	)
+
+# Define key to refer to a context.
+\def_context=
+	(\key\cx
+	\cx=cx
+	@\self
+	def key self;
+	cx
+	)
 
 \path_under=(\dir\name . (. dir "/") name)
 
@@ -89,27 +92,13 @@
 \do_benchmark=(run_benchmark trace)
 \show_benchmark=(run_benchmark say)
 
-# Define a function which maps a library name to its definition within a given
-# directory and base context.  This remembers definitions so they are not
-# loaded multiple times.
-# LATER 20210623 Deprecate def_lib
-\def_lib=
-	(\dir\cx
-	\memo=cache
-	@\lib\name
-	memo name;
-	evaluate (def "lib" lib; cx);
-	parse_file (path_under dir name)
-	)
-
 \std=
 (
 def "def" def;
+def "def_context" def_context;
+def "def_num" def_num;
 def "if" if;
 def "::" ::;
-def "chain" chain;
-def "using" using;
-def "def_lib" def_lib;
 
 def "use" use;
 def "use_file" use_file;
@@ -136,7 +125,7 @@ def "import" import;
 def "import_as" import_as;
 def "do_benchmark" do_benchmark;
 def "show_benchmark" show_benchmark;
-standard
+std
 )
 
 # Chain the libraries to load on demand.
@@ -159,6 +148,7 @@ standard
 \read_csv==(\= use "read_csv.fxl"; :: std; read)
 \read_ssv==(\= use "read_ssv.fxl"; :: std; :: read; list)
 
+def_context "std";
 :: std;
 :: bool;
 :: math;

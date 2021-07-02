@@ -8,7 +8,6 @@
 #include <ctype.h> /* isspace iscntrl */
 #include <parse.h>
 #include <report.h>
-#include <type_num.h>
 #include <type_str.h>
 #include <type_sym.h>
 #include <type_tuple.h>
@@ -220,17 +219,7 @@ static struct form *parse_symbol(void)
 		{
 		string name = parse_name();
 		if (name == 0) return 0;
-		/* See if it's a numeric constant. */
-		{
-		value def = Qnum_str0(name->data);
-		if (def)
-			{
-			str_free(name);
-			return form_val(def);
-			}
-		else
-			return form_ref(name,first_line,hold(label));
-		}
+		return form_ref(name,first_line,hold(label));
 		}
 	}
 
@@ -305,13 +294,6 @@ static struct form *parse_lambda(unsigned long first_line)
 
 	if (name == 0)
 		syntax_error("Missing name after '\\'", first_line);
-
-	/* Lambda name cannot be a numeric constant. */
-	{
-	value def = Qnum_str0(name->data);
-	if (def)
-		syntax_error("Lambda name cannot be a number", first_line);
-	}
 
 	/* Parse the optional definition of the name. */
 	skip_filler();

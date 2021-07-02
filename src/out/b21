@@ -22,6 +22,11 @@ str_num "+3.6" = 3.6
 str_num "+3." = 3
 str_num "+3" = 3
 str_num "+0" = 0
+str_num " 4.8" = 4.8
+str_num "inf" = inf
+str_num "nan" = nan
+str_num "-inf" = -inf
+str_num "-nan" = -nan
 
 = test bad
 str_num "" = void
@@ -33,17 +38,12 @@ str_num "-+" = void
 str_num "+-" = void
 str_num "+." = void
 str_num "4.8 5" = void
-str_num " 4.8" = void
 str_num "4.8 " = void
 str_num "-+3.6" = void
 str_num "+-3.6" = void
 str_num "-2.3x" = void
 str_num "3.6x" = void
 str_num "3.6 " = void
-str_num "inf" = void
-str_num "nan" = void
-str_num "-inf" = void
-str_num "-nan" = void
 
 ~1
 \err=
