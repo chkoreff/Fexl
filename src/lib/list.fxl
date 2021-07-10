@@ -1,3 +1,6 @@
+#
+using [std (lib "bool.fxl")] \;
+
 # Append lists xs and ys.
 \append=
 	(\xs\ys

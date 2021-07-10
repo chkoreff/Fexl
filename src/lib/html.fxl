@@ -1,3 +1,6 @@
+#
+using [std (lib "list.fxl") (lib "hex.fxl") (lib "format.fxl")] \;
+
 # Quote a character for embedding in HTML.
 \quote_ch=
 	(\ch

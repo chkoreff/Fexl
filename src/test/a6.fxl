@@ -1,5 +1,5 @@
 #
-evaluate (:: (use "test.fxl" std); std) \;
+using [(lib "test.fxl") std] \;
 
 \parse=
 	(\type\source

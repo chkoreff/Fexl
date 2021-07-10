@@ -1,0 +1,28 @@
+\out=
+~1
+  parse_file try.fxl
+  parse_file flintstone.fxl
+  parse_file test.fxl
+T
+T
+  parse_file stuff.fxl
+T
+other stuff here
+== in test.fxl: Do some stuff.
+run try.fxl
+==
+I am Fred.
+I am Wilma.
+I am Barney.
+I am Betty.
+  parse_file hello.fxl
+Hello world.
+  parse_file hello.fxl
+Hello world.
+  parse_file nothing.fxl
+steps 3498 bytes 16544
+~1
+\err=
+~1
+~1
+\status=0
