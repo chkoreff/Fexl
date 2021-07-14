@@ -1,5 +1,5 @@
 #
-using [(lib "test.fxl") std] \;
+evaluate (:: (use "test.fxl" std); std) \;
 
 say "== test Fibonacci"
 

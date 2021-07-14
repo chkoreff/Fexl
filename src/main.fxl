@@ -17,16 +17,6 @@
 	(\= next) key
 	)
 
-# Chain a list of contexts together, trying each one in turn.
-\chain=
-	(@\loop\list
-	list void \cx\list
-	\key
-	\val=((\= cx) key)
-	is_defined val val;
-	(\= loop list) key
-	)
-
 # (if x y) = y if x is true, other I.
 \if=(\x\y x y I)
 
@@ -51,12 +41,6 @@
 	@\self
 	def key self;
 	cx
-	)
-
-# Evaluate a form in a list of chained contexts.
-\using=
-	(\list
-	evaluate (chain list)
 	)
 
 \path_under=(\dir\name . (. dir "/") name)
@@ -108,60 +92,14 @@
 \do_benchmark=(run_benchmark trace)
 \show_benchmark=(run_benchmark say)
 
-# Evaluate an expression in a library system.  This defines a "lib" function
-# which loads libraries by name, caching them so they are not loaded again.
-# Libraries are loaded with the load function and resolved in the base context.
-# The resulting lib function is passed into the fn handler.
-\def_lib=
-	(\load\base\fn
-
-	# Cache for named libraries.
-	\v_lib=var_new
-
-	\lib=
-		(@\lib\name
-		fetch v_lib name;
-		evaluate
-			(
-			def_context "std";
-			def "lib" lib;
-			base
-			);
-		load name
-		)
-
-	# Evaluate the handler, passing in the lib function.
-	\result=(fn lib)
-
-	# Clear the cache to avoid any possible memory leak.  This could happen if
-	# your code defines a context that refers back to "lib" or "std", creating
-	# a physically circular structure in memory due to the use of var here to
-	# cache the libraries.
-
-	var_put v_lib void
-
-	# Return the result.
-	result
-	)
-
-# Define a library which loads files in a given directory.
-\def_lib_in=
-	(\dir
-	def_lib (\name parse_file (path_under dir name))
-	)
-
 # Add some functions to the standard context.
 \std=
 (
 def "def" def;
-def "def_context" def_context;
 def "def_num" def_num;
+def "def_context" def_context;
 def "if" if;
 def "::" ::;
-def "using" using;
-def "chain" chain;
-def "def_lib" def_lib;
-def "def_lib_in" def_lib_in;
 
 def "use" use;
 def "use_file" use_file;
@@ -191,41 +129,42 @@ def "show_benchmark" show_benchmark;
 std
 )
 
-# Create a lib function which loads libraries from dir_lib.
-def_lib_in dir_lib std \lib
-
 # Chain the libraries to load on demand.
 \std=
 (
-chain
-[
-std
-(lib "bool.fxl")
-(lib "math.fxl")
-(lib "list.fxl")
-(lib "format.fxl")
-(lib "indent.fxl")
-(lib "assoc.fxl")
-(lib "hex.fxl")
-(lib "html.fxl")
-(lib "time.fxl")
-(lib "date.fxl")
-(lib "run.fxl")
-(lib "read_csv.fxl")
-(lib "read_ssv.fxl")
-]
-)
+\use=(\name use_file (path_under dir_lib name))
 
-# Create a lib function which loads libraries from dir_local.
-def_lib_in dir_local std \lib
+\bool==(\= use "bool.fxl"; std)
+\math==(\= use "math.fxl"; std)
+\list==(\= use "list.fxl"; :: std; bool)
+\format==(\= use "format.fxl"; :: std; :: bool; :: math; list)
+\indent==(\= use "indent.fxl"; :: std; format)
+\assoc==(\= use "assoc.fxl"; :: std; list)
+\hex==(\= use "hex.fxl"; :: std; :: list; :: bool; math)
+\html==(\= use "html.fxl"; :: std; :: list; :: hex; format)
+\time==(\= use "time.fxl"; std)
+\date==(\= use "date.fxl"; :: std; :: math; list)
+\run==(\= use "run.fxl"; :: std; :: list; bool)
+\read==(\= use "read.fxl"; std)
+\read_csv==(\= use "read_csv.fxl"; :: std; read)
+\read_ssv==(\= use "read_ssv.fxl"; :: std; :: read; list)
 
-\std=
-(
 def_context "std";
-def "lib" lib;
-std
+:: std;
+:: bool;
+:: math;
+:: list;
+:: format;
+:: indent;
+:: assoc;
+:: hex;
+:: html;
+:: time;
+:: date;
+:: run;
+:: read_csv;
+read_ssv
 )
 
 # Evaluate the user's script.
-evaluate std;
-parse_file script_name
+use_file script_name std

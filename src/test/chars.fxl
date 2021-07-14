@@ -2,7 +2,7 @@
 #abcdefghijklmnopqrstuvwxyz
 #abcdefghijklmnopqrstuvwxyz
 # ^ Those characters used by test/b10.fxl.
-using [(lib "test.fxl") std] \;
+evaluate (:: (use "test.fxl" std); std) \;
 
 \try=
 	(\str

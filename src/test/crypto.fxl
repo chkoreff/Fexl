@@ -1,5 +1,5 @@
 #
-using [(lib "test.fxl") std] \;
+evaluate (:: (use "test.fxl" std); std) \;
 
 \try_nacl_box_public=
 	(\secret_key

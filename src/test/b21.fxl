@@ -30,10 +30,12 @@ try "+3." # weird but whatever
 try "+3"
 try "+0"
 try " 4.8" # Only leading space is allowed.
+
 try "inf"
 try "nan"
-try "-inf"
-try "-nan"
+# strtod does not handle -nan reliably on some machines.
+#try "-inf"
+#try "-nan"
 nl
 
 say "= test bad"

@@ -1,5 +1,5 @@
 #
-using [(lib "bn.fxl") std] \;
+evaluate (:: (use "bn.fxl" std); std) \;
 
 #trace_elapsed;
 show_benchmark;

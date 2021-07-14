@@ -1,7 +1,4 @@
 #
-using [std (lib "math.fxl") (lib "list.fxl")] \;
-
-#
 \long_month_names=
 [
 "January"

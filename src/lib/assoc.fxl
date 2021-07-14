@@ -1,5 +1,4 @@
 # (Sat 2018-07-28 In memoriam, Charlie the cat, thank you little friend.)
-using [std (lib "list.fxl")] \;
 
 \get_key=
 	(\key @\loop \list

@@ -34,7 +34,7 @@ try "x"
 )
 
 say "== test_full"
-test_context (chain [(lib "test.fxl") std])
+test_context (:: (use "test.fxl" std) std)
 
 say "== test_restricted"
 test_context
