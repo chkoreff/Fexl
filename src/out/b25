@@ -3,6 +3,6 @@
 ~1
 \err=
 ~1
-Undefined symbol x3.14 on line 1
+Lambda name cannot be a number on line 1
 ~1
 \status=1

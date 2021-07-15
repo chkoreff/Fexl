@@ -1,7 +1,7 @@
 struct symbol
 	{
 	struct symbol *next;
-	string name;
+	value name;
 	value pattern;
 	unsigned long line;
 	value source;

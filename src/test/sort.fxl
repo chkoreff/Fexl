@@ -20,7 +20,6 @@ def "show_list" show_list;
 def "sort" sort;
 def "tower" tower;
 def "unique" unique;
-def_num;
 void
 ) \;
 # Here I test the sort.

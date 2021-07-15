@@ -224,8 +224,9 @@ show (is_num 4.2)
 show (is_num (* 3.9 4.2))
 
 div
+# Numbers cannot have extraneous white space or other characters.
 show (is_num; str_num "4.87")
-show (is_num; str_num "  4.87") # Only leading white space is allowed.
+show (is_num; str_num "  4.87")
 show (is_num; str_num " 4.87 ")
 show (is_num; str_num "4.87x")
 show (is_num; str_num "-4.6")
@@ -378,7 +379,6 @@ def "exp" exp;
 def "log" log;
 def "sin" sin;
 def "fred" (say "I am Fred.");
-def_num;
 void
 ) \;
 say "hi"
@@ -746,7 +746,6 @@ talk
 		(
 		def "say" say;
 		def "+" *;
-		def_num;
 		void
 		)
 		form

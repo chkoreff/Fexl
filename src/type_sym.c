@@ -14,7 +14,7 @@ value Qevaluate;
 
 static void sym_free(struct symbol *sym)
 	{
-	str_free(sym->name);
+	drop(sym->name);
 	drop(sym->pattern);
 	drop(sym->source);
 	free_memory(sym,sizeof(struct symbol));
@@ -68,7 +68,7 @@ struct form *form_ref(string name, unsigned long line, value source)
 	{
 	struct symbol *sym = new_memory(sizeof(struct symbol));
 	sym->next = 0;
-	sym->name = name;
+	sym->name = Qstr(name);
 	sym->pattern = hold(QT);
 	sym->line = line;
 	sym->source = source;
@@ -87,7 +87,7 @@ static struct symbol *sym_merge(struct symbol *fun, struct symbol *arg)
 	else if (!arg)
 		cmp = -1;
 	else
-		cmp = strcmp(fun->name->data,arg->name->data);
+		cmp = strcmp(str_data(fun->name),str_data(arg->name));
 
 	if (cmp < 0)
 		{
@@ -139,7 +139,7 @@ static struct symbol *sym_pop(const char *name, struct symbol *sym,
 	if (!sym)
 		cmp = -1;
 	else
-		cmp = strcmp(name,sym->name->data);
+		cmp = strcmp(name,str_data(sym->name));
 
 	if (cmp < 0)
 		*pattern = hold(QF); /* not found */
@@ -193,15 +193,9 @@ value type_subst(value f)
 	return subst(f->L->L->R,f->L->R,f->R);
 	}
 
-static value resolve_name(value context, string name)
+static value resolve_name(value context, value name)
 	{
-	value key = Qstr(name);
-	value val = eval(A(A(hold(context),hold(key)),hold(Qcatch)));
-
-	key->L = 0;
-	key->R = 0;
-	drop(key);
-
+	value val = eval(A(A(hold(context),hold(name)),hold(Qcatch)));
 	if (val->T == type_catch && val->L && !val->L->R)
 		{
 		value x = hold(val->R);
@@ -227,7 +221,8 @@ static value resolve(value context, struct form *form)
 		if (val == 0)
 			{
 			undefined = 1;
-			undefined_symbol(sym->name->data,sym->line,str_data(sym->source));
+			undefined_symbol(str_data(sym->name),sym->line,
+				str_data(sym->source));
 			val = hold(Qvoid);
 			}
 

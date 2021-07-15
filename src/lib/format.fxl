@@ -138,7 +138,6 @@ format_num
 		def "T" T;
 		def "F" F;
 		def "void" void;
-		def_num;
 		void
 		);
 	parse str ""

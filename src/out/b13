@@ -18,10 +18,10 @@ name dirname : T
 name hex_digit : T
 name read_ssv_file : T
 name read_csv_file : T
-name 2.5 : T
-name 0 : T
-name -3.56 : T
-name -3.56e-4 : T
+name 2.5 : F
+name 0 : F
+name -3.56 : F
+name -3.56e-4 : F
 name -3.56e-4x : F
 name x : F
 == test_restricted
@@ -42,10 +42,10 @@ name dirname : F
 name hex_digit : F
 name read_ssv_file : F
 name read_csv_file : F
-name 2.5 : T
-name 0 : T
-name -3.56 : T
-name -3.56e-4 : T
+name 2.5 : F
+name 0 : F
+name -3.56 : F
+name -3.56e-4 : F
 name -3.56e-4x : F
 name x : F
 == test_run_restricted
@@ -53,6 +53,7 @@ I am Fred.
 0.927291684284476
 0.471201063818858
 I am Wilma.
+msg
 ~1
 \err=
 ~1

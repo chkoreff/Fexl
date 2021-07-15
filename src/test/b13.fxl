@@ -41,7 +41,6 @@ test_context
 	(
 	def "say" say;
 	def "is_defined" is_defined;
-	def_num;
 	void
 	)
 
@@ -55,7 +54,6 @@ def "seed_rand" seed_rand;
 def "rand" rand;
 def "fred" (say "I am Fred.");
 def "wilma" (say "I am Wilma.");
-def_num;
 void
 ) \;
 
@@ -64,4 +62,15 @@ fred
 say rand
 say rand
 wilma
+)
+
+# Regression test for resolve_name in type_sym.c.  Formerly segfaulted.
+(
+evaluate
+(\key
+eq key "msg" {key};
+std key
+) \;
+
+say msg
 )

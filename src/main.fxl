@@ -26,14 +26,6 @@
 # Define key as val.
 \def=(\key\val with key {val})
 
-# Define numeric constants.
-\def_num=
-	(\cx\key
-	\val=(str_num key)
-	is_defined val {val};
-	cx key
-	)
-
 # Define key to refer to a context.
 \def_context=
 	(\key\cx
@@ -96,7 +88,6 @@
 \std=
 (
 def "def" def;
-def "def_num" def_num;
 def "def_context" def_context;
 def "if" if;
 def "::" ::;
