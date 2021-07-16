@@ -16,7 +16,6 @@ static void sym_free(struct symbol *sym)
 	{
 	drop(sym->name);
 	drop(sym->pattern);
-	drop(sym->source);
 	free_memory(sym,sizeof(struct symbol));
 	}
 
@@ -25,6 +24,7 @@ static struct form *form_new(struct symbol *sym, value exp)
 	struct form *form = new_memory(sizeof(struct form));
 	form->sym = sym;
 	form->exp = exp;
+	form->label = 0;
 	return form;
 	}
 
@@ -43,6 +43,8 @@ static void form_free(struct form *form)
 		sym = next;
 		}
 	drop(form->exp);
+	if (form->label)
+		drop(form->label);
 	form_discard(form);
 	}
 
@@ -64,14 +66,13 @@ struct form *form_val(value exp)
 	}
 
 /* Make a reference to a symbol on a given line. */
-struct form *form_ref(string name, unsigned long line, value source)
+struct form *form_ref(string name, unsigned long line)
 	{
 	struct symbol *sym = new_memory(sizeof(struct symbol));
 	sym->next = 0;
 	sym->name = Qstr(name);
 	sym->pattern = hold(QT);
 	sym->line = line;
-	sym->source = source;
 	return form_new(sym,hold(QI));
 	}
 
@@ -213,6 +214,7 @@ static value resolve(value context, struct form *form)
 	{
 	struct symbol *sym = form->sym;
 	value exp = hold(form->exp);
+	const char *label = str_data(form->label);
 	int undefined = 0;
 
 	while (sym)
@@ -221,8 +223,7 @@ static value resolve(value context, struct form *form)
 		if (val == 0)
 			{
 			undefined = 1;
-			undefined_symbol(str_data(sym->name),sym->line,
-				str_data(sym->source));
+			undefined_symbol(str_data(sym->name),sym->line,label);
 			val = hold(Qvoid);
 			}
 

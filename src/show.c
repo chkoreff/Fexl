@@ -201,6 +201,11 @@ static void show_sym(struct symbol *sym)
 
 static void show_form(struct form *form)
 	{
+	if (form->label)
+		put_quote(get_str(form->label));
+	else
+		put_ch('0');
+	put_ch(' ');
 	show_sym(form->sym);
 	put_ch(' ');
 	limit_show(form->exp);

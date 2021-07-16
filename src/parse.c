@@ -229,7 +229,7 @@ static struct form *parse_symbol(void)
 			return form_val(def);
 			}
 		else
-			return form_ref(name,first_line,hold(label));
+			return form_ref(name,first_line);
 		}
 		}
 	}
@@ -345,7 +345,9 @@ static struct form *parse_lambda(unsigned long first_line)
 /* Parse a form (unresolved symbolic expression). */
 static struct form *parse_form(void)
 	{
-	return form_val(Qform(parse_exp()));
+	struct form *exp = parse_exp();
+	exp->label = hold(label);
+	return form_val(Qform(exp));
 	}
 
 /* Parse the next factor of an expression.  Return 0 if no factor found. */
@@ -419,6 +421,7 @@ value parse_input(input _get, void *_source, value _label)
 	struct form *exp = parse_exp();
 	if (ch != -1)
 		syntax_error("Extraneous input", line);
+	exp->label = hold(label);
 	return Qform(exp);
 	}
 	}
