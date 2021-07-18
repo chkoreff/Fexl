@@ -168,6 +168,7 @@ static void put_type(type t)
 
 	else if (t == type_assoc) put("assoc");
 	else if (t == type_with) put("with");
+	else if (t == type_def) put("def");
 	else if (t == type_fetch) put("fetch");
 
 	else put_ch('?');

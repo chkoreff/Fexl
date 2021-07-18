@@ -23,9 +23,6 @@
 \trace=(fsay stderr)
 \error=(\msg trace msg die)
 
-# Define key as val.
-\def=(\key\val with key {val})
-
 # Define key to refer to a context.
 \def_context=
 	(\key\cx
@@ -87,7 +84,6 @@
 # Add some functions to the standard context.
 \std=
 (
-def "def" def;
 def "def_context" def_context;
 def "if" if;
 def "::" ::;

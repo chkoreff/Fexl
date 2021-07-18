@@ -61,6 +61,21 @@ value type_with(value f)
 	}
 	}
 
+/*
+Equivalent to:
+\def=(\key\val with key {val})
+*/
+value type_def(value f)
+	{
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	{
+	value key = arg(f->L->L->R);
+	value val = hold(f->L->R);
+	value obj = arg(f->R);
+	return Qassoc(key,AV(hold(Qyield),val),obj);
+	}
+	}
+
 /* (fetch v k x)
 Return the value at key k in index v.  If no value, store the value of x in
 the index so you get the same value next time.  Equivalent to:
