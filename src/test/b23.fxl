@@ -1,7 +1,6 @@
 # Ensure automatic loading of libraries.  Each of these lines loads the next
 # library file in the standard search order.
-if F
-(
+\_
 say std use def if
 and or not
 neg max
@@ -16,4 +15,3 @@ split_date day_of_week
 grab_output
 read_csv_file
 read_ssv_file
-)
