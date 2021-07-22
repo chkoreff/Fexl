@@ -1,5 +1,5 @@
 #
-evaluate (:: (use "test.fxl" std); std) \;
+value; (value; std; use "test.fxl"); std; \;
 
 show_benchmark;
 
@@ -13,15 +13,13 @@ show_benchmark;
 	)
 
 # Test restricted evaluation by defining only the necessary functions.
-evaluate
-(
+value;
 def "append" append;
 def "show_list" show_list;
 def "sort" sort;
 def "tower" tower;
 def "unique" unique;
-void
-) \;
+\;
 # Here I test the sort.
 
 # A list of 30 random words from diceware.com.

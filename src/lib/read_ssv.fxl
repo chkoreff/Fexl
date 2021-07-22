@@ -79,7 +79,8 @@
 \read_ssv_chars=(read_chars get_rows)
 \read_ssv_file=(read_file get_rows)
 
+\form
 def "read_ssv_string" read_ssv_string;
 def "read_ssv_chars" read_ssv_chars;
 def "read_ssv_file" read_ssv_file;
-void
+form

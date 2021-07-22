@@ -133,13 +133,10 @@ format_num
 
 \str_to_data=
 	(\str
-	evaluate
-		(
-		def "T" T;
-		def "F" F;
-		def "void" void;
-		void
-		);
+	value;
+	def "T" T;
+	def "F" F;
+	def "void" void;
 	parse str ""
 	)
 
@@ -179,6 +176,7 @@ format_num
 # Trim spaces at the end of the string.
 \trim_end_spaces=(str_trim_spaces F T)
 
+\form
 def "repeat_str" repeat_str;
 def "format_num" format_num;
 def "format_money" format_money;
@@ -195,4 +193,4 @@ def "str_trim" str_trim;
 def "trim_spaces" trim_spaces;
 def "trim_beg_spaces" trim_beg_spaces;
 def "trim_end_spaces" trim_end_spaces;
-void
+form

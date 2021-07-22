@@ -1,17 +1,18 @@
 # Ensure automatic loading of libraries.  Each of these lines loads the next
 # library file in the standard search order.
 \_
-say std use def if
-and or not
-neg max
-map sort_all
-as_str trim_spaces
-say_data
-get_key put_key
-oct hex
-tag tr
-trace_elapsed
-split_date day_of_week
-grab_output
-read_csv_file
-read_ssv_file
+say std def # std
+use if # extra
+and or not # bool
+neg max # math
+map sort_all # list
+as_str trim_spaces # format
+say_data # indent
+get_key put_key # assoc
+oct hex # hex
+tag tr # html
+trace_elapsed # time
+split_date day_of_week # date
+grab_output # run
+read_csv_file # read_csv
+read_ssv_file # read_ssv

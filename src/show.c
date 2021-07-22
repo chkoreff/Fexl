@@ -29,7 +29,9 @@ static void put_type(type t)
 	if (t == type_A) put_ch('A');
 	else if (t == 0) put_ch('0');
 
-	else if (t == type_evaluate) put("evaluate");
+	else if (t == type_is_closed) put("is_closed");
+	else if (t == type_def) put("def");
+	else if (t == type_value) put("value");
 	else if (t == type_resolve) put("resolve");
 	else if (t == type_subst) put("subst");
 
@@ -72,7 +74,6 @@ static void put_type(type t)
 	else if (t == type_cons) put("cons");
 	else if (t == type_null) put("null");
 	else if (t == type_eval) put("eval");
-	else if (t == type_catch) put("catch");
 	else if (t == type_yield) put("yield");
 	else if (t == type_once) put("once");
 	else if (t == type_is_defined) put("is_defined");
@@ -139,9 +140,9 @@ static void put_type(type t)
 	else if (t == type_rand) put("rand");
 
 	else if (t == type_parse) put("parse");
-	else if (t == type_parse_file) put("parse_file");
+	else if (t == type_use_file) put("use_file");
 
-	else if (t == type_standard) put("std");
+	else if (t == type_std) put("std");
 
 	else if (t == type_buf) put("buf");
 	else if (t == type_buf_new) put("buf_new");
@@ -168,7 +169,6 @@ static void put_type(type t)
 
 	else if (t == type_assoc) put("assoc");
 	else if (t == type_with) put("with");
-	else if (t == type_def) put("def");
 	else if (t == type_fetch) put("fetch");
 
 	else put_ch('?');

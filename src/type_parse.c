@@ -13,8 +13,6 @@
 #include <type_parse.h>
 #include <type_str.h>
 
-value Qparse_file;
-
 static value parse_fh(FILE *fh, value label)
 	{
 	return parse_input((input)fgetc,fh,label);
@@ -64,7 +62,7 @@ value type_parse(value f)
 
 /* Parse a named file.  Note that if name designates a directory the fopen will
 succeed, but it will behave like an empty file. */
-static value parse_file(value name)
+static value use_file(value name)
 	{
 	const char *name_s = str_data(name);
 	FILE *fh = name_s[0] ? fopen(name_s,"r") : stdin;
@@ -80,14 +78,14 @@ static value parse_file(value name)
 	return exp;
 	}
 
-/* (parse_file name) Parse the named file. */
-value type_parse_file(value f)
+/* (use_file name) Parse the named file. */
+value type_use_file(value f)
 	{
 	if (!f->L) return 0;
 	{
 	value name = arg(f->R);
 	if (name->T == type_str)
-		f = parse_file(name);
+		f = use_file(name);
 	else
 		f = hold(Qvoid);
 	drop(name);

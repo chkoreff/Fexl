@@ -1,48 +1,42 @@
 # Run the user's script given by argv[1] in the enhanced standard context.
 
-# Use a file given by a direct path.
-\use_file=(\name\context evaluate context; parse_file name)
-
 # (check x d) = x if x is good, otherwise d.
-\check=(\x \x=x is_defined x x)
+\check==(\x \x=x is_defined x x)
 # (default d x) = x if x is good, otherwise d.
-\default=(\d\x \x=x is_defined x x d)
+\default==(\d\x \x=x is_defined x x d)
 
-# Returns a context which tries prev first, then next.
-\::=
-	(\prev\next
-	\key
-	\val=((\= prev) key)
-	is_defined val val;
-	(\= next) key
+# Use the context only if the form has open symbols.
+\::==
+	(\cx\form
+	\form=form
+	is_closed form form;
+	cx form
 	)
 
-# (if x y) = y if x is true, other I.
-\if=(\x\y x y I)
-
-\trace=(fsay stderr)
-\error=(\msg trace msg die)
-
 # Define key to refer to a context.
-\def_context=
+\defc==
 	(\key\cx
 	\cx=cx
-	@\self
-	def key self;
-	cx
+	@\self\form
+	cx; def key self; form
 	)
 
 \path_under=(\dir\name . (. dir "/") name)
 
 # Establish paths based on command arguments.
 \dir_base=(dirname; dirname; argv 0)
-\dir_lib=(path_under dir_base "src/lib")
+\script_name=(default ""; argv 1)
 
-\script_name=(default "" (argv 1))
+# Define some extra functions.
+\extra==
+(\=
+# (if x y) = y if x is true, other I.
+\if=(\x\y x y I)
+
 \dir_local=(dirname script_name)
 
-# Use a file in the directory which contains the user's script.
-\use=(\name use_file (path_under dir_local name))
+\trace=(fsay stderr)
+\error=(\msg trace msg die)
 
 # Make a cache which remembers the values of a function with n arguments.
 \remember=
@@ -68,9 +62,6 @@
 \LF==NL
 \QU==~ "~
 
-\import=(\cx\key with key (cx key))
-\import_as=(\cx\key\name with name (cx key))
-
 \run_benchmark=
 	(\show\f
 	fexl_benchmark f \val\steps\bytes
@@ -81,15 +72,14 @@
 \do_benchmark=(run_benchmark trace)
 \show_benchmark=(run_benchmark say)
 
-# Add some functions to the standard context.
-\std=
-(
-def "def_context" def_context;
+# Use a file in the directory which contains the user's script.
+\use==(\name use_file; path_under dir_local name)
+
+\form
+def "defc" defc;
 def "if" if;
 def "::" ::;
-
 def "use" use;
-def "use_file" use_file;
 
 def "check" check;
 def "default" default;
@@ -109,49 +99,50 @@ def "QU" QU;
 
 def "remember" remember;
 def "cache" cache;
-def "import" import;
-def "import_as" import_as;
 def "do_benchmark" do_benchmark;
 def "show_benchmark" show_benchmark;
-std
+form
 )
 
-# Chain the libraries to load on demand.
+# Enhance the standard context to load libraries on demand.
 \std=
 (
-\use=(\name use_file (path_under dir_lib name))
+\dir_lib=(path_under dir_base "src/lib")
+\use==(\name use_file; path_under dir_lib name)
 
-\bool==(\= use "bool.fxl"; std)
-\math==(\= use "math.fxl"; std)
-\list==(\= use "list.fxl"; :: std; bool)
-\format==(\= use "format.fxl"; :: std; :: bool; :: math; list)
-\indent==(\= use "indent.fxl"; :: std; format)
-\assoc==(\= use "assoc.fxl"; :: std; list)
-\hex==(\= use "hex.fxl"; :: std; :: list; :: bool; math)
-\html==(\= use "html.fxl"; :: std; :: list; :: hex; format)
-\time==(\= use "time.fxl"; std)
-\date==(\= use "date.fxl"; :: std; :: math; list)
-\run==(\= use "run.fxl"; :: std; :: list; bool)
-\read==(\= use "read.fxl"; std)
-\read_csv==(\= use "read_csv.fxl"; :: std; read)
-\read_ssv==(\= use "read_ssv.fxl"; :: std; :: read; list)
+\bool==(\= value; std; use "bool.fxl")
+\math==(\= value; std; use "math.fxl")
+\list==(\= value; bool; std; use "list.fxl")
+\format==(\= value; list; math; bool; extra; std; use "format.fxl")
+\indent==(\= value; format; extra; std; use "indent.fxl")
+\assoc==(\= value; list; std; use "assoc.fxl")
+\hex==(\= value; math; list; bool; std; use "hex.fxl")
+\html==(\= value; format; hex; list; extra; std; use "html.fxl")
+\time==(\= value; extra; std; use "time.fxl")
+\date==(\= value; list; math; std; use "date.fxl")
+\run==(\= value; bool; list; extra; std; use "run.fxl")
+\read==(\= value; extra; std; use "read.fxl")
+\read_csv==(\= value; read; extra; std; use "read_csv.fxl")
+\read_ssv==(\= value; list; read; extra; std; use "read_ssv.fxl")
 
-def_context "std";
-:: std;
-:: bool;
-:: math;
-:: list;
-:: format;
-:: indent;
-:: assoc;
-:: hex;
-:: html;
-:: time;
-:: date;
-:: run;
+defc "std";
+\form
+:: read_ssv;
 :: read_csv;
-read_ssv
+:: run;
+:: date;
+:: time;
+:: html;
+:: hex;
+:: assoc;
+:: indent;
+:: format;
+:: list;
+:: math;
+:: bool;
+:: extra;
+std form
 )
 
 # Evaluate the user's script.
-use_file script_name std
+value; std; use_file script_name

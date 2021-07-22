@@ -1,23 +1,24 @@
 # Test fancy extended standard context.
+value;
 
-# Define a few extra functions.
-evaluate
+# Define a few extra functions, and redefine "std".
+defc "std"
 (
 say "Evaluating the context."
 \speaker=(\name \x put name put " says " say x)
-def_context "std";
+\form
+std;
 def "fred" (speaker "Fred");
 def "wilma" (speaker "Wilma");
 def "goodbye" (say "Goodbye");
-std
+form
 ) \;
 
 # Now override one of the definitions.
-evaluate
-(
+value;
+std;
 def "fred" (put "HEY: " fred);
-std
-) \;
+\;
 
 # Now run this program in the enhanced context.
 say "Hi"

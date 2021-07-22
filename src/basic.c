@@ -12,7 +12,6 @@ value Qcons;
 value Qnull;
 value Qeval;
 value Qonce;
-value Qcatch;
 value Qyield;
 
 /* (I x) = x */
@@ -104,13 +103,6 @@ value type_once(value f)
 	f->T = type_I;
 	f->R = hold(x);
 	return x;
-	}
-
-/* Catch arguments but do nothing.  Used internally for symbol resolution. */
-value type_catch(value f)
-	{
-	(void)f;
-	return 0;
 	}
 
 /* (yield x f) = (f x)  Used for returning an unevaluated function. */

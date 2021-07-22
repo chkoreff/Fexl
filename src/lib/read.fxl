@@ -45,6 +45,7 @@
 	data
 	)
 
+\form
 def "scan" scan;
 def "push" push;
 def "is_eol" is_eol;
@@ -54,4 +55,4 @@ def "collect_to" collect_to;
 def "read_chars" read_chars;
 def "read_string" read_string;
 def "read_file" read_file;
-void
+form

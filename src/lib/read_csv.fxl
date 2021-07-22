@@ -67,7 +67,8 @@
 \read_csv_chars=(read_chars get_rows)
 \read_csv_file=(read_file get_rows)
 
+\form
 def "read_csv_string" read_csv_string;
 def "read_csv_chars" read_csv_chars;
 def "read_csv_file" read_csv_file;
-void
+form

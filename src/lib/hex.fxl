@@ -68,10 +68,11 @@
 		(str_bytes str)
 	)
 
+\form
 def "hex_digit" hex_digit;
 def "hex_byte" hex_byte;
 def "hex_digit_to_dec" hex_digit_to_dec;
 def "xor_hex" xor_hex;
 def "oct" oct;
 def "hex" hex;
-void
+form

@@ -1,5 +1,5 @@
 #
-evaluate (:: (use "test.fxl" std); std) \;
+value; std; (value; std; use "test.fxl") \;
 
 # Echo the characters from the input.
 \echo=

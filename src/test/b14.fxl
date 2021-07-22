@@ -96,8 +96,10 @@
 		nl
 		)
 
-	\context=
+	\form
+	value
 		(
+		std;
 		def "show_pos" show_pos;
 		def "seek_set" seek_set;
 		def "seek_cur" seek_cur;
@@ -106,11 +108,8 @@
 		def "write" write;
 		def "read" read;
 		def "sleep" sleep;
-		std
+		form
 		)
-
-	\form
-	evaluate context form
 	\code=(remove path)
 	say [(eq code 0 "Removed" "Could not remove")" "path]
 	fclose fh

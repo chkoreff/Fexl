@@ -1,9 +1,8 @@
 #
-evaluate
-(
+value;
+std;
 def "talk" (say "TALK");
-std
-) \;
+\;
 say "begin"
 talk
 talk

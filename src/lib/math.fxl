@@ -10,10 +10,11 @@
 
 \round2=(\x / (round (* 100 x)) 100)
 
+\form
 def "neg" neg;
 def "max" max;
 def "min" min;
 def "mod" mod;
 def "tau" tau;
 def "round2" round2;
-void
+form

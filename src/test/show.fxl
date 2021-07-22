@@ -105,13 +105,13 @@ eq name "b42"
 (
 run_filter
 ~
-evaluate (def "b" (say "b"); void) \; a b
+value; def "b" (say "b"); \; a b
 a c
 c
 ~
 );
 
-eq name "b43" (run_filter ~ parse_file "missing.fxl" ~);
+eq name "b43" (run_filter ~ use_file "missing.fxl" ~);
 
 # Other normal tests run here.
 run_script name ""

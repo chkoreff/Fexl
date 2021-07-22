@@ -10,7 +10,6 @@
 #include <type_sym.h>
 
 value Qsubst;
-value Qevaluate;
 
 static void sym_free(struct symbol *sym)
 	{
@@ -19,12 +18,12 @@ static void sym_free(struct symbol *sym)
 	free_memory(sym,sizeof(struct symbol));
 	}
 
-static struct form *form_new(struct symbol *sym, value exp)
+static struct form *form_new(struct symbol *sym, value exp, value label)
 	{
 	struct form *form = new_memory(sizeof(struct form));
 	form->sym = sym;
 	form->exp = exp;
-	form->label = 0;
+	form->label = label;
 	return form;
 	}
 
@@ -62,18 +61,24 @@ value Qform(struct form *exp)
 /* Make a reference to a fixed value with no symbols. */
 struct form *form_val(value exp)
 	{
-	return form_new(0,exp);
+	return form_new(0,exp,0);
+	}
+
+static struct symbol *sym_new(value name, value pattern, unsigned long line,
+	struct symbol *next)
+	{
+	struct symbol *sym = new_memory(sizeof(struct symbol));
+	sym->next = next;
+	sym->name = name;
+	sym->pattern = pattern;
+	sym->line = line;
+	return sym;
 	}
 
 /* Make a reference to a symbol on a given line. */
 struct form *form_ref(string name, unsigned long line)
 	{
-	struct symbol *sym = new_memory(sizeof(struct symbol));
-	sym->next = 0;
-	sym->name = Qstr(name);
-	sym->pattern = hold(QT);
-	sym->line = line;
-	return form_new(sym,hold(QI));
+	return form_new(sym_new(Qstr(name),hold(QT),line,0),hold(QI),0);
 	}
 
 /* Merge the symbol lists and combine patterns where they intersect. */
@@ -94,21 +99,20 @@ static struct symbol *sym_merge(struct symbol *fun, struct symbol *arg)
 		{
 		fun->pattern = A(fun->pattern,hold(QF));
 		fun->next = sym_merge(fun->next,arg);
-		return fun;
 		}
 	else if (cmp > 0)
 		{
 		arg->pattern = A(hold(QF),arg->pattern);
 		arg->next = sym_merge(fun,arg->next);
-		return arg;
+		fun = arg;
 		}
 	else
 		{
 		fun->pattern = A(fun->pattern,hold(arg->pattern));
 		fun->next = sym_merge(fun->next,arg->next);
 		sym_free(arg);
-		return fun;
 		}
+	return fun;
 	}
 
 /* Make an applicative form with the given type. */
@@ -194,70 +198,110 @@ value type_subst(value f)
 	return subst(f->L->L->R,f->L->R,f->R);
 	}
 
-static value resolve_name(value context, value name)
+/* Copy a list of symbols except the one with the given pattern. */
+static struct symbol *sym_copy(struct symbol *sym, value pattern)
 	{
-	value val = eval(A(A(hold(context),hold(name)),hold(Qcatch)));
-	if (val->T == type_catch && val->L && !val->L->R)
-		{
-		value x = hold(val->R);
-		drop(val);
-		return x;
-		}
-	else
-		{
-		drop(val);
-		return 0;
-		}
+	if (!sym) return 0;
+	if (sym->pattern == pattern)
+		return sym_copy(sym->next,pattern);
+	return sym_new(hold(sym->name),hold(sym->pattern),sym->line,
+		sym_copy(sym->next,pattern));
 	}
 
-static value resolve(value context, struct form *form)
+/* Return true if the form has no undefined symbols. */
+value type_is_closed(value f)
 	{
-	struct symbol *sym = form->sym;
-	value exp = hold(form->exp);
-	const char *label = str_data(form->label);
-	int undefined = 0;
-
-	while (sym)
-		{
-		value val = resolve_name(context,sym->name);
-		if (val == 0)
-			{
-			undefined = 1;
-			undefined_symbol(str_data(sym->name),sym->line,label);
-			val = hold(Qvoid);
-			}
-
-		{
-		value next = subst(sym->pattern,exp,val);
-		drop(val);
-		drop(exp);
-		exp = next;
-		}
-
-		sym = sym->next;
-		}
-
-	if (undefined)
-		die(0); /* The expression had undefined symbols. */
-
-	return exp;
-	}
-
-/* (evaluate context exp) Evaluate the expression in the context. */
-value type_evaluate(value f)
+	if (!f->L) return 0;
 	{
-	if (!f->L || !f->L->L) return 0;
-	{
-	value context = arg(f->L->R);
 	value exp = arg(f->R);
 	if (exp->T == type_form)
 		{
 		struct form *form = (struct form *)exp->R;
-		f = resolve(context,form);
+		f = boolean(form->sym == 0);
 		}
 	else
 		f = hold(Qvoid);
-	drop(context);
+	drop(exp);
+	return f;
+	}
+	}
+
+/* Define key as val in a form. */
+static value def(const char *key, value val, value exp)
+	{
+	struct form *form = (struct form *)exp->R;
+	struct symbol *cur = form->sym;
+	value pattern = 0;
+
+	while (cur)
+		{
+		int cmp = strcmp(key,str_data(cur->name));
+		if (cmp > 0)
+			cur = cur->next;
+		else
+			{
+			if (cmp == 0)
+				pattern = cur->pattern;
+			break;
+			}
+		}
+
+	if (pattern == 0)
+		return hold(exp);
+	else
+		return Qform(form_new(
+			sym_copy(form->sym,pattern),
+			subst(pattern,form->exp,val),
+			hold(form->label)));
+	}
+
+value type_def(value f)
+	{
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	{
+	value key = arg(f->L->L->R);
+	if (key->T == type_str)
+		{
+		value exp = arg(f->R);
+		if (exp->T == type_form)
+			f = def(str_data(key),f->L->R,exp);
+		else
+			f = hold(Qvoid);
+		drop(exp);
+		}
+	else
+		f = hold(Qvoid);
+	drop(key);
+	return f;
+	}
+	}
+
+/* Evaluate the form if all symbols are defined, otherwise report the undefined
+symbols and die. */
+value type_value(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value exp = arg(f->R);
+	if (exp->T == type_form)
+		{
+		struct form *form = (struct form *)exp->R;
+		struct symbol *cur = form->sym;
+		if (cur == 0)
+			f = hold(form->exp);
+		else
+			{
+			const char *label = str_data(form->label);
+			while (cur)
+				{
+				undefined_symbol(str_data(cur->name),cur->line,label);
+				cur = cur->next;
+				}
+			die(0);
+			}
+		}
+	else
+		f = hold(Qvoid);
 	drop(exp);
 	return f;
 	}
@@ -266,7 +310,51 @@ value type_evaluate(value f)
 /* (resolve context exp) Resolve the expression in the context and yield it. */
 value type_resolve(value f)
 	{
-	f = type_evaluate(f);
+	f = type_value(f);
 	if (f) f = AV(hold(Qyield),f);
 	return f;
+	}
+
+static struct symbol *resolve(struct symbol *sym, value *result,
+	value op(const char *name))
+	{
+	if (!sym) return 0;
+	{
+	value val = op(str_data(sym->name));
+	if (val)
+		{
+		value exp = subst(sym->pattern,*result,val);
+		drop(val);
+		drop(*result);
+		*result = exp;
+		return resolve(sym->next,result,op);
+		}
+	else
+		return sym_new(hold(sym->name),hold(sym->pattern),
+			sym->line,resolve(sym->next,result,op));
+	}
+	}
+
+value op_resolve(value f, value op(const char *name))
+	{
+	if (!f->L) return 0;
+	{
+	value exp = arg(f->R);
+	if (exp->T == type_form)
+		{
+		struct form *form = (struct form *)exp->R;
+		if (form->sym == 0)
+			f = hold(exp);
+		else
+			{
+			value result = hold(form->exp);
+			struct symbol *sym = resolve(form->sym,&result,op);
+			f = Qform(form_new(sym,result,hold(form->label)));
+			}
+		}
+	else
+		f = hold(Qvoid);
+	drop(exp);
+	return f;
+	}
 	}

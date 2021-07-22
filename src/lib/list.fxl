@@ -435,6 +435,7 @@
 	F
 	)
 
+\form
 def "append" append;
 def "flatten" flatten;
 def "each" each;
@@ -482,4 +483,4 @@ def "ends_with" ends_with;
 def "map_bytes_to_double" map_bytes_to_double;
 def "random_double" random_double;
 def "eq_data" eq_data;
-void
+form

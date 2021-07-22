@@ -441,15 +441,15 @@ try void
 # Test import.
 (
 say "= import"
-evaluate
-(
-\cx=(use "test.fxl" std)
-import cx "div";
-import_as cx "show_hex" "test.show_hex";
-import_as cx "show_str" "test.show_str";
-std
-) \;
-
+# Extract specific functions from a context.
+\cx=(value; std; use "test.fxl")
+value (cx (\; {div show_hex show_str})) \div\show_hex\show_str
+# Evaluate with alternative names.
+value;
+def "div" div;
+def "test.show_hex" show_hex;
+def "test.show_str" show_str;
+\;
 div
 test.show_hex ""
 test.show_hex "abcd"

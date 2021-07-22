@@ -1,18 +1,18 @@
 #
-evaluate (:: (use "test.fxl" std); std) \;
+value; std; (value; std; use "test.fxl"); \;
 
 \parse=
 	(\type\source
 	say "(parsing)"
 	\form=
 		(
-		eq type "file" (parse_file (path_under dir_local source));
+		eq type "file" (use source);
 		eq type "string" (parse source "");
 		eq type "stream" (parse source "");
 		void
 		)
 	say "(resolving)"
-	resolve std form
+	resolve; std form
 	)
 
 \parse=

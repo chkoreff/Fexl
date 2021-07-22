@@ -35,9 +35,9 @@ static int match(const char *other)
 	}
 
 /* Resolve standard names. */
-static value standard(value name)
+static value standard(const char *name)
 	{
-	cur_name = str_data(name);
+	cur_name = name;
 
 	if (match("put")) return hold(Qput);
 	if (match("nl")) return hold(Qnl);
@@ -101,7 +101,6 @@ static value standard(value name)
 	if (match("length_common")) return Q(type_length_common);
 	if (match("is_str")) return Q(type_is_str);
 	if (match("with")) return Q(type_with);
-	if (match("def")) return Q(type_def);
 	if (match("fetch")) return Q(type_fetch);
 
 	if (match("num_str")) return Q(type_num_str);
@@ -162,11 +161,13 @@ static value standard(value name)
 	if (match("rand")) return Q(type_rand);
 
 	if (match("parse")) return Q(type_parse);
-	if (match("parse_file")) return hold(Qparse_file);
+	if (match("use_file")) return Q(type_use_file);
 
-	if (match("evaluate")) return hold(Qevaluate);
+	if (match("is_closed")) return Q(type_is_closed);
+	if (match("def")) return Q(type_def);
+	if (match("std")) return Q(type_std);
+	if (match("value")) return Q(type_value);
 	if (match("resolve")) return Q(type_resolve);
-	if (match("std")) return Q(type_standard);
 
 	if (match("buf_new")) return Q(type_buf_new);
 	if (match("buf_put")) return Q(type_buf_put);
@@ -216,24 +217,9 @@ static value standard(value name)
 	return 0;
 	}
 
-value type_standard(value f)
+value type_std(value f)
 	{
-	if (!f->L) return 0;
-	{
-	value name = arg(f->R);
-	if (name->T == type_str)
-		{
-		value def = standard(name);
-		if (def)
-			f = AV(hold(Qyield),def);
-		else
-			f = hold(Qvoid);
-		}
-	else
-		f = hold(Qvoid);
-	drop(name);
-	return f;
-	}
+	return op_resolve(f,standard);
 	}
 
 static void beg_const(void)
@@ -249,15 +235,10 @@ static void beg_const(void)
 	Qnull = Q(type_null);
 	Qeval = Q(type_eval);
 	Qonce = Q(type_once);
-	Qcatch = Q(type_catch);
 	Qyield = Q(type_yield);
 
 	/* type_sym */
 	Qsubst = Q(type_subst);
-	Qevaluate = Q(type_evaluate);
-
-	/* type_parse */
-	Qparse_file = Q(type_parse_file);
 
 	/* type_output */
 	Qput = Q(type_put);
@@ -285,15 +266,10 @@ static void end_const(void)
 	drop(Qnull);
 	drop(Qeval);
 	drop(Qonce);
-	drop(Qcatch);
 	drop(Qyield);
 
 	/* type_sym */
 	drop(Qsubst);
-	drop(Qevaluate);
-
-	/* type_parse */
-	drop(Qparse_file);
 
 	/* type_output */
 	drop(Qput);
@@ -320,10 +296,10 @@ static void eval_script(void)
 	f = AV(Q(type_dirname),f);
 	/* Concatenate the name of the main script. */
 	f = AV(AV(Q(type_concat),f),Qstr0("/src/main.fxl"));
-
 	/* Now evaluate the script. */
-	f = AV(hold(Qparse_file),f);
-	f = AV(AV(hold(Qevaluate),Q(type_standard)),f);
+	f = AV(Q(type_use_file),f);
+	f = AV(Q(type_std),f);
+	f = AV(Q(type_value),f);
 	f = eval(f);
 	drop(f);
 	}
