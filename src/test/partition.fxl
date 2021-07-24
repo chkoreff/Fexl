@@ -50,4 +50,4 @@ show 200
 show 269 # Max that gives exact result without big numbers.
 show 270
 show 300
-#show 600 # use_bn T 5.7s F 4.7s
+#show 600 # use_bn T 0.70s F 0.38s
