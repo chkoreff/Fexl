@@ -307,7 +307,8 @@ value type_value(value f)
 	}
 	}
 
-/* (resolve context exp) Resolve the expression in the context and yield it. */
+/* Like type_value, except it yields the form value to the caller without
+evaluating it. */
 value type_resolve(value f)
 	{
 	f = type_value(f);

@@ -3,9 +3,54 @@
 # The maximum safe value for base_digits is 7.  Anything greater can yield
 # incorrect results due to overflow in multiplication.
 \base_digits=7
+
 \base=(^ 10 base_digits)
 
-# Add two numbers.
+# LATER 20210808 Perhaps implement in C with base 2^32.
+
+# Return (xh + base*xt), where xh is a base digit and xt is a bn.
+\bn_new=
+	(\xh\xt
+	eq xh 0 (xt [] \_\_ [xh;xt]) [xh;xt]
+	)
+
+\bn_eq0=is_null
+
+# Convert a number to a string of decimal digits.
+\bn_str=
+	(
+	\pad0=(\s . (repeat_str "0"; - base_digits (length s)) s)
+	@\bn_str\x
+	x "0" \xh\xt
+	bn_eq0 xt
+		(num_str xh)
+		(.  (bn_str xt) (pad0; num_str xh))
+	)
+
+# Convert a string of decimal digits to a number.
+\str_bn=
+	(@\str_bn\x
+	\x=x
+	\len=(length x)
+	le len base_digits
+		(
+		\xh=(str_num x)
+		is_undef xh void;
+		bn_new xh []
+		)
+		(
+		\pos=(- len base_digits)
+		\xh=(str_num; slice x pos base_digits)
+		is_undef xh void;
+
+		\xp=(slice x 0 pos)
+		\xt=(str_bn xp)
+		is_undef xt void;
+		bn_new xh xt
+		)
+	)
+
+# Return x+y.
 \bn_add=
 	(@\bn_add\x\y
 	x y \xh\xt
@@ -21,7 +66,10 @@
 	[zh;zt]
 	)
 
-# Multiply two numbers.
+# Return (x * base).
+\bn_mul_base=(\x x [] \_\_ [0;x])
+
+# Return x*y.
 \bn_mul=
 	(@\bn_mul\x\y
 	x [] \xh\xt
@@ -30,11 +78,10 @@
 	\zh=(* xh yh)
 	\zt=
 		(
-		bn_add (bn_mul [xh] yt);
-		bn_add (bn_mul [yh] xt);
-		\xt=(bn_mul xt yt)
-		is_null xt [];
-		[0;xt]
+		bn_add (bn_mul yt [xh]);
+		bn_add (bn_mul xt [yh]);
+		\zt=(bn_mul xt yt)
+		bn_mul_base zt
 		)
 
 	lt zh base [zh;zt];
@@ -45,46 +92,151 @@
 	[zh;zt]
 	)
 
-# Convert a number to a string of decimal digits.
-\bn_str=
-	(
-	\pad0=(\s . (repeat_str "0"; - base_digits (length s)) s)
-	@\bn_str\x
-	x "0" \xh\xt
-	is_null xt
-		(num_str xh)
-		(.  (bn_str xt) (pad0; num_str xh))
+# Return x-y if x >= y, otherwise void.
+\bn_sub=
+	(@\bn_sub\x\y
+	x (y [] \_\_ void) \xh\xt
+	y [xh;xt] \yh\yt
+
+	\zt=(bn_sub xt yt)
+	is_undef zt void;
+
+	\zh=(- xh yh)
+	gt zh 0 [zh;zt];
+	eq zh 0 (bn_mul_base zt);
+
+	\zt=(bn_sub zt [1])
+	is_undef zt void;
+
+	\zh=(+ base zh)
+	[zh;zt]
 	)
 
-# Convert a string of decimal digits to a number.
-\str_bn=
-	(
-	\bn_new=
-		(\xh\xt
-		is_void xh void;
-		is_void xt void;
-		and (is_null xt) (eq 0 xh) [] [xh;xt]
+# Return the most significant digit of x.
+\bn_msd=
+	(@\loop\x
+	x 0 \xh\xt
+	bn_eq0 xt xh;
+	loop xt
+	)
+
+# Compare two numbers when they are known to be of the same length.
+\cmp_near=
+	(@\loop\x\y
+	x 0 \xh\xt
+	y 0 \yh\yt
+	\cmp=(loop xt yt)
+	ne cmp 0 cmp;
+	eq xh yh 0; lt xh yh -1; 1
+	)
+
+# Return (x * base^n).  Assumes x > 0 so result is in normal form.
+\scale=
+	(@\loop\x\n
+	le n 0 x;
+	\n=(- n 1)
+	loop [0;x] n
+	)
+
+# Divide x by y, returning quotient q and remainder r which satisfy:
+#   x = q*y + r and 0 <= r < y
+# If y=0, return q=0 and r=0.
+\bn_div=
+	(\x\y
+
+	\y=y
+	\yn=(list_length y)
+	eq yn 0 {[] []}; # y = 0
+
+	\yd=(bn_msd y)
+
+	\x=x
+	(@\loop\x
+
+	\xn=(list_length x)
+	lt xn yn {[] x}; # x < y
+
+	\cmp=(eq xn yn (cmp_near x y) 1)
+	lt cmp 0 {[] x};   # x < y
+	eq cmp 0 {[1] []}; # x = y
+
+	# Get rough guess of quotient.
+	\g=
+		(
+		\xd=(bn_msd x)
+		\zn=(- xn yn)
+
+		gt xd yd
+			(
+			\q=(trunc; / xd (+ 1 yd))
+			scale [q] zn
+			)
+			(
+			eq zn 0 [1];
+			\zn=(- zn 1)
+			\q=(trunc; / (* base xd) (+ 1 yd))
+			scale [q] zn
+			)
 		)
 
-	@\str_bn\x
-	\len=(length x)
-	le len base_digits
-		(
-		\xh=(str_num x)
-		bn_new xh []
-		)
-		(
-		\pos=(- len base_digits)
-		\xh=(str_num; slice x pos base_digits)
-		\xp=(slice x 0 pos)
-		\xt=(str_bn xp)
-		bn_new xh xt
-		)
+	\z=(bn_sub x (bn_mul g y))
+	loop z \q1\r
+	\q=(bn_add g q1)
+	{q r}
+	)
+	x
+	)
+
+# Compare x and y, returning -1 if x < y, 0 if x = y, or 1 if x > y.
+\bn_cmp=
+	(\x\y
+	\x=x
+	\y=y
+	\xn=(list_length x)
+	\yn=(list_length y)
+	lt xn yn -1;
+	eq xn yn (cmp_near x y);
+	1
+	)
+
+\make_cmp=(\f\x\y f (bn_cmp x y) 0)
+
+\bn_lt=(make_cmp lt)
+\bn_le=(make_cmp le)
+\bn_eq=(make_cmp eq)
+\bn_ne=(make_cmp ne)
+\bn_gt=(make_cmp gt)
+\bn_ge=(make_cmp ge)
+
+\bn_mod=(\x\n bn_div x n \q\r r)
+
+# Greatest common denominator
+\bn_gcd=
+	(@\bn_gcd\a\b
+	\a=a
+	\b=b
+	bn_eq0 a b;
+	bn_eq0 b a;
+	bn_lt a b
+		(bn_gcd a (bn_mod b a))
+		(bn_gcd b (bn_mod a b))
 	)
 
 \form
-def "bn_add" bn_add;
-def "bn_mul" bn_mul;
+def "bn_eq0" bn_eq0;
 def "bn_str" bn_str;
 def "str_bn" str_bn;
+def "bn_add" bn_add;
+def "bn_mul" bn_mul;
+def "bn_sub" bn_sub;
+def "bn_div" bn_div;
+def "bn_cmp" bn_cmp;
+def "bn_lt" bn_lt;
+def "bn_le" bn_le;
+def "bn_eq" bn_eq;
+def "bn_ne" bn_ne;
+def "bn_gt" bn_gt;
+def "bn_ge" bn_ge;
+def "bn_mod" bn_mod;
+def "bn_gcd" bn_gcd;
 form
