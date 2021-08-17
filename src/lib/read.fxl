@@ -7,10 +7,10 @@
 
 # Skip matching characters.
 \skip_match=
-	(\is_match @\loop\yes
+	(\is_match\yes @\loop
 	scan yes \x
 	is_match x
-		(loop yes)
+		loop
 		(push x yes)
 	)
 
