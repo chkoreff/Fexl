@@ -7,10 +7,16 @@ include NULs), followed by a trailing NUL byte.  The trailing NUL byte makes it
 easier to call system functions that expect it.
 */
 
+/* Return the number of bytes needed to store a string of the given length. */
+static unsigned long str_size(unsigned long len)
+	{
+	return sizeof(struct string) + len + 1;
+	}
+
 /* Create a string capable of holding len bytes plus trailing NUL. */
 string str_new(unsigned long len)
 	{
-	string x = new_memory(sizeof(unsigned long) + 1 + len);
+	string x = new_memory(str_size(len));
 	x->len = len;
 	x->data[len] = '\000'; /* Set trailing NUL byte. */
 	return x;
@@ -30,7 +36,7 @@ string str_new_data0(const char *data)
 
 void str_free(string x)
 	{
-	free_memory(x, sizeof(unsigned long) + 1 + x->len);
+	free_memory(x, str_size(x->len));
 	}
 
 /* Concatenate x and y. */
