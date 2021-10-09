@@ -10,15 +10,15 @@ show_benchmark;
 (
 \run_test=
 	(
-	\show=(\k\v put [k" = "] say (bn_str v))
+	\show=(\k\v put [k" = "] say (nat_str v))
 
 	\label\fn
 	say ["= test "label]
 
 	\try=
 		(\x\y
-		\x=(str_bn x)
-		\y=(str_bn y)
+		\x=(str_nat x)
+		\y=(str_nat y)
 		\z=(fn x y)
 		show "x" x
 		show "y" y
@@ -38,21 +38,21 @@ show_benchmark;
 	try2 "1111111111111111111111111111111111111111111111111"
 	)
 
-run_test "bn_add" bn_add
-run_test "bn_mul" bn_mul
+run_test "nat_add" nat_add
+run_test "nat_mul" nat_mul
 
 (
 # Compute 2^256.
-\x=(str_bn "2") # 2^1
-\x=(bn_mul x x) # 2^2
-\x=(bn_mul x x) # 2^4
-\x=(bn_mul x x) # 2^8
-\x=(bn_mul x x) # 2^16
-\x=(bn_mul x x) # 2^32
-\x=(bn_mul x x) # 2^64
-\x=(bn_mul x x) # 2^128
-\x=(bn_mul x x) # 2^256
-\s=(bn_str x)
+\x=(str_nat "2") # 2^1
+\x=(nat_mul x x) # 2^2
+\x=(nat_mul x x) # 2^4
+\x=(nat_mul x x) # 2^8
+\x=(nat_mul x x) # 2^16
+\x=(nat_mul x x) # 2^32
+\x=(nat_mul x x) # 2^64
+\x=(nat_mul x x) # 2^128
+\x=(nat_mul x x) # 2^256
+\s=(nat_str x)
 say s
 say (length s)
 )
@@ -62,12 +62,12 @@ say (length s)
 (
 \try=
 	(\x
-	\xn=(str_bn x)
-	\y=(bn_str xn)
+	\xn=(str_nat x)
+	\y=(nat_str xn)
 	say [(as_str x)" "(as_str y)]
 	)
 
-say "= test str_bn"
+say "= test str_nat"
 try "0"
 try "1"
 try "1234"

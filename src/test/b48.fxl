@@ -9,19 +9,19 @@ show_benchmark;
 say "= test_add_sub_mul"
 \try=
 	(\x\y
-	\x=(str_bn x)
-	\y=(str_bn y)
-	say ["x   = "(bn_str x)]
-	say ["y   = "(bn_str y)]
+	\x=(str_nat x)
+	\y=(str_nat y)
+	say ["x   = "(nat_str x)]
+	say ["y   = "(nat_str y)]
 
-	\z=(bn_add x y)
-	say ["x+y = "(bn_str z)]
+	\z=(nat_add x y)
+	say ["x+y = "(nat_str z)]
 
-	\z=(bn_sub x y)
-	say ["x-y = "(is_undef z "void"; bn_str z)]
+	\z=(nat_sub_clip x y)
+	say ["x-y = "(nat_str z)]
 
-	\z=(bn_mul x y)
-	say ["x*y = "(bn_str z)]
+	\z=(nat_mul x y)
+	say ["x*y = "(nat_str z)]
 
 	nl
 	)
@@ -53,15 +53,15 @@ try "876543210" "876543210"
 say "= test_div"
 \try==
 	(\x\y
-	\x=(str_bn x)
-	\y=(str_bn y)
+	\x=(str_nat x)
+	\y=(str_nat y)
 
-	bn_div x y \q\r
+	nat_div x y \q\r
 
-	say ["x = "(bn_str x)]
-	say ["y = "(bn_str y)]
-	say ["q = "(bn_str q)]
-	say ["r = "(bn_str r)]
+	say ["x = "(nat_str x)]
+	say ["y = "(nat_str y)]
+	say ["q = "(nat_str q)]
+	say ["r = "(nat_str r)]
 	nl
 	)
 
@@ -220,10 +220,12 @@ try "4" "2"
 \y="1197507627300036"
 try x y
 
-\z=(bn_str; bn_add (str_bn "1234567"); bn_mul (str_bn x) (str_bn y))
+\z=(nat_str; nat_add (str_nat "1234567"); nat_mul (str_nat x) (str_nat y))
 try z x
 )
 
+try "123456123456" "123456123457"
+try "41597350027988327891245001396567135182" "29936006361007"
 )
 
 \test_gcd==
@@ -232,12 +234,12 @@ say "= test_gcd"
 
 \try==
 	(\a\b
-	\a=(str_bn a)
-	\b=(str_bn b)
-	\d=(bn_gcd a b)
-	say ["a = "(bn_str a)]
-	say ["b = "(bn_str b)]
-	say ["d = "(bn_str d)]
+	\a=(str_nat a)
+	\b=(str_nat b)
+	\d=(nat_gcd a b)
+	say ["a = "(nat_str a)]
+	say ["b = "(nat_str b)]
+	say ["d = "(nat_str d)]
 	nl
 	)
 
@@ -248,16 +250,16 @@ try "48" "18"
 try "18" "48"
 try "48" "48"
 
-\x=(str_bn "9774116588529608940783989389983056228593747")
-\y=(str_bn "1197507627300036")
-\d=(str_bn "301576419113008467374")
+\x=(str_nat "9774116588529608940783989389983056228593747")
+\y=(str_nat "1197507627300036")
+\d=(str_nat "301576419113008467374")
 
-\a=(bn_mul x d)
-\b=(bn_mul y d)
+\a=(nat_mul x d)
+\b=(nat_mul y d)
 
 (
-\a=(bn_str a)
-\b=(bn_str b)
+\a=(nat_str a)
+\b=(nat_str b)
 try a b
 )
 

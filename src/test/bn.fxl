@@ -8,235 +8,249 @@
 
 # LATER 20210808 Perhaps implement in C with base 2^32.
 
-# Return (xh + base*xt), where xh is a base digit and xt is a bn.
-\bn_new=
-	(\xh\xt
-	eq xh 0 (xt [] \_\_ [xh;xt]) [xh;xt]
+# Return (x0 + base*xt), where x0 is a base digit and xt is a bn.
+\nat_new=
+	(\x0\xt
+	eq x0 0 (xt [] \_\_ [x0;xt]) [x0;xt]
 	)
 
-\bn_eq0=is_null
+\nat_eq0=is_null
 
 # Convert a number to a string of decimal digits.
-\bn_str=
+\nat_str=
 	(
 	\pad0=(\s . (repeat_str "0"; - base_digits (length s)) s)
-	@\bn_str\x
-	x "0" \xh\xt
-	bn_eq0 xt
-		(num_str xh)
-		(.  (bn_str xt) (pad0; num_str xh))
+	@\nat_str\x
+	x "0" \x0\xt
+	nat_eq0 xt
+		(num_str x0)
+		(.  (nat_str xt) (pad0; num_str x0))
 	)
 
 # Convert a string of decimal digits to a number.
-\str_bn=
-	(@\str_bn\x
+\str_nat=
+	(@\str_nat\x
 	\x=x
 	\len=(length x)
 	le len base_digits
 		(
-		\xh=(str_num x)
-		is_undef xh void;
-		bn_new xh []
+		\x0=(str_num x)
+		is_undef x0 void;
+		nat_new x0 []
 		)
 		(
 		\pos=(- len base_digits)
-		\xh=(str_num; slice x pos base_digits)
-		is_undef xh void;
+		\x0=(str_num; slice x pos base_digits)
+		is_undef x0 void;
 
 		\xp=(slice x 0 pos)
-		\xt=(str_bn xp)
+		\xt=(str_nat xp)
 		is_undef xt void;
-		bn_new xh xt
+		nat_new x0 xt
 		)
 	)
 
 # Return x+y.
-\bn_add=
-	(@\bn_add\x\y
-	x y \xh\xt
-	y [xh;xt] \yh\yt
+\nat_add=
+	(@\nat_add\x\y
+	x y \x0\xt
+	y [x0;xt] \y0\yt
 
-	\zh=(+ xh yh)
-	\zt=(bn_add xt yt)
+	\zt=(nat_add xt yt)
+	\z0=(+ x0 y0)
 
-	lt zh base [zh;zt];
-
-	\zh=(- zh base)
-	\zt=(bn_add [1] zt)
-	[zh;zt]
+	lt z0 base
+		[z0;zt]
+		(
+		\z0=(- z0 base)
+		\zt=(nat_add [1] zt)
+		[z0;zt]
+		)
 	)
-
-# Return (x * base).
-\bn_mul_base=(\x x [] \_\_ [0;x])
 
 # Return x*y.
-\bn_mul=
-	(@\bn_mul\x\y
-	x [] \xh\xt
-	y [] \yh\yt
+\nat_mul=
+	(
+	\nat_shift=(\x x [] \x0\xt [0;[x0;xt]])
 
-	\zh=(* xh yh)
+	@\nat_mul\x\y
+	x [] \x0\xt
+	y [] \y0\yt
+
 	\zt=
 		(
-		bn_add (bn_mul yt [xh]);
-		bn_add (bn_mul xt [yh]);
-		\zt=(bn_mul xt yt)
-		bn_mul_base zt
+		nat_add (nat_shift; nat_mul xt yt);
+		nat_add
+			(nat_mul yt [x0])
+			(nat_mul xt [y0])
 		)
+	\z0=(* x0 y0)
 
-	lt zh base [zh;zt];
-
-	\carry=(trunc; / zh base)
-	\zh=(- zh; * base carry)
-	\zt=(bn_add [carry] zt)
-	[zh;zt]
+	lt z0 base
+		[z0;zt]
+		(
+		\carry=(trunc; / z0 base)
+		\z0=(- z0; * base carry)
+		\zt=(nat_add [carry] zt)
+		[z0;zt]
+		)
 	)
 
-# Return x-y if x >= y, otherwise void.
-\bn_sub=
-	(@\bn_sub\x\y
-	x (y [] \_\_ void) \xh\xt
-	y [xh;xt] \yh\yt
+# Compute z = x-y, returning a vector.  This only works if x >= y.  If x < y,
+# it subtracts as far as it can go but the result is generally useless.
+\nat_sub_clip=
+	(@\nat_sub_clip\x\y
+	x [] \x0\xt
+	y [x0;xt] \y0\yt
 
-	\zt=(bn_sub xt yt)
-	is_undef zt void;
+	\zt=(nat_sub_clip xt yt)
+	\z0=(- x0 y0)
 
-	\zh=(- xh yh)
-	gt zh 0 [zh;zt];
-	eq zh 0 (bn_mul_base zt);
+	gt z0 0 [z0;zt];
+	eq z0 0 (zt [] \_\_ [z0;zt]);
 
-	\zt=(bn_sub zt [1])
-	is_undef zt void;
-
-	\zh=(+ base zh)
-	[zh;zt]
+	\z0=(+ base z0)
+	\zt=(nat_sub_clip zt [1])
+	[z0;zt]
 	)
 
-# Return the most significant digit of x.
-\bn_msd=
+# Compare x and y, returning the sign s such that:
+#
+# (s =  0 and x = y) or
+# (s =  1 and x > y) or
+# (s = -1 and x < y)
+\nat_cmp=
+	(@\loop\x\y
+	x (y 0 \_\_ -1) \x0\xt
+	y 1 \y0\yt
+	\s=(loop xt yt)
+	ne 0 s s;
+	eq x0 y0 0;
+	lt x0 y0 -1;
+	1
+	)
+
+# Return the top digit in x.
+\nat_msd=
 	(@\loop\x
-	x 0 \xh\xt
-	bn_eq0 xt xh;
+	x 0 \x0\xt
+	xt x0 \_\_
 	loop xt
 	)
 
-# Compare two numbers when they are known to be of the same length.
-\cmp_near=
-	(@\loop\x\y
-	x 0 \xh\xt
-	y 0 \yh\yt
-	\cmp=(loop xt yt)
-	ne cmp 0 cmp;
-	eq xh yh 0; lt xh yh -1; 1
+# Return the top two digits in x.
+\nat_msd2=
+	(@\loop\x
+	x {0 0} \x0\xt0
+	xt0 {x0 0} \x1\xt1
+	xt1 {x1 x0} \_\_
+	loop xt0
 	)
 
 # Return (x * base^n).  Assumes x > 0 so result is in normal form.
-\scale=
+\nat_scale=
 	(@\loop\x\n
 	le n 0 x;
 	\n=(- n 1)
 	loop [0;x] n
 	)
 
+# Return the number of significant digits in x.
+\nat_len=
+	(@\loop\x
+	x 0 \_\xt
+	+ 1 (loop xt)
+	)
+
 # Divide x by y, returning quotient q and remainder r which satisfy:
 #   x = q*y + r and 0 <= r < y
 # If y=0, return q=0 and r=0.
-\bn_div=
+\nat_div=
 	(\x\y
 
 	\y=y
-	\yn=(list_length y)
+	\yn=(nat_len y)
 	eq yn 0 {[] []}; # y = 0
 
-	\yd=(bn_msd y)
+	\yd=(nat_msd y)
 
 	\x=x
-	(@\loop\x
+	(@\loop\q\r
 
-	\xn=(list_length x)
-	lt xn yn {[] x}; # x < y
+	\cmp==(nat_cmp r y)
+	eq cmp -1 {q r}; # r < y
 
-	\cmp=(eq xn yn (cmp_near x y) 1)
-	lt cmp 0 {[] x};   # x < y
-	eq cmp 0 {[1] []}; # x = y
-
-	# Get rough guess of quotient.
-	\g=
+	(
+	\rn=(nat_len r)
+	nat_msd2 r \d1\d2
+	gt d1 yd
 		(
-		\xd=(bn_msd x)
-		\zn=(- xn yn)
-
-		gt xd yd
-			(
-			\q=(trunc; / xd (+ 1 yd))
-			scale [q] zn
-			)
-			(
-			eq zn 0 [1];
-			\zn=(- zn 1)
-			\q=(trunc; / (* base xd) (+ 1 yd))
-			scale [q] zn
-			)
+		\pow=(- rn yn)
+		{d1 pow}
+		);
+	eq rn yn
+		(
+		\top==(+ 1 yd)
+		{top 0}
 		)
-
-	\z=(bn_sub x (bn_mul g y))
-	loop z \q1\r
-	\q=(bn_add g q1)
-	{q r}
+		(
+		\top==(+ d2; * base d1)
+		\pow=(- rn (+ 1 yn))
+		{top pow}
+		)
 	)
-	x
+	\top\pow
+	\qd=(trunc; / top (+ 1 yd))
+	\q=(nat_add q (nat_scale [qd] pow))
+	\r=
+		(
+		\g==(nat_mul y [qd])
+		\g==(nat_scale g pow)
+		nat_sub_clip r g
+		)
+	loop q r
+	)
+	[] x
 	)
 
-# Compare x and y, returning -1 if x < y, 0 if x = y, or 1 if x > y.
-\bn_cmp=
-	(\x\y
-	\x=x
-	\y=y
-	\xn=(list_length x)
-	\yn=(list_length y)
-	lt xn yn -1;
-	eq xn yn (cmp_near x y);
-	1
-	)
+\make_cmp=(\f\x\y f (nat_cmp x y) 0)
 
-\make_cmp=(\f\x\y f (bn_cmp x y) 0)
+\nat_lt=(make_cmp lt)
+\nat_le=(make_cmp le)
+\nat_eq=(make_cmp eq)
+\nat_ne=(make_cmp ne)
+\nat_gt=(make_cmp gt)
+\nat_ge=(make_cmp ge)
 
-\bn_lt=(make_cmp lt)
-\bn_le=(make_cmp le)
-\bn_eq=(make_cmp eq)
-\bn_ne=(make_cmp ne)
-\bn_gt=(make_cmp gt)
-\bn_ge=(make_cmp ge)
-
-\bn_mod=(\x\n bn_div x n \q\r r)
+\nat_mod=(\x\n nat_div x n \q\r r)
 
 # Greatest common denominator
-\bn_gcd=
-	(@\bn_gcd\a\b
+\nat_gcd=
+	(@\nat_gcd\a\b
 	\a=a
 	\b=b
-	bn_eq0 a b;
-	bn_eq0 b a;
-	bn_lt a b
-		(bn_gcd a (bn_mod b a))
-		(bn_gcd b (bn_mod a b))
+	nat_eq0 a b;
+	nat_eq0 b a;
+	nat_lt a b
+		(nat_gcd a (nat_mod b a))
+		(nat_gcd b (nat_mod a b))
 	)
 
 \form
-def "bn_eq0" bn_eq0;
-def "bn_str" bn_str;
-def "str_bn" str_bn;
-def "bn_add" bn_add;
-def "bn_mul" bn_mul;
-def "bn_sub" bn_sub;
-def "bn_div" bn_div;
-def "bn_cmp" bn_cmp;
-def "bn_lt" bn_lt;
-def "bn_le" bn_le;
-def "bn_eq" bn_eq;
-def "bn_ne" bn_ne;
-def "bn_gt" bn_gt;
-def "bn_ge" bn_ge;
-def "bn_mod" bn_mod;
-def "bn_gcd" bn_gcd;
+def "nat_eq0" nat_eq0;
+def "nat_str" nat_str;
+def "str_nat" str_nat;
+def "nat_add" nat_add;
+def "nat_mul" nat_mul;
+def "nat_sub_clip" nat_sub_clip;
+def "nat_div" nat_div;
+def "nat_cmp" nat_cmp;
+def "nat_lt" nat_lt;
+def "nat_le" nat_le;
+def "nat_eq" nat_eq;
+def "nat_ne" nat_ne;
+def "nat_gt" nat_gt;
+def "nat_ge" nat_ge;
+def "nat_mod" nat_mod;
+def "nat_gcd" nat_gcd;
 form

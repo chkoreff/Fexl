@@ -5,9 +5,9 @@
 use_bn
 (
 value; std; (value; std; use "bn.fxl") \;
-\add=bn_add
-\one=(str_bn "1")
-\rep=bn_str
+\add=nat_add
+\one=(str_nat "1")
+\rep=nat_str
 {add one rep}
 )
 (

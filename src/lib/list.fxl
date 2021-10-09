@@ -30,6 +30,15 @@
 	[x;\=loop xs]
 	)
 
+# Eager map.
+\map_eager=
+	(\f @\loop \xs
+	xs [] \x\xs
+	\x=(f x)
+	\xs=(loop xs)
+	[x;xs]
+	)
+
 # Apply f to each element in list xs, but only keep the good results.
 \map_good=
 	(\fn @\loop \xs
@@ -440,6 +449,7 @@ def "append" append;
 def "flatten" flatten;
 def "each" each;
 def "map" map;
+def "map_eager" map_eager;
 def "map_good" map_good;
 def "filter" filter;
 def "reverse" reverse;
