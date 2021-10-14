@@ -50,6 +50,22 @@
 		)
 	)
 
+# Compare x and y, returning the sign s such that:
+#
+# (s =  0 and x = y) or
+# (s =  1 and x > y) or
+# (s = -1 and x < y)
+\nat_cmp=
+	(@\loop\x\y
+	x (y 0 \_\_ -1) \x0\xt
+	y 1 \y0\yt
+	\s=(loop xt yt)
+	ne 0 s s;
+	eq x0 y0 0;
+	lt x0 y0 -1;
+	1
+	)
+
 # Return x+y.
 \nat_add=
 	(@\nat_add\x\y
@@ -96,38 +112,44 @@
 		)
 	)
 
-# Compute z = x-y, returning a vector.  This only works if x >= y.  If x < y,
-# it subtracts as far as it can go but the result is generally useless.
+# Compute z = x-y.  This only works if x >= y.  If x < y, it subtracts as far
+# as it can go but the result is generally useless.
 \nat_sub_clip=
-	(@\nat_sub_clip\x\y
+	(@\loop\x\y
 	x [] \x0\xt
 	y [x0;xt] \y0\yt
 
-	\zt=(nat_sub_clip xt yt)
 	\z0=(- x0 y0)
-
-	gt z0 0 [z0;zt];
-	eq z0 0 (zt [] \_\_ [z0;zt]);
-
-	\z0=(+ base z0)
-	\zt=(nat_sub_clip zt [1])
-	[z0;zt]
+	gt z0 0
+		(
+		\zt=(loop xt yt)
+		[z0;zt]
+		);
+	lt z0 0
+		(
+		\z0=(+ base z0)
+		\zt=(loop xt (nat_add [1] yt))
+		[z0;zt]
+		)
+		(
+		\zt=(loop xt yt)
+		zt [] \_\_ [z0;zt]
+		)
 	)
 
-# Compare x and y, returning the sign s such that:
-#
-# (s =  0 and x = y) or
-# (s =  1 and x > y) or
-# (s = -1 and x < y)
-\nat_cmp=
-	(@\loop\x\y
-	x (y 0 \_\_ -1) \x0\xt
-	y 1 \y0\yt
-	\s=(loop xt yt)
-	ne 0 s s;
-	eq x0 y0 0;
-	lt x0 y0 -1;
-	1
+# Compute x-y and return {sign d} where:
+#   (sign = F and d = x-y) or
+#   (sign = T and d = y-x)
+\nat_sub=
+	(\x\y
+	\sign=(eq (nat_cmp x y) -1)
+	\d=
+		(
+		sign
+			(nat_sub_clip y x)
+			(nat_sub_clip x y)
+		)
+	{sign d}
 	)
 
 # Return the top digit in x.
@@ -163,14 +185,13 @@
 	)
 
 # Divide x by y, returning quotient q and remainder r which satisfy:
-#   x = q*y + r and 0 <= r < y
-# If y=0, return q=0 and r=0.
+#   x = q*y + r  and  (y=0 or 0 <= r < y)
 \nat_div=
 	(\x\y
 
 	\y=y
 	\yn=(nat_len y)
-	eq yn 0 {[] []}; # y = 0
+	eq yn 0 {[] x}; # y = 0
 
 	\yd=(nat_msd y)
 
@@ -201,7 +222,7 @@
 	)
 	\top\pow
 	\qd=(trunc; / top (+ 1 yd))
-	\q=(nat_add q (nat_scale [qd] pow))
+	\q=(nat_add (nat_scale [qd] pow) q)
 	\r=
 		(
 		\g==(nat_mul y [qd])
@@ -240,11 +261,12 @@
 def "nat_eq0" nat_eq0;
 def "nat_str" nat_str;
 def "str_nat" str_nat;
+def "nat_cmp" nat_cmp;
 def "nat_add" nat_add;
 def "nat_mul" nat_mul;
 def "nat_sub_clip" nat_sub_clip;
+def "nat_sub" nat_sub;
 def "nat_div" nat_div;
-def "nat_cmp" nat_cmp;
 def "nat_lt" nat_lt;
 def "nat_le" nat_le;
 def "nat_eq" nat_eq;
