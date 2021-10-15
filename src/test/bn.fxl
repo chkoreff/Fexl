@@ -152,83 +152,53 @@
 	{sign d}
 	)
 
-# Return the top digit in x.
-\nat_msd=
-	(@\loop\x
-	x 0 \x0\xt
-	xt x0 \_\_
-	loop xt
-	)
+# Return a guess q such that:
+#   (y = 0  and q=0) or
+#   (x < y  and q=0) or
+#   (x >= y and q>0 and x >= q*y)
+\nat_guess=
+	(@\loop\x\y
+	x [] \x0\xt
+	y [] \y0\yt
+	yt
+		(
+		xt
+			(
+			\q=(trunc; / x0 y0)
+			eq q 0 [] [q]
+			)
+			\x1\xtt
+		xtt
+			(
+			\q=(trunc; / (+ x0; * base x1) y0)
+			lt q base [q];
+			\q1=(trunc; / q base)
+			\q0=(- q; * q1 base)
+			[q0 q1]
+			)
+			\_\_
 
-# Return the top two digits in x.
-\nat_msd2=
-	(@\loop\x
-	x {0 0} \x0\xt0
-	xt0 {x0 0} \x1\xt1
-	xt1 {x1 x0} \_\_
-	loop xt0
-	)
+		\q=(loop xt [y0])
+		[0;q]
+		)
+		\_\_
 
-# Return (x * base^n).  Assumes x > 0 so result is in normal form.
-\nat_scale=
-	(@\loop\x\n
-	le n 0 x;
-	\n=(- n 1)
-	loop [0;x] n
-	)
+	eq y0 0 (loop xt yt);
 
-# Return the number of significant digits in x.
-\nat_len=
-	(@\loop\x
-	x 0 \_\xt
-	+ 1 (loop xt)
+	loop xt (nat_add [1] yt)
+		(eq -1 (nat_cmp x y) [] [1])
+		cons
 	)
 
 # Divide x by y, returning quotient q and remainder r which satisfy:
 #   x = q*y + r  and  (y=0 or 0 <= r < y)
 \nat_div=
 	(\x\y
-
-	\y=y
-	\yn=(nat_len y)
-	eq yn 0 {[] x}; # y = 0
-
-	\yd=(nat_msd y)
-
-	\x=x
 	(@\loop\q\r
-
-	\cmp==(nat_cmp r y)
-	eq cmp -1 {q r}; # r < y
-
-	(
-	\rn=(nat_len r)
-	nat_msd2 r \d1\d2
-	gt d1 yd
-		(
-		\pow=(- rn yn)
-		{d1 pow}
-		);
-	eq rn yn
-		(
-		\top==(+ 1 yd)
-		{top 0}
-		)
-		(
-		\top==(+ d2; * base d1)
-		\pow=(- rn (+ 1 yn))
-		{top pow}
-		)
-	)
-	\top\pow
-	\qd=(trunc; / top (+ 1 yd))
-	\q=(nat_add (nat_scale [qd] pow) q)
-	\r=
-		(
-		\g==(nat_mul y [qd])
-		\g==(nat_scale g pow)
-		nat_sub_clip r g
-		)
+	\g=(nat_guess r y)
+	is_null g {q r};
+	\q=(nat_add g q)
+	\r=(nat_sub_clip r (nat_mul y g))
 	loop q r
 	)
 	[] x
