@@ -152,10 +152,11 @@
 	{sign d}
 	)
 
-# Return a guess q such that:
-#   (y = 0  and q=0) or
-#   (x < y  and q=0) or
-#   (x >= y and q>0 and x >= q*y)
+# Return a guess g such that:
+#
+#   (y = 0  and g=[]) or
+#   (x < y  and g=[]) or
+#   (x >= y and g=[pow;top] and x >= y * (top * base^pow))
 \nat_guess=
 	(@\loop\x\y
 	x [] \x0\xt
@@ -164,30 +165,40 @@
 		(
 		xt
 			(
-			\q=(trunc; / x0 y0)
-			eq q 0 [] [q]
+			lt x0 y0 [];
+			\qd=(trunc; / x0 y0)
+			[0;[qd]]
 			)
 			\x1\xtt
 		xtt
 			(
-			\q=(trunc; / (+ x0; * base x1) y0)
-			lt q base [q];
-			\q1=(trunc; / q base)
-			\q0=(- q; * q1 base)
-			[q0 q1]
+			\qd=(trunc; / (+ x0; * base x1) y0)
+			lt qd base [0;[qd]];
+			\q1=(trunc; / qd base)
+			\q0=(- qd; * q1 base)
+			[0;[q0 q1]]
 			)
 			\_\_
 
-		\q=(loop xt [y0])
-		[0;q]
+		loop xt [y0] void \pow\top
+		\pow=(+ 1 pow)
+		[pow;top]
 		)
 		\_\_
 
 	eq y0 0 (loop xt yt);
 
 	loop xt (nat_add [1] yt)
-		(eq -1 (nat_cmp x y) [] [1])
+		(eq -1 (nat_cmp x y) [] [0;[1]])
 		cons
+	)
+
+# Return (x * base^n).
+\nat_scale=
+	(@\loop\n\x
+	le n 0 x;
+	\n=(- n 1)
+	loop n [0;x]
 	)
 
 # Divide x by y, returning quotient q and remainder r which satisfy:
@@ -195,10 +206,9 @@
 \nat_div=
 	(\x\y
 	(@\loop\q\r
-	\g=(nat_guess r y)
-	is_null g {q r};
-	\q=(nat_add g q)
-	\r=(nat_sub_clip r (nat_mul y g))
+	nat_guess r y {q r} \pow\top
+	\q=(nat_add q (nat_scale pow top))
+	\r=(nat_sub_clip r (nat_scale pow (nat_mul y top)))
 	loop q r
 	)
 	[] x
