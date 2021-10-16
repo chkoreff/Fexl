@@ -11,7 +11,7 @@
 # Return (x0 + base*xt), where x0 is a base digit and xt is a bn.
 \nat_new=
 	(\x0\xt
-	eq x0 0 (xt [] \_\_ [x0;xt]) [x0;xt]
+	eq 0 x0 (xt [] \_\_ [x0;xt]) [x0;xt]
 	)
 
 \nat_eq0=is_null
@@ -193,12 +193,34 @@
 		cons
 	)
 
-# Return (x * base^n).
+# Return (base^n * x).
 \nat_scale=
 	(@\loop\n\x
 	le n 0 x;
 	\n=(- n 1)
 	loop n [0;x]
+	)
+
+# Return q + (base^pow * top)
+# Equals (nat_add q (nat_scale pow top))
+\nat_add_scale=
+	(@\loop\top\q\pow
+	eq pow 0 (nat_add q top);
+	q (nat_scale pow top) \q0\qt
+	\pow=(- pow 1)
+	\zt=(loop top qt pow)
+	zt void \_\_ [q0;zt]
+	)
+
+# Return r - (base^pow * y * top)
+# Equals (nat_sub_clip r (nat_scale pow (nat_mul y top)))
+\nat_sub_scale=
+	(@\loop\y\top\r\pow
+	eq 0 pow (nat_sub_clip r (nat_mul y top));
+	r void \r0\rt
+	\pow=(- pow 1)
+	\zt=(loop y top rt pow)
+	eq 0 r0 (zt [] \_\_ [r0;zt]) [r0;zt]
 	)
 
 # Divide x by y, returning quotient q and remainder r which satisfy:
@@ -207,8 +229,8 @@
 	(\x\y
 	(@\loop\q\r
 	nat_guess r y {q r} \pow\top
-	\q=(nat_add q (nat_scale pow top))
-	\r=(nat_sub_clip r (nat_scale pow (nat_mul y top)))
+	\q=(nat_add_scale top q pow)
+	\r=(nat_sub_scale y top r pow)
 	loop q r
 	)
 	[] x
