@@ -1,4 +1,5 @@
 # Big number calculations
+# LATER 20210808 Implement in C with base 2^32.
 
 # The maximum safe value for base_digits is 7.  Anything greater can yield
 # incorrect results due to overflow in multiplication.
@@ -6,15 +7,71 @@
 
 \base=(^ 10 base_digits)
 
-# LATER 20210808 Perhaps implement in C with base 2^32.
+\nat_eq0=is_null
 
-# Return (x0 + base*xt), where x0 is a base digit and xt is a bn.
+# Return (B*x) for nat x in any base B.
+\nat_shift=(\x x [] \x0\xt [0;[x0;xt]])
+
+# Return (x0 + B*xt) for digit x0 and nat xt in any base B.
 \nat_new=
 	(\x0\xt
 	eq 0 x0 (xt [] \_\_ [x0;xt]) [x0;xt]
 	)
 
-\nat_eq0=is_null
+# Return (B^n * x) for nat x in any base B.
+\nat_scale=
+	(@\loop\n\x
+	le n 0 x;
+	\n=(- n 1)
+	loop n [0;x]
+	)
+
+# Compare x and y, returning the sign s such that:
+# (s =  0 and x = y) or
+# (s =  1 and x > y) or
+# (s = -1 and x < y)
+\nat_cmp=
+	(@\loop\x\y
+	x (y 0 \_\_ -1) \x0\xt
+	y 1 \y0\yt
+	\s=(loop xt yt)
+	ne 0 s s;
+	eq x0 y0 0;
+	lt x0 y0 -1;
+	1
+	)
+
+\make_cmp=(\f\x\y f (nat_cmp x y) 0)
+
+\nat_lt=(make_cmp lt)
+\nat_le=(make_cmp le)
+\nat_eq=(make_cmp eq)
+\nat_ne=(make_cmp ne)
+\nat_gt=(make_cmp gt)
+\nat_ge=(make_cmp ge)
+
+# Get the top digit x0 and length xn.
+\nat_msd=
+	(@\loop\x
+	x {0 0} \d0\xt
+	xt {d0 1} \d1\xtt
+	xtt {d1 2} \_\_
+	loop xt \x0\xn
+	\xn=(+ 1 xn)
+	{x0 xn}
+	)
+
+# Get the top two digits x0 and x1 and length xn.
+# nat_msd2
+\nat_msd2=
+	(@\loop\x
+	x {0 0 0} \d0\xt
+	xt {d0 0 1} \d1\xtt
+	xtt {d1 d0 2} \_\_
+	loop xt \x0\x1\xn
+	\xn=(+ 1 xn)
+	{x0 x1 xn}
+	)
 
 # Convert a number to a string of decimal digits.
 \nat_str=
@@ -50,22 +107,6 @@
 		)
 	)
 
-# Compare x and y, returning the sign s such that:
-#
-# (s =  0 and x = y) or
-# (s =  1 and x > y) or
-# (s = -1 and x < y)
-\nat_cmp=
-	(@\loop\x\y
-	x (y 0 \_\_ -1) \x0\xt
-	y 1 \y0\yt
-	\s=(loop xt yt)
-	ne 0 s s;
-	eq x0 y0 0;
-	lt x0 y0 -1;
-	1
-	)
-
 # Return x+y.
 \nat_add=
 	(@\nat_add\x\y
@@ -86,10 +127,7 @@
 
 # Return x*y.
 \nat_mul=
-	(
-	\nat_shift=(\x x [] \x0\xt [0;[x0;xt]])
-
-	@\nat_mul\x\y
+	(@\nat_mul\x\y
 	x [] \x0\xt
 	y [] \y0\yt
 
@@ -142,7 +180,7 @@
 #   (sign = T and d = y-x)
 \nat_sub=
 	(\x\y
-	\sign=(eq (nat_cmp x y) -1)
+	\sign=(nat_lt x y)
 	\d=
 		(
 		sign
@@ -150,14 +188,6 @@
 			(nat_sub_clip x y)
 		)
 	{sign d}
-	)
-
-# Return (base^n * x).
-\nat_scale=
-	(@\loop\n\x
-	le n 0 x;
-	\n=(- n 1)
-	loop n [0;x]
 	)
 
 # Return q + (base^pow * top)
@@ -182,71 +212,49 @@
 	eq 0 r0 (zt [] \_\_ [r0;zt]) [r0;zt]
 	)
 
-\nat_measure=
-	(@\loop\x
-	x {0 0} \x0\xt
-	xt {x0 0} \x1\xtt
-	xtt
-		(
-		\qd=(+ x0; * base x1)
-		{qd 0}
-		) \_\_
-	loop xt \qd\xn
-	\xn=(+ 1 xn)
-	{qd xn}
-	)
-
-# Divide x by y, returning quotient q and remainder r which satisfy:
+# Divide x by y, returning quotient q and remainder r such that:
 #   x = q*y + r  and  (y=0 or 0 <= r < y)
+#
+# On each round I calculate a guess with digits {qd qn} such that:
+#   (qd = 0 and x < y) or
+#   (qd > 0 and x >= (y * qd * base^qn))
 \nat_div=
 	(\x\y
-	nat_measure y \yd\yn
-	eq yd 0 {[] x};
+
+	nat_msd y \y0\yn
+	eq 0 yn {[] x};
+	\yd=(+ 1 y0)
 
 	(@\loop\q\x
-	nat_measure x \xd\xn
-	(
-	lt xn yn {0 yd yn};
-	eq xn yn
+
+	\next==
+		(\qd\qn
+		\q=(nat_add_scale [qd] q qn)
+		\r=(nat_sub_scale y [qd] x qn)
+		loop q r
+		)
+
+	nat_msd2 x \x0\x1\xn
+
+	lt xn yn {q x};
+	lt x0 yd
 		(
-		eq 0 yn {xd yd yn};
-		gt xd yd {xd (+ 1 yd) yn};
-		eq xd yd
-			{(eq -1 (nat_cmp x y) 0 xd) yd yn}
-			{0 yd yn}
+		eq xn yn
+			(nat_lt x y {q x} (next 1 0))
+			(
+			\qd=(trunc; / (+ x1 (* x0 base)) yd)
+			\qn=(- xn (+ 1 yn))
+			next qd qn
+			)
 		)
 		(
-		le xd yd
-			{(* xd base) (eq 0 yn yd (+ 1 yd)) (+ 1 yn)}
-			{xd (eq 0 yn yd (+ 1 yd)) yn}
+		\qd=(trunc; / x0 yd)
+		\qn=(- xn yn)
+		next qd qn
 		)
-	)
-	\xd\yd\yn
-	\qd=(trunc; / xd yd)
-	eq 0 qd {q x};
-	\top=
-		(
-		lt qd base [qd];
-		\q1=(trunc; / qd base)
-		\q0=(- qd; * q1 base)
-		[q0 q1]
-		)
-	\pow=(- xn yn)
-	\q=(nat_add_scale top q pow)
-	\x=(nat_sub_scale y top x pow)
-	loop q x
 	)
 	[] x
 	)
-
-\make_cmp=(\f\x\y f (nat_cmp x y) 0)
-
-\nat_lt=(make_cmp lt)
-\nat_le=(make_cmp le)
-\nat_eq=(make_cmp eq)
-\nat_ne=(make_cmp ne)
-\nat_gt=(make_cmp gt)
-\nat_ge=(make_cmp ge)
 
 \nat_mod=(\x\n nat_div x n \q\r r)
 
@@ -264,20 +272,20 @@
 
 \form
 def "nat_eq0" nat_eq0;
-def "nat_str" nat_str;
-def "str_nat" str_nat;
 def "nat_cmp" nat_cmp;
-def "nat_add" nat_add;
-def "nat_mul" nat_mul;
-def "nat_sub_clip" nat_sub_clip;
-def "nat_sub" nat_sub;
-def "nat_div" nat_div;
 def "nat_lt" nat_lt;
 def "nat_le" nat_le;
 def "nat_eq" nat_eq;
 def "nat_ne" nat_ne;
 def "nat_gt" nat_gt;
 def "nat_ge" nat_ge;
+def "nat_str" nat_str;
+def "str_nat" str_nat;
+def "nat_add" nat_add;
+def "nat_mul" nat_mul;
+def "nat_sub_clip" nat_sub_clip;
+def "nat_sub" nat_sub;
+def "nat_div" nat_div;
 def "nat_mod" nat_mod;
 def "nat_gcd" nat_gcd;
 form
