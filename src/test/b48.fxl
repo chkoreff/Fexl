@@ -1,8 +1,6 @@
 #
 value; std; (value; std; use "bn.fxl") \;
 
-show_benchmark;
-
 \test_add_sub_mul==
 (
 say "= test_add_sub_mul"
@@ -87,6 +85,68 @@ say "= test_div"
 	check_result x y q r
 	nl
 	)
+
+# These smaller cases are particularly useful when testing in base 10.
+(
+try "17" "28"
+try "28" "28"
+try "28" "100"
+try "213" "28"
+try "493" "28"
+
+try "8" "0"
+try "0" "8"
+try "7" "7"
+try "9" "1"
+try "1" "2"
+try "9" "2"
+try "9" "10"
+try "10" "9"
+try "10" "2"
+
+try "99" "1"
+try "99" "2"
+try "99" "9"
+try "10" "1"
+try "10" "5"
+try "10" "6"
+try "10" "9"
+
+try "75" "3"
+try "75" "4"
+try "758" "1"
+try "758" "4"
+try "758" "9"
+
+try "37" "38"
+try "37" "37"
+try "99" "10"
+try "90" "19"
+
+try "99" "100"
+try "10" "999"
+
+try "99000" "10999"
+try "11000" "10999"
+
+try "280" "280"
+try "281" "280"
+try "280" "281"
+try "279" "280"
+try "835" "200"
+
+try "1000" "90"
+
+try "1000" "100"
+try "1000" "101"
+try "1000" "110"
+try "1000" "999"
+try "1000" "110"
+try "7700" "789"
+
+try "1100" "109"
+try "1100" "100"
+)
 
 (
 try "48001147" "10999999"
@@ -338,6 +398,7 @@ try a b
 )
 )
 
+show_benchmark;
 test_add_sub_mul
 test_div
 test_gcd
