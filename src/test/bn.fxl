@@ -190,26 +190,26 @@
 	{sign d}
 	)
 
-# Return q + (base^pow * top)
-# Equals (nat_add q (nat_scale pow top))
+# Return q + qd*(base^qn)
+# Equals (nat_add q (nat_scale qn [qd]))
 \nat_add_scale=
-	(@\loop\top\q\pow
-	eq pow 0 (nat_add q top);
-	q (nat_scale pow top) \q0\qt
-	\pow=(- pow 1)
-	\zt=(loop top qt pow)
+	(@\loop\qd\q\qn
+	eq qn 0 (nat_add q [qd]);
+	q (nat_scale qn [qd]) \q0\qt
+	\qn=(- qn 1)
+	\zt=(loop qd qt qn)
 	zt void \_\_ [q0;zt]
 	)
 
-# Return r - (base^pow * y * top)
-# Equals (nat_sub_clip r (nat_scale pow (nat_mul y top)))
+# Return x - y * qd*(base^qn)
+# Equals (nat_sub_clip x (nat_scale qn (nat_mul y [qd])))
 \nat_sub_scale=
-	(@\loop\y\top\r\pow
-	eq 0 pow (nat_sub_clip r (nat_mul y top));
-	r void \r0\rt
-	\pow=(- pow 1)
-	\zt=(loop y top rt pow)
-	eq 0 r0 (zt [] \_\_ [r0;zt]) [r0;zt]
+	(@\loop\y\qd\qn\x
+	eq 0 qn (nat_sub_clip x (nat_mul y [qd]));
+	x void \x0\xt
+	\qn=(- qn 1)
+	\zt=(loop y qd qn xt)
+	eq 0 x0 (zt [] \_\_ [x0;zt]) [x0;zt]
 	)
 
 # Divide x by y, returning quotient q and remainder r such that:
@@ -226,8 +226,8 @@
 	(@\loop\q\x
 	\next==
 		(\qd\qn
-		\q=(nat_add_scale [qd] q qn)
-		\r=(nat_sub_scale y [qd] x qn)
+		\q=(nat_add_scale qd q qn)
+		\r=(nat_sub_scale y qd qn x)
 		loop q r
 		)
 
