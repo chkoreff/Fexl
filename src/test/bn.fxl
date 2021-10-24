@@ -220,13 +220,10 @@
 #   (qd > 0 and x >= (y * qd * base^qn))
 \nat_div=
 	(\x\y
-
 	nat_msd y \y0\yn
 	eq 0 yn {[] x};
-	\yd=(+ 1 y0)
 
 	(@\loop\q\x
-
 	\next==
 		(\qd\qn
 		\q=(nat_add_scale [qd] q qn)
@@ -235,21 +232,23 @@
 		)
 
 	nat_msd2 x \x0\x1\xn
-
 	lt xn yn {q x};
-	lt x0 yd
-		(
-		eq xn yn
-			(nat_lt x y {q x} (next 1 0))
-			(
-			\qd=(trunc; / (+ x1 (* x0 base)) yd)
-			\qn=(- xn (+ 1 yn))
-			next qd qn
-			)
-		)
+
+	\yd=(eq yn 1 y0 (+ 1 y0))
+	ge x0 yd
 		(
 		\qd=(trunc; / x0 yd)
 		\qn=(- xn yn)
+		next qd qn
+		);
+	eq xn yn
+		(
+		nat_lt x y {q x};
+		next 1 0
+		)
+		(
+		\qd=(trunc; / (+ x1 (* x0 base)) yd)
+		\qn=(- xn (+ 1 yn))
 		next qd qn
 		)
 	)
