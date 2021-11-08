@@ -1,10 +1,15 @@
+#include <stdint.h>
+
 #include <stdio.h>
 #include <str.h>
+#include <types.h>
 #include <value.h>
 
 #include <basic.h>
+#include <bn.h>
 #include <file.h>
 #include <file_str.h>
+#include <type_bn.h>
 #include <type_file.h>
 #include <type_num.h>
 #include <type_output.h>
@@ -32,6 +37,13 @@ static value op_put(FILE *fh, value f)
 			fput_ch(fh,'T');
 		else if (x->T == type_F && !x->L)
 			fput_ch(fh,'F');
+		else if (x->T == type_bn)
+			{
+			struct bn *n = get_bn(x);
+			string s = bn_to_dec(n);
+			fput_str(fh,s);
+			str_free(s);
+			}
 
 		f = hold(QI);
 		}

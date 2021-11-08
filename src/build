@@ -4,6 +4,7 @@ DEV=0
 . ./lib_build
 make base64
 make basic
+make bn
 make buffer
 make convert
 make crypto
@@ -21,6 +22,7 @@ make report
 make sha256
 make sha512
 make str
+make type_bn
 make type_buf
 make type_cmp
 make type_crypto

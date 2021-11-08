@@ -5,6 +5,7 @@
 #include <crypto.h>
 #include <stdio.h>
 #include <string.h> /* strcmp */
+#include <type_bn.h>
 #include <type_buf.h>
 #include <type_cmp.h>
 #include <type_crypto.h>
@@ -207,6 +208,22 @@ static value standard(const char *name)
 	if (match("unpack64")) return Q(type_unpack64);
 	if (match("hmac_sha512")) return Q(type_hmac_sha512);
 	if (match("hmac_sha256")) return Q(type_hmac_sha256);
+
+	/* big numbers */
+	if (match("bn_cmp")) return Q(type_bn_cmp);
+	if (match("bn_lt")) return Q(type_bn_lt);
+	if (match("bn_le")) return Q(type_bn_le);
+	if (match("bn_eq")) return Q(type_bn_eq);
+	if (match("bn_ne")) return Q(type_bn_ne);
+	if (match("bn_ge")) return Q(type_bn_ge);
+	if (match("bn_gt")) return Q(type_bn_gt);
+	if (match("bn_from_dec")) return Q(type_bn_from_dec);
+	if (match("bn_to_dec")) return Q(type_bn_to_dec);
+	if (match("bn_add")) return Q(type_bn_add);
+	if (match("bn_sub")) return Q(type_bn_sub);
+	if (match("bn_mul")) return Q(type_bn_mul);
+	if (match("bn_div")) return Q(type_bn_div);
+	if (match("is_bn")) return Q(type_is_bn);
 
 	if (match("set_alarm")) return Q(type_set_alarm);
 	if (match("start_server")) return Q(type_start_server);

@@ -1,0 +1,16 @@
+extern struct bn *get_bn(value x);
+extern value type_bn(value f);
+extern value type_bn_cmp(value f);
+extern value type_bn_lt(value f);
+extern value type_bn_le(value f);
+extern value type_bn_eq(value f);
+extern value type_bn_ne(value f);
+extern value type_bn_ge(value f);
+extern value type_bn_gt(value f);
+extern value type_bn_from_dec(value f);
+extern value type_bn_to_dec(value f);
+extern value type_bn_add(value f);
+extern value type_bn_sub(value f);
+extern value type_bn_mul(value f);
+extern value type_bn_div(value f);
+extern value type_is_bn(value f);
