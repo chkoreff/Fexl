@@ -312,6 +312,11 @@ void bn_free(struct bn *x)
 	free_memory(x,bn_size(x->len));
 	}
 
+int bn_eq0(const struct bn *x)
+	{
+	return x->nsd == 0;
+	}
+
 int bn_cmp(const struct bn *x, const struct bn *y)
 	{
 	if (x->sign)

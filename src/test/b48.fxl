@@ -1,24 +1,22 @@
 #
-value; std; (value; std; use "bn.fxl") \;
-
 \test_add_sub_mul==
 (
 say "= test_add_sub_mul"
 \try=
 	(\x\y
-	\x=(str_nat x)
-	\y=(str_nat y)
-	say ["x   = "(nat_str x)]
-	say ["y   = "(nat_str y)]
+	\x=(bn_from_dec x)
+	\y=(bn_from_dec y)
+	say ["x   = "x]
+	say ["y   = "y]
 
-	\z=(nat_add x y)
-	say ["x+y = "(nat_str z)]
+	\z=(bn_add x y)
+	say ["x+y = "z]
 
-	nat_sub x y \sign\z
-	say ["x-y = "(sign "-" "")(nat_str z)]
+	\z=(bn_sub x y)
+	say ["x-y = "z]
 
-	\z=(nat_mul x y)
-	say ["x*y = "(nat_str z)]
+	\z=(bn_mul x y)
+	say ["x*y = "z]
 
 	nl
 	)
@@ -52,35 +50,31 @@ say "= test_div"
 \check_result=
 	(\x\y\q\r
 
-	\z=(nat_add r; nat_mul q y)
-	\ok1=(eq_data z x)
-	\ok2=
-		(
-		or (is_null y);
-		eq (nat_cmp r y) -1
-		)
+	\z=(bn_add r; bn_mul q y)
+	\ok1=(bn_eq z x)
+	\ok2=(or (bn_eq0 y) (bn_lt r y))
 	\ok=(and ok1 ok2)
 	if (not ok)
 		(
 		say "^^^ BAD!!"
-		say ["x = "(as_str x)]
-		say ["y = "(as_str y)]
-		say ["z = "(as_str z)]
+		say ["x = "x]
+		say ["y = "y]
+		say ["z = "z]
 		die
 		)
 	)
 
 \try==
 	(\x\y
-	\x=(str_nat x)
-	\y=(str_nat y)
+	\x=(bn_from_dec x)
+	\y=(bn_from_dec y)
 
-	nat_div x y \q\r
+	bn_div x y \q\r
 
-	say ["x = "(nat_str x)]
-	say ["y = "(nat_str y)]
-	say ["q = "(nat_str q)]
-	say ["r = "(nat_str r)]
+	say ["x = "x]
+	say ["y = "y]
+	say ["q = "q]
+	say ["r = "r]
 
 	check_result x y q r
 	nl
@@ -342,7 +336,8 @@ try "4" "2"
 \y="1197507627300036"
 try x y
 
-\z=(nat_str; nat_add (str_nat "1234567"); nat_mul (str_nat x) (str_nat y))
+\z=(bn_to_dec; bn_add (bn_from_dec "1234567");
+	bn_mul (bn_from_dec x) (bn_from_dec y))
 try z x
 )
 
@@ -368,12 +363,12 @@ say "= test_gcd"
 
 \try==
 	(\a\b
-	\a=(str_nat a)
-	\b=(str_nat b)
-	\d=(nat_gcd a b)
-	say ["a = "(nat_str a)]
-	say ["b = "(nat_str b)]
-	say ["d = "(nat_str d)]
+	\a=(bn_from_dec a)
+	\b=(bn_from_dec b)
+	\d=(bn_gcd a b)
+	say ["a = "a]
+	say ["b = "b]
+	say ["d = "d]
 	nl
 	)
 
@@ -384,16 +379,16 @@ try "48" "18"
 try "18" "48"
 try "48" "48"
 
-\x=(str_nat "9774116588529608940783989389983056228593747")
-\y=(str_nat "1197507627300036")
-\d=(str_nat "301576419113008467374")
-
-\a=(nat_mul x d)
-\b=(nat_mul y d)
-
 (
-\a=(nat_str a)
-\b=(nat_str b)
+\x=(bn_from_dec "9774116588529608940783989389983056228593747")
+\y=(bn_from_dec "1197507627300036")
+\d=(bn_from_dec "301576419113008467374")
+
+\a=(bn_mul x d)
+\b=(bn_mul y d)
+
+\a=(bn_to_dec a)
+\b=(bn_to_dec b)
 try a b
 )
 )

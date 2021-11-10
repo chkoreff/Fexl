@@ -4,10 +4,9 @@
 
 use_bn
 (
-value; std; (value; std; use "bn.fxl") \;
-\add=nat_add
-\one=(str_nat "1")
-\rep=nat_str
+\add=bn_add
+\one=(bn_from_dec "1")
+\rep=bn_to_dec
 {add one rep}
 )
 (
@@ -50,4 +49,4 @@ show 200
 show 269 # Max that gives exact result without big numbers.
 show 270
 show 300
-#show 600 # use_bn T 0.70s F 0.38s
+#show 600 # use_bn T 0.33s F 0.33s

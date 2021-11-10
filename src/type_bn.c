@@ -27,6 +27,20 @@ value Qbn(struct bn *x)
 	return V(type_bn,&atom,(value)x);
 	}
 
+value type_bn_eq0(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_bn)
+		f = boolean(bn_eq0(get_bn(x)));
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
+	}
+
 value type_bn_cmp(value f)
 	{
 	if (!f->L || !f->L->L) return 0;

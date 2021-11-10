@@ -10,6 +10,21 @@
 
 \round2=(\x / (round (* 100 x)) 100)
 
+# LATER 20211110 A version of bn_mod that doesn't bother with the quotient.
+\bn_mod=(\x\n bn_div x n \q\r r)
+
+# Greatest common denominator
+\bn_gcd=
+	(@\bn_gcd\a\b
+	\a=a
+	\b=b
+	bn_eq0 a b;
+	bn_eq0 b a;
+	bn_lt a b
+		(bn_gcd a (bn_mod b a))
+		(bn_gcd b (bn_mod a b))
+	)
+
 \form
 def "neg" neg;
 def "max" max;
@@ -17,4 +32,6 @@ def "min" min;
 def "mod" mod;
 def "tau" tau;
 def "round2" round2;
+def "bn_mod" bn_mod;
+def "bn_gcd" bn_gcd;
 form

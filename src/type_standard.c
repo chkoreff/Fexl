@@ -210,6 +210,7 @@ static value standard(const char *name)
 	if (match("hmac_sha256")) return Q(type_hmac_sha256);
 
 	/* big numbers */
+	if (match("bn_eq0")) return Q(type_bn_eq0);
 	if (match("bn_cmp")) return Q(type_bn_cmp);
 	if (match("bn_lt")) return Q(type_bn_lt);
 	if (match("bn_le")) return Q(type_bn_le);

@@ -8,6 +8,7 @@ struct bn
 
 extern struct bn *bn_new(u64 n);
 extern void bn_free(struct bn *x1);
+extern int bn_eq0(const struct bn *x);
 extern int bn_cmp(const struct bn *x, const struct bn *y);
 extern struct bn *bn_add(const struct bn *x, const struct bn *y);
 extern struct bn *bn_sub(const struct bn *x, const struct bn *y);
