@@ -40,9 +40,7 @@
 	(\read\name
 	\fh=(fopen name "r")
 	is_void fh void;
-	\data=(read_chars read (stream; fgetc fh))
-	fclose fh
-	data
+	read_chars read (stream; fgetc fh)
 	)
 
 \form

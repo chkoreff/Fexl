@@ -17,6 +17,10 @@
 #include <type_str.h>
 #include <unistd.h> /* readlink */
 
+value Qstdin;
+value Qstdout;
+value Qstderr;
+
 value type_file(value f)
 	{
 	return type_atom(f);
@@ -24,7 +28,7 @@ value type_file(value f)
 
 static void fh_free(FILE *fh)
 	{
-	(void)fh; /* I don't automatically close file handles */
+	fclose(fh);
 	}
 
 value Qfile(FILE *fh)

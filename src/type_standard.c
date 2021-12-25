@@ -111,9 +111,9 @@ static value standard(const char *name)
 	if (match("tuple_to_list")) return Q(type_tuple_to_list);
 	if (match("list_to_tuple")) return Q(type_list_to_tuple);
 
-	if (match("stdin")) return Qfile(stdin);
-	if (match("stdout")) return Qfile(stdout);
-	if (match("stderr")) return Qfile(stderr);
+	if (match("stdin")) return hold(Qstdin);
+	if (match("stdout")) return hold(Qstdout);
+	if (match("stderr")) return hold(Qstderr);
 	if (match("fopen")) return Q(type_fopen);
 	if (match("fclose")) return Q(type_fclose);
 	if (match("fgetc")) return Q(type_fgetc);
@@ -258,6 +258,11 @@ static void beg_const(void)
 	/* type_sym */
 	Qsubst = Q(type_subst);
 
+	/* type_file */
+	Qstdin = Qfile(stdin);
+	Qstdout = Qfile(stdout);
+	Qstderr = Qfile(stderr);
+
 	/* type_output */
 	Qput = Q(type_put);
 	Qnl = Q(type_nl);
@@ -288,6 +293,11 @@ static void end_const(void)
 
 	/* type_sym */
 	drop(Qsubst);
+
+	/* type_file */
+	drop(Qstdin);
+	drop(Qstdout);
+	drop(Qstderr);
 
 	/* type_output */
 	drop(Qput);

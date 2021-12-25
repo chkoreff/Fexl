@@ -1,3 +1,6 @@
+extern value Qstdin;
+extern value Qstdout;
+extern value Qstderr;
 extern value type_file(value f);
 extern value Qfile(FILE *fh);
 extern FILE *get_fh(value x);

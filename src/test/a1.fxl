@@ -805,19 +805,16 @@ try -1.3
 	(\content
 	\fh=(fopen tmp_file "w")
 	fput fh content
-	fclose fh  # You must do this.
 	)
 
 \show_chars=
 	(\f
 	\fh=(fopen tmp_file "r")
-	(@\loop
+	@\loop
 	\ch=(fget fh)
 	is_void ch ();
 	f ch
 	loop
-	)
-	fclose fh
 	)
 
 \remove_file==
