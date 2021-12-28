@@ -75,6 +75,17 @@
 # Use a file in the directory which contains the user's script.
 \use==(\name use_file; path_under dir_local name)
 
+# Map a dynamic get function to a fixed stream of values.
+# LATER 20211228 Do stream_get in C.
+\stream_get=
+	(\get\yes
+	yes;
+	\=
+	@\loop
+	\x=get
+	is_undef x [] [x;\=loop]
+	)
+
 \form
 def "defc" defc;
 def "if" if;
@@ -101,6 +112,7 @@ def "remember" remember;
 def "cache" cache;
 def "do_benchmark" do_benchmark;
 def "show_benchmark" show_benchmark;
+def "stream_get" stream_get;
 form
 )
 

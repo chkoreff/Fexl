@@ -527,17 +527,8 @@ show_list (cons 1; cons 2; null)
 	show_list (first 5 list)
 	)
 
-# The list_rand function returns a distinct fixed list of random numbers which
-# are read only on demand.  For subtle reasons I cannot use stream_values for
-# this.
-\list_rand==
-	(@\loop
-	\x==rand
-	[(\= x);\=loop]
-	)
-
-\list_1=list_rand
-\list_2=list_rand
+stream_get rand \list_1
+stream_get rand \list_2
 
 seed_rand 0.1964
 show "list_1" list_1

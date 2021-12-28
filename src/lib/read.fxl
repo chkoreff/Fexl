@@ -14,7 +14,7 @@
 		(push x yes)
 	)
 
-# Collect characters up to an ending condition.
+# Collect characters up to an end char.  The end char is skipped.
 \collect_to=
 	(\is_end\no\yes
 	\buf=buf_new
@@ -25,22 +25,43 @@
 		(buf_put buf x loop)
 	)
 
-# Map a get function to a stream of characters.
-\stream=(\get @\loop \x=get is_undef x [] [x;loop])
+# Collect characters up to an end char or EOF.  The end char is kept.
+\collect_token=
+	(\is_end\yes
+	\buf=buf_new
+	\done==(\str=(buf_get buf) yes str)
+	@\loop
+	scan done \x
+	is_end x
+		(push x done)
+		(buf_put buf x loop)
+	)
 
-\read_chars=(\read read (\data\xt data))
+\read_chars=(\read read (\data\xs data))
+
+\stream_string=
+	(\str
+	\fh=(readstr str)
+	stream_get (sgetc fh)
+	)
+
+\stream_file=
+	(\name
+	\fh=(fopen name "r")
+	is_void fh void;
+	stream_get (fgetc fh)
+	)
 
 \read_string=
-	(\read\str
-	\fh=(readstr str)
-	read_chars read (stream; sgetc fh)
+	(\read\in
+	stream_string in \xs
+	read_chars read xs
 	)
 
 \read_file=
-	(\read\name
-	\fh=(fopen name "r")
-	is_void fh void;
-	read_chars read (stream; fgetc fh)
+	(\read\in
+	stream_file in \xs
+	read_chars read xs
 	)
 
 \form
@@ -50,6 +71,7 @@ def "is_eol" is_eol;
 def "is_white" is_white;
 def "skip_match" skip_match;
 def "collect_to" collect_to;
+def "collect_token" collect_token;
 def "read_chars" read_chars;
 def "read_string" read_string;
 def "read_file" read_file;

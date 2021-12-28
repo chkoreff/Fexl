@@ -10,8 +10,10 @@
 	\buf_match=buf_new
 
 	(@\collect\in_term\term_tail
+
 	term_tail (\str=(buf_get buf_result) yes str)
 	\term_ch\term_tail
+
 	scan no \x
 	eq x term_ch
 		(
@@ -35,16 +37,16 @@
 	F term
 	)
 
+# LATER 20211227 Insist on white space terminator, forbid QU and "~".
 \get_plain_item=
-	(\yes
-	\buf=buf_new
-	\done==(\str=(buf_get buf) yes str)
-	@\loop
-	scan done \x
-	is_white x (push x done);
-	eq x QU (push x done);
-	eq x "~" (push x done);
-	buf_put buf x loop
+	(
+	collect_token
+		(\x
+		is_white x T;
+		eq x QU T;
+		eq x "~" T;
+		F
+		)
 	)
 
 \get_item=

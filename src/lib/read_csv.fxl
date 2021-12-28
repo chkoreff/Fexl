@@ -3,14 +3,13 @@
 # "Spaces are considered part of a field and should not be ignored."
 
 \get_plain_item=
-	(\yes
-	\buf=buf_new
-	\done==(\str=(buf_get buf) yes str)
-	@\loop
-	scan done \x
-	eq x "," (push x done);
-	is_eol x (push x done);
-	buf_put buf x loop
+	(\sep
+	collect_token
+		(\x
+		eq x sep T;
+		is_eol x T;
+		F
+		)
 	)
 
 # Get a char inside a quoted string.  A single QU char is treated as end of
@@ -40,7 +39,9 @@
 	)
 
 \get_item=
-	(\no\yes
+	(\sep
+	\get_plain_item=(get_plain_item sep)
+	\no\yes
 	scan no \x
 	eq x QU (get_quote_item no yes);
 	push x;
@@ -48,27 +49,46 @@
 	)
 
 \get_row=
-	(@\loop\no\yes
+	(\sep
+	\get_item=(get_item sep)
+	@\loop\no\yes
 	get_item no \item
 	scan (yes [item]) \x
-	eq x ","
+	eq x sep
 		(loop (yes [item]) \row yes [item;row])
 		(yes [item])
 	)
 
 \get_rows=
-	(@\loop\yes
+	(\sep
+	\get_row=(get_row sep)
+	@\loop\yes
 	skip_match is_eol;
 	get_row (yes []) \row
 	loop \rows yes [row;rows]
 	)
 
-\read_csv_string=(read_string get_rows)
-\read_csv_chars=(read_chars get_rows)
-\read_csv_file=(read_file get_rows)
+\read_rows=
+	(\sep\read
+	\get_rows=(get_rows sep)
+	read get_rows
+	)
+
+# comma-separated
+\read_csv_string=(read_rows ","  read_string)
+\read_csv_chars=(read_rows "," read_chars)
+\read_csv_file=(read_rows "," read_file)
+
+# tab-separated
+\read_tsv_string=(read_rows TAB read_string)
+\read_tsv_chars=(read_rows TAB read_chars)
+\read_tsv_file=(read_rows TAB read_file)
 
 \form
 def "read_csv_string" read_csv_string;
 def "read_csv_chars" read_csv_chars;
 def "read_csv_file" read_csv_file;
+def "read_tsv_string" read_tsv_string;
+def "read_tsv_chars" read_tsv_chars;
+def "read_tsv_file" read_tsv_file;
 form

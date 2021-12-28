@@ -1,5 +1,4 @@
 # Test reading CSV and SSV data.
-show_benchmark;
 
 \try_chars=
 	(\read\in
@@ -80,6 +79,25 @@ try "test.csv"
 )
 )
 
+\test_tsv==
+(
+say "== test_tsv"
+\try=(try_chars read_tsv_string)
+
+try
+~
+12	3		4
+5	6	7
+
+"a b
+""hi""
+cd"	"3.14"	-48.7
+"abc,def""ghi""jklmnopqrstuvwxyz"
+
+    
+~
+)
+
 \test_ssv==
 (
 say "== test_ssv"
@@ -156,13 +174,23 @@ second line~END
 
 ~abcde ~a~ab~abc~abcd~abcde
 ~TEST
+
+# Test some tricky string terminators.
+try
+~~
+~ABC abcd~ABA~ABC x
+~ABCD AAB~ABC~ABCD y
+~~
 )
 
 (
 \try=(try_file read_ssv_file)
 try "test.ssv"
+try "missing"
 )
 )
 
+show_benchmark;
 test_csv
+test_tsv
 test_ssv
