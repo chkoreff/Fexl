@@ -2,39 +2,33 @@
 
 # Collect a string up to the next occurrence of the terminator string.
 \collect_string=
-	(\term\no\yes
-
-	\term=(str_bytes term)
-
+	(\t_ch\term\no\yes
 	\buf_result=buf_new
-	\buf_match=buf_new
 
-	(@\collect\in_term\term_tail
+	@\loop_start
+	\fh_term=(readstr term)
 
-	term_tail (\str=(buf_get buf_result) yes str)
-	\term_ch\term_tail
-
-	scan no \x
-	eq x term_ch
+	buffer_to t_ch buf_result no
 		(
-		# Current char matches the next term char, so save it.
-		buf_put buf_match x
-		collect T term_tail
-		);
-	# Current char does not match the next term char.
-	in_term
-		(
-		# Add the previously matched terminator chars to the result.
-		buf_put buf_result (buf_get buf_match)
-		push x
+		\buf_match=buf_new
+		buf_put buf_match t_ch
+
+		@\loop_term
+		\t=(sgetc fh_term)
+		is_undef t (\str=(buf_get buf_result) yes str);
+
+		scan no \x
+		eq x t
+			(
+			buf_put buf_match x
+			loop_term
+			)
+			(
+			buf_put buf_result (buf_get buf_match)
+			push x;
+			loop_start
+			)
 		)
-		(
-		# Add current char to the result and proceed.
-		buf_put buf_result x
-		);
-	collect F term
-	)
-	F term
 	)
 
 # LATER 20211227 Insist on white space terminator, forbid QU and "~".
@@ -57,7 +51,7 @@
 	eq x "~"
 		(
 		collect_to is_white no \term
-		collect_string (. x term) no yes
+		collect_string x term no yes
 		);
 	push x;
 	get_plain_item yes

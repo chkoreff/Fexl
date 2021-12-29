@@ -14,6 +14,16 @@
 		(push x yes)
 	)
 
+# Buffer characters up to a specific end char.
+\buffer_to=
+	(\t_ch\buf\no\yes
+	@\loop
+	scan no \x
+	eq x t_ch
+		yes
+		(buf_put buf x loop)
+	)
+
 # Collect characters up to an end char.  The end char is skipped.
 \collect_to=
 	(\is_end\no\yes
@@ -70,6 +80,7 @@ def "push" push;
 def "is_eol" is_eol;
 def "is_white" is_white;
 def "skip_match" skip_match;
+def "buffer_to" buffer_to;
 def "collect_to" collect_to;
 def "collect_token" collect_token;
 def "read_chars" read_chars;
