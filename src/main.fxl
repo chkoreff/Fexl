@@ -135,7 +135,7 @@ form
 \run==(\= value; bool; list; extra; std; use "run.fxl")
 \read==(\= value; extra; std; use "read.fxl")
 \read_csv==(\= value; read; extra; std; use "read_csv.fxl")
-\read_ssv==(\= value; list; read; extra; std; use "read_ssv.fxl")
+\read_ssv==(\= value; read; extra; std; use "read_ssv.fxl")
 
 defc "std";
 \form
