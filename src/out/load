@@ -1,0 +1,33 @@
+\out=
+~1
+===============
+** use util.fxl
+** use flintstones.fxl
+: (in flintstones)
+flintstones says: Hello.
+defined remove = F
+defined use = F
+defined std = F
+** use main.fxl
+main says: Hello.
+: Meet the Flintstones.
+: I am Fred.
+: I am Wilma.
+: I am Barney.
+: I am Betty.
+x = 42
+===============
+** use main.fxl
+main says: Hello.
+: Meet the Flintstones.
+: I am Fred.
+: I am Wilma.
+: I am Barney.
+: I am Betty.
+x = 42
+steps 1366 bytes 3328
+~1
+\err=
+~1
+~1
+\status=0

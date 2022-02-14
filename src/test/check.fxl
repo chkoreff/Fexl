@@ -60,6 +60,7 @@
 "sat"
 "sort"
 "stats"
+"load"
 ]
 
 # Gather any individually specified tests.
