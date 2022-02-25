@@ -311,19 +311,51 @@ static void end_const(void)
 	close_random();
 	}
 
-/* Run "src/main.fxl" to evaluate the user's script in an enhanced context.
-The script name is argv[1], or if that is missing, the script is read from
-stdin. */
+/*
+Evaluate the user's script.  Read the script from the file named by argv[1] if
+present, or from stdin otherwise.
+
+If this program is running as "fexl0", it runs your script directly.  If it is
+running as "fexl", it first runs the local script "src/main.fxl", which then
+runs your script within an extended library context.
+
+The purpose of "fexl0" is to give you the option of bypassing src/main.fxl
+altogether, defining any extensions beyond the built-in C standard context as
+you please.
+
+In a future release I will make fexl0 the default behavior, so it always reads
+your script directly without loading any default library.  Predefined libraries
+such as the current main.fxl will be provided in the lib directory so you can
+pull them in with a one-liner.
+
+I am making this change because the one-size-fits-all approach to a standard
+library is a losing proposition.  Eventually I might even factor out the
+currently built-in C functions into independent libraries loaded on demand.
+Then you could build an entirely separate C library, put it in your own
+directory somewhere, and load it from within Fexl.  That would even give you
+the power to generate binary code on the fly and run it immediately.
+*/
 static void eval_script(void)
 	{
 	value f;
-	/* Get the name of the currently running executable. */
-	f = Qstr0(main_argv[0]);
-	/* Go two directories up, right above the bin directory. */
-	f = AV(Q(type_dirname),f);
-	f = AV(Q(type_dirname),f);
-	/* Concatenate the name of the main script. */
-	f = AV(AV(Q(type_concat),f),Qstr0("/src/main.fxl"));
+	unsigned long len = strlen(main_argv[0]);
+	if (len >= 5 && strcmp(main_argv[0]+len-5,"fexl0") == 0)
+		{
+		/* Running as fexl0, so run the user's script directly. */
+		const char *name = main_argc > 1 ? main_argv[1] : "";
+		f = Qstr0(name);
+		}
+	else
+		{
+		/* Get the name of the currently running executable. */
+		f = Qstr0(main_argv[0]);
+		/* Go two directories up, right above the bin directory. */
+		f = AV(Q(type_dirname),f);
+		f = AV(Q(type_dirname),f);
+		/* Concatenate the name of the main script. */
+		f = AV(AV(Q(type_concat),f),Qstr0("/src/main.fxl"));
+		}
+
 	/* Now evaluate the script. */
 	f = AV(Q(type_use_file),f);
 	f = AV(Q(type_std),f);
