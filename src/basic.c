@@ -91,7 +91,7 @@ value type_eval(value f)
 	if (!f->L || !f->L->L) return 0;
 	{
 	value x = arg(f->L->R);
-	return A(hold(f->R),x);
+	return AV(arg(f->R),x);
 	}
 	}
 
