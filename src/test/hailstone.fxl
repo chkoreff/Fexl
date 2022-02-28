@@ -6,11 +6,8 @@
 # https://en.wikipedia.org/wiki/Collatz_conjecture
 # The "hailstone sequence"
 \hailstone=
-	(@\loop\x
-	cons x;
-	le x 1 [];
-	\x=(is_even x (/ x 2) (+ 1; * x 3))
-	loop x
+	(@\loop\x \x=x
+	[x; le x 1 []; loop (is_even x (/ x 2) (+ 1; * x 3))]
 	)
 
 \try=
@@ -18,6 +15,8 @@
 	each (hailstone x) (\x say ["x = " x])
 	nl
 	)
+
+show_benchmark;
 
 #try 3
 #try 4

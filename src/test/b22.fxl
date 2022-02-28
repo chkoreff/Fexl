@@ -7,8 +7,7 @@ say "== test Fibonacci"
 \fib=
 	(
 	\memo=cache
-	@\fib\n
-	\n=n
+	@\fib\n \n=n
 	le n 1 (eq n 1 1 0);
 	memo n;
 	+ (fib (- n 1)) (fib (- n 2))

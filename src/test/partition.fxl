@@ -21,9 +21,9 @@ use_bn
 \partition=
 	(
 	\memo=(remember 2)
-	@\partition \n\m
-	\n=n le n 1 one;
-	\m=m le m 1 one;
+	@\partition \n \n=n \m
+	le n 1 one;
+	le m 1 one;
 	\m=(min n m)
 	memo n m;
 	add (partition (- n m) m) (partition n (- m 1))

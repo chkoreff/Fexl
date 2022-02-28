@@ -1,9 +1,10 @@
 # (SAT n f) return a list of solutions for function f with n variables.
 \SAT=
-	(@\SAT\n\f
-	\n=n \f=f
+	(@\SAT
+	\n \n=n
+	\f \f=f
 	le n 0 (f [[]] []);
-	\try=(\x map (cons x) (SAT (- n 1) (f x)))
+	\try==(\x map (cons x) (SAT (- n 1) (f x)))
 	append (try T) (try F)
 	)
 
@@ -25,6 +26,8 @@
 	show_solutions list
 	nl
 	)
+
+show_benchmark;
 
 say "SAT 0 T"
 SAT 0 T
