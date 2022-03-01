@@ -1293,5 +1293,5 @@ case \x\y\expect
 
 test_eq_data
 
-\\
+\#
 Extra stuff not parsed.

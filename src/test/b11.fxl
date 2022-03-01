@@ -171,6 +171,11 @@ try "//" ["" "" ""]
 # Demonstrate the equivalence of:
 #   \x=D F
 #   eval D \x F
+#
+# NOTE: The eval is now deprecated.  In the future syntax the equivalence will
+# be:
+#   \x=D F
+#   (\\x F) D
 
 ( \x=(put "!" 4) say (+ x x) )
 ( eval (put "!" 4) \x say (+ x x) )
