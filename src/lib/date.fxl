@@ -24,7 +24,7 @@
 \date_month=(\date slice date 0 6)
 
 # Get the date components as strings.
-\date_ymd =
+\date_ymd=
 	(\date
 	\y=(slice date 0 4)
 	\m=(slice date 4 2)

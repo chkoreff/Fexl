@@ -113,6 +113,7 @@
 	nl
 	)
 
+show_benchmark;
 test_count_days
 test_add_days
 test_day_of_week
