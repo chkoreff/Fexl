@@ -85,13 +85,13 @@ value type_null(value f)
 	return type_T(f);
 	}
 
-/* (eval x next) = (next y), where y is the final value of x. */
+/* (eval x f) = (f y), where y is the final value of x. */
 value type_eval(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	{
-	value x = arg(f->L->R);
-	return AV(arg(f->R),x);
+	value y = arg(f->L->R);
+	return AV(arg(f->R),y);
 	}
 	}
 
