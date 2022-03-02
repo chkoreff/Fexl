@@ -43,7 +43,7 @@ string => tilde_string
 ]
 
 The Fexl parser reads an expression from the input until it reaches -1 (end of
-file) or the special token "\#".  The \# token stops the parser immediately, as
+file) or the special token "\\".  The \\ token stops the parser immediately, as
 if it had reached end of file.
 */
 
@@ -360,7 +360,7 @@ static struct form *parse_factor(void)
 		{
 		unsigned long first_line = line;
 		skip();
-		if (ch == '#')
+		if (ch == '\\')
 			{
 			ch = -1; /* Two backslashes simulates end of file. */
 			return 0;

@@ -86,7 +86,7 @@ value type_null(value f)
 	}
 
 /* (eval x f) = (f y), where y is the final value of x. */
-value type_eval(value f) /* LATER 20220301 deprecated */
+value type_eval(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	{
