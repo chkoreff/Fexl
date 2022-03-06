@@ -1,0 +1,3 @@
+# Deliberately create a cycle in memory, which is only possible with a var.
+\v=var_new
+var_put v v

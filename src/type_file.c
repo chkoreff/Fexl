@@ -26,9 +26,13 @@ value type_file(value f)
 	return type_atom(f);
 	}
 
+/* Automatically close the file handle unless it's stdin, stdout, or stderr.
+That way I can still see any error message at the very end of the program.
+*/
 static void fh_free(FILE *fh)
 	{
-	fclose(fh);
+	if (fileno(fh) > 2)
+		fclose(fh);
 	}
 
 value Qfile(FILE *fh)
