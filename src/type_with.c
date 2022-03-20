@@ -61,6 +61,33 @@ value type_with(value f)
 	}
 	}
 
+value type_is_obj(value f)
+	{
+	return op_is_type(f,type_assoc);
+	}
+
+/* (split_obj obj next) = (next key val tail), where key and val are the first
+pair in the object, and tail is the value following the first pair. */
+value type_split_obj(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	{
+	value x = arg(f->L->R);
+	if (x->T == type_assoc)
+		{
+		value key = hold(x->L->L->R);
+		value val = hold(x->L->R);
+		value obj = hold(x->R);
+		value next = hold(f->R);
+		f = A(A(A(next,key),val),obj);
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
+	}
+
 /* (fetch v k x)
 Return the value at key k in index v.  If no value, store the value of x in
 the index so you get the same value next time.  Equivalent to:

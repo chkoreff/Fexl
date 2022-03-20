@@ -102,6 +102,8 @@ static value standard(const char *name)
 	if (match("length_common")) return Q(type_length_common);
 	if (match("is_str")) return Q(type_is_str);
 	if (match("with")) return Q(type_with);
+	if (match("is_obj")) return Q(type_is_obj);
+	if (match("split_obj")) return Q(type_split_obj);
 	if (match("fetch")) return Q(type_fetch);
 
 	if (match("num_str")) return Q(type_num_str);

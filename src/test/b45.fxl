@@ -1,33 +1,160 @@
 # Demonstrate built-in "with".
+
+# Convert a value to a string with no indentation.
+# LATER 20220314 Promote to library.
+\val_str=
+	(
+	# The single "=" above means I use the same buffer every time.
+	\buf=buf_new
+	\put=(buf_put buf)
+	\nl==(put NL)
+
+	\show_key==
+		(\key
+		is_str key (put (fexl_quote key));
+		is_num key (put (num_str key));
+		put "?"
+		)
+
+	\obj
+	\obj=obj
+
+	\show_pairs==
+		(@\show_pairs\obj
+
+		\show_val==
+			(@\show_val\val
+
+			is_obj val
+				(
+				put "(" nl
+				show_pairs val
+				put ")"
+				);
+
+			is_undef val (put "void");
+			is_num val (put (num_str val));
+			is_str val (put (fexl_quote val));
+			is_bool val (put (val "T" "F"));
+
+			\show_list==
+				(\beg\val\end
+				put beg nl
+				each val (\item show_val item nl)
+				put end
+				)
+
+			is_list val (show_list "[" val "]");
+			is_tuple val (show_list "{" (tuple_to_list val) "}");
+			put "?"
+			)
+
+		is_obj obj
+			(
+			split_obj obj \key\val\obj
+			\key=key
+			\val=val
+
+			put "with "
+			show_key key
+
+			(
+			is_list val nl;
+			is_obj val nl;
+			is_tuple val nl;
+			put " "
+			)
+
+			show_val val
+			put ";" nl
+
+			show_pairs obj
+			);
+		show_val obj
+		nl
+		)
+
+	show_pairs obj
+	buf_get buf
+	)
+
 show_benchmark;
 
-\q="q"
-
-\f=
+\obj=
 	(
+	\q=="q"
+
 	with "x" (+ 0 1);
 	with "y" 2;
 	with 3 "whatever";
 	with q (put "!" . q q);
+	with "obj"
+		(
+		with "a" 11;
+		with "b" 22;
+		with "c" I;
+		void
+		);
+	with "list"
+		[
+		2
+		"abc"
+		void
+		(
+		with "a" 47;
+		with "b" 82;
+		void
+		)
+		];
+	with "flag" (I I T);
+	with "tuple" {"a" 2 [{"c" 3} {"d" 4}] (with "x" 3; void)};
 	(I I)
 	)
 
-\try=
-	(\x
-	\y=(f x)
-	say [x" => "y]
+\test_1==
+	(
+	say "= test_1"
+	\try==
+		(\x
+		\y=(obj x)
+		say [x" => "y]
+		)
+
+	\run==
+		(
+		try "x"
+		try 3
+		try "y"
+		try "q"
+		try "z"
+		nl
+		)
+
+	run
+	run
+	run
 	)
 
-\run==
-(
-try "x"
-try 3
-try "y"
-try q
-try "z"
-nl
-)
+\test_2==
+	(
+	say "= test_2"
+	\try==
+		(\obj
+		\str=(val_str obj)
+		say "===="
+		put str
+		)
 
-run
-run
-run
+	try obj
+	try (obj "y")
+	try (obj 3)
+	try (obj "obj")
+	try (obj "list")
+	try (obj "z")
+	try (obj "obj" "b")
+	try (obj "obj" "z")
+	try (I void)
+	)
+
+test_1
+test_2

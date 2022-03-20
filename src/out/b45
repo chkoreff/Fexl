@@ -1,5 +1,6 @@
 \out=
 ~1
+= test_1
 x => 1
 3 => whatever
 y => 2
@@ -18,7 +19,80 @@ y => 2
 !q => qq
 z => z
 
-steps 774 bytes 1376
+= test_2
+!====
+with "x" 1;
+with "y" 2;
+with 3 "whatever";
+with "q" "qq";
+with "obj"
+(
+with "a" 11;
+with "b" 22;
+with "c" ?;
+void
+);
+with "list"
+[
+2
+"abc"
+void
+(
+with "a" 47;
+with "b" 82;
+void
+)
+];
+with "flag" T;
+with "tuple"
+{
+"a"
+2
+[
+{
+"c"
+3
+}
+{
+"d"
+4
+}
+]
+(
+with "x" 3;
+void
+)
+};
+?
+====
+2
+====
+"whatever"
+====
+with "a" 11;
+with "b" 22;
+with "c" ?;
+void
+====
+[
+2
+"abc"
+void
+(
+with "a" 47;
+with "b" 82;
+void
+)
+]
+====
+"z"
+====
+22
+====
+void
+====
+void
+steps 8973 bytes 7040
 ~1
 \err=
 ~1
