@@ -1,14 +1,20 @@
 struct symbol
 	{
-	struct symbol *next;
 	value name;
 	value pattern;
 	unsigned long line;
 	};
 
+struct table
+	{
+	unsigned long count;
+	unsigned long len;
+	struct symbol vec[0];
+	};
+
 struct form
 	{
-	struct symbol *sym;
+	struct table *table;
 	value exp;
 	value label;
 	};

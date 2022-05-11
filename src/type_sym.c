@@ -11,36 +11,42 @@
 
 value Qsubst;
 
-static void sym_free(struct symbol *sym)
+static unsigned long table_size(unsigned long len)
 	{
-	drop(sym->name);
-	drop(sym->pattern);
-	free_memory(sym,sizeof(struct symbol));
+	return sizeof(struct table) + len*sizeof(struct symbol);
 	}
 
-static struct form *form_new(struct symbol *sym, value exp, value label)
+static struct form *form_new(struct table *table, value exp, value label)
 	{
 	struct form *form = new_memory(sizeof(struct form));
-	form->sym = sym;
+	form->table = table;
 	form->exp = exp;
 	form->label = label;
 	return form;
 	}
 
+static void table_free(struct table *table)
+	{
+	unsigned long i;
+	/* Drop each symbol in vec */
+	for (i = 0; i < table->count; i++)
+		{
+		struct symbol *sym = &table->vec[i];
+		drop(sym->name);
+		drop(sym->pattern);
+		}
+	free_memory(table, table_size(table->len));
+	}
+
 static void form_discard(struct form *form)
 	{
+	if (form->table)
+		table_free(form->table);
 	free_memory(form,sizeof(struct form));
 	}
 
 static void form_free(struct form *form)
 	{
-	struct symbol *sym = form->sym;
-	while (sym)
-		{
-		struct symbol *next = sym->next;
-		sym_free(sym);
-		sym = next;
-		}
 	drop(form->exp);
 	if (form->label)
 		drop(form->label);
@@ -64,61 +70,107 @@ struct form *form_val(value exp)
 	return form_new(0,exp,0);
 	}
 
-static struct symbol *sym_new(value name, value pattern, unsigned long line,
-	struct symbol *next)
+static struct table *table_ref(value Qname, value Qpattern, unsigned long line)
 	{
-	struct symbol *sym = new_memory(sizeof(struct symbol));
-	sym->next = next;
-	sym->name = name;
-	sym->pattern = pattern;
+	struct table *table;
+	struct symbol *sym;
+
+	table = new_memory(table_size(1));
+	table->count = 1;
+	table->len = 1;
+
+	sym = &table->vec[0];
+	sym->name = Qname;
+	sym->pattern = Qpattern;
 	sym->line = line;
-	return sym;
+	return table;
 	}
 
 /* Make a reference to a symbol on a given line. */
 struct form *form_ref(string name, unsigned long line)
 	{
-	return form_new(sym_new(Qstr(name),hold(QT),line,0),hold(QI),0);
+	value Qname = Qstr(name);
+	value Qpattern = hold(QT);
+	struct table *table = table_ref(Qname,Qpattern,line);
+	return form_new(table,hold(QI),0);
 	}
 
-/* Merge the symbol lists and combine patterns where they intersect. */
-static struct symbol *sym_merge(struct symbol *fun, struct symbol *arg)
+/* Merge the tables and combine patterns where they intersect. */
+static struct table *table_merge(struct table *xt, struct table *yt)
 	{
-	int cmp;
-	if (!fun)
-		{
-		if (!arg) return 0;
-		cmp = 1;
-		}
-	else if (!arg)
-		cmp = -1;
-	else
-		cmp = strcmp(str_data(fun->name),str_data(arg->name));
+	unsigned long xn = xt ? xt->count : 0;
+	unsigned long yn = yt ? yt->count : 0;
+	unsigned long zn = xn + yn;
 
-	if (cmp < 0)
+	if (zn == 0) return 0;
+	{
+	unsigned long xi = 0;
+	unsigned long yi = 0;
+	unsigned long zi = 0;
+	struct table *zt = new_memory(table_size(zn));
+
+	zt->len = zn;
+
+	while (1)
 		{
-		fun->pattern = A(fun->pattern,hold(QF));
-		fun->next = sym_merge(fun->next,arg);
+		struct symbol *x = &xt->vec[xi];
+		struct symbol *y = &yt->vec[yi];
+		struct symbol *z = &zt->vec[zi];
+
+		int cmp;
+		if (xi < xn)
+			{
+			if (yi < yn)
+				cmp = strcmp(str_data(x->name),str_data(y->name));
+			else
+				cmp = -1;
+			}
+		else if (yi < yn)
+			cmp = 1;
+		else
+			break;
+
+		if (cmp < 0)
+			{
+			z->name = hold(x->name);
+			z->pattern = A(hold(x->pattern),hold(QF));
+			z->line = x->line;
+			xi++;
+			}
+		else if (cmp == 0)
+			{
+			z->name = hold(x->name);
+			z->pattern = A(hold(x->pattern),hold(y->pattern));
+			z->line = x->line;
+			xi++;
+			yi++;
+			}
+		else
+			{
+			z->name = hold(y->name);
+			z->pattern = A(hold(QF),hold(y->pattern));
+			z->line = y->line;
+			yi++;
+			}
+
+		zi++;
 		}
-	else if (cmp > 0)
-		{
-		arg->pattern = A(hold(QF),arg->pattern);
-		arg->next = sym_merge(fun,arg->next);
-		fun = arg;
-		}
-	else
-		{
-		fun->pattern = A(fun->pattern,hold(arg->pattern));
-		fun->next = sym_merge(fun->next,arg->next);
-		sym_free(arg);
-		}
-	return fun;
+
+	zt->count = zi;
+	return zt;
+	}
 	}
 
 /* Make an applicative form with the given type. */
 struct form *form_join(type t, struct form *fun, struct form *arg)
 	{
-	fun->sym = sym_merge(fun->sym,arg->sym);
+	{
+	struct table *table = table_merge(fun->table,arg->table);
+	if (fun->table)
+		table_free(fun->table);
+	fun->table = table;
+	}
+
 	fun->exp = V(t,fun->exp,arg->exp);
 	form_discard(arg);
 	return fun;
@@ -137,46 +189,47 @@ struct form *form_app(struct form *fun, struct form *arg)
 	}
 
 /* Delete the symbol with the given name and return the associated pattern. */
-static struct symbol *sym_pop(const char *name, struct symbol *sym,
-	value *pattern)
+static value table_pop(string name, struct table *xt)
 	{
-	int cmp;
-	if (!sym)
-		cmp = -1;
-	else
-		cmp = strcmp(name,str_data(sym->name));
-
-	if (cmp < 0)
-		*pattern = hold(QF); /* not found */
-	else if (cmp > 0)
-		sym->next = sym_pop(name,sym->next,pattern);
-	else
+	value pattern = 0;
+	if (xt != 0)
 		{
-		struct symbol *next = sym->next;
-		*pattern = hold(sym->pattern);
-		sym_free(sym);
-		sym = next;
-		}
-	return sym;
-	}
+		unsigned long xi = 0;
+		unsigned long yi = 0;
 
-/* Equivalent to (void)sym_merge(0,sym).  Used when no syms on left side. */
-static void sym_merge0(struct symbol *sym)
-	{
-	while (sym)
-		{
-		sym->pattern = A(hold(QF),sym->pattern);
-		sym = sym->next;
+		while (xi < xt->count)
+			{
+			struct symbol *x = &xt->vec[xi];
+			int cmp = pattern ? 1 : strcmp(name->data,str_data(x->name));
+
+			if (cmp == 0)
+				{
+				pattern = x->pattern;
+				drop(x->name);
+				}
+			else
+				{
+				struct symbol *y = &xt->vec[yi];
+				y->name = x->name;
+				y->pattern = A(hold(QF),x->pattern);
+				y->line = x->line;
+				yi++;
+				}
+			xi++;
+			}
+
+		xt->count = yi;
 		}
+
+	if (pattern == 0)
+		pattern = hold(QF); /* not found */
+	return pattern;
 	}
 
 /* Abstract the name from the body. */
 struct form *form_lam(string name, struct form *body)
 	{
-	value pattern;
-	struct symbol *sym = sym_pop(name->data,body->sym,&pattern);
-	sym_merge0(sym);
-	body->sym = sym;
+	value pattern = table_pop(name,body->table);
 	body->exp = AV(AV(hold(Qsubst),pattern),body->exp);
 	str_free(name);
 	return body;
@@ -198,16 +251,6 @@ value type_subst(value f)
 	return subst(f->L->L->R,f->L->R,f->R);
 	}
 
-/* Copy a list of symbols except the one with the given pattern. */
-static struct symbol *sym_copy(struct symbol *sym, value pattern)
-	{
-	if (!sym) return 0;
-	if (sym->pattern == pattern)
-		return sym_copy(sym->next,pattern);
-	return sym_new(hold(sym->name),hold(sym->pattern),sym->line,
-		sym_copy(sym->next,pattern));
-	}
-
 /* Return true if the form has no undefined symbols. */
 value type_is_closed(value f)
 	{
@@ -217,7 +260,7 @@ value type_is_closed(value f)
 	if (exp->T == type_form)
 		{
 		struct form *form = (struct form *)exp->R;
-		f = boolean(form->sym == 0);
+		f = boolean(form->table == 0);
 		}
 	else
 		f = hold(Qvoid);
@@ -230,29 +273,66 @@ value type_is_closed(value f)
 static value def(const char *key, value val, value exp)
 	{
 	struct form *form = (struct form *)exp->R;
-	struct symbol *cur = form->sym;
+	struct table *xt = form->table;
 	value pattern = 0;
 
-	while (cur)
+	if (xt != 0)
 		{
-		int cmp = strcmp(key,str_data(cur->name));
-		if (cmp > 0)
-			cur = cur->next;
-		else
+		unsigned long xi = 0;
+
+		while (xi < xt->count)
 			{
-			if (cmp == 0)
-				pattern = cur->pattern;
-			break;
+			struct symbol *x = &xt->vec[xi];
+			int cmp = strcmp(key,str_data(x->name));
+			if (cmp > 0)
+				xi++;
+			else
+				{
+				if (cmp == 0)
+					pattern = x->pattern;
+				break;
+				}
 			}
 		}
 
 	if (pattern == 0)
 		return hold(exp);
 	else
-		return Qform(form_new(
-			sym_copy(form->sym,pattern),
+		{
+		/* Copy the symbols except the one with the given pattern. */
+		struct table *yt;
+		unsigned long yn = xt->count - 1;
+
+		if (yn == 0)
+			yt = 0;
+		else
+			{
+			unsigned long xi = 0;
+			unsigned long yi = 0;
+
+			yt = new_memory(table_size(yn));
+			yt->count = yn;
+			yt->len = yn;
+
+			while (xi < xt->count)
+				{
+				struct symbol *x = &xt->vec[xi];
+				if (x->pattern != pattern)
+					{
+					struct symbol *y = &yt->vec[yi];
+					y->name = hold(x->name);
+					y->pattern = hold(x->pattern);
+					y->line = x->line;
+					yi++;
+					}
+				xi++;
+				}
+			}
+
+		return Qform(form_new(yt,
 			subst(pattern,form->exp,val),
 			hold(form->label)));
+		}
 	}
 
 value type_def(value f)
@@ -286,16 +366,17 @@ value type_value(value f)
 	if (exp->T == type_form)
 		{
 		struct form *form = (struct form *)exp->R;
-		struct symbol *cur = form->sym;
-		if (cur == 0)
+		struct table *xt = form->table;
+		if (xt == 0)
 			f = hold(form->exp);
 		else
 			{
 			const char *label = str_data(form->label);
-			while (cur)
+			unsigned long i;
+			for (i = 0; i < xt->count; i++)
 				{
-				undefined_symbol(str_data(cur->name),cur->line,label);
-				cur = cur->next;
+				struct symbol *x = &xt->vec[i];
+				undefined_symbol(str_data(x->name),x->line,label);
 				}
 			die(0);
 			}
@@ -316,26 +397,6 @@ value type_resolve(value f)
 	return f;
 	}
 
-static struct symbol *resolve(struct symbol *sym, value *result,
-	value op(const char *name))
-	{
-	if (!sym) return 0;
-	{
-	value val = op(str_data(sym->name));
-	if (val)
-		{
-		value exp = subst(sym->pattern,*result,val);
-		drop(val);
-		drop(*result);
-		*result = exp;
-		return resolve(sym->next,result,op);
-		}
-	else
-		return sym_new(hold(sym->name),hold(sym->pattern),
-			sym->line,resolve(sym->next,result,op));
-	}
-	}
-
 value op_resolve(value f, value op(const char *name))
 	{
 	if (!f->L) return 0;
@@ -344,13 +405,52 @@ value op_resolve(value f, value op(const char *name))
 	if (exp->T == type_form)
 		{
 		struct form *form = (struct form *)exp->R;
-		if (form->sym == 0)
+		struct table *xt = form->table;
+
+		if (xt == 0)
 			f = hold(exp);
 		else
 			{
 			value result = hold(form->exp);
-			struct symbol *sym = resolve(form->sym,&result,op);
-			f = Qform(form_new(sym,result,hold(form->label)));
+			struct table *yt;
+			unsigned long xi = 0;
+			unsigned long yi = 0;
+
+			yt = new_memory(table_size(xt->count));
+			yt->len = xt->count;
+
+			while (xi < xt->count)
+				{
+				struct symbol *x = &xt->vec[xi];
+				value val = op(str_data(x->name));
+
+				if (val)
+					{
+					value exp = subst(x->pattern,result,val);
+					drop(val);
+					drop(result);
+					result = exp;
+					}
+				else
+					{
+					struct symbol *y = &yt->vec[yi];
+					y->name = hold(x->name);
+					y->pattern = hold(x->pattern);
+					y->line = x->line;
+					yi++;
+					}
+				xi++;
+				}
+
+			yt->count = yi;
+
+			if (yi == 0)
+				{
+				table_free(yt);
+				yt = 0;
+				}
+
+			f = Qform(form_new(yt,result,hold(form->label)));
 			}
 		}
 	else

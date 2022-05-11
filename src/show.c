@@ -184,11 +184,15 @@ static void put_quote(string x)
 
 static void limit_show(value f);
 
-static void show_sym(struct symbol *sym)
+static void show_table(struct table *table)
 	{
 	put_ch('[');
-	while (sym)
+	if (table)
+	{
+	unsigned long i;
+	for (i = 0; i < table->count; i++)
 		{
+		struct symbol *sym = &table->vec[i];
 		put_ch('[');
 		put("sym"); put_ch(' ');
 		put_str(get_str(sym->name)); put_ch(' ');
@@ -196,8 +200,8 @@ static void show_sym(struct symbol *sym)
 		limit_show(sym->pattern);
 		put_ch(']');
 		put_ch(' ');
-		sym = sym->next;
 		}
+	}
 	put_ch(']');
 	}
 
@@ -208,7 +212,7 @@ static void show_form(struct form *form)
 	else
 		put_ch('0');
 	put_ch(' ');
-	show_sym(form->sym);
+	show_table(form->table);
 	put_ch(' ');
 	limit_show(form->exp);
 	}
