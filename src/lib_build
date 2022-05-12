@@ -1,18 +1,17 @@
 #!/bin/sh
 # These are common shell routines used by build scripts, sourced with ".".
-# Note that these build scripts do not follow header dependencies, so if you
-# make significant changes to .h files, run ./build clean first.
+# These build scripts do follow header dependencies.
 
 # stale $target $source1 ... $sourceN
-# Return true if $target does not exist or is older than any $source.
+# Return 1 if $target does not exist or is older than any $source.
 stale()
 	{
 	local target="$1"; shift
-	if [ ! -e $target ]; then return 0; fi
+	if [ ! -e $target ]; then return 1; fi
 	for source in "$@"; do
-		if [ $source -nt $target ]; then return 0; fi
+		if [ $source -nt $target ]; then return 1; fi
 	done
-	return 1
+	return 0
 	}
 
 # Run a system command and exit if unsuccessful.
@@ -24,36 +23,77 @@ run()
 	if [ $code -ne 0 ]; then exit $code; fi
 	}
 
-path()
+# Get the list of header files that a C source file includes.
+get_headers()
 	{
-	path="$path -I $1"
-	}
+	local name=$1
+	local file_c=$name.c
 
-need()
-	{
-	objects="$objects $1"
+	grep -e "^#include <.*>" $file_c |
+	sed 's/^#include <\(.*\)>.*$/\1/' |
+	(
+	while read file_h; do
+		echo -n "$file_h "
+	done;
+	)
 	}
 
 # Compile a source file if it's newer than the object file.
+#
+# I compile with -O3 because that enables -finline-functions.  You can see
+# that by running "gcc -c -Q -O3 --help=optimizers".
+#
+# I do not use -ansi because somehow that makes a bunch of symbols in various
+# system header files invisible (e.g. fdopen, snprintf, etc.)
+#
+# I do not use -pedantic because that forbids zero-size arrays, e.g. in bn.h
+# and str.h.
+
+compile()
+	{
+	local name="$1"
+	local options="$2"
+
+	local file_o=../obj/$name.o
+	objects="$objects $file_o"
+
+	local file_c=$name.c
+	local file_o=../obj/$name.o
+	mkdir -p $(dirname $file_o)
+
+	# Make sure header cache file obj/$name.dep is up to date.
+	local file_dep=../obj/$name.dep
+
+	stale $file_dep $file_c
+	if [ $? -eq 1 ]; then
+		local headers="$(get_headers $name)"
+		echo $headers >$file_dep
+	fi
+
+	stale $file_o $file_c
+	local update=$?
+
+	if [ $update -eq 0 ]; then
+		local headers="$(cat $file_dep)"
+		stale $file_o $headers
+		update=$?
+	fi
+
+	if [ $update -eq 1 ]; then
+		# Append common options.
+		options="$options -Wall -Werror -Wunused-parameter"
+
+		# The next option enforces ISO C90 compatibility.
+		options="$options -Wdeclaration-after-statement"
+
+		run gcc -c $options -O3 -I . $file_c -o $file_o
+	fi
+	}
+
 make()
 	{
 	local name="$1"
-	local file_o=../obj/$name.o
-	local file_c=$name.c
-	need $file_o
-	stale $file_o $file_c || return 0
-	mkdir -p $(dirname $file_o)
-
-	# I avoid -pedantic because I have two machines that don't recognize it.
-	local options="-Wall -Werror -Wunused-parameter -O3"
-
-	if [ $DEV -eq 1 ]; then
-	# The next option enforces ISO C90 compatibility.  I use it only during
-	# development to ensure that I can compile with older versions of gcc.
-	options="$options -Wdeclaration-after-statement"
-	fi
-
-	run gcc -c $options $path $file_c -o $file_o
+	compile $name ""
 	}
 
 # Link the object files if any is newer than the executable file.
@@ -61,15 +101,17 @@ link()
 	{
 	local name="$1"
 	local file_e=../bin/$name
-	stale $file_e $objects || return 0
-	mkdir -p $(dirname $file_e)
-	run gcc -s $objects -o $file_e -lm
+	stale $file_e $objects
+	if [ $? -eq 1 ]; then
+		mkdir -p $(dirname $file_e)
+		run gcc -s $objects -o $file_e -lm
+	fi
 	}
 
 erase()
 	{
-	run rm -rf ../obj
-	run rm -rf ../bin
+	rm -rf ../obj
+	rm -rf ../bin
 	}
 
 case "$1" in
@@ -82,8 +124,4 @@ case "$1" in
 		;;
 esac
 
-path=""
 objects=""
-
-# Always look in the current directory for header files.
-path .
