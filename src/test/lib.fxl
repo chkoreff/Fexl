@@ -1,0 +1,26 @@
+# Test dynamic libraries.
+\name=(path_under dir_base "lib/show.so")
+\lib=(dlopen name)
+dlsym lib "type_show" \show
+
+show ()
+show ["a" "b"]
+show {"a" "b"}
+show (\x\y y x)
+
+show (\; a (b c))
+
+\x==(say "Hello.")
+show x
+
+\x=x
+show x
+
+\x=(with "a" 1; with "b" 2; void)
+show x
+
+\x==(+ 2 3)
+show x
+
+\x=x
+show x

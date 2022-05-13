@@ -12,6 +12,7 @@
 #include <type_file.h>
 #include <type_hex.h>
 #include <type_istr.h>
+#include <type_lib.h>
 #include <type_limit.h>
 #include <type_math.h>
 #include <type_num.h>
@@ -233,6 +234,10 @@ static value standard(const char *name)
 	if (match("kill")) return Q(type_kill);
 	if (match("connect")) return Q(type_connect);
 	if (match("receive_keystrokes")) return Q(type_receive_keystrokes);
+
+	/* dynamic libraries */
+	if (match("dlopen")) return Q(type_dlopen);
+	if (match("dlsym")) return Q(type_dlsym);
 
 	return 0;
 	}

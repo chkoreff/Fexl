@@ -96,6 +96,29 @@ make()
 	compile $name ""
 	}
 
+make_PIC()
+	{
+	local name="$1"
+	compile $name "-fPIC"
+	}
+
+# Make a library.  I use -fPIC (Position Independent Code) so the object can
+# be linked into a shared library.
+make_lib()
+	{
+	local name="$1"
+	local file_so=../lib/$name.so
+
+	stale $file_so $objects
+	local update=$?
+
+	if [ $update -eq 1 ]; then
+		mkdir -p $(dirname $file_so)
+		run gcc -s -shared $objects -o $file_so
+	fi
+	objects=""
+	}
+
 # Link the object files if any is newer than the executable file.
 link()
 	{
@@ -104,13 +127,15 @@ link()
 	stale $file_e $objects
 	if [ $? -eq 1 ]; then
 		mkdir -p $(dirname $file_e)
-		run gcc -s $objects -o $file_e -lm
+		run gcc -rdynamic -s $objects -o $file_e -lm -ldl
 	fi
+	objects=""
 	}
 
 erase()
 	{
 	rm -rf ../obj
+	rm -rf ../lib
 	rm -rf ../bin
 	}
 
@@ -123,5 +148,3 @@ case "$1" in
 		exit 2
 		;;
 esac
-
-objects=""

@@ -62,6 +62,7 @@
 "sort"
 "stats"
 "load"
+"lib"
 ]
 
 # Gather any individually specified tests.
