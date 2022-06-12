@@ -331,15 +331,14 @@
 \str_map=(\f\str list_str; map f; str_chars str)
 
 # Insert separators between elements of a list.
-\join=
+\join_list=
 	(\sep\xs
-	to_str;
-	(@\loop\slash\xs
 	xs [] \x\xs
-	slash (cons sep) ();
-	[x; loop T xs]
-	) F xs
+	[x; (@\loop\xs xs [] \x\xs [sep x; loop xs]) xs]
 	)
+
+# Insert separators between elements of a list and flatten into a string.
+\join=(\sep\xs to_str; join_list sep xs)
 
 \join_path=(join "/")
 
@@ -483,6 +482,7 @@ def "list_str" list_str;
 def "str_bytes" str_bytes;
 def "str_chars" str_chars;
 def "str_map" str_map;
+def "join_list" join_list;
 def "join" join;
 def "join_path" join_path;
 def "split" split;
