@@ -13,8 +13,9 @@
 # (i_render_data put nl x)
 # Render x in an indented format using the given output functions.
 \i_render_data=
-	(\put\nl\x
-	\x=x
+	(\put\nl
+
+	\render=
 	(@\render\prefix\x
 
 	is_str x (put (fexl_quote x));
@@ -23,37 +24,39 @@
 	is_void x (put "void");
 
 	\loop==
-		(@\loop\is_first\is_nested\prefix\items
-		items {is_nested} \x\items
+		(@\loop\is_first\is_nested\prefix\xs
+		xs is_nested \x\xs
 		\x=x
 
-		\continue==
-			(\is_nested\prefix
-			render prefix x
-			loop F is_nested prefix items
-			)
-
-		is_nested (nl put prefix continue T prefix);
-		is_scalar x (is_first () (put " ") continue F prefix);
+		(
+		is_nested (nl put prefix {T prefix});
+		is_scalar x (is_first () (put " ") {F prefix});
 
 		# Indent one level when I first see a non-scalar.
 		\prefix=(is_first prefix (. prefix "  "))
 		nl put prefix
-		continue T prefix
+		{T prefix}
+		)
+
+		\is_nested\prefix
+		render prefix x
+		loop F is_nested prefix xs
 		)
 
 	\show_items==
-		(\items
-		loop T F prefix items \is_nested
-		is_nested (nl put prefix) ()
+		(\xs
+		loop T F prefix xs (nl put prefix) ()
 		)
 
 	is_tuple x (put "{" show_items (tuple_to_list x) put "}");
 	is_list x (put "[" show_items x put "]");
 
 	put "?"
-	) "" x
-	nl
+	)
+
+	\x
+	\x=x
+	render "" x nl
 	)
 
 \say_data=(i_render_data put nl)
