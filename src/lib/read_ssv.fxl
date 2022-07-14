@@ -2,37 +2,37 @@
 
 # Collect a string up to the next occurrence of the terminator string.
 \collect_string=
-	(\t_ch\term\no\yes
+	(\t_ch\term
 	\buf_result=buf_new
 
 	@\loop_start
 	\fh_term=(readstr term)
 
-	buffer_to t_ch buf_result no
+	buffer_to t_ch buf_result
 		(
 		\buf_match=buf_new
 		buf_put buf_match t_ch
 
 		@\loop_term
 		\t=(sgetc fh_term)
-		is_undef t (\str=(buf_get buf_result) yes str);
+		is_undef t (buf_get buf_result);
 
-		scan no \x
+		\x=look
+		is_undef x void;
 		eq x t
 			(
 			buf_put buf_match x
+			skip
 			loop_term
-			)
-			(
-			buf_put buf_result (buf_get buf_match)
-			push x;
-			loop_start
-			)
+			);
+		buf_put buf_result (buf_get buf_match)
+		loop_start
 		)
+		void
 	)
 
 # LATER 20211227 Insist on white space terminator, forbid QU and "~".
-\get_plain_item=
+\get_plain_item==
 	(
 	collect_token
 		(\x
@@ -43,32 +43,39 @@
 		)
 	)
 
-\get_item=
-	(\no\yes
-	scan no \x
-	is_eol x no;
-	eq x QU (collect_to (eq QU) no yes);
+\get_item==
+	(
+	\x=look
+	is_undef x void;
+	is_eol x (skip void);
+	eq x QU (skip collect_to (eq QU));
 	eq x "~"
 		(
-		collect_to is_white no \term
-		collect_string x term no yes
+		skip
+		\term=(collect_to is_white)
+		is_undef term void;
+		collect_string x term
 		);
-	push x;
-	get_plain_item yes
+	get_plain_item
 	)
 
-\get_row=
-	(@\loop\no\yes
-	skip_match (\x is_eol x F; is_white x);
-	get_item no \item
-	loop (yes [item]) \row yes [item;row]
+\get_row==
+	(@\loop
+	skip_match (\x is_eol x F; is_white x)
+	\str=get_item
+	is_undef str void;
+	\row=loop
+	\row=(is_undef row [] row)
+	[str;row]
 	)
 
-\get_rows=
-	(@\loop\yes
-	skip_match is_white;
-	get_row (yes []) \row
-	loop \rows yes [row;rows]
+\get_rows==
+	(@\loop
+	skip_match is_white
+	\row=get_row
+	is_undef row [];
+	\rows=loop
+	[row;rows]
 	)
 
 \read_ssv_string=(read_string get_rows)

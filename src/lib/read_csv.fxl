@@ -1,7 +1,6 @@
 # Parse the CSV (comma-separated value) format.
 # NOTE: https://www.ietf.org/rfc/rfc4180.txt
 # "Spaces are considered part of a field and should not be ignored."
-
 \get_plain_item=
 	(\sep
 	collect_token
@@ -12,66 +11,75 @@
 		)
 	)
 
-# Get a char inside a quoted string.  A single QU char is treated as end of
-# string.  Two QU chars in a row are treated as a single QU character which
-# appears in the string.
-\get_quote_char=
-	(\fail\done\keep
-	scan fail \x
-	eq x QU
-		(
-		scan done \x
-		eq x QU
-			(keep QU)
-			(push x done)
-		)
-		(keep x)
-	)
-
-# Get a quoted item.
-\get_quote_item=
-	(\no\yes
+# Get a quoted item.  A single QU char is treated as end of string.  Two QU
+# chars in a row are treated as a single QU character which appears in the
+# string.
+\get_quote_item==
+	(
 	\buf=buf_new
 	@\loop
-	get_quote_char no
-		(\str=(buf_get buf) yes str)
-		(\x buf_put buf x loop)
+	\x=look
+	is_undef x void;
+	skip
+	eq x QU
+		(
+		\x=look
+		is_undef x (buf_get buf);
+		eq x QU
+			(
+			skip
+			buf_put buf QU
+			loop
+			);
+		buf_get buf
+		);
+	buf_put buf x
+	loop
 	)
 
 \get_item=
 	(\sep
-	\get_plain_item=(get_plain_item sep)
-	\no\yes
-	scan no \x
-	eq x QU (get_quote_item no yes);
-	push x;
-	get_plain_item yes
+	\x=look
+	is_undef x void;
+	eq x QU
+		(
+		skip
+		get_quote_item
+		)
+		(get_plain_item sep)
 	)
 
 \get_row=
-	(\sep
-	\get_item=(get_item sep)
-	@\loop\no\yes
-	get_item no \item
-	scan (yes [item]) \x
-	eq x sep
-		(loop (yes [item]) \row yes [item;row])
-		(yes [item])
+	(\sep @\loop
+	\item=(get_item sep)
+	is_undef item void;
+	\row=
+		(
+		\x=look
+		is_undef x [];
+		skip
+		eq x sep
+			(
+			\row=loop
+			is_undef row [] row
+			)
+			[]
+		)
+	[item;row]
 	)
 
 \get_rows=
-	(\sep
-	\get_row=(get_row sep)
-	@\loop\yes
-	skip_match is_eol;
-	get_row (yes []) \row
-	loop \rows yes [row;rows]
+	(\sep @\loop
+	skip_match is_eol
+	\row=(get_row sep)
+	is_undef row [];
+	\rows=loop
+	[row;rows]
 	)
 
 \read_rows=
 	(\sep\read
-	\get_rows=(get_rows sep)
-	read get_rows
+	read (get_rows sep)
 	)
 
 # comma-separated

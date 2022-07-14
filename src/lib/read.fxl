@@ -1,82 +1,108 @@
-#
-\scan=(\no\yes\xs xs (no []) yes)
-\push=(\x\yes\xs yes [x;xs])
+# LATER 20220714 Code in C the stream state along with look and skip.  This
+# will avoid using vars here and cut the step count considerably.  Once that's
+# done I can even code in C some of the higher-level parse functions such as
+# skip_match, buffer_to, collect_to, etc.
+
+\v_ch=var_new
+\v_get=var_new
+
+# Get the currenct char.
+\look==(var_get v_ch)
+
+# Skip to the next char.
+\skip==
+	(
+	var_get v_get;
+	var_put v_ch
+	)
+
+\read_stream=
+	(\read\getc\fh
+	var_put v_get {(getc fh)}
+	skip
+	read
+	)
 
 \is_eol=(\x eq x LF T; eq x CR)
 \is_white=(ge " ")
 
 # Skip matching characters.
 \skip_match=
-	(\is_match\yes @\loop
-	scan yes \x
-	is_match x
-		loop
-		(push x yes)
+	(\is_match @\loop
+	\x=look
+	is_undef x ();
+	is_match x (skip loop);
 	)
 
-# Buffer characters up to a specific end char.
+# Buffer characters up to a specific end char.  Return true if found.
 \buffer_to=
-	(\t_ch\buf\no\yes
+	(\t_ch\buf
 	@\loop
-	scan no \x
-	eq x t_ch
-		yes
-		(buf_put buf x loop)
+	\x=look
+	is_undef x F;
+	skip
+	eq x t_ch T;
+	buf_put buf x
+	loop
 	)
 
 # Collect characters up to an end char.  The end char is skipped.
 \collect_to=
-	(\is_end\no\yes
+	(\is_end
 	\buf=buf_new
 	@\loop
-	scan no \x
-	is_end x
-		(\str=(buf_get buf) yes str)
-		(buf_put buf x loop)
+	\x=look
+	is_undef x void;
+	skip
+	is_end x (buf_get buf);
+	buf_put buf x
+	loop
 	)
 
 # Collect characters up to an end char or EOF.  The end char is kept.
 \collect_token=
-	(\is_end\yes
+	(\is_end
 	\buf=buf_new
-	\done==(\str=(buf_get buf) yes str)
 	@\loop
-	scan done \x
-	is_end x
-		(push x done)
-		(buf_put buf x loop)
-	)
-
-\read_chars=(\read read (\data\xs data))
-
-\stream_string=
-	(\str
-	\fh=(readstr str)
-	stream_get (sgetc fh)
-	)
-
-\stream_file=
-	(\name
-	\fh=(fopen name "r")
-	is_undef fh void;
-	stream_get (fgetc fh)
+	\x=look
+	is_undef x (buf_get buf);
+	is_end x (buf_get buf);
+	skip
+	buf_put buf x
+	loop
 	)
 
 \read_string=
-	(\read\in
-	stream_string in \xs
-	read_chars read xs
+	(\read\str
+	\fh=(readstr str)
+	read_stream read sgetc fh
 	)
 
 \read_file=
-	(\read\in
-	stream_file in \xs
-	read_chars read xs
+	(\read\name
+	\fh=(fopen name "r")
+	is_void fh void;
+	read_stream read fgetc fh
+	)
+
+\read_chars=
+	(
+	\flatten=
+		(
+		\buf=buf_new
+		@\loop\xs
+		xs (buf_get buf) \x\xs
+		buf_put buf x
+		loop xs
+		)
+	\read\xs
+	\str=(flatten xs)
+	read_string read str
 	)
 
 \form
-def "scan" scan;
-def "push" push;
+def "look" look;
+def "skip" skip;
 def "is_eol" is_eol;
 def "is_white" is_white;
 def "skip_match" skip_match;
