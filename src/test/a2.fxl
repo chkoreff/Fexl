@@ -5,7 +5,7 @@ value; std; (value; std; use "test.fxl") \;
 \echo=
 	(\get @\loop
 	\ch=get
-	is_void ch ();
+	is_undef ch ();
 	say ["ch = '" ch "'"]
 	loop
 	)

@@ -116,7 +116,7 @@ format_num
 	is_list x (put "[" show_items x put "]");
 
 	is_bool x (put (x "T" "F"));
-	is_void x (put "void");
+	is_undef x (put "void");
 	put "?"
 	)
 

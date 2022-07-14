@@ -2,7 +2,7 @@
 \echo==
 	(@\echo
 	\ch=(fgetc stdin)
-	is_void ch ();
+	is_undef ch ();
 	say ["ch " (hex_byte; ord ch)]
 	echo
 	)

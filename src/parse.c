@@ -415,8 +415,8 @@ value parse_input(input _get, void *_source, value _label)
 	get = _get;
 	source = _source;
 	label = _label;
-	ch = ' ';
 	line = 1;
+	skip();
 	{
 	struct form *exp = parse_exp();
 	if (ch != -1)

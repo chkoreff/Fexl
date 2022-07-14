@@ -112,7 +112,7 @@
 
 	@\loop
 	\ch=(sget source)
-	is_void ch (buf_get buf);
+	is_undef ch (buf_get buf);
 	eq ch "+"
 		(
 		buf_put buf " "

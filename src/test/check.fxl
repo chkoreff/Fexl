@@ -70,7 +70,7 @@
 	(
 	(@\loop\n
 	\x=(argv n)
-	is_void x [];
+	is_undef x [];
 	\n=(+ 1 n)
 	[x;loop n]
 	) 2

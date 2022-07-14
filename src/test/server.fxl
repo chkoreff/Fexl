@@ -4,7 +4,7 @@
 run_server (argv 2) "127.0.0.1" 2186 "test/error_log"
 	(@\loop
 	\ch=(fgetc stdin)
-	is_void ch ();
+	is_undef ch ();
 	if (eq ch "a")
 		(
 		trace ["SAW: "(unpack ch)]

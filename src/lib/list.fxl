@@ -349,7 +349,7 @@
 
 	(@\loop\offset
 	\pos=(search str sep offset)
-	is_void pos
+	is_undef pos
 		(
 		\len_str=(length str)
 		\top=(slice str offset (- len_str offset))
@@ -389,7 +389,7 @@
 	eq "" suffix T;
 	\start=(- (length str) (length suffix))
 	\pos=(search str suffix start)
-	is_void pos F;
+	is_undef pos F;
 	eq pos start
 	)
 
@@ -429,7 +429,7 @@
 	check_type is_str (eq x y);
 	check_type is_num (eq x y);
 	check_type is_bool (x y (not y));
-	check_type is_void T;
+	check_type is_undef T;
 
 	\eq_list==
 		(\x\y

@@ -2,7 +2,7 @@
 \echo=
 	(\get @\loop
 	\ch=get
-	is_void ch ();
+	is_undef ch ();
 	eq (ord ch) 4 ();
 	say ["ch = "(unpack ch)]
 	loop

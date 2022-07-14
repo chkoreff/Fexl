@@ -14,7 +14,7 @@
 	\source=(path_under dir_base "src/test/chars.fxl")
 
 	\fh=(fopen source "r")
-	is_void fh (error ["Could not open "source]);
+	is_undef fh (error ["Could not open "source]);
 	fh
 	)
 

@@ -58,7 +58,7 @@
 \stream_file=
 	(\name
 	\fh=(fopen name "r")
-	is_void fh void;
+	is_undef fh void;
 	stream_get (fgetc fh)
 	)
 

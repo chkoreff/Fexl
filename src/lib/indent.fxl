@@ -6,7 +6,7 @@
 	is_str x T;
 	is_num x T;
 	is_bool x T;
-	is_void x T;
+	is_undef x T;
 	F
 	)
 
@@ -21,7 +21,7 @@
 	is_str x (put (fexl_quote x));
 	is_num x (put (num_str x));
 	is_bool x (put (x "T" "F"));
-	is_void x (put "void");
+	is_undef x (put "void");
 
 	\loop==
 		(@\loop\is_first\is_nested\prefix\xs

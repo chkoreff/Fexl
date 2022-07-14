@@ -8,7 +8,7 @@ value; std; (value; std; use "test.fxl") \;
 	is_str x (type "str");
 	is_num x (type "num");
 	is_bool x (type "bool");
-	is_void x (say "void");
+	is_undef x (say "void");
 	say "other"
 	)
 
@@ -803,7 +803,7 @@ try -1.3
 	\fh=(fopen tmp_file "r")
 	@\loop
 	\ch=(fget fh)
-	is_void ch ();
+	is_undef ch ();
 	f ch
 	loop
 	)
@@ -867,7 +867,7 @@ This also goes to the file.
 	\get==
 		(
 		\ch=(fget fh_r)
-		say ["get " (is_void ch "void" ch)]
+		say ["get " (is_undef ch "void" ch)]
 		)
 
 	put "a"
@@ -1110,7 +1110,7 @@ say (is_good; flock_sh fh)
 say (is_good; flock_un fh)
 say (is_good; flock_ex "foo")
 fclose fh
-is_void fh (say "File handle is properly void after close.") ()
+is_undef fh (say "File handle is properly void after close.") ()
 
 if F
 (

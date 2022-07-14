@@ -29,7 +29,7 @@
 \index_put=
 	(@\index_put\index\new_key\new_val
 
-	is_void index (mk_index new_key new_val void void);
+	is_undef index (mk_index new_key new_val void void);
 	index \old_key\old_val\child\next
 
 	\len_common=(length_common new_key old_key)
@@ -77,7 +77,7 @@
 	(@\index_get\index\new_key
 	\new_key=new_key
 
-	is_void index void;
+	is_undef index void;
 	index \old_key\old_val\child\next
 
 	\len_common=(length_common new_key old_key)
@@ -112,7 +112,7 @@
 \index_pairs=
 	(
 	(@\index_pairs\prefix\index
-	is_void index [];
+	is_undef index [];
 	index \key\val\child\tail
 	\this_key=(. prefix key)
 	is_defined val (cons { this_key val }) ();
@@ -124,7 +124,7 @@
 
 \show_index=
 	(@\show_index\index
-	is_void index (say "void");
+	is_undef index (say "void");
 	index \key\val\child\tail
 	put ["{"(fexl_quote key)" "] put_data val nl
 	show_index child

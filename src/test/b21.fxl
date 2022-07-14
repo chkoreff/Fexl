@@ -4,7 +4,7 @@ say "=== Test new rules for numeric constants"
 \try=
 	(\x
 	\n=(str_num x)
-	say ["str_num "QU x QU" = "(is_void n "void" n)]
+	say ["str_num "QU x QU" = "(is_undef n "void" n)]
 	)
 
 say "= test good"

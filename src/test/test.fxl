@@ -11,14 +11,13 @@
 
 \show_str=
 	(\text
-	is_void text (say "void");
+	is_undef text (say "void");
 	say [(length text)":"(as_str text)]
 	)
 
 \show_hex=
 	(\bytes
-	\bytes=bytes
-	is_void bytes (say "void");
+	is_undef bytes (say "void");
 	say [(length bytes)":["(unpack bytes)"]"]
 	)
 

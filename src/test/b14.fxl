@@ -181,7 +181,7 @@ look
 
 	\fh=(
 		\fh=(fopen source "r")
-		if (is_void fh) (error ["Could not open "source])
+		if (is_undef fh) (error ["Could not open "source])
 		fh
 		)
 

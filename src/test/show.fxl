@@ -39,7 +39,7 @@
 \run_filter=(run ["../bin/fexl"])
 
 \name=(argv 2)
-is_void name (error "Missing test name");
+is_undef name (error "Missing test name");
 
 \lparen="(" \rparen=")"
 \lbrace="{" \rbrace="]"

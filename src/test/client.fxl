@@ -4,10 +4,10 @@
 \inc_ch=
 	(
 	\fh=(connect "127.0.0.1" 2186)
-	if (is_void fh) (error "Could not connect")
+	if (is_undef fh) (error "Could not connect")
 	\ch
 	\ch=(slice ch 0 1)
-	is_void ch void;
+	is_undef ch void;
 	eq ch "" "";
 	fput fh ch
 	fgetc fh
@@ -23,7 +23,7 @@ say "Enter chars: (Ctrl-D to quit)"
 (@\loop
 set_alarm 30
 \ch=(fgetc stdin)
-is_void ch ();
+is_undef ch ();
 try ch
 loop
 )
