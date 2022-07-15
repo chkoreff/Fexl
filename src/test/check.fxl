@@ -63,6 +63,7 @@
 "stats"
 "load"
 "lib"
+"stream"
 ]
 
 # Gather any individually specified tests.

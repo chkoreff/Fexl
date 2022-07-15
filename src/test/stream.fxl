@@ -1,0 +1,63 @@
+# Test stream operations.
+\name=(path_under dir_base "lib/stream.so")
+\lib=(dlopen name)
+dlsym lib "type_look" \look
+dlsym lib "type_skip" \skip
+dlsym lib "type_line" \line
+dlsym lib "type_read_stream" \read_stream
+
+\read==
+	(
+	say "READ"
+	(@\loop
+	\x=look
+	is_undef x ();
+	put x
+	skip
+
+	# Test nested stream.
+	if T
+		(
+		put "("
+		(
+		\fh==(readstr "12")
+		read_stream fh;
+		@\loop
+		\x=look
+		is_undef x ();
+		put x
+		skip
+		loop
+		)
+		put ")"
+		)
+	loop
+	)
+	nl
+	say ["line = "line]
+	["x" "y"] # Return fixed result.
+	)
+
+\try=
+	(\fh
+	\result=(read_stream fh read)
+	#nl
+	say ["result = "(as_str result)]
+	nl
+	)
+
+show_benchmark;
+try (readstr "abcd")
+try (fopen "test/hello.fxl" "r")
+try 32 # invalid source
+
+try
+(
+readstr
+~
+line 1
+line 2
+line 3~
+)
+
+say "DONE"

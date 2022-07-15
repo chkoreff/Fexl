@@ -77,20 +77,15 @@
 	[row;rows]
 	)
 
-\read_rows=
-	(\sep\read
-	read (get_rows sep)
-	)
-
 # comma-separated
-\read_csv_string=(read_rows ","  read_string)
-\read_csv_chars=(read_rows "," read_chars)
-\read_csv_file=(read_rows "," read_file)
+\read_csv_string=(\x read_string x (get_rows ","))
+\read_csv_chars=(\x read_chars x (get_rows ","))
+\read_csv_file=(\x read_file x (get_rows ","))
 
 # tab-separated
-\read_tsv_string=(read_rows TAB read_string)
-\read_tsv_chars=(read_rows TAB read_chars)
-\read_tsv_file=(read_rows TAB read_file)
+\read_tsv_string=(\x read_string x (get_rows TAB))
+\read_tsv_chars=(\x read_chars x (get_rows TAB))
+\read_tsv_file=(\x read_file x (get_rows TAB))
 
 \form
 def "read_csv_string" read_csv_string;

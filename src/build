@@ -7,6 +7,10 @@ make_PIC output_str
 make_PIC show
 make_lib show
 
+# Build stream library.
+make_PIC type_stream
+make_lib stream
+
 # Build fexl.
 make base64
 make basic

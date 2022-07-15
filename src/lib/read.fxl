@@ -1,27 +1,11 @@
-# LATER 20220714 Code in C the stream state along with look and skip.  This
-# will avoid using vars here and cut the step count considerably.  Once that's
-# done I can even code in C some of the higher-level parse functions such as
+# LATER 20220715 Code in C some of the higher-level parse functions such as
 # skip_match, buffer_to, collect_to, etc.
 
-\v_ch=var_new
-\v_get=var_new
-
-# Get the current char.
-\look==(var_get v_ch)
-
-# Skip to the next char.
-\skip==
-	(
-	var_get v_get;
-	var_put v_ch
-	)
-
-\read_stream=
-	(\read\getc\fh
-	var_put v_get {(getc fh)}
-	skip
-	read
-	)
+\name=(path_under dir_base "lib/stream.so")
+\lib=(dlopen name)
+dlsym lib "type_read_stream" \read_stream
+dlsym lib "type_look" \look
+dlsym lib "type_skip" \skip
 
 \is_eol=(\x eq x LF T; eq x CR)
 \is_white=(ge " ")
@@ -73,16 +57,13 @@
 	)
 
 \read_string=
-	(\read\str
-	\fh=(readstr str)
-	read_stream read sgetc fh
+	(\str
+	read_stream (readstr str)
 	)
 
 \read_file=
-	(\read\name
-	\fh=(fopen name "r")
-	is_void fh void;
-	read_stream read fgetc fh
+	(\name
+	read_stream (fopen name "r")
 	)
 
 \read_chars=
@@ -95,9 +76,9 @@
 		buf_put buf x
 		loop xs
 		)
-	\read\xs
-	\str=(flatten xs)
-	read_string read str
+	\xs
+	\str==(flatten xs)
+	read_string str
 	)
 
 \form
