@@ -6,7 +6,7 @@
 \v_ch=var_new
 \v_get=var_new
 
-# Get the currenct char.
+# Get the current char.
 \look==(var_get v_ch)
 
 # Skip to the next char.
