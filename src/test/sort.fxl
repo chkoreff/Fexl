@@ -1,5 +1,5 @@
 #
-value; (value; std; use "test.fxl"); std; \;
+value; std; (value; std; use "test.fxl") \;
 
 show_benchmark;
 

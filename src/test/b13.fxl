@@ -34,7 +34,7 @@ try "x"
 )
 
 say "== test_full"
-test_context (\form std; (\= value; std; use "test.fxl"); form)
+test_context (\form std; (\= value; std; use "test.fxl") form)
 
 say "== test_restricted"
 test_context
