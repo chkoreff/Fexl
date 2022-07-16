@@ -41,12 +41,29 @@ dlsym lib "type_read_stream" \read_stream
 \try=
 	(\fh
 	\result=(read_stream fh read)
-	#nl
 	say ["result = "(as_str result)]
 	nl
 	)
 
+# Test the default empty stream.
+\test_empty==
+	(
+	say "EMPTY"
+	say ["line "line]
+	\try==
+		(
+		\x=look
+		say ["x = "(as_str x)]
+		skip
+		)
+
+	try
+	try
+	nl
+	)
+
 show_benchmark;
+test_empty
 try (readstr "abcd")
 try (fopen "test/hello.fxl" "r")
 try 32 # invalid source

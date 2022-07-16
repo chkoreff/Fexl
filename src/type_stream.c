@@ -11,9 +11,15 @@
 
 /* LATER 20220715 Possibly unify this with parse.c */
 
-static int ch; /* current character */
-static unsigned long line; /* current line number */
-static input get; /* current input routine */
+static int empty(void *source)
+	{
+	(void)source;
+	return -1;
+	}
+
+static int ch = -1; /* current character */
+static unsigned long line = 1; /* current line number */
+static input get = empty; /* current input routine */
 static void *source; /* current input source */
 
 static void skip(void)
@@ -62,7 +68,6 @@ static value read_stream(value f, input _get, void *_source)
 
 	get = _get;
 	source = _source;
-	line = 1;
 	skip();
 
 	f = arg(f->R); /* Run the parse function */

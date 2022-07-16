@@ -1,5 +1,10 @@
 \out=
 ~1
+EMPTY
+line 1
+x = void
+x = void
+
 READ
 a(12)b(12)c(12)d(12)
 line = 1
@@ -21,7 +26,7 @@ line = 3
 result = ["x" "y"]
 
 DONE
-steps 7524 bytes 4576
+steps 7836 bytes 4576
 ~1
 \err=
 ~1
