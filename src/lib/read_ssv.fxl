@@ -78,9 +78,11 @@
 	[row;rows]
 	)
 
-\read_ssv_string=(\x read_string x get_rows)
-\read_ssv_chars=(\x read_chars x get_rows)
-\read_ssv_file=(\x read_file x get_rows)
+\parse=(\read\x read x get_rows)
+
+\read_ssv_string=(parse read_string)
+\read_ssv_chars=(parse read_chars)
+\read_ssv_file=(parse read_file)
 
 \form
 def "read_ssv_string" read_ssv_string;

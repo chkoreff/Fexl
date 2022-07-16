@@ -77,17 +77,27 @@
 	[row;rows]
 	)
 
+\parse=(\read\sep\x read x (get_rows sep))
+
+# Use arbitrary separator.
+\read_xsv_string=(parse read_string)
+\read_xsv_chars=(parse read_chars)
+\read_xsv_file=(parse read_file)
+
 # comma-separated
-\read_csv_string=(\x read_string x (get_rows ","))
-\read_csv_chars=(\x read_chars x (get_rows ","))
-\read_csv_file=(\x read_file x (get_rows ","))
+\read_csv_string=(read_xsv_string ",")
+\read_csv_chars=(read_xsv_chars ",")
+\read_csv_file=(read_xsv_file ",")
 
 # tab-separated
-\read_tsv_string=(\x read_string x (get_rows TAB))
-\read_tsv_chars=(\x read_chars x (get_rows TAB))
-\read_tsv_file=(\x read_file x (get_rows TAB))
+\read_tsv_string=(read_xsv_string TAB)
+\read_tsv_chars=(read_xsv_chars TAB)
+\read_tsv_file=(read_xsv_file TAB)
 
 \form
+def "read_xsv_string" read_xsv_string;
+def "read_xsv_chars" read_xsv_chars;
+def "read_xsv_file" read_xsv_file;
 def "read_csv_string" read_csv_string;
 def "read_csv_chars" read_csv_chars;
 def "read_csv_file" read_csv_file;

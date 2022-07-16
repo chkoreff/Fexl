@@ -154,7 +154,17 @@ second line"]
 ["~a~ab~abc~abcd"]
 ]
 void
-steps 159722 bytes 9184
+== test_xsv
+[
+["12" "3" "" "4"]
+["5" "6" "7"]
+[~1 a b
+"hi"
+cd~1 "3.14" "-48.7"]
+[~1 abc|def"ghi"jklmnopqrstuvwxyz~1]
+["    "]
+]
+steps 168260 bytes 9152
 ~3
 \err=
 ~1
