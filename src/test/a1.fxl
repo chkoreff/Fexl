@@ -538,9 +538,6 @@ show "list_2" list_2
 )
 
 div
-eval_file "resolve.fxl"
-
-div
 \x=T say (is_bool x)
 \x=F say (is_bool x)
 \x=(T 1) say (is_bool x)

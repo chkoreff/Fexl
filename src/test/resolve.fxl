@@ -1,3 +1,62 @@
+# Test the defc function thoroughly.
+\test_0==
+(
+\try=
+	(
+	\cx==(say "Evaluating the context." std)
+	\key\form
+	\key==(say "Evaluating the key." key)
+	\form==(say "Evaluating the form." form)
+	\result=(value; defc key cx form)
+	say ["result "(is_undef result "void" "ok")]
+	nl
+	)
+
+say "== test_0"
+show_benchmark;
+
+# Test with bad key.
+try (I 3) (\; say "Hello.")
+# Test with bad form.
+try (I "std") 3
+# Test good.
+try (I "std") (\; say "Hello")
+)
+
+\test_1==
+(
+say "== test_1"
+show_benchmark;
+
+value;
+defc (I "std")
+	(
+	say "Evaluating the context."
+	\form
+	std;
+	def "F" F;
+	def "if" if;
+	def "fred" (say "I am Fred.");
+	form
+	)
+	(
+	say "Evaluating the form."
+	\;
+	# Demonstrate that "std" refers to itself.
+	value; std \;
+	value; std \;
+	value; std \;
+
+	if F std
+	fred
+	)
+)
+
+\test_2==
+(
+say "== test_2"
+show_benchmark;
+
 # Test fancy extended standard context.
 value;
 (
@@ -11,8 +70,10 @@ def "fred" (speaker "Fred");
 def "wilma" (speaker "Wilma");
 def "goodbye" (say "Goodbye");
 form
-) \;
+);
 
+say "Evaluating the form."
+\;
 # Now override one of the definitions.
 value;
 std;
@@ -26,3 +87,8 @@ say (is_void void)
 fred "a"
 wilma "b"
 goodbye
+)
+
+test_0
+test_1
+test_2

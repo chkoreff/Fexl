@@ -64,6 +64,7 @@
 "load"
 "lib"
 "stream"
+"resolve"
 ]
 
 # Gather any individually specified tests.

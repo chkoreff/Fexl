@@ -1,0 +1,39 @@
+\out=
+~1
+== test_0
+Evaluating the context.
+Evaluating the key.
+result void
+
+Evaluating the context.
+Evaluating the key.
+Evaluating the form.
+result void
+
+Evaluating the context.
+Evaluating the key.
+Evaluating the form.
+Hello
+result ok
+
+steps 1164 bytes 3584
+== test_1
+Evaluating the context.
+Evaluating the form.
+I am Fred.
+steps 1260 bytes 3488
+== test_2
+Evaluating the context.
+Evaluating the form.
+Hi
+57
+T
+HEY: Fred says a
+Wilma says b
+Goodbye
+steps 788 bytes 4736
+~1
+\err=
+~1
+~1
+\status=0
