@@ -1,9 +1,8 @@
 # Test fancy extended standard context.
 value;
-
-# Define a few extra functions, and redefine "std".
-defc "std"
 (
+# Define std to include a few extra functions.
+defc "std";
 say "Evaluating the context."
 \speaker=(\name \x put name put " says " say x)
 \form
