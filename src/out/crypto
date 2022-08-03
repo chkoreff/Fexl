@@ -1,5 +1,5 @@
 \out=
-~1
+~
 [ test_box
 nacl_box_public
 secret_key = 32:[236162636465666768696a6b6c6d6e6f707172737475767778797a0a23616263]
@@ -668,8 +668,8 @@ msg = "The quick brown fox jumps over the lazy dog"
 key = "key"
 mac = b42af09057bac1e2d41708e48a902e09b5ff7f12ab428a4fe86653c73dd248fb82f948a549f7b791a5b41915ee4d1ec3935357e4e2317250d0372afa2ebeeb3a
 
-~1
+~
 \err=
-~1
-~1
+~
+~
 \status=0

@@ -5,6 +5,7 @@
 	\term=
 		(
 		\check=(\y is_void (search x y 0) y)
+		check "~";
 		(@\loop\count
 		\term=(. "~"; num_str count)
 		check term;

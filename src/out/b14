@@ -1,5 +1,5 @@
 \out=
-~1
+~
 directory src/lib
 [
 assoc.fxl
@@ -82,8 +82,8 @@ get e
 get f
 get g
 at  h
-~1
+~
 \err=
-~1
-~1
+~
+~
 \status=0

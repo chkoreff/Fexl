@@ -1,5 +1,5 @@
 \out=
-~1
+~
 [ test_run_function
 out:
 [
@@ -70,8 +70,8 @@ status: good
 [ test_big_output
 grabbed 200000 bytes
 ]
-~1
+~
 \err=
-~1
-~1
+~
+~
 \status=0

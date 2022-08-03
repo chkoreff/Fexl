@@ -1,5 +1,5 @@
 \out=
-~1
+~
 Returns (Fund vs. Benchmark)
 [
 -0.893261320594374 -16.5237724084178
@@ -87,8 +87,8 @@ Modigliani risk-adjusted performance
 1.7106%
 Sharpe Ratio of Fund vs. Benchmark
 0.0275
-~1
+~
 \err=
-~1
-~1
+~
+~
 \status=0

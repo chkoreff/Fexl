@@ -1,5 +1,5 @@
 \out=
-~1
+~
 === Test new rules for numeric constants
 = test good
 str_num "0" = 0
@@ -45,8 +45,8 @@ str_num "nan" = void
 str_num "-inf" = void
 str_num "-nan" = void
 
-~1
+~
 \err=
-~1
-~1
+~
+~
 \status=0

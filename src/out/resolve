@@ -1,5 +1,5 @@
 \out=
-~1
+~
 == test_0
 Evaluating the context.
 Evaluating the key.
@@ -32,8 +32,8 @@ HEY: Fred says a
 Wilma says b
 Goodbye
 steps 788 bytes 4736
-~1
+~
 \err=
-~1
-~1
+~
+~
 \status=0

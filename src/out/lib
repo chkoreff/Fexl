@@ -1,5 +1,5 @@
 \out=
-~1
+~
 [I]
 [list [list] [0 [str "a"] [0 [str "b"] [null]]]]
 [tuple [tuple] [0 [str "a"] [0 [str "b"] [null]]]]
@@ -11,8 +11,8 @@ Hello.
 [assoc [A [A [I] [str "a"]] [num 1]] [assoc [A [A [I] [str "b"]] [num 2]] [void]]]
 [A [A [add] [num 2]] [num 3]]
 [num 5]
-~1
+~
 \err=
-~1
-~1
+~
+~
 \status=0

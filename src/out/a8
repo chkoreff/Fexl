@@ -1,5 +1,5 @@
 \out=
-~1
+~
 == test_rand
 [
 get
@@ -24,8 +24,8 @@ BEG
 END
 xs = !!!["a" "b" "c"]
 xs = ["a" "b" "c"]
-~1
+~
 \err=
-~1
-~1
+~
+~
 \status=0

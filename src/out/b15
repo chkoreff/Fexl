@@ -1,5 +1,5 @@
 \out=
-~1
+~
 \index=
 {"" "5763"
 void
@@ -367,8 +367,8 @@ void
 }
 get: {"abc" "4113"}
 get: {"" void}
-~1
+~
 \err=
-~1
-~1
+~
+~
 \status=0

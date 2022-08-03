@@ -1,17 +1,17 @@
 \out=
-~1
+~
 hello
 This goes to stdout.
 x = 7
 This goes to stdout.
 x = 7
 bye
-~1
+~
 \err=
-~1
+~
 This goes to stderr.
 x = 7
 This goes to stderr.
 x = 7
-~1
+~
 \status=0

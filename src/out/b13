@@ -1,5 +1,5 @@
 \out=
-~1
+~
 == test_full
 name say : T
 name is_defined : T
@@ -53,8 +53,8 @@ I am Fred.
 0.927291684284476
 0.471201063818858
 I am Wilma.
-~1
+~
 \err=
-~1
-~1
+~
+~
 \status=0

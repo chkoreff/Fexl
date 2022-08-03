@@ -1,5 +1,5 @@
 \out=
-~1
+~
 ==
 [
 (parsing)
@@ -21,8 +21,8 @@ HI
 ]
 got it
 x = 7
-~1
+~
 \err=
-~1
-~1
+~
+~
 \status=0

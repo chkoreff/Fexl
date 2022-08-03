@@ -1,5 +1,5 @@
 \out=
-~1
+~
 ===============
 ** use util.fxl
 ** use flintstones.fxl
@@ -26,8 +26,8 @@ main says: Hello.
 : I am Betty.
 x = 42
 steps 1360 bytes 3328
-~1
+~
 \err=
-~1
-~1
+~
+~
 \status=0

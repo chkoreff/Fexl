@@ -1,5 +1,5 @@
 \out=
-~1
+~
 EMPTY
 line 1
 x = void
@@ -27,8 +27,8 @@ result = ["x" "y"]
 
 DONE
 steps 7836 bytes 4576
-~1
+~
 \err=
-~1
-~1
+~
+~
 \status=0
