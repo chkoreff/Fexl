@@ -1231,61 +1231,70 @@ try "   "
 try "  abcd   "
 )
 
-\run_test=
-	(\label\handle\list_case
-
-	\list_error=
-		(
-		map_good
-			(\case
-			handle case \ok\result
-			ok void {case result}
-			)
-			list_case
-		)
-	is_null list_error ();
-
-	trace ["ERRORS in "label":"]
-	trace "["
-	each list_error (\row trace (as_str row))
-	trace "]"
-
-	die
-	)
-
 \test_eq_data==
 (
 say "= test_eq_data"
-show_benchmark;
-run_test "eq_data"
-(\case
-case \x\y\expect
-\result=(eq_data x y)
-\ok=(is_bool result (result expect (not expect)) F)
-{ok result}
-)
-[
-{ "a" "b"  F }
-{ "a" "a"  T }
-{ pi pi  T }
-{ F F  T }
-{ F T  F }
-{ T F  F }
-{ T T  T }
-{ void 32  F }
-{ void void  T }
-{ ["a" "b"] ["a"]  F }
-{ ["a" ["b" "c"]] ["a" ["b" "c"]]  T }
-{ {"a" {"b" "c"}} {"a" {"b" "c"}}  T }
-{ {"a" {"b" "x"}} {"a" {"b" "c"}}  F }
-{ {"a" {"b"}} {"a" {"b" "c"}}  F }
-{ {} {}  T }
-{ {} 3  F }
-{ "a" (\x x)  F }
-{ (\x x) {"a" "b"}  F }
-{ (\x x) (\x\y x)  F }
-]
 
+\try=
+	(
+	\eq_bool=(\x\y x y (not y))
+
+	\x\y\expect
+	\result=(eq_data x y)
+	eq_bool result expect ();
+
+	\show==(\k\v say [k" = "(as_str v)])
+	say "ERROR"
+	show "x" x
+	show "y" y
+	show "expect" expect
+	show "result" result
+	nl
+	)
+
+\try_app=
+	(\x
+	\y=(x "a")
+	try x y F
+	)
+
+show_benchmark;
+
+try "a" "b"  F
+try "a" "a"  T
+try pi pi  T
+try F F  T
+try F T  F
+try T F  F
+try T T  T
+try void 32  F
+try void void  T
+try ["a" "b"] ["a"]  F
+try ["a" ["b" "c"]] ["a" ["b" "c"]]  T
+try {"a" {"b" "c"}} {"a" {"b" "c"}}  T
+try {"a" {"b" "x"}} {"a" {"b" "c"}}  F
+try {"a" {"b"}} {"a" {"b" "c"}}  F
+try {} {}  T
+try {} 3  F
+try "a" (\x x)  F
+try (\x x) {"a" "b"}  F
+try (\x x) (\x\y x)  F
+
+try (\x x) (\x x)  F
+try stdin stdout F
+try stdin stdin F
+
+try_app T
+try_app F
+try_app null
+
+# Expand cons form to compare with list.
+(
+\expand=(\xs tuple_to_list; list_to_tuple xs)
+\x=(expand; cons "a"; cons "b"; null)
+\y=["a" "b"]
+try x y T
+)
 )
 
 test_eq_data
