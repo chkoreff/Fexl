@@ -428,6 +428,25 @@ value type_ftell(value f)
 	}
 	}
 
+/* \n=(fileno fh) */
+value type_fileno(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_file)
+		{
+		FILE *fh = get_fh(x);
+		int n = fileno(fh);
+		f = Qnum(n);
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
+	}
+
 /* \str=(fread fh size) Read at most size bytes from the file, clipping if it
 reaches end of file. */
 value type_fread(value f)

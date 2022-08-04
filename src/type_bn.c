@@ -147,7 +147,7 @@ value type_bn_div(value f)
 		struct bn *q;
 		struct bn *r;
 		bn_div(get_bn(x),get_bn(y),&q,&r);
-		f = AV(hold(Qtuple),V(0,Qbn(q),V(0,Qbn(r),hold(Qnull))));
+		f = pair(Qbn(q),Qbn(r));
 		}
 	else
 		f = hold(Qvoid);

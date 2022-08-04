@@ -137,6 +137,7 @@ static value standard(const char *name)
 	if (match("fseek_cur")) return Q(type_fseek_cur);
 	if (match("fseek_end")) return Q(type_fseek_end);
 	if (match("ftell")) return Q(type_ftell);
+	if (match("fileno")) return Q(type_fileno);
 	if (match("fread")) return Q(type_fread);
 	if (match("mkfile")) return Q(type_mkfile);
 	if (match("dir_names")) return Q(type_dir_names);

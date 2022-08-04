@@ -24,6 +24,7 @@ extern value type_fseek_set(value f);
 extern value type_fseek_cur(value f);
 extern value type_fseek_end(value f);
 extern value type_ftell(value f);
+extern value type_fileno(value f);
 extern value type_fread(value f);
 extern value type_mkfile(value f);
 extern value type_dir_names(value f);

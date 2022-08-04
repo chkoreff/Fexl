@@ -47,3 +47,8 @@ value type_list_to_tuple(value f)
 	expand(f);
 	return AV(hold(Qtuple),hold(f->R));
 	}
+
+value pair(value x, value y)
+	{
+	return AV(hold(Qtuple),V(0,x,V(0,y,hold(Qnull))));
+	}
