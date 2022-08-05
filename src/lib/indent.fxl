@@ -16,36 +16,47 @@
 	(\put\nl
 
 	\render=
-	(@\render\prefix\x
+	(@\render\top_prefix\x
 
 	is_str x (put (fexl_quote x));
 	is_num x (put (num_str x));
 	is_bool x (put (x "T" "F"));
 	is_undef x (put "void");
 
-	\loop==
-		(@\loop\is_first\is_nested\prefix\xs
-		xs is_nested \x\xs
-		\x=x
-
+	\show_items=
 		(
-		is_nested (nl put prefix {T prefix});
-		is_scalar x (is_first () (put " ") {F prefix});
+		\loop_nested==
+			(\prefix
+			@\loop\xs
+			xs (nl put top_prefix) \x \x=x
+			nl put prefix
+			render prefix x
+			loop
+			)
 
-		# Indent one level when I first see a non-scalar.
-		\prefix=(is_first prefix (. prefix "  "))
-		nl put prefix
-		{T prefix}
-		)
-
-		\is_nested\prefix
-		render prefix x
-		loop F is_nested prefix xs
-		)
-
-	\show_items==
-		(\xs
-		loop T F prefix xs (nl put prefix) ()
+		\xs
+		xs () \x \x=x
+		is_scalar x
+			(
+			render top_prefix x
+			@\loop\xs
+			xs () \x \x=x
+			is_scalar x
+				(
+				put " " # Separator between scalars
+				render top_prefix x
+				loop
+				)
+				(
+				\prefix=(. top_prefix "  ") # Indent at non-scalar
+				\xt
+				loop_nested prefix xs
+				)
+			)
+			(
+			\xt
+			loop_nested top_prefix xs
+			)
 		)
 
 	is_tuple x (put "{" show_items (tuple_to_list x) put "}");
@@ -54,8 +65,7 @@
 	put "?"
 	)
 
-	\x
-	\x=x
+	\x \x=x
 	render "" x nl
 	)
 
