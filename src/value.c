@@ -138,8 +138,8 @@ value eval(value f)
 	while (1)
 		{
 		value g = f->T(f);
-		num_steps++;
 		if (g == 0) return f;
+		num_steps++;
 		drop(f);
 		f = g;
 		}

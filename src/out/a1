@@ -299,7 +299,7 @@ x = 4
 x = 2
 x = 1
 
-steps 1885 bytes 1664
+steps 1056 bytes 1664
 ==
 x = 81
 ==
@@ -960,7 +960,7 @@ end "  abcd   " = "  abcd"
 
 ]
 = test_eq_data
-steps 9056 bytes 3808
+steps 5426 bytes 3808
 ~6
 \err=
 ~
