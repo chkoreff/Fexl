@@ -415,31 +415,22 @@
 
 # Return true if data items x and y are equal.
 \eq_data=
-	(@\eq_data\x\y
-	\x=x
-	\y=y
-
-	\check_type=
-		(\is_type\compare\next
-		is_type x (is_type y compare F);
-		is_type y F;
-		next
-		)
-
-	check_type is_str (eq x y);
-	check_type is_num (eq x y);
-	check_type is_bool (x y (not y));
-	check_type is_undef T;
-
-	\eq_list==
-		(\x\y
+	(
+	\eq_list=
+		(\eq_data\x\y
 		x (y T \_\_ F) \xh\xt
 		y F \yh\yt
 		eq_data xh yh (eq_data xt yt) F
 		)
 
-	check_type is_list (eq_list x y);
-	check_type is_tuple (eq_list (tuple_to_list x) (tuple_to_list y));
+	@\eq_data\x\y
+	\x=x
+	is_str x (eq x y);
+	is_num x (eq x y);
+	is_bool x (x y (not y));
+	is_undef x (is_void y);
+	is_list x (eq_list eq_data x y);
+	is_tuple x (eq_list eq_data (tuple_to_list x) (tuple_to_list y));
 	F
 	)
 

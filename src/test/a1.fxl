@@ -1268,7 +1268,7 @@ try F T  F
 try T F  F
 try T T  T
 try void 32  F
-try void void  T
+try void (I void)  T
 try ["a" "b"] ["a"]  F
 try ["a" ["b" "c"]] ["a" ["b" "c"]]  T
 try {"a" {"b" "c"}} {"a" {"b" "c"}}  T
