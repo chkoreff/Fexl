@@ -104,13 +104,14 @@ format_num
 	is_num x (put (num_str x));
 
 	\show_items==
-		(
-		(@\loop\space\xs
-		xs () \x\xs
-		if space (put " ")
+		(\xs
+		xs () \x
+		render x;
+		@\loop\xs
+		xs () \x
+		put " "
 		render x
-		loop T xs
-		) F
+		loop
 		)
 
 	is_tuple x (put "{" show_items (tuple_to_list x) put "}");
