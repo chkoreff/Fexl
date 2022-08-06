@@ -343,11 +343,11 @@ static struct form *parse_lambda(unsigned long first_line)
 	}
 
 /* Parse a form (unresolved symbolic expression). */
-static struct form *parse_form(void)
+static value parse_form(void)
 	{
 	struct form *exp = parse_exp();
 	exp->label = hold(label);
-	return form_val(Qform(exp));
+	return Qform(exp);
 	}
 
 /* Parse the next factor of an expression.  Return 0 if no factor found. */
@@ -368,7 +368,7 @@ static struct form *parse_factor(void)
 		else if (ch == ';')
 			{
 			skip();
-			return parse_form();
+			return form_val(parse_form());
 			}
 		else if (ch == '=')
 			{
@@ -409,6 +409,15 @@ static struct form *parse_exp(void)
 	return exp;
 	}
 
+/* Parse a top level form. */
+static value parse_top(void)
+	{
+	value exp = parse_form();
+	if (ch != -1)
+		syntax_error("Extraneous input", line);
+	return exp;
+	}
+
 /* Parse the given input. */
 value parse_input(input _get, void *_source, value _label)
 	{
@@ -417,11 +426,5 @@ value parse_input(input _get, void *_source, value _label)
 	label = _label;
 	line = 1;
 	skip();
-	{
-	struct form *exp = parse_exp();
-	if (ch != -1)
-		syntax_error("Extraneous input", line);
-	exp->label = hold(label);
-	return Qform(exp);
-	}
+	return parse_top();
 	}
