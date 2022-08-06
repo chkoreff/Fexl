@@ -4,8 +4,8 @@
 
 #include <basic.h>
 #include <input.h>
-#include <type_file.h>
 #include <type_istr.h>
+#include <type_file.h>
 #include <type_num.h>
 #include <type_str.h>
 
