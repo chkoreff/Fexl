@@ -1237,7 +1237,7 @@ say "= test_eq_data"
 
 \try=
 	(
-	\eq_bool=(\x\y x y (not y))
+	\eq_bool=(\x\y is_bool x (is_bool y (x y (not y)) F) F)
 
 	\x\y\expect
 	\result=(eq_data x y)
@@ -1298,6 +1298,12 @@ try x y T
 )
 
 test_eq_data
+
+# Try parsing invalid source.
+(
+\x=(parse 33 "")
+say (is_undef x)
+)
 
 \\
 Extra stuff not parsed.
