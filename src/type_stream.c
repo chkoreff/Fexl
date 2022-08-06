@@ -17,26 +17,26 @@ static int empty(void *source)
 	return -1;
 	}
 
-static int ch = -1; /* current character */
-static unsigned long line = 1; /* current line number */
-static input get = empty; /* current input routine */
-static void *source; /* current input source */
+static int cur_ch = -1; /* current character */
+static unsigned long cur_line = 1; /* current line number */
+static input cur_get = empty; /* current input routine */
+static void *cur_source; /* current input source */
 
 static void skip(void)
 	{
-	ch = get(source);
-	if (ch == '\n')
-		line++;
+	cur_ch = cur_get(cur_source);
+	if (cur_ch == '\n')
+		cur_line++;
 	}
 
 /* Return the current character. */
 value type_look(value f)
 	{
-	if (ch < 0)
+	if (cur_ch < 0)
 		f = hold(Qvoid);
 	else
 		{
-		char c = ch;
+		char c = cur_ch;
 		f = Qstr(str_new_data(&c,1));
 		}
 	return f;
@@ -54,30 +54,31 @@ value type_skip(value f)
 value type_line(value f)
 	{
 	(void)f;
-	return Qnum(line);
+	return Qnum(cur_line);
 	}
 
-/* Run the parse function f->R in the stream defined by _get and _source.  This
-saves and restores the current stream to enable nested calls. */
-static value read_stream(value f, input _get, void *_source)
+/* Read a stream, saving and restoring the context to enable nested calls.*/
+static value read_stream(input get, void *source, value read)
 	{
-	int save_ch = ch;
-	unsigned long save_line = line;
-	input save_get = get;
-	input save_source = source;
+	value exp;
 
-	get = _get;
-	source = _source;
+	int save_cur_ch = cur_ch;
+	unsigned long save_cur_line = cur_line;
+	input save_cur_get = cur_get;
+	void *save_cur_source = cur_source;
+
+	cur_get = get;
+	cur_source = source;
 	skip();
 
-	f = arg(f->R); /* Run the parse function */
+	exp = eval(read); /* Run the parse function */
 
-	ch = save_ch;
-	line = save_line;
-	get = save_get;
-	source = save_source;
+	cur_ch = save_cur_ch;
+	cur_line = save_cur_line;
+	cur_get = save_cur_get;
+	cur_source = save_cur_source;
 
-	return f;
+	return exp;
 	}
 
 /* (read_stream source read) */
@@ -88,9 +89,9 @@ value type_read_stream(value f)
 	value x = arg(f->L->R);
 
 	if (x->T == type_istr)
-		f = read_stream(f,(input)sgetc,x->R);
+		f = read_stream((input)sgetc,x->R,hold(f->R));
 	else if (x->T == type_file)
-		f = read_stream(f,(input)fgetc,x->R);
+		f = read_stream((input)fgetc,x->R,hold(f->R));
 	else
 		f = hold(Qvoid);
 

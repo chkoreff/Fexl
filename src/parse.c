@@ -47,24 +47,24 @@ file) or the special token "\\".  The \\ token stops the parser immediately, as
 if it had reached end of file.
 */
 
-static int ch; /* current character */
-static unsigned long line; /* current line number */
-static input get; /* current input routine */
-static void *source; /* current input source */
-static value label; /* label of current input source */
+static int cur_ch; /* current character */
+static unsigned long cur_line; /* current line number */
+static input cur_get; /* current input routine */
+static void *cur_source; /* current input source */
+static value cur_label; /* label of current input source */
 
 static void skip(void)
 	{
-	ch = get(source);
-	if (ch == '\n')
-		line++;
+	cur_ch = cur_get(cur_source);
+	if (cur_ch == '\n')
+		cur_line++;
 	}
 
 static void skip_line(void)
 	{
 	while (1)
 		{
-		if (ch == '\n' || ch == -1)
+		if (cur_ch == '\n' || cur_ch == -1)
 			{
 			skip();
 			return;
@@ -76,14 +76,14 @@ static void skip_line(void)
 
 static int at_white(void)
 	{
-	return isspace(ch) || iscntrl(ch);
+	return isspace(cur_ch) || iscntrl(cur_ch);
 	}
 
 static void skip_white(void)
 	{
 	while (1)
 		{
-		if (!at_white() || ch == -1)
+		if (!at_white() || cur_ch == -1)
 			return;
 		else
 			skip();
@@ -94,7 +94,7 @@ static void skip_filler(void)
 	{
 	while (1)
 		{
-		if (ch == '#')
+		if (cur_ch == '#')
 			skip_line();
 		else if (at_white())
 			skip_white();
@@ -105,7 +105,7 @@ static void skip_filler(void)
 
 static void syntax_error(const char *code, unsigned long line)
 	{
-	fatal_error(code,line,str_data(label));
+	fatal_error(code,line,str_data(cur_label));
 	}
 
 /* Parse a name, or return 0 if I don't see one.
@@ -120,19 +120,19 @@ static string parse_name(void)
 	while (1)
 		{
 		if (at_white()
-			|| ch == '\\'
-			|| ch == '(' || ch == ')'
-			|| ch == '[' || ch == ']'
-			|| ch == '{' || ch == '}'
-			|| ch == ';'
-			|| ch == '"'
-			|| ch == '~'
-			|| ch == '#'
-			|| ch == '='
-			|| ch == -1)
+			|| cur_ch == '\\'
+			|| cur_ch == '(' || cur_ch == ')'
+			|| cur_ch == '[' || cur_ch == ']'
+			|| cur_ch == '{' || cur_ch == '}'
+			|| cur_ch == ';'
+			|| cur_ch == '"'
+			|| cur_ch == '~'
+			|| cur_ch == '#'
+			|| cur_ch == '='
+			|| cur_ch == -1)
 			break;
 
-		buf_add(&buf,(char)ch);
+		buf_add(&buf,(char)cur_ch);
 		skip();
 		}
 
@@ -152,7 +152,7 @@ static string collect_string(
 
 	while (match_pos < end_len)
 		{
-		if (ch == end_data[match_pos])
+		if (cur_ch == end_data[match_pos])
 			{
 			match_pos++;
 			skip();
@@ -163,11 +163,11 @@ static string collect_string(
 			buf_addn(&buf,end_data,match_pos);
 			match_pos = 0;
 			}
-		else if (ch == -1)
+		else if (cur_ch == -1)
 			syntax_error("Unclosed string", first_line);
 		else
 			{
-			buf_add(&buf,(char)ch);
+			buf_add(&buf,(char)cur_ch);
 			skip();
 			}
 		}
@@ -181,13 +181,13 @@ static string parse_terminator(unsigned long first_line)
 	struct buffer buf = {0};
 	while (1)
 		{
-		if (ch == -1 || at_white())
+		if (cur_ch == -1 || at_white())
 			break;
-		buf_add(&buf,(char)ch);
+		buf_add(&buf,(char)cur_ch);
 		skip();
 		}
 
-	if (ch == -1)
+	if (cur_ch == -1)
 		syntax_error("Incomplete string terminator", first_line);
 
 	skip();
@@ -204,13 +204,13 @@ static string parse_content(string end, unsigned long first_line)
 
 static struct form *parse_symbol(void)
 	{
-	unsigned long first_line = line;
-	if (ch == '"')
+	unsigned long first_line = cur_line;
+	if (cur_ch == '"')
 		{
 		skip();
 		return form_val(Qstr(collect_string("\"",1,first_line)));
 		}
-	else if (ch == '~')
+	else if (cur_ch == '~')
 		{
 		string end = parse_terminator(first_line);
 		string content = parse_content(end,first_line);
@@ -242,7 +242,7 @@ static struct form *parse_list(void)
 	struct form *term = parse_term();
 	if (term == 0) return form_val(hold(Qnull));
 	skip_filler();
-	return form_join(0,term, (ch == ';' ? parse_exp() : parse_list()));
+	return form_join(0,term, (cur_ch == ';' ? parse_exp() : parse_list()));
 	}
 
 static struct form *parse_tuple(void)
@@ -256,32 +256,32 @@ static struct form *parse_tuple(void)
 static struct form *parse_term(void)
 	{
 	struct form *exp;
-	unsigned long first_line = line;
-	if (ch == '(') /* parenthesized expression */
+	unsigned long first_line = cur_line;
+	if (cur_ch == '(') /* parenthesized expression */
 		{
 		skip();
 		exp = parse_exp();
-		if (ch != ')')
+		if (cur_ch != ')')
 			syntax_error("Unclosed parenthesis", first_line);
 		skip();
 		}
-	else if (ch == '[') /* list */
+	else if (cur_ch == '[') /* list */
 		{
 		skip();
 		skip_filler();
 		exp = parse_list();
 		if (exp->exp->T == 0)
 			exp = form_appv(form_val(hold(Qlist)),exp);
-		if (ch != ']')
+		if (cur_ch != ']')
 			syntax_error("Unclosed bracket", first_line);
 		skip();
 		}
-	else if (ch == '{') /* tuple */
+	else if (cur_ch == '{') /* tuple */
 		{
 		skip();
 		skip_filler();
 		exp = form_appv(form_val(hold(Qtuple)),parse_tuple());
-		if (ch != '}')
+		if (cur_ch != '}')
 			syntax_error("Unclosed brace", first_line);
 		skip();
 		}
@@ -315,11 +315,11 @@ static struct form *parse_lambda(unsigned long first_line)
 
 	/* Parse the optional definition of the name. */
 	skip_filler();
-	first_line = line;
-	if (ch == '=')
+	first_line = cur_line;
+	if (cur_ch == '=')
 		{
 		skip();
-		if (ch == '=')
+		if (cur_ch == '=')
 			{
 			eager = 0;
 			skip();
@@ -346,7 +346,7 @@ static struct form *parse_lambda(unsigned long first_line)
 static value parse_form(void)
 	{
 	struct form *exp = parse_exp();
-	exp->label = hold(label);
+	exp->label = hold(cur_label);
 	return Qform(exp);
 	}
 
@@ -354,23 +354,23 @@ static value parse_form(void)
 static struct form *parse_factor(void)
 	{
 	skip_filler();
-	if (ch == -1)
+	if (cur_ch == -1)
 		return 0;
-	else if (ch == '\\')
+	else if (cur_ch == '\\')
 		{
-		unsigned long first_line = line;
+		unsigned long first_line = cur_line;
 		skip();
-		if (ch == '\\')
+		if (cur_ch == '\\')
 			{
-			ch = -1; /* Two backslashes simulates end of file. */
+			cur_ch = -1; /* Two backslashes simulates end of file. */
 			return 0;
 			}
-		else if (ch == ';')
+		else if (cur_ch == ';')
 			{
 			skip();
 			return form_val(parse_form());
 			}
-		else if (ch == '=')
+		else if (cur_ch == '=')
 			{
 			skip();
 			return form_appv(form_val(hold(Qonce)),parse_exp());
@@ -378,7 +378,7 @@ static struct form *parse_factor(void)
 		else
 			return parse_lambda(first_line);
 		}
-	else if (ch == ';')
+	else if (cur_ch == ';')
 		{
 		skip();
 		return parse_exp();
@@ -386,8 +386,8 @@ static struct form *parse_factor(void)
 	else
 		{
 		struct form *factor = parse_term();
-		if (ch == '=')
-			syntax_error("Missing name declaration before '='", line);
+		if (cur_ch == '=')
+			syntax_error("Missing name declaration before '='", cur_line);
 		return factor;
 		}
 	}
@@ -413,18 +413,18 @@ static struct form *parse_exp(void)
 static value parse_top(void)
 	{
 	value exp = parse_form();
-	if (ch != -1)
-		syntax_error("Extraneous input", line);
+	if (cur_ch != -1)
+		syntax_error("Extraneous input", cur_line);
 	return exp;
 	}
 
 /* Parse the given input. */
-value parse_input(input _get, void *_source, value _label)
+value parse_input(input get, void *source, value label)
 	{
-	get = _get;
-	source = _source;
-	label = _label;
-	line = 1;
+	cur_get = get;
+	cur_source = source;
+	cur_label = label;
+	cur_line = 1;
 	skip();
 	return parse_top();
 	}
