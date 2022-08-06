@@ -611,17 +611,33 @@ value type_receive_keystrokes(value f)
 	}
 	}
 
+static unsigned long num_steps = 0;
+
 /* (fexl_benchmark x next) Evaluate x and return (next val steps bytes), where
 val is the value of x, steps is the number of reduction steps, and bytes is the
 number of memory bytes used. */
+static value eval_count(value f)
+	{
+	while (1)
+		{
+		value g = f->T(f);
+		if (g == 0) return f;
+		num_steps++;
+		drop(f);
+		f = g;
+		}
+	}
+
 value type_fexl_benchmark(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	clear_free_list();
 	{
+	value (*save_eval)(value f) = eval;
 	unsigned long save_num_steps = num_steps;
 	unsigned long save_cur_bytes = cur_bytes;
 
+	eval = eval_count;
 	num_steps = 0;
 
 	{
@@ -631,6 +647,7 @@ value type_fexl_benchmark(value f)
 	f = A(A(A(hold(f->R),x),Qnum(steps)),Qnum(bytes));
 	}
 
+	eval = save_eval;
 	num_steps += save_num_steps;
 	return f;
 	}
