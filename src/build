@@ -7,10 +7,6 @@ make_PIC output_str
 make_PIC show
 make_lib show
 
-# Build stream library.
-make_PIC type_stream
-make_lib stream
-
 # Build fexl.
 make base64
 make basic
@@ -32,6 +28,7 @@ make report
 make sha256
 make sha512
 make str
+make stream
 make type_bn
 make type_buf
 make type_cmp
@@ -50,6 +47,7 @@ make type_rand
 make type_run
 make type_signal
 make type_standard
+make type_stream
 make type_str
 make type_sym
 make type_time

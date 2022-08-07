@@ -1,12 +1,6 @@
 # LATER 20220715 Code in C some of the higher-level parse functions such as
 # skip_match, buffer_to, collect_to, etc.
 
-\name=(path_under dir_base "lib/stream.so")
-\lib=(dlopen name)
-dlsym lib "type_read_stream" \read_stream
-dlsym lib "type_look" \look
-dlsym lib "type_skip" \skip
-
 \is_eol=(\x eq x LF T; eq x CR)
 \is_white=(ge " ")
 
@@ -56,16 +50,10 @@ dlsym lib "type_skip" \skip
 	loop
 	)
 
-\read_string=
-	(\str
-	read_stream (readstr str)
-	)
+\read_string==read_stream
+\read_file=(\name read_stream (fopen name "r"))
 
-\read_file=
-	(\name
-	read_stream (fopen name "r")
-	)
-
+# LATER 20220807 Enhance stream.c to allow reading a list directly.
 \read_chars=
 	(
 	\flatten=
@@ -77,8 +65,7 @@ dlsym lib "type_skip" \skip
 		loop xs
 		)
 	\xs
-	\str==(flatten xs)
-	read_string str
+	read_stream (flatten xs)
 	)
 
 \form

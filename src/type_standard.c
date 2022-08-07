@@ -23,6 +23,7 @@
 #include <type_signal.h>
 #include <type_standard.h>
 #include <type_str.h>
+#include <type_stream.h>
 #include <type_sym.h>
 #include <type_time.h>
 #include <type_tuple.h>
@@ -145,6 +146,12 @@ static value standard(const char *name)
 	if (match("file_size")) return Q(type_file_size);
 	if (match("symlink")) return Q(type_symlink);
 	if (match("rename")) return Q(type_rename);
+
+	/* stream */
+	if (match("look")) return Q(type_look);
+	if (match("skip")) return Q(type_skip);
+	if (match("line")) return Q(type_line);
+	if (match("read_stream")) return Q(type_read_stream);
 
 	if (match("time")) return Q(type_time);
 	if (match("localtime")) return Q(type_localtime);

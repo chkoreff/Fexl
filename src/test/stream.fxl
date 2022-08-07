@@ -1,10 +1,4 @@
 # Test stream operations.
-\name=(path_under dir_base "lib/stream.so")
-\lib=(dlopen name)
-dlsym lib "type_look" \look
-dlsym lib "type_skip" \skip
-dlsym lib "type_line" \line
-dlsym lib "type_read_stream" \read_stream
 
 \read==
 	(
@@ -64,6 +58,7 @@ dlsym lib "type_read_stream" \read_stream
 
 show_benchmark;
 test_empty
+try "abcd"
 try (readstr "abcd")
 try (fopen "test/hello.fxl" "r")
 try 32 # invalid source

@@ -1300,10 +1300,7 @@ try x y T
 test_eq_data
 
 # Try parsing invalid source.
-(
-\x=(parse 33 "")
-say (is_undef x)
-)
+say (is_void (parse 33 ""))
 
 \\
 Extra stuff not parsed.

@@ -1,6 +1,4 @@
 #include <str.h>
-
-#include <input.h>
 #include <value.h>
 
 #include <basic.h>
@@ -8,6 +6,7 @@
 #include <ctype.h> /* isspace iscntrl */
 #include <parse.h>
 #include <report.h>
+#include <stream.h>
 #include <type_num.h>
 #include <type_str.h>
 #include <type_sym.h>
@@ -46,19 +45,6 @@ The Fexl parser reads an expression from the input until it reaches -1 (end of
 file) or the special token "\\".  The \\ token stops the parser immediately, as
 if it had reached end of file.
 */
-
-static int cur_ch; /* current character */
-static unsigned long cur_line; /* current line number */
-static input cur_get; /* current input routine */
-static void *cur_source; /* current input source */
-static value cur_label; /* label of current input source */
-
-static void skip(void)
-	{
-	cur_ch = cur_get(cur_source);
-	if (cur_ch == '\n')
-		cur_line++;
-	}
 
 static void skip_line(void)
 	{
@@ -102,6 +88,8 @@ static void skip_filler(void)
 			return;
 		}
 	}
+
+static value cur_label; /* label of current input stream */
 
 static void syntax_error(const char *code, unsigned long line)
 	{
@@ -409,22 +397,18 @@ static struct form *parse_exp(void)
 	return exp;
 	}
 
-/* Parse a top level form. */
-static value parse_top(void)
+static value type_parse_fexl(value f)
 	{
 	value exp = parse_form();
 	if (cur_ch != -1)
 		syntax_error("Extraneous input", cur_line);
+	(void)f;
 	return exp;
 	}
 
-/* Parse the given input. */
-value parse_input(input get, void *source, value label)
+/* Parse a top level form. */
+value parse_fexl(value stream, value label)
 	{
-	cur_get = get;
-	cur_source = source;
 	cur_label = label;
-	cur_line = 1;
-	skip();
-	return parse_top();
+	return read_stream(stream,V(type_parse_fexl,0,0));
 	}

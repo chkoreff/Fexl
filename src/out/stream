@@ -11,6 +11,11 @@ line = 1
 result = ["x" "y"]
 
 READ
+a(12)b(12)c(12)d(12)
+line = 1
+result = ["x" "y"]
+
+READ
 s(12)a(12)y(12) (12)"(12)H(12)e(12)l(12)l(12)o(12) (12)w(12)o(12)r(12)l(12)d(12)!(12)"(12)
 (12)
 line = 2
@@ -26,7 +31,7 @@ line = 3
 result = ["x" "y"]
 
 DONE
-steps 4729 bytes 4448
+steps 5321 bytes 4448
 ~
 \err=
 ~

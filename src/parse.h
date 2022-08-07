@@ -1,1 +1,1 @@
-extern value parse_input(input get, void *source, value label);
+extern value parse_fexl(value x, value label);
