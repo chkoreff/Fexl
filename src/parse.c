@@ -96,6 +96,13 @@ static void syntax_error(const char *code, unsigned long line)
 	fatal_error(code,line,str_data(cur_label));
 	}
 
+/* Add the current character to the buffer. */
+static void buf_keep(buffer buf)
+	{
+	buf_add(buf,(char)cur_ch);
+	skip();
+	}
+
 /* Parse a name, or return 0 if I don't see one.
 
 A name may contain just about anything, except for white space and a few other
@@ -104,25 +111,21 @@ special characters.  This is the simplest rule that can work.
 static string parse_name(void)
 	{
 	struct buffer buf = {0};
-
-	while (1)
-		{
-		if (at_white()
-			|| cur_ch == '\\'
-			|| cur_ch == '(' || cur_ch == ')'
-			|| cur_ch == '[' || cur_ch == ']'
-			|| cur_ch == '{' || cur_ch == '}'
-			|| cur_ch == ';'
-			|| cur_ch == '"'
-			|| cur_ch == '~'
-			|| cur_ch == '#'
-			|| cur_ch == '='
-			|| cur_ch == -1)
-			break;
-
-		buf_add(&buf,(char)cur_ch);
-		skip();
-		}
+	while
+		(
+		!at_white()
+		&& cur_ch != '\\'
+		&& cur_ch != '(' && cur_ch != ')'
+		&& cur_ch != '[' && cur_ch != ']'
+		&& cur_ch != '{' && cur_ch != '}'
+		&& cur_ch != ';'
+		&& cur_ch != '"'
+		&& cur_ch != '~'
+		&& cur_ch != '#'
+		&& cur_ch != '='
+		&& cur_ch != -1
+		)
+		buf_keep(&buf);
 
 	if (!buf.top) return 0;
 	return buf_clear(&buf);
@@ -154,10 +157,7 @@ static string collect_string(
 		else if (cur_ch == -1)
 			syntax_error("Unclosed string", first_line);
 		else
-			{
-			buf_add(&buf,(char)cur_ch);
-			skip();
-			}
+			buf_keep(&buf);
 		}
 
 	return buf_clear(&buf);
@@ -167,13 +167,8 @@ static string collect_string(
 static string parse_terminator(unsigned long first_line)
 	{
 	struct buffer buf = {0};
-	while (1)
-		{
-		if (cur_ch == -1 || at_white())
-			break;
-		buf_add(&buf,(char)cur_ch);
-		skip();
-		}
+	while (cur_ch != -1 && !at_white())
+		buf_keep(&buf);
 
 	if (cur_ch == -1)
 		syntax_error("Incomplete string terminator", first_line);
