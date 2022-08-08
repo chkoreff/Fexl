@@ -30,8 +30,19 @@ l(12)i(12)n(12)e(12) (12)1(12)
 line = 3
 result = ["x" "y"]
 
+steps 4539 bytes 4448
+
+TF
+TF
+
+FT
+TF
+
+FTF
+FTF
+FT
+TF
 DONE
-steps 5321 bytes 4448
 ~
 \err=
 ~

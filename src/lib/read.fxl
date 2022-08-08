@@ -1,59 +1,29 @@
-# LATER 20220715 Code in C some of the higher-level parse functions such as
-# skip_match, buffer_to, collect_to, etc.
-
-\is_eol=(\x eq x LF T; eq x CR)
-\is_white=(ge " ")
+#
+# LATER 20220808 Code in C
+\at_eol==(at_ch LF T; at_ch CR)
 
 # Skip matching characters.
 \skip_match=
-	(\is_match @\loop
-	\x=look
-	is_undef x ();
-	is_match x (skip loop);
-	)
-
-# Buffer characters up to a specific end char.  Return true if found.
-\buffer_to=
-	(\t_ch\buf
+	(\is_match
 	@\loop
-	\x=look
-	is_undef x F;
-	skip
-	eq x t_ch T;
-	buf_put buf x
-	loop
+	is_match (skip loop);
 	)
 
-# Collect characters up to an end char.  The end char is skipped.
+# LATER 20220808 Code in C
+\skip_white==(skip_match at_white)
+
+# Collect characters up to an ending condition.
 \collect_to=
 	(\is_end
 	\buf=buf_new
 	@\loop
-	\x=look
-	is_undef x void;
-	skip
-	is_end x (buf_get buf);
-	buf_put buf x
+	is_end (buf_get buf);
+	buf_keep buf
 	loop
 	)
 
-# Collect characters up to an end char or EOF.  The end char is kept.
-\collect_token=
-	(\is_end
-	\buf=buf_new
-	@\loop
-	\x=look
-	is_undef x (buf_get buf);
-	is_end x (buf_get buf);
-	skip
-	buf_put buf x
-	loop
-	)
-
-\read_string==read_stream
 \read_file=(\name read_stream (fopen name "r"))
 
-# LATER 20220807 Enhance stream.c to allow reading a list directly.
 \read_chars=
 	(
 	\flatten=
@@ -69,15 +39,10 @@
 	)
 
 \form
-def "look" look;
-def "skip" skip;
-def "is_eol" is_eol;
-def "is_white" is_white;
+def "at_eol" at_eol;
 def "skip_match" skip_match;
-def "buffer_to" buffer_to;
+def "skip_white" skip_white;
 def "collect_to" collect_to;
-def "collect_token" collect_token;
 def "read_chars" read_chars;
-def "read_string" read_string;
 def "read_file" read_file;
 form

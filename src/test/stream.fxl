@@ -1,12 +1,13 @@
 # Test stream operations.
 
+\test_1==
+(
 \read==
 	(
 	say "READ"
 	(@\loop
-	\x=look
-	is_undef x ();
-	put x
+	at_eof ();
+	put look
 	skip
 
 	# Test nested stream.
@@ -17,9 +18,8 @@
 		\fh==(readstr "12")
 		read_stream fh;
 		@\loop
-		\x=look
-		is_undef x ();
-		put x
+		at_eof ();
+		put look
 		skip
 		loop
 		)
@@ -46,8 +46,7 @@
 	say ["line "line]
 	\try==
 		(
-		\x=look
-		say ["x = "(as_str x)]
+		say ["x = "(as_str look)]
 		skip
 		)
 
@@ -64,12 +63,44 @@ try (fopen "test/hello.fxl" "r")
 try 32 # invalid source
 
 try
-(
-readstr
 ~
 line 1
 line 2
 line 3~
 )
 
+\test_2==
+(
+(
+# Empty stream
+nl
+read_stream "";
+say [at_eof (at_ch "")]
+skip
+say [at_eof (at_ch "")]
+)
+(
+# Stream with a single NUL character
+nl
+read_stream (chr 0);
+say [at_eof (at_ch "")]
+skip
+say [at_eof (at_ch "")]
+)
+(
+# Stream with multiple characters
+nl
+read_stream "abc";
+say [at_eof (at_ch "a") (at_ch "x")]
+skip
+say [at_eof (at_ch "b") (at_ch "x")]
+skip
+say [at_eof (at_ch "c")]
+skip
+say [at_eof (at_ch "c")]
+)
+)
+
+test_1
+test_2
 say "DONE"

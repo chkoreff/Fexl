@@ -3,10 +3,11 @@
 # "Spaces are considered part of a field and should not be ignored."
 \get_plain_item=
 	(\sep
-	collect_token
-		(\x
-		eq x sep T;
-		is_eol x T;
+	collect_to
+		(
+		at_ch sep T;
+		at_eol T;
+		at_eof T;
 		F
 		)
 	)
@@ -16,61 +17,49 @@
 # string.
 \get_quote_item==
 	(
+	skip
 	\buf=buf_new
 	@\loop
-	\x=look
-	is_undef x void;
-	skip
-	eq x QU
+	at_ch QU
 		(
-		\x=look
-		is_undef x (buf_get buf);
-		eq x QU
+		skip
+		at_ch QU
 			(
-			skip
-			buf_put buf QU
+			buf_keep buf
 			loop
-			);
-		buf_get buf
+			)
+			(buf_get buf)
 		);
-	buf_put buf x
+	at_eof void;
+	buf_keep buf
 	loop
 	)
 
 \get_item=
 	(\sep
-	\x=look
-	is_undef x void;
-	eq x QU
-		(
-		skip
-		get_quote_item
-		)
-		(get_plain_item sep)
+	at_ch QU get_quote_item;
+	at_eof void;
+	get_plain_item sep
 	)
 
 \get_row=
-	(\sep @\loop
+	(\sep
+	@\loop
 	\item=(get_item sep)
 	is_undef item void;
-	\row=
+	at_ch sep
 		(
-		\x=look
-		is_undef x [];
 		skip
-		eq x sep
-			(
-			\row=loop
-			is_undef row [] row
-			)
-			[]
+		\row=loop
+		is_undef row [item] [item;row]
 		)
-	[item;row]
+		[item]
 	)
 
 \get_rows=
-	(\sep @\loop
-	skip_match is_eol
+	(\sep
+	@\loop
+	skip_match at_eol
 	\row=(get_row sep)
 	is_undef row [];
 	\rows=loop
@@ -80,7 +69,7 @@
 \parse=(\read\sep\x read x (get_rows sep))
 
 # Use arbitrary separator.
-\read_xsv_string=(parse read_string)
+\read_xsv_string=(parse read_stream)
 \read_xsv_chars=(parse read_chars)
 \read_xsv_file=(parse read_file)
 

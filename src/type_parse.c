@@ -2,6 +2,8 @@
 #include <str.h>
 #include <value.h>
 
+#include <buffer.h>
+
 #include <basic.h>
 #include <die.h>
 #include <file.h>

@@ -2,6 +2,8 @@
 #include <str.h>
 #include <value.h>
 
+#include <buffer.h>
+
 #include <basic.h>
 #include <input.h>
 #include <stream.h>
@@ -25,6 +27,13 @@ void skip(void)
 	cur_ch = cur_get(cur_source);
 	if (cur_ch == '\n')
 		cur_line++;
+	}
+
+/* Add the current character to the buffer. */
+void buf_keep(buffer buf)
+	{
+	buf_add(buf,(char)cur_ch);
+	skip();
 	}
 
 /* Read input, saving and restoring the context to enable nested calls.*/

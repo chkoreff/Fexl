@@ -1,77 +1,107 @@
 # Parse the SSV (space-separated value) format.
 
 # Collect a string up to the next occurrence of the terminator string.
+# LATER 20220808 Code in C
 \collect_string=
 	(\t_ch\term
 	\buf_result=buf_new
 
 	@\loop_start
+
+	# Buffer characters up to t_ch.
+	(@\loop
+	at_ch t_ch skip;
+	at_eof void; # Did not find t_ch.
+	buf_keep buf_result
+	loop
+	)
+
+	# Try to match the term now.
+	\buf_match=buf_new
+	buf_put buf_match t_ch
 	\fh_term=(readstr term)
 
-	buffer_to t_ch buf_result
+	@\loop_term
+	\t=(sgetc fh_term)
+	is_undef t
 		(
-		\buf_match=buf_new
-		buf_put buf_match t_ch
-
-		@\loop_term
-		\t=(sgetc fh_term)
-		is_undef t (buf_get buf_result);
-
-		\x=look
-		is_undef x void;
-		eq x t
-			(
-			buf_put buf_match x
-			skip
-			loop_term
-			);
+		# Matched all term chars, so return the result.
+		buf_get buf_result
+		);
+	at_ch t
+		(
+		# Matched the next char.
+		buf_keep buf_match
+		loop_term
+		)
+		(
+		# Did not match the next char.  Keep the matched ones and start over.
 		buf_put buf_result (buf_get buf_match)
 		loop_start
 		)
-		void
 	)
 
 # LATER 20211227 Insist on white space terminator, forbid QU and "~".
 \get_plain_item==
 	(
-	collect_token
-		(\x
-		is_white x T;
-		eq x QU T;
-		eq x "~" T;
+	collect_to
+		(
+		at_white T;
+		at_ch QU T;
+		at_ch "~" T;
+		at_eof T;
 		F
 		)
 	)
 
-\get_item==
+\get_quote_item==
 	(
-	\x=look
-	is_undef x void;
-	is_eol x (skip void);
-	eq x QU (skip collect_to (eq QU));
-	eq x "~"
+	skip
+	\buf=buf_new
+	@\loop
+	at_ch QU (skip buf_get buf);
+	at_eof void;
+	buf_keep buf
+	loop
+	)
+
+\get_tilde_item==
+	(
+	skip
+	\buf=buf_new
+	@\loop
+	at_white
 		(
 		skip
-		\term=(collect_to is_white)
-		is_undef term void;
-		collect_string x term
+		\term=(buf_get buf)
+		collect_string "~" term
 		);
+	at_eof void;
+	buf_keep buf
+	loop
+	)
+
+\get_item==
+	(
+	at_eof void;
+	at_ch QU get_quote_item;
+	at_ch "~" get_tilde_item;
+	at_eol (skip void);
 	get_plain_item
 	)
 
 \get_row==
 	(@\loop
-	skip_match (\x is_eol x F; is_white x)
-	\str=get_item
-	is_undef str void;
+	skip_match (at_eol F; at_white)
+	\item=get_item
+	is_undef item void;
 	\row=loop
-	\row=(is_undef row [] row)
-	[str;row]
+	is_undef row [item] [item;row]
 	)
 
 \get_rows==
 	(@\loop
-	skip_match is_white
+	skip_white
 	\row=get_row
 	is_undef row [];
 	\rows=loop
@@ -80,7 +110,7 @@
 
 \parse=(\read\x read x get_rows)
 
-\read_ssv_string=(parse read_string)
+\read_ssv_string=(parse read_stream)
 \read_ssv_chars=(parse read_chars)
 \read_ssv_file=(parse read_file)
 

@@ -1,13 +1,39 @@
 #include <str.h>
 #include <value.h>
 
+#include <buffer.h>
+
 #include <basic.h>
 #include <stream.h>
+#include <type_buf.h>
 #include <type_num.h>
 #include <type_str.h>
 #include <type_stream.h>
 
-/* LATER 20220807 Provide at_ch and at_eof to avoid many look calls. */
+value type_at_eof(value f)
+	{
+	(void)f;
+	return boolean(cur_ch == -1);
+	}
+
+value type_at_white(value f)
+	{
+	(void)f;
+	return boolean(cur_ch <= ' ' && cur_ch != -1);
+	}
+
+value type_at_ch(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = f->R;
+	if (x->T == type_str)
+		f = boolean(cur_ch == *str_data(x));
+	else
+		f = hold(Qvoid);
+	return f;
+	}
+	}
 
 /* Return the current character. */
 value type_look(value f)
@@ -35,6 +61,24 @@ value type_line(value f)
 	{
 	(void)f;
 	return Qnum(cur_line);
+	}
+
+value type_buf_keep(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_buf)
+		{
+		buffer buf = (buffer)(x->R);
+		buf_keep(buf);
+		f = hold(QI);
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
 	}
 
 /* (read_stream stream read) */

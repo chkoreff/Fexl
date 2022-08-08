@@ -83,13 +83,6 @@ static void syntax_error(const char *code, unsigned long line)
 	fatal_error(code,line,str_data(cur_label));
 	}
 
-/* Add the current character to the buffer. */
-static void buf_keep(buffer buf)
-	{
-	buf_add(buf,(char)cur_ch);
-	skip();
-	}
-
 /* Parse a name, or return 0 if I don't see one.
 
 A name may contain just about anything, except for white space and a few other

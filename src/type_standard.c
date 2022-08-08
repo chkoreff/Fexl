@@ -148,9 +148,13 @@ static value standard(const char *name)
 	if (match("rename")) return Q(type_rename);
 
 	/* stream */
+	if (match("at_eof")) return Q(type_at_eof);
+	if (match("at_white")) return Q(type_at_white);
+	if (match("at_ch")) return Q(type_at_ch);
 	if (match("look")) return Q(type_look);
 	if (match("skip")) return Q(type_skip);
 	if (match("line")) return Q(type_line);
+	if (match("buf_keep")) return Q(type_buf_keep);
 	if (match("read_stream")) return Q(type_read_stream);
 
 	if (match("time")) return Q(type_time);
