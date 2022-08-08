@@ -3,7 +3,6 @@
 
 #include <basic.h>
 #include <buffer.h>
-#include <ctype.h> /* isspace iscntrl */
 #include <parse.h>
 #include <report.h>
 #include <stream.h>
@@ -41,49 +40,37 @@ string => quote_string
 string => tilde_string
 ]
 
-The Fexl parser reads an expression from the input until it reaches -1 (end of
-file) or the special token "\\".  The \\ token stops the parser immediately, as
-if it had reached end of file.
+The Fexl parser reads an expression from the input until it reaches end of file
+or the special token "\\" which acts like end of file.
 */
 
+/* Skip to end of line. */
 static void skip_line(void)
 	{
-	while (1)
-		{
-		if (cur_ch == '\n' || cur_ch == -1)
-			{
-			skip();
-			return;
-			}
-		else
-			skip();
-		}
+	while (cur_ch != '\n' && cur_ch != -1)
+		skip();
 	}
 
 static int at_white(void)
 	{
-	return isspace(cur_ch) || iscntrl(cur_ch);
+	return cur_ch <= ' ' && cur_ch != -1;
 	}
 
 static void skip_white(void)
 	{
-	while (1)
-		{
-		if (!at_white() || cur_ch == -1)
-			return;
-		else
-			skip();
-		}
+	while (at_white())
+		skip();
 	}
 
+/* Skip white space and comments. */
 static void skip_filler(void)
 	{
 	while (1)
 		{
-		if (cur_ch == '#')
+		if (at_white())
+			skip();
+		else if (cur_ch == '#')
 			skip_line();
-		else if (at_white())
-			skip_white();
 		else
 			return;
 		}
@@ -113,7 +100,7 @@ static string parse_name(void)
 	struct buffer buf = {0};
 	while
 		(
-		!at_white()
+		cur_ch > ' '
 		&& cur_ch != '\\'
 		&& cur_ch != '(' && cur_ch != ')'
 		&& cur_ch != '[' && cur_ch != ']'
@@ -123,7 +110,6 @@ static string parse_name(void)
 		&& cur_ch != '~'
 		&& cur_ch != '#'
 		&& cur_ch != '='
-		&& cur_ch != -1
 		)
 		buf_keep(&buf);
 
@@ -167,7 +153,7 @@ static string collect_string(
 static string parse_terminator(unsigned long first_line)
 	{
 	struct buffer buf = {0};
-	while (cur_ch != -1 && !at_white())
+	while (cur_ch > ' ')
 		buf_keep(&buf);
 
 	if (cur_ch == -1)
@@ -378,18 +364,14 @@ static struct form *parse_factor(void)
 /* Parse an expression. */
 static struct form *parse_exp(void)
 	{
-	struct form *exp = 0;
+	struct form *exp = parse_factor();
+	if (exp == 0) return form_val(hold(QI));
 	while (1)
 		{
 		struct form *factor = parse_factor();
-		if (factor == 0) break;
-		if (exp == 0)
-			exp = factor;
-		else
-			exp = form_app(exp,factor);
+		if (factor == 0) return exp;
+		exp = form_app(exp,factor);
 		}
-	if (exp == 0) exp = form_val(hold(QI));
-	return exp;
 	}
 
 static value type_parse_fexl(value f)

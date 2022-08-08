@@ -7,7 +7,7 @@
 #include <type_str.h>
 #include <type_stream.h>
 
-/* LATER 20220807 Provide (at ch) and at_eof to avoid many look calls. */
+/* LATER 20220807 Provide at_ch and at_eof to avoid many look calls. */
 
 /* Return the current character. */
 value type_look(value f)
