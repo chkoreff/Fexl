@@ -22,6 +22,12 @@ value type_at_white(value f)
 	return boolean(cur_ch <= ' ' && cur_ch != -1);
 	}
 
+value type_at_eol(value f)
+	{
+	(void)f;
+	return boolean(cur_ch == '\n' || cur_ch == '\r');
+	}
+
 value type_at_ch(value f)
 	{
 	if (!f->L) return 0;

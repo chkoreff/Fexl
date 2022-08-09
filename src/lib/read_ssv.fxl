@@ -1,7 +1,7 @@
 # Parse the SSV (space-separated value) format.
 
 # Collect a string up to the next occurrence of the terminator string.
-# LATER 20220808 Code in C
+# LATER 20220808 Code in C by unifying with the code in parse.c.
 \collect_string=
 	(\t_ch\term
 	\buf_result=buf_new
@@ -41,7 +41,6 @@
 		)
 	)
 
-# LATER 20211227 Insist on white space terminator, forbid QU and "~".
 \get_plain_item==
 	(
 	collect_to

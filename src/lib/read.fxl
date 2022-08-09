@@ -1,7 +1,3 @@
-#
-# LATER 20220808 Code in C
-\at_eol==(at_ch LF T; at_ch CR)
-
 # Skip matching characters.
 \skip_match=
 	(\is_match
@@ -39,7 +35,6 @@
 	)
 
 \form
-def "at_eol" at_eol;
 def "skip_match" skip_match;
 def "skip_white" skip_white;
 def "collect_to" collect_to;

@@ -76,10 +76,9 @@
 \use==(\name use_file; path_under dir_local name)
 
 # Map a dynamic get function to a fixed stream of values.
-# LATER 20211228 Do stream_get in C.
 \stream_get=
-	(\get\yes
-	yes;
+	(\get
+	yield;
 	\=
 	@\loop
 	\x=get
