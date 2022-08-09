@@ -150,6 +150,7 @@ static value standard(const char *name)
 	/* stream */
 	if (match("at_eof")) return Q(type_at_eof);
 	if (match("at_white")) return Q(type_at_white);
+	if (match("skip_white")) return Q(type_skip_white);
 	if (match("at_eol")) return Q(type_at_eol);
 	if (match("at_ch")) return Q(type_at_ch);
 	if (match("look")) return Q(type_look);

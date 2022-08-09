@@ -51,17 +51,6 @@ static void skip_line(void)
 		skip();
 	}
 
-static int at_white(void)
-	{
-	return cur_ch <= ' ' && cur_ch != -1;
-	}
-
-static void skip_white(void)
-	{
-	while (at_white())
-		skip();
-	}
-
 /* Skip white space and comments. */
 static void skip_filler(void)
 	{

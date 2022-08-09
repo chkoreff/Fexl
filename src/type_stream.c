@@ -19,7 +19,14 @@ value type_at_eof(value f)
 value type_at_white(value f)
 	{
 	(void)f;
-	return boolean(cur_ch <= ' ' && cur_ch != -1);
+	return boolean(at_white());
+	}
+
+value type_skip_white(value f)
+	{
+	(void)f;
+	skip_white();
+	return hold(QI);
 	}
 
 value type_at_eol(value f)

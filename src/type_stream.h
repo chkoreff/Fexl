@@ -1,5 +1,6 @@
 extern value type_at_eof(value f);
 extern value type_at_white(value f);
+extern value type_skip_white(value f);
 extern value type_at_eol(value f);
 extern value type_at_ch(value f);
 extern value type_look(value f);

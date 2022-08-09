@@ -29,6 +29,17 @@ void skip(void)
 		cur_line++;
 	}
 
+int at_white(void)
+	{
+	return cur_ch <= ' ' && cur_ch != -1;
+	}
+
+void skip_white(void)
+	{
+	while (at_white())
+		skip();
+	}
+
 /* Add the current character to the buffer. */
 void buf_keep(buffer buf)
 	{

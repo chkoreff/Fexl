@@ -5,9 +5,6 @@
 	is_match (skip loop);
 	)
 
-# LATER 20220808 Code in C
-\skip_white==(skip_match at_white)
-
 # Collect characters up to an ending condition.
 \collect_to=
 	(\is_end
@@ -36,7 +33,6 @@
 
 \form
 def "skip_match" skip_match;
-def "skip_white" skip_white;
 def "collect_to" collect_to;
 def "read_chars" read_chars;
 def "read_file" read_file;
