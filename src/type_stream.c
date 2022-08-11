@@ -83,10 +83,39 @@ value type_buf_keep(value f)
 	value x = arg(f->R);
 	if (x->T == type_buf)
 		{
-		buffer buf = (buffer)(x->R);
-		buf_keep(buf);
+		buf_keep(get_buf(x));
 		f = hold(QI);
 		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
+	}
+
+value type_collect_to_ch(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	{
+	value x = arg(f->L->R);
+	value y = arg(f->R);
+	if (x->T == type_buf && y->T == type_str)
+		f = boolean(collect_to_ch(get_buf(x),str_data(y)[0]));
+	else
+		f = hold(Qvoid);
+	drop(x);
+	drop(y);
+	return f;
+	}
+	}
+
+value type_collect_tilde_string(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_buf)
+		f = Qnum(collect_tilde_string(get_buf(x)));
 	else
 		f = hold(Qvoid);
 	drop(x);

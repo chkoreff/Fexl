@@ -1,6 +1,8 @@
 #include <str.h>
 #include <value.h>
 
+#include <buffer.h>
+
 #include <basic.h>
 #include <crypto.h>
 #include <stdio.h>
@@ -157,6 +159,8 @@ static value standard(const char *name)
 	if (match("skip")) return Q(type_skip);
 	if (match("line")) return Q(type_line);
 	if (match("buf_keep")) return Q(type_buf_keep);
+	if (match("collect_to_ch")) return Q(type_collect_to_ch);
+	if (match("collect_tilde_string")) return Q(type_collect_tilde_string);
 	if (match("read_stream")) return Q(type_read_stream);
 
 	if (match("time")) return Q(type_time);

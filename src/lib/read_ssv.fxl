@@ -1,46 +1,4 @@
 # Parse the SSV (space-separated value) format.
-
-# Collect a string up to the next occurrence of the terminator string.
-# LATER 20220808 Code in C by unifying with the code in parse.c.
-\collect_string=
-	(\t_ch\term
-	\buf_result=buf_new
-
-	@\loop_start
-
-	# Buffer characters up to t_ch.
-	(@\loop
-	at_ch t_ch skip;
-	at_eof void; # Did not find t_ch.
-	buf_keep buf_result
-	loop
-	)
-
-	# Try to match the term now.
-	\buf_match=buf_new
-	buf_put buf_match t_ch
-	\fh_term=(readstr term)
-
-	@\loop_term
-	\t=(sgetc fh_term)
-	is_undef t
-		(
-		# Matched all term chars, so return the result.
-		buf_get buf_result
-		);
-	at_ch t
-		(
-		# Matched the next char.
-		buf_keep buf_match
-		loop_term
-		)
-		(
-		# Did not match the next char.  Keep the matched ones and start over.
-		buf_put buf_result (buf_get buf_match)
-		loop_start
-		)
-	)
-
 \get_plain_item==
 	(
 	collect_to
@@ -57,27 +15,13 @@
 	(
 	skip
 	\buf=buf_new
-	@\loop
-	at_ch QU (skip buf_get buf);
-	at_eof void;
-	buf_keep buf
-	loop
+	collect_to_ch buf QU (buf_get buf) void
 	)
 
 \get_tilde_item==
 	(
-	skip
 	\buf=buf_new
-	@\loop
-	at_white
-		(
-		skip
-		\term=(buf_get buf)
-		collect_string "~" term
-		);
-	at_eof void;
-	buf_keep buf
-	loop
+	eq 1 (collect_tilde_string buf) (buf_get buf) void
 	)
 
 \get_item==
