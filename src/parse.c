@@ -65,6 +65,89 @@ static void skip_filler(void)
 		}
 	}
 
+/* Collect chars to the first white space.  Return true if found. */
+static int collect_to_white(struct buffer *buf)
+	{
+	while (1)
+		{
+		if (cur_ch > ' ')
+			buf_keep(buf);
+		else if (cur_ch == -1)
+			return 0;
+		else
+			{
+			skip();
+			return 1;
+			}
+		}
+	}
+
+/* Collect chars to t_ch.  Return true if found. */
+static int collect_to_ch(struct buffer *buf, const char t_ch)
+	{
+	while (1)
+		{
+		if (cur_ch == t_ch)
+			{
+			skip();
+			return 1;
+			}
+		else if (cur_ch == -1)
+			return 0;
+		else
+			buf_keep(buf);
+		}
+	}
+
+/* Collect chars to a terminator string.  Return true if found. */
+static int collect_string(struct buffer *buf, const char *end,
+	unsigned long len)
+	{
+	if (len == 1) /* Optimize this case. */
+		return collect_to_ch(buf,end[0]);
+	{
+	unsigned long pos = 0;
+
+	while (pos < len)
+		{
+		if (cur_ch == end[pos])
+			{
+			pos++;
+			skip();
+			}
+		else if (pos > 0)
+			{
+			/* Buffer the ones matched so far and start over. */
+			buf_addn(buf,end,pos);
+			pos = 0;
+			}
+		else if (cur_ch == -1)
+			return 0;
+		else
+			buf_keep(buf);
+		}
+	return 1;
+	}
+	}
+
+/* Collect chars to a white space to get a terminator string.  Then collect
+chars to the next occurrence of that terminator.  Return:
+
+	-1 : if no terminator was found
+	 0 : if no occurrence of the terminator was found
+	 1 : if the terminator was found
+*/
+static int collect_tilde_string(struct buffer *buf)
+	{
+	if (!collect_to_white(buf)) return -1;
+	{
+	string end = buf_clear(buf);
+	int ok = collect_string(buf,end->data,end->len);
+	str_free(end);
+	return ok;
+	}
+	}
+
 static value cur_label; /* label of current input stream */
 
 static void syntax_error(const char *code, unsigned long line)
@@ -75,7 +158,7 @@ static void syntax_error(const char *code, unsigned long line)
 /* Parse a name, or return 0 if I don't see one.
 
 A name may contain just about anything, except for white space and a few other
-special characters.  This is the simplest rule that can work.
+special chars.  This is the simplest rule that can work.
 */
 static string parse_name(void)
 	{
@@ -99,198 +182,185 @@ static string parse_name(void)
 	return buf_clear(&buf);
 	}
 
-/* Collect a string up to an ending terminator. */
-static string collect_string(
-	const char *end_data,
-	unsigned long end_len,
-	unsigned long first_line
-	)
+static void error_unclosed(unsigned long first_line)
 	{
-	unsigned long match_pos = 0;
-	struct buffer buf = {0};
-
-	while (match_pos < end_len)
-		{
-		if (cur_ch == end_data[match_pos])
-			{
-			match_pos++;
-			skip();
-			}
-		else if (match_pos > 0)
-			{
-			/* Buffer the ones matched so far and start over. */
-			buf_addn(&buf,end_data,match_pos);
-			match_pos = 0;
-			}
-		else if (cur_ch == -1)
-			syntax_error("Unclosed string", first_line);
-		else
-			buf_keep(&buf);
-		}
-
-	return buf_clear(&buf);
+	syntax_error("Unclosed string", first_line);
 	}
 
-/* Parse a tilde string terminator. */
-static string parse_terminator(unsigned long first_line)
+static struct form *parse_quote_string(void)
 	{
-	struct buffer buf = {0};
-	while (cur_ch > ' ')
-		buf_keep(&buf);
-
-	if (cur_ch == -1)
-		syntax_error("Incomplete string terminator", first_line);
+	unsigned long first_line = cur_line;
+	struct buffer s_buf = {0};
+	struct buffer *buf = &s_buf;
 
 	skip();
-	return buf_clear(&buf);
+	if (!collect_to_ch(buf,'"'))
+		{
+		buf_discard(&s_buf);
+		error_unclosed(first_line);
+		}
+
+	return form_val(Qstr(buf_clear(&s_buf)));
 	}
 
-/* Gather string content up to the next occurrence of terminator. */
-static string parse_content(string end, unsigned long first_line)
+static struct form *parse_tilde_string(void)
 	{
-	string content = collect_string(end->data, end->len, first_line);
-	str_free(end);
-	return content;
+	unsigned long first_line = cur_line;
+	struct buffer buf = {0};
+
+	int code = collect_tilde_string(&buf);
+	if (code != 1)
+		{
+		buf_discard(&buf);
+		if (code == -1)
+			syntax_error("Incomplete string terminator", first_line);
+		else
+			error_unclosed(first_line);
+		}
+
+	return form_val(Qstr(buf_clear(&buf)));
 	}
 
 static struct form *parse_symbol(void)
 	{
 	unsigned long first_line = cur_line;
-	if (cur_ch == '"')
+	string name = parse_name();
+	if (name == 0) return 0;
+	/* See if it's a numeric constant. */
+	{
+	value n = Qnum_str0(name->data);
+	if (n)
 		{
-		skip();
-		return form_val(Qstr(collect_string("\"",1,first_line)));
-		}
-	else if (cur_ch == '~')
-		{
-		string end = parse_terminator(first_line);
-		string content = parse_content(end,first_line);
-		return form_val(Qstr(content));
+		str_free(name);
+		return form_val(n);
 		}
 	else
-		{
-		string name = parse_name();
-		if (name == 0) return 0;
-		/* See if it's a numeric constant. */
-		{
-		value def = Qnum_str0(name->data);
-		if (def)
-			{
-			str_free(name);
-			return form_val(def);
-			}
-		else
-			return form_ref(name,first_line);
-		}
-		}
+		return form_ref(name,first_line);
+	}
 	}
 
 static struct form *parse_term(void);
 static struct form *parse_exp(void);
 
-static struct form *parse_list(void)
+static struct form *parse_nested(void)
+	{
+	unsigned long first_line = cur_line;
+	struct form *exp;
+	skip();
+	exp = parse_exp();
+	if (cur_ch != ')')
+		syntax_error("Unclosed parenthesis", first_line);
+	skip();
+	return exp;
+	}
+
+/* LATER 20220811 Unify list/tuple representation and reduce this code. */
+static struct form *parse_list_items(void)
 	{
 	struct form *term = parse_term();
 	if (term == 0) return form_val(hold(Qnull));
 	skip_filler();
-	return form_join(0,term, (cur_ch == ';' ? parse_exp() : parse_list()));
+	if (cur_ch == ';')
+		return form_join(0,term,parse_exp());
+	else
+		return form_join(0,term,parse_list_items());
+	}
+
+static struct form *parse_tuple_items(void)
+	{
+	struct form *term = parse_term();
+	if (term == 0) return form_val(hold(Qnull));
+	skip_filler();
+	return form_join(0,term,parse_tuple_items());
+	}
+
+static struct form *parse_list(void)
+	{
+	unsigned long first_line = cur_line;
+	struct form *exp;
+	skip();
+	skip_filler();
+	exp = parse_list_items();
+	if (exp->exp->T == 0)
+		exp = form_appv(form_val(hold(Qlist)),exp);
+	if (cur_ch != ']')
+		syntax_error("Unclosed bracket", first_line);
+	skip();
+	return exp;
 	}
 
 static struct form *parse_tuple(void)
 	{
-	struct form *term = parse_term();
-	if (term == 0) return form_val(hold(Qnull));
+	struct form *exp;
+	unsigned long first_line = cur_line;
+	skip();
 	skip_filler();
-	return form_join(0,term,parse_tuple());
+	exp = form_appv(form_val(hold(Qtuple)),parse_tuple_items());
+	if (cur_ch != '}')
+		syntax_error("Unclosed brace", first_line);
+	skip();
+	return exp;
 	}
 
 static struct form *parse_term(void)
 	{
-	struct form *exp;
-	unsigned long first_line = cur_line;
-	if (cur_ch == '(') /* parenthesized expression */
-		{
-		skip();
-		exp = parse_exp();
-		if (cur_ch != ')')
-			syntax_error("Unclosed parenthesis", first_line);
-		skip();
-		}
-	else if (cur_ch == '[') /* list */
-		{
-		skip();
-		skip_filler();
-		exp = parse_list();
-		if (exp->exp->T == 0)
-			exp = form_appv(form_val(hold(Qlist)),exp);
-		if (cur_ch != ']')
-			syntax_error("Unclosed bracket", first_line);
-		skip();
-		}
-	else if (cur_ch == '{') /* tuple */
-		{
-		skip();
-		skip_filler();
-		exp = form_appv(form_val(hold(Qtuple)),parse_tuple());
-		if (cur_ch != '}')
-			syntax_error("Unclosed brace", first_line);
-		skip();
-		}
+	if (cur_ch == '(')
+		return parse_nested();
+	else if (cur_ch == '[')
+		return parse_list();
+	else if (cur_ch == '{')
+		return parse_tuple();
+	else if (cur_ch == '"')
+		return parse_quote_string();
+	else if (cur_ch == '~')
+		return parse_tilde_string();
 	else
-		exp = parse_symbol();
-
-	return exp;
+		return parse_symbol();
 	}
 
 /* Parse a lambda form following the initial '\' character. */
 static struct form *parse_lambda(unsigned long first_line)
 	{
-	string name;
-	struct form *def = 0;
-	struct form *exp;
-	int eager = 1;
-
-	/* Parse the name. */
-	skip_white();
-	name = parse_name();
-
+	string name = parse_name();
 	if (name == 0)
 		syntax_error("Missing name after '\\'", first_line);
 
 	/* Lambda name cannot be a numeric constant. */
 	{
-	value def = Qnum_str0(name->data);
-	if (def)
+	value n = Qnum_str0(name->data);
+	if (n)
 		syntax_error("Lambda name cannot be a number", first_line);
 	}
 
-	/* Parse the optional definition of the name. */
 	skip_filler();
+	if (cur_ch != '=')
+		return form_lam(name,parse_exp()); /* No definition */
+
 	first_line = cur_line;
+	skip();
+
+	/* Parse the definition. */
+	{
+	int eager = 0;
+	struct form *def;
+	struct form *exp;
+
 	if (cur_ch == '=')
-		{
 		skip();
-		if (cur_ch == '=')
-			{
-			eager = 0;
-			skip();
-			}
-		skip_filler();
-		def = parse_term();
-		if (def == 0)
-			syntax_error("Missing definition", first_line);
-		}
+	else
+		eager = 1;
 
-	/* Parse the body of the function and abstract the name out. */
-	exp = form_lam(name,parse_exp());
-
-	/* Apply the definition if any. */
+	skip_filler();
+	def = parse_term();
 	if (def == 0)
-		return exp;
-	else if (eager)
+		syntax_error("Missing definition", first_line);
+
+	exp = form_lam(name,parse_exp());
+	if (eager)
 		return form_appv(form_appv(form_val(hold(Qeval)),def),exp);
 	else
-		return form_app(exp,def);
+		return form_appv(exp,def);
+	}
 	}
 
 /* Parse a form (unresolved symbolic expression). */
@@ -327,7 +397,10 @@ static struct form *parse_factor(void)
 			return form_appv(form_val(hold(Qonce)),parse_exp());
 			}
 		else
+			{
+			skip_filler();
 			return parse_lambda(first_line);
+			}
 		}
 	else if (cur_ch == ';')
 		{

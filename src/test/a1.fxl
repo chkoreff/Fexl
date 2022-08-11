@@ -1299,6 +1299,14 @@ try x y T
 
 test_eq_data
 
+# Test filler after "\", which is allowed but not recommended.
+(
+\  x==1
+
+\  # comment
+   x==1
+)
+
 # Try parsing invalid source.
 say (is_void (parse 33 ""))
 

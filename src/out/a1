@@ -960,7 +960,7 @@ end "  abcd   " = "  abcd"
 
 ]
 = test_eq_data
-steps 4466 bytes 2976
+steps 4407 bytes 2976
 T
 ~6
 \err=
