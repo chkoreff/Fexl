@@ -1307,6 +1307,26 @@ test_eq_data
    x==1
 )
 
+# Test some sequences with ";" tails.  This has always been allowed in lists
+# as of version 26.24.0 is it also allowed in tuples.
+(
+\try=(\x say (as_str x))
+# list
+(
+\x==["a" "b" "c"; cons "d"; cons "e"; null]
+try x
+try (list_to_tuple x)
+nl
+)
+# tuple
+(
+\x=={"a" "b" "c"; cons "d"; cons "e"; null}
+try x
+try (tuple_to_list x)
+nl
+)
+)
+
 # Try parsing invalid source.
 say (is_void (parse 33 ""))
 
