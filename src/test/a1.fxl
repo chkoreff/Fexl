@@ -1288,13 +1288,7 @@ try_app T
 try_app F
 try_app null
 
-# Expand cons form to compare with list.
-(
-\expand=(\xs tuple_to_list; list_to_tuple xs)
-\x=(expand; cons "a"; cons "b"; null)
-\y=["a" "b"]
-try x y T
-)
+try (cons "a"; cons "b"; null) ["a" "b"] T
 )
 
 test_eq_data
