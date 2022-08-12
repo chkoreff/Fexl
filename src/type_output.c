@@ -44,7 +44,6 @@ static value op_put(FILE *fh, value f)
 			fput_str(fh,s);
 			str_free(s);
 			}
-
 		f = hold(QI);
 		}
 	drop(x);

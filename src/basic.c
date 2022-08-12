@@ -69,14 +69,26 @@ value wrap(value x)
 value type_list(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
-	return A(A(hold(f->R),hold(f->L->L->R->L)),wrap(f->L->L->R->R));
+	{
+	value z = f->L->L->R;
+	value x = hold(z->L);
+	value y = wrap(z->R);
+
+	return A(A(hold(f->R),x),y);
+	}
 	}
 
 /* (cons x y a b) = (b x y) */
 value type_cons(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
-	return A(A(hold(f->R),hold(f->L->L->L->R)),hold(f->L->L->R));
+	{
+	value z = f->L->L;
+	value x = hold(z->L->R);
+	value y = hold(z->R);
+
+	return A(A(hold(f->R),x),y);
+	}
 	}
 
 /* (null a b) = a */
