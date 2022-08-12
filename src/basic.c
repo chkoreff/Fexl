@@ -39,7 +39,7 @@ value type_F(value f)
 value type_Y(value f)
 	{
 	if (!f->L) return 0;
-	return A(hold(f->R),hold(f));
+	return AV(arg(f->R),hold(f));
 	}
 
 value type_atom(value f)
@@ -74,7 +74,7 @@ value type_list(value f)
 	value x = hold(z->L);
 	value y = wrap(z->R);
 
-	return A(A(hold(f->R),x),y);
+	return AV(eval(AV(arg(f->R),x)),y);
 	}
 	}
 
@@ -87,7 +87,7 @@ value type_cons(value f)
 	value x = hold(z->L->R);
 	value y = hold(z->R);
 
-	return A(A(hold(f->R),x),y);
+	return AV(eval(AV(arg(f->R),x)),y);
 	}
 	}
 
@@ -121,7 +121,7 @@ value type_once(value f)
 value type_yield(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
-	return A(hold(f->R),hold(f->L->R));
+	return AV(arg(f->R),hold(f->L->R));
 	}
 
 value boolean(int x)
