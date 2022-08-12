@@ -1325,6 +1325,13 @@ try x
 try (tuple_to_list x)
 nl
 )
+# no initial terms
+(
+\x==[; cons "d"; cons "e"; null]
+try x
+try (list_to_tuple x)
+nl
+)
 )
 
 # Try parsing invalid source.

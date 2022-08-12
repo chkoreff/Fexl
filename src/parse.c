@@ -31,7 +31,7 @@ term   => string
 
 items  => empty
 items  => term items
-items  => term ; exp
+items  => ; exp
 
 string => quote_string
 string => tilde_string
@@ -147,19 +147,26 @@ static struct form *parse_nested(void)
 	return exp;
 	}
 
-/* LATER 20220811 Unify list/tuple representation and reduce this code. */
 static struct form *parse_items(void)
 	{
-	struct form *term = parse_term();
-	if (term == 0) return form_val(hold(Qnull));
 	skip_filler();
 	if (cur_ch == ';')
-		return form_join(0,term,parse_exp());
+		{
+		skip();
+		return parse_exp();
+		}
 	else
-		return form_join(0,term,parse_items());
+		{
+		struct form *term = parse_term();
+		if (term == 0)
+			return form_val(hold(Qnull));
+		else
+			return form_join(0,term,parse_items());
+		}
+
 	}
 
-static struct form *parse_seq(const char t_ch, const char *msg)
+static struct form *parse_seq(value which, const char t_ch, const char *msg)
 	{
 	struct form *exp;
 	unsigned long first_line = cur_line;
@@ -170,30 +177,21 @@ static struct form *parse_seq(const char t_ch, const char *msg)
 	if (cur_ch != t_ch)
 		syntax_error(msg, first_line);
 	skip();
-	return exp;
-	}
 
-static struct form *wrap_list(struct form *exp)
-	{
-	if (exp->exp->T == type_null)
-		return exp;
+	if (exp->exp->T == 0)
+		return form_appv(form_val(hold(which)),exp);
 	else
-		return form_appv(form_val(hold(Qlist)),exp);
-	}
-
-static struct form *wrap_tuple(struct form *exp)
-	{
-	return form_appv(form_val(hold(Qtuple)),exp);
+		return exp;
 	}
 
 static struct form *parse_list(void)
 	{
-	return wrap_list(parse_seq(']',"Unclosed bracket"));
+	return parse_seq(Qlist,']',"Unclosed bracket");
 	}
 
 static struct form *parse_tuple(void)
 	{
-	return wrap_tuple(parse_seq('}',"Unclosed brace"));
+	return parse_seq(Qtuple,'}',"Unclosed brace");
 	}
 
 static struct form *parse_term(void)
