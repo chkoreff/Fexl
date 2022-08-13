@@ -124,6 +124,8 @@ static value standard(const char *name)
 	if (match("fclose")) return Q(type_fclose);
 	if (match("fgetc")) return Q(type_fgetc);
 	if (match("fget")) return Q(type_fget);
+	if (match("clearerr")) return Q(type_clearerr);
+	if (match("feof")) return Q(type_feof);
 	if (match("flook")) return Q(type_flook);
 	if (match("remove")) return Q(type_remove);
 	if (match("is_newer")) return Q(type_is_newer);

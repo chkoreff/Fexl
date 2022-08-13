@@ -8,6 +8,8 @@ extern value type_fopen(value f);
 extern value type_fclose(value f);
 extern value type_fgetc(value f);
 extern value type_fget(value f);
+extern value type_clearerr(value f);
+extern value type_feof(value f);
 extern value type_flook(value f);
 extern value type_remove(value f);
 extern value type_is_newer(value f);

@@ -847,7 +847,7 @@ This also goes to the file.
 	\get==
 		(
 		\ch=(fget fh_r)
-		say ["get " (is_undef ch "void" ch)]
+		say ["get " (is_undef ch ((clearerr fh_r) "void") ch)]
 		)
 
 	put "a"

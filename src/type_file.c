@@ -91,27 +91,51 @@ value type_fclose(value f)
 	}
 	}
 
-/* I noticed that fgetc changed its behavior with 5.4.0-51-generic.  Now when
-it sees end of file, it sets the error flag so that subsequent reads fail, even
-when more data is written to the file.  To work around that, I use this version
-that clears the error flag. */
-static int patch_fgetc(FILE *fh)
-	{
-	int ch = fgetc(fh);
-	if (ch == -1) clearerr(fh);
-	return ch;
-	}
-
 /* (fgetc fh) returns the next single byte from the file, or void if none. */
 value type_fgetc(value f)
 	{
-	return op_getc(f,type_file,(input)patch_fgetc);
+	return op_getc(f,type_file,(input)fgetc);
 	}
 
 /* (fget fh) returns the next UTF-8 character from the file, or void if none. */
 value type_fget(value f)
 	{
-	return op_get(f,type_file,(input)patch_fgetc);
+	return op_get(f,type_file,(input)fgetc);
+	}
+
+value type_clearerr(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_file)
+		{
+		FILE *fh = get_fh(x);
+		clearerr(fh);
+		f = hold(QI);
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
+	}
+
+value type_feof(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_file)
+		{
+		FILE *fh = get_fh(x);
+		f = boolean(feof(fh));
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
 	}
 
 /* (flook fh) returns the next byte from the file without consuming it. */
@@ -123,7 +147,7 @@ value type_flook(value f)
 	if (x->T == type_file)
 		{
 		FILE *fh = get_fh(x);
-		int ch = patch_fgetc(fh);
+		int ch = fgetc(fh);
 		if (ch == -1)
 			f = hold(Qvoid);
 		else
