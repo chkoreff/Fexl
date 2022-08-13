@@ -531,54 +531,26 @@ value type_connect(value f)
 	}
 	}
 
-static void do_execv(const char **argv)
-	{
-	const char *path = argv[0];
-	int result = execv(path,(char *const *)argv);
-	if (result == -1) die("exec failed");
-	}
-
 /* (exec argv) Call execv with the given argument list.  The first argument is
 the full path of the executable program.  This call does not return. */
 value type_exec(value f)
 	{
 	if (!f->L) return 0;
-	expand(f);
 	{
-	unsigned long len = 0;
-	value p = f->R;
-	while (p->T == 0)
-		{
-		value item = eval(p->L);
-		if (item->T != type_str)
-			die("bad arg to exec");
-		p->L = item;
-		p = p->R;
-		len++;
-		}
-
-	{
-	/* Allocate an array of pointers and store the list entries there. */
-	unsigned long size = (len+1) * sizeof(char *);
-	const char **argv = new_memory(size);
-	unsigned long pos = 0;
-
-	p = f->R;
-	while (p->T == 0)
-		{
-		argv[pos] = str_data(p->L);
-		p = p->R;
-		pos++;
-		}
-	argv[pos] = 0; /* ending sentinel */
+	struct collect collect;
+	beg_collect(f->R,&collect,"bad arg to exec");
 
 	fflush(stdout); /* Flush any existing output. */
+
+	{
 	/* Call execv with the argument list. */
-	do_execv(argv);
+	char *const *argv = (void *)collect.argv;
+	if (execv(argv[0],argv) == -1)
+		die("exec failed");
+	}
 
 	/* Although execv doesn't return, here is the code to clean up memory. */
-	free_memory(argv,size);
-	}
+	end_collect(&collect);
 
 	return hold(QI);
 	}

@@ -3,7 +3,9 @@
 
 #include <basic.h>
 #include <convert.h>
+#include <die.h>
 #include <input.h>
+#include <memory.h>
 #include <type_num.h>
 #include <type_str.h>
 
@@ -298,4 +300,59 @@ value type_length_common(value f)
 value type_is_str(value f)
 	{
 	return op_is_type(f,type_str);
+	}
+
+/* This collects a vector of raw (char *) strings from list x.  It is called
+from type_exec. */
+void beg_collect(value x, struct collect *collect, const char *msg)
+	{
+	unsigned long len = 0;
+	value items = 0;
+	unsigned long size;
+	const char **argv;
+
+	/* Collect items from x into a simple list. */
+	{
+	value *p = &items;
+	value item;
+	while ((item = iterate(&x)) != 0)
+		{
+		*p = V(0,arg(item),0);
+		p = &((*p)->R);
+		len++;
+		}
+	*p = hold(Qnull);
+	}
+
+	/* Collect strings from simple list into a vector. */
+	size = (len+1) * sizeof(char *);
+	argv = new_memory(size);
+
+	{
+	value p = items;
+	unsigned long pos = 0;
+
+	while (p->T == 0)
+		{
+		value item = p->L;
+		if (item->T != type_str)
+			die(msg);
+
+		argv[pos++] = str_data(item);
+		p = p->R;
+		}
+	argv[pos] = 0; /* ending sentinel */
+	}
+
+	collect->len = len;
+	collect->items = items;
+	collect->size = size;
+	collect->argv = argv;
+	}
+
+/* Free the memory created in beg_collect. */
+void end_collect(struct collect *collect)
+	{
+	free_memory((void *)collect->argv, collect->size);
+	drop(collect->items);
 	}
