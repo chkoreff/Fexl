@@ -1331,5 +1331,8 @@ nl
 # Try parsing invalid source.
 say (is_void (parse 33 ""))
 
+# Test that {} is equivalent to I.
+say ({} "x")
+
 \\
 Extra stuff not parsed.

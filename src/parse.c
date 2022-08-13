@@ -178,7 +178,7 @@ static struct form *parse_seq(value which, const char t_ch, const char *msg)
 		syntax_error(msg, first_line);
 	skip();
 
-	if (exp->exp->T == 0)
+	if (exp->exp->T == 0 || which->T == type_tuple)
 		return form_appv(form_val(hold(which)),exp);
 	else
 		return exp;

@@ -960,7 +960,7 @@ end "  abcd   " = "  abcd"
 
 ]
 = test_eq_data
-steps 4264 bytes 2976
+steps 4286 bytes 2976
 ["a" "b" "c" "d" "e"]
 {"a" "b" "c" "d" "e"}
 
@@ -971,6 +971,7 @@ steps 4264 bytes 2976
 {"d" "e"}
 
 T
+x
 ~6
 \err=
 ~

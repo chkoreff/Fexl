@@ -23,7 +23,9 @@
 		cons (put "(2)" I;I;"-1");
 		[
 		(put "(3)" "-a")
+		#(\x x) # Test bad arg to exec.
 		(put "(4)" path)
+		; 33 # Test non-list tail.
 		]
 		]
 	run_program cmd "" \out\err\status
