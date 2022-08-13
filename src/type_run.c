@@ -141,15 +141,16 @@ static value op_process(value f, int catch_stderr)
 	fflush(stderr);
 
 	{
-	/* Create a series of pipes, each with a read and write side. */
-	int fd_in[2];
-	int fd_out[2];
-	int fd_err[2];
+	/* Create a series of pipes with read side [0] and write side [1]. */
+	/* Naming: (c:child p:parent) x (i:in o:out e:err) */
+	int ci_po[2];
+	int pi_co[2];
+	int pe_ce[2];
 
-	do_pipe(fd_in);
-	do_pipe(fd_out);
+	do_pipe(ci_po);
+	do_pipe(pi_co);
 	if (catch_stderr)
-		do_pipe(fd_err);
+		do_pipe(pe_ce);
 
 	{
 	pid_t pid = fork();
@@ -158,75 +159,52 @@ static value op_process(value f, int catch_stderr)
 	if (pid == 0)
 		{
 		/* This is the child process. */
-
-		/* Duplicate read side of input pipe to stdin. */
-		do_dup2(fd_in[0],0);
-		/* Duplicate write side of output pipe to stdout. */
-		do_dup2(fd_out[1],1);
+		do_dup2(ci_po[0],0); /* Duplicate ci to stdin. */
+		do_dup2(pi_co[1],1); /* Duplicate co to stdout. */
 		if (catch_stderr)
-			{
-			/* Duplicate write side of error pipe to stderr. */
-			do_dup2(fd_err[1],2);
-			}
+			do_dup2(pe_ce[1],2); /* Duplicate ce to stderr. */
 
-		/* Close unused file handles.  They're actually all unused because I
-		duplicated the ones I still need.  At a minimum, I must close the write
-		side of the input pipe, otherwise the child hangs waiting for stdin to
-		close. */
-
-		do_close(fd_in[0]);
-		do_close(fd_in[1]); /* Must do this one to avoid hang. */
-
-		do_close(fd_out[0]);
-		do_close(fd_out[1]);
-
+		/* Close unused files, including the ones I just duplicated. */
+		do_close(ci_po[0]);
+		do_close(pi_co[1]);
 		if (catch_stderr)
-			{
-			do_close(fd_err[0]);
-			do_close(fd_err[1]);
-			}
+			do_close(pe_ce[1]);
 
-		/* Evaluate the child function. */
+		do_close(pi_co[0]);
+		do_close(ci_po[1]); /* Must do this one to avoid hang. */
+		if (catch_stderr)
+			do_close(pe_ce[0]);
+
+		/* Evaluate the child, interacting with parent. */
 		drop(eval(hold(f->L->R)));
 
-		/* Exit here to avoid continuing with evaluation.  This means that
-		memory leak detection does not occur for the child function.  If you
-		want that level of checking, you should exec with (argv 0) instead. */
+		/* Exit to avoid continuing with evaluation. */
 		exit(0);
 		return 0;
 		}
 	else
 		{
 		/* This is the parent process. */
+		value exp = hold(f->R); /* handler function */
 
-		/* Open write side of input pipe as child input. */
-		FILE *child_in = do_fdopen(fd_in[1],"w");
-		/* Open read side of output pipe as child output. */
-		FILE *child_out = do_fdopen(fd_out[0],"r");
-		FILE *child_err = 0;
+		exp = A(exp,Qfile(do_fdopen(ci_po[1],"w"))); /* po -> ci */
+		exp = A(exp,Qfile(do_fdopen(pi_co[0],"r"))); /* pi <- co */
 		if (catch_stderr)
-			{
-			/* Open read side of error pipe as child error. */
-			child_err = do_fdopen(fd_err[0],"r");
-			}
+			exp = A(exp,Qfile(do_fdopen(pe_ce[0],"r"))); /* pe <- ce */
 
-		/* Close unused file handles.  I don't close the ones I just opened
-		because they are still in play (i.e. fdopen does not dup). */
-
-		do_close(fd_in[0]);  /* Close the read side of the input pipe. */
-		do_close(fd_out[1]); /* Close the write side of the output pipe. */
+		/* Close unused file handles. */
+		do_close(ci_po[0]);
+		do_close(pi_co[1]);
 		if (catch_stderr)
-			do_close(fd_err[1]); /* Close the write side of the error pipe. */
+			do_close(pe_ce[1]);
 
+		/* Evaluate the parent, interacting with child. */
+		exp = eval(exp);
+
+		/* Wait for child to complete and pass in the status. */
 		{
-		value handler = A(A(hold(f->R),Qfile(child_in)),Qfile(child_out));
-		int status;
-		if (catch_stderr)
-			handler = A(handler,Qfile(child_err));
-
-		handler = eval(handler);
-		status = do_wait(pid);
-		return A(handler,Qnum(status));
+		int status = do_wait(pid);
+		return AV(exp,Qnum(status));
 		}
 		}
 	}
