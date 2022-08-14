@@ -317,6 +317,20 @@ int bn_eq0(const struct bn *x)
 	return x->nsd == 0;
 	}
 
+int bn_is_neg(const struct bn *x)
+	{
+	return x->sign;
+	}
+
+struct bn *bn_neg(const struct bn *x)
+	{
+	struct bn *y = bn_new(x->nsd);
+	y->sign = x->nsd ? (1 - x->sign) : 0;
+	y->nsd = x->nsd;
+	vec_copy(x->nsd,x->vec,y->vec);
+	return y;
+	}
+
 int bn_cmp(const struct bn *x, const struct bn *y)
 	{
 	if (x->sign)

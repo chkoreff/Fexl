@@ -13,7 +13,7 @@
 # LATER 20211110 A version of bn_mod that doesn't bother with the quotient.
 \bn_mod=(\x\n bn_div x n \q\r r)
 
-# Greatest common denominator
+# Greatest common denominator for non-negative numbers.
 \bn_gcd=
 	(@\bn_gcd\a\b
 	\a=a

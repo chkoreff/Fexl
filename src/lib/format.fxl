@@ -178,6 +178,18 @@ format_num
 # Trim spaces at the end of the string.
 \trim_end_spaces=(str_trim_spaces F T)
 
+# Get a string of random digits 0-9 with a length from 0 to 15.
+\random_digits=
+	(\len
+	lt len 0 void;
+	gt len 15 void;
+	\r=random_double
+	\r=(eq 1 r 0 r)
+	\r=(format_num len "" r)
+	\r=(slice r 2 len)
+	r
+	)
+
 \form
 def "repeat_str" repeat_str;
 def "format_num" format_num;
@@ -195,4 +207,5 @@ def "str_trim" str_trim;
 def "trim_spaces" trim_spaces;
 def "trim_beg_spaces" trim_beg_spaces;
 def "trim_end_spaces" trim_end_spaces;
+def "random_digits" random_digits;
 form

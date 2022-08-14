@@ -27,13 +27,37 @@ value Qbn(struct bn *x)
 	return V(type_bn,&atom,(value)x);
 	}
 
-value type_bn_eq0(value f)
+static value op_pred(value f, int op(const struct bn *x))
 	{
 	if (!f->L) return 0;
 	{
 	value x = arg(f->R);
 	if (x->T == type_bn)
-		f = boolean(bn_eq0(get_bn(x)));
+		f = boolean(op(get_bn(x)));
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
+	}
+
+value type_bn_eq0(value f)
+	{
+	return op_pred(f,bn_eq0);
+	}
+
+value type_bn_is_neg(value f)
+	{
+	return op_pred(f,bn_is_neg);
+	}
+
+value type_bn_neg(value f)
+	{
+	if (!f->L) return 0;
+	{
+	value x = arg(f->R);
+	if (x->T == type_bn)
+		f = Qbn(bn_neg(get_bn(x)));
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -115,7 +139,7 @@ value type_bn_to_dec(value f)
 	}
 	}
 
-static value op_bn2(value f,
+static value op_2(value f,
 	struct bn *op(const struct bn *, const struct bn *))
 	{
 	if (!f->L || !f->L->L) return 0;
@@ -132,9 +156,9 @@ static value op_bn2(value f,
 	}
 	}
 
-value type_bn_add(value f) { return op_bn2(f,bn_add); }
-value type_bn_sub(value f) { return op_bn2(f,bn_sub); }
-value type_bn_mul(value f) { return op_bn2(f,bn_mul); }
+value type_bn_add(value f) { return op_2(f,bn_add); }
+value type_bn_sub(value f) { return op_2(f,bn_sub); }
+value type_bn_mul(value f) { return op_2(f,bn_mul); }
 
 value type_bn_div(value f)
 	{
