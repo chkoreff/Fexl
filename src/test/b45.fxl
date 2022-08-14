@@ -1,7 +1,6 @@
 # Demonstrate built-in "with".
 
 # Convert a value to a string with no indentation.
-# LATER 20220314 Promote to library.
 \val_str=
 	(
 	# The single "=" above means I use the same buffer every time.

@@ -159,6 +159,7 @@ static value op_2(value f,
 value type_bn_add(value f) { return op_2(f,bn_add); }
 value type_bn_sub(value f) { return op_2(f,bn_sub); }
 value type_bn_mul(value f) { return op_2(f,bn_mul); }
+value type_bn_mod(value f) { return op_2(f,bn_mod); }
 
 value type_bn_div(value f)
 	{

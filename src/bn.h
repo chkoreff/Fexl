@@ -22,5 +22,6 @@ extern void bn_div
 	struct bn **qp,
 	struct bn **rp
 	);
+extern struct bn *bn_mod(const struct bn *x, const struct bn *y);
 extern struct bn *bn_from_dec(const char *s);
 extern string bn_to_dec(const struct bn *x);

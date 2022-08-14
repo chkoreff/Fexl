@@ -246,11 +246,21 @@ Divide x by y, and return quotient q and remainder r where:
 
 I do not optimize the case where y=1 because I want constant time operation as
 far as possible and you probably don't divide by 1 too often anyway.
+
+On each round I calculate a guess with digits {qd qn} where:
+   (qd = 0 and x < y) or
+   (qd > 0 and x >= (y * qd * base^qn))
 */
-static void vec_div(u32 xn, const u32 *x, u32 yn, const u32 *y, u32 *q, u32 *r)
+static void vec_div
+	(
+	u32 xn, const u32 *x,
+	u32 yn, const u32 *y,
+	u32 *q, u32 *r
+	)
 	{
 	vec_copy(xn,x,r);
-	vec_zero(xn,q);
+	if (q)
+		vec_zero(xn,q);
 	if (yn == 0) return;
 	{
 	u64 y0 = y[yn-1];
@@ -278,11 +288,18 @@ static void vec_div(u32 xn, const u32 *x, u32 yn, const u32 *y, u32 *q, u32 *r)
 			qn = xn - yn - 1;
 			}
 
-		vec_add_u32(xn-qn,q+qn,qd,q+qn);
+		if (q)
+			vec_add_u32(xn-qn,q+qn,qd,q+qn);
 		vec_sub_mul(r+qn,yn,y,qd);
 		xn = vec_nsd(xn,r);
 		}
 	}
+	}
+
+/* Divide x by y and return remainder without computing quotient. */
+static void vec_mod(u32 xn, const u32 *x, u32 yn, const u32 *y, u32 *r)
+	{
+	vec_div(xn,x,yn,y,0,r);
 	}
 
 /* Return the number of bytes needed to store a bn of the given length. */
@@ -474,14 +491,6 @@ struct bn *bn_from_dec(const char *s)
 	}
 	}
 
-/*
-Divide x by y and return quotient q and remainder r where:
-   x = q*y + r  and  (y=0 or 0 <= abs(r) < abs(y))
-
-On each round I calculate a guess with digits {qd qn} where:
-   (qd = 0 and x < y) or
-   (qd > 0 and x >= (y * qd * base^qn))
-*/
 void bn_div
 	(
 	const struct bn *x,
@@ -502,6 +511,15 @@ void bn_div
 
 	*qp = q;
 	*rp = r;
+	}
+
+struct bn *bn_mod(const struct bn *x, const struct bn *y)
+	{
+	struct bn *r = bn_new(x->nsd);
+	vec_mod(x->nsd,x->vec,y->nsd,y->vec,r->vec);
+	set_nsd(r);
+	r->sign = x->sign;
+	return r;
 	}
 
 /* Buffer the decimal digits in a base B number. */

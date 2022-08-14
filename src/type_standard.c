@@ -248,6 +248,7 @@ static value standard(const char *name)
 	if (match("bn_add")) return Q(type_bn_add);
 	if (match("bn_sub")) return Q(type_bn_sub);
 	if (match("bn_mul")) return Q(type_bn_mul);
+	if (match("bn_mod")) return Q(type_bn_mod);
 	if (match("bn_div")) return Q(type_bn_div);
 	if (match("is_bn")) return Q(type_is_bn);
 

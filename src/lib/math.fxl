@@ -10,9 +10,6 @@
 
 \round2=(\x / (round (* 100 x)) 100)
 
-# LATER 20211110 A version of bn_mod that doesn't bother with the quotient.
-\bn_mod=(\x\n bn_div x n \q\r r)
-
 # Greatest common denominator for non-negative numbers.
 \bn_gcd=
 	(@\bn_gcd\a\b
@@ -32,6 +29,5 @@ def "min" min;
 def "mod" mod;
 def "tau" tau;
 def "round2" round2;
-def "bn_mod" bn_mod;
 def "bn_gcd" bn_gcd;
 form

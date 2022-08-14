@@ -15,5 +15,6 @@ extern value type_bn_to_dec(value f);
 extern value type_bn_add(value f);
 extern value type_bn_sub(value f);
 extern value type_bn_mul(value f);
+extern value type_bn_mod(value f);
 extern value type_bn_div(value f);
 extern value type_is_bn(value f);
