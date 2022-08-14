@@ -58,17 +58,16 @@ value type_void(value f)
 /* Wrap list function around data if necessary. */
 value wrap(value x)
 	{
-	value y = hold(x);
-	if (y->T == 0)
-		return AV(hold(Qlist),y);
+	if (x->T == 0)
+		return AV(hold(Qlist),hold(x));
 	else
-		return y;
+		return hold(x);
 	}
 
 /* ([x;y] a b) = (b x y) */
 value type_list(value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	if (!f->L->L || !f->L->L->L) return 0;
 	{
 	value z = f->L->L->R;
 	value x = hold(z->L);
