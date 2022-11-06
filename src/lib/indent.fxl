@@ -50,12 +50,12 @@
 				(
 				\prefix=(. top_prefix "  ") # Indent at non-scalar
 				\xt
-				loop_nested prefix xs
+				loop_nested prefix [x;xt]
 				)
 			)
 			(
 			\xt
-			loop_nested top_prefix xs
+			loop_nested top_prefix [x;xt]
 			)
 		)
 

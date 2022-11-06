@@ -57,3 +57,14 @@ put_quote_data x nl
 
 say "=="
 i_render_data (\x put (quote x)) nl x
+
+# Ensure single evaluation of list items.
+say "=="
+say_data
+[
+[
+"a"
+(put "(1)" ["b"])
+[ (put "(2)" ["c"]) ]
+]
+]
