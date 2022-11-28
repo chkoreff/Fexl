@@ -251,6 +251,11 @@ value type_subst(value f)
 	return subst(f->L->L->R,f->L->R,f->R);
 	}
 
+static int is_closed(struct table *xt)
+	{
+	return (xt == 0 || xt->count == 0);
+	}
+
 /* Return true if the form has no undefined symbols. */
 value type_is_closed(value f)
 	{
@@ -260,7 +265,7 @@ value type_is_closed(value f)
 	if (exp->T == type_form)
 		{
 		struct form *form = (struct form *)exp->R;
-		f = boolean(form->table == 0);
+		f = boolean(is_closed(form->table));
 		}
 	else
 		f = hold(Qvoid);
@@ -367,7 +372,8 @@ value type_value(value f)
 		{
 		struct form *form = (struct form *)exp->R;
 		struct table *xt = form->table;
-		if (xt == 0)
+
+		if (is_closed(xt))
 			f = hold(form->exp);
 		else
 			{
@@ -407,7 +413,7 @@ value op_resolve(value f, value op(const char *name))
 		struct form *form = (struct form *)exp->R;
 		struct table *xt = form->table;
 
-		if (xt == 0)
+		if (is_closed(xt))
 			f = hold(exp);
 		else
 			{

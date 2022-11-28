@@ -1311,6 +1311,13 @@ nl
 )
 )
 
+# Test form with table->count == 0.
+(
+\form=(\; \x x)
+say (is_closed form)
+\f=(value form)
+)
+
 # Try parsing invalid source.
 say (is_void (parse 33 ""))
 
