@@ -1,372 +1,84 @@
 \out=
 ~
-\index=
-{"" "5763"
-void
-{"123456" "v2_123456"
-void
-{"a" "4999"
-{"bc" "4113"
-{"d" "2174"
-void
-void
-}
-void
-}
-{"def" "7249"
-void
-{"fgh" void
-{"i" "5851"
-void
-{"j" "3674"
-void
-void
-}
-}
-{"mno" void
-{"f" "1286"
-void
-{"g" "0053"
-void
-void
-}
-}
-{"xy" "2113"
-{"z" "4113"
-void
-void
-}
-void
-}
-}
-}
-}
-}
-}
-}
-\pairs=
+= test_1
+list:
 [
-{"" "5763"}
-{"123456" "v2_123456"}
-{"a" "4999"}
-{"abc" "4113"}
-{"abcd" "2174"}
-{"def" "7249"}
-{"fghi" "5851"}
-{"fghj" "3674"}
-{"mnof" "1286"}
-{"mnog" "0053"}
-{"xy" "2113"}
-{"xyz" "4113"}
+{"" "9972"
+  []
+}
+{"a" "6870"
+  []
+}
+{"bc" void
+  [
+  {"cc" "5233"
+    [
+    {"da" "1618"
+      []
+    }
+    {"xyz" "3364"
+      [
+      {"a" "4610"
+        [
+        {"bc" "3291"
+          []
+        }
+        ]
+      }
+      {"b" "2173"
+        []
+      }
+      ]
+    }
+    ]
+  }
+  {"da" "0724"
+    []
+  }
+  {"qr" "1889"
+    []
+  }
+  ]
+}
+{"d" "1974"
+  []
+}
 ]
-\index=
-{"" "5763"
-void
-{"123456" "v1_123456"
-void
-{"a" "4999"
-{"bc" "4113"
-{"d" "2174"
-void
-void
-}
-void
-}
-{"def" "7249"
-void
-{"fgh" void
-{"i" "5851"
-void
-{"j" "3674"
-void
-void
-}
-}
-{"mno" void
-{"f" "1285"
-void
-{"g" "0053"
-void
-void
-}
-}
-{"xy" "2113"
-{"z" "4113"
-void
-void
-}
-void
-}
-}
-}
-}
-}
-}
-}
-\pairs=
+pairs:
 [
-{"" "5763"}
-{"123456" "v1_123456"}
-{"a" "4999"}
-{"abc" "4113"}
-{"abcd" "2174"}
-{"def" "7249"}
-{"fghi" "5851"}
-{"fghj" "3674"}
-{"mnof" "1285"}
-{"mnog" "0053"}
-{"xy" "2113"}
-{"xyz" "4113"}
+{"" "9972"}
+{"a" "6870"}
+{"bccc" "5233"}
+{"bcccda" "1618"}
+{"bcccxyz" "3364"}
+{"bcccxyza" "4610"}
+{"bcccxyzabc" "3291"}
+{"bcccxyzb" "2173"}
+{"bcda" "0724"}
+{"bcqr" "1889"}
+{"d" "1974"}
 ]
-\index=
-{"a" "4998"
-{"bc" "4113"
-{"d" "2174"
-void
-void
-}
-void
-}
-void
-}
-\pairs=
-[
-{"a" "4998"}
-{"abc" "4113"}
-{"abcd" "2174"}
-]
-\index=
-{"a" "4998"
-{"bc" "4113"
-{"d" "2174"
-void
-void
-}
-void
-}
-void
-}
-\pairs=
-[
-{"a" "4998"}
-{"abc" "4113"}
-{"abcd" "2174"}
-]
-== 0
-\index=
-void
-\pairs=
+delete:
 []
-== 1
-\index=
-{"abc" "4113"
-void
-void
-}
-\pairs=
-[
-{"abc" "4113"}
-]
-== 2
-\index=
-{"ab" void
-{"c" "4113"
-void
-{"e" "1210"
-void
-void
-}
-}
-void
-}
-\pairs=
-[
-{"abc" "4113"}
-{"abe" "1210"}
-]
-== 3
-\index=
-{"a" "4999"
-{"b" void
-{"c" "4113"
-void
-{"e" "1210"
-void
-void
-}
-}
-void
-}
-void
-}
-\pairs=
-[
-{"a" "4999"}
-{"abc" "4113"}
-{"abe" "1210"}
-]
-== 4
-\index=
-{"ab" void
-{"c" "4113"
-void
-{"e" "1210"
-void
-void
-}
-}
-void
-}
-\pairs=
-[
-{"abc" "4113"}
-{"abe" "1210"}
-]
-== 5
-\index=
-{"abe" "1210"
-void
-void
-}
-\pairs=
-[
-{"abe" "1210"}
-]
-== 6
-\index=
-void
-\pairs=
-[]
-== 0
-\index=
-void
-\pairs=
-[]
-== 1
-\index=
-{"" "5763"
-void
-void
-}
-\pairs=
-[
-{"" "5763"}
-]
-== 2
-\index=
-{"" "5764"
-void
-void
-}
-\pairs=
-[
-{"" "5764"}
-]
-== 3
-\index=
-{"" "5765"
-void
-void
-}
-\pairs=
-[
-{"" "5765"}
-]
-== 4
-\index=
-void
-\pairs=
-[]
-\index=
-{"" "5763"
-void
-{"123456" "v2_123456"
-void
-{"a" "4999"
-{"bc" "4113"
-{"d" "2174"
-void
-void
-}
-void
-}
-{"def" "7249"
-void
-{"fgh" void
-{"i" "5851"
-void
-{"j" "3674"
-void
-void
-}
-}
-{"mno" void
-{"f" "1286"
-void
-{"g" "0053"
-void
-void
-}
-}
-{"xy" "2113"
-{"z" "4113"
-void
-void
-}
-void
-}
-}
-}
-}
-}
-}
-}
-\pairs=
-[
-{"" "5763"}
-{"123456" "v2_123456"}
-{"a" "4999"}
-{"abc" "4113"}
-{"abcd" "2174"}
-{"def" "7249"}
-{"fghi" "5851"}
-{"fghj" "3674"}
-{"mnof" "1286"}
-{"mnog" "0053"}
-{"xy" "2113"}
-{"xyz" "4113"}
-]
-get: {"" "5763"}
-get: {"abcxyz" void}
-get: {"abc" "4113"}
-get: {"." void}
-get: {"a" "4999"}
-get: {"ab" void}
-get: {"mno" void}
-get: {"mnof" "1286"}
-get: {"mnofx" void}
-get: {"1234" void}
-get: {"mnog" "0053"}
-get: {"mnOg" void}
-==
-get: {"" "5763"}
-get: {"123456" "v2_123456"}
-get: {"a" "4999"}
-get: {"abc" "4113"}
-get: {"abcd" "2174"}
-get: {"def" "7249"}
-get: {"fghi" "5851"}
-get: {"fghj" "3674"}
-get: {"mnof" "1286"}
-get: {"mnog" "0053"}
-get: {"xy" "2113"}
-get: {"xyz" "4113"}
-{"abc" "4113"
-void
-void
-}
-get: {"abc" "4113"}
-get: {"" void}
+= test_2
+length = 15
+GOOD
+length = 15
+GOOD
+= test_3
+length = 3
+GOOD
+length = 3
+GOOD
+= test_4
+length = 15
+GOOD
+length = 15
+GOOD
+= test_hash
+length = 1018
+GOOD
+steps 2345088 bytes 801248
 ~
 \err=
 ~

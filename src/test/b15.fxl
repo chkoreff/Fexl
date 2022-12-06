@@ -1,299 +1,407 @@
 # INDEX CONCEPT
+#
 # An index is a highly efficient structure for mapping string keys to arbitrary
 # values.  It uses the longest common prefix of keys to narrow the search
-# quickly and eliminate repeated initial key material.  To delete a key you map
-# it to a void value.
+# quickly and eliminate repeated initial key material.
 #
 # INDEX REPRESENTATION
-# An index value is either (void) or {key val child tail}.  The child is the
-# index of entries that start with key.  The tail is the index of entries
-# greater than key.  The index key and its tail key have no common prefix.
+#
+# An index is either [] or [{key val child}; tail].
+#
+# The key is a string.
+# The val, which may be void, is the arbitrary value associated with the key.
+# The child is the index of entries that start with key.
+# The tail is the index of entries greater than key.
+# The keys in an index share no common prefix.
 
-\mk_index=
-	(\key\val\child\next
-	\key=key
-	\val=val
-	is_defined val { key val child next };
-	is_defined child
-		(
-		child \c_key\c_val\c_child\c_next
-		is_defined c_next { key void child next };
-		# All child keys start with same suffix, so combine with upper key.
-		\new_key=(. key c_key)
-		{ new_key c_val c_child next }
-		);
-	next
-	)
+# (index_get key list) Return the value associated with key.
+\index_get=
+	(@\loop\new_key\list
+	list void \top\tail
+	top \old_key\old_val\child
 
-# (index_put index key val) Return a new index with key mapped to val.
-\index_put=
-	(@\index_put\index\new_key\new_val
-
-	is_undef index (mk_index new_key new_val void void);
-	index \old_key\old_val\child\next
+	eq new_key old_key old_val; # new_key and old_key are identical.
 
 	\len_common=(length_common new_key old_key)
-	\len_old_suffix=(- (length old_key) len_common)
-	\len_new_suffix=(- (length new_key) len_common)
-
-	eq len_new_suffix 0
-		(
-		eq len_old_suffix 0
-			# new_key and old_key are identical.
-			(mk_index new_key new_val child next);
-		eq len_common 0
-			# new_key is null and old_key is not.
-			(mk_index new_key new_val void index);
-
-		# new_key is a proper prefix of old_key.
-		\old_suffix=(slice old_key len_common len_old_suffix)
-		\child=(mk_index old_suffix old_val child void)
-		mk_index new_key new_val child next
-		);
-	eq len_common 0
+	eq 0 len_common
 		(
 		# new_key and old_key have no prefix in common.
-		lt new_key old_key (mk_index new_key new_val void index);
-		\next=(index_put next new_key new_val)
-		mk_index old_key old_val child next
+		lt new_key old_key void;
+		loop new_key tail
+		);
+
+	\len_new_suffix=(- (length new_key) len_common)
+	eq 0 len_new_suffix void; # new_key is a proper prefix of old_key
+	ne (length old_key) len_common void;
+
+	# old_key is a proper prefix of new_key.
+	\new_suffix=(slice new_key len_common len_new_suffix)
+	loop new_suffix child
+	)
+
+# (index_put key val list) Return a new index with key mapped to val.
+\index_put=
+	(@\loop\new_key\new_val\list
+
+	list [{new_key new_val []}]
+	\top\tail
+	top \old_key\old_val\child
+
+	eq new_key old_key
+		(
+		# new_key and old_key are identical.
+		[{old_key new_val child}; tail]
+		);
+
+	\len_common=(length_common new_key old_key)
+	eq 0 len_common
+		(
+		# new_key and old_key have no prefix in common.
+		lt new_key old_key [{new_key new_val []} top; tail];
+		\tail=(loop new_key new_val tail)
+		[top;tail]
+		);
+
+	\len_new_suffix=(- (length new_key) len_common)
+	\len_old_suffix=(- (length old_key) len_common)
+
+	eq 0 len_new_suffix
+		(
+		# new_key is a proper prefix of old_key
+		\old_suffix=(slice old_key len_common len_old_suffix)
+		[{new_key new_val [{old_suffix old_val child}]}; tail]
 		);
 
 	\prefix=(slice new_key 0 len_common)
 	\new_suffix=(slice new_key len_common len_new_suffix)
-	\child=(index_put child new_suffix new_val)
 
-	eq len_old_suffix 0
+	eq 0 len_old_suffix
+		(
 		# old_key is a proper prefix of new_key.
-		(mk_index prefix old_val child next);
-
-	# new_key and old_key share a common prefix.
-	\old_suffix=(slice old_key len_common len_old_suffix)
-	\child=(index_put child old_suffix old_val)
-	mk_index prefix void child next
+		\new_child=(loop new_suffix new_val child)
+		[{prefix old_val new_child}; tail]
+		)
+		(
+		# new_key and old_key share a common proper prefix.
+		\old_suffix=(slice old_key len_common len_old_suffix)
+		\new_child=(loop new_suffix new_val [{old_suffix old_val child}])
+		[{prefix void new_child}; tail]
+		)
 	)
 
-# (index_get index key) Return the value associated with the key.
-\index_get=
-	(@\index_get\index\new_key
-	\new_key=new_key
+# (index_del key list) Return a new index with key deleted.
+\index_del=
+	(@\loop\new_key\list
+	list [] \top\tail
+	top \old_key\old_val\child
 
-	is_undef index void;
-	index \old_key\old_val\child\next
+	eq new_key old_key
+		(
+		# new_key and old_key are identical.
+		is_null child tail;
+		[{old_key void child}; tail]
+		)
 
 	\len_common=(length_common new_key old_key)
-	\len_old_suffix=(- (length old_key) len_common)
-	\len_new_suffix=(- (length new_key) len_common)
-
-	eq len_new_suffix 0
-		(
-		eq len_old_suffix 0 old_val; # new_key and old_key are identical.
-		void
-		);
-	eq len_common 0
+	eq 0 len_common
 		(
 		# new_key and old_key have no prefix in common.
-		lt new_key old_key void;
-		index_get next new_key
+		lt new_key old_key [top;tail];
+		\tail=(loop new_key tail)
+		[top;tail]
 		);
-	eq len_old_suffix 0
-		(
-		# old_key is a proper prefix of new_key.
-		\new_suffix=(slice new_key len_common len_new_suffix)
-		index_get child new_suffix
-		);
-	void
+
+	\len_new_suffix=(- (length new_key) len_common)
+	eq 0 len_new_suffix [top;tail]; # new_key is a proper prefix of old_key
+	ne (length old_key) len_common [top;tail];
+
+	# old_key is a proper prefix of new_key.
+	\new_suffix=(slice new_key len_common len_new_suffix)
+	\new_child=(loop new_suffix child)
+	is_null new_child tail;
+
+	\prefix=(slice new_key 0 len_common)
+	[{prefix old_val new_child}; tail]
 	)
 
-# (index_put_pairs index pairs) Run through the list of {key val} pairs and put
-# them in the index.
-\index_put_pairs=(fold \index\pair pair; index_put index)
+# (index_put_pairs pairs list) Put all the {key val} pairs into the index.
+\index_put_pairs=
+	(@\loop\pairs\list
+	pairs list \pair\pairs
+	pair \key\val
+	\list=(index_put key val list)
+	loop pairs list
+	)
 
-# (index_pairs index) Return the list of {key val} pairs defined in the index.
+# (index_pairs list) Return the list of {key val} pairs defined in the index.
 \index_pairs=
 	(
-	(@\index_pairs\prefix\index
-	is_undef index [];
-	index \key\val\child\tail
-	\this_key=(. prefix key)
-	is_defined val (cons { this_key val }) ();
-	append (index_pairs this_key child);
-	index_pairs prefix tail
+	(@\loop\prefix\list
+	list [] \top\tail
+	top \key\val\child
+	\key=(. prefix key)
+	\pairs==(append (loop key child) (loop prefix tail))
+	is_defined val [{key val};pairs] pairs
 	)
 	""
 	)
 
-\show_index=
-	(@\show_index\index
-	is_undef index (say "void");
-	index \key\val\child\tail
-	put ["{"(fexl_quote key)" "] put_data val nl
-	show_index child
-	show_index tail
-	say "}"
-	)
-
-\test_index_put==
-(
-\try=
-	(\pairs
-	\index=(index_put_pairs void pairs)
-	\new_pairs=(index_pairs index)
-	say "\index="
-	show_index index
-	say "\pairs="
-	say_data new_pairs
-	)
-
-\try_both=
-	(\pairs
-	try pairs
-	try (reverse pairs)
-	)
-
-try_both
-[
-{"123456" "v1_123456"}
-{"" "5763"}
-{"a" "4999"}
-{"a" "4999"}
-{"abc" "4113"}
-{"mnog" "0053"}
-{"mnof" "1285"}
-{"123456" "v2_123456"}
-{"def" "7249"}
-{"abcd" "2174"}
-{"xyz" "4113"}
-{"mnof" "1286"}
-{"xy" "2113"}
-{"fghj" "3674"}
-{"fghi" "5851"}
-]
-
-try_both
-[
-{"abcd" "2174"}
-{"abc" "4113"}
-{"a" "4998"}
-]
-
-# Test putting void values (deletion).
-(
-\pairs=
-[
-{"abc" "4113"}
-{"abe" "1210"}
-{"a" "4999"}
-{"a" void}
-{"abc" void}
-{"abe" void}
-]
-each (range 0 (list_length pairs)) \n
-say ["== "n]
-try (first n pairs)
-)
-
-(
-\pairs=
-[
-{"" "5763"}
-{"" "5764"}
-{"" "5765"}
-{"" void}
-]
-each (range 0 (list_length pairs)) \n
-say ["== "n]
-try (first n pairs)
-)
-
-)
-
-\test_index_get==
-(
-\try=
-	(\index\key
-	\val=(index_get index key)
-	put "get: "put_data {key val} nl
+# Test index_get.
+\validate_pairs==
+	(\pairs\list
+	each pairs
+		(\pair
+		pair \key\val
+		\val2=(index_get key list)
+		eq val val2 ();
+		say ["BAD "(as_str key)" "(as_str val)" "(as_str val2)]
+		)
 	)
 
 \test_1==
-(
-\index=
-(index_put_pairs
-void
-[
-{"123456" "v1_123456"}
-{"" "5763"}
-{"a" "4999"}
-{"a" "4999"}
-{"abc" "4113"}
-{"mnog" "0053"}
-{"mnof" "1285"}
-{"123456" "v2_123456"}
-{"def" "7249"}
-{"abcd" "2174"}
-{"xyz" "4113"}
-{"mnof" "1286"}
-{"xy" "2113"}
-{"fghj" "3674"}
-{"fghi" "5851"}
-]
-)
+	(
+	say "= test_1"
 
-say "\index="
-show_index index
-say "\pairs="
-say_data (index_pairs index)
+	\list=
+	(
+	index_put "bcqr" "1889";
+	index_put "bcccda" "1618";
+	index_put "bccc" "5233";
+	index_put "bc" void;
+	index_put "bc" "9381";
+	index_put "bcda" "0724";
+	index_put "bccc" "6247";
+	index_put "bcccxyzb" "2173";
+	index_put "bcccxyza" "4610";
+	index_put "" "9972";
+	index_put "bcccxyzabc" "3291";
+	index_put "bcccxyza" "3291";
+	index_put "bcccxyz" "3364";
+	index_put "" "3972";
+	index_put "d" "1974";
+	index_put "a" "6870";
+	index_put "bcccxyz" "4954";
+	[]
+	)
 
-\try=(try index)
+	(
+	say "list:"
+	say_data list
 
-try ""
-try "abcxyz"
-try "abc"
-try "."
-try "a"
-try "ab"
-try "mno"
-try "mnof"
-try "mnofx"
-try "1234"
-try "mnog"
-try "mnOg"
+	say "pairs:"
+	\pairs=(index_pairs list)
+	say_data pairs
 
-say "=="
-try ""
-try "123456"
-try "a"
-try "abc"
-try "abcd"
-try "def"
-try "fghi"
-try "fghj"
-try "mnof"
-try "mnog"
-try "xy"
-try "xyz"
-)
+	validate_pairs pairs list
+
+	# Try some keys not in the index.
+	\try==
+		(\key
+		\val=(index_get key list)
+		is_undef val ();
+		say ["BAD "(as_str key)]
+		)
+	try "bx"
+	try "bcc"
+	try "bca"
+	try "bcccz"
+	)
+
+	(
+	# Test delete.
+	say "delete:"
+	say_data
+	(
+	index_del "d";
+	index_del "abcdefg";
+	index_del "";
+	index_del "a";
+	index_del "abcdefh";
+	index_del "bcccda";
+	index_del "bcqr";
+	index_del "bcccxyzzzz";
+	index_del "bcccxyzabc";
+	index_del "bcccxyz";
+	index_del "bcda";
+	index_del "bcccxyzb";
+	index_del "bcccxyza";
+	index_del "bcc";
+	index_del "bccc";
+	index_del "b";
+	index_del "bc";
+	index_del "c";
+	index_del "x";
+	index_del "a";
+	# Add a couple keys first to make it interesting.
+	index_put "abcdefg" "6674";
+	index_put "bc" "9941";
+	list
+	)
+	)
+	)
+
+# Sort unique pairs, keeping the latest one.
+\sort_pairs==(combine_keys (\x\y y))
+
+# Compare lists of string pairs.
+\eq_pairs==
+	(@\loop\xs\ys
+	xs (ys T \_\_ F) \x\xs
+	ys F \y\ys
+
+	x \kx\vx
+	y \ky\vy
+
+	ne kx ky F;
+	ne vx vy F;
+	loop xs ys
+	)
+
+\test_pairs==
+	(\pairs
+
+	say ["length = "(list_length pairs)]
+	\list=(index_put_pairs pairs [])
+
+	\list_pairs=(index_pairs list)
+
+	validate_pairs list_pairs list
+
+	\check_pairs=(sort_pairs pairs)
+	\ok=(eq_pairs list_pairs check_pairs)
+	say (ok "GOOD" "BAD")
+	)
+
+\test_pairs_both==
+	(\pairs
+	test_pairs pairs
+	\pairs=(reverse pairs)
+	test_pairs pairs
+	)
 
 \test_2==
-(
-\index=
-(
-index_put_pairs
-void
-[
-{"abc" "4113"}
-]
-)
-\try=(try index)
+	(
+	say "= test_2"
+	test_pairs_both
+	[
+	{"123456" "v1_123456"}
+	{"" "5763"}
+	{"a" "4999"}
+	{"a" "4999"}
+	{"abc" "4113"}
+	{"mnog" "0053"}
+	{"mnof" "1285"}
+	{"123456" "v2_123456"}
+	{"def" "7249"}
+	{"abcd" "2174"}
+	{"xyz" "4113"}
+	{"mnof" "1286"}
+	{"xy" "2113"}
+	{"fghj" "3674"}
+	{"fghi" "5851"}
+	]
+	)
 
-show_index index
-try "abc"
-try ""
-)
+\test_3==
+	(
+	say "= test_3"
+	test_pairs_both
+	[
+	{"abcd" "2174"}
+	{"abc" "4113"}
+	{"a" "4998"}
+	]
+	)
 
+\test_4==
+	(
+	say "= test_4"
+	test_pairs_both
+	[
+	{"123456" "v1_123456"}
+	{"" "5763"}
+	{"a" "4999"}
+	{"a" "4999"}
+	{"abc" "4113"}
+	{"mnog" "0053"}
+	{"mnof" "1285"}
+	{"123456" "v2_123456"}
+	{"def" "7249"}
+	{"abcd" "2174"}
+	{"xyz" "4113"}
+	{"mnof" "1286"}
+	{"xy" "2113"}
+	{"fghj" "3674"}
+	{"fghi" "5851"}
+	]
+	)
+
+# Generate a list of {key val} pairs with an iterated seed.
+\gen_pairs==
+	(\f @\loop\n\seed
+	lt n 1 [];
+	f seed \key\val\seed
+	\n=(- n 1)
+	\tail=(loop n seed)
+	[{key val}; tail]
+	)
+
+\test_hash==
+	(
+	say "= test_hash"
+
+	\pairs=
+		(
+		gen_pairs
+		(\seed
+		\seed=(sha256 seed)
+		\q_seed=(unpack seed)
+		\key=(slice q_seed 0 16)
+		\val=(slice q_seed 16 4)
+		{key val seed}
+		)
+		1000
+		"start"
+		)
+
+	# Add a few more keys to test override.
+	\pairs==
+	[
+	{"abc" "1027"}
+	{"abc" "2866"}
+
+	{"bcccxyz" "4954"}
+	{"a" "6870"}
+	{"d" "1974"}
+	{"" "3972"}
+
+	{"bcccxyz" "3364"}
+	{"bcccxyza" "3291"}
+	{"bcccxyzabc" "3291"}
+	{"" "9972"}
+	{"bcccxyza" "4610"}
+	{"bcccxyzb" "2173"}
+
+	{"bccc" "6247"}
+	{"bcda" "0724"}
+
+	{"bc" "9381"}
+	{"bccc" "5233"}
+	{"bcccda" "1618"}
+	{"bcqr" "1889"}
+
+	;pairs
+	]
+
+	#\pairs=(append pairs pairs)
+
+	test_pairs pairs
+	)
+
+#trace_elapsed;
+show_benchmark;
 test_1
 test_2
-)
-
-test_index_put
-test_index_get
+test_3
+test_4
+test_hash
