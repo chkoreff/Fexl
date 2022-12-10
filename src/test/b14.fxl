@@ -30,6 +30,7 @@
 		]
 	run_program cmd "" \out\err\status
 	put out
+	put err
 	)
 
 \demo_seek=

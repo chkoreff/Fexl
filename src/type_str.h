@@ -18,14 +18,6 @@ extern value type_dirname(value f);
 extern value type_basename(value f);
 extern value type_length_common(value f);
 extern value type_is_str(value f);
-
-struct collect
-	{
-	unsigned long len;
-	value items;
-	unsigned long size;
-	const char *const *argv;
-	};
-
-extern void beg_collect(value x, struct collect *collect, const char *msg);
-extern void end_collect(struct collect *collect);
+extern value op_argv(value f,
+	value op(const char *const *argv),
+	const char *err);

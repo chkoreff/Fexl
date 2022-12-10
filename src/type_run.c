@@ -509,29 +509,21 @@ value type_connect(value f)
 	}
 	}
 
+static value do_exec(const char *const *argv)
+	{
+	fflush(stdout); /* Flush any existing output. */
+
+	/* Call execv with the argument list. */
+	if (execv(argv[0], (char *const *)argv) == -1)
+		die("exec failed");
+	return hold(QI);
+	}
+
 /* (exec argv) Call execv with the given argument list.  The first argument is
 the full path of the executable program.  This call does not return. */
 value type_exec(value f)
 	{
-	if (!f->L) return 0;
-	{
-	struct collect collect;
-	beg_collect(f->R,&collect,"bad arg to exec");
-
-	fflush(stdout); /* Flush any existing output. */
-
-	{
-	/* Call execv with the argument list. */
-	char *const *argv = (void *)collect.argv;
-	if (execv(argv[0],argv) == -1)
-		die("exec failed");
-	}
-
-	/* Although execv doesn't return, here is the code to clean up memory. */
-	end_collect(&collect);
-
-	return hold(QI);
-	}
+	return op_argv(f,do_exec,"bad arg to exec");
 	}
 
 /* (receive_keystrokes fn)
