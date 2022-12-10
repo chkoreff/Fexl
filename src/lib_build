@@ -102,6 +102,14 @@ make_PIC()
 	compile $name "-fPIC"
 	}
 
+# Include a name in the list of objects to be linked.
+need()
+	{
+	local name="$1"
+	local file_o=../obj/$name.o
+	objects="$objects $file_o"
+	}
+
 # Make a library.  I use -fPIC (Position Independent Code) so the object can
 # be linked into a shared library.
 make_lib()

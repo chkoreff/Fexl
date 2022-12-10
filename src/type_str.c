@@ -302,50 +302,39 @@ value type_is_str(value f)
 	return op_is_type(f,type_str);
 	}
 
+static unsigned long list_length(value p)
+	{
+	unsigned long len = 0;
+	while (p->T == 0)
+		{
+		len++;
+		p = p->R;
+		}
+	return len;
+	}
+
 /* Collect a vector of raw (char *) strings from a list and pass it to the op
-function.  Die with err if any item is not a string. */
-value op_argv(value f, value op(const char *const *argv), const char *err)
+function.  Any item that is not a string ends the list. */
+value op_argv(value f, value op(const char *const *argv))
 	{
 	if (!f->L) return 0;
 	{
-	const char **argv;
-	unsigned long size;
-	value items = 0;
-	unsigned long len = 0;
-
-	/* Collect items into a simple list. */
-	{
-	value list = f->R;
-	value *p = &items;
-	value item;
-	while ((item = iterate(&list)) != 0)
-		{
-		*p = V(0,arg(item),0);
-		p = &((*p)->R);
-		len++;
-		}
-	*p = hold(Qnull);
-	}
-
-	/* Collect strings from simple list into a vector. */
-	{
+	value items = hold(expand(f));
+	unsigned long len = list_length(items);
+	unsigned long size = (len+1) * sizeof(char *);
+	const char **argv = new_memory(size);
 	value p = items;
 	unsigned long pos = 0;
 
-	size = (len+1) * sizeof(char *);
-	argv = new_memory(size);
-
 	while (p->T == 0)
 		{
-		value item = p->L;
+		value item = (p->L = eval(p->L));
 		if (item->T != type_str)
-			die(err);
-
+			break;
 		argv[pos++] = str_data(item);
 		p = p->R;
 		}
 	argv[pos] = 0; /* ending sentinel */
-	}
 
 	f = op(argv);
 

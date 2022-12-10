@@ -1,9 +1,17 @@
 #!/bin/sh
 . ./lib_build
 
-# Build test library.
+# Build test code.
 make_PIC output
 make_PIC output_str
+objects=""
+
+need output
+make_PIC test
+make_lib test
+
+need output
+need output_str
 make_PIC show
 make_lib show
 

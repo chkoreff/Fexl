@@ -1324,5 +1324,35 @@ say (is_void (parse 33 ""))
 # Test that {} is equivalent to I.
 say ({} "x")
 
+# Test expansion of tuple items.
+(
+\x=={"a"; append ["b" "c"] ["d"]}
+x \a\b\c\d
+put "a = " put (as_str a) nl
+put "b = " put (as_str b) nl
+put "c = " put (as_str c) nl
+put "d = " put (as_str d) nl
+)
+
+# Test op_argv.
+(
+\name=(path_under dir_base "lib/test.so")
+\lib=(dlopen name)
+dlsym lib "type_test_argv" \test_argv
+
+test_argv []
+test_argv ["a" "b"]
+
+# This includes a non-string (the number 3), which clips the list.
+test_argv
+[
+(I "a") "b"
+;
+append ["c" "d"];
+append (map (. "x") ["e" "f"]);
+["g" (I "h") 3 "i" "j"]
+]
+)
+
 \\
 Extra stuff not parsed.

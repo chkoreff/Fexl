@@ -523,7 +523,7 @@ static value do_exec(const char *const *argv)
 the full path of the executable program.  This call does not return. */
 value type_exec(value f)
 	{
-	return op_argv(f,do_exec,"bad arg to exec");
+	return op_argv(f,do_exec);
 	}
 
 /* (receive_keystrokes fn)

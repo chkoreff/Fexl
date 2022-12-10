@@ -9,15 +9,19 @@ value Qtuple;
 
 value type_tuple(value f)
 	{
-	if (!f->L->L) return 0;
+	if (!f->L->L)
+		{
+		expand(f);
+		return 0;
+		}
 	{
 	value exp = hold(f->R);
 	value args = f->L->R;
-	value item;
-
-	while ((item = iterate(&args)) != 0)
-		exp = AV(eval(exp),hold(item));
-
+	while (args->T == 0)
+		{
+		exp = AV(eval(exp),hold(args->L));
+		args = args->R;
+		}
 	return exp;
 	}
 	}
@@ -44,7 +48,7 @@ value type_tuple_to_list(value f)
 value type_list_to_tuple(value f)
 	{
 	if (!f->L) return 0;
-	return AV(hold(Qtuple),hold(f->R));
+	return AV(hold(Qtuple),hold(expand(f)));
 	}
 
 value pair(value x, value y)

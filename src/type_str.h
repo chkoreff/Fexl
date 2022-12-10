@@ -18,6 +18,4 @@ extern value type_dirname(value f);
 extern value type_basename(value f);
 extern value type_length_common(value f);
 extern value type_is_str(value f);
-extern value op_argv(value f,
-	value op(const char *const *argv),
-	const char *err);
+extern value op_argv(value f, value op(const char *const *argv));

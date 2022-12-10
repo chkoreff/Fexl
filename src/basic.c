@@ -189,39 +189,48 @@ value type_is_good(value f) { return op_predicate(f,is_good); }
 value type_is_bool(value f) { return op_predicate(f,is_bool); }
 value type_is_list(value f) { return op_predicate(f,is_list); }
 
-/* Return the next item from a list, advancing to the tail of the list. */
-value iterate(value *p)
+/* Expand the list data f->R inline. */
+value expand(value f)
 	{
-	value x = *p;
-	value item;
-	value tail;
+	value p = f;
+	while (1)
+		{
+		value x = p->R;
+		if (x->T == 0)
+			{
+			p = x;
+			continue;
+			}
 
-	if (x->T == 0)
-		{
-		item = x->L;
-		tail = x->R;
-		}
-	else
-		{
-		x = arg(x);
-		if (x->T == type_list && !x->L->L)
+		x = (p->R = eval(x));
+
+		if (x->T == type_cons && x->L && x->L->L && !x->L->L->L)
 			{
-			item = x->R->L;
-			tail = x->R->R;
+			/* Change x inline from type_cons to type_list. */
+			value data = V(0,hold(x->L->R),arg(x->R));
+			drop(x->L);
+			drop(x->R);
+			x->T = type_list;
+			x->L = hold(Qlist);
+			x->R = hold(data);
+			drop(x);
+			p->R = data;
 			}
-		else if (x->T == type_cons && x->L && x->L->L && !x->L->L->L)
+		else if (x->T == type_list && !x->L->L)
 			{
-			item = x->L->R;
-			tail = x->R;
+			value data = hold(x->R);
+			drop(x);
+			p->R = data;
 			}
+		else if (x->T == type_null && !x->L)
+			break;
 		else
 			{
-			item = 0;
-			tail = 0;
+			/* Replace non-list tail with null. */
+			drop(x);
+			p->R = hold(Qnull);
+			break;
 			}
-		drop(x);
 		}
-
-	*p = tail;
-	return item;
+	return f->R;
 	}
