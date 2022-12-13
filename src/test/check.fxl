@@ -66,6 +66,7 @@
 "lib"
 "stream"
 "resolve"
+"record"
 ]
 
 # Gather any individually specified tests.

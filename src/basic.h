@@ -30,4 +30,5 @@ extern value type_is_void(value f);
 extern value type_is_good(value f);
 extern value type_is_bool(value f);
 extern value type_is_list(value f);
+extern value type_chain(value f);
 extern value expand(value y);

@@ -52,6 +52,7 @@ make type_num
 make type_output
 make type_parse
 make type_rand
+make type_record
 make type_run
 make type_signal
 make type_standard

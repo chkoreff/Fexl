@@ -21,6 +21,7 @@
 #include <type_output.h>
 #include <type_parse.h>
 #include <type_rand.h>
+#include <type_record.h>
 #include <type_run.h>
 #include <type_signal.h>
 #include <type_standard.h>
@@ -92,6 +93,7 @@ static value standard(const char *name)
 	if (match("is_good")) return Q(type_is_good);
 	if (match("is_bool")) return Q(type_is_bool);
 	if (match("is_list")) return Q(type_is_list);
+	if (match("chain")) return Q(type_chain);
 
 	if (match(".")) return Q(type_concat);
 	if (match("length")) return Q(type_length);
@@ -214,6 +216,12 @@ static value standard(const char *name)
 	if (match("unpack")) return Q(type_unpack);
 	if (match("pack")) return Q(type_pack);
 
+	/* record */
+	if (match("empty")) return hold(Qempty);
+	if (match("set")) return Q(type_set);
+	if (match("record_count")) return Q(type_record_count);
+	if (match("record_item")) return Q(type_record_item);
+
 	/* crypto functions */
 	if (match("random_bytes")) return Q(type_random_bytes);
 	if (match("random_nonce")) return Q(type_random_nonce);
@@ -302,6 +310,9 @@ static void beg_const(void)
 	/* type_tuple */
 	Qtuple = Q(type_tuple);
 
+	/* type_record */
+	Qempty = record_empty();
+
 	/* type_signal */
 	init_signal();
 	}
@@ -337,6 +348,9 @@ static void end_const(void)
 
 	/* type_tuple */
 	drop(Qtuple);
+
+	/* type_record */
+	drop(Qempty);
 
 	close_random();
 	}

@@ -18,6 +18,7 @@
 #include <type_output.h>
 #include <type_parse.h>
 #include <type_rand.h>
+#include <type_record.h>
 #include <type_run.h>
 #include <type_standard.h>
 #include <type_str.h>
@@ -174,6 +175,8 @@ static void put_type(type t)
 	else if (t == type_split_obj) put("split_obj");
 	else if (t == type_fetch) put("fetch");
 
+	else if (t == type_record) put("record");
+
 	else put_ch('?');
 	}
 
@@ -219,6 +222,21 @@ static void show_form(struct form *form)
 	limit_show(form->exp);
 	}
 
+static void show_record(struct record *x)
+	{
+	unsigned long i;
+	for (i = 0; i < x->count; i++)
+		{
+		struct item *item = &x->item[i];
+		put_ch('[');
+		limit_show(item->key);
+		put_ch(' ');
+		limit_show(item->val);
+		put_ch(']');
+		put_ch(' ');
+		}
+	}
+
 static void show_atom(value f)
 	{
 	if (f->T == type_num)
@@ -233,6 +251,8 @@ static void show_atom(value f)
 		put_ulong(fileno(get_fh(f)));
 	else if (f->T == type_form)
 		show_form((struct form *)f->R);
+	else if (f->T == type_record)
+		show_record(get_record(f));
 	else
 		put_ch('?');
 	}

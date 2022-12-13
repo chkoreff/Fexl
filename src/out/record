@@ -1,0 +1,124 @@
+\out=
+~
+BEG
+= test_1
+count 1
+a = void
+!b = 2
+c = void
+d = void
+e = void
+
+= test_2
+count 1
+a = void
+b = 222
+c = void
+d = void
+e = void
+
+= test_3
+count 1
+a = void
+b = 22
+c = void
+d = void
+e = void
+
+= test_4
+count 4
+a = 1
+b = 2
+c = 33
+d = 44
+e = void
+
+= test_5
+count 5
+a = 1
+b = 2
+c = 33
+d = 44
+e = 5
+
+= test_6
+count 5
+a = 1
+b = 2
+c = 33
+d = 44
+e = 5
+
+= test_7
+obj_3043:
+count 3
+a = void
+b = 2
+c = 3
+d = 44
+e = void
+
+obj_8237:
+count 2
+a = void
+b = void
+c = void
+d = 44
+e = 5
+
+obj_7892:
+count 5
+a = 1
+b = 2
+c = 33
+d = 44
+e = 5
+
+= test_8
+count void
+a = 1
+b = 2
+c = 3
+d = void
+e = void
+
+steps 476 bytes 4608
+= test_9
+0
+void
+count 4
+a = 1
+b = void
+c = 33
+d = 44
+e = 5
+
+at "x" = void
+at void = void
+at -1 = {"a" 1}
+at 2.6 = {"d" 44}
+at 99 = void
+at 0 = {"a" 1}
+at 1 = {"c" 33}
+at 2 = {"d" 44}
+at 3 = {"e" 5}
+at 4 = void
+[
+{"a" 1}
+{"c" 33}
+{"d" 44}
+{"e" 5}
+]
+[
+{"a" 1}
+{"c" 33}
+{"d" 44}
+{"e" 5}
+]
+steps 3729 bytes 8384
+END
+~
+\err=
+~
+~
+\status=0

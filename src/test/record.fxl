@@ -1,0 +1,235 @@
+#
+\try_keys==
+	(
+	\keys==["a" "b" "c" "d" "e"]
+	\obj
+	say ["count "(as_str; record_count obj)]
+	each keys
+		(\key
+		\v=(obj key)
+		say [key" = "(as_str v)]
+		)
+	nl
+	)
+
+\test_1==
+	(
+	say "= test_1"
+	\obj=
+		(
+		set "b" (put "!" 2);
+		empty
+		)
+
+	try_keys obj
+	)
+
+\test_2==
+	(
+	say "= test_2"
+	\obj=
+		(
+		# Modified inline
+		set "b" 222;
+		set "b" 22;
+		set "b" (put "!" 2);
+		empty
+		)
+
+	try_keys obj
+	)
+
+\test_3==
+	(
+	say "= test_3"
+
+	\obj=empty
+	\obj=(set "b" (put "!" 2) obj)
+	\obj=(set "b" 22 obj)
+
+	try_keys obj
+	)
+
+\test_4==
+	(
+	say "= test_4"
+
+	\obj=empty
+	\obj=(set "d" 4 obj)
+	\obj=(set "d" 44 obj)
+	\obj=(set "b" 2 obj)
+	\obj=(set "c" 3 obj)
+	\obj=(set "c" 33 obj)
+	\obj=(set "a" 1 obj)
+
+	try_keys obj
+	)
+
+\test_5==
+	(
+	say "= test_5"
+
+	\obj=empty
+	\obj=(set "d" 4 obj)
+	\obj=(set "d" 44 obj)
+	\obj=(set "b" 2 obj)
+	\obj=(set "c" 3 obj)
+	\obj=(set "c" 33 obj)
+	\obj=(set "a" 11 obj)
+	\obj=(set "a" 1 obj)
+	\obj=(set "e" 5 obj)
+
+	try_keys obj
+	)
+
+\test_6==
+	(
+	say "= test_6"
+
+	\obj=
+	(
+	set "e" 5;
+	set "a" 1;
+	set "a" 11;
+	set "c" 33;
+	set "c" 3;
+	set "b" 2;
+	set "d" 44;
+	set "d" 4;
+	empty
+	)
+
+	try_keys obj
+	)
+
+\test_7==
+	(
+	say "= test_7"
+
+	\obj_2810=
+		(
+		set "d" 44;
+		set "d" 4;
+		empty
+		)
+
+	\obj_3043=
+		(
+		set "c" 3;
+		set "b" 2;
+		obj_2810
+		)
+
+	\obj_7892=
+		(
+		\obj=(set "c" 33 obj_3043)
+		\obj=(set "a" 11 obj)
+		set "e" 5;
+		set "a" 1;
+		obj
+		)
+
+	\obj_8237=
+		(
+		set "e" 5;
+		I obj_2810
+		)
+
+	(
+	say "obj_3043:"
+	try_keys obj_3043
+	)
+
+	(
+	say "obj_8237:"
+	try_keys obj_8237
+	)
+
+	(
+	say "obj_7892:"
+	try_keys obj_7892
+	)
+	)
+
+# Test chain function
+\test_8==
+	(
+	say "= test_8"
+
+	\f1=
+		(
+		set "a" 1;
+		set "b" 2;
+		empty
+		)
+
+	\f2=
+		(
+		set "c" 3;
+		empty
+		)
+
+	\f=(chain f1 f2)
+
+	show_benchmark;
+	try_keys f
+	)
+
+# Return the lazy list of pairs in a record.
+\record_pairs=
+	(\obj
+	\count=(record_count obj)
+	(@\loop\pos
+	ge pos count [];
+	\item=(record_item obj pos)
+	\pos=(+ 1 pos)
+	[item;\= loop pos]
+	)
+	0
+	)
+
+\test_9==
+	(
+	say "= test_9"
+
+	say (as_str; record_count empty)
+	say (as_str; record_count void)
+
+	\obj=
+	(
+	set "e" 5;
+	set "a" 1;
+	set "a" 11;
+	set "c" 33;
+	set "c" 3;
+	set "d" 44;
+	set "d" 4;
+	empty
+	)
+
+	try_keys obj
+
+	show_benchmark;
+
+	each ["x" void -1 2.6 99; range 0 (record_count obj)]
+		(\pos
+		\item=(record_item obj pos)
+		say ["at "(as_str pos)" = "(as_str item)]
+		)
+
+	\pairs=(record_pairs obj)
+	say_data pairs
+	say_data pairs
+	)
+
+say "BEG"
+test_1
+test_2
+test_3
+test_4
+test_5
+test_6
+test_7
+test_8
+test_9
+say "END"

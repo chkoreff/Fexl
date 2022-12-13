@@ -189,6 +189,22 @@ value type_is_good(value f) { return op_predicate(f,is_good); }
 value type_is_bool(value f) { return op_predicate(f,is_bool); }
 value type_is_list(value f) { return op_predicate(f,is_list); }
 
+/* \chain==(\a\b\x \v=(a x) is_defined v v (b x)) */
+value type_chain(value f)
+	{
+	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	{
+	value x = arg(f->R);
+	value v = eval(AV(arg(f->L->L->R),x));
+
+	if (v->T != type_void)
+		return v;
+
+	drop(v);
+	return eval(AV(arg(f->L->R),hold(x)));
+	}
+	}
+
 /* Expand the list data f->R inline. */
 value expand(value f)
 	{
