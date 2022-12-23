@@ -222,6 +222,23 @@
 	say_data pairs
 	)
 
+\test_10==
+	(
+	say "= test_10"
+	# Test former leak with inline update.
+	(
+	\z1=(set "a" 1 empty)
+	\z2==(I z1)
+	\z3=(set "a" z2 z2)
+	)
+	# Test former leak with inline insert.
+	(
+	\z1=(set "a" 1 empty)
+	\z2==(I z1)
+	\z3=(set "b" z2 z2)
+	)
+	)
+
 say "BEG"
 test_1
 test_2
@@ -232,4 +249,5 @@ test_6
 test_7
 test_8
 test_9
+test_10
 say "END"

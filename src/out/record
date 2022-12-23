@@ -116,6 +116,7 @@ at 4 = void
 {"e" 5}
 ]
 steps 3729 bytes 8384
+= test_10
 END
 ~
 \err=
