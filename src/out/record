@@ -2,15 +2,15 @@
 ~
 BEG
 = test_1
-count 1
+!count 1
 a = void
-!b = 2
+b = 2
 c = void
 d = void
 e = void
 
 = test_2
-count 1
+!count 1
 a = void
 b = 222
 c = void
@@ -18,7 +18,7 @@ d = void
 e = void
 
 = test_3
-count 1
+!count 1
 a = void
 b = 22
 c = void

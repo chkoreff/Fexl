@@ -15,9 +15,9 @@ struct record *get_record(value x)
 	return (struct record *)x->R;
 	}
 
-static unsigned long record_size(unsigned long count)
+static unsigned long record_size(unsigned long len)
 	{
-	return sizeof(struct record) + count*sizeof(struct item);
+	return sizeof(struct record) + len*sizeof(struct item);
 	}
 
 static void record_free(struct record *rec)
@@ -30,7 +30,7 @@ static void record_free(struct record *rec)
 		drop(item->key);
 		drop(item->val);
 		}
-	free_memory(rec, record_size(rec->count));
+	free_memory(rec, record_size(rec->len));
 	}
 
 /* LATER 20221213 Perhaps use binary search. */
@@ -70,11 +70,42 @@ static value Qrecord(struct record *rec)
 	return V(type_record,&atom,(value)rec);
 	}
 
-static struct record *new_record(unsigned long count)
+static struct record *new_record(unsigned long count, unsigned long extra)
 	{
-	struct record *rec = new_memory(record_size(count));
+	unsigned long len = count + extra;
+	struct record *rec = new_memory(record_size(len));
 	rec->count = count;
+	rec->len = len;
 	return rec;
+	}
+
+static struct record *new_record_bump(unsigned long count)
+	{
+	unsigned long extra = count >> 1;
+	const unsigned long min = 5;
+	if (extra < min) extra = min;
+	return new_record(count,extra);
+	}
+
+static void insert_inline(struct record *old_rec, unsigned long pos,
+	value x, value y)
+	{
+	unsigned long i;
+	for (i = old_rec->count; i > pos; i--)
+		{
+		struct item *old_item = &old_rec->item[i-1];
+		struct item *new_item = &old_rec->item[i];
+
+		new_item->key = old_item->key;
+		new_item->val = old_item->val;
+		}
+	{
+	struct item *new_item = &old_rec->item[pos];
+	new_item->key = hold(x);
+	new_item->val = hold(y);
+	}
+
+	old_rec->count++;
 	}
 
 static void copy(struct item *old_vec, struct item *new_vec, unsigned long n)
@@ -89,10 +120,10 @@ static void copy(struct item *old_vec, struct item *new_vec, unsigned long n)
 		}
 	}
 
-static value insert(struct record *old_rec, unsigned long pos,
+static value insert_copy(struct record *old_rec, unsigned long pos,
 	value x, value y)
 	{
-	struct record *new_rec = new_record(old_rec->count+1);
+	struct record *new_rec = new_record_bump(old_rec->count+1);
 
 	copy(old_rec->item, new_rec->item, pos);
 	{
@@ -105,9 +136,9 @@ static value insert(struct record *old_rec, unsigned long pos,
 	return Qrecord(new_rec);
 	}
 
-static value update(struct record *old_rec, unsigned long pos, value y)
+static value update_copy(struct record *old_rec, unsigned long pos, value y)
 	{
-	struct record *new_rec = new_record(old_rec->count);
+	struct record *new_rec = new_record(old_rec->count,0);
 
 	copy(old_rec->item, new_rec->item, pos);
 	{
@@ -138,15 +169,33 @@ static value set(value x, value y, value z)
 		}
 
 	if (cmp == 0)
-		return update(old_rec,pos,y);
+		{
+		if (z->N <= 2)
+			{
+			/* Update inline */
+			drop(item->val);
+			item->val = hold(y);
+			return hold(z);
+			}
+		else
+			return update_copy(old_rec,pos,y);
+		}
 	else
-		return insert(old_rec,pos,x,y);
+		{
+		if (z->N <= 2 && old_rec->count < old_rec->len)
+			{
+			insert_inline(old_rec,pos,x,y);
+			return hold(z);
+			}
+		else
+			return insert_copy(old_rec,pos,x,y);
+		}
 	}
 
 /* Return an empty record. */
 value record_empty(void)
 	{
-	return Qrecord(new_record(0));
+	return Qrecord(new_record_bump(0));
 	}
 
 /* (set key val obj) Set key to val in record obj, returning a record like obj
@@ -159,10 +208,13 @@ value type_set(value f)
 	value x = arg(f->L->L->R);
 	if (x->T == type_str)
 		{
-		value y = f->L->R;
 		value z = arg(f->R);
 		if (z->T == type_record)
+			{
+			value y = arg(f->L->R);
 			f = set(x,y,z);
+			drop(y);
+			}
 		else
 			f = hold(Qvoid);
 		drop(z);

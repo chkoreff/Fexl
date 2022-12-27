@@ -7,6 +7,7 @@ struct item
 struct record
 	{
 	unsigned long count;
+	unsigned long len;
 	struct item item[0];
 	};
 
