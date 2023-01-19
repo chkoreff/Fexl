@@ -2,7 +2,7 @@
 #
 # An index is a highly efficient structure for mapping string keys to arbitrary
 # values.  It uses the longest common prefix of keys to narrow the search
-# quickly and eliminate repeated initial key material.
+# quickly.
 #
 # INDEX REPRESENTATION
 #
@@ -12,124 +12,108 @@
 # The val, which may be void, is the arbitrary value associated with the key.
 # The child is the index of entries that start with key.
 # The tail is the index of entries greater than key.
-# The keys in an index share no common prefix.
 
 # (index_get key index)
 # Return the value associated with key, or void if none.
 \index_get=
-	(@\loop\new_key\index
-	index void \top\tail
-	top \old_key\old_val\child
-
-	eq new_key old_key old_val; # new_key and old_key are identical.
-
-	\len_common=(length_common new_key old_key)
-	eq 0 len_common
+	(\new_key
+	(@\loop\pos\index
+	index void \row\tail
+	row \old_key\val\child
+	compare_at pos new_key old_key
+		void
 		(
-		# new_key and old_key have no prefix in common.
-		lt new_key old_key void;
-		loop new_key tail
-		);
-
-	\len_new_suffix=(- (length new_key) len_common)
-	eq 0 len_new_suffix void; # new_key is a proper prefix of old_key
-	ne (length old_key) len_common void;
-
-	# old_key is a proper prefix of new_key.
-	\new_suffix=(slice new_key len_common len_new_suffix)
-	loop new_suffix child
+		\len_common=(length_common new_key old_key)
+		ne (length old_key) len_common void;
+		eq (length new_key) len_common val;
+		loop len_common child
+		)
+		(loop pos tail)
+	)
+	0
 	)
 
 # (index_put key val index)
 # Return a new index with key mapped to val.
 \index_put=
-	(@\loop\new_key\new_val\index
-
+	(\new_key\new_val
+	(@\loop\pos\index
 	index [{new_key new_val []}]
-	\top\tail
-	top \old_key\old_val\child
-
-	eq new_key old_key
+	\row\tail
+	row \old_key\old_val\child
+	compare_at pos new_key old_key
+		[{new_key new_val []};index]
 		(
-		# new_key and old_key are identical.
-		[{old_key new_val child}; tail]
-		);
-
-	\len_common=(length_common new_key old_key)
-	eq 0 len_common
-		(
-		# new_key and old_key have no prefix in common.
-		lt new_key old_key [{new_key new_val []} top; tail];
-		\tail=(loop new_key new_val tail)
-		[top;tail]
-		);
-
-	\len_new_suffix=(- (length new_key) len_common)
-	\len_old_suffix=(- (length old_key) len_common)
-
-	eq 0 len_new_suffix
-		(
-		# new_key is a proper prefix of old_key
-		\old_suffix=(slice old_key len_common len_old_suffix)
-		[{new_key new_val [{old_suffix old_val child}]}; tail]
-		);
-
-	\prefix=(slice new_key 0 len_common)
-	\new_suffix=(slice new_key len_common len_new_suffix)
-
-	eq 0 len_old_suffix
-		(
-		# old_key is a proper prefix of new_key.
-		\new_child=(loop new_suffix new_val child)
-		[{prefix old_val new_child}; tail]
+		\len_common=(length_common new_key old_key)
+		eq (length new_key) len_common
+			(
+			# new_key is a prefix of old_key
+			eq (length old_key) len_common
+				(
+				# new_key is identical to old_key
+				[{old_key new_val child}; tail]
+				)
+				(
+				# new_key is a proper prefix of old_key
+				[{new_key new_val [row]};tail]
+				)
+			)
+			(
+			# new_key is not a prefix of old_key
+			eq (length old_key) len_common
+				(
+				# old_key is a proper prefix of new_key
+				\child=(loop len_common child)
+				[{old_key old_val child}; tail]
+				)
+				(
+				# old_key and new_key share a common proper prefix
+				\prefix=(slice old_key 0 len_common)
+				\child=(loop len_common [row])
+				[{prefix void child}; tail]
+				)
+			)
 		)
 		(
-		# new_key and old_key share a common proper prefix.
-		\old_suffix=(slice old_key len_common len_old_suffix)
-		\new_child=(loop new_suffix new_val [{old_suffix old_val child}])
-		[{prefix void new_child}; tail]
+		\tail=(loop pos tail)
+		[row;tail]
 		)
+	)
+	0
 	)
 
 # (index_del key index)
 # Return a new index with key deleted.
 \index_del=
-	(@\loop\new_key\index
-	index [] \top\tail
-	top \old_key\old_val\child
-
-	eq new_key old_key
+	(\new_key
+	(@\loop\pos\index
+	index [] \row\tail
+	row \old_key\old_val\child
+	compare_at pos new_key old_key
+		index
 		(
-		# new_key and old_key are identical.
-		is_null child tail;
-		[{old_key void child}; tail]
+		\len_common=(length_common new_key old_key)
+		ne (length old_key) len_common index;
+		eq (length new_key) len_common
+			(
+			# new_key is identical to old_key
+			is_null child tail;
+			[{old_key void child}; tail]
+			)
+			(
+			# old_key is a proper prefix of new_key
+			\child=(loop len_common child)
+			is_defined old_val [{old_key old_val child}; tail];
+			is_null child tail;
+			[{old_key void child}; tail]
+			)
 		)
-
-	\len_common=(length_common new_key old_key)
-	eq 0 len_common
 		(
-		# new_key and old_key have no prefix in common.
-		lt new_key old_key [top;tail];
-		\tail=(loop new_key tail)
-		[top;tail]
-		);
-
-	\len_new_suffix=(- (length new_key) len_common)
-	eq 0 len_new_suffix [top;tail]; # new_key is a proper prefix of old_key
-	ne (length old_key) len_common [top;tail];
-
-	# old_key is a proper prefix of new_key.
-	\new_suffix=(slice new_key len_common len_new_suffix)
-	\new_child=(loop new_suffix child)
-
-	\prefix=(slice new_key 0 len_common)
-	is_null new_child
-		(
-		is_defined old_val
-			[{prefix old_val []}; tail]
-			tail
+		\tail=(loop pos tail)
+		[row;tail]
 		)
-		[{prefix old_val new_child}; tail]
+	)
+	0
 	)
 
 # (index_put_pairs pairs index)
@@ -145,15 +129,13 @@
 # (index_pairs index)
 # Return the list of {key val} pairs defined in the index.
 \index_pairs=
-	(
-	(@\loop\prefix\index
-	index [] \top\tail
-	top \key\val\child
-	\key=(. prefix key)
-	\pairs==(append (loop key child) (loop prefix tail))
-	is_defined val [{key val};pairs] pairs
-	)
-	""
+	(@\loop\index
+	index [] \row\tail
+	row \key\val\child
+	\list==(append (loop child) (loop tail))
+	is_defined val
+		[{key val};list]
+		list
 	)
 
 # Test index_get.

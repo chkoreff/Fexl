@@ -297,6 +297,57 @@ value type_length_common(value f)
 	}
 	}
 
+/* (compare_at pos x y LT EQ GT)
+Compare the corresponding characters at offset pos and return LT, EQ, or GT.
+Equivalent to:
+
+	(\pos\x\y\LT\EQ\GT
+	\cx=(slice x pos 1)
+	\cy=(slice y pos 1)
+	gt cx cy GT; lt cx cy LT; EQ
+	)
+*/
+value type_compare_at(value f)
+	{
+	if (0
+		|| !f->L
+		|| !f->L->L
+		|| !f->L->L->L
+		|| !f->L->L->L->L
+		|| !f->L->L->L->L->L
+		|| !f->L->L->L->L->L->L
+		)
+		return 0;
+	{
+	value pos = arg(f->L->L->L->L->L->R);
+	value x = arg(f->L->L->L->L->R);
+	value y = arg(f->L->L->L->R);
+
+	if (pos->T == type_num && x->T == type_str && y->T == type_str)
+		{
+		string xs = get_str(x);
+		string ys = get_str(y);
+		unsigned long n = get_ulong(pos);
+		int cx = n < xs->len ? xs->data[n] : -1;
+		int cy = n < ys->len ? ys->data[n] : -1;
+
+		if (cx < cy)
+			f = hold(f->L->L->R);
+		else if (cx == cy)
+			f = hold(f->L->R);
+		else
+			f = hold(f->R);
+		}
+	else
+		f = hold(Qvoid);
+
+	drop(pos);
+	drop(x);
+	drop(y);
+	return f;
+	}
+	}
+
 value type_is_str(value f)
 	{
 	return op_is_type(f,type_str);

@@ -106,6 +106,7 @@ static value standard(const char *name)
 	if (match("dirname")) return Q(type_dirname);
 	if (match("basename")) return Q(type_basename);
 	if (match("length_common")) return Q(type_length_common);
+	if (match("compare_at")) return Q(type_compare_at);
 	if (match("is_str")) return Q(type_is_str);
 	if (match("with")) return Q(type_with);
 	if (match("is_obj")) return Q(type_is_obj);
