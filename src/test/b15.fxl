@@ -13,6 +13,69 @@
 # The child is the index of entries that start with key.
 # The tail is the index of entries greater than key.
 
+\render_list=
+	(\render_row\tab\list
+	[
+	tab "[" NL
+	(
+	(@\loop\list
+	list [] \row\tail
+	[
+	(render_row tab row);
+	loop tail
+	]
+	)
+	list
+	)
+	tab "]" NL
+	]
+	)
+
+\render_val=
+	(\val
+	is_defined val (fexl_quote val) "void"
+	)
+
+\render_pairs=
+	(
+	render_list
+		(\tab\row
+		row \key\val
+		[tab "{" (fexl_quote key) " " (render_val val) "}" NL]
+		)
+	)
+
+\render_index=
+	(@\render_index
+	render_list
+		(\tab\row
+		row \key\val\child
+		[tab "{" (fexl_quote key) " " (render_val val)
+			(
+			is_null child
+				" []"
+				[
+				NL
+				(
+				\tab=(. tab TAB)
+				render_index tab child
+				)
+				tab
+				]
+			)
+		"}" NL
+		]
+		)
+	)
+
+\make_say=
+	(\render\pairs
+	put (render "" pairs)
+	)
+
+\say_pairs=(make_say render_pairs)
+\say_index=(make_say render_index)
+
 # (index_get key index)
 # Return the value associated with key, or void if none.
 \index_get=
@@ -178,11 +241,11 @@
 
 	(
 	say "index:"
-	say_data index
+	say_index index
 
 	say "pairs:"
 	\pairs=(index_pairs index)
-	say_data pairs
+	say_pairs pairs
 
 	validate_pairs pairs index
 
@@ -202,7 +265,7 @@
 	(
 	# Test delete.
 	say "delete:"
-	say_data
+	say_index
 	(
 	index_del "d";
 	index_del "abcdefg";
@@ -403,10 +466,10 @@
 	)
 
 	say "before delete:"
-	say_data index
+	say_index index
 
 	say "pairs:"
-	say_data (index_pairs index)
+	say_pairs (index_pairs index)
 	nl
 
 	\index=(index_del "d" index)
@@ -446,18 +509,18 @@
 	\index=(index_del "cacd" index)
 
 	say "after delete:"
-	say_data index
+	say_index index
 
 	say "pairs:"
-	say_data (index_pairs index)
+	say_pairs (index_pairs index)
 	nl
 	)
 
 # Generate a list of {key val} pairs with an iterated seed.
 \gen_pairs==
-	(\f @\loop\n\seed
+	(\iterate @\loop\n\seed
 	lt n 1 [];
-	f seed \key\val\seed
+	iterate seed \key\val\seed
 	\n=(- n 1)
 	\tail=(loop n seed)
 	[{key val}; tail]
