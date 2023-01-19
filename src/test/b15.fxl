@@ -14,10 +14,11 @@
 # The tail is the index of entries greater than key.
 # The keys in an index share no common prefix.
 
-# (index_get key list) Return the value associated with key.
+# (index_get key index)
+# Return the value associated with key, or void if none.
 \index_get=
-	(@\loop\new_key\list
-	list void \top\tail
+	(@\loop\new_key\index
+	index void \top\tail
 	top \old_key\old_val\child
 
 	eq new_key old_key old_val; # new_key and old_key are identical.
@@ -39,11 +40,12 @@
 	loop new_suffix child
 	)
 
-# (index_put key val list) Return a new index with key mapped to val.
+# (index_put key val index)
+# Return a new index with key mapped to val.
 \index_put=
-	(@\loop\new_key\new_val\list
+	(@\loop\new_key\new_val\index
 
-	list [{new_key new_val []}]
+	index [{new_key new_val []}]
 	\top\tail
 	top \old_key\old_val\child
 
@@ -89,10 +91,11 @@
 		)
 	)
 
-# (index_del key list) Return a new index with key deleted.
+# (index_del key index)
+# Return a new index with key deleted.
 \index_del=
-	(@\loop\new_key\list
-	list [] \top\tail
+	(@\loop\new_key\index
+	index [] \top\tail
 	top \old_key\old_val\child
 
 	eq new_key old_key
@@ -129,20 +132,22 @@
 		[{prefix old_val new_child}; tail]
 	)
 
-# (index_put_pairs pairs list) Put all the {key val} pairs into the index.
+# (index_put_pairs pairs index)
+# Put all the {key val} pairs into the index.
 \index_put_pairs=
-	(@\loop\pairs\list
-	pairs list \pair\pairs
+	(@\loop\pairs\index
+	pairs index \pair\pairs
 	pair \key\val
-	\list=(index_put key val list)
-	loop pairs list
+	\index=(index_put key val index)
+	loop pairs index
 	)
 
-# (index_pairs list) Return the list of {key val} pairs defined in the index.
+# (index_pairs index)
+# Return the list of {key val} pairs defined in the index.
 \index_pairs=
 	(
-	(@\loop\prefix\list
-	list [] \top\tail
+	(@\loop\prefix\index
+	index [] \top\tail
 	top \key\val\child
 	\key=(. prefix key)
 	\pairs==(append (loop key child) (loop prefix tail))
@@ -153,11 +158,11 @@
 
 # Test index_get.
 \validate_pairs==
-	(\pairs\list
+	(\pairs\index
 	each pairs
 		(\pair
 		pair \key\val
-		\val2=(index_get key list)
+		\val2=(index_get key index)
 		eq val val2 ();
 		say ["BAD "(as_str key)" "(as_str val)" "(as_str val2)]
 		)
@@ -167,7 +172,7 @@
 	(
 	say "= test_1"
 
-	\list=
+	\index=
 	(
 	index_put "bcqr" "1889";
 	index_put "bcccda" "1618";
@@ -190,19 +195,19 @@
 	)
 
 	(
-	say "list:"
-	say_data list
+	say "index:"
+	say_data index
 
 	say "pairs:"
-	\pairs=(index_pairs list)
+	\pairs=(index_pairs index)
 	say_data pairs
 
-	validate_pairs pairs list
+	validate_pairs pairs index
 
 	# Try some keys not in the index.
 	\try==
 		(\key
-		\val=(index_get key list)
+		\val=(index_get key index)
 		is_undef val ();
 		say ["BAD "(as_str key)]
 		)
@@ -240,7 +245,7 @@
 	# Add a couple keys first to make it interesting.
 	index_put "abcdefg" "6674";
 	index_put "bc" "9941";
-	list
+	index
 	)
 	)
 	)
@@ -266,11 +271,11 @@
 	(\pairs
 
 	say ["length = "(list_length pairs)]
-	\list=(index_put_pairs pairs [])
+	\index=(index_put_pairs pairs [])
 
-	\list_pairs=(index_pairs list)
+	\list_pairs=(index_pairs index)
 
-	validate_pairs list_pairs list
+	validate_pairs list_pairs index
 
 	\check_pairs=(sort_pairs pairs)
 	\ok=(eq_pairs list_pairs check_pairs)
