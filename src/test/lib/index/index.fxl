@@ -17,16 +17,17 @@
 # Return the value associated with key, or void if none.
 \index_get=
 	(\new_key
+	\len_new_key=(length new_key)
 	(@\loop\pos\index
 	index void \row\tail
 	row \old_key\val\child
 	compare_at pos new_key old_key
 		void
 		(
-		\len_common=(length_common new_key old_key)
-		ne (length old_key) len_common void;
-		eq (length new_key) len_common val;
-		loop len_common child
+		\pos=(length old_key)
+		eq pos len_new_key
+			(eq old_key new_key val void)
+			(loop pos child)
 		)
 		(loop pos tail)
 	)

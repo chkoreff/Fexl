@@ -67,6 +67,9 @@ cx_index;
 	try "bcc"
 	try "bca"
 	try "bcccz"
+	try "bcccxyzabcx"
+	try "bccd"
+	try "bcccdb"
 	)
 
 	(
