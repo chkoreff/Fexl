@@ -24,10 +24,10 @@
 	compare_at pos new_key old_key
 		void
 		(
-		\pos=(length old_key)
-		eq pos len_new_key
+		\len_old_key=(length old_key)
+		eq len_old_key len_new_key
 			(eq old_key new_key val void)
-			(loop pos child)
+			(loop len_old_key child)
 		)
 		(loop pos tail)
 	)
@@ -56,7 +56,7 @@
 				)
 				(
 				# new_key is a proper prefix of old_key
-				[{new_key new_val [row]};tail]
+				[{new_key new_val [row]}; tail]
 				)
 			)
 			(
