@@ -84,12 +84,14 @@
 		x \kx\vx
 		y \ky\vy
 
-		lt kx ky (\tail=(loop xt ys) [x;tail]);
-		gt kx ky (\tail=(loop xs yt) [y;tail]);
-
-		\vx=(combine vx vy)
-		\tail=(loop xt yt)
-		[{kx vx};tail]
+		compare kx ky
+			(\tail=(loop xt ys) [x;tail])
+			(
+			\vx=(combine vx vy)
+			\tail=(loop xt yt)
+			[{kx vx};tail]
+			)
+			(\tail=(loop xs yt) [y;tail])
 		)
 
 	# Merge each adjoining pair of segments in a list of segments.
@@ -137,12 +139,14 @@
 	x \kx\vx
 	y \ky\vy
 
-	lt kx ky (loop xt ys \L\M\R {[x;L] M R});
-	gt kx ky (loop xs yt \L\M\R {L M [y;R]});
-
-	loop xt yt \L\M\R
-	\v=(combine vx vy)
-	{L [{kx v};M] R}
+	compare kx ky
+		(loop xt ys \L\M\R {[x;L] M R})
+		(
+		loop xt yt \L\M\R
+		\v=(combine vx vy)
+		{L [{kx v};M] R}
+		)
+		(loop xs yt \L\M\R {L M [y;R]})
 	)
 
 # Group a list of items xs into a list of groups.  Use extract to get the key
@@ -232,9 +236,10 @@
 	(@\loop\xs\n
 	xs void \x\xs
 	\n=n
-	lt n 0 void;
-	eq n 0 x;
-	loop xs (- n 1)
+	compare n 0
+		void
+		x
+		(loop xs (- n 1))
 	)
 
 # Combine the elements of two lists pairwise.

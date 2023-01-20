@@ -31,6 +31,54 @@ static value op_cmp(value f, int op(int))
 	}
 	}
 
+/* (compare x y LT EQ GT)
+Compare the numbers or strings and return LT, EQ, or GT. */
+value type_compare(value f)
+	{
+	if (0
+		|| !f->L
+		|| !f->L->L
+		|| !f->L->L->L
+		|| !f->L->L->L->L
+		|| !f->L->L->L->L->L
+		)
+		return 0;
+	{
+	value x = arg(f->L->L->L->L->R);
+	value y = arg(f->L->L->L->R);
+
+	if (x->T == type_num && y->T == type_num)
+		{
+		double xn = get_double(x);
+		double yn = get_double(y);
+
+		if (xn < yn)
+			f = hold(f->L->L->R);
+		else if (xn == yn)
+			f = hold(f->L->R);
+		else
+			f = hold(f->R);
+		}
+	else if (x->T == type_str && y->T == type_str)
+		{
+		int cmp = str_cmp(get_str(x),get_str(y));
+
+		if (cmp < 0)
+			f = hold(f->L->L->R);
+		else if (cmp == 0)
+			f = hold(f->L->R);
+		else
+			f = hold(f->R);
+		}
+	else
+		f = hold(Qvoid);
+
+	drop(x);
+	drop(y);
+	return f;
+	}
+	}
+
 static int lt(int x) { return x < 0; }
 static int le(int x) { return x <= 0; }
 static int eq(int x) { return x == 0; }

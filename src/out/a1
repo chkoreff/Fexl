@@ -948,6 +948,24 @@ d = "d"
 6 : g
 7 : h
 ]
+= test_compare
+eq 0 0
+lt 2 3
+gt 3 2
+lt -5 20
+gt 50 -5
+eq -6.3 -6.3
+
+eq "" ""
+lt "" "a"
+gt "b" ""
+lt "a" "b"
+lt "a" "aa"
+gt "b" "a"
+gt "aa" "a"
+eq "aa" "aa"
+
+[-5 0.2 12 22 36 47.3]
 ~6
 \err=
 ~

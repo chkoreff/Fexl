@@ -196,7 +196,7 @@ pairs:
 = test_hash
 length = 1018
 GOOD
-steps 1730832 bytes 765728
+steps 1703928 bytes 765664
 ~
 \err=
 ~

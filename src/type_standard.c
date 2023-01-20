@@ -70,6 +70,7 @@ static value standard(const char *name)
 	if (match("cos")) return Q(type_cos);
 	if (match("pi")) return Qnum(num_pi);
 
+	if (match("compare")) return Q(type_compare);
 	if (match("lt")) return Q(type_lt);
 	if (match("le")) return Q(type_le);
 	if (match("eq")) return Q(type_eq);

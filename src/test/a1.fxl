@@ -1354,5 +1354,44 @@ append (map (. "x") ["e" "f"]);
 ]
 )
 
+(
+say "= test_compare"
+\try==
+	(\x\y
+	compare x y (put "lt") (put "eq") (put "gt")
+	say [" "(as_str x)" "(as_str y)]
+	)
+
+try 0 0
+try 2 3
+try 3 2
+try -5 20
+try 50 -5
+try -6.3 -6.3
+nl
+
+try "" ""
+try "" "a"
+try "b" ""
+try "a" "b"
+try "a" "aa"
+try "b" "a"
+try "aa" "a"
+try "aa" "aa"
+nl
+)
+(
+say_data;
+sort
+[
+47.3
+0.2
+-5
+22
+36
+12
+]
+)
+
 \\
 Extra stuff not parsed.
