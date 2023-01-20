@@ -1,0 +1,147 @@
+# INDEX OPERATIONS
+#
+# An index is a highly efficient structure for mapping string keys to arbitrary
+# values.  It uses the longest common prefix of keys to narrow the search
+# quickly.
+#
+# INDEX REPRESENTATION
+#
+# An index is either [] or [{key val child}; tail].
+#
+# The key is a string.
+# The val, which may be void, is the arbitrary value associated with the key.
+# The child is the index of entries that start with key.
+# The tail is the index of entries greater than key.
+
+# (index_get key index)
+# Return the value associated with key, or void if none.
+\index_get=
+	(\new_key
+	(@\loop\pos\index
+	index void \row\tail
+	row \old_key\val\child
+	compare_at pos new_key old_key
+		void
+		(
+		\len_common=(length_common new_key old_key)
+		ne (length old_key) len_common void;
+		eq (length new_key) len_common val;
+		loop len_common child
+		)
+		(loop pos tail)
+	)
+	0
+	)
+
+# (index_put key val index)
+# Return a new index with key mapped to val.
+\index_put=
+	(\new_key\new_val
+	(@\loop\pos\index
+	index [{new_key new_val []}]
+	\row\tail
+	row \old_key\old_val\child
+	compare_at pos new_key old_key
+		[{new_key new_val []};index]
+		(
+		\len_common=(length_common new_key old_key)
+		eq (length new_key) len_common
+			(
+			# new_key is a prefix of old_key
+			eq (length old_key) len_common
+				(
+				# new_key is identical to old_key
+				[{old_key new_val child}; tail]
+				)
+				(
+				# new_key is a proper prefix of old_key
+				[{new_key new_val [row]};tail]
+				)
+			)
+			(
+			# new_key is not a prefix of old_key
+			eq (length old_key) len_common
+				(
+				# old_key is a proper prefix of new_key
+				\child=(loop len_common child)
+				[{old_key old_val child}; tail]
+				)
+				(
+				# old_key and new_key share a common proper prefix
+				\prefix=(slice old_key 0 len_common)
+				\child=(loop len_common [row])
+				[{prefix void child}; tail]
+				)
+			)
+		)
+		(
+		\tail=(loop pos tail)
+		[row;tail]
+		)
+	)
+	0
+	)
+
+# (index_del key index)
+# Return a new index with key deleted.
+\index_del=
+	(\new_key
+	(@\loop\pos\index
+	index [] \row\tail
+	row \old_key\old_val\child
+	compare_at pos new_key old_key
+		index
+		(
+		\len_common=(length_common new_key old_key)
+		ne (length old_key) len_common index;
+		eq (length new_key) len_common
+			(
+			# new_key is identical to old_key
+			is_null child tail;
+			[{old_key void child}; tail]
+			)
+			(
+			# old_key is a proper prefix of new_key
+			\child=(loop len_common child)
+			is_defined old_val [{old_key old_val child}; tail];
+			is_null child tail;
+			[{old_key void child}; tail]
+			)
+		)
+		(
+		\tail=(loop pos tail)
+		[row;tail]
+		)
+	)
+	0
+	)
+
+# (index_pairs index)
+# Return the list of {key val} pairs defined in the index.
+\index_pairs=
+	(@\loop\index
+	index [] \row\tail
+	row \key\val\child
+	\list==(append (loop child) (loop tail))
+	is_defined val
+		[{key val};list]
+		list
+	)
+
+# (index_put_pairs pairs index)
+# Put all the {key val} pairs into the index.
+\index_put_pairs=
+	(@\loop\pairs\index
+	pairs index \pair\pairs
+	pair \key\val
+	\index=(index_put key val index)
+	loop pairs index
+	)
+
+\form
+def "index_get" index_get;
+def "index_put" index_put;
+def "index_del" index_del;
+def "index_pairs" index_pairs;
+def "index_put_pairs" index_put_pairs;
+form

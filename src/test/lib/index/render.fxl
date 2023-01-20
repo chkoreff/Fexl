@@ -1,0 +1,69 @@
+# Custom functions to render/print values.
+
+\render_list=
+	(\render_row\tab\list
+	[
+	tab "[" NL
+	(
+	(@\loop\list
+	list [] \row\tail
+	[(render_row tab row); loop tail]
+	)
+	list
+	)
+	tab "]" NL
+	]
+	)
+
+\render_val=
+	(\val
+	is_defined val (fexl_quote val) "void"
+	)
+
+\render_pairs=
+	(
+	render_list
+		(\tab\row
+		row \key\val
+		[tab "{" (fexl_quote key) " " (render_val val) "}" NL]
+		)
+	)
+
+\render_index=
+	(@\render_index
+	render_list
+		(\tab\row
+		row \key\val\child
+		[tab "{" (fexl_quote key) " " (render_val val)
+			(
+			is_null child
+				" []"
+				[
+				NL
+				(
+				\tab=(. tab TAB)
+				render_index tab child
+				)
+				tab
+				]
+			)
+		"}" NL
+		]
+		)
+	)
+
+\make_say=
+	(\render\pairs
+	put (render "" pairs)
+	)
+
+\say_pairs=(make_say render_pairs)
+\say_index=(make_say render_index)
+
+\form
+def "render_list" render_list;
+def "render_pairs" render_pairs;
+def "render_index" render_index;
+def "say_pairs" say_pairs;
+def "say_index" say_index;
+form
