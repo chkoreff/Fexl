@@ -25,7 +25,8 @@
 		void
 		(
 		\len_old_key=(length old_key)
-		eq len_old_key len_new_key
+		compare len_new_key len_old_key
+			void
 			(eq old_key new_key val void)
 			(loop len_old_key child)
 		)
