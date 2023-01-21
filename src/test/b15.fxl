@@ -8,105 +8,16 @@ cx_render;
 cx_index;
 \;
 
-# Test index_get.
-\validate_pairs==
-	(\pairs\index
-	each pairs
-		(\pair
-		pair \key\val
-		\val2=(index_get key index)
-		eq val val2 ();
-		say ["BAD "(as_str key)" "(as_str val)" "(as_str val2)]
-		)
-	)
-
-\test_1==
-	(
-	say "= test_1"
-
-	\index=
-	(
-	index_put "bcqr" "1889";
-	index_put "bcccda" "1618";
-	index_put "bccc" "5233";
-	index_put "bc" void;
-	index_put "bc" "9381";
-	index_put "bcda" "0724";
-	index_put "bccc" "6247";
-	index_put "bcccxyzb" "2173";
-	index_put "bcccxyza" "4610";
-	index_put "" "9972";
-	index_put "bcccxyzabc" "3291";
-	index_put "bcccxyza" "3291";
-	index_put "bcccxyz" "3364";
-	index_put "" "3972";
-	index_put "d" "1974";
-	index_put "a" "6870";
-	index_put "bcccxyz" "4954";
-	[]
-	)
-
-	(
-	say "index:"
-	say_index index
-
-	say "pairs:"
-	\pairs=(index_pairs index)
-	say_pairs pairs
-
-	validate_pairs pairs index
-
-	# Try some keys not in the index.
-	\try==
-		(\key
-		\val=(index_get key index)
-		is_undef val ();
-		say ["BAD "(as_str key)]
-		)
-	try "bx"
-	try "bcc"
-	try "bca"
-	try "bcccz"
-	try "bcccxyzabcx"
-	try "bccd"
-	try "bcccdb"
-	)
-
-	(
-	# Test delete.
-	say "delete:"
-	say_index
-	(
-	index_del "d";
-	index_del "abcdefg";
-	index_del "";
-	index_del "a";
-	index_del "abcdefh";
-	index_del "bcccda";
-	index_del "bcqr";
-	index_del "bcccxyzzzz";
-	index_del "bcccxyzabc";
-	index_del "bcccxyz";
-	index_del "bcda";
-	index_del "bcccxyzb";
-	index_del "bcccxyza";
-	index_del "bcc";
-	index_del "bccc";
-	index_del "b";
-	index_del "bc";
-	index_del "c";
-	index_del "x";
-	index_del "a";
-	# Add a couple keys first to make it interesting.
-	index_put "abcdefg" "6674";
-	index_put "bc" "9941";
-	index
-	)
-	)
-	)
-
 # Sort unique pairs, keeping the latest one.
-\sort_pairs==(combine_keys (\x\y y))
+\sort_pairs=(combine_keys (\x\y y))
+
+# Compare values.
+\eq_val==
+	(\x\y
+	is_undef x (is_undef y);
+	is_undef y F;
+	eq x y
+	)
 
 # Compare lists of string pairs.
 \eq_pairs==
@@ -122,32 +33,173 @@ cx_index;
 	loop xs ys
 	)
 
+# (index_do index pairs)
+# Add or delete a list of {key val} pairs.
+\index_do=
+	(@\loop\index\pairs
+	pairs index \pair\pairs
+	pair \key\val
+	\index=
+		(
+		is_defined val
+			(index_put key val)
+			(index_del key)
+			index
+		)
+	loop index pairs
+	)
+
+\render_errors=
+	(
+	render_list
+		(\tab\row
+		row \key\val\val2
+		[tab "{" (fexl_quote key)
+			" " (render_val val)
+			" "(render_val val2)
+		"}" NL
+		]
+		)
+	)
+
+# Using a custom function here instead of say_data.
+\say_errors=(make_say render_errors)
+
 \test_pairs==
 	(\pairs
 
-	say ["length = "(list_length pairs)]
-	\index=(index_put_pairs pairs [])
-
-	\list_pairs=(index_pairs index)
-
-	validate_pairs list_pairs index
-
+	# Get the expected list of {key val} pairs to check.
 	\check_pairs=(sort_pairs pairs)
-	\ok=(eq_pairs list_pairs check_pairs)
+
+	# Create the index.
+	\index=(index_do [] pairs)
+
+	# Ensure that the list of pairs in the index is correct.
+	(
+	\ok=
+		(
+		# Get the list of pairs defined in the index.
+		\list_pairs==(index_pairs index)
+		# Get the expected list of defined pairs.
+		\expect_pairs==(filter (\p p \_ is_defined) check_pairs)
+		# Ensure that they're equal.
+		eq_pairs list_pairs expect_pairs
+		)
+
+	put "pairs: "
 	say (ok "GOOD" "BAD")
 	)
 
-\test_pairs_both==
-	(\pairs
-	test_pairs pairs
-	\pairs=(reverse pairs)
-	test_pairs pairs
+	# Ensure that index_get matches the values in check_pairs.
+	(
+	\get_errors==
+		(@\loop\pairs
+		pairs [] \pair\pairs
+		pair \key\val
+		\val2=(index_get key index)
+		eq_val val val2
+			(loop pairs)
+			[{key val val2}; loop pairs]
+		)
+
+	put "get: "
+	\errors==(get_errors check_pairs)
+	is_null errors
+		(say "GOOD")
+		(
+		say "ERRORS:"
+		say_errors errors
+		)
+	)
 	)
 
-\test_2==
+\test_0249==
 	(
-	say "= test_2"
-	test_pairs_both
+	say "= test_0249"
+
+	\index=
+	(
+	index_do []
+	[
+	{"bcccxyz" "4954"}
+	{"a" "6870"}
+	{"d" "1974"}
+	{"" "3972"}
+	{"bcccxyz" "3364"}
+	{"bcccxyza" "3291"}
+	{"bcccxyzabc" "3291"}
+	{"" "9972"}
+	{"bcccxyza" "4610"}
+	{"bcccxyzb" "2173"}
+	{"bccc" "6247"}
+	{"bcda" "0724"}
+	{"bc" "9381"}
+	{"bc" void}
+	{"bccc" "5233"}
+	{"bcccda" "1618"}
+	{"bcqr" "1889"}
+
+	#{"bccd" "7422"} # LATER 20230121 you get a different index value here
+
+	{"bx" void}
+	{"bcc" void}
+	{"bca" void}
+	{"bcccz" void}
+	{"bcccxyzabcx" void}
+	{"bccd" void}
+	{"bcccdb" void}
+	]
+	)
+
+	(
+	say "index:"
+	say_index index
+
+	say "pairs:"
+	\pairs=(index_pairs index)
+	say_pairs pairs
+	)
+
+	# Test delete.
+	say "delete:"
+	\index=
+	(
+	index_do index
+	[
+	# Add a couple keys first to make it interesting.
+	{"bc" "9941"}
+	{"abcdefg" "6674"}
+	# Now delete.
+	{"a" void}
+	{"x" void}
+	{"c" void}
+	{"bc" void}
+	{"b" void}
+	{"bccc" void}
+	{"bcc" void}
+	{"bcccxyza" void}
+	{"bcccxyzb" void}
+	{"bcda" void}
+	{"bcccxyz" void}
+	{"bcccxyzabc" void}
+	{"bcccxyzzzz" void}
+	{"bcqr" void}
+	{"bcccda" void}
+	{"abcdefh" void}
+	{"a" void}
+	{"" void}
+	{"abcdefg" void}
+	{"d" void}
+	]
+	)
+
+	say_index index
+	)
+
+\test_5437==
+	(
+	say "= test_5437"
+	test_pairs
 	[
 	{"123456" "v1_123456"}
 	{"" "5763"}
@@ -167,10 +219,10 @@ cx_index;
 	]
 	)
 
-\test_3==
+\test_8924==
 	(
-	say "= test_3"
-	test_pairs_both
+	say "= test_8924"
+	test_pairs
 	[
 	{"abcd" "2174"}
 	{"abc" "4113"}
@@ -178,10 +230,10 @@ cx_index;
 	]
 	)
 
-\test_4==
+\test_3650==
 	(
-	say "= test_4"
-	test_pairs_both
+	say "= test_3650"
+	test_pairs
 	[
 	{"123456" "v1_123456"}
 	{"" "5763"}
@@ -201,13 +253,13 @@ cx_index;
 	]
 	)
 
-\test_5==
+\test_6051==
 	(
-	say "= test_5"
+	say "= test_6051"
 
 	\index=
 	(
-	index_put_pairs
+	index_do []
 	[
 	{"" "3785"}
 	{"aaaabc" "9114"}
@@ -272,7 +324,6 @@ cx_index;
 	{"abc" "7010"}
 	{"bba" "1569"}
 	]
-	[]
 	)
 
 	say "before delete:"
@@ -282,41 +333,47 @@ cx_index;
 	say_pairs (index_pairs index)
 	nl
 
-	\index=(index_del "d" index)
-	\index=(index_del "bb" index)
+	\index=
+	(
+	index_do index
+	[
+	{"d" void}
+	{"bb" void}
 
-	\index=(index_del "bbx" index)
-	\index=(index_del "aaaax" index)
+	{"bbx" void}
+	{"aaaax" void}
 
-	\index=(index_del "bbacdf" index)
-	\index=(index_del "bbacde" index)
+	{"bbacdf" void}
+	{"bbacde" void}
 
-	\index=(index_del "bbac" index)
+	{"bbac" void}
 
-	\index=(index_del "ca" index)
-	\index=(index_del "bbacd" index)
-	\index=(index_del "abcd" index)
-	\index=(index_del "abcdef" index)
-	\index=(index_del "abcde" index)
-	\index=(index_del "abcdefg" index)
-	\index=(index_del "" index)
+	{"ca" void}
+	{"bbacd" void}
+	{"abcd" void}
+	{"abcdef" void}
+	{"abcde" void}
+	{"abcdefg" void}
+	{"" void}
 
-	\index=(index_del "aaabcc" index)
-	\index=(index_del "aaabcd" index)
-	\index=(index_del "aa" index)
-	\index=(index_del "abc" index)
-	\index=(index_del "aaacdx" index)
-	\index=(index_del "aaacde" index)
+	{"aaabcc" void}
+	{"aaabcd" void}
+	{"aa" void}
+	{"abc" void}
+	{"aaacdx" void}
+	{"aaacde" void}
 
-	\index=(index_del "aaaab" index)
-	\index=(index_del "aaaabcx" index)
-	\index=(index_del "aaaabc" index)
+	{"aaaab" void}
+	{"aaaabcx" void}
+	{"aaaabc" void}
 
-	\index=(index_del "x" index)
-	\index=(index_del "e" index)
+	{"x" void}
+	{"e" void}
 
-	\index=(index_del "cab" index)
-	\index=(index_del "cacd" index)
+	{"cab" void}
+	{"cacd" void}
+	]
+	)
 
 	say "after delete:"
 	say_index index
@@ -324,6 +381,100 @@ cx_index;
 	say "pairs:"
 	say_pairs (index_pairs index)
 	nl
+	)
+
+\test_3215==
+	(
+	say "= test_3215"
+	test_pairs
+	[
+	{"" void}
+	{"a" void}
+	{"aaabce" void}
+	{"bbacx" void}
+	{"x" void}
+	]
+	)
+
+\test_0236==
+	(
+	say "= test_0236"
+	test_pairs
+	[
+	{"" "3785"}
+	{"aaaabc" "9114"}
+	{"aaabcc" "2014"}
+	{"aaabcd" "7679"}
+	{"aaacde" "3161"}
+	{"bbabc" "4682"}
+	{"bbabd" "1863"}
+
+	{"bbacde" "6455"}
+	{"bbacd" "1553"}
+	{"bbac" "8261"}
+
+	{"bbacdf" "3986"}
+	{"bbacef" "9370"}
+	{"e" "1067"}
+
+	{"" "3785"}
+	{"aa" "8059"}
+	{"aaaabc" "9114"}
+	{"aaabcc" "2014"}
+	{"aaabcd" "7679"}
+	{"aaacde" "3161"}
+	{"bbabc" "4682"}
+	{"bbabd" "1863"}
+	{"bbac" "8259"}
+	{"bbacde" "6455"}
+	{"bbacd" "1553"}
+	{"bbacdf" "3986"}
+	{"bbacef" "9369"}
+	{"cab" "1546"}
+	{"cac" "7869"}
+	{"cacd" "1055"}
+	{"e" "1067"}
+
+	{"bbac" "8260"}
+	{"bbacef" "9370"}
+	{"aa" "8060"}
+	{"bbac" "8261"}
+
+	{"" "3785"}
+	{"aaaabc" "9114"}
+	{"aaabcc" "2014"}
+	{"aaabcd" "7679"}
+	{"aaacde" "3161"}
+	{"bbabc" "4682"}
+	{"bbabd" "1863"}
+	{"bbac" "8261"}
+	{"bbacd" "1553"}
+	{"bbacde" "6455"}
+	{"bbacdf" "3986"}
+	{"bbacef" "9370"}
+	{"cab" "1546"}
+	{"cac" "7869"}
+	{"cacd" "1055"}
+	{"e" "1067"}
+
+	{"abcdefg" "0825"}
+	{"abcdef" "2039"}
+	{"abcde" "7596"}
+	{"abcd" "2936"}
+	{"abc" "7010"}
+	{"bba" "1569"}
+
+	{"abcc" void}
+	{"x" void}
+	{"def" void}
+
+	{"bb" void} # new_key is a proper prefix of old_key
+	{"bbabcx" void}
+
+	# Test share common proper prefix:
+	{"bbx" void} # pos 0
+	{"aaaax" void} # pos 3
+	]
 	)
 
 # Generate a list of {key val} pairs with an iterated seed.
@@ -336,9 +487,9 @@ cx_index;
 	[{key val}; tail]
 	)
 
-\test_hash==
+\test_3517==
 	(
-	say "= test_hash"
+	say "= test_3517"
 
 	\pairs=
 		(
@@ -383,16 +534,28 @@ cx_index;
 	;pairs
 	]
 
-	#\pairs=(append pairs pairs)
-
 	test_pairs pairs
 	)
 
-#trace_elapsed;
+# Test rendering errors.
+\test_2744==
+	(
+	say "= test_2744"
+	say_errors
+	[
+	{"d" "1974" void}
+	{"bccc" "5233" "9999"}
+	{"bcccxyz" "3364" void}
+	]
+	)
+
 show_benchmark;
-test_1
-test_2
-test_3
-test_4
-test_5
-test_hash
+test_0249
+test_5437
+test_8924
+test_3650
+test_6051
+test_3215
+test_0236
+test_3517
+test_2744

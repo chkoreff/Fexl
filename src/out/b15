@@ -1,6 +1,6 @@
 \out=
 ~
-= test_1
+= test_0249
 index:
 [
 {"" "9972" []}
@@ -45,22 +45,16 @@ pairs:
 delete:
 [
 ]
-= test_2
-length = 15
-GOOD
-length = 15
-GOOD
-= test_3
-length = 3
-GOOD
-length = 3
-GOOD
-= test_4
-length = 15
-GOOD
-length = 15
-GOOD
-= test_5
+= test_5437
+pairs: GOOD
+get: GOOD
+= test_8924
+pairs: GOOD
+get: GOOD
+= test_3650
+pairs: GOOD
+get: GOOD
+= test_6051
 before delete:
 [
 {"" "3785" []}
@@ -193,10 +187,22 @@ pairs:
 {"cac" "7869"}
 ]
 
-= test_hash
-length = 1018
-GOOD
-steps 1701608 bytes 765664
+= test_3215
+pairs: GOOD
+get: GOOD
+= test_0236
+pairs: GOOD
+get: GOOD
+= test_3517
+pairs: GOOD
+get: GOOD
+= test_2744
+[
+{"d" "1974" void}
+{"bccc" "5233" "9999"}
+{"bcccxyz" "3364" void}
+]
+steps 1661860 bytes 543104
 ~
 \err=
 ~

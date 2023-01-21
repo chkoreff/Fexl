@@ -62,8 +62,10 @@
 
 \form
 def "render_list" render_list;
+def "render_val" render_val;
 def "render_pairs" render_pairs;
 def "render_index" render_index;
+def "make_say" make_say;
 def "say_pairs" say_pairs;
 def "say_index" say_index;
 form
