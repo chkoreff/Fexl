@@ -44,7 +44,7 @@
 	\row\tail
 	row \old_key\old_val\child
 	compare_at pos new_key old_key
-		[{new_key new_val []};index]
+		[{new_key new_val []}; index]
 		(
 		\len_common=(length_common new_key old_key)
 		eq (length new_key) len_common
@@ -86,6 +86,12 @@
 
 # (index_del key index)
 # Return a new index with key deleted.
+#
+# LATER 20230121 This maintains the most compact form by detecting index values
+# with a void value and a child with a single branch.  This code is not as
+# elegant as I would like, which suggests a new simpler data structure that I'm
+# working on now.
+
 \index_del=
 	(\new_key
 	(@\loop\pos\index
@@ -99,15 +105,33 @@
 		eq (length new_key) len_common
 			(
 			# new_key is identical to old_key
-			is_null child tail;
-			[{old_key void child}; tail]
+			child
+				tail
+				(\child_row\child_tail
+				child_tail
+					[child_row;tail]
+					(\_\_
+					[{old_key void child}; tail]
+					)
+				)
 			)
 			(
 			# old_key is a proper prefix of new_key
 			\child=(loop len_common child)
-			is_defined old_val [{old_key old_val child}; tail];
-			is_null child tail;
-			[{old_key void child}; tail]
+
+			is_defined old_val
+				[{old_key old_val child}; tail]
+				(
+				child
+					tail
+					(\child_row\child_tail
+					child_tail
+						[child_row;tail]
+						(\_\_
+						[{old_key void child}; tail]
+						)
+					)
+				)
 			)
 		)
 		(

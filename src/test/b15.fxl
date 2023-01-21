@@ -139,7 +139,7 @@ cx_index;
 	{"bcccda" "1618"}
 	{"bcqr" "1889"}
 
-	#{"bccd" "7422"} # LATER 20230121 you get a different index value here
+	{"bccd" "7422"}
 
 	{"bx" void}
 	{"bcc" void}
@@ -170,7 +170,6 @@ cx_index;
 	{"bc" "9941"}
 	{"abcdefg" "6674"}
 	# Now delete.
-	{"a" void}
 	{"x" void}
 	{"c" void}
 	{"bc" void}
@@ -188,7 +187,6 @@ cx_index;
 	{"abcdefh" void}
 	{"a" void}
 	{"" void}
-	{"abcdefg" void}
 	{"d" void}
 	]
 	)
