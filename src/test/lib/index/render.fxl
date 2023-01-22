@@ -33,22 +33,14 @@
 	(@\render_index
 	render_list
 		(\tab\row
-		row \key\val\child
-		[tab "{" (fexl_quote key) " " (render_val val)
-			(
-			is_null child
-				" []"
-				[
-				NL
-				(
-				\tab=(. tab TAB)
-				render_index tab child
-				)
-				tab
-				]
-			)
-		"}" NL
-		]
+		row \is_leaf\key\val
+		is_leaf
+			[tab "{" is_leaf" "(fexl_quote key) " " (fexl_quote val) "}" NL]
+			[
+			tab "{" is_leaf" "(fexl_quote key) NL
+				(\tab=(. tab TAB) render_index tab val)
+			tab "}" NL
+			]
 		)
 	)
 

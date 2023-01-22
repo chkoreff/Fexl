@@ -3,30 +3,33 @@
 = test_0249
 index:
 [
-{"" "9972" []}
-{"a" "6870" []}
-{"bc" void
+{T "" "9972"}
+{T "a" "6870"}
+{F "bc"
 	[
-	{"bccc" "5233"
+	{F "bccc"
 		[
-		{"bcccda" "1618" []}
-		{"bcccxyz" "3364"
+		{T "bccc" "5233"}
+		{T "bcccda" "1618"}
+		{F "bcccxyz"
 			[
-			{"bcccxyza" "4610"
+			{T "bcccxyz" "3364"}
+			{F "bcccxyza"
 				[
-				{"bcccxyzabc" "3291" []}
+				{T "bcccxyza" "4610"}
+				{T "bcccxyzabc" "3291"}
 				]
 			}
-			{"bcccxyzb" "2173" []}
+			{T "bcccxyzb" "2173"}
 			]
 		}
 		]
 	}
-	{"bcda" "0724" []}
-	{"bcqr" "1889" []}
+	{T "bcda" "0724"}
+	{T "bcqr" "1889"}
 	]
 }
-{"d" "1974" []}
+{T "d" "1974"}
 ]
 pairs:
 [
@@ -44,7 +47,7 @@ pairs:
 ]
 delete:
 [
-{"abcdefg" "6674" []}
+{T "abcdefg" "6674"}
 ]
 = test_5437
 pairs: GOOD
@@ -58,34 +61,39 @@ get: GOOD
 = test_6051
 before delete:
 [
-{"" "3785" []}
-{"a" void
+{T "" "3785"}
+{F "a"
 	[
-	{"aa" "8060"
+	{F "aa"
 		[
-		{"aaa" void
+		{T "aa" "8060"}
+		{F "aaa"
 			[
-			{"aaaabc" "9114" []}
-			{"aaabc" void
+			{T "aaaabc" "9114"}
+			{F "aaabc"
 				[
-				{"aaabcc" "2014" []}
-				{"aaabcd" "7679" []}
+				{T "aaabcc" "2014"}
+				{T "aaabcd" "7679"}
 				]
 			}
-			{"aaacde" "3161" []}
+			{T "aaacde" "3161"}
 			]
 		}
 		]
 	}
-	{"abc" "7010"
+	{F "abc"
 		[
-		{"abcd" "2936"
+		{T "abc" "7010"}
+		{F "abcd"
 			[
-			{"abcde" "7596"
+			{T "abcd" "2936"}
+			{F "abcde"
 				[
-				{"abcdef" "2039"
+				{T "abcde" "7596"}
+				{F "abcdef"
 					[
-					{"abcdefg" "0825" []}
+					{T "abcdef" "2039"}
+					{T "abcdefg" "0825"}
 					]
 				}
 				]
@@ -96,38 +104,42 @@ before delete:
 	}
 	]
 }
-{"bba" "1569"
+{F "bba"
 	[
-	{"bbab" void
+	{T "bba" "1569"}
+	{F "bbab"
 		[
-		{"bbabc" "4682" []}
-		{"bbabd" "1863" []}
+		{T "bbabc" "4682"}
+		{T "bbabd" "1863"}
 		]
 	}
-	{"bbac" "8261"
+	{F "bbac"
 		[
-		{"bbacd" "1553"
+		{T "bbac" "8261"}
+		{F "bbacd"
 			[
-			{"bbacde" "6455" []}
-			{"bbacdf" "3986" []}
+			{T "bbacd" "1553"}
+			{T "bbacde" "6455"}
+			{T "bbacdf" "3986"}
 			]
 		}
-		{"bbacef" "9370" []}
+		{T "bbacef" "9370"}
 		]
 	}
 	]
 }
-{"ca" void
+{F "ca"
 	[
-	{"cab" "1546" []}
-	{"cac" "7869"
+	{T "cab" "1546"}
+	{F "cac"
 		[
-		{"cacd" "1055" []}
+		{T "cac" "7869"}
+		{T "cacd" "1055"}
 		]
 	}
 	]
 }
-{"e" "1067" []}
+{T "e" "1067"}
 ]
 pairs:
 [
@@ -158,18 +170,19 @@ pairs:
 
 after delete:
 [
-{"bba" "1569"
+{F "bba"
 	[
-	{"bbab" void
+	{T "bba" "1569"}
+	{F "bbab"
 		[
-		{"bbabc" "4682" []}
-		{"bbabd" "1863" []}
+		{T "bbabc" "4682"}
+		{T "bbabd" "1863"}
 		]
 	}
-	{"bbacef" "9370" []}
+	{T "bbacef" "9370"}
 	]
 }
-{"cac" "7869" []}
+{T "cac" "7869"}
 ]
 pairs:
 [
@@ -195,7 +208,7 @@ get: GOOD
 {"bccc" "5233" "9999"}
 {"bcccxyz" "3364" void}
 ]
-steps 1660216 bytes 543104
+steps 1653948 bytes 577120
 ~
 \err=
 ~
