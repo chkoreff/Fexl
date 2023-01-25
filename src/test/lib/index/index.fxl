@@ -27,15 +27,14 @@
 	compare_at pos new_key old_key
 		void
 		(
-		\len_old_key=(length old_key)
-		compare len_new_key len_old_key
-			void
+		is_leaf
+			(eq old_key new_key val void)
 			(
-			eq old_key new_key
-				(is_leaf val; loop len_new_key val)
+			\len_old_key=(length old_key)
+			lt len_new_key len_old_key
 				void
+				(loop len_old_key val)
 			)
-			(is_leaf void; loop len_old_key val)
 		)
 		(loop pos tail)
 	)
