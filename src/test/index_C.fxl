@@ -1,0 +1,74 @@
+#
+\cx_index=(value; std; use "lib/index/index.fxl")
+\cx_render_C=(value; std; cx_index; use "lib/index/render_C.fxl")
+
+value;
+std;
+cx_render_C;
+\;
+
+\try_pairs==
+	(\pairs
+	say "function:"
+	put (compile_pairs pairs)
+	nl
+	)
+
+\test_0870==
+	(
+	say "= test_0870"
+
+	try_pairs
+	[
+	]
+	)
+
+\test_0745==
+	(
+	say "= test_0745"
+
+	try_pairs
+	[
+	{"" "0273"}
+	{"a" "4563"}
+	{"ab" "9685"}
+	{"abc" "5498"}
+	{"bc" "8976"}
+	]
+	)
+
+\test_1197==
+	(
+	say "= test_1197"
+
+	try_pairs
+	[
+	{"" "3785"}
+	{"aa" "8060"}
+	{"aaaabc" "9114"}
+	{"aaabcc" "2014"}
+	{"aaabcd" "7679"}
+	{"aaacde" "3161"}
+	{"abc" "7010"}
+	{"abcd" "2936"}
+	{"abcde" "7596"}
+	{"abcdef" "2039"}
+	{"abcdefg" "0825"}
+	{"bba" "1569"}
+	{"bbabc" "4682"}
+	{"bbabd" "1863"}
+	{"bbac" "8261"}
+	{"bbacd" "1553"}
+	{"bbacde" "6455"}
+	{"bbacdf" "3986"}
+	{"bbacef" "9370"}
+	{"cab" "1546"}
+	{"cac" "7869"}
+	{"cacd" "1055"}
+	{"e" "1067"}
+	]
+	)
+
+test_0870
+test_0745
+test_1197

@@ -67,6 +67,7 @@
 "stream"
 "resolve"
 "record"
+"index_C"
 ]
 
 # Gather any individually specified tests.

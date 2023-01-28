@@ -1,0 +1,226 @@
+\out=
+~
+= test_0870
+function:
+const char *lookup(const char *x, unsigned long n)
+	{
+	(void)x;
+	(void)n;
+	return 0;
+	}
+
+= test_0745
+function:
+const char *lookup(const char *x, unsigned long n)
+	{
+	if (n == 0)
+		return "0273";
+	if (x[0] == 'a')
+		{
+		if (n == 1 && strncmp(x,"a",n) == 0)
+			return "4563";
+		if (n <= 1) return 0;
+		if (x[1] == 'b')
+			{
+			if (n == 2 && strncmp(x,"ab",n) == 0)
+				return "9685";
+			if (n <= 2) return 0;
+			if (x[2] == 'c')
+				{
+				if (n == 3 && strncmp(x,"abc",n) == 0)
+					return "5498";
+				return 0;
+				}
+			return 0;
+			}
+		return 0;
+		}
+	if (x[0] == 'b')
+		{
+		if (n == 2 && strncmp(x,"bc",n) == 0)
+			return "8976";
+		return 0;
+		}
+	return 0;
+	}
+
+= test_1197
+function:
+const char *lookup(const char *x, unsigned long n)
+	{
+	if (n == 0)
+		return "3785";
+	if (x[0] == 'a')
+		{
+		if (n <= 1) return 0;
+		if (x[1] == 'a')
+			{
+			if (n == 2 && strncmp(x,"aa",n) == 0)
+				return "8060";
+			if (n <= 2) return 0;
+			if (x[2] == 'a')
+				{
+				if (n <= 3) return 0;
+				if (x[3] == 'a')
+					{
+					if (n == 6 && strncmp(x,"aaaabc",n) == 0)
+						return "9114";
+					return 0;
+					}
+				if (x[3] == 'b')
+					{
+					if (n <= 5) return 0;
+					if (x[5] == 'c')
+						{
+						if (n == 6 && strncmp(x,"aaabcc",n) == 0)
+							return "2014";
+						return 0;
+						}
+					if (x[5] == 'd')
+						{
+						if (n == 6 && strncmp(x,"aaabcd",n) == 0)
+							return "7679";
+						return 0;
+						}
+					return 0;
+					}
+				if (x[3] == 'c')
+					{
+					if (n == 6 && strncmp(x,"aaacde",n) == 0)
+						return "3161";
+					return 0;
+					}
+				return 0;
+				}
+			return 0;
+			}
+		if (x[1] == 'b')
+			{
+			if (n == 3 && strncmp(x,"abc",n) == 0)
+				return "7010";
+			if (n <= 3) return 0;
+			if (x[3] == 'd')
+				{
+				if (n == 4 && strncmp(x,"abcd",n) == 0)
+					return "2936";
+				if (n <= 4) return 0;
+				if (x[4] == 'e')
+					{
+					if (n == 5 && strncmp(x,"abcde",n) == 0)
+						return "7596";
+					if (n <= 5) return 0;
+					if (x[5] == 'f')
+						{
+						if (n == 6 && strncmp(x,"abcdef",n) == 0)
+							return "2039";
+						if (n <= 6) return 0;
+						if (x[6] == 'g')
+							{
+							if (n == 7 && strncmp(x,"abcdefg",n) == 0)
+								return "0825";
+							return 0;
+							}
+						return 0;
+						}
+					return 0;
+					}
+				return 0;
+				}
+			return 0;
+			}
+		return 0;
+		}
+	if (x[0] == 'b')
+		{
+		if (n == 3 && strncmp(x,"bba",n) == 0)
+			return "1569";
+		if (n <= 3) return 0;
+		if (x[3] == 'b')
+			{
+			if (n <= 4) return 0;
+			if (x[4] == 'c')
+				{
+				if (n == 5 && strncmp(x,"bbabc",n) == 0)
+					return "4682";
+				return 0;
+				}
+			if (x[4] == 'd')
+				{
+				if (n == 5 && strncmp(x,"bbabd",n) == 0)
+					return "1863";
+				return 0;
+				}
+			return 0;
+			}
+		if (x[3] == 'c')
+			{
+			if (n == 4 && strncmp(x,"bbac",n) == 0)
+				return "8261";
+			if (n <= 4) return 0;
+			if (x[4] == 'd')
+				{
+				if (n == 5 && strncmp(x,"bbacd",n) == 0)
+					return "1553";
+				if (n <= 5) return 0;
+				if (x[5] == 'e')
+					{
+					if (n == 6 && strncmp(x,"bbacde",n) == 0)
+						return "6455";
+					return 0;
+					}
+				if (x[5] == 'f')
+					{
+					if (n == 6 && strncmp(x,"bbacdf",n) == 0)
+						return "3986";
+					return 0;
+					}
+				return 0;
+				}
+			if (x[4] == 'e')
+				{
+				if (n == 6 && strncmp(x,"bbacef",n) == 0)
+					return "9370";
+				return 0;
+				}
+			return 0;
+			}
+		return 0;
+		}
+	if (x[0] == 'c')
+		{
+		if (n <= 2) return 0;
+		if (x[2] == 'b')
+			{
+			if (n == 3 && strncmp(x,"cab",n) == 0)
+				return "1546";
+			return 0;
+			}
+		if (x[2] == 'c')
+			{
+			if (n == 3 && strncmp(x,"cac",n) == 0)
+				return "7869";
+			if (n <= 3) return 0;
+			if (x[3] == 'd')
+				{
+				if (n == 4 && strncmp(x,"cacd",n) == 0)
+					return "1055";
+				return 0;
+				}
+			return 0;
+			}
+		return 0;
+		}
+	if (x[0] == 'e')
+		{
+		if (n == 1 && strncmp(x,"e",n) == 0)
+			return "1067";
+		return 0;
+		}
+	return 0;
+	}
+
+~
+\err=
+~
+~
+\status=0
