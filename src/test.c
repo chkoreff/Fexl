@@ -4,6 +4,7 @@
 #include <basic.h>
 #include <output.h>
 #include <type_str.h>
+#include <type_sym.h>
 
 static value test_argv(const char *const *argv)
 	{
@@ -22,4 +23,15 @@ static value test_argv(const char *const *argv)
 value type_test_argv(value f)
 	{
 	return op_argv(f,test_argv);
+	}
+
+static value define(void)
+	{
+	if (match("test_argv")) return Q(type_test_argv);
+	return 0;
+	}
+
+value type_define(value f)
+	{
+	return op_resolve(f,define);
 	}

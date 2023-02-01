@@ -1,7 +1,7 @@
 # Test dynamic libraries.
-\name=(path_under dir_base "lib/show.so")
-\lib=(dlopen name)
-dlsym lib "type_show" \show
+# Skipping a couple lines here to preserve
+# the original line numbers.
+value; std; load "show"; \;
 
 show ()
 show ["a" "b"]

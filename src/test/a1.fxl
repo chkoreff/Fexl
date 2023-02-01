@@ -1336,9 +1336,7 @@ put "d = " put (as_str d) nl
 
 # Test op_argv.
 (
-\name=(path_under dir_base "lib/test.so")
-\lib=(dlopen name)
-dlsym lib "type_test_argv" \test_argv
+value; std; load "test"; \;
 
 test_argv []
 test_argv ["a" "b"]

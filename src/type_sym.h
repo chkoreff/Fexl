@@ -32,5 +32,7 @@ extern value type_subst(value f);
 extern value type_is_closed(value f);
 extern value type_def(value f);
 extern value type_value(value f);
+extern const char *cur_name;
+extern int match(const char *other);
 extern value type_resolve(value f);
-extern value op_resolve(value f, value op(const char *name));
+extern value op_resolve(value f, value define(void));

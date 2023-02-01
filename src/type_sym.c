@@ -403,7 +403,14 @@ value type_resolve(value f)
 	return f;
 	}
 
-value op_resolve(value f, value op(const char *name))
+const char *cur_name;
+
+int match(const char *other)
+	{
+	return strcmp(cur_name,other) == 0;
+	}
+
+value op_resolve(value f, value define(void))
 	{
 	if (!f->L) return 0;
 	{
@@ -428,7 +435,10 @@ value op_resolve(value f, value op(const char *name))
 			while (xi < xt->count)
 				{
 				struct symbol *x = &xt->vec[xi];
-				value val = op(str_data(x->name));
+				value val;
+
+				cur_name = str_data(x->name);
+				val = define();
 
 				if (val)
 					{

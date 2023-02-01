@@ -27,6 +27,9 @@
 \dir_base=(dirname; dirname; argv 0)
 \script_name=(default ""; argv 1)
 
+\trace=(fsay stderr)
+\error=(\msg trace msg die)
+
 # Define some extra functions.
 \extra==
 (\=
@@ -34,9 +37,6 @@
 \if=(\x\y x y I)
 
 \dir_local=(dirname script_name)
-
-\trace=(fsay stderr)
-\error=(\msg trace msg die)
 
 # Make a cache which remembers the values of a function with n arguments.
 \remember=
@@ -136,6 +136,20 @@ form
 \read_csv==(\= value; std; extra; read; use "read_csv.fxl")
 \read_ssv==(\= value; std; extra; read; use "read_ssv.fxl")
 
+\load==
+	(\module
+
+	\path=(path_under dir_base (. "lib/"; . module ".so"))
+	\lib=(dlopen path)
+	is_void lib (error ["Could not open library "path]);
+
+	\sym=="type_define"
+	\entry=(dlsym lib sym)
+	is_void entry (error ["Could not find symbol "sym]);
+
+	entry \cx cx
+	)
+
 defc "std";
 \form
 :: read_ssv;
@@ -152,7 +166,10 @@ defc "std";
 :: math;
 :: bool;
 :: extra;
-std form
+def "use_lib" use;
+def "load" load;
+std;
+form
 )
 
 # Evaluate the user's script.

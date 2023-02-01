@@ -33,18 +33,9 @@
 #include <type_var.h>
 #include <type_with.h>
 
-static const char *cur_name;
-
-static int match(const char *other)
-	{
-	return strcmp(cur_name,other) == 0;
-	}
-
 /* Resolve standard names. */
-static value standard(const char *name)
+static value standard(void)
 	{
-	cur_name = name;
-
 	if (match("put")) return hold(Qput);
 	if (match("nl")) return hold(Qnl);
 	if (match("say")) return Q(type_say);

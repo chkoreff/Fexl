@@ -308,3 +308,14 @@ value type_show(value f)
 	show(f->R);nl();
 	return hold(QI);
 	}
+
+static value define(void)
+	{
+	if (match("show")) return Q(type_show);
+	return 0;
+	}
+
+value type_define(value f)
+	{
+	return op_resolve(f,define);
+	}
