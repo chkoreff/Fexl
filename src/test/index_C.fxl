@@ -1,11 +1,6 @@
 #
-\cx_index=(value; std; use "lib/index/index.fxl")
-\cx_render_C=(value; std; cx_index; use "lib/index/render_C.fxl")
-
-value;
-std;
-cx_render_C;
-\;
+\cx=(value; std; use "lib/index_C/context.fxl")
+value; std; cx \;
 
 \try_pairs==
 	(\pairs

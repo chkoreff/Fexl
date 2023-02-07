@@ -1,63 +1,27 @@
-# Custom functions to render/print values.
-
-\render_list=
-	(\render_row\tab\list
-	[
-	tab "[" NL
-	(
-	(@\loop\list
-	list [] \row\tail
-	[(render_row tab row); loop tail]
-	)
-	list
-	)
-	tab "]" NL
-	]
-	)
-
-\render_val=
-	(\val
-	is_defined val (fexl_quote val) "void"
-	)
-
-\render_pairs=
-	(
-	render_list
-		(\tab\row
-		row \key\val
-		[tab "{" (fexl_quote key) " " (render_val val) "}" NL]
-		)
-	)
-
+#
 \render_index=
 	(@\render_index
 	render_list
-		(\tab\row
+		(\row\next
 		row \is_leaf\key\val
 		is_leaf
-			[tab "{" is_leaf" "(fexl_quote key) " " (fexl_quote val) "}" NL]
-			[
-			tab "{" is_leaf" "(fexl_quote key) NL
-				(\tab=(. tab TAB) render_index tab val)
-			tab "}" NL
-			]
+			(
+			say ["{T "(fexl_quote key) " " (fexl_quote val) "}"];
+			next
+			)
+			(
+			say ["{F "(fexl_quote key) ];
+			indent
+				(
+				render_index val;
+				end
+				);
+			say "}";
+			next
+			)
 		)
 	)
 
-\make_say=
-	(\render\pairs
-	put (render "" pairs)
-	)
-
-\say_pairs=(make_say render_pairs)
-\say_index=(make_say render_index)
-
 \form
-def "render_list" render_list;
-def "render_val" render_val;
-def "render_pairs" render_pairs;
 def "render_index" render_index;
-def "make_say" make_say;
-def "say_pairs" say_pairs;
-def "say_index" say_index;
 form

@@ -1,12 +1,6 @@
 #
-\cx_render=(value; std; use "lib/index/render.fxl")
-\cx_index=(value; std; use "lib/index/index.fxl")
-
-value;
-std;
-cx_render;
-cx_index;
-\;
+\cx=(value; std; use "lib/b15/context.fxl")
+value; std; cx; \;
 
 # Sort unique pairs, keeping the latest one.
 \sort_pairs=(combine_keys (\x\y y))
@@ -48,22 +42,6 @@ cx_index;
 		)
 	loop index pairs
 	)
-
-\render_errors=
-	(
-	render_list
-		(\tab\row
-		row \key\val\val2
-		[tab "{" (fexl_quote key)
-			" " (render_val val)
-			" "(render_val val2)
-		"}" NL
-		]
-		)
-	)
-
-# Using a custom function here instead of say_data.
-\say_errors=(make_say render_errors)
 
 \test_pairs==
 	(\pairs

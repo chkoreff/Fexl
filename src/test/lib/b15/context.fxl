@@ -1,0 +1,84 @@
+#
+\cx_render=(value; std; use "lib/render/base.fxl")
+\cx_render_list=(value; std; cx_render; use "lib/render/list.fxl")
+
+\cx_render_local=
+(
+value;
+std;
+cx_render;
+cx_render_list;
+\;
+
+\render_val=
+	(\val
+	is_defined val (fexl_quote val) "void"
+	)
+
+\render_pairs=
+	(
+	render_list
+		(\row\next
+		row \key\val
+		say ["{" (fexl_quote key) " " (render_val val) "}"];
+		next
+		)
+	)
+
+\render_errors=
+	(
+	render_list
+		(\row\next
+		row \key\val\val2
+		say ["{" (fexl_quote key)" " (render_val val)" "(render_val val2)"}"];
+		next
+		)
+	)
+
+\form
+def "render_pairs" render_pairs;
+def "render_errors" render_errors;
+form
+)
+
+\cx_render_index=
+	(
+	value;
+	std;
+	cx_render;
+	cx_render_list;
+	use "lib/index/render.fxl"
+	)
+
+\cx_output=
+(
+value;
+std;
+cx_render;
+cx_render_index;
+cx_render_local;
+def "_put" put;
+\;
+
+\put_render=
+	(\render\tab\x
+	_put (render x end tab)
+	)
+
+\say_pairs=(put_render render_pairs "")
+\say_index=(put_render render_index "")
+\say_errors=(put_render render_errors "")
+
+\form
+def "say_pairs" say_pairs;
+def "say_index" say_index;
+def "say_errors" say_errors;
+form
+)
+
+\cx_index=(value; std; use "lib/index/index.fxl")
+
+\form
+cx_index;
+cx_output;
+form

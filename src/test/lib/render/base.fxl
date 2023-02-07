@@ -1,0 +1,19 @@
+# Pure functional output
+
+\end==(\tab [])
+\say==(\x\next\tab [tab x NL; next tab])
+\put==(\x\next\tab [x; next tab])
+\nl=(put NL)
+
+\indent==
+	(\content\next\tab
+	[(eval (. tab TAB) content); next tab]
+	)
+
+\form
+def "end" end;
+def "say" say;
+def "put" put;
+def "nl" nl;
+def "indent" indent;
+form

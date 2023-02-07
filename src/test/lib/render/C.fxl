@@ -1,0 +1,17 @@
+# Rendering C code.
+
+# Indent content in a block enclosed with braces.
+\scope==
+	(\content
+	indent
+		(
+		say "{";
+		content;
+		say "}";
+		end
+		)
+	)
+
+\form
+def "scope" scope;
+form
