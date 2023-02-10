@@ -1,88 +1,100 @@
-fexl - Function EXpression Language
-===================================
+# fexl - Function EXpression Language
 
 [Fexl](http://fexl.com) is a simple but powerful scripting language.  It allows
 you to manipulate numbers, strings, streams, and functions easily and reliably,
 all within a secure "sandbox".
 
-Getting started
----------------
+## Getting started
 
 Go into the source code directory:
-
-	cd src
+```
+cd src
+```
 
 Build the code and test its validity:
-
-	test/check
+```
+test/check
+```
 
 That runs the test scripts, comparing their outputs with the reference files in
 the out directory.  They should all succeed, however, if you run on a 32-bit
 system you will see some inconsequential differences in tests which measure
 memory usage or deliberately try to run out of memory.
 
-Installation
-------------
+## Installation
 
 There is no "installation" as such.  You just put the Fexl code anywhere you
 like, build it, and run it from there.  There is no script to copy it to /usr
 or anything like that.
 
-My approach is to create a ~/bin/fexl script which does this:
-
-	exec ~/project/fexl/bin/fexl "$@"
+One approach is to create a ~/bin/fexl script which does this:
+```
+exec ~/project/fexl/bin/fexl "$@"
+```
 
 So the "fexl" script in my search path runs the real executable right where I
 built it, setting argv[0] to its full path name, allowing it to resolve the
-names of any files it might need that come bundled with the distribution.  That
-way I don't have to rely on non-portable features like "/proc/self/exe" to
-locate the executable.
+names of any files it might need that come bundled with the distribution.
 
-Development Tools
------------------
+Lately I've been using a shell alias instead, putting this in my
+`~/.bash_aliases`:
+```
+alias fexl=~/code/fexl/bin/fexl
+```
+
+## Development Tools
 
 To build the code:
-
-	./build
+```
+./build
+```
 
 To erase the output files and build the code from scratch:
-
-	./build clean
+```
+./build clean
+```
 
 To erase the output files:
-
-	./build erase
+```
+./build erase
+```
 
 To do a verbose build, showing all the commands:
-
-	verbose=1 ./build
+```
+verbose=1 ./build
+```
 
 To build the code and run a fexl program:
-
-	./fexl [FILE]
+```
+./fexl [FILE]
+```
 
 To build the code and check all the tests:
-
-	test/check
+```
+test/check
+```
 
 You can also check a specific set of tests, e.g.:
-
-	test/check chars b10 sat crypto
+```
+test/check chars b10 sat crypto
+```
 
 You can show the output of an individual test, e.g.:
-
-	test/show sat
+```
+test/show sat
+```
 
 To source the handy shell aliases that I use for development:
-
-	. handy
+```
+. handy
+```
 
 To see the current version number (http://semver.org):
+```
+cat VERSION
+```
 
-	cat VERSION
-
-Guide to source code
---------------------
+## Guide to source code
 
 The `main` routine is in fexl.c.
 
@@ -96,8 +108,7 @@ and `drop` in value.c, which implement the reference counting mechanism.
 
 The "test" directory contains the Fexl test suite.
 
-Technical Details
------------------
+## Technical Details
 
 The interpreter creates an initial value which represents your entire program.
 It then evaluates that value, reducing it one step at a time until it reaches a
@@ -114,14 +125,12 @@ a value on the left side to a value on the right side.
 The initial value is fully resolved and contains no symbols, so the interpreter
 does not have to do any symbol lookups or bindings during evaluation.
 
-Credits
--------
+## Credits
 
 "On the Building Blocks of Mathematical Logic", Moses Schönfinkel, 1924
 
 "Typed Representation of Objects by Functions", Jørgen Steensgaard-Madsen, 1989
 
-License
--------
-This code is copyright 2011 by Patrick Chkoreff (pc@fexl.com).
+## License
+This code is copyright 2023 by Patrick Chkoreff (pc@fexl.com).
 See the LICENSE file for details.
