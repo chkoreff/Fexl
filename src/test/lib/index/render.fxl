@@ -1,27 +1,21 @@
 #
-\render_index=
-	(@\render_index
-	render_list
-		(\row\next
+\say_index=
+	(@\say_index
+	say_list
+		(\row
 		row \is_leaf\key\val
 		is_leaf
 			(
-			say ["{T "(fexl_quote key) " " (fexl_quote val) "}"];
-			next
+			say ["{T "(fexl_quote key) " " (fexl_quote val) "}"]
 			)
 			(
-			say ["{F "(fexl_quote key) ];
-			indent
-				(
-				render_index val;
-				end
-				);
-			say "}";
-			next
+			say ["{F "(fexl_quote key)]
+			indent (say_index val)
+			say "}"
 			)
 		)
 	)
 
 \form
-def "render_index" render_index;
+def "say_index" say_index;
 form

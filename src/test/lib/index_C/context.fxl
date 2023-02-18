@@ -12,16 +12,15 @@ cx_render_C;
 
 # Process all the rows in an index.
 \do_rows=
-	(@\do_rows \checked_bound\pos\rows\next
-	rows next \row\rows
+	(@\do_rows \checked_bound\pos\rows
+	rows () \row\rows
 	row \is_leaf\key\val
 
 	\check_ch==
-		(\next
+		(
 		\ch=(slice key pos 1)
-		checked_bound () (say ["if (n <= "(num_str pos)") return 0;"]);
-		say ["if (x["(num_str pos)"] == '"ch"')"];
-		next
+		checked_bound () (say ["if (n <= "(num_str pos)") return 0;"])
+		say ["if (x["(num_str pos)"] == '"ch"')"]
 		)
 
 	\len=(length key)
@@ -29,89 +28,63 @@ cx_render_C;
 	is_leaf
 		(
 		\do_strncmp==
-			(\next
+			(
 			say ["if (n == "(num_str len)" && strncmp(x,"
-				(fexl_quote key)",n) == 0)"];
-			indent
-				(
-				say ["return "(fexl_quote val)";"];
-				end
-				);
-			next
+				(fexl_quote key)",n) == 0)"]
+			indent (say ["return "(fexl_quote val)";"])
 			)
 
 		lt pos len
 			(
-			check_ch;
+			check_ch
 			scope
-				(\next
-				do_strncmp;
-				say "return 0;";
-				next
-				);
-			do_rows T pos rows;
-			next
+				(
+				do_strncmp
+				say "return 0;"
+				)
+			do_rows T pos rows
 			);
 		eq len 0
 			(
 			# Optimize null key.
-			say ["if (n == "(num_str pos)")"];
-			indent
-				(
-				say ["return "(fexl_quote val)";"];
-				end
-				);
-			do_rows T pos rows;
-			next
+			say ["if (n == "(num_str pos)")"]
+			indent (say ["return "(fexl_quote val)";"])
+			do_rows T pos rows
 			)
 			(
-			do_strncmp;
-			do_rows checked_bound pos rows;
-			next
+			do_strncmp
+			do_rows checked_bound pos rows
 			)
 		)
 		(
-		check_ch;
+		check_ch
 		scope
-			(\next
-			do_rows F len val;
-			say "return 0;";
-			next
-			);
-		do_rows T pos rows;
-		next
-		)
-	)
-
-\render_index==
-	(\index
-	say "const char *lookup(const char *x, unsigned long n)";
-	scope
-		(\next
-		(\return
-		index
 			(
-			# Special case for empty index.
-			say "(void)x;";
-			say "(void)n;";
-			return
+			do_rows F len val
+			say "return 0;"
 			)
-			(\_\_
-			do_rows F 0 index;
-			return
-			)
-		);
-		say "return 0;";
-		next
-		);
-	end
+		do_rows T pos rows
+		)
 	)
 
 # (compile_index index)
 # Return C code which implements the index.
 \compile_index==
 	(\index
-	render_index index ""
+	say "const char *lookup(const char *x, unsigned long n)"
+	scope
+		(
+		index
+			(
+			# Special case for empty index.
+			say "(void)x;"
+			say "(void)n;"
+			)
+			(\_\_
+			do_rows F 0 index
+			)
+		say "return 0;"
+		)
 	)
 
 # (index_put_pairs pairs index)

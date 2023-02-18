@@ -5,10 +5,9 @@
 	(\content
 	indent
 		(
-		say "{";
-		content;
-		say "}";
-		end
+		say "{"
+		content
+		say "}"
 		)
 	)
 

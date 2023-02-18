@@ -1,21 +1,11 @@
 #
-\render_rows==
-	(\render_row @\loop \list\next
-	list next \row\tail
-	render_row row;
-	loop tail;
-	next
-	)
-
-\render_list==
-	(\render_row\list\next
-	say "[";
-	render_rows render_row list;
-	say "]";
-	next
+\say_list==
+	(\say_row\list
+	say "["
+	each list say_row
+	say "]"
 	)
 
 \form
-def "render_rows" render_rows;
-def "render_list" render_list;
+def "say_list" say_list;
 form
