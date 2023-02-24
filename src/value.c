@@ -33,30 +33,11 @@ unions, and using a named union is more pain than it's worth.
 
 static value free_list = 0;
 
-static void push_free(value f)
-	{
-	f->N = (unsigned long)free_list;
-	free_list = f;
-	}
-
-static value pop_free(void)
-	{
-	value f = free_list;
-	free_list = (value)f->N;
-	return f;
-	}
-
-/* Increment the reference count. */
-value hold(value f)
-	{
-	f->N++;
-	return f;
-	}
-
-/* Decrement the reference count and recycle if it drops to zero. */
-void drop(value f)
-	{
-	if (--f->N == 0)
+/* Recycle a value f with reference count 0, putting f on the free list and
+dropping its content.  If f is an atom, its data is freed.  If f is a function
+application, its L and R reference counts are decremented and those are also
+recycled if their counts reach 0. */
+static void recycle(value f)
 	{
 	value stack = f;
 	while (stack)
@@ -86,9 +67,31 @@ void drop(value f)
 				free(f->R);
 				}
 			}
-		push_free(f);
+
+		f->N = (unsigned long)free_list;
+		free_list = f;
 		}
 	}
+
+static value pop_free(void)
+	{
+	value f = free_list;
+	free_list = (value)f->N;
+	return f;
+	}
+
+/* Increment the reference count. */
+value hold(value f)
+	{
+	f->N++;
+	return f;
+	}
+
+/* Decrement the reference count and recycle if it drops to zero. */
+void drop(value f)
+	{
+	if (--f->N == 0)
+		recycle(f);
 	}
 
 void clear_free_list(void)
