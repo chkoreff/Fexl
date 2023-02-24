@@ -57,13 +57,28 @@ value hold(value f)
 void drop(value f)
 	{
 	if (--f->N == 0)
+	{
+	value stack = f;
+	while (stack)
 		{
+		value f = stack;
+		stack = (value)f->N;
+
 		if (f->L)
 			{
 			if (f->L->N)
 				{
-				drop(f->L);
-				drop(f->R);
+				if (--f->R->N == 0)
+					{
+					f->R->N = (unsigned long)stack;
+					stack = f->R;
+					}
+
+				if (--f->L->N == 0)
+					{
+					f->L->N = (unsigned long)stack;
+					stack = f->L;
+					}
 				}
 			else
 				{
@@ -73,6 +88,7 @@ void drop(value f)
 			}
 		push_free(f);
 		}
+	}
 	}
 
 void clear_free_list(void)
