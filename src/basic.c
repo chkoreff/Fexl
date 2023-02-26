@@ -250,3 +250,33 @@ value expand(value f)
 		}
 	return f->R;
 	}
+
+void beg_basic(void)
+	{
+	QI = Q(type_I);
+	QT = Q(type_T);
+	QF = Q(type_F);
+	QY = Q(type_Y);
+	Qvoid = Q(type_void);
+	Qlist = Q(type_list);
+	Qcons = Q(type_cons);
+	Qnull = Q(type_null);
+	Qeval = Q(type_eval);
+	Qonce = Q(type_once);
+	Qyield = Q(type_yield);
+	}
+
+void end_basic(void)
+	{
+	drop(QI);
+	drop(QT);
+	drop(QF);
+	drop(QY);
+	drop(Qvoid);
+	drop(Qlist);
+	drop(Qcons);
+	drop(Qnull);
+	drop(Qeval);
+	drop(Qonce);
+	drop(Qyield);
+	}

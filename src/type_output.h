@@ -9,3 +9,5 @@ extern value type_fput(value f);
 extern value type_fnl(value f);
 extern value type_fsay(value f);
 extern value type_fflush(value f);
+extern void beg_output(void);
+extern void end_output(void);

@@ -36,3 +36,5 @@ extern const char *cur_name;
 extern int match(const char *other);
 extern value type_resolve(value f);
 extern value op_resolve(value f, value define(void));
+extern void beg_sym(void);
+extern void end_sym(void);

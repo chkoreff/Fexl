@@ -475,3 +475,13 @@ value op_resolve(value f, value define(void))
 	return f;
 	}
 	}
+
+void beg_sym(void)
+	{
+	Qsubst = Q(type_subst);
+	}
+
+void end_sym(void)
+	{
+	drop(Qsubst);
+	}

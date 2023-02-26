@@ -273,78 +273,23 @@ value type_std(value f)
 
 static void beg_const(void)
 	{
-	/* basic */
-	QI = Q(type_I);
-	QT = Q(type_T);
-	QF = Q(type_F);
-	QY = Q(type_Y);
-	Qvoid = Q(type_void);
-	Qlist = Q(type_list);
-	Qcons = Q(type_cons);
-	Qnull = Q(type_null);
-	Qeval = Q(type_eval);
-	Qonce = Q(type_once);
-	Qyield = Q(type_yield);
-
-	/* type_sym */
-	Qsubst = Q(type_subst);
-
-	/* type_file */
-	Qstdin = Qfile(stdin);
-	Qstdout = Qfile(stdout);
-	Qstderr = Qfile(stderr);
-
-	/* type_output */
-	Qput = Q(type_put);
-	Qnl = Q(type_nl);
-	Qfput = Q(type_fput);
-	Qfnl = Q(type_fnl);
-
-	/* type_tuple */
-	Qtuple = Q(type_tuple);
-
-	/* type_record */
-	Qempty = record_empty();
-
-	/* type_signal */
+	beg_basic();
+	beg_sym();
+	beg_file();
+	beg_output();
+	beg_tuple();
+	beg_record();
 	init_signal();
 	}
 
 static void end_const(void)
 	{
-	/* basic */
-	drop(QI);
-	drop(QT);
-	drop(QF);
-	drop(QY);
-	drop(Qvoid);
-	drop(Qlist);
-	drop(Qcons);
-	drop(Qnull);
-	drop(Qeval);
-	drop(Qonce);
-	drop(Qyield);
-
-	/* type_sym */
-	drop(Qsubst);
-
-	/* type_file */
-	drop(Qstdin);
-	drop(Qstdout);
-	drop(Qstderr);
-
-	/* type_output */
-	drop(Qput);
-	drop(Qnl);
-	drop(Qfput);
-	drop(Qfnl);
-
-	/* type_tuple */
-	drop(Qtuple);
-
-	/* type_record */
-	drop(Qempty);
-
+	end_basic();
+	end_sym();
+	end_file();
+	end_output();
+	end_tuple();
+	end_record();
 	close_random();
 	}
 

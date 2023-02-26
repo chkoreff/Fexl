@@ -18,3 +18,5 @@ extern value record_empty(void);
 extern value type_set(value f);
 extern value type_record_count(value f);
 extern value type_record_item(value f);
+extern void beg_record(void);
+extern void end_record(void);

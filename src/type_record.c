@@ -273,3 +273,13 @@ value type_record_item(value f)
 	}
 	return f;
 	}
+
+void beg_record(void)
+	{
+	Qempty = record_empty();
+	}
+
+void end_record(void)
+	{
+	drop(Qempty);
+	}

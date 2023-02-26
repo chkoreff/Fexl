@@ -55,3 +55,13 @@ value pair(value x, value y)
 	{
 	return AV(hold(Qtuple),V(0,x,V(0,y,hold(Qnull))));
 	}
+
+void beg_tuple(void)
+	{
+	Qtuple = Q(type_tuple);
+	}
+
+void end_tuple(void)
+	{
+	drop(Qtuple);
+	}
