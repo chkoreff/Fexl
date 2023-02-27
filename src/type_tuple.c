@@ -48,7 +48,7 @@ value type_tuple_to_list(value f)
 value type_list_to_tuple(value f)
 	{
 	if (!f->L) return 0;
-	return AV(hold(Qtuple),hold(expand(f)));
+	return AV(hold(Qtuple),hold(f->R));
 	}
 
 value pair(value x, value y)
