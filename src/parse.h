@@ -1,1 +1,1 @@
-extern value parse_fexl(value x, value label);
+extern value parse_fexl(value stream, value label);
