@@ -10,4 +10,4 @@ extern int collect_to_ch(struct buffer *buf, const char t_ch);
 extern int collect_string(struct buffer *buf, const char *end,
 	unsigned long len);
 extern int collect_tilde_string(struct buffer *buf);
-extern value read_stream(value x, value read);
+extern value read_stream(value stream, value read);
