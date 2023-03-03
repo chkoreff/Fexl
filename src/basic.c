@@ -218,7 +218,7 @@ value expand(value f)
 			continue;
 			}
 
-		x = (p->R = eval(x));
+		x = eval(x);
 
 		if (x->T == type_cons && x->L && x->L->L && !x->L->L->L)
 			{
@@ -239,7 +239,10 @@ value expand(value f)
 			p->R = data;
 			}
 		else if (x->T == type_null && !x->L)
+			{
+			p->R = x;
 			break;
+			}
 		else
 			{
 			/* Replace non-list tail with null. */
