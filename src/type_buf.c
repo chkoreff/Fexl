@@ -16,10 +16,15 @@ value type_buf(value f)
 	return type_atom(f);
 	}
 
+static void drop_buf(value f)
+	{
+	buf_free((buffer)f->R);
+	}
+
 /* buf_new returns a new empty character buffer. */
 value type_buf_new(value f)
 	{
-	static struct value atom = {0, (type)buf_free};
+	static struct value atom = {0, (type)drop_buf};
 	(void)f;
 	return V(type_buf,&atom,(value)buf_new());
 	}

@@ -9,9 +9,9 @@
 #include <type_num.h>
 #include <type_str.h>
 
-static void num_free(double *p)
+static void drop_num(value f)
 	{
-	free_memory(p,sizeof(double));
+	(void)f;
 	}
 
 value type_num(value f)
@@ -21,10 +21,8 @@ value type_num(value f)
 
 value Qnum(double x)
 	{
-	static struct value atom = {0, (type)num_free};
-	double *p = new_memory(sizeof(double));
-	*p = x;
-	return V(type_num,&atom,(value)p);
+	static struct value atom = {0, (type)drop_num};
+	return V_double(type_num,&atom,x);
 	}
 
 value Qnum_str0(const char *name)
@@ -38,7 +36,7 @@ value Qnum_str0(const char *name)
 
 double get_double(value x)
 	{
-	return *((double *)x->R);
+	return x->v_double;
 	}
 
 unsigned long get_ulong(value x)

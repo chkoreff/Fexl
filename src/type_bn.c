@@ -21,9 +21,14 @@ value type_bn(value f)
 	return type_atom(f);
 	}
 
+static void drop_bn(value f)
+	{
+	bn_free((struct bn *)f->R);
+	}
+
 value Qbn(struct bn *x)
 	{
-	static struct value atom = {0, (type)bn_free};
+	static struct value atom = {0, (type)drop_bn};
 	return V(type_bn,&atom,(value)x);
 	}
 

@@ -19,15 +19,16 @@ static struct istr *istr_new(value x)
 	return in;
 	}
 
-static void istr_free(struct istr *in)
+static void drop_istr(value f)
 	{
-	drop(in->str);
+	struct istr *in = (struct istr *)f->R;
+	drop(in->str); // LATER 20230329 This makes drop recursive.
 	free_memory(in,sizeof(struct istr));
 	}
 
 value Qistr(value x)
 	{
-	static struct value atom = {0, (type)istr_free};
+	static struct value atom = {0, (type)drop_istr};
 	return V(type_istr,&atom,(value)istr_new(x));
 	}
 

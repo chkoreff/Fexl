@@ -45,9 +45,10 @@ static void form_discard(struct form *form)
 	free_memory(form,sizeof(struct form));
 	}
 
-static void form_free(struct form *form)
+static void drop_form(value f)
 	{
-	drop(form->exp);
+	struct form *form = (struct form *)f->R;
+	drop(form->exp); // LATER 20230329 This makes drop recursive.
 	if (form->label)
 		drop(form->label);
 	form_discard(form);
@@ -60,7 +61,7 @@ value type_form(value f)
 
 value Qform(struct form *exp)
 	{
-	static struct value atom = {0, (type)form_free};
+	static struct value atom = {0, (type)drop_form};
 	return V(type_form,&atom,(value)exp);
 	}
 
@@ -235,8 +236,9 @@ struct form *form_lam(string name, struct form *body)
 	return body;
 	}
 
-/* Use pattern p to make a copy of expression e with argument x substituted in
-the places designated by the pattern. */
+// Use pattern p to make a copy of expression e with argument x substituted in
+// the places designated by the pattern.
+
 static value subst(value p, value e, value x)
 	{
 	if (p == QF) return hold(e);

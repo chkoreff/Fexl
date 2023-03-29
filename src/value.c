@@ -63,8 +63,8 @@ static void recycle(value f)
 				}
 			else
 				{
-				void (*free)(void *) = (void *)f->L->T;
-				free(f->R);
+				void (*free)(value) = (void *)f->L->T;
+				free(f);
 				}
 			}
 
@@ -106,14 +106,24 @@ void end_value(void)
 	end_memory();
 	}
 
+static value new_value(void)
+	{
+	return free_list ? pop_free() : new_memory(sizeof(struct value));
+	}
+
 /* Return a value of type T with the given left and right side. */
 value V(type T, value L, value R)
 	{
-	value f = free_list ? pop_free() : new_memory(sizeof(struct value));
-	f->N = 1;
-	f->T = T;
-	f->L = L;
-	f->R = R;
+	value f = new_value();
+	*f = (struct value){1, T, L, {.R = R}};
+	return f;
+	}
+
+// Return a value of type T with a double value.
+value V_double(type T, value L, double v_double)
+	{
+	value f = new_value();
+	*f = (struct value){1, T, L, {.v_double = v_double}};
 	return f;
 	}
 

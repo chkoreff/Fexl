@@ -11,14 +11,14 @@ value type_lib(value f)
 	return type_atom(f);
 	}
 
-static void lib_free(void *lib)
+static void drop_lib(value f)
 	{
-	dlclose(lib);
+	dlclose(f->R);
 	}
 
 value Qlib(void *lib)
 	{
-	static struct value atom = {0, (type)lib_free};
+	static struct value atom = {0, (type)drop_lib};
 	return V(type_lib,&atom,(value)lib);
 	}
 

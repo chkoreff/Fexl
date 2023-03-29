@@ -6,7 +6,11 @@ struct value
 	unsigned long N;
 	type T;
 	value L;
-	value R;
+	union
+		{
+		value R;
+		double v_double;
+		};
 	};
 
 extern value hold(value f);
@@ -14,6 +18,7 @@ extern void drop(value f);
 extern void clear_free_list(void);
 extern void end_value(void);
 extern value V(type T, value L, value R);
+extern value V_double(type T, value L, double v_double);
 extern value Q(type T);
 extern value AV(value x, value y);
 extern value type_A(value f);

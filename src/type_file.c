@@ -35,9 +35,14 @@ static void fh_free(FILE *fh)
 		fclose(fh);
 	}
 
+static void drop_file(value f)
+	{
+	fh_free((FILE *)f->R);
+	}
+
 value Qfile(FILE *fh)
 	{
-	static struct value atom = {0, (type)fh_free};
+	static struct value atom = {0, (type)drop_file};
 	return V(type_file,&atom,(value)fh);
 	}
 
