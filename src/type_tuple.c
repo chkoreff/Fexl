@@ -2,7 +2,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <type_num.h>
 #include <type_tuple.h>
 
 value Qtuple;

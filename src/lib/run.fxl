@@ -11,7 +11,7 @@
 	\out=(file_content child_out)
 
 	\status
-	\err=(file_content child_err);
+	\err=(file_content child_err)
 	{ out err status }
 	)
 

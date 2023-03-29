@@ -7,7 +7,7 @@ struct bn
 	};
 
 extern struct bn *bn_new(u64 n);
-extern void bn_free(struct bn *x1);
+extern void bn_free(struct bn *x);
 extern int bn_eq0(const struct bn *x);
 extern int bn_is_neg(const struct bn *x);
 extern struct bn *bn_neg(const struct bn *x);
