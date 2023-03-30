@@ -19,7 +19,7 @@ static struct istr *istr_new(value x)
 	return in;
 	}
 
-static void drop_istr(value f)
+static void clear_istr(value f)
 	{
 	struct istr *in = (struct istr *)f->R;
 	drop(in->str); // LATER 20230329 This makes drop recursive.
@@ -28,7 +28,7 @@ static void drop_istr(value f)
 
 value Qistr(value x)
 	{
-	static struct value atom = {0, (type)drop_istr};
+	static struct value atom = {0, {.clear=clear_istr}};
 	return V(type_istr,&atom,(value)istr_new(x));
 	}
 

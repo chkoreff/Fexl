@@ -9,7 +9,7 @@
 #include <type_num.h>
 #include <type_str.h>
 
-static void drop_num(value f)
+static void clear_num(value f)
 	{
 	(void)f;
 	}
@@ -21,7 +21,7 @@ value type_num(value f)
 
 value Qnum(double x)
 	{
-	static struct value atom = {0, (type)drop_num};
+	static struct value atom = {0, {.clear=clear_num}};
 	return V_double(type_num,&atom,x);
 	}
 

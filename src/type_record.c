@@ -20,7 +20,7 @@ static unsigned long record_size(unsigned long len)
 	return sizeof(struct record) + len*sizeof(struct item);
 	}
 
-static void drop_record(value f)
+static void clear_record(value f)
 	{
 	struct record *rec = (struct record *)f->R;
 	unsigned long i;
@@ -67,7 +67,7 @@ value type_record(value f)
 
 static value Qrecord(struct record *rec)
 	{
-	static struct value atom = {0, (type)drop_record};
+	static struct value atom = {0, {.clear=clear_record}};
 	return V(type_record,&atom,(value)rec);
 	}
 

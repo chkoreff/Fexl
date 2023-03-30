@@ -4,7 +4,11 @@ typedef value (*type)(value);
 struct value
 	{
 	unsigned long N;
-	type T;
+	union
+		{
+		type T;
+		void (*clear)(value);
+		};
 	value L;
 	union
 		{

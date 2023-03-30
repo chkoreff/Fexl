@@ -62,10 +62,7 @@ static void recycle(value f)
 					}
 				}
 			else
-				{
-				void (*free)(value) = (void *)f->L->T;
-				free(f);
-				}
+				f->L->clear(f);
 			}
 
 		f->N = (unsigned long)free_list;
@@ -115,7 +112,7 @@ static value new_value(void)
 value V(type T, value L, value R)
 	{
 	value f = new_value();
-	*f = (struct value){1, T, L, {.R = R}};
+	*f = (struct value){1, {.T=T}, L, {.R = R}};
 	return f;
 	}
 
@@ -123,7 +120,7 @@ value V(type T, value L, value R)
 value V_double(type T, value L, double v_double)
 	{
 	value f = new_value();
-	*f = (struct value){1, T, L, {.v_double = v_double}};
+	*f = (struct value){1, {.T=T}, L, {.v_double = v_double}};
 	return f;
 	}
 

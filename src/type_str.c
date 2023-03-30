@@ -19,14 +19,14 @@ value type_str(value f)
 	return type_atom(f);
 	}
 
-static void drop_str(value f)
+static void clear_str(value f)
 	{
 	str_free((string)f->R);
 	}
 
 value Qstr(string x)
 	{
-	static struct value atom = {0, (type)drop_str};
+	static struct value atom = {0, {.clear=clear_str}};
 	return V(type_str,&atom,(value)x);
 	}
 

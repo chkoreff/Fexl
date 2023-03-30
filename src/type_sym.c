@@ -45,7 +45,7 @@ static void form_discard(struct form *form)
 	free_memory(form,sizeof(struct form));
 	}
 
-static void drop_form(value f)
+static void clear_form(value f)
 	{
 	struct form *form = (struct form *)f->R;
 	drop(form->exp); // LATER 20230329 This makes drop recursive.
@@ -61,7 +61,7 @@ value type_form(value f)
 
 value Qform(struct form *exp)
 	{
-	static struct value atom = {0, (type)drop_form};
+	static struct value atom = {0, {.clear=clear_form}};
 	return V(type_form,&atom,(value)exp);
 	}
 
