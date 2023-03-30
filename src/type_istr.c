@@ -21,14 +21,14 @@ static struct istr *istr_new(value x)
 
 static void clear_istr(value f)
 	{
-	struct istr *in = (struct istr *)f->R;
-	drop(in->str); // LATER 20230329 This makes drop recursive.
+	struct istr *in = f->v_ptr;
+	drop_arg(in->str);
 	free_memory(in,sizeof(struct istr));
 	}
 
 value Qistr(value x)
 	{
-	static struct value atom = {0, {.clear=clear_istr}};
+	static struct value atom = {{.N=0}, {.clear=clear_istr}};
 	return V(type_istr,&atom,(value)istr_new(x));
 	}
 
@@ -46,7 +46,7 @@ static int slook(struct istr *in)
 
 struct istr *get_istr(value x)
 	{
-	return (struct istr *)x->R;
+	return x->v_ptr;
 	}
 
 value type_istr(value f)

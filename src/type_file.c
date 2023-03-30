@@ -37,18 +37,18 @@ static void fh_free(FILE *fh)
 
 static void clear_file(value f)
 	{
-	fh_free((FILE *)f->R);
+	fh_free(f->v_ptr);
 	}
 
 value Qfile(FILE *fh)
 	{
-	static struct value atom = {0, {.clear=clear_file}};
+	static struct value atom = {{.N=0}, {.clear=clear_file}};
 	return V(type_file,&atom,(value)fh);
 	}
 
 FILE *get_fh(value x)
 	{
-	return (FILE *)x->R;
+	return x->v_ptr;
 	}
 
 /* (fopen path mode) Open a file and return fh, where fh is the open file
@@ -421,7 +421,7 @@ static value op_seek(value f, int whence)
 	if (x->T == type_file && y->T == type_num)
 		{
 		FILE *fh = get_fh(x);
-		long offset = get_double(y);
+		long offset = y->v_double;
 		int code = fseek(fh,offset,whence);
 		f = Qnum(code);
 		}

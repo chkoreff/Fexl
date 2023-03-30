@@ -8,7 +8,7 @@
 
 buffer get_buf(value x)
 	{
-	return (buffer)x->R;
+	return x->v_ptr;
 	}
 
 value type_buf(value f)
@@ -18,13 +18,13 @@ value type_buf(value f)
 
 static void clear_buf(value f)
 	{
-	buf_free((buffer)f->R);
+	buf_free(f->v_ptr);
 	}
 
 /* buf_new returns a new empty character buffer. */
 value type_buf_new(value f)
 	{
-	static struct value atom = {0, {.clear=clear_buf}};
+	static struct value atom = {{.N=0}, {.clear=clear_buf}};
 	(void)f;
 	return V(type_buf,&atom,(value)buf_new());
 	}

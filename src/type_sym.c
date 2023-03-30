@@ -25,33 +25,33 @@ static struct form *form_new(struct table *table, value exp, value label)
 	return form;
 	}
 
-static void table_free(struct table *table)
+static void table_free(struct table *table, void (*do_drop)(value))
 	{
 	unsigned long i;
 	/* Drop each symbol in vec */
 	for (i = 0; i < table->count; i++)
 		{
 		struct symbol *sym = &table->vec[i];
-		drop(sym->name);
-		drop(sym->pattern);
+		do_drop(sym->name);
+		do_drop(sym->pattern);
 		}
 	free_memory(table, table_size(table->len));
 	}
 
-static void form_discard(struct form *form)
+static void form_discard(struct form *form, void (*do_drop)(value))
 	{
 	if (form->table)
-		table_free(form->table);
+		table_free(form->table,do_drop);
 	free_memory(form,sizeof(struct form));
 	}
 
 static void clear_form(value f)
 	{
-	struct form *form = (struct form *)f->R;
-	drop(form->exp); // LATER 20230329 This makes drop recursive.
-	if (form->label)
-		drop(form->label);
-	form_discard(form);
+	struct form *form = f->v_ptr;
+	drop_arg(form->exp);
+	if (form->label) // LATER 20230330 Seems always true here.
+		drop_arg(form->label);
+	form_discard(form,drop_arg);
 	}
 
 value type_form(value f)
@@ -61,7 +61,7 @@ value type_form(value f)
 
 value Qform(struct form *exp)
 	{
-	static struct value atom = {0, {.clear=clear_form}};
+	static struct value atom = {{.N=0}, {.clear=clear_form}};
 	return V(type_form,&atom,(value)exp);
 	}
 
@@ -168,12 +168,12 @@ struct form *form_join(type t, struct form *fun, struct form *arg)
 	{
 	struct table *table = table_merge(fun->table,arg->table);
 	if (fun->table)
-		table_free(fun->table);
+		table_free(fun->table,drop);
 	fun->table = table;
 	}
 
 	fun->exp = V(t,fun->exp,arg->exp);
-	form_discard(arg);
+	form_discard(arg,drop);
 	return fun;
 	}
 
@@ -266,7 +266,7 @@ value type_is_closed(value f)
 	value exp = arg(f->R);
 	if (exp->T == type_form)
 		{
-		struct form *form = (struct form *)exp->R;
+		struct form *form = exp->v_ptr;
 		f = boolean(is_closed(form->table));
 		}
 	else
@@ -279,7 +279,7 @@ value type_is_closed(value f)
 /* Define key as val in a form. */
 static value def(const char *key, value val, value exp)
 	{
-	struct form *form = (struct form *)exp->R;
+	struct form *form = exp->v_ptr;
 	struct table *xt = form->table;
 	value pattern = 0;
 
@@ -372,7 +372,7 @@ value type_value(value f)
 	value exp = arg(f->R);
 	if (exp->T == type_form)
 		{
-		struct form *form = (struct form *)exp->R;
+		struct form *form = exp->v_ptr;
 		struct table *xt = form->table;
 
 		if (is_closed(xt))
@@ -419,7 +419,7 @@ value op_resolve(value f, value define(void))
 	value exp = arg(f->R);
 	if (exp->T == type_form)
 		{
-		struct form *form = (struct form *)exp->R;
+		struct form *form = exp->v_ptr;
 		struct table *xt = form->table;
 
 		if (is_closed(xt))
@@ -464,7 +464,7 @@ value op_resolve(value f, value define(void))
 
 			if (yi == 0)
 				{
-				table_free(yt);
+				table_free(yt,drop);
 				yt = 0;
 				}
 

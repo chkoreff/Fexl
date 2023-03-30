@@ -13,7 +13,7 @@
 
 struct bn *get_bn(value x)
 	{
-	return (struct bn *)x->R;
+	return x->v_ptr;
 	}
 
 value type_bn(value f)
@@ -23,12 +23,12 @@ value type_bn(value f)
 
 static void clear_bn(value f)
 	{
-	bn_free((struct bn *)f->R);
+	bn_free(f->v_ptr);
 	}
 
 value Qbn(struct bn *x)
 	{
-	static struct value atom = {0, {.clear=clear_bn}};
+	static struct value atom = {{.N=0}, {.clear=clear_bn}};
 	return V(type_bn,&atom,(value)x);
 	}
 

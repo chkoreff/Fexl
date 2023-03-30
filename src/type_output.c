@@ -32,7 +32,7 @@ static value op_put(FILE *fh, value f)
 		if (x->T == type_str)
 			fput_str(fh,get_str(x));
 		else if (x->T == type_num)
-			fput_double(fh,get_double(x));
+			fput_double(fh,x->v_double);
 		else if (x->T == type_T && !x->L)
 			fput_ch(fh,'T');
 		else if (x->T == type_F && !x->L)

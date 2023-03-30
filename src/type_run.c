@@ -37,7 +37,7 @@ value type_argv(value f)
 	value x = arg(f->R);
 	if (x->T == type_num)
 		{
-		int i = get_double(x);
+		int i = x->v_double;
 		if (i >= 0 && i < main_argc)
 			f = Qstr(str_new_data0(main_argv[i]));
 		else
@@ -449,8 +449,8 @@ value type_kill(value f)
 	value v_sig = arg(f->R);
 	if (v_pid->T == type_num && v_sig->T == type_num)
 		{
-		int pid = get_double(v_pid);
-		int sig = get_double(v_sig);
+		int pid = v_pid->v_double;
+		int sig = v_sig->v_double;
 		(void)kill(pid,sig);
 		{
 		int status;

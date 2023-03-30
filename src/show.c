@@ -240,7 +240,7 @@ static void show_record(struct record *x)
 static void show_atom(value f)
 	{
 	if (f->T == type_num)
-		put_double(get_double(f));
+		put_double(f->v_double);
 	else if (f->T == type_str)
 		put_quote(get_str(f));
 	else if (f->T == type_var)
@@ -250,7 +250,7 @@ static void show_atom(value f)
 	else if (f->T == type_file)
 		put_ulong(fileno(get_fh(f)));
 	else if (f->T == type_form)
-		show_form((struct form *)f->R);
+		show_form(f->v_ptr);
 	else if (f->T == type_record)
 		show_record(get_record(f));
 	else

@@ -16,7 +16,7 @@ static value op_num(value f, double op(double))
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
-		f = Qnum(op(get_double(x)));
+		f = Qnum(op(x->v_double));
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -31,7 +31,7 @@ static value op_num_num(value f, double op(double,double))
 	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_num && y->T == type_num)
-		f = Qnum(op(get_double(x),get_double(y)));
+		f = Qnum(op(x->v_double,y->v_double));
 	else
 		f = hold(Qvoid);
 	drop(x);

@@ -3,7 +3,11 @@ typedef value (*type)(value);
 
 struct value
 	{
-	unsigned long N;
+	union
+		{
+		unsigned long N;
+		value next;
+		};
 	union
 		{
 		type T;
@@ -13,10 +17,12 @@ struct value
 	union
 		{
 		value R;
+		void *v_ptr;
 		double v_double;
 		};
 	};
 
+extern void drop_arg(value f);
 extern value hold(value f);
 extern void drop(value f);
 extern void clear_free_list(void);

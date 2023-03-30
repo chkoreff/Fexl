@@ -14,13 +14,13 @@ value type_var(value f)
 
 static void clear_var(value f)
 	{
-	drop(f->R); // LATER 20230329 This makes drop recursive.
+	drop_arg(f->R);
 	}
 
 /* var_new returns a new variable with a void value. */
 value type_var_new(value f)
 	{
-	static struct value atom = {0, {.clear=clear_var}};
+	static struct value atom = {{.N=0}, {.clear=clear_var}};
 	(void)f;
 	return V(type_var,&atom,hold(Qvoid));
 	}

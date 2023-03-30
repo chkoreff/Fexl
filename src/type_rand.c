@@ -13,7 +13,7 @@ value type_seed_rand(value f)
 	value x = arg(f->R);
 	if (x->T == type_num)
 		{
-		double seed = get_double(x) * (double)RAND_MAX;
+		double seed = x->v_double * (double)RAND_MAX;
 		srand(seed);
 		f = hold(QI);
 		}

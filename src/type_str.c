@@ -11,7 +11,7 @@
 
 string get_str(value x)
 	{
-	return (string)x->R;
+	return x->v_ptr;
 	}
 
 value type_str(value f)
@@ -21,12 +21,12 @@ value type_str(value f)
 
 static void clear_str(value f)
 	{
-	str_free((string)f->R);
+	str_free(f->v_ptr);
 	}
 
 value Qstr(string x)
 	{
-	static struct value atom = {0, {.clear=clear_str}};
+	static struct value atom = {{.N=0}, {.clear=clear_str}};
 	return V(type_str,&atom,(value)x);
 	}
 
@@ -140,8 +140,8 @@ value type_slice(value f)
 	value z = arg(f->R);
 	if (x->T == type_str && y->T == type_num && z->T == type_num)
 		{
-		double yn = get_double(y);
-		double zn = get_double(z);
+		double yn = y->v_double;
+		double zn = z->v_double;
 		if (yn >= 0 && zn >= 0)
 			f = Qstr(str_slice(get_str(x),yn,zn));
 		else
@@ -166,7 +166,7 @@ value type_search(value f)
 	value z = arg(f->R);
 	if (x->T == type_str && y->T == type_str && z->T == type_num)
 		{
-		double zn = get_double(z);
+		double zn = z->v_double;
 		if (zn >= 0)
 			{
 			string xs = get_str(x);
@@ -236,7 +236,7 @@ value type_chr(value f)
 	value x = arg(f->R);
 	if (x->T == type_num)
 		{
-		double xn = get_double(x);
+		double xn = x->v_double;
 		char ch = xn;
 		f = Qstr(str_new_data(&ch,1));
 		}
@@ -257,7 +257,7 @@ value type_char_width(value f)
 	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_num)
 		{
-		double yn = get_double(y);
+		double yn = y->v_double;
 		if (yn >= 0)
 			{
 			string xs = get_str(x);

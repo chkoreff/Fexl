@@ -33,7 +33,7 @@ static value op_strftime(value f, struct tm *(*convert)(const time_t *))
 	value x = arg(f->R);
 	if (x->T == type_num)
 		{
-		time_t n = get_double(x);
+		time_t n = x->v_double;
 		struct tm *tm = convert(&n);
 		char buf[32];
 		strftime(buf,32,time_format,tm);

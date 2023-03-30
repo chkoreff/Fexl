@@ -12,7 +12,7 @@ value Qempty;
 
 struct record *get_record(value x)
 	{
-	return (struct record *)x->R;
+	return x->v_ptr;
 	}
 
 static unsigned long record_size(unsigned long len)
@@ -22,14 +22,14 @@ static unsigned long record_size(unsigned long len)
 
 static void clear_record(value f)
 	{
-	struct record *rec = (struct record *)f->R;
+	struct record *rec = f->v_ptr;
 	unsigned long i;
 	/* Drop each item in record */
 	for (i = 0; i < rec->count; i++)
 		{
 		struct item *item = &rec->item[i];
-		drop(item->key);
-		drop(item->val);
+		drop_arg(item->key);
+		drop_arg(item->val);
 		}
 	free_memory(rec, record_size(rec->len));
 	}
@@ -67,7 +67,7 @@ value type_record(value f)
 
 static value Qrecord(struct record *rec)
 	{
-	static struct value atom = {0, {.clear=clear_record}};
+	static struct value atom = {{.N=0}, {.clear=clear_record}};
 	return V(type_record,&atom,(value)rec);
 	}
 

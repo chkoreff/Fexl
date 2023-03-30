@@ -21,7 +21,7 @@ value type_num(value f)
 
 value Qnum(double x)
 	{
-	static struct value atom = {0, {.clear=clear_num}};
+	static struct value atom = {{.N=0}, {.clear=clear_num}};
 	return V_double(type_num,&atom,x);
 	}
 
@@ -34,14 +34,9 @@ value Qnum_str0(const char *name)
 		return 0;
 	}
 
-double get_double(value x)
-	{
-	return x->v_double;
-	}
-
 unsigned long get_ulong(value x)
 	{
-	double n = get_double(x);
+	double n = x->v_double;
 	return n >= 0 ? n : 0;
 	}
 
@@ -51,7 +46,7 @@ value type_num_str(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
-		f = Qstr(str_new_data0(format_double(get_double(x))));
+		f = Qstr(str_new_data0(format_double(x->v_double)));
 	else
 		f = hold(Qvoid);
 	drop(x);

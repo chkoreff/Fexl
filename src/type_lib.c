@@ -13,12 +13,12 @@ value type_lib(value f)
 
 static void clear_lib(value f)
 	{
-	dlclose(f->R);
+	dlclose(f->v_ptr);
 	}
 
 value Qlib(void *lib)
 	{
-	static struct value atom = {0, {.clear=clear_lib}};
+	static struct value atom = {{.N=0}, {.clear=clear_lib}};
 	return V(type_lib,&atom,(value)lib);
 	}
 
@@ -52,7 +52,7 @@ value type_dlsym(value f)
 	value y = arg(f->R);
 	if (x->T == type_lib && y->T == type_str)
 		{
-		void *lib = x->R;
+		void *lib = x->v_ptr;
 		const char *name = str_data(y);
 		type t = dlsym(lib,name);
 

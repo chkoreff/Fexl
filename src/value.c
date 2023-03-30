@@ -4,77 +4,72 @@
 /*
 The value structure is defined as follows.
 
-The N field is the reference count.
+Let f be a pointer to a struct value.
 
-The T field is the type, a C routine which steps the value during evaluation.
+f->N is the reference count.
 
-The L and R fields are the left and right components of the value, defined as
-follows:
+f->T is the type, a C routine which steps the value during evaluation.
 
-1. If L == 0, then R == 0 and the value is a primary function (combinator).
+f->next links values on the free list after f->N drops to 0.
 
-2. If L != 0 and L->N == 0, the value is an atom.  R points to the data, and
-L->T points to the function that frees the data when N == 0.
+Every value f is one of three classes: combinator, atom, or apply.
 
-3. If L != 0 and L->N > 0, the value is the function application of L to R.
+1. combinator : (f->L == 0 && f->R == 0)
 
-See the "drop" routine below for a succinct example of those rules.
+A combinator is a primary function with no arguments.
 
-The N field also serves to link values on the free list.  It is not strictly
-portable to store a pointer in an unsigned long field, but people have relied
-on that for decades, and it works on every machine I use.
+2. atom       : (f->L != 0 && f->L->N == 0)
 
-I considered using the uintptr_t type mentioned in the C Reference Standard,
-but that type is designated as "optional" and thus not strictly portable.
+An atom is a piece of data.  The data reside in the union which follows f->L.
+The f->L->clear field is a function that frees the data when f->N drops to 0.
 
-A union would do the trick, but the ISO C90 standard does not support unnamed
-unions, and using a named union is more pain than it's worth.
+3. apply      : (f->L != 0 && f->L->N > 0)
+
+An apply is the application of f->L to f->R.
+
+The "recycle" routine below succinctly reflects these rules.
+
+Note that on most machines, (sizeof(struct value) == 32).
 */
 
 static value free_list = 0;
+static value free_stack = 0;
 
-/* Recycle a value f with reference count 0, putting f on the free list and
-dropping its content.  If f is an atom, its data is freed.  If f is a function
-application, its L and R reference counts are decremented and those are also
-recycled if their counts reach 0. */
+void drop_arg(value f)
+	{
+	if (--f->N == 0)
+		{
+		f->next = free_stack;
+		free_stack = f;
+		}
+	}
+
+// Recycle a value f with reference count 0, putting f on the free list and
+// dropping its content.  If f is an atom, its data is freed.  If f is an
+// apply, its L and R reference counts are decremented and those are also
+// recycled if their counts reach 0.
 static void recycle(value f)
 	{
-	value stack = f;
-	while (stack)
+	free_stack = f;
+	while (free_stack)
 		{
-		value f = stack;
-		stack = (value)f->N;
+		value f = free_stack;
+		free_stack = f->next;
 
 		if (f->L)
 			{
 			if (f->L->N)
 				{
-				if (--f->R->N == 0)
-					{
-					f->R->N = (unsigned long)stack;
-					stack = f->R;
-					}
-
-				if (--f->L->N == 0)
-					{
-					f->L->N = (unsigned long)stack;
-					stack = f->L;
-					}
+				drop_arg(f->R);
+				drop_arg(f->L);
 				}
 			else
 				f->L->clear(f);
 			}
 
-		f->N = (unsigned long)free_list;
+		f->next = free_list;
 		free_list = f;
 		}
-	}
-
-static value pop_free(void)
-	{
-	value f = free_list;
-	free_list = (value)f->N;
-	return f;
 	}
 
 /* Increment the reference count. */
@@ -94,7 +89,11 @@ void drop(value f)
 void clear_free_list(void)
 	{
 	while (free_list)
-		free_memory(pop_free(),sizeof(struct value));
+		{
+		value f = free_list;
+		free_list = f->next;
+		free_memory(f,sizeof(struct value));
+		}
 	}
 
 void end_value(void)
@@ -105,14 +104,20 @@ void end_value(void)
 
 static value new_value(void)
 	{
-	return free_list ? pop_free() : new_memory(sizeof(struct value));
+	value f = free_list;
+	if (f)
+		{
+		free_list = f->next;
+		return f;
+		}
+	return new_memory(sizeof(struct value));
 	}
 
 /* Return a value of type T with the given left and right side. */
 value V(type T, value L, value R)
 	{
 	value f = new_value();
-	*f = (struct value){1, {.T=T}, L, {.R = R}};
+	*f = (struct value){{.N=1}, {.T=T}, L, {.R = R}};
 	return f;
 	}
 
@@ -120,7 +125,7 @@ value V(type T, value L, value R)
 value V_double(type T, value L, double v_double)
 	{
 	value f = new_value();
-	*f = (struct value){1, {.T=T}, L, {.v_double = v_double}};
+	*f = (struct value){{.N=1}, {.T=T}, L, {.v_double = v_double}};
 	return f;
 	}
 
