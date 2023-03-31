@@ -261,6 +261,7 @@ static value standard(void)
 
 	/* dynamic libraries */
 	if (match("dlopen")) return Q(type_dlopen);
+	if (match("dlerror")) return Q(type_dlerror);
 	if (match("dlsym")) return Q(type_dlsym);
 
 	return 0;

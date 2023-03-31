@@ -44,6 +44,13 @@ value type_dlopen(value f)
 	}
 	}
 
+value type_dlerror(value f)
+	{
+	char *msg = dlerror();
+	(void)f;
+	return Qstr0(msg ? msg : "");
+	}
+
 value type_dlsym(value f)
 	{
 	if (!f->L || !f->L->L) return 0;

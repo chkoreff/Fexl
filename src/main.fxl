@@ -141,9 +141,9 @@ form
 
 	\path=(path_under dir_base (. "lib/"; . module ".so"))
 	\lib=(dlopen path)
-	is_void lib (error ["Could not open library "path]);
+	is_void lib (error dlerror);
 
-	\sym=="type_define"
+	\sym=(. "type_cx_" module)
 	\entry=(dlsym lib sym)
 	is_void entry (error ["Could not find symbol "sym]);
 

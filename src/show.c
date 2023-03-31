@@ -305,7 +305,7 @@ void show_line(const char *name, value f)
 	put(name);show(f);nl();
 	}
 
-value type_show(value f)
+static value type_show(value f)
 	{
 	if (!f->R) return 0;
 	show(f->R);nl();
@@ -318,7 +318,7 @@ static value define(void)
 	return 0;
 	}
 
-value type_define(value f)
+value type_cx_show(value f)
 	{
 	return op_resolve(f,define);
 	}
