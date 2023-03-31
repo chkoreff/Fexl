@@ -28,6 +28,7 @@ extern struct form *form_join(type t, struct form *fun, struct form *arg);
 extern struct form *form_appv(struct form *fun, struct form *arg);
 extern struct form *form_app(struct form *fun, struct form *arg);
 extern struct form *form_lam(string name, struct form *body);
+extern value type_pattern(value f);
 extern value type_subst(value f);
 extern value type_is_closed(value f);
 extern value type_def(value f);

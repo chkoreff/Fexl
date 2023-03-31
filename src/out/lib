@@ -3,7 +3,7 @@
 [I]
 [list [list] [0 [str "a"] [0 [str "b"] [null]]]]
 [tuple [tuple] [0 [str "a"] [0 [str "b"] [null]]]]
-[subst [subst [subst] [A [F] [A [F] [T]]]] [subst [subst [subst] [A [T] [F]]] [A [I] [I]]]]
+[subst [pattern [A [F] [A [F] [T]]]] [subst [pattern [A [T] [F]]] [A [I] [I]]]]
 [form "test/lib.fxl" [[sym a 11 [A [T] [F]]] [sym b 11 [A [F] [A [T] [F]]]] [sym c 11 [A [F] [A [F] [T]]]] ] [A [I] [A [I] [I]]]]
 [A [say] [str "Hello."]]
 Hello.

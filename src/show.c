@@ -37,6 +37,7 @@ static void put_type(type t)
 	else if (t == type_value) put("value");
 	else if (t == type_resolve) put("resolve");
 	else if (t == type_subst) put("subst");
+	else if (t == type_pattern) put("pattern");
 
 	else if (t == type_put) put("put");
 	else if (t == type_nl) put("nl");
@@ -253,6 +254,8 @@ static void show_atom(value f)
 		show_form(f->v_ptr);
 	else if (f->T == type_record)
 		show_record(get_record(f));
+	else if (f->T == type_pattern)
+		limit_show(f->R);
 	else
 		put_ch('?');
 	}

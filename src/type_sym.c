@@ -227,11 +227,28 @@ static value table_pop(string name, struct table *xt)
 	return pattern;
 	}
 
+value type_pattern(value f)
+	{
+	(void)f;
+	return 0;
+	}
+
+static void clear_pattern(value f)
+	{
+	drop_arg(f->R);
+	}
+
+static value wrap_pattern(value pattern)
+	{
+	static struct value atom = {{.N=0}, {.clear=clear_pattern}};
+	return V(type_pattern,&atom,pattern);
+	}
+
 /* Abstract the name from the body. */
 struct form *form_lam(string name, struct form *body)
 	{
-	value pattern = table_pop(name,body->table);
-	body->exp = AV(AV(hold(Qsubst),pattern),body->exp);
+	value pattern = wrap_pattern(table_pop(name,body->table));
+	body->exp = V(type_subst,pattern,body->exp);
 	str_free(name);
 	return body;
 	}
@@ -249,7 +266,7 @@ static value subst(value p, value e, value x)
 /* (subst p e x) Calls substitute. */
 value type_subst(value f)
 	{
-	if (!f->L->L->L) return 0;
+	if (f->L->T == type_pattern) return 0;
 	return subst(f->L->L->R,f->L->R,f->R);
 	}
 
