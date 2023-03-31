@@ -13,7 +13,7 @@ value Qsubst;
 
 static unsigned long table_size(unsigned long len)
 	{
-	return sizeof(struct table) + len*sizeof(struct symbol);
+	return sizeof(struct table) + sizeof(struct symbol[len]);
 	}
 
 static struct form *form_new(struct table *table, value exp, value label)

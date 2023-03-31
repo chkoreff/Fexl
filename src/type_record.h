@@ -8,7 +8,7 @@ struct record
 	{
 	unsigned long count;
 	unsigned long len;
-	struct item item[0];
+	struct item item[];
 	};
 
 extern value Qempty;

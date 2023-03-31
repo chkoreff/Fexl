@@ -9,7 +9,7 @@ struct table
 	{
 	unsigned long count;
 	unsigned long len;
-	struct symbol vec[0];
+	struct symbol vec[];
 	};
 
 struct form

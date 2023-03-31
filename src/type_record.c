@@ -17,7 +17,7 @@ struct record *get_record(value x)
 
 static unsigned long record_size(unsigned long len)
 	{
-	return sizeof(struct record) + len*sizeof(struct item);
+	return sizeof(struct record) + sizeof(struct item[len]);
 	}
 
 static void clear_record(value f)

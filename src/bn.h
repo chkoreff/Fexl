@@ -3,7 +3,7 @@ struct bn
 	u32 sign;
 	u32 nsd;
 	u32 len;
-	u32 vec[0];
+	u32 vec[];
 	};
 
 extern struct bn *bn_new(u64 n);

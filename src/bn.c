@@ -305,7 +305,7 @@ static void vec_mod(u32 xn, const u32 *x, u32 yn, const u32 *y, u32 *r)
 /* Return the number of bytes needed to store a bn of the given length. */
 static u64 bn_size(u64 n)
 	{
-	return sizeof(struct bn) + n*sizeof(u32);
+	return sizeof(struct bn) + sizeof(u32[n]);
 	}
 
 /* Create an uninitialized bn of length n, where (0 <= n <= UINT32_MAX). */

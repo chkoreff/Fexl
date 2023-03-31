@@ -10,7 +10,7 @@ easier to call system functions that expect it.
 /* Return the number of bytes needed to store a string of the given length. */
 static unsigned long str_size(unsigned long len)
 	{
-	return sizeof(struct string) + len + 1;
+	return sizeof(struct string) + sizeof(char[len+1]);
 	}
 
 /* Create a string capable of holding len bytes plus trailing NUL. */
