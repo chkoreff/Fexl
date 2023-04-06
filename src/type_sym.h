@@ -19,7 +19,6 @@ struct form
 	value label;
 	};
 
-extern value Qsubst;
 extern value type_form(value f);
 extern value Qform(struct form *exp);
 extern struct form *form_val(value exp);
@@ -37,5 +36,3 @@ extern const char *cur_name;
 extern int match(const char *other);
 extern value type_resolve(value f);
 extern value op_resolve(value f, value define(void));
-extern void beg_sym(void);
-extern void end_sym(void);

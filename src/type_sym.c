@@ -9,8 +9,6 @@
 #include <type_str.h>
 #include <type_sym.h>
 
-value Qsubst;
-
 static unsigned long table_size(unsigned long len)
 	{
 	return sizeof(struct table) + sizeof(struct symbol[len]);
@@ -493,14 +491,4 @@ value op_resolve(value f, value define(void))
 	drop(exp);
 	return f;
 	}
-	}
-
-void beg_sym(void)
-	{
-	Qsubst = Q(type_subst);
-	}
-
-void end_sym(void)
-	{
-	drop(Qsubst);
 	}

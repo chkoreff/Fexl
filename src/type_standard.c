@@ -275,7 +275,6 @@ value type_std(value f)
 static void beg_const(void)
 	{
 	beg_basic();
-	beg_sym();
 	beg_file();
 	beg_output();
 	beg_tuple();
@@ -286,7 +285,6 @@ static void beg_const(void)
 static void end_const(void)
 	{
 	end_basic();
-	end_sym();
 	end_file();
 	end_output();
 	end_tuple();
