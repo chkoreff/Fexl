@@ -69,7 +69,7 @@ struct form *form_val(value exp)
 	return form_new(0,exp,0);
 	}
 
-static struct table *table_ref(value Qname, value Qpattern, unsigned long line)
+static struct table *table_ref(string name, unsigned long line)
 	{
 	struct table *table;
 	struct symbol *sym;
@@ -79,8 +79,8 @@ static struct table *table_ref(value Qname, value Qpattern, unsigned long line)
 	table->len = 1;
 
 	sym = &table->vec[0];
-	sym->name = Qname;
-	sym->pattern = Qpattern;
+	sym->name = Qstr(name);
+	sym->pattern = hold(QT);
 	sym->line = line;
 	return table;
 	}
@@ -88,9 +88,7 @@ static struct table *table_ref(value Qname, value Qpattern, unsigned long line)
 /* Make a reference to a symbol on a given line. */
 struct form *form_ref(string name, unsigned long line)
 	{
-	value Qname = Qstr(name);
-	value Qpattern = hold(QT);
-	struct table *table = table_ref(Qname,Qpattern,line);
+	struct table *table = table_ref(name,line);
 	return form_new(table,hold(QI),0);
 	}
 
