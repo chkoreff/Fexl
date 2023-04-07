@@ -33,16 +33,6 @@ Note that on most machines, (sizeof(struct value) == 32).
 */
 
 static value free_list = 0;
-static value free_stack = 0;
-
-void drop_arg(value f)
-	{
-	if (--f->N == 0)
-		{
-		f->next = free_stack;
-		free_stack = f;
-		}
-	}
 
 // Recycle a value f with reference count 0, putting f on the free list and
 // dropping its content.  If f is an atom, its data is freed.  If f is an
@@ -50,26 +40,19 @@ void drop_arg(value f)
 // recycled if their counts reach 0.
 static void recycle(value f)
 	{
-	free_stack = f;
-	while (free_stack)
+	if (f->L)
 		{
-		value f = free_stack;
-		free_stack = f->next;
-
-		if (f->L)
+		if (f->L->N)
 			{
-			if (f->L->N)
-				{
-				drop_arg(f->R);
-				drop_arg(f->L);
-				}
-			else
-				f->L->clear(f);
+			drop(f->L);
+			drop(f->R);
 			}
-
-		f->next = free_list;
-		free_list = f;
+		else
+			f->L->clear(f);
 		}
+
+	f->next = free_list;
+	free_list = f;
 	}
 
 /* Increment the reference count. */

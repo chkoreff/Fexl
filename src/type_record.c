@@ -28,8 +28,8 @@ static void clear_record(value f)
 	for (i = 0; i < rec->count; i++)
 		{
 		struct item *item = &rec->item[i];
-		drop_arg(item->key);
-		drop_arg(item->val);
+		drop(item->key);
+		drop(item->val);
 		}
 	free_memory(rec, record_size(rec->len));
 	}

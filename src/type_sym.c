@@ -23,33 +23,33 @@ static struct form *form_new(struct table *table, value exp, value label)
 	return form;
 	}
 
-static void table_free(struct table *table, void (*do_drop)(value))
+static void table_free(struct table *table)
 	{
 	unsigned long i;
 	/* Drop each symbol in vec */
 	for (i = 0; i < table->count; i++)
 		{
 		struct symbol *sym = &table->vec[i];
-		do_drop(sym->name);
-		do_drop(sym->pattern);
+		drop(sym->name);
+		drop(sym->pattern);
 		}
 	free_memory(table, table_size(table->len));
 	}
 
-static void form_discard(struct form *form, void (*do_drop)(value))
+static void form_discard(struct form *form)
 	{
 	if (form->table)
-		table_free(form->table,do_drop);
+		table_free(form->table);
 	free_memory(form,sizeof(struct form));
 	}
 
 static void clear_form(value f)
 	{
 	struct form *form = f->v_ptr;
-	drop_arg(form->exp);
+	drop(form->exp);
 	if (form->label) // LATER 20230330 Seems always true here.
-		drop_arg(form->label);
-	form_discard(form,drop_arg);
+		drop(form->label);
+	form_discard(form);
 	}
 
 value type_form(value f)
@@ -164,12 +164,12 @@ struct form *form_join(type t, struct form *fun, struct form *arg)
 	{
 	struct table *table = table_merge(fun->table,arg->table);
 	if (fun->table)
-		table_free(fun->table,drop);
+		table_free(fun->table);
 	fun->table = table;
 	}
 
 	fun->exp = V(t,fun->exp,arg->exp);
-	form_discard(arg,drop);
+	form_discard(arg);
 	return fun;
 	}
 
@@ -231,7 +231,7 @@ value type_pattern(value f)
 
 static void clear_pattern(value f)
 	{
-	drop_arg(f->R);
+	drop(f->R);
 	}
 
 static value wrap_pattern(value pattern)
@@ -477,7 +477,7 @@ value op_resolve(value f, value define(void))
 
 			if (yi == 0)
 				{
-				table_free(yt,drop);
+				table_free(yt);
 				yt = 0;
 				}
 

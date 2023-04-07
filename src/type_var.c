@@ -14,7 +14,7 @@ value type_var(value f)
 
 static void clear_var(value f)
 	{
-	drop_arg(f->R);
+	drop(f->R);
 	}
 
 /* var_new returns a new variable with a void value. */

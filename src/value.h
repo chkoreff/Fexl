@@ -22,7 +22,6 @@ struct value
 		};
 	};
 
-extern void drop_arg(value f);
 extern value hold(value f);
 extern void drop(value f);
 extern void clear_free_list(void);

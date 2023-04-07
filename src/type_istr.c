@@ -22,7 +22,7 @@ static struct istr *istr_new(value x)
 static void clear_istr(value f)
 	{
 	struct istr *in = f->v_ptr;
-	drop_arg(in->str);
+	drop(in->str);
 	free_memory(in,sizeof(struct istr));
 	}
 
