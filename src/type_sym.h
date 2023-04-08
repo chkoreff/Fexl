@@ -20,13 +20,14 @@ struct form
 	};
 
 extern value type_form(value f);
-extern value Qform(struct form *exp);
-extern struct form *form_val(value exp);
-extern struct form *form_ref(string name, unsigned long line);
-extern struct form *form_join(type t, struct form *fun, struct form *arg);
-extern struct form *form_appv(struct form *fun, struct form *arg);
-extern struct form *form_app(struct form *fun, struct form *arg);
-extern struct form *form_lam(string name, struct form *body);
+extern value Qform(struct form form);
+extern struct form form_null(void);
+extern struct form form_val(value exp);
+extern struct form form_ref(string name, unsigned long line);
+extern struct form form_join(type t, struct form fun, struct form arg);
+extern struct form form_appv(struct form fun, struct form arg);
+extern struct form form_app(struct form fun, struct form arg);
+extern struct form form_lam(string name, struct form body);
 extern value type_pattern(value f);
 extern value type_subst(value f);
 extern value type_is_closed(value f);

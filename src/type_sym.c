@@ -5,7 +5,7 @@
 #include <die.h>
 #include <memory.h>
 #include <report.h>
-#include <string.h> /* strcmp */
+#include <string.h> // strcmp
 #include <type_str.h>
 #include <type_sym.h>
 
@@ -14,19 +14,10 @@ static unsigned long table_size(unsigned long len)
 	return sizeof(struct table) + sizeof(struct symbol[len]);
 	}
 
-static struct form *form_new(struct table *table, value exp, value label)
-	{
-	struct form *form = new_memory(sizeof(struct form));
-	form->table = table;
-	form->exp = exp;
-	form->label = label;
-	return form;
-	}
-
 static void table_free(struct table *table)
 	{
 	unsigned long i;
-	/* Drop each symbol in vec */
+	// Drop each symbol in vec.
 	for (i = 0; i < table->count; i++)
 		{
 		struct symbol *sym = &table->vec[i];
@@ -36,20 +27,17 @@ static void table_free(struct table *table)
 	free_memory(table, table_size(table->len));
 	}
 
-static void form_discard(struct form *form)
-	{
-	if (form->table)
-		table_free(form->table);
-	free_memory(form,sizeof(struct form));
-	}
-
 static void clear_form(value f)
 	{
 	struct form *form = f->v_ptr;
+
 	drop(form->exp);
-	if (form->label) // LATER 20230330 Seems always true here.
-		drop(form->label);
-	form_discard(form);
+	drop(form->label);
+
+	if (form->table)
+		table_free(form->table);
+
+	free_memory(form,sizeof(struct form));
 	}
 
 value type_form(value f)
@@ -57,16 +45,23 @@ value type_form(value f)
 	return type_atom(f);
 	}
 
-value Qform(struct form *exp)
+value Qform(struct form form)
 	{
 	static struct value atom = {{.N=0}, {.clear=clear_form}};
-	return V(type_form,&atom,(value)exp);
+	struct form *p = new_memory(sizeof(struct form));
+	*p = form;
+	return V(type_form,&atom,(value)p);
 	}
 
-/* Make a reference to a fixed value with no symbols. */
-struct form *form_val(value exp)
+struct form form_null(void)
 	{
-	return form_new(0,exp,0);
+	return (struct form){ 0, 0, 0 };
+	}
+
+// Make a reference to a fixed value with no symbols.
+struct form form_val(value exp)
+	{
+	return (struct form){ 0, exp, 0 };
 	}
 
 static struct table *table_ref(string name, unsigned long line)
@@ -85,27 +80,28 @@ static struct table *table_ref(string name, unsigned long line)
 	return table;
 	}
 
-/* Make a reference to a symbol on a given line. */
-struct form *form_ref(string name, unsigned long line)
+// Make a reference to a symbol on a given line.
+struct form form_ref(string name, unsigned long line)
 	{
 	struct table *table = table_ref(name,line);
-	return form_new(table,hold(QI),0);
+	return (struct form){ table, hold(QI), 0 };
 	}
 
-/* Merge the tables and combine patterns where they intersect. */
+// Merge the tables and combine patterns where they intersect.
 static struct table *table_merge(struct table *xt, struct table *yt)
 	{
+	struct table *zt = 0;
 	unsigned long xn = xt ? xt->count : 0;
 	unsigned long yn = yt ? yt->count : 0;
 	unsigned long zn = xn + yn;
 
-	if (zn == 0) return 0;
+	if (zn != 0)
 	{
 	unsigned long xi = 0;
 	unsigned long yi = 0;
 	unsigned long zi = 0;
-	struct table *zt = new_memory(table_size(zn));
 
+	zt = new_memory(table_size(zn));
 	zt->len = zn;
 
 	while (1)
@@ -154,38 +150,38 @@ static struct table *table_merge(struct table *xt, struct table *yt)
 		}
 
 	zt->count = zi;
+	}
+
+	if (xt) table_free(xt);
+	if (yt) table_free(yt);
+
 	return zt;
 	}
-	}
 
-/* Make an applicative form with the given type. */
-struct form *form_join(type t, struct form *fun, struct form *arg)
+// Make an applicative form with the given type.
+struct form form_join(type t, struct form fun, struct form arg)
 	{
+	return (struct form)
+		{
+		table_merge(fun.table,arg.table),
+		V(t,fun.exp,arg.exp),
+		0
+		};
+	}
+
+// Apply function to argument, keeping the type of the function.
+struct form form_appv(struct form fun, struct form arg)
 	{
-	struct table *table = table_merge(fun->table,arg->table);
-	if (fun->table)
-		table_free(fun->table);
-	fun->table = table;
+	return form_join(fun.exp->T,fun,arg);
 	}
 
-	fun->exp = V(t,fun->exp,arg->exp);
-	form_discard(arg);
-	return fun;
-	}
-
-/* Apply function to argument, keeping the type of the function. */
-struct form *form_appv(struct form *fun, struct form *arg)
-	{
-	return form_join(fun->exp->T,fun,arg);
-	}
-
-/* Apply function to argument. */
-struct form *form_app(struct form *fun, struct form *arg)
+// Apply function to argument.
+struct form form_app(struct form fun, struct form arg)
 	{
 	return form_join(type_A,fun,arg);
 	}
 
-/* Delete the symbol with the given name and return the associated pattern. */
+// Delete the symbol with the given name and return the associated pattern.
 static value table_pop(string name, struct table *xt)
 	{
 	value pattern = 0;
@@ -219,7 +215,7 @@ static value table_pop(string name, struct table *xt)
 		}
 
 	if (pattern == 0)
-		pattern = hold(QF); /* not found */
+		pattern = hold(QF); // not found
 	return pattern;
 	}
 
@@ -240,12 +236,12 @@ static value wrap_pattern(value pattern)
 	return V(type_pattern,&atom,pattern);
 	}
 
-/* Abstract the name from the body. */
-struct form *form_lam(string name, struct form *body)
+// Abstract the name from the body.
+struct form form_lam(string name, struct form body)
 	{
-	value pattern = wrap_pattern(table_pop(name,body->table));
-	body->exp = V(type_subst,pattern,body->exp);
+	value pattern = wrap_pattern(table_pop(name,body.table));
 	str_free(name);
+	body.exp = V(type_subst,pattern,body.exp);
 	return body;
 	}
 
@@ -259,7 +255,7 @@ static value subst(value p, value e, value x)
 	return V(e->T,subst(p->L,e->L,x),subst(p->R,e->R,x));
 	}
 
-/* (subst p e x) Calls substitute. */
+// (subst p e x) Calls substitute.
 value type_subst(value f)
 	{
 	if (f->L->T == type_pattern) return 0;
@@ -271,7 +267,7 @@ static int is_closed(struct table *xt)
 	return (xt == 0 || xt->count == 0);
 	}
 
-/* Return true if the form has no undefined symbols. */
+// Return true if the form has no undefined symbols.
 value type_is_closed(value f)
 	{
 	if (!f->L) return 0;
@@ -289,7 +285,7 @@ value type_is_closed(value f)
 	}
 	}
 
-/* Define key as val in a form. */
+// Define key as val in a form.
 static value def(const char *key, value val, value exp)
 	{
 	struct form *form = exp->v_ptr;
@@ -319,7 +315,7 @@ static value def(const char *key, value val, value exp)
 		return hold(exp);
 	else
 		{
-		/* Copy the symbols except the one with the given pattern. */
+		// Copy the symbols except the one with the given pattern.
 		struct table *yt;
 		unsigned long yn = xt->count - 1;
 
@@ -349,9 +345,9 @@ static value def(const char *key, value val, value exp)
 				}
 			}
 
-		return Qform(form_new(yt,
+		return Qform((struct form){ yt,
 			subst(pattern,form->exp,val),
-			hold(form->label)));
+			hold(form->label) });
 		}
 	}
 
@@ -376,8 +372,8 @@ value type_def(value f)
 	}
 	}
 
-/* Evaluate the form if all symbols are defined, otherwise report the undefined
-symbols and die. */
+// Evaluate the form if all symbols are defined, otherwise report the undefined
+// symbols and die.
 value type_value(value f)
 	{
 	if (!f->L) return 0;
@@ -409,8 +405,8 @@ value type_value(value f)
 	}
 	}
 
-/* Like type_value, except it yields the form value to the caller without
-evaluating it. */
+// Like type_value, except it yields the form value to the caller without
+// evaluating it.
 value type_resolve(value f)
 	{
 	f = type_value(f);
@@ -481,7 +477,7 @@ value op_resolve(value f, value define(void))
 				yt = 0;
 				}
 
-			f = Qform(form_new(yt,result,hold(form->label)));
+			f = Qform((struct form){ yt, result, hold(form->label) });
 			}
 		}
 	else
