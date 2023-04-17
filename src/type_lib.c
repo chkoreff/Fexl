@@ -51,6 +51,15 @@ value type_dlerror(value f)
 	return Qstr0(msg ? msg : "");
 	}
 
+// Work around for the -pedantic option in lib_build, avoiding the error:
+// ISO C forbids initialization between function pointer and ‘void *’
+static type get_type(void *lib, const char *name)
+	{
+	union { type t; void *p; } u;
+	u.p = dlsym(lib,name);
+	return u.t;
+	}
+
 value type_dlsym(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
@@ -61,7 +70,7 @@ value type_dlsym(value f)
 		{
 		void *lib = x->v_ptr;
 		const char *name = str_data(y);
-		type t = dlsym(lib,name);
+		type t = get_type(lib,name);
 
 		if (t == 0)
 			f = hold(Qvoid);

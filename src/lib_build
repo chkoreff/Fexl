@@ -45,9 +45,6 @@ get_headers()
 #
 # I do not use -ansi because somehow that makes a bunch of symbols in various
 # system header files invisible (e.g. fdopen, snprintf, etc.)
-#
-# I do not use -pedantic because that forbids zero-size arrays, e.g. in bn.h
-# and str.h.
 
 compile()
 	{
@@ -81,7 +78,7 @@ compile()
 
 	if [ $update -eq 1 ]; then
 		# Append common options.
-		options="$options -Wall -Werror -Wunused-parameter"
+		options="$options -Wall -Werror -Wunused-parameter -pedantic"
 
 		# The next option enforces ISO C90 compatibility.
 		options="$options -Wdeclaration-after-statement"
