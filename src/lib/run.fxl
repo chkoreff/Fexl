@@ -42,6 +42,8 @@
 	run_function_filter child_fn ""
 	)
 
+# LATER 20230425 Use a pid file instead, because if you're running the browser
+# on the same machine as the server, this can kill the browser too.
 \stop_server=
 	(\ip\port
 	\argv=["/usr/bin/lsof" (to_str ["-i4TCP@"ip":"port]) "-t"]

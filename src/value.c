@@ -100,7 +100,7 @@ static value new_value(void)
 value V(type T, value L, value R)
 	{
 	value f = new_value();
-	*f = (struct value){{.N=1}, {.T=T}, L, {.R = R}};
+	*f = (struct value){{.N=1}, {.T=T}, L, {.R=R}};
 	return f;
 	}
 

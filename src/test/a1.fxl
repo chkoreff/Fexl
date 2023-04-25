@@ -1391,5 +1391,14 @@ sort
 ]
 )
 
+(
+# Test var_putf
+\v=var_new
+var_putf v (say "Hello")
+say "["
+var_get v
+say "]"
+)
+
 \\
 Extra stuff not parsed.

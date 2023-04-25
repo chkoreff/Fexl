@@ -17,7 +17,7 @@ static void clear_var(value f)
 	drop(f->R);
 	}
 
-/* var_new returns a new variable with a void value. */
+// (var_new) Return a new variable with a void value.
 value type_var_new(value f)
 	{
 	static struct value atom = {{.N=0}, {.clear=clear_var}};
@@ -25,7 +25,7 @@ value type_var_new(value f)
 	return V(type_var,&atom,hold(Qvoid));
 	}
 
-/* (var_get var) returns val, where val is the current value of var. */
+// (var_get var) Return the current value of var.
 value type_var_get(value f)
 	{
 	if (!f->L) return 0;
@@ -40,15 +40,14 @@ value type_var_get(value f)
 	}
 	}
 
-/* (var_put var val) replaces the value of the variable. */
-value type_var_put(value f)
+static value op_put(value f, value op(value))
 	{
 	if (!f->L || !f->L->L) return 0;
 	{
 	value x = arg(f->L->R);
 	if (x->T == type_var)
 		{
-		value v = arg(f->R);
+		value v = op(f->R);
 		drop(x->R);
 		x->R = v;
 		f = hold(QI);
@@ -58,6 +57,18 @@ value type_var_put(value f)
 	drop(x);
 	return f;
 	}
+	}
+
+// (var_put var x) Put the value of x into var.
+value type_var_put(value f)
+	{
+	return op_put(f,arg);
+	}
+
+// (var_putf var x) Put x into var.
+value type_var_putf(value f)
+	{
+	return op_put(f,hold);
 	}
 
 value type_is_var(value f)
