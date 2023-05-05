@@ -40,21 +40,6 @@ value type_var_get(value f)
 	}
 	}
 
-// (var_getf var) Yield the current value of var.
-value type_var_getf(value f)
-	{
-	if (!f->L) return 0;
-	{
-	value x = arg(f->R);
-	if (x->T == type_var)
-		f = A(hold(Qyield),hold(x->R));
-	else
-		f = hold(Qvoid);
-	drop(x);
-	return f;
-	}
-	}
-
 static value op_put(value f, value op(value))
 	{
 	if (!f->L || !f->L->L) return 0;

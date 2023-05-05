@@ -1392,13 +1392,11 @@ sort
 )
 
 (
-# Test var_putf and var_getf
+# Test var_putf
 \v=var_new
 var_putf v (say "Hello")
-var_getf v \hello
 say "["
 var_get v
-hello
 say "]"
 )
 

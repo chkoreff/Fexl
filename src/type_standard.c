@@ -199,7 +199,6 @@ static value standard(void)
 
 	if (match("var_new")) return Q(type_var_new);
 	if (match("var_get")) return Q(type_var_get);
-	if (match("var_getf")) return Q(type_var_getf);
 	if (match("var_put")) return Q(type_var_put);
 	if (match("var_putf")) return Q(type_var_putf);
 	if (match("is_var")) return Q(type_is_var);
