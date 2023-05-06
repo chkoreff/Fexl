@@ -523,7 +523,7 @@ struct bn *bn_mod(const struct bn *x, const struct bn *y)
 	}
 
 /* Buffer the decimal digits in a base B number. */
-static void vec_to_dec(struct buffer *buf, u32 xn, const u32 *x, u32 *q, u32 *r)
+static void vec_to_dec(buffer buf, u32 xn, const u32 *x, u32 *q, u32 *r)
 	{
 	u32 y[1] = {10};
 

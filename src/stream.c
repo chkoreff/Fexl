@@ -69,7 +69,7 @@ void skip_filler(void)
 	}
 
 /* Collect chars to the first white space.  Return true if found. */
-int collect_to_white(struct buffer *buf)
+int collect_to_white(buffer buf)
 	{
 	while (1)
 		{
@@ -86,7 +86,7 @@ int collect_to_white(struct buffer *buf)
 	}
 
 /* Collect chars to t_ch.  Return true if found. */
-int collect_to_ch(struct buffer *buf, const char t_ch)
+int collect_to_ch(buffer buf, const char t_ch)
 	{
 	while (1)
 		{
@@ -103,7 +103,7 @@ int collect_to_ch(struct buffer *buf, const char t_ch)
 	}
 
 /* Collect chars to a terminator string.  Return true if found. */
-int collect_string(struct buffer *buf, const char *end, unsigned long len)
+int collect_string(buffer buf, const char *end, unsigned long len)
 	{
 	if (len == 1) /* Optimize this case. */
 		return collect_to_ch(buf,end[0]);
@@ -139,7 +139,7 @@ chars to the next occurrence of that terminator.  Return:
 	 0 : if no occurrence of the terminator was found
 	 1 : if the terminator was found
 */
-int collect_tilde_string(struct buffer *buf)
+int collect_tilde_string(buffer buf)
 	{
 	if (!collect_to_white(buf)) return -1;
 	{
