@@ -43,7 +43,7 @@ void skip_white(void)
 /* Add the current character to the buffer. */
 void buf_keep(buffer buf)
 	{
-	buf_add(buf,(char)cur_ch);
+	buf_add(buf,cur_ch);
 	skip();
 	}
 
