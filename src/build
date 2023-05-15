@@ -1,70 +1,17 @@
 #!/bin/sh
 . ./lib_build
 
-# Build test code.
-make_PIC output
-make_PIC output_str
-objects=""
-
-# Build test.so
-need output
-make_PIC test
-make_lib test
-
-# Build show.so
-need output
-need output_str
-make_PIC show
-make_lib show
-
 # Build fexl.
-make base64
-make basic
-make bn
-make buffer
-make convert
-make crypto
 make die
-make fexl
-make file
-make file_str
-make format
-make input
-make limit
 make memory
-make nacl
-make parse
-make report
-make sha256
-make sha512
-make str
-make stream
-make type_bn
-make type_buf
-make type_cmp
-make type_crypto
-make type_file
-make type_hex
-make type_input
-make type_istr
-make type_lib
-make type_limit
-make type_math
-make type_num
-make type_output
-make type_parse
-make type_rand
-make type_record
-make type_run
-make type_signal
-make type_standard
-make type_stream
-make type_str
-make type_sym
-make type_time
-make type_tuple
-make type_var
-make type_with
+
 make value
+make app
+make lam
+make ref
+
+make io
+make show
+
+make fexl
 link fexl
-ln -fs ../bin/fexl ../bin/fexl0

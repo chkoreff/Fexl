@@ -1,8 +1,0 @@
-extern value Qtuple;
-extern value type_tuple(value f);
-extern value type_is_tuple(value f);
-extern value type_tuple_to_list(value f);
-extern value type_list_to_tuple(value f);
-extern value pair(value x, value y);
-extern void beg_tuple(void);
-extern void end_tuple(void);

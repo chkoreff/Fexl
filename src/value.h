@@ -1,5 +1,27 @@
 typedef struct value *value;
-typedef value (*type)(value);
+
+struct type
+	{
+	value (*step)(value pair);
+	value (*apply)(value fun, value arg, value cx);
+	void (*clear)(value exp);
+	};
+
+struct ref
+	{
+	unsigned long pos;
+	};
+
+struct lam
+	{
+	value body;
+	};
+
+struct app
+	{
+	value fun;
+	value arg;
+	};
 
 struct value
 	{
@@ -8,29 +30,18 @@ struct value
 		unsigned long N;
 		value next;
 		};
+	struct type *type;
 	union
 		{
-		type T;
-		void (*clear)(value);
-		};
-	value L;
-	union
-		{
-		value R;
-		void *v_ptr;
-		double v_double;
+		struct ref ref;
+		struct lam lam;
+		struct app app;
 		};
 	};
 
-extern value hold(value f);
-extern void drop(value f);
+extern value free_list;
+extern value new_exp(struct type *type);
+extern value hold(value exp);
+extern void drop(value exp);
 extern void clear_free_list(void);
-extern void end_value(void);
-extern value V(type T, value L, value R);
-extern value V_double(type T, value L, double v_double);
-extern value Q(type T);
-extern value AV(value x, value y);
-extern value type_A(value f);
-extern value A(value x, value y);
-extern value (*eval)(value f);
-extern value arg(value f);
+extern value eval(value pair);
