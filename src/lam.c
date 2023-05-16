@@ -20,9 +20,12 @@ static value apply(value fun, value arg, value cx)
 			: A(hold(arg),hold(cx));
 
 	value fun_exp = fun->app.fun;
-	value fun_cx = hold(fun->app.arg);
+	value fun_cx = fun->app.arg;
 
-	return A(hold(fun_exp->lam.body), A(pair,fun_cx));
+	value body_exp = hold(fun_exp->lam.body);
+	value body_cx = A(pair,hold(fun_cx));
+
+	return A(body_exp, body_cx);
 	}
 
 static void clear(value exp)

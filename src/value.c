@@ -46,6 +46,20 @@ void clear_free_list(void)
 		}
 	}
 
+/* Reduce a pair until done.  A pair is an expression combined with a context
+which defines any unbound references in the expression.  The context is a list
+of zero or more pairs.  Each unbound reference in the expression refers by
+position to a pair in the context, numbering from zero.
+
+pair => A(exp,context)
+
+exp => R(unsigned long pos)
+exp => L(exp body)
+exp => A(exp fun, exp arg)
+
+context => R(0)             // empty context
+context => A(pair,context)  // context with pair at position 0
+*/
 value eval(value pair)
 	{
 	while (1)

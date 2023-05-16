@@ -40,6 +40,8 @@ static void limit_show(value exp)
 		}
 	else
 		put_ch('?');
+
+	max_depth++;
 	}
 
 void show(value f)
