@@ -1,54 +1,58 @@
-#include <die.h>
 #include <memory.h>
 #include <stdio.h>
-// #include <string.h> // strlen
 
 #include <value.h>
 #include <app.h>
 #include <lam.h>
 #include <ref.h>
 
-#include <io.h>
 #include <show.h>
 
 int argc;
 const char **argv;
 
 static unsigned long remain_steps;
-static unsigned long max_bytes = 1000000;
+static unsigned long max_bytes;
 
-static value (*orig_step_app)(value);
-
-static value limit_step_app(value pair)
+static value eval_limit(value pair)
 	{
-	if (remain_steps == 0)
-		return 0;
-
-	if (cur_bytes > max_bytes)
+	while (1)
 		{
-		// Out of memory
-		remain_steps = 0;
-		return 0;
+		if (remain_steps == 0)
+			break;
+		else if (cur_bytes > max_bytes)
+			{
+			// Out of memory
+			remain_steps = 0;
+			break;
+			}
+		else
+			{
+			value next;
+			remain_steps--;
+			next = pair->app.fun->type->step(pair);
+			if (next == 0) break;
+			drop(pair);
+			pair = next;
+			}
 		}
-
-	remain_steps--;
-	return orig_step_app(pair);
-	}
-
-value limit_eval(unsigned long steps, value pair)
-	{
-	orig_step_app = type_app.step;
-	type_app.step = limit_step_app;
-
-	max_bytes = 1000000;
-	remain_steps = steps;
-	pair = eval(pair);
-
-	type_app.step = orig_step_app;
 	return pair;
 	}
 
-void try_eval(value exp)
+static value limit_eval(unsigned long steps, value pair)
+	{
+	value (*save_eval)(value f) = eval;
+	eval = eval_limit;
+	remain_steps = steps;
+	max_bytes = 1000000;
+
+	pair = eval(pair);
+
+	eval = save_eval;
+	return pair;
+	}
+
+static void try_eval(value exp)
 	{
 	value pair = A(exp,R(0));
 	pair = eval(pair);
@@ -59,7 +63,7 @@ void try_eval(value exp)
 	clear_free_list();
 	}
 
-void try_limit_eval(unsigned long steps, value exp)
+static void try_limit_eval(unsigned long steps, value exp)
 	{
 	value pair = A(exp,R(0));
 	pair = limit_eval(steps,pair);
@@ -92,7 +96,7 @@ value II(void)
 	return A(I(),I());
 	}
 
-value exp_7811(void)
+static value exp_7811(void)
 	{
 	value exp = A(II(),II());
 	exp = A(exp,hold(exp));
@@ -105,7 +109,7 @@ value exp_7811(void)
 // \Y=(\f (\Q Q Q) (\x f (x x))) # fixpoint
 // \I=(\x x) # identity
 // (Y I)
-value exp_YI(void)
+static value exp_YI(void)
 	{
 	return
 	A(
@@ -116,7 +120,7 @@ value exp_YI(void)
 
 // This function consumes an unbounded amount of memory.
 // (Y Y)
-value exp_YY(void)
+static value exp_YY(void)
 	{
 	return
 	A(
@@ -129,7 +133,7 @@ value exp_YY(void)
 // This function consumes an unbounded amount of memory.
 // \S=(\x\y\z x z; y z) # fusion
 // Y S S S  # Apply fixpoint to the fusion operator in a weird way.
-value exp_YSSS(void)
+static value exp_YSSS(void)
 	{
 	return
 	A(
@@ -141,7 +145,7 @@ value exp_YSSS(void)
 	);
 	}
 
-void run_tests(void)
+static void run_tests(void)
 	{
 	printf("sizeof(struct value) = %lu\n", sizeof(struct value));
 
@@ -150,11 +154,11 @@ void run_tests(void)
 	try_eval(II());
 	try_eval(exp_7811());
 	try_limit_eval(10000,exp_YI());
-	try_limit_eval(40000,exp_YY());
-	try_limit_eval(40000,exp_YSSS());
+	try_limit_eval(80000,exp_YY());
+	try_limit_eval(80000,exp_YSSS());
 	}
 
-void run_script(void)
+static void run_script(void)
 	{
 	// TODO run an actual script
 	run_tests();

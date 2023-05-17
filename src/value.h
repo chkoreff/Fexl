@@ -44,4 +44,4 @@ extern value new_exp(struct type *type);
 extern value hold(value exp);
 extern void drop(value exp);
 extern void clear_free_list(void);
-extern value eval(value pair);
+extern value (*eval)(value f);

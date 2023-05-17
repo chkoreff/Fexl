@@ -60,13 +60,16 @@ exp => A(exp fun, exp arg)
 context => R(0)             // empty context
 context => A(pair,context)  // context with pair at position 0
 */
-value eval(value pair)
+static value eval_normal(value pair)
 	{
 	while (1)
 		{
 		value next = pair->app.fun->type->step(pair);
-		if (next == 0) return pair;
+		if (next == 0) break;
 		drop(pair);
 		pair = next;
 		}
+	return pair;
 	}
+
+value (*eval)(value f) = eval_normal;

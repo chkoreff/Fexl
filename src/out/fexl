@@ -12,7 +12,7 @@ pair = (A (L (R 0)) (R 0))
 cur_bytes = 768
 
 continue
-pair = (A (A (R 0) (R 0)) (A (A (L (A (R 1) (A (R 0) (R 0)))) (A (A (L (R 0)) (A (A (L (A (L (A (R 0) (R 0))) (L (A (R 1) (A (R 0) (R 0)))))) (R 0)) (R 0))) (R 0))) (A (A (L (R 0)) (A (A (L (A (L (A (R 0) (R 0))) (L (A (R 1) (A (R 0) (R 0)))))) (R 0)) (R 0))) (R 0))))
+pair = (A (A (R 1) (A (R 0) (R 0))) (A (A (L (A (R 1) (A (R 0) (R 0)))) (A (A (L (R 0)) (A (A (L (A (L (A (R 0) (R 0))) (L (A (R 1) (A (R 0) (R 0)))))) (R 0)) (R 0))) (R 0))) (A (A (L (R 0)) (A (A (L (A (L (A (R 0) (R 0))) (L (A (R 1) (A (R 0) (R 0)))))) (R 0)) (R 0))) (R 0))))
 stopped
 cur_bytes = 864
 
