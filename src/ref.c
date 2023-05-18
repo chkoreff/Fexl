@@ -20,20 +20,7 @@ static value step(value pair)
 	return find_pos(pair->app.fun->ref.pos, pair->app.arg);
 	}
 
-static value apply(value fun, value arg, value cx)
-	{
-	(void)fun;
-	(void)arg;
-	(void)cx;
-	return 0;
-	}
-
-static void clear(value exp)
-	{
-	(void)exp;
-	}
-
-struct type type_ref = { step, apply, clear };
+struct type type_ref = { step, no_apply, no_clear };
 
 value R(unsigned long pos)
 	{

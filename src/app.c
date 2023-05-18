@@ -13,21 +13,13 @@ static value step(value pair)
 	return next;
 	}
 
-static value apply(value fun, value arg, value cx)
-	{
-	(void)fun;
-	(void)arg;
-	(void)cx;
-	return 0;
-	}
-
 static void clear(value exp)
 	{
 	drop(exp->app.fun);
 	drop(exp->app.arg);
 	}
 
-struct type type_app = { step, apply, clear };
+struct type type_app = { step, no_apply, clear };
 
 value A(value fun, value arg)
 	{

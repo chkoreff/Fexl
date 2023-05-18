@@ -14,7 +14,7 @@ void *new_memory(unsigned long num_bytes)
 	{
 	void *data = malloc(num_bytes);
 	if (data == 0)
-		die("The program ran out of memory.");
+		die("Out of memory");
 
 	cur_blocks++;
 	cur_bytes += num_bytes;

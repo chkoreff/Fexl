@@ -1,0 +1,16 @@
+typedef int (*input)(void);
+extern int empty(void);
+extern int cur_ch;
+extern unsigned long cur_line;
+extern input cur_get;
+extern const char *cur_name;
+extern void skip(void);
+extern int at_white(void);
+extern void skip_white(void);
+extern void buf_keep(buffer buf);
+extern void skip_line(void);
+extern void skip_filler(void);
+extern int collect_to_white(buffer buf);
+extern int collect_to_ch(buffer buf, const char t_ch);
+extern int collect_string(buffer buf, const char *end, unsigned long len);
+extern int collect_tilde_string(buffer buf);

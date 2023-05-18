@@ -4,12 +4,6 @@
 
 #include <lam.h>
 
-static value step(value pair)
-	{
-	(void)pair;
-	return 0;
-	}
-
 static value apply(value fun, value arg, value cx)
 	{
 	// Don't bind a reference to a reference.  This allows infinite loops
@@ -33,7 +27,7 @@ static void clear(value exp)
 	drop(exp->lam.body);
 	}
 
-struct type type_lam = { step, apply, clear };
+struct type type_lam = { no_step, apply, clear };
 
 value L(value body)
 	{

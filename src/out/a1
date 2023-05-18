@@ -1,0 +1,5 @@
+exp = (A (L (A (L (A (L (A (L (A (L (A (L (R 0)) (A (R 0) (R 0)))) (A (R 0) (R 0)))) (A (R 0) (R 0)))) (A (R 0) (R 0)))) (A (R 0) (R 0)))) (L (R 0)))
+pair = (A (L (R 0)) (R 0))
+num_steps = 100
+num_bytes = 128
+

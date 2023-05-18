@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <str.h>
 #include <io.h>
 
 #include <value.h>
@@ -6,10 +7,19 @@
 #include <lam.h>
 #include <ref.h>
 
+#include <type_str.h>
+
 #include <show.h>
 
 static unsigned long max_depth;
 static unsigned long max_call;
+
+static void put_quote(string x)
+	{
+	put_ch('"');
+	put_str(x);
+	put_ch('"');
+	}
 
 static void limit_show(value exp)
 	{
@@ -36,6 +46,12 @@ static void limit_show(value exp)
 		limit_show(exp->app.fun);
 		put_ch(' ');
 		limit_show(exp->app.arg);
+		put_ch(')');
+		}
+	else if (exp->type == &type_str)
+		{
+		put("(str ");
+		put_quote(exp->v_ptr);
 		put_ch(')');
 		}
 	else

@@ -1,0 +1,2 @@
+Out of memory
+exp = (A (L (A (L (A (A (A (R 1) (R 0)) (R 0)) (R 0))) (L (L (L (A (A (R 2) (R 0)) (A (R 1) (R 0)))))))) (L (A (L (A (R 0) (R 0))) (L (A (R 1) (A (R 0) (R 0)))))))

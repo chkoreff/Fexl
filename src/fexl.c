@@ -1,4 +1,7 @@
+#include <die.h>
+#include <limit.h>
 #include <memory.h>
+#include <signal.h> // sigaction
 #include <stdio.h>
 
 #include <value.h>
@@ -6,162 +9,141 @@
 #include <lam.h>
 #include <ref.h>
 
+#include <str.h>
+#include <buffer.h>
+#include <stream.h>
+
+#include <parse.h>
+#include <type_str.h>
+
 #include <show.h>
+
+static FILE *cur_fh;
+
+static int get(void)
+	{
+	//return '('; // Test stack overflow in parser.
+	return fgetc(cur_fh);
+	}
+
+value parse_script(const char *name)
+	{
+	value exp;
+	cur_name = name;
+	cur_fh = name[0] ? fopen(name,"r") : stdin;
+	if (!cur_fh)
+		{
+		fprintf(stderr,"Could not open source file %s\n",name);
+		die(0);
+		}
+	cur_get = get;
+	skip();
+
+	exp = parse_fexl();
+
+	fclose(cur_fh);
+	cur_fh = 0;
+	return exp;
+	}
 
 int argc;
 const char **argv;
 
-static unsigned long remain_steps;
-static unsigned long max_bytes;
+// Benchmark version of eval which counts reduction steps.
 
-static value eval_limit(value pair)
+static unsigned long num_steps = 0;
+
+static value eval_count(value pair)
 	{
 	while (1)
 		{
-		if (remain_steps == 0)
-			break;
-		else if (cur_bytes > max_bytes)
-			{
-			// Out of memory
-			remain_steps = 0;
-			break;
-			}
-		else
-			{
-			value next;
-			remain_steps--;
-			next = pair->app.fun->type->step(pair);
-			if (next == 0) break;
-			drop(pair);
-			pair = next;
-			}
+		value next = pair->app.fun->type->step(pair);
+		if (next == 0) break;
+		num_steps++;
+		drop(pair);
+		pair = next;
 		}
 	return pair;
 	}
 
-static value limit_eval(unsigned long steps, value pair)
+static void die_perror(const char *msg)
 	{
-	value (*save_eval)(value f) = eval;
-	eval = eval_limit;
-	remain_steps = steps;
-	max_bytes = 1000000;
-
-	pair = eval(pair);
-
-	eval = save_eval;
-	return pair;
+	perror(msg);
+	die(0);
 	}
 
-static void try_eval(value exp)
+static void handle_signal(int signum)
 	{
-	value pair = A(exp,R(0));
-	pair = eval(pair);
-	show_line("pair = ",pair);
-
-	printf("cur_bytes = %lu\n\n",cur_bytes);
-	drop(pair);
-	clear_free_list();
+	if (signum == SIGXCPU)
+		die("Out of time");
+	else if (signum == SIGSEGV)
+		die("Out of stack");
 	}
 
-static void try_limit_eval(unsigned long steps, value exp)
+/* Reference:
+https://stackoverflow.com/questions/31784823/interrupting-open-with-sigalrm
+
+This sets a signal handler so it does not kill the process when the signal
+happens, but instead interrupts any system call in progress.
+*/
+void set_handler(int signum)
 	{
-	value pair = A(exp,R(0));
-	pair = limit_eval(steps,pair);
+	struct sigaction sa;
+	sa.sa_handler = handle_signal;
+	// Override default SA_RESTART.
+	sa.sa_flags = SA_ONSTACK; // Use the alternate signal stack.
 
-	// NOTE: You can continue an interrupted eval like this.
-	if (remain_steps == 0)
-		{
-		printf("continue\n");
-		pair = limit_eval(6,pair);
-		//pair = limit_eval(3,pair);
-		}
-
-	show_line("pair = ",pair);
-
-	if (remain_steps == 0)
-		printf("stopped\n");
-
-	printf("cur_bytes = %lu\n\n",cur_bytes);
-	drop(pair);
-	clear_free_list();
+	sigemptyset(&sa.sa_mask);
+	if (sigaction(signum, &sa, NULL) < 0)
+		die_perror("sigaction(2) error");
 	}
 
-value I(void)
+static stack_t alt_stack;
+
+void init_signal(void)
 	{
-	return L(R(0));
+	// Set alternate stack context for signals.
+	{
+	size_t num_bytes = 16384;
+	alt_stack.ss_sp = new_memory(num_bytes);
+	alt_stack.ss_flags = 0;
+	alt_stack.ss_size = num_bytes;
+	sigaltstack(&alt_stack,NULL);
 	}
 
-value II(void)
-	{
-	return A(I(),I());
-	}
-
-static value exp_7811(void)
-	{
-	value exp = A(II(),II());
-	exp = A(exp,hold(exp));
-	exp = A(exp,hold(exp));
-	exp = A(exp,hold(exp));
-	return exp;
-	}
-
-// This function runs forever in fixed memory.
-// \Y=(\f (\Q Q Q) (\x f (x x))) # fixpoint
-// \I=(\x x) # identity
-// (Y I)
-static value exp_YI(void)
-	{
-	return
-	A(
-		L(A(L(A(R(1),R(0))),L(R(0)))),
-		L(A(L(A(R(0),R(0))),L(A(R(1),A(R(0),R(0))))))
-	);
-	}
-
-// This function consumes an unbounded amount of memory.
-// (Y Y)
-static value exp_YY(void)
-	{
-	return
-	A(
-		L(A(R(0),R(0))),
-		L(A(L(A(R(0),R(0))),L(A(R(1),A(R(0),R(0)))))
-		)
-	);
-	}
-
-// This function consumes an unbounded amount of memory.
-// \S=(\x\y\z x z; y z) # fusion
-// Y S S S  # Apply fixpoint to the fusion operator in a weird way.
-static value exp_YSSS(void)
-	{
-	return
-	A(
-		L(A(
-			L(A(A(A(R(0),R(1)),R(1)),R(1))),
-			L(A(L(A(R(0),R(0))),L(A(R(1),A(R(0),R(0))))))
-			)),
-		L(L(L(A(A(R(2),R(0)),A(R(1),R(0))))))
-	);
-	}
-
-static void run_tests(void)
-	{
-	printf("sizeof(struct value) = %lu\n", sizeof(struct value));
-
-	try_eval(R(0));
-	try_eval(I());
-	try_eval(II());
-	try_eval(exp_7811());
-	try_limit_eval(10000,exp_YI());
-	try_limit_eval(80000,exp_YY());
-	try_limit_eval(80000,exp_YSSS());
+	// Set signal handlers.
+	set_handler(SIGXCPU);
+	set_handler(SIGSEGV);
 	}
 
 static void run_script(void)
 	{
-	// TODO run an actual script
-	run_tests();
+	init_signal();
+
+	limit_time(1); // LATER Perhaps use alarm for sub-second limits.
+	limit_stack(20000);
+	limit_memory(10000000);
+
+	{
+	const char *name = argc > 1 ? argv[1] : "";
+	value exp = parse_script(name);
+	show_line("exp = ",exp);
+
+	{
+	value pair = A(exp,R(0));
+	unsigned long old_bytes = cur_bytes;
+
+	eval = eval_count;
+	pair = eval(pair);
+	show_line("pair = ",pair);
+	{
+	unsigned long num_bytes = cur_bytes - old_bytes;
+	printf("num_steps = %lu\n",num_steps);
+	printf("num_bytes = %lu\n\n",num_bytes);
+	}
+	drop(pair);
+	}
+	}
 	}
 
 int main(int _argc, const char *_argv[])
@@ -171,6 +153,7 @@ int main(int _argc, const char *_argv[])
 
 	run_script();
 
+	free_memory(alt_stack.ss_sp, alt_stack.ss_size);
 	clear_free_list();
 	end_memory();
 	return 0;

@@ -36,6 +36,8 @@ struct value
 		struct ref ref;
 		struct lam lam;
 		struct app app;
+		double v_double;
+		void *v_ptr;
 		};
 	};
 
@@ -44,4 +46,7 @@ extern value new_exp(struct type *type);
 extern value hold(value exp);
 extern void drop(value exp);
 extern void clear_free_list(void);
+extern value no_step(value pair);
+extern value no_apply(value fun, value arg, value cx);
+extern void no_clear(value exp);
 extern value (*eval)(value f);

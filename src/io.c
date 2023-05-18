@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <str.h>
 #include <string.h> // strlen
 
 #include <io.h>
@@ -19,6 +20,11 @@ void fput_ch(FILE *fh, char ch)
 	fputd(fh,&ch,1);
 	}
 
+void fput_str(FILE *fh, string x)
+	{
+	fputd(fh,x->data,x->len);
+	}
+
 void put(const char *data)
 	{
 	fput(stdout,data);
@@ -27,6 +33,11 @@ void put(const char *data)
 void put_ch(char ch)
 	{
 	fput_ch(stdout,ch);
+	}
+
+void put_str(string x)
+	{
+	fput_str(stdout,x);
 	}
 
 void nl(void)

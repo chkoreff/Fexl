@@ -3,6 +3,7 @@
 
 # Build fexl.
 make die
+make limit
 make memory
 
 make value
@@ -10,8 +11,15 @@ make app
 make lam
 make ref
 
+make str
+make buffer
+make stream
+
 make io
 make show
+
+make parse
+make type_str
 
 make fexl
 link fexl

@@ -1,0 +1,20 @@
+#!/bin/sh
+./build || exit
+
+check()
+	{
+	local name="$1"
+	echo "test $name"
+	../bin/fexl test/$name.fxl 2>&1 | diff - out/$name
+	}
+
+list="$@"
+
+# Run all tests by default.
+if [ "$list" = "" ]; then
+	list="a1 a2 a3 a4 a5 a6"
+fi
+
+for name in $list; do
+	check $name
+done

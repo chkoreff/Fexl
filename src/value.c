@@ -46,6 +46,25 @@ void clear_free_list(void)
 		}
 	}
 
+value no_step(value pair)
+	{
+	(void)pair;
+	return 0;
+	}
+
+value no_apply(value fun, value arg, value cx)
+	{
+	(void)fun;
+	(void)arg;
+	(void)cx;
+	return 0;
+	}
+
+void no_clear(value exp)
+	{
+	(void)exp;
+	}
+
 /* Reduce a pair until done.  A pair is an expression combined with a context
 which defines any unbound references in the expression.  The context is a list
 of zero or more pairs.  Each unbound reference in the expression refers by
