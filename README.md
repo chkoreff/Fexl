@@ -3,10 +3,14 @@
 This is a test branch for the new lambda evaluation mechanism.
 
 ## Run the test
-
 ```
 cd src
-./fexl | diff - out/fexl
+test/check
+```
+
+You can also check a specific set of tests, e.g.:
+```
+test/check a1 a3 a5
 ```
 
 ## License
