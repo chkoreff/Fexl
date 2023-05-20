@@ -258,9 +258,9 @@ static value parse_factor(void)
 		{
 		unsigned long first_line = cur_line;
 		skip();
-		if (cur_ch == '\\')
+		if (cur_ch == '#')
 			{
-			cur_ch = EOF; // Two backslashes simulates end of file.
+			cur_ch = EOF; // "\#" simulates end of file.
 			return 0;
 			}
 		else
