@@ -5,14 +5,11 @@
 #include <stdio.h>
 
 #include <value.h>
-#include <app.h>
-#include <lam.h>
-#include <ref.h>
+#include <basic.h>
 
 #include <str.h>
 #include <buffer.h>
 #include <stream.h>
-
 #include <parse.h>
 #include <type_str.h>
 
@@ -57,7 +54,7 @@ static value eval_count(value pair)
 	{
 	while (1)
 		{
-		value next = pair->L->type->step(pair);
+		value next = pair->L->T->step(pair);
 		if (next == 0) break;
 		num_steps++;
 		drop(pair);
@@ -118,33 +115,24 @@ void init_signal(void)
 
 static void run_script(void)
 	{
-	init_signal();
-
-	limit_time(1); // LATER Perhaps use alarm for sub-second limits.
-	limit_stack(20000);
-	limit_memory(10000000);
-
-	{
 	const char *name = argc > 1 ? argv[1] : "";
-	value exp = parse_script(name);
-	show_line("exp = ",exp);
+	value pair = parse_script(name);
+	show_line("exp = ",pair->L);
 	clear_free_list();
 
 	{
-	value pair = A(exp,R(0));
 	unsigned long old_bytes = cur_bytes;
 
 	eval = eval_count;
 	pair = eval(pair);
-	show_line("pair = ",pair);
+	show_line("exp = ",pair->L);
 	{
 	unsigned long num_bytes = cur_bytes - old_bytes;
 	printf("num_steps = %lu\n",num_steps);
 	printf("num_bytes = %lu\n\n",num_bytes);
 	}
+	}
 	drop(pair);
-	}
-	}
 	}
 
 int main(int _argc, const char *_argv[])
@@ -152,7 +140,17 @@ int main(int _argc, const char *_argv[])
 	argc = _argc;
 	argv = _argv;
 
+	init_signal();
+
+	limit_time(1); // LATER Perhaps use alarm for sub-second limits.
+	limit_stack(20000);
+	limit_memory(10000000);
+
+	beg_basic();
+
 	run_script();
+
+	end_basic();
 
 	free_memory(alt_stack.ss_sp, alt_stack.ss_size);
 	clear_free_list();

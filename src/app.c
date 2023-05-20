@@ -8,7 +8,7 @@ static value step(value pair)
 	value cx = pair->R;
 	value fun = eval(A(hold(exp->L),hold(cx)));
 	value arg = exp->R;
-	value next = fun->L->type->apply(fun,arg,cx);
+	value next = fun->L->T->apply(fun,arg,cx);
 	drop(fun);
 	return next;
 	}

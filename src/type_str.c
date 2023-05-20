@@ -1,5 +1,7 @@
-#include <str.h>
 #include <value.h>
+
+#include <basic.h>
+#include <str.h>
 
 #include <type_str.h>
 
@@ -8,7 +10,7 @@ static void clear(value exp)
 	str_free(exp->v_ptr);
 	}
 
-struct type type_str = { no_step, no_apply, clear };
+struct type type_str = { no_step, apply_atom, clear };
 
 value Qstr(string x)
 	{

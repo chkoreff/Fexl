@@ -1,9 +1,5 @@
 #include <memory.h>
-
 #include <value.h>
-#include <ref.h>
-#include <lam.h>
-#include <app.h>
 
 value free_list = 0;
 
@@ -16,7 +12,7 @@ value new_exp(struct type *type)
 		exp = new_memory(sizeof(struct value));
 
 	exp->N = 1;
-	exp->type = type;
+	exp->T = type;
 	return exp;
 	}
 
@@ -30,7 +26,7 @@ void drop(value exp)
 	{
 	if (--exp->N == 0)
 		{
-		exp->type->clear(exp);
+		exp->T->clear(exp);
 		exp->next = free_list;
 		free_list = exp;
 		}
@@ -83,7 +79,7 @@ static value eval_normal(value pair)
 	{
 	while (1)
 		{
-		value next = pair->L->type->step(pair);
+		value next = pair->L->T->step(pair);
 		if (next == 0) break;
 		drop(pair);
 		pair = next;

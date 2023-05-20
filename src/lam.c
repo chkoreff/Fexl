@@ -9,7 +9,7 @@ static value apply(value fun, value arg, value cx)
 	// Don't bind a reference to a reference.  This allows infinite loops
 	// to run in constant space.
 	value pair =
-		(arg->type == &type_ref)
+		(arg->T == &type_ref)
 			? find_pos(arg->v_u64,cx)
 			: A(hold(arg),hold(cx));
 

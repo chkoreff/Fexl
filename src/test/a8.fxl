@@ -1,0 +1,2 @@
+# Test strings yielding void when used as function.
+"abc" "cde" () ~ Hello world.~

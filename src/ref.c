@@ -6,7 +6,7 @@ value find_pos(unsigned long pos, value cx)
 	{
 	while (1)
 		{
-		if (cx->type == &type_ref)
+		if (cx->T == &type_ref)
 			return 0;
 		if (pos == 0)
 			return hold(cx->L);

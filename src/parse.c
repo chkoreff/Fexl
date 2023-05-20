@@ -67,16 +67,43 @@ static value parse_tuple(void)
 	return 0;
 	}
 
+static void error_unclosed(unsigned long first_line)
+	{
+	syntax_error("Unclosed string", first_line);
+	}
+
 static value parse_quote_string(void)
 	{
-	syntax_error("TODO parse_quote_string", cur_line);
-	return 0;
+	unsigned long first_line = cur_line;
+	struct buffer s_buf = {0};
+	struct buffer *buf = &s_buf;
+
+	skip();
+	if (!collect_to_ch(buf,'"'))
+		{
+		buf_discard(&s_buf);
+		error_unclosed(first_line);
+		}
+
+	return Qstr(buf_clear(&s_buf));
 	}
 
 static value parse_tilde_string(void)
 	{
-	syntax_error("TODO parse_tilde_string", cur_line);
-	return 0;
+	unsigned long first_line = cur_line;
+	struct buffer buf = {0};
+
+	int code = collect_tilde_string(&buf);
+	if (code != 1)
+		{
+		buf_discard(&buf);
+		if (code == -1)
+			syntax_error("Incomplete string terminator", first_line);
+		else
+			error_unclosed(first_line);
+		}
+
+	return Qstr(buf_clear(&buf));
 	}
 
 // Parse a name, or return 0 if I don't see one.
@@ -111,7 +138,7 @@ static value find_sym(string name)
 	unsigned long pos = 0;
 	while (1)
 		{
-		if (cx->type == &type_ref)
+		if (cx->T == &type_ref)
 			return 0;
 		else if (str_eq(name, cx->L->v_ptr))
 			return R(pos);
@@ -125,7 +152,7 @@ static value find_env(string name)
 	value cx = cx_env;
 	while (1)
 		{
-		if (cx->type == &type_ref)
+		if (cx->T == &type_ref)
 			return 0;
 		{
 		value top = cx->L;
@@ -154,7 +181,7 @@ static value parse_symbol(void)
 		if (exp == 0)
 			{
 			undefined_symbol(name->data,first_line);
-			exp = I();
+			exp = hold(QI);
 			}
 		}
 
@@ -233,7 +260,7 @@ static value parse_factor(void)
 		skip();
 		if (cur_ch == '\\')
 			{
-			cur_ch = -1; // Two backslashes simulates end of file.
+			cur_ch = EOF; // Two backslashes simulates end of file.
 			return 0;
 			}
 		else
@@ -261,7 +288,7 @@ static value parse_exp(void)
 	{
 	value exp = parse_factor();
 	if (exp == 0)
-		return I();
+		return hold(QI);
 	while (1)
 		{
 		value factor = parse_factor();
@@ -273,21 +300,24 @@ static value parse_exp(void)
 // Parse a top level expression.
 value parse_fexl(void)
 	{
-	value exp;
-
-	// Define I.
+	// Define standard context.
+	// TODO implement context as a function.
 	cx_env = R(0);
-	cx_env = A(A(Qstr(str_new_data0("I")),I()),cx_env);
+	cx_env = A(A(Qstr(str_new_data0("I")),hold(QI)),cx_env);
+	cx_env = A(A(Qstr(str_new_data0("void")),hold(Qvoid)),cx_env);
 
 	cx_lam = R(0); // empty context
 	has_undef = 0;
-	exp = parse_exp();
-	if (cur_ch != -1)
+
+	{
+	value exp = parse_exp();
+	if (cur_ch != EOF)
 		syntax_error("Extraneous input", cur_line);
 	if (has_undef)
 		die(0);
 
 	drop(cx_lam);
 	drop(cx_env);
-	return exp;
+	return A(exp,R(0));
+	}
 	}

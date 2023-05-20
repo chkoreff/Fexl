@@ -14,7 +14,7 @@ struct value
 		unsigned long N;
 		value next;
 		};
-	struct type *type;
+	struct type *T;
 	value L;
 	union
 		{
