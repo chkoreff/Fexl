@@ -83,7 +83,7 @@ static value eval_normal(value pair)
 	{
 	while (1)
 		{
-		value next = pair->app.fun->type->step(pair);
+		value next = pair->L->type->step(pair);
 		if (next == 0) break;
 		drop(pair);
 		pair = next;

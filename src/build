@@ -21,5 +21,7 @@ make show
 make parse
 make type_str
 
+make basic
+
 make fexl
 link fexl

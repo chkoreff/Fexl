@@ -57,7 +57,7 @@ static value eval_count(value pair)
 	{
 	while (1)
 		{
-		value next = pair->app.fun->type->step(pair);
+		value next = pair->L->type->step(pair);
 		if (next == 0) break;
 		num_steps++;
 		drop(pair);
@@ -128,6 +128,7 @@ static void run_script(void)
 	const char *name = argc > 1 ? argv[1] : "";
 	value exp = parse_script(name);
 	show_line("exp = ",exp);
+	clear_free_list();
 
 	{
 	value pair = A(exp,R(0));

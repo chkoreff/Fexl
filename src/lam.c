@@ -10,13 +10,13 @@ static value apply(value fun, value arg, value cx)
 	// to run in constant space.
 	value pair =
 		(arg->type == &type_ref)
-			? find_pos(arg->ref.pos,cx)
+			? find_pos(arg->v_u64,cx)
 			: A(hold(arg),hold(cx));
 
-	value fun_exp = fun->app.fun;
-	value fun_cx = fun->app.arg;
+	value fun_exp = fun->L;
+	value fun_cx = fun->R;
 
-	value body_exp = hold(fun_exp->lam.body);
+	value body_exp = hold(fun_exp->L);
 	value body_cx = A(pair,hold(fun_cx));
 
 	return A(body_exp, body_cx);
@@ -24,7 +24,7 @@ static value apply(value fun, value arg, value cx)
 
 static void clear(value exp)
 	{
-	drop(exp->lam.body);
+	drop(exp->L);
 	}
 
 struct type type_lam = { no_step, apply, clear };
@@ -32,6 +32,6 @@ struct type type_lam = { no_step, apply, clear };
 value L(value body)
 	{
 	value exp = new_exp(&type_lam);
-	exp->lam.body = body;
+	exp->L = body;
 	return exp;
 	}

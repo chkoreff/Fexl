@@ -7,22 +7,6 @@ struct type
 	void (*clear)(value exp);
 	};
 
-struct ref
-	{
-	unsigned long pos;
-	};
-
-struct lam
-	{
-	value body;
-	};
-
-struct app
-	{
-	value fun;
-	value arg;
-	};
-
 struct value
 	{
 	union
@@ -31,13 +15,13 @@ struct value
 		value next;
 		};
 	struct type *type;
+	value L;
 	union
 		{
-		struct ref ref;
-		struct lam lam;
-		struct app app;
-		double v_double;
+		unsigned long v_u64;
+		double v_double; // TODO use
 		void *v_ptr;
+		value R;
 		};
 	};
 

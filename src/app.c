@@ -4,19 +4,19 @@
 
 static value step(value pair)
 	{
-	value exp = pair->app.fun;
-	value cx = pair->app.arg;
-	value fun = eval(A(hold(exp->app.fun),hold(cx)));
-	value arg = exp->app.arg;
-	value next = fun->app.fun->type->apply(fun,arg,cx);
+	value exp = pair->L;
+	value cx = pair->R;
+	value fun = eval(A(hold(exp->L),hold(cx)));
+	value arg = exp->R;
+	value next = fun->L->type->apply(fun,arg,cx);
 	drop(fun);
 	return next;
 	}
 
 static void clear(value exp)
 	{
-	drop(exp->app.fun);
-	drop(exp->app.arg);
+	drop(exp->L);
+	drop(exp->R);
 	}
 
 struct type type_app = { step, no_apply, clear };
@@ -24,7 +24,7 @@ struct type type_app = { step, no_apply, clear };
 value A(value fun, value arg)
 	{
 	value exp = new_exp(&type_app);
-	exp->app.fun = fun;
-	exp->app.arg = arg;
+	exp->L = fun;
+	exp->R = arg;
 	return exp;
 	}

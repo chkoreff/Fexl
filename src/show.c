@@ -8,6 +8,7 @@
 #include <ref.h>
 
 #include <type_str.h>
+#include <basic.h>
 
 #include <show.h>
 
@@ -33,19 +34,19 @@ static void limit_show(value exp)
 	max_depth--;
 
 	if (exp->type == &type_ref)
-		printf("(R %lu)", exp->ref.pos);
+		printf("(R %lu)", exp->v_u64);
 	else if (exp->type == &type_lam)
 		{
 		put("(L ");
-		limit_show(exp->lam.body);
+		limit_show(exp->L);
 		put_ch(')');
 		}
 	else if (exp->type == &type_app)
 		{
 		put("(A ");
-		limit_show(exp->app.fun);
+		limit_show(exp->L);
 		put_ch(' ');
-		limit_show(exp->app.arg);
+		limit_show(exp->R);
 		put_ch(')');
 		}
 	else if (exp->type == &type_str)
@@ -54,6 +55,8 @@ static void limit_show(value exp)
 		put_quote(exp->v_ptr);
 		put_ch(')');
 		}
+	else if (exp->type == &type_I)
+		put("I");
 	else
 		put_ch('?');
 

@@ -10,11 +10,14 @@
 #include <app.h>
 #include <lam.h>
 #include <ref.h>
+
+#include <basic.h>
 #include <type_str.h>
 
 #include <parse.h>
 
-static value cur_cx;
+static value cx_env;
+static value cx_lam;
 static int has_undef = 0;
 
 static void syntax_error(const char *code, unsigned long line)
@@ -104,16 +107,35 @@ static string parse_name(void)
 
 static value find_sym(string name)
 	{
-	value cx = cur_cx;
+	value cx = cx_lam;
 	unsigned long pos = 0;
 	while (1)
 		{
 		if (cx->type == &type_ref)
 			return 0;
-		else if (str_eq(name, cx->app.fun->v_ptr))
+		else if (str_eq(name, cx->L->v_ptr))
 			return R(pos);
 		pos++;
-		cx = cx->app.arg;
+		cx = cx->R;
+		}
+	}
+
+value find_env(string name)
+	{
+	value cx = cx_env;
+	while (1)
+		{
+		if (cx->type == &type_ref)
+			return 0;
+		{
+		value top = cx->L;
+		value top_fun = top->L;
+		string top_name = top_fun->v_ptr;
+
+		if (str_eq(name,top_name))
+			return hold(top->R);
+		cx = cx->R;
+		}
 		}
 	}
 
@@ -128,8 +150,12 @@ static value parse_symbol(void)
 	value exp = find_sym(name);
 	if (exp == 0)
 		{
-		undefined_symbol(name->data,first_line);
-		exp = L(R(0));
+		exp = find_env(name);
+		if (exp == 0)
+			{
+			undefined_symbol(name->data,first_line);
+			exp = L(R(0));
+			}
 		}
 
 	str_free(name);
@@ -166,11 +192,11 @@ static value parse_lambda(unsigned long first_line)
 	skip_filler();
 	if (cur_ch != '=')
 		{
-		value old_cx = hold(cur_cx);
-		cur_cx = A(Qstr(name),cur_cx);
+		value old_cx = hold(cx_lam);
+		cx_lam = A(Qstr(name),cx_lam);
 		exp = parse_exp();
-		drop(cur_cx);
-		cur_cx = old_cx;
+		drop(cx_lam);
+		cx_lam = old_cx;
 		return L(exp);
 		}
 	else
@@ -188,11 +214,11 @@ static value parse_lambda(unsigned long first_line)
 			syntax_error("Missing definition", first_line);
 
 		{
-		value old_cx = hold(cur_cx);
-		cur_cx = A(Qstr(name),cur_cx);
+		value old_cx = hold(cx_lam);
+		cx_lam = A(Qstr(name),cx_lam);
 		exp = parse_exp();
-		drop(cur_cx);
-		cur_cx = old_cx;
+		drop(cx_lam);
+		cx_lam = old_cx;
 		return A(L(exp),def);
 		}
 		}
@@ -251,13 +277,20 @@ static value parse_exp(void)
 value parse_fexl(void)
 	{
 	value exp;
-	cur_cx = R(0); // empty context
+
+	// Define I.
+	cx_env = R(0);
+	cx_env = A(A(Qstr(str_new_data0("I")),I()),cx_env);
+
+	cx_lam = R(0); // empty context
 	has_undef = 0;
 	exp = parse_exp();
 	if (cur_ch != -1)
 		syntax_error("Extraneous input", cur_line);
 	if (has_undef)
 		die(0);
-	drop(cur_cx);
+
+	drop(cx_lam);
+	drop(cx_env);
 	return exp;
 	}
