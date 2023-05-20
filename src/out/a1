@@ -1,5 +1,5 @@
 exp = (A (L (A (L (A (L (A (L (A (L (A (L (R 0)) (A (R 0) (R 0)))) (A (R 0) (R 0)))) (A (R 0) (R 0)))) (A (R 0) (R 0)))) (A (R 0) (R 0)))) (L I))
 exp = (L I)
-num_steps = 100
+num_steps = 38
 num_bytes = 128
 

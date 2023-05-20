@@ -88,4 +88,4 @@ static value eval_normal(value pair)
 	return pair;
 	}
 
-value (*eval)(value f) = eval_normal;
+value (*eval)(value) = eval_normal;

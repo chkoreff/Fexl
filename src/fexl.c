@@ -5,6 +5,8 @@
 #include <stdio.h>
 
 #include <value.h>
+#include <app.h>
+#include <lam.h>
 #include <basic.h>
 
 #include <str.h>
@@ -45,23 +47,6 @@ value parse_script(const char *name)
 
 int argc;
 const char **argv;
-
-// Benchmark version of eval which counts reduction steps.
-
-static unsigned long num_steps = 0;
-
-static value eval_count(value pair)
-	{
-	while (1)
-		{
-		value next = pair->L->T->step(pair);
-		if (next == 0) break;
-		num_steps++;
-		drop(pair);
-		pair = next;
-		}
-	return pair;
-	}
 
 static void die_perror(const char *msg)
 	{
@@ -113,6 +98,17 @@ void init_signal(void)
 	set_handler(SIGSEGV);
 	}
 
+// Benchmark version which counts eval calls.
+static unsigned long num_steps = 0;
+
+static value (*save_eval)(value);
+
+static value eval_count(value pair)
+	{
+	num_steps++;
+	return save_eval(pair);
+	}
+
 static void run_script(void)
 	{
 	const char *name = argc > 1 ? argv[1] : "";
@@ -123,8 +119,11 @@ static void run_script(void)
 	{
 	unsigned long old_bytes = cur_bytes;
 
+	save_eval = eval;
 	eval = eval_count;
 	pair = eval(pair);
+	eval = save_eval;
+
 	show_line("exp = ",pair->L);
 	{
 	unsigned long num_bytes = cur_bytes - old_bytes;
