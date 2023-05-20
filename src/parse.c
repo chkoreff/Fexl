@@ -120,7 +120,7 @@ static value find_sym(string name)
 		}
 	}
 
-value find_env(string name)
+static value find_env(string name)
 	{
 	value cx = cx_env;
 	while (1)
@@ -154,7 +154,7 @@ static value parse_symbol(void)
 		if (exp == 0)
 			{
 			undefined_symbol(name->data,first_line);
-			exp = L(R(0));
+			exp = I();
 			}
 		}
 
@@ -179,49 +179,46 @@ static value parse_term(void)
 		return parse_symbol();
 	}
 
+static value parse_def(void)
+	{
+	value def;
+	if (cur_ch == '=')
+		{
+		unsigned long first_line = cur_line;
+		skip();
+		skip_filler();
+		def = parse_term();
+		if (def == 0)
+			syntax_error("Missing definition", first_line);
+		}
+	else
+		def = 0;
+	return def;
+	}
+
 static value parse_lambda(unsigned long first_line)
 	{
-	value exp;
-
 	string name = parse_name();
 	if (name == 0)
 		syntax_error("Missing name after '\\'", first_line);
 
-	// TODO Lambda name cannot be a numeric constant.
-
 	skip_filler();
-	if (cur_ch != '=')
-		{
-		value old_cx = hold(cx_lam);
-		cx_lam = A(Qstr(name),cx_lam);
-		exp = parse_exp();
-		drop(cx_lam);
-		cx_lam = old_cx;
-		return L(exp);
-		}
-	else
-		{
-		value def;
+	{
+	value def = parse_def();
+	value old_cx = hold(cx_lam);
 
-		first_line = cur_line;
-		skip();
+	cx_lam = A(Qstr(name),cx_lam);
+	{
+	value exp = parse_exp();
+	drop(cx_lam);
+	cx_lam = old_cx;
 
-		// Parse the definition.
-		skip_filler();
-
-		def = parse_term();
-		if (def == 0)
-			syntax_error("Missing definition", first_line);
-
-		{
-		value old_cx = hold(cx_lam);
-		cx_lam = A(Qstr(name),cx_lam);
-		exp = parse_exp();
-		drop(cx_lam);
-		cx_lam = old_cx;
-		return A(L(exp),def);
-		}
-		}
+	exp = L(exp);
+	if (def)
+		exp = A(exp,def);
+	return exp;
+	}
+	}
 	}
 
 // Parse the next factor of an expression, if any.
@@ -264,7 +261,7 @@ static value parse_exp(void)
 	{
 	value exp = parse_factor();
 	if (exp == 0)
-		return L(R(0));
+		return I();
 	while (1)
 		{
 		value factor = parse_factor();

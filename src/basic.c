@@ -10,6 +10,7 @@ static value step_I(value pair)
 
 struct type type_I = { step_I, no_apply, no_clear };
 
+// LATER: constant QI
 value I(void)
 	{
 	return L(new_exp(&type_I));
