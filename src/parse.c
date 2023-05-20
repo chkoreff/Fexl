@@ -225,6 +225,14 @@ static value parse_def(void)
 
 static value parse_lambda(unsigned long first_line)
 	{
+	int eager = 0;
+	if (cur_ch == '\\')
+		{
+		skip();
+		eager = 1;
+		}
+
+	{
 	string name = parse_name();
 	if (name == 0)
 		syntax_error("Missing name after '\\'", first_line);
@@ -240,10 +248,15 @@ static value parse_lambda(unsigned long first_line)
 	drop(cx_lam);
 	cx_lam = old_cx;
 
-	exp = L(exp);
+	if (eager)
+		exp = LV(exp);
+	else
+		exp = L(exp);
+
 	if (def)
 		exp = A(exp,def);
 	return exp;
+	}
 	}
 	}
 	}

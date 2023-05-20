@@ -41,6 +41,12 @@ static void limit_show(value exp)
 		limit_show(exp->L);
 		put_ch(')');
 		}
+	else if (exp->T == &type_lamv)
+		{
+		put("(LV ");
+		limit_show(exp->L);
+		put_ch(')');
+		}
 	else if (exp->T == &type_app)
 		{
 		put("(A ");

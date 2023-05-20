@@ -1,0 +1,14 @@
+# Eager evaluation, equivalent to shorter a9.fxl
+(\exp
+(\\exp
+(\\exp
+(\\exp
+(\\exp
+(\\exp
+exp
+) (exp exp)
+) (exp exp)
+) (exp exp)
+) (exp exp)
+) (exp exp)
+) I

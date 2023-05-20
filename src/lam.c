@@ -29,16 +29,29 @@ static value apply_lam(value fun, value arg, value cx)
 	return bind(fun,get_pair(arg,cx));
 	}
 
+static value apply_lamv(value fun, value arg, value cx)
+	{
+	return bind(fun,eval(get_pair(arg,cx)));
+	}
+
 static void clear(value exp)
 	{
 	drop(exp->L);
 	}
 
 struct type type_lam = { no_step, apply_lam, clear };
+struct type type_lamv = { no_step, apply_lamv, clear };
 
 value L(value body)
 	{
 	value exp = new_exp(&type_lam);
+	exp->L = body;
+	return exp;
+	}
+
+value LV(value body)
+	{
+	value exp = new_exp(&type_lamv);
 	exp->L = body;
 	return exp;
 	}

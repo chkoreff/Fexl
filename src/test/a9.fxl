@@ -1,0 +1,8 @@
+# Eager evaluation
+\exp=I
+\\exp=(exp exp)
+\\exp=(exp exp)
+\\exp=(exp exp)
+\\exp=(exp exp)
+\\exp=(exp exp)
+exp
