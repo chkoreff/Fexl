@@ -1,0 +1,7 @@
+# String concatenation
+. (I "abc");
+. (I "de");
+. "f";
+. "gh";
+(); I;
+""

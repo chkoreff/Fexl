@@ -65,6 +65,8 @@ static void limit_show(value exp)
 		put("I");
 	else if (exp->T == &type_void)
 		put("void");
+	else if (exp->T == &type_concat)
+		put(".");
 	else
 		put_ch('?');
 

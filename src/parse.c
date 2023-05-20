@@ -318,6 +318,9 @@ value parse_fexl(void)
 	cx_env = R(0);
 	cx_env = A(A(Qstr(str_new_data0("I")),hold(QI)),cx_env);
 	cx_env = A(A(Qstr(str_new_data0("void")),hold(Qvoid)),cx_env);
+	cx_env = A(A(Qstr(str_new_data0(".")),
+		LV(LV(new_exp(&type_concat)))
+		),cx_env);
 
 	cx_lam = R(0); // empty context
 	has_undef = 0;
