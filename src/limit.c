@@ -1,8 +1,8 @@
+#include <die.h>
+#include <stdio.h> // perror
 #include <sys/resource.h>
 
-#include <die.h>
 #include <limit.h>
-#include <stdio.h> /* perror */
 
 /* Set the soft limit for a resource. */
 static void set_limit(int resource, unsigned long n)

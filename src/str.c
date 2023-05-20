@@ -1,6 +1,7 @@
 #include <memory.h>
+#include <string.h> // memcpy strlen
+
 #include <str.h>
-#include <string.h> /* memcpy strlen */
 
 /* A string has a length field, followed by that number of bytes (which may
 include NULs), followed by a trailing NUL byte.  The trailing NUL byte makes it

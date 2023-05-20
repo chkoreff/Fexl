@@ -1,9 +1,11 @@
 #include <value.h>
 #include <app.h>
 #include <lam.h>
+#include <ref.h>
 
 #include <basic.h>
 
+value R0;
 value QI;
 value Qvoid;
 
@@ -33,14 +35,21 @@ value apply_atom(value fun, value arg, value cx)
 	return A(hold(Qvoid),hold(cx));
 	}
 
+value V(value exp)
+	{
+	return A(exp,hold(R0));
+	}
+
 void beg_basic(void)
 	{
+	R0 = R(0);
 	QI = L(new_exp(&type_I));
 	Qvoid = new_exp(&type_void);
 	}
 
 void end_basic(void)
 	{
+	drop(R0);
 	drop(QI);
 	drop(Qvoid);
 	}

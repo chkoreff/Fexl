@@ -315,14 +315,14 @@ value parse_fexl(void)
 	{
 	// Define standard context.
 	// TODO implement context as a function.
-	cx_env = R(0);
+	cx_env = hold(R0);
 	cx_env = A(A(Qstr(str_new_data0("I")),hold(QI)),cx_env);
 	cx_env = A(A(Qstr(str_new_data0("void")),hold(Qvoid)),cx_env);
 	cx_env = A(A(Qstr(str_new_data0(".")),
 		LV(LV(new_exp(&type_concat)))
 		),cx_env);
 
-	cx_lam = R(0); // empty context
+	cx_lam = hold(R0); // empty context
 	has_undef = 0;
 
 	{
@@ -334,6 +334,6 @@ value parse_fexl(void)
 
 	drop(cx_lam);
 	drop(cx_env);
-	return A(exp,R(0));
+	return V(exp);
 	}
 	}
