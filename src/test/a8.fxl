@@ -1,2 +1,5 @@
 # Test strings yielding void when used as function.
-"abc" "cde" () ~ Hello world.~
+\exp=("abc" "cde" () ~ Hello world.~)
+put "exp = " show exp nl
+\\exp=exp
+put "exp = " show exp nl

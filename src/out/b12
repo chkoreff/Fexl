@@ -1,5 +1,5 @@
 exp = (A (A (A (A (A (A (A (num 3.14) (num -3.2)) (num inf)) (num nan)) (num -inf)) (num -nan)) (num 0)) (num 0.3))
 exp = void
-num_steps = 7
-num_bytes = 256
+num_steps = 18
+num_bytes = 226
 

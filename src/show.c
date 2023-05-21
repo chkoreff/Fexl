@@ -8,6 +8,8 @@
 #include <ref.h>
 #include <basic.h>
 
+#include <type_convert.h>
+#include <type_math.h>
 #include <type_num.h>
 #include <type_str.h>
 #include <type_output.h>
@@ -93,6 +95,8 @@ static void limit_show(value exp)
 		put("/");
 	else if (exp->T == &type_xor)
 		put("xor");
+	else if (exp->T == &type_show)
+		put("show");
 	else
 		put_ch('?');
 
@@ -110,3 +114,11 @@ void show_line(const char *name, value exp)
 	{
 	put(name); show(exp); nl();
 	}
+
+static value step_show(value pair)
+	{
+	show(pair->R->L->L);
+	return V(hold(QI));
+	}
+
+struct type type_show = { step_show, no_apply, no_clear };

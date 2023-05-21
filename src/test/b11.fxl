@@ -1,4 +1,5 @@
 # String concatenation
+say;
 . (I "abc");
 . (I "de");
 . "f";

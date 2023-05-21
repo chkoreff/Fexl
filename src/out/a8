@@ -1,5 +1,5 @@
 exp = (A (A (A (str "abc") (str "cde")) (L I)) (str "Hello world."))
 exp = void
-num_steps = 3
-num_bytes = 83
+num_steps = 14
+num_bytes = 181
 

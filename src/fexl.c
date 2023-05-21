@@ -13,6 +13,8 @@
 #include <buffer.h>
 #include <stream.h>
 #include <parse.h>
+#include <type_convert.h>
+#include <type_math.h>
 #include <type_num.h>
 #include <type_str.h>
 #include <type_output.h>
@@ -115,7 +117,6 @@ static void run_script(value cx_env)
 	{
 	const char *name = argc > 1 ? argv[1] : "";
 	value pair = parse_script(name,cx_env);
-	show_line("exp = ",pair->L);
 	clear_free_list();
 
 	{
@@ -129,7 +130,6 @@ static void run_script(value cx_env)
 
 	type_app.step = save_step_app;
 
-	show_line("exp = ",pair->L);
 	{
 	unsigned long num_steps = cur_steps - beg_steps;
 	unsigned long num_bytes = cur_bytes - beg_bytes;
@@ -151,6 +151,7 @@ static void define(const char *key, value val)
 static void beg_std(void)
 	{
 	cx_std = hold(R0);
+
 	define("I", hold(QI));
 	define("void", hold(Qvoid));
 	define(".", E(E(new_exp(&type_concat))));
@@ -164,6 +165,8 @@ static void beg_std(void)
 	define("*", E(E(new_exp(&type_mul))));
 	define("/", E(E(new_exp(&type_div))));
 	define("xor", E(E(new_exp(&type_xor))));
+
+	define("show", L(new_exp(&type_show)));
 	}
 
 static void end_std(void)

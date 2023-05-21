@@ -6,25 +6,27 @@ make die
 make limit
 make memory
 
+make str
+make buffer
+make stream
+make output
+make format
+
 make value
 make app
 make lam
 make ref
 
-make str
-make buffer
-make stream
-
-make output
-make show
-
+make basic
 make parse
+
+make type_convert
+make type_math
 make type_num
+make type_output
 make type_str
 
-make basic
-make type_output
-make format
+make show
 
 make fexl
 link fexl
