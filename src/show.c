@@ -42,9 +42,9 @@ static void limit_show(value exp)
 		limit_show(exp->L);
 		put_ch(')');
 		}
-	else if (exp->T == &type_lamv)
+	else if (exp->T == &type_eager)
 		{
-		put("(LV ");
+		put("(E ");
 		limit_show(exp->L);
 		put_ch(')');
 		}

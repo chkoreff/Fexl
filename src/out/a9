@@ -1,4 +1,4 @@
-exp = (A (L (A (LV (A (LV (A (LV (A (LV (A (LV (R 0)) (A (R 0) (R 0)))) (A (R 0) (R 0)))) (A (R 0) (R 0)))) (A (R 0) (R 0)))) (A (R 0) (R 0)))) (L I))
+exp = (A (L (A (E (A (E (A (E (A (E (A (E (R 0)) (A (R 0) (R 0)))) (A (R 0) (R 0)))) (A (R 0) (R 0)))) (A (R 0) (R 0)))) (A (R 0) (R 0)))) (L I))
 exp = (L I)
 num_steps = 11
 num_bytes = 128

@@ -1,4 +1,4 @@
-exp = (A (A (LV (LV .)) (A (L I) (str "abc"))) (A (A (LV (LV .)) (A (L I) (str "de"))) (A (A (LV (LV .)) (str "f")) (A (A (LV (LV .)) (str "gh")) (A (L I) (A (L I) (str "")))))))
+exp = (A (A (E (E .)) (A (L I) (str "abc"))) (A (A (E (E .)) (A (L I) (str "de"))) (A (A (E (E .)) (str "f")) (A (A (E (E .)) (str "gh")) (A (L I) (A (L I) (str "")))))))
 exp = (str "abcdefgh")
 num_steps = 12
 num_bytes = 604

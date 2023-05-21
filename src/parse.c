@@ -216,7 +216,7 @@ static value parse_term(void)
 
 static value parse_def(void)
 	{
-	value def;
+	value def = 0;
 	if (cur_ch == '=')
 		{
 		unsigned long first_line = cur_line;
@@ -226,8 +226,6 @@ static value parse_def(void)
 		if (def == 0)
 			syntax_error("Missing definition", first_line);
 		}
-	else
-		def = 0;
 	return def;
 	}
 
@@ -274,11 +272,11 @@ static value parse_factor(void)
 			}
 		else
 			{
-			value (*wrap)(value) = L;
+			value (*wrap)(value) = L; // lazy
 			if (cur_ch == '\\')
 				{
 				skip();
-				wrap = LV; // eager
+				wrap = E; // eager
 				}
 			skip_filler();
 			return parse_lambda(first_line,wrap);
@@ -321,7 +319,7 @@ value parse_fexl(void)
 	cx_env = A(A(Qstr(str_new_data0("I")),hold(QI)),cx_env);
 	cx_env = A(A(Qstr(str_new_data0("void")),hold(Qvoid)),cx_env);
 	cx_env = A(A(Qstr(str_new_data0(".")),
-		LV(LV(new_exp(&type_concat)))
+		E(E(new_exp(&type_concat)))
 		),cx_env);
 
 	cx_lam = hold(R0); // empty context

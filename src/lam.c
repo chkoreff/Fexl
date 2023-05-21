@@ -29,7 +29,7 @@ static value apply_lam(value fun, value arg, value cx)
 	return bind(fun,get_pair(arg,cx));
 	}
 
-static value apply_lamv(value fun, value arg, value cx)
+static value apply_eager(value fun, value arg, value cx)
 	{
 	return bind(fun,eval(get_pair(arg,cx)));
 	}
@@ -40,7 +40,7 @@ static void clear(value exp)
 	}
 
 struct type type_lam = { no_step, apply_lam, clear };
-struct type type_lamv = { no_step, apply_lamv, clear };
+struct type type_eager = { no_step, apply_eager, clear };
 
 value L(value body)
 	{
@@ -49,9 +49,9 @@ value L(value body)
 	return exp;
 	}
 
-value LV(value body)
+value E(value body)
 	{
-	value exp = new_exp(&type_lamv);
+	value exp = new_exp(&type_eager);
 	exp->L = body;
 	return exp;
 	}
