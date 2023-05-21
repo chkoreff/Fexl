@@ -14,6 +14,7 @@
 #include <stream.h>
 #include <parse.h>
 #include <type_str.h>
+#include <type_output.h>
 
 #include <show.h>
 
@@ -152,6 +153,7 @@ static void beg_std(void)
 	define("I", hold(QI));
 	define("void", hold(Qvoid));
 	define(".", E(E(new_exp(&type_concat))));
+	define("say", E(new_exp(&type_say)));
 	}
 
 static void end_std(void)

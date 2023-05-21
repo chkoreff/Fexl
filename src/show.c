@@ -6,10 +6,11 @@
 #include <app.h>
 #include <lam.h>
 #include <ref.h>
+#include <basic.h>
 
 #include <type_num.h>
 #include <type_str.h>
-#include <basic.h>
+#include <type_output.h>
 
 #include <show.h>
 
@@ -74,6 +75,8 @@ static void limit_show(value exp)
 		put("void");
 	else if (exp->T == &type_concat)
 		put(".");
+	else if (exp->T == &type_say)
+		put("say");
 	else
 		put_ch('?');
 

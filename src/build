@@ -23,6 +23,7 @@ make type_num
 make type_str
 
 make basic
+make type_output
 
 make fexl
 link fexl

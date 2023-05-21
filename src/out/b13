@@ -1,0 +1,9 @@
+exp = (A (L (A (R 0) (R 0))) (A (A (A (A (A (A (A (E say) (A (L I) (str "Hello world."))) (E say)) (num 2.3)) (E say)) void) (E say)) (str "Bye")))
+Hello world.
+Bye
+Hello world.
+Bye
+exp = (L I)
+num_steps = 18
+num_bytes = 351
+
