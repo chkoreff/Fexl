@@ -77,6 +77,8 @@ static void limit_show(value exp)
 		put(".");
 	else if (exp->T == &type_say)
 		put("say");
+	else if (exp->T == &type_num_str)
+		put("num_str");
 	else
 		put_ch('?');
 

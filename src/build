@@ -24,6 +24,7 @@ make type_str
 
 make basic
 make type_output
+make format
 
 make fexl
 link fexl

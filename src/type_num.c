@@ -3,6 +3,10 @@
 #include <value.h>
 #include <basic.h>
 
+#include <str.h>
+#include <type_str.h>
+#include <format.h>
+
 #include <type_num.h>
 
 static void clear(value exp)
@@ -29,3 +33,14 @@ value Qnum_str0(const char *name)
 	else
 		return 0;
 	}
+
+static value step_num_str(value pair)
+	{
+	value x = pair->R->L->L;
+	if (x->T == &type_num)
+		return V(Qstr0(format_double(x->v_double)));
+	else
+		return V(hold(Qvoid));
+	}
+
+struct type type_num_str = { step_num_str, no_apply, no_clear };

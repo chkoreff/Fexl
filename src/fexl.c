@@ -13,6 +13,7 @@
 #include <buffer.h>
 #include <stream.h>
 #include <parse.h>
+#include <type_num.h>
 #include <type_str.h>
 #include <type_output.h>
 
@@ -154,6 +155,7 @@ static void beg_std(void)
 	define("void", hold(Qvoid));
 	define(".", E(E(new_exp(&type_concat))));
 	define("say", E(new_exp(&type_say)));
+	define("num_str", E(new_exp(&type_num_str)));
 	}
 
 static void end_std(void)

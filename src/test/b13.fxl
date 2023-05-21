@@ -2,7 +2,7 @@
 \test=
 	(
 	say (I "Hello world.")
-	say 2.3  # TODO num_str
+	say (num_str 2.3)
 	say void
 	say "Bye"
 	)
