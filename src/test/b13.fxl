@@ -4,7 +4,8 @@
 	say (I "Hello world.")
 	say (num_str 2.3)
 	say void
-	say "Bye"
+	put "Bye" nl
+	nl
 	)
 
 test

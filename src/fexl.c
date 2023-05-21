@@ -155,6 +155,8 @@ static void beg_std(void)
 	define("void", hold(Qvoid));
 	define(".", E(E(new_exp(&type_concat))));
 	define("say", E(new_exp(&type_say)));
+	define("put", E(new_exp(&type_put)));
+	define("nl", new_exp(&type_nl));
 	define("num_str", E(new_exp(&type_num_str)));
 	}
 

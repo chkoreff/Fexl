@@ -21,3 +21,22 @@ static value step_say(value pair)
 	}
 
 struct type type_say = { step_say, no_apply, no_clear };
+
+static value step_put(value pair)
+	{
+	value x = pair->R->L->L;
+	if (x->T == &type_str)
+		put_str(x->v_ptr);
+	return V(hold(QI));
+	}
+
+struct type type_put = { step_put, no_apply, no_clear };
+
+static value step_nl(value pair)
+	{
+	(void)pair;
+	put_ch('\n');
+	return V(hold(QI));
+	}
+
+struct type type_nl = { step_nl, no_apply, no_clear };
