@@ -2,7 +2,6 @@
 #include <stdio.h>
 
 #include <str.h>
-#include <io.h>
 #include <buffer.h>
 #include <stream.h>
 
@@ -21,23 +20,26 @@ static value cx_env;
 static value cx_lam;
 static int has_undef = 0;
 
-static void syntax_error(const char *code, unsigned long line)
+static void put_error_location(unsigned long line)
 	{
-	fprintf(stderr,"%s on line %lu", code, line);
+	fprintf(stderr," on line %lu", line);
 	if (cur_name[0])
 		fprintf(stderr," of %s\n", cur_name);
 	else
 		fprintf(stderr,"\n");
+	}
+
+static void syntax_error(const char *code, unsigned long line)
+	{
+	fprintf(stderr,"%s",code);
+	put_error_location(line);
 	die(0);
 	}
 
 static void undefined_symbol(const char *name, unsigned long line)
 	{
-	fprintf(stderr,"Undefined symbol %s on line %lu", name, line);
-	if (cur_name[0])
-		fprintf(stderr," of %s\n", cur_name);
-	else
-		fprintf(stderr,"\n");
+	fprintf(stderr,"Undefined symbol %s",name);
+	put_error_location(line);
 	has_undef = 1;
 	}
 
