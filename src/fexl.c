@@ -29,7 +29,7 @@ static int get(void)
 	return fgetc(cur_fh);
 	}
 
-value parse_script(const char *name, value cx_env)
+static value parse_script(const char *name, value cx_env)
 	{
 	value exp;
 	cur_name = name;
@@ -48,9 +48,6 @@ value parse_script(const char *name, value cx_env)
 	cur_fh = 0;
 	return exp;
 	}
-
-int argc;
-const char **argv;
 
 static void die_perror(const char *msg)
 	{
@@ -72,7 +69,7 @@ https://stackoverflow.com/questions/31784823/interrupting-open-with-sigalrm
 This sets a signal handler so it does not kill the process when the signal
 happens, but instead interrupts any system call in progress.
 */
-void set_handler(int signum)
+static void set_handler(int signum)
 	{
 	struct sigaction sa;
 	sa.sa_handler = handle_signal;
@@ -86,7 +83,7 @@ void set_handler(int signum)
 
 static stack_t alt_stack;
 
-void init_signal(void)
+static void init_signal(void)
 	{
 	// Set alternate stack context for signals.
 	{
@@ -185,6 +182,9 @@ static void end_std(void)
 	{
 	drop(cx_std);
 	}
+
+int argc;
+const char **argv;
 
 static void run_script(value cx_env)
 	{
