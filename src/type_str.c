@@ -35,3 +35,8 @@ value Qstr(string x)
 	exp->v_ptr = x;
 	return exp;
 	}
+
+value Qstr0(const char *data)
+	{
+	return Qstr(str_new_data0(data));
+	}
