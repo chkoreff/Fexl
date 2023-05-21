@@ -33,4 +33,4 @@ extern void clear_free_list(void);
 extern value no_step(value pair);
 extern value no_apply(value fun, value arg, value cx);
 extern void no_clear(value exp);
-extern value (*eval)(value pair);
+extern value eval(value pair);

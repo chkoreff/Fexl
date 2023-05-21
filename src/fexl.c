@@ -99,14 +99,14 @@ void init_signal(void)
 	}
 
 // Benchmark version which counts eval calls.
-static unsigned long num_steps = 0;
+static unsigned long cur_steps = 0;
 
-static value (*save_eval)(value);
+static value (*save_step_app)(value);
 
-static value eval_count(value pair)
+static value count_step_app(value pair)
 	{
-	num_steps++;
-	return save_eval(pair);
+	cur_steps++;
+	return save_step_app(pair);
 	}
 
 static void run_script(void)
@@ -117,16 +117,20 @@ static void run_script(void)
 	clear_free_list();
 
 	{
-	unsigned long old_bytes = cur_bytes;
+	unsigned long beg_steps = cur_steps;
+	unsigned long beg_bytes = cur_bytes;
 
-	save_eval = eval;
-	eval = eval_count;
+	save_step_app = type_app.step;
+	type_app.step = count_step_app;
+
 	pair = eval(pair);
-	eval = save_eval;
+
+	type_app.step = save_step_app;
 
 	show_line("exp = ",pair->L);
 	{
-	unsigned long num_bytes = cur_bytes - old_bytes;
+	unsigned long num_steps = cur_steps - beg_steps;
+	unsigned long num_bytes = cur_bytes - beg_bytes;
 	printf("num_steps = %lu\n",num_steps);
 	printf("num_bytes = %lu\n\n",num_bytes);
 	}

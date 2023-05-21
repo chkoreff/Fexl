@@ -76,7 +76,7 @@ exp => A(exp fun, exp arg)
 context => R(0)             // empty context
 context => A(pair,context)  // context with pair at position 0
 */
-static value eval_normal(value pair)
+value eval(value pair)
 	{
 	while (1)
 		{
@@ -87,5 +87,3 @@ static value eval_normal(value pair)
 		}
 	return pair;
 	}
-
-value (*eval)(value) = eval_normal;
