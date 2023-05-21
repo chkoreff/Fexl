@@ -85,6 +85,14 @@ static void limit_show(value exp)
 		put("num_str");
 	else if (exp->T == &type_add)
 		put("+");
+	else if (exp->T == &type_sub)
+		put("-");
+	else if (exp->T == &type_mul)
+		put("*");
+	else if (exp->T == &type_div)
+		put("/");
+	else if (exp->T == &type_xor)
+		put("xor");
 	else
 		put_ch('?');
 

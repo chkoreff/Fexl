@@ -160,6 +160,10 @@ static void beg_std(void)
 	define("num_str", E(new_exp(&type_num_str)));
 
 	define("+", E(E(new_exp(&type_add))));
+	define("-", E(E(new_exp(&type_sub))));
+	define("*", E(E(new_exp(&type_mul))));
+	define("/", E(E(new_exp(&type_div))));
+	define("xor", E(E(new_exp(&type_xor))));
 	}
 
 static void end_std(void)
