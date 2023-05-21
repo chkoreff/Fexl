@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <str.h>
-#include <io.h>
+#include <output.h>
 
 #include <value.h>
 #include <app.h>

@@ -15,7 +15,7 @@ make str
 make buffer
 make stream
 
-make io
+make output
 make show
 
 make parse

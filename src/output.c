@@ -2,7 +2,7 @@
 #include <str.h>
 #include <string.h> // strlen
 
-#include <io.h>
+#include <output.h>
 
 void fputd(FILE *fh, const char *data, unsigned long len)
 	{
