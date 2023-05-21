@@ -49,7 +49,6 @@ static value step_add(value pair)
 	{
 	value x = pair->R->R->L->L;
 	value y = pair->R->L->L;
-	// TODO test
 	if (x->T == &type_num && y->T == &type_num)
 		{
 		double xn = x->v_double;
