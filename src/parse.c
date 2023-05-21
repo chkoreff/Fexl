@@ -223,15 +223,7 @@ static value parse_def(void)
 	return def;
 	}
 
-static value parse_lambda(unsigned long first_line)
-	{
-	int eager = 0;
-	if (cur_ch == '\\')
-		{
-		skip();
-		eager = 1;
-		}
-
+static value parse_lambda(unsigned long first_line, value wrap(value))
 	{
 	string name = parse_name();
 	if (name == 0)
@@ -248,15 +240,11 @@ static value parse_lambda(unsigned long first_line)
 	drop(cx_lam);
 	cx_lam = old_cx;
 
-	if (eager)
-		exp = LV(exp);
-	else
-		exp = L(exp);
+	exp = wrap(exp);
 
 	if (def)
 		exp = A(exp,def);
 	return exp;
-	}
 	}
 	}
 	}
@@ -278,8 +266,14 @@ static value parse_factor(void)
 			}
 		else
 			{
+			value (*wrap)(value) = L;
+			if (cur_ch == '\\')
+				{
+				skip();
+				wrap = LV; // eager
+				}
 			skip_filler();
-			return parse_lambda(first_line);
+			return parse_lambda(first_line,wrap);
 			}
 		}
 	else if (cur_ch == ';')

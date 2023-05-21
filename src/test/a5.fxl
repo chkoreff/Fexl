@@ -1,2 +1,5 @@
 # Test undefined symbols.
 x y
+
+\\z=I  # ok
+\ \z=I # syntax error
