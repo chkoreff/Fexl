@@ -1,4 +1,5 @@
 # Use predefined I function.
+show_benchmark;
 \exp=I
 \exp=(exp exp)
 \exp=(exp exp)

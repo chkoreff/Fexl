@@ -105,40 +105,50 @@ void init_signal(void)
 // Benchmark version which counts eval calls.
 static unsigned long cur_steps = 0;
 
-static value (*save_step_app)(value);
+static value (*orig_step_app)(value);
 
 static value count_step_app(value pair)
 	{
 	cur_steps++;
-	return save_step_app(pair);
+	return orig_step_app(pair);
 	}
 
-static void run_script(value cx_env)
+static value op_benchmark(FILE *fh, value pair)
 	{
-	const char *name = argc > 1 ? argv[1] : "";
-	value pair = parse_script(name,cx_env);
-	clear_free_list();
+	value x = hold(pair->R->L);
 
+	clear_free_list();
 	{
 	unsigned long beg_steps = cur_steps;
 	unsigned long beg_bytes = cur_bytes;
 
-	save_step_app = type_app.step;
+	cur_steps = 0;
+
 	type_app.step = count_step_app;
-
-	pair = eval(pair);
-
-	type_app.step = save_step_app;
+	x = eval(x);
+	type_app.step = orig_step_app;
 
 	{
-	unsigned long num_steps = cur_steps - beg_steps;
 	unsigned long num_bytes = cur_bytes - beg_bytes;
-	printf("num_steps = %lu\n",num_steps);
-	printf("num_bytes = %lu\n\n",num_bytes);
+	fprintf(fh,"steps %lu bytes %lu\n",cur_steps,num_bytes);
+	cur_steps += beg_steps;
+	return x;
 	}
 	}
-	drop(pair);
 	}
+
+static value step_show_benchmark(value pair)
+	{
+	return op_benchmark(stdout,pair);
+	}
+
+static value step_trace_benchmark(value pair)
+	{
+	return op_benchmark(stderr,pair);
+	}
+
+struct type type_show_benchmark = { step_show_benchmark, no_apply, no_clear };
+struct type type_trace_benchmark = { step_trace_benchmark, no_apply, no_clear };
 
 // Define standard context.
 static value cx_std;
@@ -167,11 +177,21 @@ static void beg_std(void)
 	define("xor", E(E(new_exp(&type_xor))));
 
 	define("show", L(new_exp(&type_show)));
+	define("show_benchmark", L(new_exp(&type_show_benchmark)));
+	define("trace_benchmark", L(new_exp(&type_trace_benchmark)));
 	}
 
 static void end_std(void)
 	{
 	drop(cx_std);
+	}
+
+static void run_script(value cx_env)
+	{
+	const char *name = argc > 1 ? argv[1] : "";
+	value pair = parse_script(name,cx_env);
+	pair = eval(pair);
+	drop(pair);
 	}
 
 int main(int _argc, const char *_argv[])
@@ -184,6 +204,8 @@ int main(int _argc, const char *_argv[])
 	limit_time(1); // LATER Perhaps use alarm for sub-second limits.
 	limit_stack(20000);
 	limit_memory(10000000);
+
+	orig_step_app = type_app.step;
 
 	beg_basic();
 	beg_std();

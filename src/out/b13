@@ -6,6 +6,4 @@ Hello world.
 2.3
 Bye
 
-num_steps = 24
-num_bytes = 415
-
+steps 24 bytes 544

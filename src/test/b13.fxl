@@ -1,4 +1,5 @@
 # Output
+show_benchmark;
 \test=
 	(
 	say (I "Hello world.")

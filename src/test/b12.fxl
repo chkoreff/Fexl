@@ -1,4 +1,5 @@
 # Numeric constants
+show_benchmark;
 \exp=(3.14 -3.2 inf nan -inf -nan 0 .3)
 put "exp = " show exp nl
 \\exp=exp

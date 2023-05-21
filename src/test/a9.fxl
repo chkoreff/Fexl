@@ -1,4 +1,5 @@
 # Eager evaluation
+show_benchmark;
 \exp=I
 \\exp=(exp exp)
 \\exp=(exp exp)
