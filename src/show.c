@@ -83,6 +83,8 @@ static void limit_show(value exp)
 		put("nl");
 	else if (exp->T == &type_num_str)
 		put("num_str");
+	else if (exp->T == &type_add)
+		put("+");
 	else
 		put_ch('?');
 

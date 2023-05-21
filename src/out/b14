@@ -1,0 +1,16 @@
+exp = (A (L (A (A (A (A (A (A (A (A (A (A (A (A (A (A (A (A (A (A (A (A (A (A (A (R 0) (A (A (E (E +)) (num 2.3)) (num 0.8))) (R 0)) (A (A (E (E +)) (num 2.3)) (A (A (E (E +)) (num 0.8)) (A (A (E (E +)) (num -4)) (num 0))))) (R 0)) (A (A (E (E +)) (num 4)) (str "a"))) (R 0)) (A (A (E (E +)) (num inf)) (num nan))) (R 0)) (A (A (E (E +)) (num inf)) (num inf))) (R 0)) (A (A (E (E +)) (num inf)) (num -inf))) (E say)) (str "abcd~ABA")) (E say)) (str "AAB~ABC")) (E say)) (str "hello")) (E say)) (str ""hello"")) (E say)) (str "~(1) "hello"~(1)")) (E say)) (str "~(2) ~(1) "hello"~(1)~(2)"))) (L (A (E say) (A (E num_str) (R 0)))))
+3.1
+-0.9
+nan
+inf
+-nan
+abcd~ABA
+AAB~ABC
+hello
+"hello"
+~(1) "hello"~(1)
+~(2) ~(1) "hello"~(1)~(2)
+exp = (L I)
+num_steps = 52
+num_bytes = 1116
+

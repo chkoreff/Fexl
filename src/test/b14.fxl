@@ -1,0 +1,19 @@
+#
+\try=(\x say (num_str x))
+
+try (+ 2.3 0.8)
+try (+ 2.3; + 0.8; + -4; 0)
+try (+ 4 "a")
+try (+ inf nan)
+try (+ inf inf)
+try (+ inf -inf)
+
+# Test some tricky string terminators.
+say ~ABC abcd~ABA~ABC
+say ~ABCD AAB~ABC~ABCD
+# Multiple layers of quotation.
+
+say "hello"
+say ~(1) "hello"~(1)
+say ~(2) ~(1) "hello"~(1)~(2)
+say ~(3) ~(2) ~(1) "hello"~(1)~(2)~(3)

@@ -158,6 +158,8 @@ static void beg_std(void)
 	define("put", E(new_exp(&type_put)));
 	define("nl", new_exp(&type_nl));
 	define("num_str", E(new_exp(&type_num_str)));
+
+	define("+", E(E(new_exp(&type_add))));
 	}
 
 static void end_std(void)
