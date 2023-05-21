@@ -167,29 +167,30 @@ static value find_env(string name)
 		}
 	}
 
-static value parse_symbol(void)
-	{
-	unsigned long first_line = cur_line;
-	string name = parse_name();
-	if (name == 0) return 0;
-
+static value resolve(string name)
 	{
 	value exp = find_sym(name);
 	if (exp == 0)
 		{
 		exp = find_env(name);
 		if (exp == 0)
-			{
-			// See if it's a numeric constant.
-			exp = Qnum_str0(name->data);
-			if (exp == 0)
-				{
-				undefined_symbol(name->data,first_line);
-				exp = hold(QI);
-				}
-			}
+			exp = Qnum_str0(name->data); // Check for numeric constant.
 		}
+	return exp;
+	}
 
+static value parse_symbol(void)
+	{
+	unsigned long first_line = cur_line;
+	string name = parse_name();
+	if (name == 0) return 0;
+	{
+	value exp = resolve(name);
+	if (exp == 0)
+		{
+		undefined_symbol(name->data,first_line);
+		exp = hold(QI);
+		}
 	str_free(name);
 	return exp;
 	}
