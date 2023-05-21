@@ -19,7 +19,7 @@ struct value
 	union
 		{
 		unsigned long v_u64;
-		double v_double; // TODO use
+		double v_double;
 		void *v_ptr;
 		value R;
 		};

@@ -35,6 +35,11 @@ void put_ch(char ch)
 	fput_ch(stdout,ch);
 	}
 
+void put_double(double x)
+	{
+	printf("%.15g",x);
+	}
+
 void put_str(string x)
 	{
 	fput_str(stdout,x);

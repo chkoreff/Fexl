@@ -19,6 +19,7 @@ make io
 make show
 
 make parse
+make type_num
 make type_str
 
 make basic

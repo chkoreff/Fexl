@@ -4,5 +4,6 @@ extern void fput_ch(FILE *fh, char ch);
 extern void fput_str(FILE *fh, string x);
 extern void put(const char *data);
 extern void put_ch(char ch);
+extern void put_double(double x);
 extern void put_str(string x);
 extern void nl(void);

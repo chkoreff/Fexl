@@ -7,6 +7,7 @@
 #include <lam.h>
 #include <ref.h>
 
+#include <type_num.h>
 #include <type_str.h>
 #include <basic.h>
 
@@ -53,6 +54,12 @@ static void limit_show(value exp)
 		limit_show(exp->L);
 		put_ch(' ');
 		limit_show(exp->R);
+		put_ch(')');
+		}
+	else if (exp->T == &type_num)
+		{
+		put("(num ");
+		put_double(exp->v_double);
 		put_ch(')');
 		}
 	else if (exp->T == &type_str)

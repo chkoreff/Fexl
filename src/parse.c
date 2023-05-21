@@ -12,6 +12,7 @@
 #include <ref.h>
 
 #include <basic.h>
+#include <type_num.h>
 #include <type_str.h>
 
 #include <parse.h>
@@ -171,7 +172,6 @@ static value parse_symbol(void)
 	unsigned long first_line = cur_line;
 	string name = parse_name();
 	if (name == 0) return 0;
-	// TODO See if it's a numeric constant.
 
 	{
 	value exp = find_sym(name);
@@ -180,8 +180,13 @@ static value parse_symbol(void)
 		exp = find_env(name);
 		if (exp == 0)
 			{
-			undefined_symbol(name->data,first_line);
-			exp = hold(QI);
+			// See if it's a numeric constant.
+			exp = Qnum_str0(name->data);
+			if (exp == 0)
+				{
+				undefined_symbol(name->data,first_line);
+				exp = hold(QI);
+				}
 			}
 		}
 
