@@ -25,7 +25,7 @@ static int get(void)
 	return fgetc(cur_fh);
 	}
 
-value parse_script(const char *name)
+value parse_script(const char *name, value cx_env)
 	{
 	value exp;
 	cur_name = name;
@@ -38,7 +38,7 @@ value parse_script(const char *name)
 	cur_get = get;
 	skip();
 
-	exp = parse_fexl();
+	exp = parse_fexl(cx_env);
 
 	fclose(cur_fh);
 	cur_fh = 0;
@@ -109,10 +109,10 @@ static value count_step_app(value pair)
 	return save_step_app(pair);
 	}
 
-static void run_script(void)
+static void run_script(value cx_env)
 	{
 	const char *name = argc > 1 ? argv[1] : "";
-	value pair = parse_script(name);
+	value pair = parse_script(name,cx_env);
 	show_line("exp = ",pair->L);
 	clear_free_list();
 
@@ -138,6 +138,27 @@ static void run_script(void)
 	drop(pair);
 	}
 
+// Define standard context.
+static value cx_std;
+
+static void define(const char *key, value val)
+	{
+	cx_std = A(A(Qstr0(key),val),cx_std);
+	}
+
+static void beg_std(void)
+	{
+	cx_std = hold(R0);
+	define("I", hold(QI));
+	define("void", hold(Qvoid));
+	define(".", E(E(new_exp(&type_concat))));
+	}
+
+static void end_std(void)
+	{
+	drop(cx_std);
+	}
+
 int main(int _argc, const char *_argv[])
 	{
 	argc = _argc;
@@ -150,10 +171,12 @@ int main(int _argc, const char *_argv[])
 	limit_memory(10000000);
 
 	beg_basic();
+	beg_std();
 
-	run_script();
+	run_script(cx_std);
 
 	end_basic();
+	end_std();
 
 	free_memory(alt_stack.ss_sp, alt_stack.ss_size);
 	clear_free_list();

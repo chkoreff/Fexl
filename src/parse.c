@@ -311,18 +311,10 @@ static value parse_exp(void)
 	}
 
 // Parse a top level expression.
-value parse_fexl(void)
+value parse_fexl(value cx)
 	{
-	// Define standard context.
-	// TODO implement context as a function.
-	cx_env = hold(R0);
-	cx_env = A(A(Qstr0("I"),hold(QI)),cx_env);
-	cx_env = A(A(Qstr0("void"),hold(Qvoid)),cx_env);
-	cx_env = A(A(Qstr0("."),
-		E(E(new_exp(&type_concat)))
-		),cx_env);
-
-	cx_lam = hold(R0); // empty context
+	cx_env = cx;
+	cx_lam = hold(R0); // empty stack
 	has_undef = 0;
 
 	{
@@ -333,7 +325,6 @@ value parse_fexl(void)
 		die(0);
 
 	drop(cx_lam);
-	drop(cx_env);
 	return V(exp);
 	}
 	}
