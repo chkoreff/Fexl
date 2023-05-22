@@ -42,16 +42,19 @@ static void clear(value exp)
 struct type type_lam = { no_step, apply_lam, clear };
 struct type type_eager = { no_step, apply_eager, clear };
 
-value L(value body)
+static value new(struct type *type, value body)
 	{
-	value exp = new_exp(&type_lam);
+	value exp = new_exp(type);
 	exp->L = body;
 	return exp;
 	}
 
+value L(value body)
+	{
+	return new(&type_lam,body);
+	}
+
 value E(value body)
 	{
-	value exp = new_exp(&type_eager);
-	exp->L = body;
-	return exp;
+	return new(&type_eager,body);
 	}

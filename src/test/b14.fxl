@@ -16,6 +16,7 @@ try (* 27 3.6)
 try (/ 27 3.6)
 try (xor 27 3.6)
 try (/ 1 3)
+try (+ (+ 1 2) (+ 3 4))
 
 nl
 # Test some tricky string terminators.

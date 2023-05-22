@@ -1,4 +1,4 @@
-steps 90 bytes 1792
+steps 100 bytes 1856
 3.1
 -0.9
 nan
@@ -11,6 +11,7 @@ inf
 7.5
 24
 0.333333333333333
+10
 
 abcd~ABA
 AAB~ABC
