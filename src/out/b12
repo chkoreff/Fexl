@@ -1,3 +1,3 @@
-exp = (A (A (A (A (A (A (A (num 3.14) (num -3.2)) (num inf)) (num nan)) (num -inf)) (num -nan)) (num 0)) (num 0.3))
-exp = void
-steps 18 bytes 384
+BEG exp = (L (A F (A T F)) (L (A F T) (A I I)))
+END exp = (L (A F (A T F)) (L (A F T) (A I I)))
+steps 0 bytes 20813

@@ -1,16 +1,12 @@
-#include <die.h>
-#include <stdio.h>
-
 #include <str.h>
-#include <buffer.h>
-#include <stream.h>
 
+#include <buffer.h>
 #include <value.h>
-#include <app.h>
-#include <lam.h>
-#include <ref.h>
 
 #include <basic.h>
+#include <die.h>
+#include <stdio.h>
+#include <stream.h>
 #include <type_num.h>
 #include <type_str.h>
 
@@ -18,7 +14,59 @@
 
 static value cx_env;
 static value cx_lam;
-static int has_undef = 0;
+static int has_undef;
+
+static value pre(value x)
+	{
+	return A(hold(QI),x);
+	}
+
+static value ref(value sym)
+	{
+	return A(A(A(sym,hold(QT)),hold(QI)),hold(QI));
+	}
+
+static value merge(value fun, value arg)
+	{
+	int cmp;
+	if (fun->T == &type_A)
+		{
+		if (arg->T == &type_A)
+			cmp = str_cmp(fun->L->L->v_ptr, arg->L->L->v_ptr);
+		else
+			cmp = -1;
+		}
+	else
+		{
+		if (arg->T != &type_A)
+			return hold(arg);
+		cmp = 1;
+		}
+
+	if (cmp == 0)
+		return
+			A(A(hold(fun->L->L), A(hold(fun->L->R),hold(arg->L->R))),
+			merge(fun->R,arg->R)
+			);
+	else if (cmp < 0)
+		return
+			A(A(hold(fun->L->L), A(hold(fun->L->R),hold(QF))),
+			merge(fun->R,arg)
+			);
+	else
+		return
+			A(A(hold(arg->L->L), A(hold(QF),hold(arg->L->R))),
+			merge(fun,arg->R)
+			);
+	}
+
+static value app(value fun, value arg)
+	{
+	value exp = A(merge(fun->L,arg->L), A(hold(fun->R),hold(arg->R)));
+	drop(fun);
+	drop(arg);
+	return exp;
+	}
 
 static void put_error_location(unsigned long line)
 	{
@@ -60,13 +108,13 @@ static value parse_nested(void)
 
 static value parse_list(void)
 	{
-	syntax_error("TODO parse_list", cur_line);
+	syntax_error("LATER parse_list", cur_line);
 	return 0;
 	}
 
 static value parse_tuple(void)
 	{
-	syntax_error("TODO parse_tuple", cur_line);
+	syntax_error("LATER parse_tuple", cur_line);
 	return 0;
 	}
 
@@ -88,7 +136,7 @@ static value parse_quote_string(void)
 		error_unclosed(first_line);
 		}
 
-	return Qstr(buf_clear(&s_buf));
+	return pre(Qstr(buf_clear(&s_buf)));
 	}
 
 static value parse_tilde_string(void)
@@ -106,7 +154,7 @@ static value parse_tilde_string(void)
 			error_unclosed(first_line);
 		}
 
-	return Qstr(buf_clear(&buf));
+	return pre(Qstr(buf_clear(&buf)));
 	}
 
 // Parse a name, or return 0 if I don't see one.
@@ -135,50 +183,38 @@ static string parse_name(void)
 	return buf_clear(&buf);
 	}
 
-static value find_sym(string name)
+static value find_item(string name, value cx)
 	{
-	value cx = cx_lam;
-	unsigned long pos = 0;
 	while (1)
 		{
-		if (cx->T == &type_ref)
+		if (cx->T == &type_A)
+			{
+			value top = cx->L;
+			if (str_eq(name, top->L->v_ptr))
+				return top;
+			else
+				cx = cx->R;
+			}
+		else
 			return 0;
-		else if (str_eq(name, cx->L->v_ptr))
-			return R(pos);
-		pos++;
-		cx = cx->R;
-		}
-	}
-
-static value find_env(string name)
-	{
-	value cx = cx_env;
-	while (1)
-		{
-		if (cx->T == &type_ref)
-			return 0;
-		{
-		value top = cx->L;
-		value top_fun = top->L;
-		string top_name = top_fun->v_ptr;
-
-		if (str_eq(name,top_name))
-			return hold(top->R);
-		cx = cx->R;
-		}
 		}
 	}
 
 static value resolve(string name)
 	{
-	value exp = find_sym(name);
-	if (exp == 0)
-		{
-		exp = find_env(name);
-		if (exp == 0)
-			exp = Qnum_str0(name->data); // Check for numeric constant.
-		}
-	return exp;
+	value exp = find_item(name, cx_lam);
+	if (exp)
+		return hold(exp->R);
+
+	exp = find_item(name, cx_env);
+	if (exp)
+		return pre(hold(exp->R));
+
+	exp = Qnum_str0(name->data); // Check for numeric constant.
+	if (exp)
+		return pre(exp);
+
+	return 0;
 	}
 
 static value parse_symbol(void)
@@ -191,7 +227,7 @@ static value parse_symbol(void)
 	if (exp == 0)
 		{
 		undefined_symbol(name->data,first_line);
-		exp = hold(QI);
+		exp = pre(hold(QI));
 		}
 	str_free(name);
 	return exp;
@@ -229,7 +265,46 @@ static value parse_def(void)
 	return def;
 	}
 
-static value parse_lambda(unsigned long first_line, value wrap(value))
+// Pop the name out of the map, returning A(pattern,new_map).
+static value pop(string name, value map)
+	{
+	if (map->T == &type_A)
+		{
+		value remain = pop(name,map->R);
+		value pattern = hold(remain->L);
+		value tail = hold(remain->R);
+		value top = map->L;
+		value top_sym = top->L;
+		value top_pattern = hold(top->R);
+
+		drop(remain);
+
+		if (pattern == QF && str_eq(name,top_sym->v_ptr))
+			{
+			drop(pattern);
+			return A(top_pattern, tail); // found
+			}
+		else
+			return A(pattern,
+				A(A(hold(top_sym),A(hold(QF),top_pattern)), tail));
+		}
+	else
+		return A(hold(QF),hold(map));
+	}
+
+static value abstract(string name, value exp, type type)
+	{
+	value remain = pop(name,exp->L);
+	value pattern = hold(remain->L);
+	value new_map = hold(remain->R);
+	value form = hold(exp->R);
+
+	drop(remain);
+	drop(exp);
+	return A(new_map,V(type,pattern,form));
+	}
+
+static value parse_lambda(unsigned long first_line, type type)
 	{
 	string name = parse_name();
 	if (name == 0)
@@ -238,18 +313,20 @@ static value parse_lambda(unsigned long first_line, value wrap(value))
 	skip_filler();
 	{
 	value def = parse_def();
-	value old_cx = hold(cx_lam);
+	value save_cx = hold(cx_lam);
+	value sym = Qstr(name);
+	cx_lam = A(A(sym,ref(hold(sym))),cx_lam);
 
-	cx_lam = A(Qstr(name),cx_lam);
 	{
 	value exp = parse_exp();
-	drop(cx_lam);
-	cx_lam = old_cx;
+	exp = abstract(name,exp,type);
 
-	exp = wrap(exp);
+	drop(cx_lam);
+	cx_lam = save_cx;
 
 	if (def)
-		exp = A(exp,def);
+		exp = app(exp,def);
+
 	return exp;
 	}
 	}
@@ -272,14 +349,14 @@ static value parse_factor(void)
 			}
 		else
 			{
-			value (*wrap)(value) = L; // lazy
+			type type = &type_L; // lazy
 			if (cur_ch == '\\')
 				{
 				skip();
-				wrap = E; // eager
+				type = &type_E; // eager
 				}
 			skip_filler();
-			return parse_lambda(first_line,wrap);
+			return parse_lambda(first_line,type);
 			}
 		}
 	else if (cur_ch == ';')
@@ -301,30 +378,60 @@ static value parse_exp(void)
 	{
 	value exp = parse_factor();
 	if (exp == 0)
-		return hold(QI);
+		return pre(hold(QI));
 	while (1)
 		{
 		value factor = parse_factor();
 		if (factor == 0) return exp;
-		exp = A(exp,factor);
+		exp = app(exp,factor);
 		}
 	}
 
 // Parse a top level expression.
-value parse_fexl(value cx)
+static value parse_fexl(const char *name, input get, value cx)
 	{
+	cur_name = name;
+	cur_get = get;
+	skip(); // Read first char.
+
 	cx_env = cx;
-	cx_lam = hold(R0); // empty stack
+	cx_lam = hold(QI); // empty stack
 	has_undef = 0;
 
 	{
 	value exp = parse_exp();
 	if (cur_ch != EOF)
 		syntax_error("Extraneous input", cur_line);
+
+	{
+	value val = hold(exp->R);
+	drop(exp);
+	drop(cx_lam);
+
 	if (has_undef)
 		die(0);
-
-	drop(cx_lam);
-	return V(exp);
+	return val;
 	}
+	}
+	}
+
+// Parse a file.
+
+static FILE *cur_fh;
+
+static int get_fh(void)
+	{
+	//return '('; // Test stack overflow in parser.
+	return fgetc(cur_fh);
+	}
+
+value parse_fexl_fh(const char *name, FILE *fh, value cx)
+	{
+	value exp;
+	cur_fh = fh;
+	exp = parse_fexl(name,get_fh,cx);
+
+	fclose(cur_fh);
+	cur_fh = 0;
+	return exp;
 	}

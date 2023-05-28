@@ -1,0 +1,3 @@
+BEG exp = (A (A + (A (A ^ 49) 0.5)) (A (A * (A (A xor 3) 5)) (A (A + (A (A - (A (A * 5) 5)) 2)) (A (A - 37) 0))))
+END exp = 367
+steps 16 bytes 21101

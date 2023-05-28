@@ -1,5 +1,1 @@
-# Test syntax error
-(
-	(())
-	()
-#)
+\x 3 x

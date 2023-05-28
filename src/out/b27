@@ -1,0 +1,28 @@
+BEG exp = (A (A (A (A (A (A (A (A (A (A (A (A _ _) 2.3) say) void) say) (A I I)) (A (L (A (A (A (A _ _) F) T) F) (A (A (A (A _ _) (A _ _)) I) (A cos (A (A _ _) 8)))) (L (A F (A F T)) (A say (A num_str I))))) say) "]") say) "Bye") nl)
+Hello world.
+
+
+[
+2.3
+10
+32.6
+
+-32
+-32
+
+2
+3
+-5
+
+11
+2.71828182845905
+-20.6
+0.5
+0.5
+0.38268343236509
+0.923879532511287
+]
+Bye
+
+END exp = I
+steps 115 bytes 25997

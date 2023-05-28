@@ -1,6 +1,1 @@
-# Test strings yielding void when used as function.
-show_benchmark;
-\exp=("abc" "cde" () ~ Hello world.~)
-put "exp = " show exp nl
-\\exp=exp
-put "exp = " show exp nl
+\x\y 3 x

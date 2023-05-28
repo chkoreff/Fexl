@@ -1,42 +1,82 @@
-#include <value.h>
-#include <basic.h>
 #include <str.h>
+#include <value.h>
+
+#include <basic.h>
+#include <context.h>
+#include <memory.h>
 
 #include <type_str.h>
 
-static void clear(value exp)
+static void clear_str(value f)
 	{
-	str_free(exp->v_ptr);
+	str_free(f->v_ptr);
 	}
 
-struct type type_str = { no_step, apply_atom, clear };
+struct type type_str = { 0, apply_void, clear_str };
 
-static value op_str2(value pair, string op(string,string))
+string get_str(value x)
 	{
-	value x = pair->R->R->L->L;
-	value y = pair->R->L->L;
-	if (x->T == &type_str && y->T == &type_str)
-		return V(Qstr(op(x->v_ptr,y->v_ptr)));
-	else
-		return V(hold(Qvoid));
+	return x->v_ptr;
 	}
 
-// (. x y) is the concatenation of strings x and y.
-static value step_concat(value pair)
+const char *str_data(value x)
 	{
-	return op_str2(pair,str_concat);
+	return get_str(x)->data;
 	}
-
-struct type type_concat = { step_concat, no_apply, no_clear };
 
 value Qstr(string x)
 	{
-	value exp = new_exp(&type_str);
-	exp->v_ptr = x;
-	return exp;
+	return Q(&type_str,x);
 	}
 
 value Qstr0(const char *data)
 	{
 	return Qstr(str_new_data0(data));
+	}
+
+static value apply_str_str(value f, value x)
+	{
+	value g;
+
+	x = eval(x);
+	if (f->L == 0)
+		{
+		if (x->T == &type_str)
+			g = V(f->T,hold(f),hold(x));
+		else
+			g = hold(Qvoid);
+		}
+	else
+		{
+		if (x->T == &type_str)
+			{
+			string (*op)(string,string) = f->L->v_ptr;
+			g = Qstr(op(f->R->v_ptr, x->v_ptr));
+			}
+		else
+			g = hold(Qvoid);
+		}
+
+	drop(f);
+	drop(x);
+	return g;
+	}
+
+static struct type op_str_str = { 0, apply_str_str, clear_T };
+
+void def_type_str(void)
+	{
+	// (. x y) is the concatenation of strings x and y.
+	define(".", Q(&op_str_str, str_concat));
+	// LATER length
+	// LATER slice
+	// LATER search
+	// LATER str_num
+	// LATER ord
+	// LATER chr
+	// LATER char_width
+	// LATER dirname
+	// LATER basename
+	// LATER length_common
+	// LATER compare_at
 	}

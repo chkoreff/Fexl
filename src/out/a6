@@ -1,1 +1,3 @@
-Unclosed parenthesis on line 2 of test/a6.fxl
+BEG exp = (L (A F T) (A 3 I))
+END exp = (L (A F T) (A 3 I))
+steps 0 bytes 20461

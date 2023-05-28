@@ -1,0 +1,10 @@
+#
+\x=
+(
+(() ()) I () "Hello" "bye" 2.0 inf -3
+# Test some tricky string terminators.
+~ABC abcd~ABA~ABC
+~ABCD AAB~ABC~ABCD
+)
+
+T 3

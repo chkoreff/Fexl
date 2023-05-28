@@ -1,53 +1,12 @@
-#include <die.h>
-#include <limit.h>
-#include <memory.h>
-#include <signal.h> // sigaction
 #include <stdio.h>
-
 #include <value.h>
-#include <app.h>
-#include <lam.h>
-#include <basic.h>
 
-#include <str.h>
-#include <buffer.h>
-#include <stream.h>
+#include <context.h>
+#include <die.h>
+#include <memory.h>
 #include <parse.h>
-#include <type_convert.h>
-#include <type_math.h>
-#include <type_num.h>
-#include <type_str.h>
-#include <type_output.h>
-
 #include <show.h>
-
-static FILE *cur_fh;
-
-static int get(void)
-	{
-	//return '('; // Test stack overflow in parser.
-	return fgetc(cur_fh);
-	}
-
-static value parse_script(const char *name, value cx_env)
-	{
-	value exp;
-	cur_name = name;
-	cur_fh = name[0] ? fopen(name,"r") : stdin;
-	if (!cur_fh)
-		{
-		fprintf(stderr,"Could not open source file %s\n",name);
-		die(0);
-		}
-	cur_get = get;
-	skip();
-
-	exp = parse_fexl(cx_env);
-
-	fclose(cur_fh);
-	cur_fh = 0;
-	return exp;
-	}
+#include <signal.h> // sigaction
 
 static void die_perror(const char *msg)
 	{
@@ -63,12 +22,7 @@ static void handle_signal(int signum)
 		die("Out of stack");
 	}
 
-/* Reference:
-https://stackoverflow.com/questions/31784823/interrupting-open-with-sigalrm
-
-This sets a signal handler so it does not kill the process when the signal
-happens, but instead interrupts any system call in progress.
-*/
+// Set a handler to catch a signal instead of killing the process.
 static void set_handler(int signum)
 	{
 	struct sigaction sa;
@@ -99,120 +53,41 @@ static void init_signal(void)
 	set_handler(SIGSEGV);
 	}
 
-// Benchmark version which counts eval calls.
-static unsigned long cur_steps = 0;
+static unsigned long num_steps;
 
-static value (*orig_step_app)(value);
-
-static value count_step_app(value pair)
+static value count_step_A(value f)
 	{
-	cur_steps++;
-	return orig_step_app(pair);
+	num_steps++;
+	return step_A(f);
 	}
 
-static value op_benchmark(FILE *fh, value pair)
-	{
-	value x = hold(pair->R->L);
-
-	clear_free_list();
-	{
-	unsigned long beg_steps = cur_steps;
-	unsigned long beg_bytes = cur_bytes;
-
-	cur_steps = 0;
-
-	type_app.step = count_step_app;
-	x = eval(x);
-	type_app.step = orig_step_app;
-
-	{
-	unsigned long num_bytes = cur_bytes - beg_bytes;
-	fprintf(fh,"steps %lu bytes %lu\n",cur_steps,num_bytes);
-	cur_steps += beg_steps;
-	return x;
-	}
-	}
-	}
-
-static value step_show_benchmark(value pair)
-	{
-	return op_benchmark(stdout,pair);
-	}
-
-static value step_trace_benchmark(value pair)
-	{
-	return op_benchmark(stderr,pair);
-	}
-
-struct type type_show_benchmark = { step_show_benchmark, no_apply, no_clear };
-struct type type_trace_benchmark = { step_trace_benchmark, no_apply, no_clear };
-
-// Define standard context.
-static value cx_std;
-
-static void define(const char *key, value val)
-	{
-	cx_std = A(A(Qstr0(key),val),cx_std);
-	}
-
-static void beg_std(void)
-	{
-	cx_std = hold(R0);
-
-	define("I", hold(QI));
-	define("void", hold(Qvoid));
-	define(".", E(E(new_exp(&type_concat))));
-	define("say", E(new_exp(&type_say)));
-	define("put", E(new_exp(&type_put)));
-	define("nl", new_exp(&type_nl));
-	define("num_str", E(new_exp(&type_num_str)));
-
-	define("+", E(E(new_exp(&type_add))));
-	define("-", E(E(new_exp(&type_sub))));
-	define("*", E(E(new_exp(&type_mul))));
-	define("/", E(E(new_exp(&type_div))));
-	define("xor", E(E(new_exp(&type_xor))));
-
-	define("show", L(new_exp(&type_show)));
-	define("show_benchmark", L(new_exp(&type_show_benchmark)));
-	define("trace_benchmark", L(new_exp(&type_trace_benchmark)));
-	}
-
-static void end_std(void)
-	{
-	drop(cx_std);
-	}
-
-int argc;
-const char **argv;
-
-static void run_script(value cx_env)
+int main(int argc, const char *argv[])
 	{
 	const char *name = argc > 1 ? argv[1] : "";
-	value pair = parse_script(name,cx_env);
-	pair = eval(pair);
-	drop(pair);
-	}
-
-int main(int _argc, const char *_argv[])
-	{
-	argc = _argc;
-	argv = _argv;
+	FILE *fh = name[0] ? fopen(name,"r") : stdin;
+	if (!fh)
+		{
+		fprintf(stderr,"Could not open source file %s\n",name);
+		die(0);
+		}
 
 	init_signal();
 
-	limit_time(1); // LATER Perhaps use alarm for sub-second limits.
-	limit_stack(20000);
-	limit_memory(10000000);
-
-	orig_step_app = type_app.step;
-
-	beg_basic();
 	beg_std();
 
-	run_script(cx_std);
+	{
+	value exp = parse_fexl_fh(name,fh,cx_std);
+	show_line("BEG exp = ",exp);
 
-	end_basic();
+	type_A.step = count_step_A;
+	exp = eval(exp);
+	type_A.step = step_A;
+
+	show_line("END exp = ",exp);
+	printf("steps %lu bytes %lu\n",num_steps,cur_bytes);
+	drop(exp);
+	}
+
 	end_std();
 
 	free_memory(alt_stack.ss_sp, alt_stack.ss_size);

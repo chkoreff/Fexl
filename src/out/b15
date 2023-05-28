@@ -1,5 +1,3 @@
-Hello
-steps 1 bytes 128
-Hello
-steps 1 bytes 128
-steps 4 bytes 224
+BEG exp = (L (A F (A F T)) (L (A T F) (A I I)))
+END exp = (L (A F (A F T)) (L (A T F) (A I I)))
+steps 0 bytes 20813

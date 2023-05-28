@@ -1,1 +1,3 @@
-steps 37 bytes 480
+BEG exp = (L F (L (A F T) (A 3 I)))
+END exp = (L F (L (A F T) (A 3 I)))
+steps 0 bytes 20653

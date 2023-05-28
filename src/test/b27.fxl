@@ -1,0 +1,42 @@
+#
+say "Hello world."
+nl
+say ""
+put "[" nl
+# Can only say strings, these have no effect.
+say 2.3
+say void
+say (I I)
+
+# Test num_str
+(
+\try=(\x say (num_str x))
+try "a"
+
+try 2.3
+
+try (abs 10)
+try (abs -32.6)
+
+nl
+try (trunc -32.6)
+try (ceil -32.6)
+
+nl
+try (round 2.3)
+try (ceil 2.3)
+try (round (I -4.7))
+
+nl
+try (sqrt 121)
+try (exp 1)
+try (log (exp -20.6))
+try (^ (sin (/ pi 4)) 2)
+try (^ (cos (/ pi 4)) 2)
+try (sin (/ pi 8))
+try (cos (/ pi 8))
+)
+
+say "]"
+say "Bye"
+nl

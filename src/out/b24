@@ -1,0 +1,3 @@
+BEG exp = (A (E (A (A F (A (A F (A (A F (A F (A (A (A _ _) F) F))) F)) F)) F) (A (E (A (A F (A (A F (A F (A (A (A _ _) F) F))) F)) F) (A (E (A (A F (A F (A (A F T) F))) F) (A (E (A F (A F T)) (L F (A (A (A _ _) I) I))) (A (A . (A I "a")) 3))) (A . 3))) (A (A . (A (A . (A I "abc")) (A I "de"))) (A (A . "f") "g")))) (A . (A I "a")))
+END exp = (L F (A (A (A (? . "a") "abcdefg") void) void))
+steps 18 bytes 22951

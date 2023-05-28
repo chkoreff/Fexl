@@ -1,42 +1,53 @@
-#include <value.h>
-#include <basic.h>
-
-#include <str.h>
-#include <type_str.h>
-
 #include <stdio.h>
+#include <str.h>
+#include <value.h>
+
+#include <basic.h>
+#include <context.h>
 #include <output.h>
+#include <type_str.h>
 
 #include <type_output.h>
 
-static value step_say(value pair)
+static value apply_str(value f, value x)
 	{
-	value x = pair->R->L->L;
+	value g;
+
+	x = eval(x);
 	if (x->T == &type_str)
 		{
-		put_str(x->v_ptr);
-		put_ch('\n');
+		void (*op)(string) = f->v_ptr;
+		op(x->v_ptr);
 		}
-	return V(hold(QI));
+	g = hold(QI);
+
+	drop(f);
+	drop(x);
+	return g;
 	}
 
-struct type type_say = { step_say, no_apply, no_clear };
+static struct type op_str = { 0, apply_str, no_clear };
 
-static value step_put(value pair)
+static void def1(const char *name, void op(string))
 	{
-	value x = pair->R->L->L;
-	if (x->T == &type_str)
-		put_str(x->v_ptr);
-	return V(hold(QI));
+	define(name, Q(&op_str,op));
 	}
 
-struct type type_put = { step_put, no_apply, no_clear };
-
-static value step_nl(value pair)
+static value op_nl(void)
 	{
-	(void)pair;
-	put_ch('\n');
-	return V(hold(QI));
+	nl();
+	return hold(QI);
 	}
 
-struct type type_nl = { step_nl, no_apply, no_clear };
+static void say_str(string x)
+	{
+	put_str(x);
+	nl();
+	}
+
+void def_type_output(void)
+	{
+	def0("nl", op_nl);
+	def1("say", say_str);
+	def1("put", put_str);
+	}

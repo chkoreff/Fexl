@@ -1,9 +1,3 @@
-Hello world.
-2.3
-Bye
-
-Hello world.
-2.3
-Bye
-
-steps 24 bytes 544
+BEG exp = (L (A T T) (A I I))
+END exp = (L (A T T) (A I I))
+steps 0 bytes 20429

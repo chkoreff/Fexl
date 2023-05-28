@@ -1,0 +1,3 @@
+BEG exp = (A (A (A (A (A I (A I I)) I) (L F (L F 3))) (A @ @)) (A @ I))
+END exp = 3
+steps 6 bytes 20653

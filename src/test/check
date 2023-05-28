@@ -8,13 +8,37 @@ check()
 	../bin/fexl test/$name.fxl 2>&1 | diff - out/$name
 	}
 
+refresh()
+	{
+	local name="$1"
+	echo "refresh $name"
+	../bin/fexl test/$name.fxl 2>&1 | cat >new/$name
+	}
+
 list="$@"
 
 # Run all tests by default.
 if [ "$list" = "" ]; then
-	list="a1 a2 a3 a4 a5 a6 a7 a8 a9 b10 b11 b12 b13 b14 b15"
+	list="$list a1 a2 a3 a4 a5 a6 a7 a8 a9"
+	list="$list b10 b11 b12 b13 b14 b15 b16 b17 b18 b19"
+	list="$list b20 b21 b22 b23 b24 b25 b26 b27 b28"
 fi
 
-for name in $list; do
-	check $name
-done
+do_check()
+	{
+	for name in $list; do
+		check $name
+	done
+	}
+
+do_refresh()
+	{
+	rm -rf new
+	mkdir new
+	for name in $list; do
+		refresh $name
+	done
+	}
+
+do_check
+#do_refresh

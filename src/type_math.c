@@ -1,23 +1,73 @@
 #include <value.h>
+
 #include <basic.h>
+#include <context.h>
+#include <math.h> // pow fabs sqrt exp log sin cos M_PI
 #include <type_num.h>
 
 #include <type_math.h>
 
-// Arithmetic operators
+// Unary operators
 
-static value op_num2(value pair, double op(double,double))
+static value apply_num(value f, value x)
 	{
-	value x = pair->R->R->L->L;
-	value y = pair->R->L->L;
-	if (x->T == &type_num && y->T == &type_num)
+	value g;
+	x = eval(x);
+	if (x->T == &type_num)
 		{
-		double xn = x->v_double;
-		double yn = y->v_double;
-		return V(Qnum(op(xn,yn)));
+		double (*op)(double) = f->v_ptr;
+		g = Qnum(op(x->v_double));
 		}
 	else
-		return V(hold(Qvoid));
+		g = hold(Qvoid);
+
+	drop(f);
+	drop(x);
+	return g;
+	}
+
+static struct type op_num = { 0, apply_num, no_clear };
+
+static void def1(const char *name, double op(double))
+	{
+	define(name, Q(&op_num,op));
+	}
+
+// Binary operators
+
+static value apply_num_num(value f, value x)
+	{
+	value g;
+
+	x = eval(x);
+	if (f->L == 0)
+		{
+		if (x->T == &type_num)
+			g = V(f->T,hold(f),hold(x));
+		else
+			g = hold(Qvoid);
+		}
+	else
+		{
+		if (x->T == &type_num)
+			{
+			double (*op)(double,double) = f->L->v_ptr;
+			g = Qnum(op(f->R->v_double, x->v_double));
+			}
+		else
+			g = hold(Qvoid);
+		}
+
+	drop(f);
+	drop(x);
+	return g;
+	}
+
+static struct type op_num_num = { 0, apply_num_num, clear_T };
+
+static void def2(const char *name, double op(double,double))
+	{
+	define(name, Q(&op_num_num,op));
 	}
 
 static double add(double x, double y) { return x + y; }
@@ -26,17 +76,24 @@ static double mul(double x, double y) { return x * y; }
 static double div(double x, double y) { return x / y; }
 static double xor(double x, double y) { return (long)x ^ (long)y; }
 
-static value step_add(value pair) { return op_num2(pair,add); }
-struct type type_add = { step_add, no_apply, no_clear };
+void def_type_math(void)
+	{
+	define("pi", Qnum(M_PI));
 
-static value step_sub(value pair) { return op_num2(pair,sub); }
-struct type type_sub = { step_sub, no_apply, no_clear };
+	def1("round", round);
+	def1("ceil", ceil);
+	def1("trunc", trunc);
+	def1("abs", fabs);
+	def1("sqrt", sqrt);
+	def1("exp", exp);
+	def1("log", log);
+	def1("sin", sin);
+	def1("cos", cos);
 
-static value step_mul(value pair) { return op_num2(pair,mul); }
-struct type type_mul = { step_mul, no_apply, no_clear };
-
-static value step_div(value pair) { return op_num2(pair,div); }
-struct type type_div = { step_div, no_apply, no_clear };
-
-static value step_xor(value pair) { return op_num2(pair,xor); }
-struct type type_xor = { step_xor, no_apply, no_clear };
+	def2("+", add);
+	def2("-", sub);
+	def2("*", mul);
+	def2("/", div);
+	def2("^", pow);
+	def2("xor", xor);
+	}

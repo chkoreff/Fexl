@@ -2,31 +2,27 @@
 . ./lib_build
 
 # Build fexl.
+make basic
+make buffer
+make context
 make die
+make format
 make limit
 make memory
-
-make str
-make buffer
-make stream
 make output
-make format
-
-make value
-make app
-make lam
-make ref
-
-make basic
 make parse
-
-make type_convert
+make show
+make str
+make stream
 make type_math
 make type_num
 make type_output
 make type_str
+make value
 
-make show
+#make format
+#make type_convert
+#make type_meta
 
 make fexl
 link fexl

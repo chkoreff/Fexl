@@ -1,23 +1,32 @@
 #include <stdio.h>
 #include <str.h>
-#include <output.h>
-
 #include <value.h>
-#include <app.h>
-#include <lam.h>
-#include <ref.h>
-#include <basic.h>
 
-#include <type_convert.h>
-#include <type_math.h>
+#include <basic.h>
+#include <context.h>
+#include <output.h>
 #include <type_num.h>
 #include <type_str.h>
-#include <type_output.h>
 
 #include <show.h>
 
-static unsigned long max_depth;
-static unsigned long max_call;
+// Find the name of atom f in context cx.
+static const char *atom_name(value f, value cx)
+	{
+	while (1)
+		{
+		if (cx->T == &type_A)
+			{
+			value top = cx->L;
+			value val = top->R;
+			if (f->T == val->T && f->v_ptr == val->v_ptr)
+				return str_data(top->L);
+			cx = cx->R;
+			}
+		else
+			return "?";
+		}
+	}
 
 static void put_quote(string x)
 	{
@@ -26,7 +35,21 @@ static void put_quote(string x)
 	put_ch('"');
 	}
 
-static void limit_show(value exp)
+static void limit_show(value f);
+
+void show_exp(const char *name, value f)
+	{
+	put_ch('(');
+	put(name);
+	put_ch(' '); limit_show(f->L);
+	put_ch(' '); limit_show(f->R);
+	put_ch(')');
+	}
+
+static unsigned long max_depth;
+static unsigned long max_call;
+
+static void limit_show(value f)
 	{
 	if (max_call == 0 || max_depth == 0)
 		{
@@ -37,88 +60,35 @@ static void limit_show(value exp)
 	max_call--;
 	max_depth--;
 
-	if (exp->T == &type_ref)
-		printf("(R %lu)", exp->v_u64);
-	else if (exp->T == &type_lam)
-		{
-		put("(L ");
-		limit_show(exp->L);
-		put_ch(')');
-		}
-	else if (exp->T == &type_eager)
-		{
-		put("(E ");
-		limit_show(exp->L);
-		put_ch(')');
-		}
-	else if (exp->T == &type_app)
-		{
-		put("(A ");
-		limit_show(exp->L);
-		put_ch(' ');
-		limit_show(exp->R);
-		put_ch(')');
-		}
-	else if (exp->T == &type_num)
-		{
-		put("(num ");
-		put_double(exp->v_double);
-		put_ch(')');
-		}
-	else if (exp->T == &type_str)
-		{
-		put("(str ");
-		put_quote(exp->v_ptr);
-		put_ch(')');
-		}
-	else if (exp->T == &type_I)
-		put("I");
-	else if (exp->T == &type_void)
-		put("void");
-	else if (exp->T == &type_concat)
-		put(".");
-	else if (exp->T == &type_say)
-		put("say");
-	else if (exp->T == &type_put)
-		put("put");
-	else if (exp->T == &type_nl)
-		put("nl");
-	else if (exp->T == &type_num_str)
-		put("num_str");
-	else if (exp->T == &type_add)
-		put("+");
-	else if (exp->T == &type_sub)
-		put("-");
-	else if (exp->T == &type_mul)
-		put("*");
-	else if (exp->T == &type_div)
-		put("/");
-	else if (exp->T == &type_xor)
-		put("xor");
-	else if (exp->T == &type_show)
-		put("show");
+	if (f->T == &type_num)
+		put_double(f->v_double);
+	else if (f->T == &type_str)
+		put_quote(get_str(f));
 	else
-		put_ch('?');
+		{
+		if (f->T == &type_A)
+			show_exp("A",f);
+		else if (f->T == &type_L)
+			show_exp("L",f);
+		else if (f->T == &type_E)
+			show_exp("E",f);
+		else if (f->L)
+			show_exp("?",f); // intermediate form
+		else
+			put(atom_name(f,cx_std)); // atom
+		}
 
 	max_depth++;
 	}
 
 void show(value f)
 	{
-	max_depth = 100;
+	max_depth = 12;
 	max_call = 200;
 	limit_show(f);
 	}
 
-void show_line(const char *name, value exp)
+void show_line(const char *name, value f)
 	{
-	put(name); show(exp); nl();
+	put(name);show(f);nl();
 	}
-
-static value step_show(value pair)
-	{
-	show(pair->R->L->L);
-	return V(hold(QI));
-	}
-
-struct type type_show = { step_show, no_apply, no_clear };

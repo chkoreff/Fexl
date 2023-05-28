@@ -1,21 +1,3 @@
-steps 100 bytes 1856
-3.1
--0.9
-nan
-inf
--nan
-
-30.6
-23.4
-97.2
-7.5
-24
-0.333333333333333
-10
-
-abcd~ABA
-AAB~ABC
-hello
-"hello"
-~(1) "hello"~(1)
-~(2) ~(1) "hello"~(1)~(2)
+BEG exp = (L (A F (A T T)) (L F (A I I)))
+END exp = (L (A F (A T T)) (L F (A I I)))
+steps 0 bytes 20717

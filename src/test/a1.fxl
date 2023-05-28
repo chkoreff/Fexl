@@ -1,12 +1,1 @@
-#
-show_benchmark;
-\exp=()
-\exp=(exp exp)
-\exp=(exp exp)
-\exp=(exp exp)
-\exp=(exp exp)
-\exp=(exp exp)
-exp
-
-\#
-Extra stuff not parsed.
+\x 3

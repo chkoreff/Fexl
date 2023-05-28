@@ -1,9 +1,1 @@
-# String concatenation
-show_benchmark;
-say;
-. (I "abc");
-. (I "de");
-. "f";
-. "gh";
-(); I;
-""
+\x\y x 3

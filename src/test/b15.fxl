@@ -1,10 +1,1 @@
-# Nested benchmark
-show_benchmark;
-(
-show_benchmark;
-say "Hello"
-)
-(
-show_benchmark;
-say "Hello"
-)
+\x\y y x
