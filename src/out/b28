@@ -1,3 +1,2 @@
-BEG exp = (A (E (A (A F (A (A F (A F (A (A T F) F))) F)) F) (A (E (A (A F (A F (A (A F T) F))) F) (A (E (A F (A F T)) (L F (A (A I I) I))) (A (A + 1) "a"))) (A + "a"))) (A round "a"))
+steps 7 bytes 384
 END exp = (L F (A (A void void) void))
-steps 7 bytes 21933

@@ -19,9 +19,11 @@ list="$@"
 
 # Run all tests by default.
 if [ "$list" = "" ]; then
-	list="$list a1 a2 a3 a4 a5 a6 a7 a8 a9"
-	list="$list b10 b11 b12 b13 b14 b15 b16 b17 b18 b19"
-	list="$list b20 b21 b22 b23 b24 b25 b26 b27 b28"
+	list="$list a1 a2 a3 a4 a5 a6 a7 a8 a9 b10"
+	list="$list b11 b12 b13 b14 b15 b16 b17 b18 b19 b20"
+	list="$list b21 b22 b23 b24 b25 b26 b27 b28 b29 b30"
+	list="$list b31 b32 b33 b34 b35 b36 b37 b38 b39 b40"
+	list="$list b41"
 fi
 
 do_check()

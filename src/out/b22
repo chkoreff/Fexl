@@ -1,3 +1,2 @@
-BEG exp = (A (A 3 4) 5)
+steps 2 bytes 0
 END exp = void
-steps 2 bytes 20301

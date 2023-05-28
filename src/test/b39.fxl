@@ -1,0 +1,13 @@
+# Output
+show_benchmark;
+\test=
+	(
+	say (I "Hello world.")
+	say (num_str 2.3)
+	say void
+	put "Bye" nl
+	nl
+	)
+
+test
+test

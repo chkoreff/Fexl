@@ -53,14 +53,6 @@ static void init_signal(void)
 	set_handler(SIGSEGV);
 	}
 
-static unsigned long num_steps;
-
-static value count_step_A(value f)
-	{
-	num_steps++;
-	return step_A(f);
-	}
-
 int main(int argc, const char *argv[])
 	{
 	const char *name = argc > 1 ? argv[1] : "";
@@ -76,15 +68,8 @@ int main(int argc, const char *argv[])
 	beg_std();
 
 	{
-	value exp = parse_fexl_fh(name,fh,cx_std);
-	show_line("BEG exp = ",exp);
-
-	type_A.step = count_step_A;
-	exp = eval(exp);
-	type_A.step = step_A;
-
-	show_line("END exp = ",exp);
-	printf("steps %lu bytes %lu\n",num_steps,cur_bytes);
+	value exp = eval(parse_fexl_fh(name,fh,cx_std));
+	show_line("END exp = ",exp); // LATER eliminate
 	drop(exp);
 	}
 

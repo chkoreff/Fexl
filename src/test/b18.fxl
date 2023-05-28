@@ -1,1 +1,2 @@
+show_benchmark;
 (\\x \y x) (T 10 20)

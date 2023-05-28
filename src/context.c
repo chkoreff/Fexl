@@ -5,6 +5,7 @@
 #include <context.h>
 #include <limit.h>
 #include <type_math.h>
+#include <type_meta.h>
 #include <type_num.h>
 #include <type_output.h>
 #include <type_str.h>
@@ -39,10 +40,9 @@ void beg_std(void)
 	def_type_str();
 	def_type_math();
 	def_type_output();
+	def_meta();
 
 	// LATER show
-	// LATER show_benchmark
-	// LATER trace_benchmark
 	// LATER meta functions
 	// LATER time
 	// LATER rand

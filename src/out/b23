@@ -1,3 +1,2 @@
-BEG exp = (A (A (A (A (A @ T) 3) 4) 5) 6)
+steps 14 bytes 96
 END exp = (? T (A @ T))
-steps 14 bytes 20429

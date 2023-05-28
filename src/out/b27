@@ -1,4 +1,3 @@
-BEG exp = (A (A (A (A (A (A (A (A (A (A (A (A _ _) 2.3) say) void) say) (A I I)) (A (L (A (A (A (A _ _) F) T) F) (A (A (A (A _ _) (A _ _)) I) (A cos (A (A _ _) 8)))) (L (A F (A F T)) (A say (A num_str I))))) say) "]") say) "Bye") nl)
 Hello world.
 
 
@@ -24,5 +23,5 @@ Hello world.
 ]
 Bye
 
+steps 115 bytes 1248
 END exp = I
-steps 115 bytes 25997

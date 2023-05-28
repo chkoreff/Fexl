@@ -1,0 +1,4 @@
+# This function consumes an unbounded amount of memory.
+\Y=(\f (\Q Q Q) (\x f (x x))) # fixpoint
+\S=(\x\y\z x z; y z) # fusion
+Y S S S  # Apply fixpoint to the fusion operator in a weird way.

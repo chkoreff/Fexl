@@ -1,3 +1,2 @@
-BEG exp = (A (L F (A T 3)) (A (A (A (A (A (A (A (A (A (A I I) I) I) "Hello") "bye") 2) inf) -3) "abcd~ABA") "AAB~ABC"))
+steps 2 bytes 32
 END exp = (? T 3)
-steps 2 bytes 20973

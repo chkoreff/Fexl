@@ -15,6 +15,7 @@ make show
 make str
 make stream
 make type_math
+make type_meta
 make type_num
 make type_output
 make type_str

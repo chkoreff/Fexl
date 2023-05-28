@@ -1,3 +1,4 @@
+show_benchmark;
 (\x\y\z
 	((x x) y)
 	(z y)

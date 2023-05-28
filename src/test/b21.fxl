@@ -1,4 +1,5 @@
 #
+show_benchmark;
 \x=
 (
 (() ()) I () "Hello" "bye" 2.0 inf -3

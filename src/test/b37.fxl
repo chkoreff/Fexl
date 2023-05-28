@@ -1,0 +1,15 @@
+# Eager evaluation, equivalent to shorter b36.fxl
+show_benchmark;
+(\exp
+(\\exp
+(\\exp
+(\\exp
+(\\exp
+(\\exp
+exp
+) (exp exp)
+) (exp exp)
+) (exp exp)
+) (exp exp)
+) (exp exp)
+) I

@@ -1,0 +1,22 @@
+steps 100 bytes 1440
+3.1
+-0.9
+nan
+inf
+-nan
+
+30.6
+23.4
+97.2
+7.5
+24
+0.333333333333333
+10
+
+abcd~ABA
+AAB~ABC
+hello
+"hello"
+~(1) "hello"~(1)
+~(2) ~(1) "hello"~(1)~(2)
+END exp = I

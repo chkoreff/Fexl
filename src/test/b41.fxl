@@ -1,0 +1,11 @@
+# Nested benchmark
+show_benchmark;
+(
+show_benchmark;
+\\x=(+ 1 1)
+say "Hello"
+)
+(
+show_benchmark;
+say "Hello"
+)

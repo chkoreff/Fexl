@@ -1,3 +1,2 @@
-BEG exp = (A (E (A F T) (L F I)) (A (A T 10) 20))
+steps 3 bytes 32
 END exp = (L F 10)
-steps 3 bytes 20589
