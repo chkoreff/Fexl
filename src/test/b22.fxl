@@ -1,3 +1,7 @@
 #
+\\exp=
+(
 show_benchmark;
 3 4 5
+)
+put "END exp = " show exp nl

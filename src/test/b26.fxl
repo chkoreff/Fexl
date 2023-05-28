@@ -1,4 +1,8 @@
+\\exp=
+(
 show_benchmark;
 + (^ 49 0.5);
 * (xor 3 5);
 + (- (* 5 5) 2) (- 37 0)
+)
+put "END exp = " show exp nl

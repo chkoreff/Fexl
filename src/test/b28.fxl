@@ -1,6 +1,10 @@
 #
+\\exp=
+(
 show_benchmark;
 \\x=(round "a")
 \\y=(+ "a")
 \\z=(+ 1 "a")
 \_ x y z
+)
+put "END exp = " show exp nl

@@ -1,2 +1,6 @@
+\\exp=
+(
 show_benchmark;
 (\\x \y x) (T 10 20)
+)
+put "END exp = " show exp nl

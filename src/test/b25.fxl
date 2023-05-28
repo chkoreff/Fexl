@@ -1,2 +1,6 @@
+\\exp=
+(
 show_benchmark;
 F 3
+)
+put "END exp = " show exp nl

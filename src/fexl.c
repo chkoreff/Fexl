@@ -5,7 +5,6 @@
 #include <die.h>
 #include <memory.h>
 #include <parse.h>
-#include <show.h>
 #include <signal.h> // sigaction
 
 static void die_perror(const char *msg)
@@ -66,13 +65,7 @@ int main(int argc, const char *argv[])
 	init_signal();
 
 	beg_std();
-
-	{
-	value exp = eval(parse_fexl_fh(name,fh,cx_std));
-	show_line("END exp = ",exp); // LATER eliminate
-	drop(exp);
-	}
-
+	drop(eval(parse_fexl_fh(name,fh,cx_std)));
 	end_std();
 
 	free_memory(alt_stack.ss_sp, alt_stack.ss_size);

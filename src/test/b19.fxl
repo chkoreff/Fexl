@@ -1,3 +1,7 @@
+\\exp=
+(
 show_benchmark;
 ((() (()())) ())
 (\x\y 3) (@ @) (@ I)
+)
+put "END exp = " show exp nl

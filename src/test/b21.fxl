@@ -1,4 +1,6 @@
 #
+\\exp=
+(
 show_benchmark;
 \x=
 (
@@ -9,3 +11,5 @@ show_benchmark;
 )
 
 T 3
+)
+put "END exp = " show exp nl

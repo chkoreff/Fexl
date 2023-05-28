@@ -1,7 +1,11 @@
 #
+\\exp=
+(
 show_benchmark;
 \\a=(. (() "a"))
 \\b=(.  (. (I "abc") (I "de")) (. "f" "g"))
 \\c=(. 3)
 \\d=(. (() "a") 3)
 \_ a b c d
+)
+put "END exp = " show exp nl
