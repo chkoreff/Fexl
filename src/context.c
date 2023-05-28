@@ -42,8 +42,6 @@ void beg_std(void)
 	def_type_output();
 	def_meta();
 
-	// LATER show
-	// LATER meta functions
 	// LATER time
 	// LATER rand
 	// LATER crypto

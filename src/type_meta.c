@@ -3,6 +3,7 @@
 #include <basic.h>
 #include <context.h>
 #include <memory.h>
+#include <show.h>
 #include <stdio.h>
 
 #include <type_meta.h>
@@ -56,8 +57,20 @@ static struct type type_show_benchmark =
 static struct type type_trace_benchmark =
 	{ 0, apply_trace_benchmark, no_clear };
 
+static value apply_show(value f, value x)
+	{
+	show(x);
+	drop(f);
+	drop(x);
+	return hold(QI);
+	}
+
+static struct type type_show = { 0, apply_show, no_clear };
+
 void def_meta(void)
 	{
+	// LATER introspection functions
 	define("show_benchmark", Q(&type_show_benchmark,0));
 	define("trace_benchmark", Q(&type_trace_benchmark,0));
+	define("show", Q(&type_show,0));
 	}

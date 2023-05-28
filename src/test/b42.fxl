@@ -1,0 +1,40 @@
+# Show some expressions.
+\try=(\x put ": " show x nl)
+
+try (\x 3)
+try (\x x)
+try (\x\y y)
+try (\x\y x)
+try (\y\x y)
+try (\x 3 x)
+try (\x\y 3 y)
+try (\x\y 3 x)
+try (\x\y y 3)
+try (\x x 3)
+try (\x\y x 3)
+try (\x\y x y)
+try (\x x x)
+try (\x\y x x)
+try (\x\y y x)
+try (\x\y\z ((x x) y) (z y))
+try (\\x=(T 10 20) \y x)
+try ((\\x \y x) (T 10 20))
+try
+	(
+	((() (()())) ())
+	(\x\y 3) (@ @) (@ I)
+	)
+try (F 3)
+try (^ 49 0.5)
+
+try @
+try (\f (\Q Q Q) (\x f (x x))) # fixpoint
+
+try (\x=(+ 1 1) x)
+try ((\x x) (+ 1 1))
+
+try (\\x=(+ 1 1) x)
+try ((\\x x) (+ 1 1))
+
+try ("abc" "cde" () ~ Hello world.~)
+try (3.14 -3.2 inf nan -inf -nan 0 .3)
