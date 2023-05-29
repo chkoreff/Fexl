@@ -38,3 +38,6 @@ try ((\\x x) (+ 1 1))
 
 try ("abc" "cde" () ~ Hello world.~)
 try (3.14 -3.2 inf nan -inf -nan 0 .3)
+try show_benchmark
+try trace_benchmark
+try show

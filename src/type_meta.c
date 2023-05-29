@@ -17,7 +17,7 @@ static value count_step_A(value f)
 	return step_A(f);
 	}
 
-static value op_benchmark(value f, value x, FILE *fh)
+static value apply_benchmark(value f, value x)
 	{
 	clear_free_list();
 
@@ -33,6 +33,7 @@ static value op_benchmark(value f, value x, FILE *fh)
 
 	{
 	unsigned long num_bytes = cur_bytes - beg_bytes;
+	FILE *fh = f->v_ptr;
 
 	fprintf(fh,"steps %lu bytes %lu\n",cur_steps,num_bytes);
 	cur_steps += beg_steps;
@@ -42,35 +43,23 @@ static value op_benchmark(value f, value x, FILE *fh)
 	}
 	}
 
-static value apply_show_benchmark(value f, value x)
-	{
-	return op_benchmark(f,x,stdout);
-	}
+static struct type type_benchmark = { 0, apply_benchmark, no_clear };
 
-static value apply_trace_benchmark(value f, value x)
+static value apply_value_I(value f, value x)
 	{
-	return op_benchmark(f,x,stderr);
-	}
-
-static struct type type_show_benchmark =
-	{ 0, apply_show_benchmark, no_clear };
-static struct type type_trace_benchmark =
-	{ 0, apply_trace_benchmark, no_clear };
-
-static value apply_show(value f, value x)
-	{
-	show(x);
+	void (*op)(value) = f->v_ptr;
+	op(x);
 	drop(f);
 	drop(x);
 	return hold(QI);
 	}
 
-static struct type type_show = { 0, apply_show, no_clear };
+static struct type type_value_I = { 0, apply_value_I, no_clear };
 
 void use_meta(void)
 	{
 	// LATER introspection functions
-	define("show_benchmark", Q(&type_show_benchmark,0));
-	define("trace_benchmark", Q(&type_trace_benchmark,0));
-	define("show", Q(&type_show,0));
+	define("show_benchmark", Q(&type_benchmark,stdout));
+	define("trace_benchmark", Q(&type_benchmark,stderr));
+	define("show", Q(&type_value_I,show));
 	}

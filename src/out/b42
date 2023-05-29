@@ -27,3 +27,6 @@
 : (A (E T I) (A (A + 1) 1))
 : (A (A (A "abc" "cde") I) "Hello world.")
 : (A (A (A (A (A (A (A 3.14 -3.2) inf) nan) -inf) -nan) 0) 0.3)
+: show_benchmark
+: trace_benchmark
+: show
