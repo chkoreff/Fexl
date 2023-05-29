@@ -1,10 +1,13 @@
+#include <stdio.h>
+#include <str.h>
 #include <value.h>
 
 #include <basic.h>
 #include <context.h>
 #include <memory.h>
+#include <parse.h>
 #include <show.h>
-#include <stdio.h>
+#include <type_str.h>
 
 #include <type_meta.h>
 
@@ -56,10 +59,37 @@ static value apply_value_I(value f, value x)
 
 static struct type type_value_I = { 0, apply_value_I, no_clear };
 
+static value apply_str_value(value f, value x)
+	{
+	value g;
+	x = eval(x);
+	if (x->T == &type_str)
+		{
+		value (*op)(string) = f->v_ptr;
+		g = op(x->v_ptr);
+		}
+	else
+		g = hold(Qvoid);
+
+	drop(f);
+	drop(x);
+	return g;
+	}
+
+static struct type type_str_value = { 0, apply_str_value, no_clear };
+
+static value load(string s)
+	{
+	const char *name = s->data;
+	FILE *fh = open_source(name);
+	return load_fh(name,fh);
+	}
+
 void use_meta(void)
 	{
 	// LATER introspection functions
 	define("show_benchmark", Q(&type_benchmark,stdout));
 	define("trace_benchmark", Q(&type_benchmark,stderr));
 	define("show", Q(&type_value_I,show));
+	define("load", Q(&type_str_value,load));
 	}

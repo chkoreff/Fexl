@@ -1,1 +1,2 @@
-extern value parse_fexl_fh(const char *name, FILE *fh);
+extern FILE *open_source(const char *name);
+extern value load_fh(const char *name, FILE *fh);

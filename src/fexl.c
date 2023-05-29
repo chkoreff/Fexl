@@ -55,17 +55,12 @@ static void init_signal(void)
 int main(int argc, const char *argv[])
 	{
 	const char *name = argc > 1 ? argv[1] : "";
-	FILE *fh = name[0] ? fopen(name,"r") : stdin;
-	if (!fh)
-		{
-		fprintf(stderr,"Could not open source file %s\n",name);
-		die(0);
-		}
+	FILE *fh = open_source(name);
 
 	init_signal();
 
 	beg_std();
-	drop(eval(parse_fexl_fh(name,fh)));
+	drop(eval(load_fh(name,fh)));
 	end_std();
 
 	free_memory(alt_stack.ss_sp, alt_stack.ss_size);

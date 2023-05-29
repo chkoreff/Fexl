@@ -1,0 +1,9 @@
+Could not open source file missing
+load "test/b44_1.fxl"
+Hello
+exp = 3.14159265358979
+
+load 3
+exp = void
+
+load "missing"

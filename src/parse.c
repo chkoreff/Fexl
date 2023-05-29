@@ -389,6 +389,7 @@ static value parse_exp(void)
 // Parse a top level expression.
 static value parse_fexl(const char *name, input get)
 	{
+	cx_lam = hold(QI); // empty stack
 	cur_name = name;
 	cur_get = get;
 	skip(); // Read first char.
@@ -404,6 +405,7 @@ static value parse_fexl(const char *name, input get)
 		die(0); // Has undefined symbols
 
 	drop(exp);
+	drop(cx_lam);
 	return val;
 	}
 	}
@@ -418,16 +420,22 @@ static int get_fh(void)
 	return fgetc(cur_fh);
 	}
 
-value parse_fexl_fh(const char *name, FILE *fh)
+FILE *open_source(const char *name)
 	{
-	value exp;
+	FILE *fh = name[0] ? fopen(name,"r") : stdin;
+	if (!fh)
+		{
+		fprintf(stderr,"Could not open source file %s\n",name);
+		die(0);
+		}
+	return fh;
+	}
 
+value load_fh(const char *name, FILE *fh)
+	{
+	value g;
 	cur_fh = fh;
-	cx_lam = hold(QI); // empty stack
-	exp = parse_fexl(name,get_fh);
-	drop(cx_lam);
-
-	fclose(cur_fh);
-	cur_fh = 0;
-	return exp;
+	g = parse_fexl(name,get_fh);
+	fclose(fh);
+	return g;
 	}
