@@ -65,7 +65,7 @@ int main(int argc, const char *argv[])
 	init_signal();
 
 	beg_std();
-	drop(eval(parse_fexl_fh(name,fh,cx_std)));
+	drop(eval(parse_fexl_fh(name,fh)));
 	end_std();
 
 	free_memory(alt_stack.ss_sp, alt_stack.ss_size);

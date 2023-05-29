@@ -4,6 +4,7 @@
 #include <value.h>
 
 #include <basic.h>
+#include <context.h>
 #include <die.h>
 #include <stdio.h>
 #include <stream.h>
@@ -12,9 +13,7 @@
 
 #include <parse.h>
 
-static value cx_env;
 static value cx_lam;
-static int has_undef;
 
 static value pre(value x)
 	{
@@ -88,7 +87,6 @@ static void undefined_symbol(const char *name, unsigned long line)
 	{
 	fprintf(stderr,"Undefined symbol %s",name);
 	put_error_location(line);
-	has_undef = 1;
 	}
 
 static value parse_exp(void);
@@ -206,7 +204,7 @@ static value resolve(string name)
 	if (exp)
 		return hold(exp->R);
 
-	exp = find_item(name, cx_env);
+	exp = find_item(name, cx_std);
 	if (exp)
 		return pre(hold(exp->R));
 
@@ -227,9 +225,10 @@ static value parse_symbol(void)
 	if (exp == 0)
 		{
 		undefined_symbol(name->data,first_line);
-		exp = pre(hold(QI));
+		exp = ref(Qstr(name));
 		}
-	str_free(name);
+	else
+		str_free(name);
 	return exp;
 	}
 	}
@@ -388,30 +387,24 @@ static value parse_exp(void)
 	}
 
 // Parse a top level expression.
-static value parse_fexl(const char *name, input get, value cx)
+static value parse_fexl(const char *name, input get)
 	{
 	cur_name = name;
 	cur_get = get;
 	skip(); // Read first char.
 
-	cx_env = cx;
-	cx_lam = hold(QI); // empty stack
-	has_undef = 0;
-
 	{
 	value exp = parse_exp();
+	value val = hold(exp->R);
+
 	if (cur_ch != EOF)
 		syntax_error("Extraneous input", cur_line);
 
-	{
-	value val = hold(exp->R);
-	drop(exp);
-	drop(cx_lam);
+	if (exp->L->T == &type_A)
+		die(0); // Has undefined symbols
 
-	if (has_undef)
-		die(0);
+	drop(exp);
 	return val;
-	}
 	}
 	}
 
@@ -425,11 +418,14 @@ static int get_fh(void)
 	return fgetc(cur_fh);
 	}
 
-value parse_fexl_fh(const char *name, FILE *fh, value cx)
+value parse_fexl_fh(const char *name, FILE *fh)
 	{
 	value exp;
+
 	cur_fh = fh;
-	exp = parse_fexl(name,get_fh,cx);
+	cx_lam = hold(QI); // empty stack
+	exp = parse_fexl(name,get_fh);
+	drop(cx_lam);
 
 	fclose(cur_fh);
 	cur_fh = 0;
