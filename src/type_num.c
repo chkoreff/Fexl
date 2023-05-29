@@ -27,8 +27,6 @@ value Qnum_str0(const char *name)
 		return 0;
 	}
 
-// TODO Move these apply functions to context.c
-
 static value apply_num_str(value f, value x)
 	{
 	value g;

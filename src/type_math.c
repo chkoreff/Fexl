@@ -65,7 +65,7 @@ static value apply_num_num_num(value f, value x)
 
 static struct type type_num_num_num = { 0, apply_num_num_num, clear_T };
 
-static void def2(const char *name, double op(double,double))
+static void define_num_num_num(const char *name, double op(double,double))
 	{
 	define(name, Q(&type_num_num_num,op));
 	}
@@ -90,10 +90,10 @@ void use_math(void)
 	define_num_num("sin", sin);
 	define_num_num("cos", cos);
 
-	def2("+", add);
-	def2("-", sub);
-	def2("*", mul);
-	def2("/", div);
-	def2("^", pow);
-	def2("xor", xor);
+	define_num_num_num("+", add);
+	define_num_num_num("-", sub);
+	define_num_num_num("*", mul);
+	define_num_num_num("/", div);
+	define_num_num_num("^", pow);
+	define_num_num_num("xor", xor);
 	}
