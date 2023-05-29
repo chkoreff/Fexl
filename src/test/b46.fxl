@@ -1,0 +1,4 @@
+# Test missing file
+say "BEG"
+load "missing"
+say "END"

@@ -9,7 +9,4 @@
 
 try "test/b44_1.fxl"
 #try "" # stdin
-
 try 3 # not a file name
-try "missing" # file does not exist
-say "NO"  # don't reach here
