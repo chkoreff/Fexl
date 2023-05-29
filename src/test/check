@@ -41,6 +41,7 @@ do_check()
 		echo "All tests succeeded"
 	else
 		echo "These tests failed:$list_fail"
+		exit 1
 	fi
 	}
 
