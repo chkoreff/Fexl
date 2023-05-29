@@ -19,7 +19,7 @@ void define(const char *key, value val)
 	cx_std = A(A(Qstr0(key),val),cx_std);
 	}
 
-void def0(const char *name, value op(void))
+void define_op(const char *name, value op(void))
 	{
 	define(name, Q(&type_Z,op));
 	}
@@ -35,12 +35,12 @@ void beg_std(void)
 
 	cx_std = hold(QI); // empty stack
 
-	def_basic();
-	def_type_num();
-	def_type_str();
-	def_type_math();
-	def_type_output();
-	def_meta();
+	use_basic();
+	use_num();
+	use_str();
+	use_math();
+	use_output();
+	use_meta();
 
 	// LATER time
 	// LATER rand

@@ -1,1 +1,1 @@
-extern void def_type_output(void);
+extern void use_output(void);

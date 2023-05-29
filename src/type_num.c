@@ -27,19 +27,17 @@ value Qnum_str0(const char *name)
 		return 0;
 	}
 
-static string num_str(double x)
-	{
-	return str_new_data0(format_double(x));
-	}
-
-// TODO unify these apply functions?
+// TODO Move these apply functions to context.c
 
 static value apply_num_str(value f, value x)
 	{
 	value g;
 	x = eval(x);
 	if (x->T == &type_num)
-		g = Qstr(num_str(x->v_double));
+		{
+		string (*op)(double) = f->v_ptr;
+		g = Qstr(op(x->v_double));
+		}
 	else
 		g = hold(Qvoid);
 
@@ -50,7 +48,17 @@ static value apply_num_str(value f, value x)
 
 static struct type type_num_str = { 0, apply_num_str, no_clear };
 
-void def_type_num(void)
+static void define_num_str(const char *name, string op(double))
 	{
-	define("num_str", Q(&type_num_str,0)); // TODO op
+	define(name, Q(&type_num_str,op));
+	}
+
+static string num_str(double x)
+	{
+	return str_new_data0(format_double(x));
+	}
+
+void use_num(void)
+	{
+	define_num_str("num_str", num_str);
 	}

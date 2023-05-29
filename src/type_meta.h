@@ -1,1 +1,1 @@
-extern void def_meta(void);
+extern void use_meta(void);

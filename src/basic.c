@@ -107,7 +107,7 @@ void beg_basic(void)
 	Qvoid = Q(&type_void,0);
 	}
 
-void def_basic(void)
+void use_basic(void)
 	{
 	define("I", hold(QI));
 	define("T", hold(QT));

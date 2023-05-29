@@ -9,7 +9,7 @@
 
 // Unary operators
 
-static value apply_num(value f, value x)
+static value apply_num_num(value f, value x)
 	{
 	value g;
 	x = eval(x);
@@ -26,16 +26,16 @@ static value apply_num(value f, value x)
 	return g;
 	}
 
-static struct type op_num = { 0, apply_num, no_clear };
+static struct type type_num_num = { 0, apply_num_num, no_clear };
 
-static void def1(const char *name, double op(double))
+static void define_num_num(const char *name, double op(double))
 	{
-	define(name, Q(&op_num,op));
+	define(name, Q(&type_num_num,op));
 	}
 
 // Binary operators
 
-static value apply_num_num(value f, value x)
+static value apply_num_num_num(value f, value x)
 	{
 	value g;
 
@@ -63,11 +63,11 @@ static value apply_num_num(value f, value x)
 	return g;
 	}
 
-static struct type op_num_num = { 0, apply_num_num, clear_T };
+static struct type type_num_num_num = { 0, apply_num_num_num, clear_T };
 
 static void def2(const char *name, double op(double,double))
 	{
-	define(name, Q(&op_num_num,op));
+	define(name, Q(&type_num_num_num,op));
 	}
 
 static double add(double x, double y) { return x + y; }
@@ -76,19 +76,19 @@ static double mul(double x, double y) { return x * y; }
 static double div(double x, double y) { return x / y; }
 static double xor(double x, double y) { return (long)x ^ (long)y; }
 
-void def_type_math(void)
+void use_math(void)
 	{
 	define("pi", Qnum(M_PI));
 
-	def1("round", round);
-	def1("ceil", ceil);
-	def1("trunc", trunc);
-	def1("abs", fabs);
-	def1("sqrt", sqrt);
-	def1("exp", exp);
-	def1("log", log);
-	def1("sin", sin);
-	def1("cos", cos);
+	define_num_num("round", round);
+	define_num_num("ceil", ceil);
+	define_num_num("trunc", trunc);
+	define_num_num("abs", fabs);
+	define_num_num("sqrt", sqrt);
+	define_num_num("exp", exp);
+	define_num_num("log", log);
+	define_num_num("sin", sin);
+	define_num_num("cos", cos);
 
 	def2("+", add);
 	def2("-", sub);

@@ -8,5 +8,5 @@ extern value apply_void(value f, value x);
 extern struct type type_L;
 extern struct type type_E;
 extern void beg_basic(void);
-extern void def_basic(void);
+extern void use_basic(void);
 extern void end_basic(void);

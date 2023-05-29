@@ -34,7 +34,7 @@ value Qstr0(const char *data)
 	return Qstr(str_new_data0(data));
 	}
 
-static value apply_str_str(value f, value x)
+static value apply_str_str_str(value f, value x)
 	{
 	value g;
 
@@ -62,12 +62,18 @@ static value apply_str_str(value f, value x)
 	return g;
 	}
 
-static struct type op_str_str = { 0, apply_str_str, clear_T };
+static struct type type_str_str_str = { 0, apply_str_str_str, clear_T };
 
-void def_type_str(void)
+static void define_str_str_str(const char *name, string op(string,string))
+	{
+	define(name, Q(&type_str_str_str, op));
+	}
+
+void use_str(void)
 	{
 	// (. x y) is the concatenation of strings x and y.
-	define(".", Q(&op_str_str, str_concat));
+	define_str_str_str(".",str_concat);
+
 	// LATER length
 	// LATER slice
 	// LATER search

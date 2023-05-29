@@ -1,1 +1,1 @@
-extern void def_type_math(void);
+extern void use_math(void);

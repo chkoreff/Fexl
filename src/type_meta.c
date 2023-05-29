@@ -67,7 +67,7 @@ static value apply_show(value f, value x)
 
 static struct type type_show = { 0, apply_show, no_clear };
 
-void def_meta(void)
+void use_meta(void)
 	{
 	// LATER introspection functions
 	define("show_benchmark", Q(&type_show_benchmark,0));
