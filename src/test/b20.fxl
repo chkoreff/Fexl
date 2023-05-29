@@ -1,4 +1,5 @@
 # Undefined symbols
+say "HI"
 \x
 x y z
 y
