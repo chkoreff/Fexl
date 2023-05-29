@@ -9,7 +9,7 @@
 
 #include <type_output.h>
 
-static value apply_str_I(value f, value x)
+static value apply_print(value f, value x)
 	{
 	value g;
 	x = eval(x);
@@ -25,11 +25,11 @@ static value apply_str_I(value f, value x)
 	return g;
 	}
 
-static struct type type_str_I = { 0, apply_str_I, no_clear };
+static struct type type_print = { 0, apply_print, no_clear };
 
-static void define_str_I(const char *name, void op(string))
+static void define_print(const char *name, void op(string))
 	{
-	define(name, Q(&type_str_I,op));
+	define(name, Q(&type_print,op));
 	}
 
 static value op_nl(void)
@@ -47,6 +47,6 @@ static void say_str(string x)
 void use_output(void)
 	{
 	define_op("nl", op_nl);
-	define_str_I("say", say_str);
-	define_str_I("put", put_str);
+	define_print("say", say_str);
+	define_print("put", put_str);
 	}

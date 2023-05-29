@@ -48,25 +48,25 @@ static value apply_benchmark(value f, value x)
 
 static struct type type_benchmark = { 0, apply_benchmark, no_clear };
 
-static value apply_value_I(value f, value x)
+static value apply_show(value f, value x)
 	{
-	void (*op)(value) = f->v_ptr;
-	op(x);
+	show(x);
 	drop(f);
 	drop(x);
 	return hold(QI);
 	}
 
-static struct type type_value_I = { 0, apply_value_I, no_clear };
+static struct type type_show = { 0, apply_show, no_clear };
 
-static value apply_str_value(value f, value x)
+static value apply_load(value f, value x)
 	{
 	value g;
 	x = eval(x);
 	if (x->T == &type_str)
 		{
-		value (*op)(string) = f->v_ptr;
-		g = op(x->v_ptr);
+		const char *name = str_data(x);
+		FILE *fh = open_source(name);
+		g = load_fh(name,fh);
 		}
 	else
 		g = hold(Qvoid);
@@ -76,20 +76,13 @@ static value apply_str_value(value f, value x)
 	return g;
 	}
 
-static struct type type_str_value = { 0, apply_str_value, no_clear };
-
-static value load(string s)
-	{
-	const char *name = s->data;
-	FILE *fh = open_source(name);
-	return load_fh(name,fh);
-	}
+static struct type type_load = { 0, apply_load, no_clear };
 
 void use_meta(void)
 	{
 	// LATER introspection functions
 	define("show_benchmark", Q(&type_benchmark,stdout));
 	define("trace_benchmark", Q(&type_benchmark,stderr));
-	define("show", Q(&type_value_I,show));
-	define("load", Q(&type_str_value,load));
+	define("show", Q(&type_show,0));
+	define("load", Q(&type_load,0));
 	}

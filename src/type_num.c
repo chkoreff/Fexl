@@ -32,10 +32,7 @@ static value apply_num_str(value f, value x)
 	value g;
 	x = eval(x);
 	if (x->T == &type_num)
-		{
-		string (*op)(double) = f->v_ptr;
-		g = Qstr(op(x->v_double));
-		}
+		g = Qstr(str_new_data0(format_double(x->v_double)));
 	else
 		g = hold(Qvoid);
 
@@ -46,17 +43,7 @@ static value apply_num_str(value f, value x)
 
 static struct type type_num_str = { 0, apply_num_str, no_clear };
 
-static void define_num_str(const char *name, string op(double))
-	{
-	define(name, Q(&type_num_str,op));
-	}
-
-static string num_str(double x)
-	{
-	return str_new_data0(format_double(x));
-	}
-
 void use_num(void)
 	{
-	define_num_str("num_str", num_str);
+	define("num_str", Q(&type_num_str,0));
 	}
