@@ -37,7 +37,6 @@ value Qstr0(const char *data)
 static value apply_str_str_str(value f, value x)
 	{
 	value g;
-
 	x = eval(x);
 	if (f->L == 0)
 		{

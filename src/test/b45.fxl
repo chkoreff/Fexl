@@ -1,0 +1,16 @@
+#
+\fred=(say "I am Fred.")
+\wilma=(say "I am Wilma.")
+\barney=(say "I am Barney.")
+\betty=(say "I am Betty.")
+
+define "fred" fred
+define "wilma" wilma
+define "barney" barney
+define "betty" betty
+
+load "test/b45_1.fxl"
+nl
+
+define "double" (* 2)
+load "test/b45_2.fxl"

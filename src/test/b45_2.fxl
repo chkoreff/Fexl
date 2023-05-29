@@ -1,0 +1,3 @@
+#
+wilma
+put "x = " say (num_str; double 32)
