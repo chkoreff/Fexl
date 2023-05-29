@@ -1,18 +1,23 @@
 #!/bin/sh
 ./build || exit
 
+list_fail=""
+
 check()
 	{
 	local name="$1"
 	echo "test $name"
 	../bin/fexl test/$name.fxl 2>&1 | diff - out/$name
+	if [ $? -eq 1 ]; then
+		list_fail="$list_fail $name"
+	fi
 	}
 
 refresh()
 	{
 	local name="$1"
 	echo "refresh $name"
-	../bin/fexl test/$name.fxl 2>&1 | cat >new/$name
+	../bin/fexl test/$name.fxl 2>&1 | cat >tmp/$name
 	}
 
 list="$@"
@@ -28,15 +33,21 @@ fi
 
 do_check()
 	{
+	list_fail=""
 	for name in $list; do
 		check $name
 	done
+	if [ "$list_fail" = "" ]; then
+		echo "All tests succeeded"
+	else
+		echo "These tests failed:$list_fail"
+	fi
 	}
 
 do_refresh()
 	{
-	rm -rf new
-	mkdir new
+	rm -rf tmp
+	mkdir tmp
 	for name in $list; do
 		refresh $name
 	done
