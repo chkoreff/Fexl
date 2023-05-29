@@ -36,29 +36,19 @@ value Qstr0(const char *data)
 
 static value apply_str_str_str(value f, value x)
 	{
-	value g;
-	x = eval(x);
 	if (f->L == 0)
-		{
-		if (x->T == &type_str)
-			g = V(f->T,hold(f),hold(x));
-		else
-			g = hold(Qvoid);
-		}
+		return need(f,x,&type_str);
 	else
 		{
+		x = eval(x);
 		if (x->T == &type_str)
 			{
 			string (*op)(string,string) = f->L->v_ptr;
-			g = Qstr(op(f->R->v_ptr, x->v_ptr));
+			return next(f,x, Qstr(op(f->R->v_ptr, x->v_ptr)));
 			}
 		else
-			g = hold(Qvoid);
+			return apply_void(f,x);
 		}
-
-	drop(f);
-	drop(x);
-	return g;
 	}
 
 static struct type type_str_str_str = { 0, apply_str_str_str, clear_T };

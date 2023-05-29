@@ -27,25 +27,14 @@ void define_op(const char *name, value op(void))
 
 static value apply_define(value f, value x)
 	{
-	value g;
 	if (f->L == 0)
-		{
-		x = eval(x);
-		if (x->T == &type_str)
-			g = V(f->T,hold(f),hold(x));
-		else
-			g = hold(Qvoid);
-		}
+		return need(f,x,&type_str);
 	else
 		{
 		const char *key = str_data(f->R);
 		define(key,hold(x));
-		g = hold(QI);
+		return apply_F(f,x);
 		}
-
-	drop(f);
-	drop(x);
-	return g;
 	}
 
 static struct type type_define = { 0, apply_define, clear_T };

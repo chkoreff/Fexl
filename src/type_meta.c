@@ -51,29 +51,22 @@ static struct type type_benchmark = { 0, apply_benchmark, no_clear };
 static value apply_show(value f, value x)
 	{
 	show(x);
-	drop(f);
-	drop(x);
-	return hold(QI);
+	return apply_F(f,x);
 	}
 
 static struct type type_show = { 0, apply_show, no_clear };
 
 static value apply_load(value f, value x)
 	{
-	value g;
 	x = eval(x);
 	if (x->T == &type_str)
 		{
 		const char *name = str_data(x);
 		FILE *fh = open_source(name);
-		g = load_fh(name,fh);
+		return next(f,x, load_fh(name,fh));
 		}
 	else
-		g = hold(Qvoid);
-
-	drop(f);
-	drop(x);
-	return g;
+		return apply_void(f,x);
 	}
 
 static struct type type_load = { 0, apply_load, no_clear };

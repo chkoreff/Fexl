@@ -11,18 +11,13 @@
 
 static value apply_print(value f, value x)
 	{
-	value g;
 	x = eval(x);
 	if (x->T == &type_str)
 		{
 		void (*op)(string) = f->v_ptr;
 		op(x->v_ptr);
 		}
-	g = hold(QI);
-
-	drop(f);
-	drop(x);
-	return g;
+	return apply_F(f,x);
 	}
 
 static struct type type_print = { 0, apply_print, no_clear };

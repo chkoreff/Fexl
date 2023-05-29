@@ -29,16 +29,11 @@ value Qnum_str0(const char *name)
 
 static value apply_num_str(value f, value x)
 	{
-	value g;
 	x = eval(x);
 	if (x->T == &type_num)
-		g = Qstr(str_new_data0(format_double(x->v_double)));
+		return next(f,x, Qstr(str_new_data0(format_double(x->v_double))));
 	else
-		g = hold(Qvoid);
-
-	drop(f);
-	drop(x);
-	return g;
+		return apply_void(f,x);
 	}
 
 static struct type type_num_str = { 0, apply_num_str, no_clear };

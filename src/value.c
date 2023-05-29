@@ -69,6 +69,12 @@ value Qdouble(type T, double x)
 	return f;
 	}
 
+// Apply x to y where x is known to be already evaluated.
+value AV(value x, value y)
+	{
+	return V(x->T,x,y);
+	}
+
 // The type for function application
 value step_A(value f)
 	{
