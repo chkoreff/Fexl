@@ -15,10 +15,15 @@ static value apply_num_num(value f, value x)
 	if (x->T == &type_num)
 		{
 		double (*op)(double) = f->v_ptr;
-		return next(f,x, Qnum(op(x->v_double)));
+		f = Qnum(op(x->v_double));
+		drop(x);
+		return f;
 		}
 	else
-		return apply_void(f,x);
+		{
+		drop(x);
+		return hold(Qvoid);
+		}
 	}
 
 static struct type type_num_num = { 0, apply_num_num, no_clear };
@@ -32,18 +37,31 @@ static void define_num_num(const char *name, double op(double))
 
 static value apply_num_num_num(value f, value x)
 	{
+	x = eval(x);
 	if (f->L == 0)
-		return need(f,x,&type_num);
+		{
+		if (x->T == &type_num)
+			return V(f->T,hold(f),x);
+		else
+			{
+			drop(x);
+			return hold(Qvoid);
+			}
+		}
 	else
 		{
-		x = eval(x);
 		if (x->T == &type_num)
 			{
 			double (*op)(double,double) = f->L->v_ptr;
-			return next(f,x, Qnum(op(f->R->v_double, x->v_double)));
+			f = Qnum(op(f->R->v_double, x->v_double));
+			drop(x);
+			return f;
 			}
 		else
-			return apply_void(f,x);
+			{
+			drop(x);
+			return hold(Qvoid);
+			}
 		}
 	}
 

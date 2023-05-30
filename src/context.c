@@ -28,12 +28,21 @@ void define_op(const char *name, value op(void))
 static value apply_define(value f, value x)
 	{
 	if (f->L == 0)
-		return need(f,x,&type_str);
+		{
+		x = eval(x);
+		if (x->T == &type_str)
+			return V(f->T,hold(f),x);
+		else
+			{
+			drop(x);
+			return hold(Qvoid);
+			}
+		}
 	else
 		{
 		const char *key = str_data(f->R);
-		define(key,hold(x));
-		return apply_F(f,x);
+		define(key,x);
+		return hold(QI);
 		}
 	}
 

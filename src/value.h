@@ -31,7 +31,6 @@ extern void clear_free_list(void);
 extern value V(type T, value L, value R);
 extern value Q(type T, void *p);
 extern value Qdouble(type T, double x);
-extern value AV(value x, value y);
 extern value step_A(value f);
 extern void clear_A(value f);
 extern struct type type_A;

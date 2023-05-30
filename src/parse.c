@@ -94,14 +94,14 @@ static value parse_exp(void);
 static value parse_nested(void)
 	{
 	unsigned long first_line = cur_line;
-	value exp;
-
 	skip();
-	exp = parse_exp();
+	{
+	value exp = parse_exp();
 	if (cur_ch != ')')
 		syntax_error("Unclosed parenthesis", first_line);
 	skip();
 	return exp;
+	}
 	}
 
 static value parse_list(void)
@@ -433,9 +433,10 @@ FILE *open_source(const char *name)
 
 value load_fh(const char *name, FILE *fh)
 	{
-	value g;
 	cur_fh = fh;
-	g = parse_fexl(name,get_fh);
+	{
+	value val = parse_fexl(name,get_fh);
 	fclose(fh);
-	return g;
+	return val;
+	}
 	}

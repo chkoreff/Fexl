@@ -12,35 +12,22 @@ value Qvoid;
 // (I x) = x
 static value apply_I(value f, value x)
 	{
-	drop(f);
+	(void)f;
 	return x;
 	}
 
 static struct type type_I = { 0, apply_I, no_clear };
 
-value need(value f, value x, type t)
-	{
-	x = eval(x);
-	if (x->T == t)
-		return AV(f,x);
-	else
-		return apply_void(f,x);
-	}
-
-value next(value f, value x, value g)
-	{
-	drop(f);
-	drop(x);
-	return g;
-	}
-
 // (T x y) = x
 static value apply_T(value f, value x)
 	{
 	if (f->L == 0)
-		return AV(f,x);
+		return V(f->T,hold(f),x);
 	else
-		return next(f,x, hold(f->R));
+		{
+		drop(x);
+		return hold(f->R);
+		}
 	}
 
 void clear_T(value f)
@@ -55,9 +42,11 @@ void clear_T(value f)
 static struct type type_T = { 0, apply_T, clear_T };
 
 // (F x y) = y
-value apply_F(value f, value x)
+static value apply_F(value f, value x)
 	{
-	return next(f,x, hold(QI));
+	(void)f;
+	drop(x);
+	return hold(QI);
 	}
 
 static struct type type_F = { 0, apply_F, no_clear };
@@ -65,7 +54,7 @@ static struct type type_F = { 0, apply_F, no_clear };
 // (Y x) = (x (Y x))
 static value apply_Y(value f, value x)
 	{
-	return A(x,A(f,hold(x)));
+	return A(x,A(hold(f),hold(x)));
 	}
 
 static struct type type_Y = { 0, apply_Y, no_clear };
@@ -73,7 +62,9 @@ static struct type type_Y = { 0, apply_Y, no_clear };
 // (void x) = void
 value apply_void(value f, value x)
 	{
-	return next(f,x, hold(Qvoid));
+	(void)f;
+	drop(x);
+	return hold(Qvoid);
 	}
 
 static struct type type_void = { 0, apply_void, no_clear };
@@ -90,7 +81,9 @@ static value subst(value p, value e, value x)
 // Lambda substitution
 static value apply_L(value f, value x)
 	{
-	return next(f,x,subst(f->L,f->R,x));
+	f = subst(f->L,f->R,x);
+	drop(x);
+	return f;
 	}
 
 // Eager substitution

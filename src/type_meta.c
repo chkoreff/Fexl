@@ -40,7 +40,6 @@ static value apply_benchmark(value f, value x)
 
 	fprintf(fh,"steps %lu bytes %lu\n",cur_steps,num_bytes);
 	cur_steps += beg_steps;
-	drop(f);
 	return x;
 	}
 	}
@@ -50,23 +49,31 @@ static struct type type_benchmark = { 0, apply_benchmark, no_clear };
 
 static value apply_show(value f, value x)
 	{
+	(void)f;
 	show(x);
-	return apply_F(f,x);
+	drop(x);
+	return hold(QI);
 	}
 
 static struct type type_show = { 0, apply_show, no_clear };
 
 static value apply_load(value f, value x)
 	{
+	(void)f;
 	x = eval(x);
 	if (x->T == &type_str)
 		{
 		const char *name = str_data(x);
 		FILE *fh = open_source(name);
-		return next(f,x, load_fh(name,fh));
+		f = load_fh(name,fh);
+		drop(x);
+		return f;
 		}
 	else
-		return apply_void(f,x);
+		{
+		drop(x);
+		return hold(Qvoid);
+		}
 	}
 
 static struct type type_load = { 0, apply_load, no_clear };

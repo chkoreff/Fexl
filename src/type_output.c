@@ -17,7 +17,8 @@ static value apply_print(value f, value x)
 		void (*op)(string) = f->v_ptr;
 		op(x->v_ptr);
 		}
-	return apply_F(f,x);
+	drop(x);
+	return hold(QI);
 	}
 
 static struct type type_print = { 0, apply_print, no_clear };
