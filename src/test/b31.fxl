@@ -1,3 +1,4 @@
 # This function consumes an unbounded amount of stack.
+limit_stack 20000
 \Y=(\f (\Q Q Q) (\x f (x x))) # fixpoint
 Y Y

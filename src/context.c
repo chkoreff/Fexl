@@ -2,7 +2,7 @@
 #include <value.h>
 
 #include <basic.h>
-#include <limit.h>
+#include <type_limit.h>
 #include <type_math.h>
 #include <type_meta.h>
 #include <type_num.h>
@@ -50,11 +50,6 @@ static struct type type_define = { 0, apply_define, clear_T };
 
 void beg_std(void)
 	{
-	// LATER Define fexl functions for these and don't call them here.
-	limit_time(1); // LATER Perhaps use alarm for sub-second limits.
-	limit_stack(20000);
-	limit_memory(10000000);
-
 	beg_basic();
 
 	cx_std = hold(QI); // empty stack
@@ -66,6 +61,7 @@ void beg_std(void)
 	use_math();
 	use_output();
 	use_meta();
+	use_limit();
 
 	// LATER time
 	// LATER rand

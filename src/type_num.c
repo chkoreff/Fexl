@@ -27,6 +27,12 @@ value Qnum_str0(const char *name)
 		return 0;
 	}
 
+unsigned long get_ulong(value x)
+	{
+	double n = x->v_double;
+	return n >= 0 ? n : 0;
+	}
+
 static value apply_num_str(value f, value x)
 	{
 	(void)f;

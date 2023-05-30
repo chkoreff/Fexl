@@ -1,4 +1,5 @@
 # This function runs forever in fixed memory.
+limit_time 1
 \Y=(\f (\Q Q Q) (\x f (x x))) # fixpoint
 \I=(\x x) # identity
 (Y I)
