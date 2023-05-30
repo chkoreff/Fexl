@@ -1,7 +1,7 @@
 # Feed all the items in a list to a function.
 # In effect this converts a list [x y z] to a tuple {x y z}.
 # LATER Code this in C and use as the basis for tuples.
-\unwind=
+\\unwind=
 	(@\loop\xs\f
 	xs f \x\xs
 	loop xs (f x)
