@@ -35,7 +35,6 @@ unsigned long get_ulong(value x)
 
 static value apply_num_str(value f, value x)
 	{
-	(void)f;
 	x = eval(x);
 	if (x->T == &type_num)
 		{

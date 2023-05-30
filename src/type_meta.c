@@ -59,7 +59,6 @@ static struct type type_show = { 0, apply_show, no_clear };
 
 static value apply_load(value f, value x)
 	{
-	(void)f;
 	x = eval(x);
 	if (x->T == &type_str)
 		{
