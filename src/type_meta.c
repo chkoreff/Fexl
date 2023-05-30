@@ -80,6 +80,7 @@ static struct type type_load = { 0, apply_load, no_clear };
 void use_meta(void)
 	{
 	// LATER introspection functions
+	// LATER die
 	define("show_benchmark", Q(&type_benchmark,stdout));
 	define("trace_benchmark", Q(&type_benchmark,stderr));
 	define("show", Q(&type_show,0));

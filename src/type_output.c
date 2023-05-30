@@ -45,4 +45,5 @@ void use_output(void)
 	define_op("nl", op_nl);
 	define_print("say", say_str);
 	define_print("put", put_str);
+	// LATER fput fsay
 	}

@@ -8,6 +8,7 @@ value QT;
 value QF;
 value QY;
 value Qvoid;
+value Qnull;
 
 // (I x) = x
 static value apply_I(value f, value x)
@@ -95,6 +96,37 @@ static value apply_E(value f, value x)
 struct type type_L = { 0, apply_L, clear_A };
 struct type type_E = { 0, apply_E, clear_A };
 
+// Pair
+
+static value apply_pair(value f, value x)
+	{
+	return A(A(x,hold(f->L)),hold(f->R));
+	}
+
+struct type type_pair = { 0, apply_pair, clear_A };
+
+// List
+
+struct type type_null = { 0, apply_T, clear_T };
+
+static value apply_list(value f, value x)
+	{
+	drop(x);
+	return V(&type_pair,hold(f->L),hold(f->R));
+	}
+
+struct type type_list = { 0, apply_list, clear_A };
+
+static value apply_cons(value f, value x)
+	{
+	if (f->L == 0)
+		return V(f->T,hold(f),x);
+	else
+		return V(&type_list,hold(f->R),x);
+	}
+
+struct type type_cons = { 0, apply_cons, clear_T };
+
 void beg_basic(void)
 	{
 	QI = Q(&type_I,0);
@@ -102,6 +134,7 @@ void beg_basic(void)
 	QF = Q(&type_F,0);
 	QY = Q(&type_Y,0);
 	Qvoid = Q(&type_void,0);
+	Qnull = Q(&type_null,0);
 	}
 
 void use_basic(void)
@@ -111,6 +144,8 @@ void use_basic(void)
 	define("F", hold(QF));
 	define("@", Q(&type_Y,0));
 	define("void", hold(Qvoid));
+	define("null", hold(Qnull));
+	define("cons", Q(&type_cons,0));
 	}
 
 void end_basic(void)
@@ -120,4 +155,5 @@ void end_basic(void)
 	drop(QF);
 	drop(QY);
 	drop(Qvoid);
+	drop(Qnull);
 	}

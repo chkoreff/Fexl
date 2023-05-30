@@ -59,12 +59,22 @@ static value merge(value fun, value arg)
 			);
 	}
 
-static value app(value fun, value arg)
+static value appv(type t, value fun, value arg)
 	{
-	value exp = A(merge(fun->L,arg->L), A(hold(fun->R),hold(arg->R)));
+	value exp = A(merge(fun->L,arg->L), V(t,hold(fun->R),hold(arg->R)));
 	drop(fun);
 	drop(arg);
 	return exp;
+	}
+
+static value app(value fun, value arg)
+	{
+	return appv(&type_A,fun,arg);
+	}
+
+static value cons(value fun, value arg)
+	{
+	return appv(&type_list,fun,arg);
 	}
 
 static void put_error_location(unsigned long line)
@@ -89,6 +99,7 @@ static void undefined_symbol(const char *name, unsigned long line)
 	put_error_location(line);
 	}
 
+static value parse_term(void);
 static value parse_exp(void);
 
 static value parse_nested(void)
@@ -104,10 +115,35 @@ static value parse_nested(void)
 	}
 	}
 
-static value parse_list(void)
+static value parse_items(void)
 	{
-	syntax_error("LATER parse_list", cur_line);
-	return 0;
+	skip_filler();
+	if (cur_ch == ';')
+		{
+		skip();
+		return parse_exp();
+		}
+	else
+		{
+		value term = parse_term();
+		if (term == 0)
+			return pre(hold(Qnull));
+		else
+			return cons(term,parse_items());
+		}
+	}
+
+static value parse_seq(const char t_ch, const char *msg)
+	{
+	unsigned long first_line = cur_line;
+	skip();
+	{
+	value exp = parse_items();
+	if (cur_ch != t_ch)
+		syntax_error(msg, first_line);
+	skip();
+	return exp;
+	}
 	}
 
 static value parse_tuple(void)
@@ -238,7 +274,7 @@ static value parse_term(void)
 	if (cur_ch == '(')
 		return parse_nested();
 	else if (cur_ch == '[')
-		return parse_list();
+		return parse_seq(']',"Unclosed bracket");
 	else if (cur_ch == '{')
 		return parse_tuple();
 	else if (cur_ch == '"')

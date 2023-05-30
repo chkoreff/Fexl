@@ -1,0 +1,17 @@
+==
+: null
+: (? null 3)
+: 3
+: (? cons (A I 1))
+: (list (A I 1) null)
+: (list 1 (list 2 null))
+: (list (A I 1) (list 2 (list 3 (list 4 (list 5 null)))))
+: (list (A I 1) (list 2 (list 3 (A I (list 4 (list 5 null))))))
+==
+[]
+[]
+[1]
+[1 2]
+[1 2 3]
+[1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3]
+steps 2618 bytes 2464

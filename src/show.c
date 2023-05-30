@@ -72,6 +72,16 @@ static void limit_show(value f)
 			show_exp("L",f);
 		else if (f->T == &type_E)
 			show_exp("E",f);
+		// LATER Use special list syntax.
+		else if (f->T == &type_list)
+			show_exp("list",f);
+		else if (f->T == &type_null)
+			{
+			if (f->L)
+				show_exp("?",f); // intermediate form
+			else
+				put("null");
+			}
 		else if (f->L)
 			show_exp("?",f); // intermediate form
 		else

@@ -1,0 +1,63 @@
+#
+(
+# Show the raw forms.
+\try=(\\exp put ": " show exp nl)
+
+say "=="
+try []
+try ([] 3)
+try ([] 3 4)
+try (cons (I 1))
+try (cons (I 1) [])
+try (cons 1 [2])
+try (\x=(I 1) \y=([4 5]) [x 2 3; y])
+try (\x=(I 1) \y=(() [4 5]) [x 2 3; y])
+)
+
+(
+# Iterate through lists.
+
+\is_null=(\xs xs T \_\_ F)
+
+# Append lists xs and ys.
+\append=
+	(\xs\ys
+	(@\loop\xs
+	xs ys \x\xs
+	[x;loop xs]
+	) xs
+	)
+
+\show_items=
+	(@\loop\xs
+	xs () \x\xs
+	put (num_str x)
+	is_null xs () (put " ")
+	loop xs
+	)
+
+\show_items=
+	(\xs
+	put "["
+	show_items xs
+	put "]"
+	nl
+	)
+
+say "=="
+show_benchmark;
+show_items []
+show_items null
+show_items [1]
+show_items [1 2]
+show_items (cons 1; cons 2; cons 3; null)
+show_items
+	(
+	\xs=[1 2 3]
+	\xs=(append xs xs)
+	\xs=(append xs xs)
+	\xs=(append xs xs)
+	\xs=(append xs xs)
+	xs
+	)
+)
