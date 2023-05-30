@@ -127,6 +127,49 @@ static value apply_cons(value f, value x)
 
 struct type type_cons = { 0, apply_cons, clear_T };
 
+/*
+# Feed all the items in a list to a function.
+# In effect this converts a list [x y z] to a tuple {x y z}.
+LATER Use this as the basis for tuples.
+
+\unwind=
+	(@\loop\xs\f
+	xs f \x\xs
+	loop xs (f x)
+	)
+*/
+static value apply_unwind(value f, value x)
+	{
+	if (f->L == 0)
+		return V(f->T,hold(f),x);
+	else
+		{
+		value handler = x;
+		value list = eval(hold(f->R));
+		if (list->T == &type_null)
+			{
+			drop(list);
+			return handler;
+			}
+		else if (list->T == &type_list)
+			{
+			value unwind = hold(f->L);
+			value head = hold(list->L);
+			value tail = hold(list->R);
+			drop(list);
+			return A(A(unwind,tail),A(handler,head));
+			}
+		else
+			{
+			drop(x);
+			drop(list);
+			return hold(Qvoid);
+			}
+		}
+	}
+
+struct type type_unwind = { 0, apply_unwind, clear_T };
+
 void beg_basic(void)
 	{
 	QI = Q(&type_I,0);
@@ -146,6 +189,7 @@ void use_basic(void)
 	define("void", hold(Qvoid));
 	define("null", hold(Qnull));
 	define("cons", Q(&type_cons,0));
+	define("unwind", Q(&type_unwind,0));
 	}
 
 void end_basic(void)

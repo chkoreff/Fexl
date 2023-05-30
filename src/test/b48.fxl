@@ -1,8 +1,8 @@
-# Feed all the items in a list to a function.
-# In effect this converts a list [x y z] to a tuple {x y z}.
-# LATER Code this in C and use as the basis for tuples.
+# Test unwind
 \\unwind=
-	(@\loop\xs\f
+	(
+	T unwind;  # Use the built in version written in C.
+	@\loop\xs\f
 	xs f \x\xs
 	loop xs (f x)
 	)
@@ -36,5 +36,31 @@ put ":" print [I] "a"
 put ":" print [I I] "a" "b"
 put ":" print [I I I] "a" "b" "c"
 put ":" print [I I I I] "a" "b" "c" "d"
+)
+
+(
+\try=(\\exp put ": " show exp nl)
+
+show_benchmark;
+try (unwind (() []) 37)
+
+try
+	(
+	unwind
+		(
+		I;
+		cons "a";
+		cons "b";
+		I;
+		null
+		)
+		(\x\y
+		put "x = " say x
+		put "y = " say y
+		37
+		)
+	)
+
+try (unwind "a" 37)
 )
 say "END"
