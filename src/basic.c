@@ -79,8 +79,8 @@ static value subst(value p, value e, value x)
 	return V(e->T,subst(p->L,e->L,x),subst(p->R,e->R,x));
 	}
 
-// Lambda substitution
-static value apply_L(value f, value x)
+// Direct substitution
+static value apply_D(value f, value x)
 	{
 	f = subst(f->L,f->R,x);
 	drop(x);
@@ -90,10 +90,10 @@ static value apply_L(value f, value x)
 // Eager substitution
 static value apply_E(value f, value x)
 	{
-	return apply_L(f,eval(x));
+	return apply_D(f,eval(x));
 	}
 
-struct type type_L = { 0, apply_L, clear_A };
+struct type type_D = { 0, apply_D, clear_A };
 struct type type_E = { 0, apply_E, clear_A };
 
 // Pair

@@ -68,8 +68,8 @@ static void limit_show(value f)
 		{
 		if (f->T == &type_A)
 			show_exp("A",f);
-		else if (f->T == &type_L)
-			show_exp("L",f);
+		else if (f->T == &type_D)
+			show_exp("D",f);
 		else if (f->T == &type_E)
 			show_exp("E",f);
 		// LATER Use special list syntax.

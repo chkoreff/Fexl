@@ -384,7 +384,7 @@ static value parse_factor(void)
 			}
 		else
 			{
-			type type = &type_L; // lazy
+			type type = &type_D; // direct
 			if (cur_ch == '\\')
 				{
 				skip();

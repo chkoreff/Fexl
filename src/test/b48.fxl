@@ -1,0 +1,40 @@
+# Feed all the items in a list to a function.
+# In effect this converts a list [x y z] to a tuple {x y z}.
+# LATER Code this in C and use as the basis for tuples.
+\unwind=
+	(@\loop\xs\f
+	xs f \x\xs
+	loop xs (f x)
+	)
+
+\\print=
+	(@\loop\xs
+	xs nl \_\xs
+	\x
+	put " " put x
+	loop xs
+	)
+
+\try=
+	(
+	\xs
+	put ":"
+	unwind xs (print xs)
+	)
+
+(
+show_benchmark;
+try []
+try ["a"]
+try ["a" "b"]
+try ["a" "b" "c"]
+try ["a" "b" "c" "d"]
+
+# Call print directly.  The list encodes the number of items to print.
+put ":" print []
+put ":" print [I] "a"
+put ":" print [I I] "a" "b"
+put ":" print [I I I] "a" "b" "c"
+put ":" print [I I I I] "a" "b" "c" "d"
+)
+say "END"
