@@ -133,14 +133,14 @@ static value parse_items(void)
 		}
 	}
 
-static value parse_seq(const char t_ch, const char *msg)
+static value parse_list(void)
 	{
 	unsigned long first_line = cur_line;
 	skip();
 	{
 	value exp = parse_items();
-	if (cur_ch != t_ch)
-		syntax_error(msg, first_line);
+	if (cur_ch != ']')
+		syntax_error("Unclosed bracket", first_line);
 	skip();
 	return exp;
 	}
@@ -274,7 +274,7 @@ static value parse_term(void)
 	if (cur_ch == '(')
 		return parse_nested();
 	else if (cur_ch == '[')
-		return parse_seq(']',"Unclosed bracket");
+		return parse_list();
 	else if (cur_ch == '{')
 		return parse_tuple();
 	else if (cur_ch == '"')
@@ -348,7 +348,7 @@ static value parse_lambda(unsigned long first_line, type type)
 	skip_filler();
 	{
 	value def = parse_def();
-	value save_cx = hold(cx_lam);
+	value cx_save = hold(cx_lam);
 	value sym = Qstr(name);
 	cx_lam = A(A(sym,ref(hold(sym))),cx_lam);
 
@@ -357,7 +357,7 @@ static value parse_lambda(unsigned long first_line, type type)
 	exp = abstract(name,exp,type);
 
 	drop(cx_lam);
-	cx_lam = save_cx;
+	cx_lam = cx_save;
 
 	if (def)
 		exp = app(exp,def);
