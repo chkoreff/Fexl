@@ -12,6 +12,8 @@ try (cons (I 1) [])
 try (cons 1 [2])
 try (\x=(I 1) \y=([4 5]) [x 2 3; y])
 try (\x=(I 1) \y=(() [4 5]) [x 2 3; y])
+try ([1 2] void)
+try ((cons 1; cons 2; null) void)
 )
 
 (

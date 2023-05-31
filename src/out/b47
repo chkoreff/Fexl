@@ -7,6 +7,8 @@
 : (list 1 (list 2 null))
 : (list (A I 1) (list 2 (list 3 (list 4 (list 5 null)))))
 : (list (A I 1) (list 2 (list 3 (A I (list 4 (list 5 null))))))
+: (pair 1 (list 2 null))
+: (pair 1 (A (A cons 2) null))
 ==
 []
 []

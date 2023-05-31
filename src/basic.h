@@ -8,6 +8,7 @@ extern void clear_T(value f);
 extern value apply_void(value f, value x);
 extern struct type type_D;
 extern struct type type_E;
+extern struct type type_pair;
 extern struct type type_null;
 extern struct type type_list;
 extern void beg_basic(void);
