@@ -225,7 +225,7 @@ static value find_item(string name, value cx)
 			{
 			value top = cx->L;
 			if (str_eq(name, top->L->v_ptr))
-				return top;
+				return hold(top->R);
 			else
 				cx = cx->R;
 			}
@@ -237,12 +237,10 @@ static value find_item(string name, value cx)
 static value resolve(string name)
 	{
 	value exp = find_item(name, cx_lam);
-	if (exp)
-		return hold(exp->R);
+	if (exp) return exp;
 
 	exp = find_item(name, cx_cur);
-	if (exp)
-		return pre(hold(exp->R));
+	if (exp) return pre(exp);
 
 	exp = Qnum_str0(name->data); // Check for numeric constant.
 	if (exp)
