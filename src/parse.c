@@ -217,7 +217,7 @@ static string parse_name(void)
 	return buf_clear(&buf);
 	}
 
-static value find_item(string name, value cx)
+value find_item(string name, value cx)
 	{
 	while (1)
 		{

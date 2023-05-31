@@ -60,6 +60,8 @@ void show(value f)
 		show_exp("list",f);
 	else if (f->T == &type_null && f->L == 0)
 		put("null");
+	else if (f->T == &type_single)
+		show_exp("single",f);
 	else if (f->T == &type_pair)
 		show_exp("pair",f);
 	else if (f->L)

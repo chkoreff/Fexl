@@ -1,0 +1,40 @@
+= Test resolve.
+resolve "fred"
+  = T
+  no
+
+resolve "32.8"
+  = T
+  no
+
+resolve "+"
+  = (? T (single I +))
+  yes +
+
+resolve "I"
+  = (? T (single I I))
+  yes I
+
+resolve "cons"
+  = (? T (single I cons))
+  yes cons
+
+resolve "resolve"
+  = (? T (single I resolve))
+  yes resolve
+
+= Test enclose and restrict.
+before eval:
+  resolve "I" = (yes I)
+  resolve "fred" = no
+Hello
+after restrict:
+  resolve "I" = no
+  resolve "fred" = no
+after define:
+  resolve "I" = no
+  resolve "fred" = (yes 32)
+after eval:
+  resolve "I" = (yes I)
+  resolve "fred" = no
+x = 37

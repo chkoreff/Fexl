@@ -1,7 +1,9 @@
+#include <stdio.h>
 #include <str.h>
 #include <value.h>
 
 #include <basic.h>
+#include <parse.h>
 #include <type_limit.h>
 #include <type_math.h>
 #include <type_meta.h>
@@ -46,6 +48,49 @@ static value apply_define(value f, value x)
 
 static struct type type_define = { 0, apply_define, clear_T };
 
+// Save current context and restore after evaluation.
+
+static value apply_enclose(value f, value x)
+	{
+	value cx_save = hold(cx_cur);
+	(void)f;
+	x = eval(x);
+	drop(cx_cur);
+	cx_cur = cx_save;
+	return x;
+	}
+
+static struct type type_enclose = { 0, apply_enclose, no_clear };
+
+// Clear the current context.
+
+static value op_restrict(void)
+	{
+	drop(cx_cur);
+	cx_cur = hold(QI); // empty stack
+	return hold(QI);
+	}
+
+// Resolve a symbol from current context.
+
+static value apply_resolve(value f, value x)
+	{
+	x = eval(x);
+	if (x->T == &type_str)
+		{
+		f = maybe(find_item(x->v_ptr,cx_cur));
+		drop(x);
+		return f;
+		}
+	else
+		{
+		drop(x);
+		return hold(Qvoid);
+		}
+	}
+
+static struct type type_resolve = { 0, apply_resolve, no_clear };
+
 // Define initial context.
 
 void beg_context(void)
@@ -55,6 +100,10 @@ void beg_context(void)
 	cx_cur = hold(QI); // empty stack
 
 	define("define",Q(&type_define,0));
+	define("enclose",Q(&type_enclose,0));
+	define_op("restrict",op_restrict);
+	define("resolve",Q(&type_resolve,0));
+
 	use_basic();
 	use_num();
 	use_str();

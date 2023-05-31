@@ -96,6 +96,28 @@ static value apply_E(value f, value x)
 struct type type_D = { 0, apply_D, clear_A };
 struct type type_E = { 0, apply_E, clear_A };
 
+// Single
+
+static value apply_single(value f, value x)
+	{
+	return A(x,hold(f->R));
+	}
+
+struct type type_single = { 0, apply_single, clear_A };
+
+value single(value x)
+	{
+	return V(&type_single,hold(QI),x);
+	}
+
+value maybe(value x)
+	{
+	if (x == 0)
+		return hold(QT);
+	else
+		return V(&type_T,hold(QT),single(x));
+	}
+
 // Pair
 
 static value apply_pair(value f, value x)

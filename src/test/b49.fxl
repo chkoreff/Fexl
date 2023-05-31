@@ -1,0 +1,65 @@
+#
+\QU=~ "~
+
+(
+say "= Test resolve."
+
+\try=
+	(\sym
+	put "resolve " put QU put sym put QU nl
+	\\result=(resolve sym)
+	put "  = " show result nl
+	result
+		(say "  no")
+		(\val put "  yes " show val nl)
+	nl
+	)
+
+try (I "fred")
+try "32.8" # numbers are not defined by the context
+
+try (I "+")
+try (. "" "I")
+try (. "co" "ns")
+try "resolve"
+)
+
+(
+say "= Test enclose and restrict."
+
+\try=
+	(\sym
+	put "  resolve " put QU put sym put QU
+	put " = "
+	resolve sym
+		(say "no")
+		(\val put "(" put "yes " show val put ")" nl)
+	)
+
+say "before eval:"
+try "I"
+try "fred"
+\\x=
+	(
+	enclose;
+	say "Hello"
+	restrict
+
+	say "after restrict:"
+	try "I"
+	try "fred"
+
+	define "fred" 32
+	define "wilma" 64
+
+	say "after define:"
+	try "I"
+	try "fred"
+	37
+	)
+
+say "after eval:"
+try "I"
+try "fred"
+put "x = " show x nl
+)
