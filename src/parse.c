@@ -148,8 +148,28 @@ static value parse_list(void)
 
 static value parse_tuple(void)
 	{
-	syntax_error("LATER parse_tuple", cur_line);
-	return 0;
+	unsigned long first_line = cur_line;
+	skip();
+	skip_filler();
+	{
+	value result = pre(hold(Qempty));
+	while (1)
+		{
+		value term = parse_term();
+		if (term == 0)
+			{
+			if (cur_ch != '}')
+				syntax_error("Unclosed brace", first_line);
+			skip();
+			return result;
+			}
+		else
+			{
+			skip_filler();
+			result = appv(&type_tuple,result,term);
+			}
+		}
+	}
 	}
 
 static void error_unclosed(unsigned long first_line)

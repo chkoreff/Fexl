@@ -1,3 +1,4 @@
+= test_2349
 :
 : a
 : a b
@@ -9,10 +10,25 @@
 : a b c
 : a b c d
 steps 334 bytes 608
+= test_8877
 : 37
 x = a
 y = b
 : 37
 : void
 steps 44 bytes 352
+= test_0114
+: empty
+: (tuple empty 1)
+: (tuple (tuple empty 1) 2)
+: (tuple (tuple (tuple empty 1) 2) 3)
+: (tuple (tuple (tuple (tuple empty 1) 2) 3) 4)
+: (tuple (tuple (tuple empty 1) 2) (tuple (tuple empty 3) 4))
+: (A (D (A (A F (A (A F (A (A (A (A (A F T) F) F) F) F)) F)) F) (A (D (A (A F (A (A (A (A F T) F) F) F)) F) (A (D (A (A F (A F T)) F) (tuple (tuple (tuple (tuple (tuple empty I) I) "c") (A (A . "") I)) "e")) "d")) (A (A I I) "b"))) "a")
+
+= test_6521
+:
+: a
+: a b
+: a b c d e
 END

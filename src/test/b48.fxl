@@ -16,13 +16,13 @@
 	)
 
 \try=
-	(
-	\xs
+	(\xs
 	put ":"
 	unwind xs (print xs)
 	)
 
 (
+say "= test_2349"
 show_benchmark;
 try []
 try ["a"]
@@ -39,6 +39,7 @@ put ":" print [I I I I] "a" "b" "c" "d"
 )
 
 (
+say "= test_8877"
 \try=(\\exp put ": " show exp nl)
 
 show_benchmark;
@@ -63,4 +64,56 @@ try
 
 try (unwind "a" 37)
 )
+
+# Test raw forms.
+(
+say "= test_0114"
+\try=(\f put ": " show f nl)
+
+try {}
+try {1}
+try {1 2}
+try {1 2 3}
+try {1 2 3 4}
+try {1 2{3 4}}
+try
+	(
+	\a="a"
+	\b=(() () "b")
+	\d="d"
+	{a b "c" (. "" d) "e"}
+	)
+nl
+)
+
+# Test using tuples as functions.
+(
+say "= test_6521"
+
+\\print=
+	(@\loop\xs
+	xs nl \_\xs
+	\x
+	put " " put x
+	loop xs
+	)
+
+\try=
+	(\xs\tuple
+	tuple;
+	put ":" print xs
+	)
+
+try [] {}
+try [I] {"a"}
+try [I I] {"a" "b"}
+try [I I I I I]
+	(
+	\a="a"
+	\b=(() () "b")
+	\d="d"
+	{a b "c" (. "" d) "e"}
+	)
+)
+
 say "END"

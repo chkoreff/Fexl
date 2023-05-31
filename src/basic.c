@@ -9,6 +9,7 @@ value QF;
 value QY;
 value Qvoid;
 value Qnull;
+value Qempty;
 
 // (I x) = x
 static value apply_I(value f, value x)
@@ -147,12 +148,25 @@ static value apply_cons(value f, value x)
 		return V(&type_list,hold(f->R),x);
 	}
 
-struct type type_cons = { 0, apply_cons, clear_T };
+static struct type type_cons = { 0, apply_cons, clear_T };
+
+// Tuples
+
+struct type type_empty = { 0, apply_I, no_clear };
+
+static value apply_tuple(value f, value x)
+	{
+	value prev = hold(f->L);
+	value item = hold(f->R);
+	return A(A(prev,x),item);
+	}
+
+struct type type_tuple = { 0, apply_tuple, clear_A };
 
 /*
-# Feed all the items in a list to a function.
-# In effect this converts a list [x y z] to a tuple {x y z}.
-LATER Use this as the basis for tuples.
+Feed all the items in a list to a function.
+In effect this converts a list [x y z] to a tuple {x y z}.
+LATER: Do this by converting the list to an actual tuple structure.
 
 \unwind=
 	(@\loop\xs\f
@@ -200,6 +214,7 @@ void beg_basic(void)
 	QY = Q(&type_Y,0);
 	Qvoid = Q(&type_void,0);
 	Qnull = Q(&type_null,0);
+	Qempty = Q(&type_empty,0);
 	}
 
 void use_basic(void)
@@ -222,4 +237,5 @@ void end_basic(void)
 	drop(QY);
 	drop(Qvoid);
 	drop(Qnull);
+	drop(Qempty);
 	}
