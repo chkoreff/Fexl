@@ -163,41 +163,29 @@ static value apply_tuple(value f, value x)
 
 struct type type_tuple = { 0, apply_tuple, clear_A };
 
-/*
-Feed all the items in a list to a function.
-In effect this converts a list [x y z] to a tuple {x y z}.
-LATER: Do this by converting the list to an actual tuple structure.
-
-\unwind=
-	(@\loop\xs\f
-	xs f \x\xs
-	loop xs (f x)
-	)
-*/
-static value apply_unwind(value f, value x)
+// Convert list to tuple, e.g. [1 2 3] to {1 2 3}.
+static value apply_unwind(value f, value list)
 	{
-	if (f->L == 0)
-		return V(f->T,hold(f),x);
-	else
+	f = hold(Qempty);
+	while (1)
 		{
-		value handler = x;
-		value list = eval(hold(f->R));
+		list = eval(list);
 		if (list->T == &type_null)
 			{
 			drop(list);
-			return handler;
+			return f;
 			}
 		else if (list->T == &type_list)
 			{
-			value unwind = hold(f->L);
-			value head = hold(list->L);
+			value item = hold(list->L);
 			value tail = hold(list->R);
+			f = V(&type_tuple,f,item);
 			drop(list);
-			return A(A(unwind,tail),A(handler,head));
+			list = tail;
 			}
 		else
 			{
-			drop(x);
+			drop(f);
 			drop(list);
 			return hold(Qvoid);
 			}

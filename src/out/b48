@@ -1,3 +1,20 @@
+= test_8501
+a = a
+b = b
+c = c
+.
+= test_1723
+a = a
+b = b
+c = c
+.
+= test_3290
+: empty
+: (tuple empty "a")
+: (tuple (tuple empty "a") "b")
+: (tuple (tuple (tuple (tuple empty "a") "b") "c") "d")
+: void
+: void
 = test_2349
 :
 : a
@@ -9,14 +26,14 @@
 : a b
 : a b c
 : a b c d
-steps 334 bytes 608
+steps 324 bytes 736
 = test_8877
 : 37
 x = a
 y = b
 : 37
 : void
-steps 44 bytes 352
+steps 42 bytes 384
 = test_0114
 : empty
 : (tuple empty 1)

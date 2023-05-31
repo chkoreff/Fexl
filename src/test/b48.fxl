@@ -1,11 +1,35 @@
-# Test unwind
-\\unwind=
-	(
-	T unwind;  # Use the built in version written in C.
-	@\loop\xs\f
-	xs f \x\xs
-	loop xs (f x)
-	)
+# Test tuples
+
+(
+say "= test_8501"
+{"a" "b" "c"} \a\b\c
+put "a = " say a
+put "b = " say b
+put "c = " say c
+say "."
+)
+
+(
+say "= test_1723"
+unwind ["a" "b" "c"] \a\b\c
+put "a = " say a
+put "b = " say b
+put "c = " say c
+say "."
+)
+
+(
+say "= test_3290"
+\try=(\\f put ": " show f nl)
+
+try (unwind [])
+try (unwind ["a"])
+try (unwind ["a" "b"])
+try (unwind ["a" "b"; () () ["c" "d"]])
+
+try (unwind 3)
+try (unwind ["a" "b";3]) # improper list
+)
 
 \\print=
 	(@\loop\xs
@@ -15,14 +39,15 @@
 	loop xs
 	)
 
+(
+say "= test_2349"
+
 \try=
 	(\xs
 	put ":"
 	unwind xs (print xs)
 	)
 
-(
-say "= test_2349"
 show_benchmark;
 try []
 try ["a"]
@@ -40,9 +65,10 @@ put ":" print [I I I I] "a" "b" "c" "d"
 
 (
 say "= test_8877"
-\try=(\\exp put ": " show exp nl)
+\try=(\\f put ": " show f nl)
 
 show_benchmark;
+
 try (unwind (() []) 37)
 
 try
