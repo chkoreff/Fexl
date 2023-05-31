@@ -35,67 +35,35 @@ static void put_quote(string x)
 	put_ch('"');
 	}
 
-static void limit_show(value f);
-
 void show_exp(const char *name, value f)
 	{
 	put_ch('(');
 	put(name);
-	put_ch(' '); limit_show(f->L);
-	put_ch(' '); limit_show(f->R);
+	put_ch(' '); show(f->L);
+	put_ch(' '); show(f->R);
 	put_ch(')');
-	}
-
-static unsigned long max_depth;
-static unsigned long max_call;
-
-static void limit_show(value f)
-	{
-	if (max_call == 0 || max_depth == 0)
-		{
-		put_ch('_');
-		return;
-		}
-
-	max_call--;
-	max_depth--;
-
-	if (f->T == &type_num)
-		put_double(f->v_double);
-	else if (f->T == &type_str)
-		put_quote(get_str(f));
-	else
-		{
-		if (f->T == &type_A)
-			show_exp("A",f);
-		else if (f->T == &type_D)
-			show_exp("D",f);
-		else if (f->T == &type_E)
-			show_exp("E",f);
-		// LATER Use special list syntax.
-		else if (f->T == &type_list)
-			show_exp("list",f);
-		else if (f->T == &type_null)
-			{
-			if (f->L)
-				show_exp("?",f); // intermediate form
-			else
-				put("null");
-			}
-		else if (f->L)
-			show_exp("?",f); // intermediate form
-		else
-			put(atom_name(f,cx_cur)); // atom
-		}
-
-	max_depth++;
 	}
 
 void show(value f)
 	{
-	max_depth = 12;
-	max_call = 200;
-	limit_show(f);
+	if (f->T == &type_num)
+		put_double(f->v_double);
+	else if (f->T == &type_str)
+		put_quote(get_str(f));
+	else if (f->T == &type_A)
+		show_exp("A",f);
+	else if (f->T == &type_D)
+		show_exp("D",f);
+	else if (f->T == &type_E)
+		show_exp("E",f);
+	else if (f->T == &type_list)
+		show_exp("list",f);
+	else if (f->T == &type_null && f->L == 0)
+		put("null");
+	else if (f->L)
+		show_exp("?",f); // intermediate form
+	else
+		put(atom_name(f,cx_cur)); // atom
 	}
 
 void show_line(const char *name, value f)
