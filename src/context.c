@@ -11,13 +11,11 @@
 
 #include <context.h>
 
-// Define standard context.
-
-value cx_std;
+value cx_cur; // Current context
 
 void define(const char *key, value val)
 	{
-	cx_std = A(A(Qstr0(key),val),cx_std);
+	cx_cur = A(A(Qstr0(key),val),cx_cur);
 	}
 
 void define_op(const char *name, value op(void))
@@ -48,11 +46,13 @@ static value apply_define(value f, value x)
 
 static struct type type_define = { 0, apply_define, clear_T };
 
-void beg_std(void)
+// Define initial context.
+
+void beg_context(void)
 	{
 	beg_basic();
 
-	cx_std = hold(QI); // empty stack
+	cx_cur = hold(QI); // empty stack
 
 	define("define",Q(&type_define,0));
 	use_basic();
@@ -68,8 +68,8 @@ void beg_std(void)
 	// LATER crypto
 	}
 
-void end_std(void)
+void end_context(void)
 	{
-	drop(cx_std);
+	drop(cx_cur);
 	end_basic();
 	}

@@ -85,7 +85,7 @@ static void limit_show(value f)
 		else if (f->L)
 			show_exp("?",f); // intermediate form
 		else
-			put(atom_name(f,cx_std)); // atom
+			put(atom_name(f,cx_cur)); // atom
 		}
 
 	max_depth++;

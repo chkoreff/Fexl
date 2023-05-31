@@ -59,9 +59,9 @@ int main(int argc, const char *argv[])
 
 	init_signal();
 
-	beg_std();
+	beg_context();
 	drop(eval(load_fh(name,fh)));
-	end_std();
+	end_context();
 
 	free_memory(alt_stack.ss_sp, alt_stack.ss_size);
 	clear_free_list();

@@ -240,7 +240,7 @@ static value resolve(string name)
 	if (exp)
 		return hold(exp->R);
 
-	exp = find_item(name, cx_std);
+	exp = find_item(name, cx_cur);
 	if (exp)
 		return pre(hold(exp->R));
 
