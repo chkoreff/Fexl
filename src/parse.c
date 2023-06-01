@@ -67,14 +67,16 @@ terminated by a repeat occurrence of the delimiter.
 
 static value cx_lam;
 
+// Make an expression for a predefined value.
 static value pre(value x)
 	{
 	return A(hold(QI),x);
 	}
 
-static value ref(value sym)
+// Make an expression which refers to a name on a given line.
+static value ref(value name, unsigned long line)
 	{
-	return A(A(A(sym,hold(QT)),hold(QI)),hold(QI));
+	return A(A(A(A(name,Qnum(line)),hold(QT)),hold(QI)),hold(QI));
 	}
 
 static value merge(value fun, value arg)
@@ -83,7 +85,7 @@ static value merge(value fun, value arg)
 	if (fun->T == &type_A)
 		{
 		if (arg->T == &type_A)
-			cmp = str_cmp(fun->L->L->v_ptr, arg->L->L->v_ptr);
+			cmp = str_cmp(fun->L->L->L->v_ptr, arg->L->L->L->v_ptr);
 		else
 			cmp = -1;
 		}
@@ -310,7 +312,7 @@ static value parse_symbol(void)
 	if (exp == 0)
 		{
 		undefined_symbol(name->data,first_line);
-		exp = ref(Qstr(name));
+		exp = ref(Qstr(name),first_line);
 		}
 	else
 		str_free(name);
@@ -357,20 +359,17 @@ static value pop(string name, value map)
 		value remain = pop(name,map->R);
 		value pattern = hold(remain->L);
 		value tail = hold(remain->R);
-		value top = map->L;
-		value top_sym = top->L;
-		value top_pattern = hold(top->R);
 
 		drop(remain);
 
-		if (pattern == QF && str_eq(name,top_sym->v_ptr))
+		if (pattern == QF && str_eq(name, map->L->L->L->v_ptr))
 			{
 			drop(pattern);
-			return A(top_pattern, tail); // found
+			return A(hold(map->L->R), tail); // found
 			}
 		else
 			return A(pattern,
-				A(A(hold(top_sym),A(hold(QF),top_pattern)), tail));
+				A(A(hold(map->L->L),A(hold(QF),hold(map->L->R))), tail));
 		}
 	else
 		return A(hold(QF),hold(map));
@@ -399,7 +398,7 @@ static value parse_lambda(unsigned long first_line, type type)
 	value def = parse_def();
 	value cx_save = hold(cx_lam);
 	value sym = Qstr(name);
-	cx_lam = A(A(sym,ref(hold(sym))),cx_lam);
+	cx_lam = A(A(sym,ref(hold(sym),first_line)),cx_lam);
 
 	{
 	value exp = parse_exp();
