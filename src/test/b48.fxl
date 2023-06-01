@@ -10,8 +10,55 @@ say "."
 )
 
 (
+say "= test_2777"
+\tuple=
+	(
+	I; I;
+	\b="b"
+	\e="e"
+	{"a" b "c"; cons "d"; cons e; cons "f"; null}
+	)
+
+tuple;
+put ":"
+\x put " " put x
+\x put " " put x
+\x put " " put x
+\x put " " put x
+\x put " " put x
+\x put " " put x
+nl
+)
+
+(
+say "= test_6103"
+put ":"
+{"a" "b"; 3} # improper list
+\x put " " put x
+\x put " " put x
+\tail put "; " show tail
+nl
+)
+
+(
+# Test tuple_to_list
+say "= test_6469"
+\try=
+	(\x
+	\\x=(tuple_to_list x)
+	put ": " show x nl
+	)
+
+try 3
+try {}
+try (I {"a" "b"})
+try {"a" "b"; "c"} # improper list
+try (list_to_tuple (cons "a"; cons "b"; null))
+)
+
+(
 say "= test_1723"
-unwind ["a" "b" "c"] \a\b\c
+list_to_tuple ["a" "b" "c"] \a\b\c
 put "a = " say a
 put "b = " say b
 put "c = " say c
@@ -22,19 +69,19 @@ say "."
 say "= test_3290"
 \try=(\\f put ": " show f nl)
 
-try (unwind [])
-try (unwind ["a"])
-try (unwind ["a" "b"])
-try (unwind ["a" "b"; () () ["c" "d"]])
+try (list_to_tuple [])
+try (list_to_tuple ["a"])
+try (list_to_tuple ["a" "b"])
+try (list_to_tuple ["a" "b"; () () ["c" "d"]])
 
-try (unwind 3)
-try (unwind ["a" "b";3]) # improper list
+try (list_to_tuple 3)
+try (list_to_tuple ["a" "b";3]) # improper list
 )
 
+# Print a list of strings.
 \\print=
 	(@\loop\xs
-	xs nl \_\xs
-	\x
+	xs nl \x\xs
 	put " " put x
 	loop xs
 	)
@@ -42,11 +89,7 @@ try (unwind ["a" "b";3]) # improper list
 (
 say "= test_2349"
 
-\try=
-	(\xs
-	put ":"
-	unwind xs (print xs)
-	)
+\try=(\xs put ":" print xs)
 
 show_benchmark;
 try []
@@ -54,13 +97,6 @@ try ["a"]
 try ["a" "b"]
 try ["a" "b" "c"]
 try ["a" "b" "c" "d"]
-
-# Call print directly.  The list encodes the number of items to print.
-put ":" print []
-put ":" print [I] "a"
-put ":" print [I I] "a" "b"
-put ":" print [I I I] "a" "b" "c"
-put ":" print [I I I I] "a" "b" "c" "d"
 )
 
 (
@@ -69,11 +105,11 @@ say "= test_8877"
 
 show_benchmark;
 
-try (unwind (() []) 37)
+try (list_to_tuple (() []) 37)
 
 try
 	(
-	unwind
+	list_to_tuple
 		(
 		I;
 		cons "a";
@@ -88,7 +124,7 @@ try
 		)
 	)
 
-try (unwind "a" 37)
+try (list_to_tuple "a" 37)
 )
 
 # Test raw forms.
@@ -112,28 +148,17 @@ try
 nl
 )
 
-# Test using tuples as functions.
 (
 say "= test_6521"
 
-\\print=
-	(@\loop\xs
-	xs nl \_\xs
-	\x
-	put " " put x
-	loop xs
-	)
+\try=(\tuple put ":" print (tuple_to_list tuple))
 
-\try=
-	(\xs\tuple
-	tuple;
-	put ":" print xs
-	)
+show_benchmark;
 
-try [] {}
-try [I] {"a"}
-try [I I] {"a" "b"}
-try [I I I I I]
+try {}
+try {"a"}
+try {"a" "b"}
+try
 	(
 	\a="a"
 	\b=(() () "b")

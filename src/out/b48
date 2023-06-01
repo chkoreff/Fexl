@@ -3,49 +3,55 @@ a = a
 b = b
 c = c
 .
+= test_2777
+: a b c d e f
+= test_6103
+: a b; 3
+= test_6469
+: void
+: null
+: (list "a" (list "b" null))
+: (list "a" (list "b" "c"))
+: (list "a" (A (A cons "b") null))
 = test_1723
 a = a
 b = b
 c = c
 .
 = test_3290
-: empty
-: (tuple empty "a")
-: (tuple (tuple empty "a") "b")
-: (tuple (tuple (tuple (tuple empty "a") "b") "c") "d")
-: void
-: void
+: (tuple I null)
+: (tuple I (list "a" null))
+: (tuple I (list "a" (list "b" null)))
+: (tuple I (list "a" (list "b" (A (A I I) (list "c" (list "d" null))))))
+: (tuple I 3)
+: (tuple I (list "a" (list "b" 3)))
 = test_2349
 :
 : a
 : a b
 : a b c
 : a b c d
-:
-: a
-: a b
-: a b c
-: a b c d
-steps 324 bytes 736
+steps 144 bytes 416
 = test_8877
 : 37
 x = a
 y = b
 : 37
 : void
-steps 42 bytes 384
+steps 41 bytes 352
 = test_0114
-: empty
-: (tuple empty 1)
-: (tuple (tuple empty 1) 2)
-: (tuple (tuple (tuple empty 1) 2) 3)
-: (tuple (tuple (tuple (tuple empty 1) 2) 3) 4)
-: (tuple (tuple (tuple empty 1) 2) (tuple (tuple empty 3) 4))
-: (A (D (A (A F (A (A F (A (A (A (A (A F T) F) F) F) F)) F)) F) (A (D (A (A F (A (A (A (A F T) F) F) F)) F) (A (D (A (A F (A F T)) F) (tuple (tuple (tuple (tuple (tuple empty I) I) "c") (A (A . "") I)) "e")) "d")) (A (A I I) "b"))) "a")
+: (tuple I null)
+: (tuple I (list 1 null))
+: (tuple I (list 1 (list 2 null)))
+: (tuple I (list 1 (list 2 (list 3 null))))
+: (tuple I (list 1 (list 2 (list 3 (list 4 null)))))
+: (tuple I (list 1 (list 2 (list (tuple I (list 3 (list 4 null))) null))))
+: (A (D (A (A F (A (A F (A F (A T F))) F)) F) (A (D (A (A F (A F (A F (A T F)))) F) (A (D (A F (A F (A F (A F (A (A F T) F))))) (tuple I (list I (list I (list "c" (list (A (A . "") I) (list "e" null))))))) "d")) (A (A I I) "b"))) "a")
 
 = test_6521
 :
 : a
 : a b
 : a b c d e
+steps 126 bytes 512
 END

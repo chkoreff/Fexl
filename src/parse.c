@@ -77,6 +77,11 @@ static value cons(value fun, value arg)
 	return appv(&type_list,fun,arg);
 	}
 
+static value tuple(value exp)
+	{
+	return appv(&type_tuple,pre(hold(QI)),exp);
+	}
+
 static void put_error_location(unsigned long line)
 	{
 	fprintf(stderr," on line %lu", line);
@@ -133,42 +138,16 @@ static value parse_items(void)
 		}
 	}
 
-static value parse_list(void)
+static value parse_seq(const char t_ch, const char *msg)
 	{
 	unsigned long first_line = cur_line;
 	skip();
 	{
 	value exp = parse_items();
-	if (cur_ch != ']')
-		syntax_error("Unclosed bracket", first_line);
+	if (cur_ch != t_ch)
+		syntax_error(msg, first_line);
 	skip();
 	return exp;
-	}
-	}
-
-static value parse_tuple(void)
-	{
-	unsigned long first_line = cur_line;
-	skip();
-	skip_filler();
-	{
-	value result = pre(hold(Qempty));
-	while (1)
-		{
-		value term = parse_term();
-		if (term == 0)
-			{
-			if (cur_ch != '}')
-				syntax_error("Unclosed brace", first_line);
-			skip();
-			return result;
-			}
-		else
-			{
-			skip_filler();
-			result = appv(&type_tuple,result,term);
-			}
-		}
 	}
 	}
 
@@ -292,9 +271,9 @@ static value parse_term(void)
 	if (cur_ch == '(')
 		return parse_nested();
 	else if (cur_ch == '[')
-		return parse_list();
+		return parse_seq(']',"Unclosed bracket");
 	else if (cur_ch == '{')
-		return parse_tuple();
+		return tuple(parse_seq('}',"Unclosed brace"));
 	else if (cur_ch == '"')
 		return parse_quote_string();
 	else if (cur_ch == '~')

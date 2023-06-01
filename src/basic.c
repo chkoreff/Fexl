@@ -9,7 +9,6 @@ value QF;
 value QY;
 value Qvoid;
 value Qnull;
-value Qempty;
 
 // (I x) = x
 static value apply_I(value f, value x)
@@ -152,47 +151,54 @@ static struct type type_cons = { 0, apply_cons, clear_T };
 
 // Tuples
 
-struct type type_empty = { 0, apply_I, no_clear };
-
 static value apply_tuple(value f, value x)
 	{
-	value prev = hold(f->L);
-	value item = hold(f->R);
-	return A(A(prev,x),item);
-	}
-
-struct type type_tuple = { 0, apply_tuple, clear_A };
-
-// Convert list to tuple, e.g. [1 2 3] to {1 2 3}.
-static value apply_unwind(value f, value list)
-	{
-	f = hold(Qempty);
+	value list = hold(f->R);
 	while (1)
 		{
 		list = eval(list);
 		if (list->T == &type_null)
 			{
 			drop(list);
-			return f;
+			return x;
 			}
 		else if (list->T == &type_list)
 			{
 			value item = hold(list->L);
 			value tail = hold(list->R);
-			f = V(&type_tuple,f,item);
 			drop(list);
+			x = A(x,item);
 			list = tail;
 			}
 		else
-			{
-			drop(f);
-			drop(list);
-			return hold(Qvoid);
-			}
+			return A(x,list); // improper list tail
 		}
 	}
 
-struct type type_unwind = { 0, apply_unwind, clear_T };
+struct type type_tuple = { 0, apply_tuple, clear_A };
+
+// Convert list to tuple, e.g. [1 2 3] to {1 2 3}.
+static value apply_list_to_tuple(value f, value x)
+	{
+	(void)f;
+	return V(&type_tuple,hold(QI),x);
+	}
+
+struct type type_list_to_tuple = { 0, apply_list_to_tuple, clear_T };
+
+// Convert to tuple to list, e.g. {1 2 3} to [1 2 3].
+static value apply_tuple_to_list(value f, value x)
+	{
+	x = eval(x);
+	if (x->T == &type_tuple)
+		f = hold(x->R);
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
+
+struct type type_tuple_to_list = { 0, apply_tuple_to_list, clear_T };
 
 void beg_basic(void)
 	{
@@ -202,7 +208,6 @@ void beg_basic(void)
 	QY = Q(&type_Y,0);
 	Qvoid = Q(&type_void,0);
 	Qnull = Q(&type_null,0);
-	Qempty = Q(&type_empty,0);
 	}
 
 void use_basic(void)
@@ -214,7 +219,8 @@ void use_basic(void)
 	define("void", hold(Qvoid));
 	define("null", hold(Qnull));
 	define("cons", Q(&type_cons,0));
-	define("unwind", Q(&type_unwind,0));
+	define("list_to_tuple", Q(&type_list_to_tuple,0));
+	define("tuple_to_list", Q(&type_tuple_to_list,0));
 	}
 
 void end_basic(void)
@@ -225,5 +231,4 @@ void end_basic(void)
 	drop(QY);
 	drop(Qvoid);
 	drop(Qnull);
-	drop(Qempty);
 	}
