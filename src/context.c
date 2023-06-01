@@ -10,6 +10,7 @@
 #include <type_num.h>
 #include <type_output.h>
 #include <type_str.h>
+#include <type_var.h>
 
 #include <context.h>
 
@@ -111,6 +112,7 @@ void beg_context(void)
 	use_output();
 	use_meta();
 	use_limit();
+	use_var();
 
 	// LATER time
 	// LATER rand

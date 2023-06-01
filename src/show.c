@@ -7,6 +7,7 @@
 #include <output.h>
 #include <type_num.h>
 #include <type_str.h>
+#include <type_var.h>
 
 #include <show.h>
 
@@ -66,6 +67,10 @@ void show(value f)
 		show_exp("single",f);
 	else if (f->T == &type_pair)
 		show_exp("pair",f);
+	else if (f->T == &type_var)
+		{
+		put("(var "); show(f->R); put(")");
+		}
 	else if (f->L)
 		show_exp("?",f); // intermediate form
 	else

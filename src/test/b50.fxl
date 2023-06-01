@@ -1,0 +1,47 @@
+#
+\do_show=(\x put ": " show x nl)
+
+(
+# Test yield
+say "= test_1225"
+yield (+ 1 2) \x
+do_show x
+\\x=x
+do_show x
+)
+
+(
+# Test var
+say "= test_0994"
+
+\do_var_put=
+	(\v\x
+	var_put v x
+	\\y=(var_get v)
+	do_show y
+	)
+
+show_benchmark;
+
+\\v=var_new
+do_show v
+
+do_var_put (I v) (+ 1 2)
+do_var_put v (. "a" "b")
+do_var_put v {(+ 1 2)}
+do_var_put v (yield; + 1 2)
+do_var_put v void
+
+# Test malformed
+nl
+
+\\f=(var_put (I 3))
+do_show f
+
+\\f=(var_get (I 3))
+do_show f
+
+var_put v v     # This would create a LEAK.
+var_put v void  # However, I break the cycle here.
+do_show v
+)

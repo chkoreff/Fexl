@@ -20,6 +20,7 @@ make type_meta
 make type_num
 make type_output
 make type_str
+make type_var
 make value
 
 #make format

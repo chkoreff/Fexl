@@ -118,6 +118,14 @@ value maybe(value x)
 		return V(&type_T,hold(QT),single(x));
 	}
 
+static value apply_yield(value f, value x)
+	{
+	(void)f;
+	return single(x);
+	}
+
+static struct type type_yield = { 0, apply_yield, no_clear };
+
 // Pair
 
 static value apply_pair(value f, value x)
@@ -218,6 +226,7 @@ void use_basic(void)
 	define("@", Q(&type_Y,0));
 	define("void", hold(Qvoid));
 	define("null", hold(Qnull));
+	define("yield", Q(&type_yield,0));
 	define("cons", Q(&type_cons,0));
 	define("list_to_tuple", Q(&type_list_to_tuple,0));
 	define("tuple_to_list", Q(&type_tuple_to_list,0));

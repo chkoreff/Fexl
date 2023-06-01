@@ -1,0 +1,15 @@
+= test_1225
+: (A (A + 1) 2)
+: 3
+= test_0994
+: (var void)
+: 3
+: "ab"
+: (tuple I (list (A (A + 1) 2) null))
+: (single I (A (A + 1) 2))
+: void
+
+: void
+: void
+: (var void)
+steps 109 bytes 1312
