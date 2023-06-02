@@ -72,7 +72,7 @@ static struct type type_void = { 0, apply_void, no_clear };
 
 // Use pattern p to make a copy of expression e with argument x substituted in
 // the places designated by the pattern.
-static value subst(value p, value e, value x)
+value subst(value p, value e, value x)
 	{
 	if (p == QF) return hold(e);
 	if (p == QT) return hold(x);

@@ -287,33 +287,21 @@ value find_item(string name, value cx)
 		}
 	}
 
-static value resolve(string name)
-	{
-	value exp = find_item(name, cx_lam);
-	if (exp) return exp;
-
-	exp = find_item(name, cx_cur);
-	if (exp) return pre(exp);
-
-	exp = Qnum_str0(name->data); // Check for numeric constant.
-	if (exp)
-		return pre(exp);
-
-	return 0;
-	}
-
 static value parse_symbol(void)
 	{
 	unsigned long first_line = cur_line;
 	string name = parse_name();
 	if (name == 0) return 0;
 	{
-	value exp = resolve(name);
+	value exp = find_item(name, cx_lam); // Check for lambda symbol.
 	if (exp == 0)
 		{
-		undefined_symbol(name->data,first_line);
-		exp = ref(Qstr(name),first_line);
+		exp = Qnum_str0(name->data); // Check for numeric constant.
+		if (exp) exp = pre(exp);
 		}
+
+	if (exp == 0)
+		exp = ref(Qstr(name),first_line); // external symbol
 	else
 		str_free(name);
 	return exp;
@@ -480,17 +468,11 @@ static value parse_fexl(const char *name, input get)
 
 	{
 	value exp = parse_exp();
-	value val = hold(exp->R);
-
 	if (cur_ch != EOF)
 		syntax_error("Extraneous input", cur_line);
 
-	if (exp->L->T == &type_A)
-		die(0); // Has undefined symbols
-
-	drop(exp);
 	drop(cx_lam);
-	return val;
+	return exp;
 	}
 	}
 
@@ -515,11 +497,48 @@ FILE *open_source(const char *name)
 	return fh;
 	}
 
+// Resolve all external symbols in an expression.
+
+static value resolve_exp(value exp)
+	{
+	value val = hold(exp->R);
+	value map = exp->L;
+	int has_undef = 0;
+
+	while (map->T == &type_A)
+		{
+		value item = map->L;
+		value sym = item->L;
+		string name = sym->L->v_ptr;
+		value def = find_item(name,cx_cur);
+
+		if (def == 0)
+			{
+			undefined_symbol(name->data, sym->R->v_double);
+			has_undef = 1;
+			}
+		else
+			{
+			value new = subst(item->R,val,def);
+			drop(def);
+			drop(val);
+			val = new;
+			}
+		map = map->R;
+		}
+
+	if (has_undef)
+		die(0); // Has undefined symbols
+
+	drop(exp);
+	return val;
+	}
+
 value load_fh(const char *name, FILE *fh)
 	{
 	cur_fh = fh;
 	{
-	value val = parse_fexl(name,get_fh);
+	value val = resolve_exp(parse_fexl(name,get_fh));
 	fclose(fh);
 	return val;
 	}

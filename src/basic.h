@@ -6,6 +6,7 @@ extern value Qvoid;
 extern value Qnull;
 extern void clear_T(value f);
 extern value apply_void(value f, value x);
+extern value subst(value p, value e, value x);
 extern struct type type_D;
 extern struct type type_E;
 extern struct type type_single;

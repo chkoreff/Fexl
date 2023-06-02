@@ -1,5 +1,6 @@
 # Test undefined symbols.
-x y
-
-\\z=I  # ok
-\ \z=I # syntax error
+T (say "HI"); # Does not run.
+\x
+y
+x
+z a
