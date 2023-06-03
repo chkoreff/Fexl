@@ -127,7 +127,7 @@ try
 try (list_to_tuple "a" 37)
 )
 
-# Test raw forms.
+# Test raw values.
 (
 say "= test_0114"
 \try=(\f put ": " show f nl)

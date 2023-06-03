@@ -11,7 +11,6 @@ int empty(void)
 int cur_ch = -1; // current character
 unsigned long cur_line = 1; // current line number
 input cur_get = empty; // current input routine
-const char *cur_name; // current name of source stream
 
 void skip(void)
 	{

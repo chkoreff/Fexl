@@ -123,4 +123,5 @@ void end_context(void)
 	{
 	drop(cx_cur);
 	end_basic();
+	clear_free_list();
 	}

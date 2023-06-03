@@ -1,0 +1,8 @@
+#
+loadf "test/b53_1.fxl" \demo
+define "fred" (say "I am Fred.")
+
+say "BEG"
+demo
+demo
+say "END"

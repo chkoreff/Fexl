@@ -7,6 +7,7 @@
 #include <memory.h>
 #include <parse.h>
 #include <signal.h> // sigaction
+#include <type_str.h>
 
 static void die_perror(const char *msg)
 	{
@@ -37,7 +38,7 @@ static void set_handler(int signum)
 
 static stack_t alt_stack;
 
-static void init_signal(void)
+static void beg_signal(void)
 	{
 	// Set alternate stack context for signals.
 	{
@@ -53,19 +54,24 @@ static void init_signal(void)
 	set_handler(SIGSEGV);
 	}
 
+static void end_signal(void)
+	{
+	free_memory(alt_stack.ss_sp, alt_stack.ss_size);
+	}
+
 int main(int argc, const char *argv[])
 	{
 	const char *name = argc > 1 ? argv[1] : "";
 	FILE *fh = open_source(name);
 
-	init_signal();
-
+	beg_signal();
 	beg_context();
-	drop(eval(load_fh(name,fh)));
-	end_context();
 
-	free_memory(alt_stack.ss_sp, alt_stack.ss_size);
-	clear_free_list();
+	drop(eval(load(Qstr0(name),fh)));
+
+	end_context();
+	end_signal();
+
 	end_memory();
 	return 0;
 	}

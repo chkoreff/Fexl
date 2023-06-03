@@ -5,6 +5,7 @@
 #include <basic.h>
 #include <context.h>
 #include <output.h>
+#include <parse.h>
 #include <type_num.h>
 #include <type_str.h>
 #include <type_var.h>
@@ -67,12 +68,14 @@ void show(value f)
 		show_exp("single",f);
 	else if (f->T == &type_pair)
 		show_exp("pair",f);
+	else if (f->T == &type_form)
+		show_exp("form",f);
 	else if (f->T == &type_var)
 		{
 		put("(var "); show(f->R); put(")");
 		}
 	else if (f->L)
-		show_exp("?",f); // intermediate form
+		show_exp("?",f); // intermediate value
 	else
 		put(atom_name(f,cx_cur)); // atom
 	}

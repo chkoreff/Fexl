@@ -22,9 +22,15 @@ nl
 # Test some tricky string terminators.
 say ~ABC abcd~ABA~ABC
 say ~ABCD AAB~ABC~ABCD
-# Multiple layers of quotation.
 
+# Multiple layers of quotation.
 say "hello"
 say ~(1) "hello"~(1)
 say ~(2) ~(1) "hello"~(1)~(2)
 say ~(3) ~(2) ~(1) "hello"~(1)~(2)~(3)
+
+# Test filler after "\", which is allowed but not recommended.
+\  x=1
+
+\\  # comment
+   x=1

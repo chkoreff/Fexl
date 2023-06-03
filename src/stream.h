@@ -3,7 +3,6 @@ extern int empty(void);
 extern int cur_ch;
 extern unsigned long cur_line;
 extern input cur_get;
-extern const char *cur_name;
 extern void skip(void);
 extern int at_white(void);
 extern void skip_white(void);

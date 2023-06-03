@@ -1,6 +1,6 @@
 #
 (
-# Show the raw forms.
+# Show the raw values.
 \try=(\\exp put ": " show exp nl)
 
 say "=="

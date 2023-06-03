@@ -13,4 +13,6 @@ load "test/b45_1.fxl"
 nl
 
 define "double" (* 2)
-load "test/b45_2.fxl"
+\;
+wilma
+put "x = " say (num_str; double 32)

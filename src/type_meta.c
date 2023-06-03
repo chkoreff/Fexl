@@ -64,9 +64,8 @@ static value apply_load(value f, value x)
 		{
 		const char *name = str_data(x);
 		FILE *fh = open_source(name);
-		f = load_fh(name,fh);
-		drop(x);
-		return f;
+		value (*op)(value,FILE *) = f->v_ptr;
+		return op(x,fh);
 		}
 	else
 		{
@@ -84,5 +83,6 @@ void use_meta(void)
 	define("show_benchmark", Q(&type_benchmark,stdout));
 	define("trace_benchmark", Q(&type_benchmark,stderr));
 	define("show", Q(&type_show,0));
-	define("load", Q(&type_load,0));
+	define("load", Q(&type_load,load));
+	define("loadf", Q(&type_load,loadf));
 	}

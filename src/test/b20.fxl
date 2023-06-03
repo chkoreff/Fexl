@@ -1,5 +1,5 @@
-# Undefined symbols
-say "HI"
+# Test undefined symbols.
+say "HI" # Does not run.
 \x
 x y z
 y
