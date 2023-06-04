@@ -52,7 +52,7 @@ continues through end of line.
 
 The "empty" element means end of file.
 
-A "name" is any sequence of characters except for white space or any of these:
+A "name" is any sequence of characters other than white space or these:
 	\ ( ) [ ] { } ; " ~ # =
 
 A "quote_string" starts with a '"' (QU), followed by any sequence of characters
@@ -248,9 +248,6 @@ static value parse_tilde_string(void)
 	}
 
 // Parse a name, or return 0 if I don't see one.
-//
-// A name may contain just about anything, except for white space and a few
-// other special chars.  This is the simplest rule that can work.
 static string parse_name(void)
 	{
 	struct buffer buf = {0};
