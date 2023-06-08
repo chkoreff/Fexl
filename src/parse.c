@@ -273,19 +273,13 @@ static string parse_name(void)
 
 value find_item(string name, value cx)
 	{
-	while (1)
+	while (cx->T == &type_A)
 		{
-		if (cx->T == &type_A)
-			{
-			value top = cx->L;
-			if (str_eq(name, top->L->v_ptr))
-				return hold(top->R);
-			else
-				cx = cx->R;
-			}
-		else
-			return 0;
+		if (str_eq(name, cx->L->L->v_ptr))
+			return hold(cx->L->R);
+		cx = cx->R;
 		}
+	return 0;
 	}
 
 static value parse_symbol(void)
