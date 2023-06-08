@@ -15,19 +15,13 @@
 // Find the name of atom f in context cx.
 static const char *atom_name(value f, value cx)
 	{
-	while (1)
+	while (cx->T == &type_A)
 		{
-		if (cx->T == &type_A)
-			{
-			value top = cx->L;
-			value val = top->R;
-			if (f->T == val->T && f->v_ptr == val->v_ptr)
-				return str_data(top->L);
-			cx = cx->R;
-			}
-		else
-			return "?";
+		if (f == cx->L->R)
+			return str_data(cx->L->L);
+		cx = cx->R;
 		}
+	return "?";
 	}
 
 static void put_quote(string x)
