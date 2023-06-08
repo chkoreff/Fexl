@@ -338,15 +338,12 @@ static value find_pattern(const char *key, value map)
 	{
 	while (map->T == &type_A)
 		{
-		value item = map->L;
-		int cmp = strcmp(key, str_data(item->L->L));
-
-		if (cmp > 0)
-			map = map->R;
-		else if (cmp < 0)
+		int cmp = strcmp(key, str_data(map->L->L->L));
+		if (cmp < 0)
 			break;
-		else
-			return item->R;
+		if (cmp == 0)
+			return map->L->R;
+		map = map->R;
 		}
 	return QF;
 	}
