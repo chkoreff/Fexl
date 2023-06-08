@@ -40,6 +40,22 @@ void show_exp(const char *name, value f)
 	put_ch(')');
 	}
 
+static void show_items(value f)
+	{
+	while (f->T == &type_list)
+		{
+		show(f->L);
+		f = f->R;
+		if (f->T == &type_list)
+			put_ch(' ');
+		}
+	if (f->T != &type_null)
+		{
+		put("; ");
+		show(f);
+		}
+	}
+
 void show(value f)
 	{
 	if (f->T == &type_num)
@@ -53,11 +69,19 @@ void show(value f)
 	else if (f->T == &type_E)
 		show_exp("E",f);
 	else if (f->T == &type_list)
-		show_exp("list",f);
+		{
+		put_ch('[');
+		show_items(f);
+		put_ch(']');
+		}
 	else if (f->T == &type_null && f->L == 0)
-		put("null");
+		put("[]");
 	else if (f->T == &type_tuple)
-		show_exp("tuple",f);
+		{
+		put_ch('{');
+		show_items(f->R);
+		put_ch('}');
+		}
 	else if (f->T == &type_single)
 		show_exp("single",f);
 	else if (f->T == &type_pair)

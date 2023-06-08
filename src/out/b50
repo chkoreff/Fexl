@@ -5,7 +5,7 @@
 : (var void)
 : 3
 : "ab"
-: (tuple I (list (A (A + 1) 2) null))
+: {(A (A + 1) 2)}
 : (single I (A (A + 1) 2))
 : void
 
