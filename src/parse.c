@@ -8,6 +8,7 @@
 #include <die.h>
 #include <stdio.h>
 #include <stream.h>
+#include <string.h> // strcmp
 #include <type_num.h>
 #include <type_str.h>
 
@@ -339,40 +340,48 @@ static value parse_def(void)
 	return def;
 	}
 
-// Pop the name out of the map, returning A(pattern,new_map).
-static value pop(string name, value map)
+static value find_pattern(const char *key, value map)
+	{
+	while (map->T == &type_A)
+		{
+		value item = map->L;
+		int cmp = strcmp(key, str_data(item->L->L));
+
+		if (cmp > 0)
+			map = map->R;
+		else if (cmp < 0)
+			break;
+		else
+			return item->R;
+		}
+	return QF;
+	}
+
+// Pop the pattern out of the map, returning a new map with QF on the left of
+// each pattern.
+static value pop_lam(value pattern, value map)
 	{
 	if (map->T == &type_A)
 		{
-		value remain = pop(name,map->R);
-		value pattern = hold(remain->L);
-		value tail = hold(remain->R);
+		value item = map->L;
+		value tail = pop_lam(pattern,map->R);
 
-		drop(remain);
-
-		if (pattern == QF && str_eq(name, map->L->L->L->v_ptr))
-			{
-			drop(pattern);
-			return A(hold(map->L->R), tail); // found
-			}
+		if (item->R == pattern)
+			return tail;
 		else
-			return A(pattern,
-				A(A(hold(map->L->L),A(hold(QF),hold(map->L->R))), tail));
+			return A(A(hold(item->L),A(hold(QF),hold(item->R))), tail);
 		}
 	else
-		return A(hold(QF),hold(map));
+		return hold(QI);
 	}
 
 static value abstract(string name, value exp, type type)
 	{
-	value remain = pop(name,exp->L);
-	value pattern = hold(remain->L);
-	value new_map = hold(remain->R);
-	value val = hold(exp->R);
-
-	drop(remain);
+	value pattern = find_pattern(name->data,exp->L);
+	value map = pop_lam(pattern,exp->L);
+	value body = V(type,hold(pattern),hold(exp->R));
 	drop(exp);
-	return A(new_map,V(type,pattern,val));
+	return A(map,body);
 	}
 
 // Parse an expression in a new temporary lambda context.
@@ -412,7 +421,7 @@ static value parse_lambda(unsigned long first_line, type type)
 
 static value resolve_exp(value label, value exp)
 	{
-	value val = hold(exp->R);
+	value body = hold(exp->R);
 	value map = exp->L;
 	int has_undef = 0;
 
@@ -430,10 +439,10 @@ static value resolve_exp(value label, value exp)
 			}
 		else
 			{
-			value new = subst(item->R,val,def);
+			value new = subst(item->R,body,def);
 			drop(def);
-			drop(val);
-			val = new;
+			drop(body);
+			body = new;
 			}
 		map = map->R;
 		}
@@ -443,7 +452,7 @@ static value resolve_exp(value label, value exp)
 
 	drop(label);
 	drop(exp);
-	return val;
+	return body;
 	}
 
 static value step_form(value f)
@@ -580,10 +589,10 @@ static value parse_fexl_fh(value label, FILE *fh)
 	{
 	cur_fh = fh;
 	{
-	value val = parse_fexl(label,get_fh);
+	value exp = parse_fexl(label,get_fh);
 	fclose(fh);
 	cur_fh = 0;
-	return val;
+	return exp;
 	}
 	}
 
