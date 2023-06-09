@@ -3,11 +3,18 @@
 
 list_fail=""
 
+run()
+	{
+	local name="$1"
+	# Force line buffering so stdout and stderr are interleaved.
+	stdbuf -oL ../bin/fexl test/$name.fxl 2>&1
+	}
+
 check()
 	{
 	local name="$1"
 	echo "test $name"
-	../bin/fexl test/$name.fxl 2>&1 | diff - out/$name
+	run $name | diff - out/$name
 	if [ $? -eq 1 ]; then
 		list_fail="$list_fail $name"
 	fi
@@ -17,7 +24,7 @@ refresh()
 	{
 	local name="$1"
 	echo "refresh $name"
-	../bin/fexl test/$name.fxl 2>&1 | cat >tmp/$name
+	run $name | cat >tmp/$name
 	}
 
 list="$@"

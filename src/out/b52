@@ -1,5 +1,3 @@
-Undefined symbol fred on line 3 of test/b52_1.fxl
-Undefined symbol wilma on line 4 of test/b52_1.fxl
 Meet the Flintstones.
 I am Fred.
 I am Wilma.
@@ -9,3 +7,5 @@ I am Betty.
 I am Wilma.
 x = 64
 BEG
+Undefined symbol fred on line 3 of test/b52_1.fxl
+Undefined symbol wilma on line 4 of test/b52_1.fxl
