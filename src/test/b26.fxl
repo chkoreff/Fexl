@@ -5,4 +5,4 @@ show_benchmark;
 * (xor 3 5);
 + (- (* 5 5) 2) (- 37 0)
 )
-put "END exp = " show exp nl
+put "END exp = " show std exp nl

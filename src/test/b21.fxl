@@ -12,4 +12,4 @@ show_benchmark;
 
 T 3
 )
-put "END exp = " show exp nl
+put "END exp = " show std exp nl

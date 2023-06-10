@@ -1,0 +1,7 @@
+Hello
+: hello
+: fred
+: (A say "I am Fred.")
+I am Fred.
+I am Wilma.
+END

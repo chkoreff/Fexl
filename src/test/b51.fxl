@@ -1,9 +1,10 @@
 #
-show (\; say "hello") nl
-
-\wilma=(say "I am Wilma.")
-#define "wilma" wilma  # Deliberately don't define it.
-define "double" (* 2)
+show std (\; say "hello") nl
+restrict
+(
+set "double" (* 2);
+std
+)
 \;
 wilma
 put "x = " say (num_str; double 32)

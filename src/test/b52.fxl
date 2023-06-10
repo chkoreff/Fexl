@@ -1,8 +1,14 @@
 # Load a demo function which calls "fred".
-loadf "test/b52_1.fxl" \demo
+\\demo=(read "test/b52_1.fxl")
+\demo=(restrict std demo) # TODO need "resolve" I guess
 
-# Run a Flintstones demo, but enclose it so that "fred" is not defined below.
-enclose (load "test/b45.fxl")
+\value= # TODO in C
+	(\cx
+	restrict (set "std" cx; cx)
+	)
+
+# Run the Flintstones demo.
+(value std; read "test/b45.fxl")
 
 say "BEG"
 demo # Reports undefined symbol fred

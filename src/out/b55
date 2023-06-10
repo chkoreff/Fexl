@@ -1,0 +1,21 @@
+: restrict
+: void
+: (? restrict empty)
+: void
+: 27
+Undefined symbol say on line 10 of test/b55.fxl
+: void
+Undefined symbol nl on line 11 of test/b55.fxl
+Undefined symbol put on line 11 of test/b55.fxl
+Undefined symbol say on line 11 of test/b55.fxl
+: void
+Hello
+: I
+Undefined symbol say on line 32 of test/b55.fxl
+: void
+Undefined symbol num_str on line 46 of test/b55.fxl
+: void
+Hello
+7
+Bye
+: I

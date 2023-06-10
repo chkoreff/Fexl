@@ -1,0 +1,107 @@
+# TODO Will need to change this because later will die on undefined symbol.
+
+\try=(\\exp put ": " show std exp nl)
+
+try restrict
+try (restrict (I 3))
+try (restrict (I empty))
+try (restrict (I empty) (I 3))
+try (restrict (I empty) (\; 27))
+(
+T
+(
+put
+~
+Undefined symbol say on line 10 of test/b55.fxl
+: void
+~
+);
+try (restrict (I empty) (\; say "HI"))
+)
+(
+T
+(
+put
+~
+Undefined symbol nl on line 11 of test/b55.fxl
+Undefined symbol put on line 11 of test/b55.fxl
+Undefined symbol say on line 11 of test/b55.fxl
+: void
+~
+);
+try (restrict empty (\; say "HI" put "BYE" nl))
+)
+
+try
+	(
+	restrict
+	(
+	set "say" say;
+	empty
+	)
+	\;
+	say "Hello"
+	)
+
+(
+T
+(
+put
+~
+Undefined symbol say on line 32 of test/b55.fxl
+: void
+~
+); # TODO
+try
+	(
+	restrict
+	(
+	set "SAY" say;
+	empty
+	)
+	\;
+	say "Hello"
+	)
+)
+
+(
+T
+(
+put
+~
+Undefined symbol num_str on line 46 of test/b55.fxl
+: void
+~
+); # TODO
+try
+	(
+	restrict
+	(
+	set "say" say;
+	set "put" put;
+	set "nl" nl;
+	empty
+	)
+	\;
+	say "Hello"
+	say (num_str 7)
+	put "Bye" nl
+	)
+)
+
+try
+	(
+	restrict
+	(
+	set "say" say;
+	set "put" put;
+	set "nl" nl;
+	set "num_str" num_str;
+	empty
+	)
+	\;
+	say "Hello"
+	say (num_str 7)
+	put "Bye" nl
+	)
+

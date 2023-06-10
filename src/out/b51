@@ -1,2 +1,2 @@
 (form "test/b51.fxl" (A (A (A (A "say" 2) (A T F)) I) (A I "hello")))
-Undefined symbol wilma on line 8 of test/b51.fxl
+Undefined symbol wilma on line 9 of test/b51.fxl

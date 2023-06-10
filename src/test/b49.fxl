@@ -1,65 +1,40 @@
 #
 \QU=~ "~
 
-(
-say "= Test resolve."
-
 \try=
-	(\sym
-	put "resolve " put QU put sym put QU nl
-	\\result=(resolve sym)
-	put "  = " show result nl
-	result
-		(say "  no")
-		(\val put "  yes " show val nl)
-	nl
-	)
-
-try (I "fred")
-try "32.8" # numbers are not defined by the context
-
-try (I "+")
-try (. "" "I")
-try (. "co" "ns")
-try "resolve"
-)
-
-(
-say "= Test enclose and restrict."
-
-\try=
-	(\sym
-	put "  resolve " put QU put sym put QU
+	(\cx\sym
+	put "get " put QU put sym put QU
 	put " = "
-	resolve sym
+	get sym cx
 		(say "no")
-		(\val put "(" put "yes " show val put ")" nl)
+		(\val put "(" put "yes " show cx val put ")" nl)
 	)
 
-say "before eval:"
-try "I"
-try "fred"
-\\x=
+try std (I "fred")
+try std "32.8" # numbers are not defined by the context
+
+try std (I "+")
+try std (. "" "I")
+try std (. "co" "ns")
+try std "get"
+
+try std "I"
+try std "fred"
+try empty "I"
+try std "fred"
+
+(
+\cx=
 	(
-	enclose;
-	say "Hello"
-	restrict
-
-	say "after restrict:"
-	try "I"
-	try "fred"
-
-	define "fred" 32
-	define "wilma" 64
-
-	say "after define:"
-	try "I"
-	try "fred"
-	37
+	set "fred" 32;
+	set "wilma" 64;
+	empty
 	)
 
-say "after eval:"
-try "I"
-try "fred"
-put "x = " show x nl
+try cx "I"
+try cx "fred"
+try cx "wilma"
 )
+
+try std "I"
+try std "fred"

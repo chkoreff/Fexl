@@ -1,7 +1,10 @@
-load "test/b44_1.fxl"
+read "test/b44_1.fxl"
 Hello
-exp = 3.14159265358979
+exp = pi
 
-load 3
+read 3
 exp = void
 
+: read
+: void
+: (form "test/b45_1.fxl" (A (A (A (A "barney" 5) (A (A F T) F)) (A (A (A "betty" 6) (A F T)) (A (A (A "fred" 3) (A (A (A (A F T) F) F) F)) (A (A (A "say" 2) (A (A (A (A (A T F) F) F) F) F)) (A (A (A "wilma" 4) (A (A (A F T) F) F)) I))))) (A (A (A (A (A I "Meet the Flintstones.") I) I) I) I)))

@@ -4,15 +4,28 @@
 \barney=(say "I am Barney.")
 \betty=(say "I am Betty.")
 
-define "fred" fred
-define "wilma" wilma
-define "barney" barney
-define "betty" betty
-
-load "test/b45_1.fxl"
+(
+restrict
+(
+set "fred" fred;
+set "wilma" wilma;
+set "barney" barney;
+set "betty" betty;
+std
+)
+;
+read "test/b45_1.fxl"
+)
 nl
 
-define "double" (* 2)
+(
+restrict
+(
+set "wilma" wilma;
+set "double" (* 2);
+std
+)
 \;
 wilma
 put "x = " say (num_str; double 32)
+)

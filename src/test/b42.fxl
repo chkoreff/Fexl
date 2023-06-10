@@ -1,5 +1,5 @@
 # Show some expressions.
-\try=(\x put ": " show x nl)
+\try=(\x put ": " show std x nl)
 
 try (\x 3)
 try (\x x)

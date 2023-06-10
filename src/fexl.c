@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <str.h>
+#include <str.h> // TODO
 #include <value.h>
 
 #include <context.h>
@@ -7,7 +7,6 @@
 #include <memory.h>
 #include <parse.h>
 #include <signal.h> // sigaction
-#include <type_str.h>
 
 static void die_perror(const char *msg)
 	{
@@ -67,7 +66,8 @@ int main(int argc, const char *argv[])
 	beg_signal();
 	beg_context();
 
-	drop(eval(load(Qstr0(name),fh)));
+	(void) type_form;// TODO
+	drop(eval(load(cx_std,name,fh)));
 
 	end_context();
 	end_signal();

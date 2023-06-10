@@ -36,7 +36,7 @@ if [ "$list" = "" ]; then
 	list="$list b21 b22 b23 b24 b25 b26 b27 b28 b29 b30"
 	list="$list b31 b32 b33 b34 b35 b36 b37 b38 b39 b40"
 	list="$list b41 b42 b43 b44 b45 b46 b47 b48 b49 b50"
-	list="$list b51 b52 b53"
+	list="$list b51 b52 b53 b54 b55 b56"
 fi
 
 do_check()

@@ -7,21 +7,50 @@
 #include <output.h>
 #include <parse.h>
 #include <type_num.h>
+#include <type_record.h>
 #include <type_str.h>
 #include <type_var.h>
 
 #include <show.h>
 
-// Find the name of atom f in context cx.
-static const char *atom_name(value f, value cx)
+static value cx_cur;
+
+// TODO possibly look up by value *first* before checking other things.
+
+static value find_value(value f)
 	{
-	while (cx->T == &type_A)
+	value cx = cx_cur;
+	while (cx->L)
 		{
 		if (f == cx->L->R)
-			return str_data(cx->L->L);
+			return cx->L->L;
 		cx = cx->R;
 		}
-	return "?";
+	return 0;
+	}
+
+// Find the name of atom f in the current context.
+static const char *atom_name(value f)
+	{
+	if (1)
+		{
+		value val = find_value(f);
+		if (val)
+			return str_data(val);
+		else
+			return "?";
+		}
+	else
+		{
+		value cx = cx_cur;
+		while (cx->L)
+			{
+			if (f == cx->L->R)
+				return str_data(cx->L->L);
+			cx = cx->R;
+			}
+		return "?";
+		}
 	}
 
 static void put_quote(string x)
@@ -30,6 +59,8 @@ static void put_quote(string x)
 	put_str(x);
 	put_ch('"');
 	}
+
+static void show(value f);
 
 void show_exp(const char *name, value f)
 	{
@@ -56,7 +87,42 @@ static void show_items(value f)
 		}
 	}
 
-void show(value f)
+static void show_record(value f)
+	{
+	if (f->L)
+		{
+		put_ch('(');
+		while (f->L)
+			{
+			put("set ");
+			put_quote(get_str(f->L->L));
+			put_ch(' ');
+			show(f->L->R);
+			put("; ");
+			f = f->R;
+			}
+		put("empty");
+		put_ch(')');
+		}
+	else
+		put("empty");
+	}
+
+static void show(value f)
+	{
+	// TODO
+	if (f->T == &type_null && f->L == 0)
+		{
+		put("[]");
+		}
+	else
+	{
+	value val = find_value(f);
+	if (val)
+		{
+		put(str_data(val));
+		}
+	else
 	{
 	if (f->T == &type_num)
 		put_double(f->v_double);
@@ -88,6 +154,8 @@ void show(value f)
 		show_exp("pair",f);
 	else if (f->T == &type_form)
 		show_exp("form",f);
+	else if (f->T == &type_record)
+		show_record(f);
 	else if (f->T == &type_var)
 		{
 		put("(var "); show(f->R); put(")");
@@ -95,10 +163,20 @@ void show(value f)
 	else if (f->L)
 		show_exp("?",f); // intermediate value
 	else
-		put(atom_name(f,cx_cur)); // atom
+		put(atom_name(f)); // atom
+	}
+	}
+	}
+
+void show_in(value cx, value f)
+	{
+	value save_cx_cur = cx_cur;
+	cx_cur = cx;
+	show(f);
+	cx_cur = save_cx_cur;
 	}
 
 void show_line(const char *name, value f)
 	{
-	put(name);show(f);nl();
+	put(name); show_in(cx_std,f); nl();
 	}

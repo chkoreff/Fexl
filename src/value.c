@@ -74,7 +74,7 @@ value step_A(value f)
 	{
 	value g = eval(hold(f->L));
 	value h = g->T->apply(g,hold(f->R));
-	drop(g);
+	drop(g); // TODO
 	drop(f);
 	return h;
 	}

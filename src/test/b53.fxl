@@ -1,7 +1,27 @@
-#
-loadf "test/b53_1.fxl" \demo
-define "fred" (say "I am Fred.")
+# TODO need "resolve" I guess
+\\demo=
+	(
+	#say "READ" # TODO
+	read "test/b53_1.fxl"
+	)
 
+\demo=
+	(
+	restrict
+		(
+		#say "RESOLVE" # TODO
+		set "fred" (say "I am Fred.");
+		empty
+		)
+		demo
+	)
+
+restrict
+(
+set "demo" demo;
+std
+)
+\;
 say "BEG"
 demo
 demo

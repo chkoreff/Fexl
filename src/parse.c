@@ -4,13 +4,16 @@
 #include <value.h>
 
 #include <basic.h>
-#include <context.h>
+#include <context.h> // TODO
 #include <die.h>
 #include <stdio.h>
 #include <stream.h>
-#include <string.h> // strcmp
+#include <string.h> // strcmp TODO
 #include <type_num.h>
 #include <type_str.h>
+#include <type_record.h>
+
+#include <show.h> // TODO
 
 #include <parse.h>
 
@@ -273,7 +276,7 @@ static string parse_name(void)
 
 value find_item(string name, value cx)
 	{
-	while (cx->T == &type_A)
+	while (cx->L)
 		{
 		if (str_eq(name, cx->L->L->v_ptr))
 			return hold(cx->L->R);
@@ -338,7 +341,7 @@ static value find_pattern(const char *key, value map)
 	{
 	while (map->T == &type_A)
 		{
-		int cmp = strcmp(key, str_data(map->L->L->L));
+		int cmp = strcmp(key, str_data(map->L->L->L)); // TODO str_cmp
 		if (cmp < 0)
 			break;
 		if (cmp == 0)
@@ -408,52 +411,7 @@ static value parse_lambda(unsigned long first_line, type type)
 	}
 	}
 
-// Resolve all external symbols in an expression using the current context.
-
-static value resolve_exp(value label, value exp)
-	{
-	value body = hold(exp->R);
-	value map = exp->L;
-	int has_undef = 0;
-
-	while (map->T == &type_A)
-		{
-		value item = map->L;
-		value sym = item->L;
-		string name = sym->L->v_ptr;
-		value def = find_item(name,cx_cur);
-
-		if (def == 0)
-			{
-			undefined_symbol(name->data, sym->R->v_double, str_data(label));
-			has_undef = 1;
-			}
-		else
-			{
-			value new = subst(item->R,body,def);
-			drop(def);
-			drop(body);
-			body = new;
-			}
-		map = map->R;
-		}
-
-	if (has_undef)
-		die(0); // Has undefined symbols
-
-	drop(label);
-	drop(exp);
-	return body;
-	}
-
-static value step_form(value f)
-	{
-	value g = resolve_exp(hold(f->L), hold(f->R));
-	drop(f);
-	return g;
-	}
-
-struct type type_form = { step_form, 0, clear_A };
+struct type type_form = { 0, apply_void, clear_A };
 
 static value parse_form(void)
 	{
@@ -576,7 +534,7 @@ FILE *open_source(const char *name)
 	return fh;
 	}
 
-static value parse_fexl_fh(value label, FILE *fh)
+value parse_fexl_fh(value label, FILE *fh)
 	{
 	cur_fh = fh;
 	{
@@ -587,12 +545,106 @@ static value parse_fexl_fh(value label, FILE *fh)
 	}
 	}
 
-value load(value label, FILE *fh)
+static value do_restrict(value cx, value form)
 	{
-	return resolve_exp(label, parse_fexl_fh(label,fh));
+	value label = form->L;
+	value exp = form->R;
+	value map = exp->L;
+	value body = hold(exp->R);
+	int has_undef = 0;
+
+	while (map->T == &type_A)
+		{
+		if (cx->L == 0)
+			{
+			value sym = map->L->L->L;
+			unsigned long line = map->L->L->R->v_double;
+			undefined_symbol(str_data(sym),line,str_data(label)); // TODO
+			has_undef = 1;
+			map = map->R;
+			}
+		else
+			{
+			value key = cx->L->L;
+			value sym = map->L->L->L;
+			int cmp = str_cmp(key->v_ptr,sym->v_ptr);
+
+			if (cmp < 0)
+				cx = cx->R;
+			else if (cmp == 0)
+				{
+				value val = cx->L->R;
+				value pattern = map->L->R;
+				value new = subst(pattern,body,val);
+				drop(body);
+				body = new;
+				cx = cx->R;
+				map = map->R;
+				}
+			else
+				{
+				unsigned long line = map->L->L->R->v_double;
+				undefined_symbol(str_data(sym),line,str_data(label));
+				has_undef = 1;
+				map = map->R;
+				}
+			}
+		}
+	if (has_undef)
+		{
+		if (0) // TODO
+			{
+			drop(body);
+			body = hold(Qvoid);
+			}
+		else
+			die(0);
+		}
+
+	drop(form);
+	return body;
 	}
 
-value loadf(value label, FILE *fh)
+static value apply_restrict(value f, value x)
 	{
-	return single(V(&type_form,label,parse_fexl_fh(label,fh)));
+	if (f->L == 0)
+		{
+		x = eval(x);
+		if (x->T == &type_record)
+			return V(f->T,hold(f),x);
+		else
+			{
+			drop(x);
+			return hold(Qvoid);
+			}
+		}
+	else
+		{
+		x = eval(x);
+		if (x->T == &type_form)
+			return do_restrict(f->R, x);
+		else
+			{
+			drop(x);
+			return hold(Qvoid);
+			}
+		}
+	}
+
+static struct type type_restrict = { 0, apply_restrict, clear_T };
+
+void use_parse(void) // TODO don't like this here
+	{
+	define("restrict",Q(&type_restrict,0));
+	}
+
+value load(value cx, const char *name, FILE *fh) // TODO
+	{
+	value label = Qstr0(name);
+	value exp = parse_fexl_fh(label,fh);
+	value form = V(&type_form,label,exp);
+	//return A(A(Q(&type_restrict,0),hold(cx)),form); // TODO
+	value result = do_restrict(cx,form);
+	//show_line("result = ",result);
+	return result;
 	}

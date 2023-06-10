@@ -7,7 +7,11 @@
 #include <memory.h>
 #include <parse.h>
 #include <show.h>
+#include <type_record.h>
 #include <type_str.h>
+
+#include <die.h> // TODO
+#include <output.h> // TODO
 
 #include <type_meta.h>
 
@@ -49,23 +53,39 @@ static struct type type_benchmark = { 0, apply_benchmark, no_clear };
 
 static value apply_show(value f, value x)
 	{
-	(void)f;
-	show(x);
-	drop(x);
-	return hold(QI);
+	if (f->L == 0)
+		{
+		x = eval(x);
+		if (x->T == &type_record)
+			return V(f->T,hold(f),x);
+		else
+			{
+			drop(x);
+			return hold(Qvoid);
+			}
+		}
+	else
+		{
+		show_in(f->R,x);
+		drop(x);
+		return hold(QI);
+		}
 	}
 
-static struct type type_show = { 0, apply_show, no_clear };
+static struct type type_show = { 0, apply_show, clear_T };
 
-static value apply_load(value f, value x)
+static value apply_read(value f, value x)
 	{
+	(void)f;
 	x = eval(x);
 	if (x->T == &type_str)
 		{
 		const char *name = str_data(x);
 		FILE *fh = open_source(name);
-		value (*op)(value,FILE *) = f->v_ptr;
-		return op(x,fh);
+		value exp = parse_fexl_fh(x,fh);
+		exp = V(&type_form,hold(x),exp);
+		drop(x);
+		return exp;
 		}
 	else
 		{
@@ -74,7 +94,7 @@ static value apply_load(value f, value x)
 		}
 	}
 
-static struct type type_load = { 0, apply_load, no_clear };
+static struct type type_read = { 0, apply_read, no_clear }; // TODO move to parse
 
 void use_meta(void)
 	{
@@ -83,6 +103,5 @@ void use_meta(void)
 	define("show_benchmark", Q(&type_benchmark,stdout));
 	define("trace_benchmark", Q(&type_benchmark,stderr));
 	define("show", Q(&type_show,0));
-	define("load", Q(&type_load,load));
-	define("loadf", Q(&type_load,loadf));
+	define("read", Q(&type_read,0));
 	}

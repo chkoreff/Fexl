@@ -1,4 +1,5 @@
 # Test tuples
+\show=(show std)
 
 (
 say "= test_8501"

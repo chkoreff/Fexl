@@ -1,4 +1,4 @@
 # Test missing file
 say "BEG"
-load "missing"
+\\exp=(read "missing")
 say "END"

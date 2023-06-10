@@ -1,0 +1,152 @@
+# Test records
+\try=(\\exp put ": " show std exp nl)
+
+try empty
+try (set (I "x"))
+try (set (I 3))
+try (set (I "x") (say "HI"))
+try (set (I "x") (say "HI"); I 3)
+try (set (I "x") (say "HI"); I empty)
+try
+	(
+	set "x" 1;
+	set "y" 2;
+	empty
+	)
+try
+	(
+	set "y" 2;
+	set "x" 1;
+	empty
+	)
+
+try
+	(
+	set "x" 1;
+	set "x" 2;
+	empty
+	)
+
+try
+	(
+	set "a" "0970";
+	set "d" "7631";
+	set "c" "0653";
+	set "b" "1500";
+	set "f" "2534";
+	set "d" "6258";
+	set "a" "1549";
+	set "e" "1551";
+	empty
+	)
+
+try
+	(
+	set "say" say;
+	set "+" +;
+	set "nl" nl;
+	set "put" put;
+	set "num_str" num_str;
+	empty
+	)
+
+# Test chain operator.
+try ::
+try (:: (I empty))
+try (:: (I 3))
+try (:: (I empty) (I 3))
+try (:: (I empty) (I; set "a" "3549"; empty))
+
+try
+	(
+	::
+		(
+		set "a" "3549";
+		empty
+		)
+		empty
+	)
+
+try
+	(
+	::
+		(
+		set "a" "3549";
+		empty
+		)
+		(
+		set "b" "3160";
+		empty
+		)
+	)
+
+try
+	(
+	::
+		(
+		set "a" "3549";
+		empty
+		)
+		(
+		set "a" "3160";
+		empty
+		)
+	)
+
+try
+	(
+	::
+		(
+		set "b" "3160";
+		empty
+		)
+		(
+		set "a" "3549";
+		empty
+		)
+	)
+
+try
+	(
+	::
+		(
+		set "x" "0205";
+		set "e" "7709";
+		set "c" "2609";
+		set "aa" "0853";
+		set "x" "2380";
+		empty
+		)
+		(
+		set "a" "0970";
+		set "d" "7631";
+		set "c" "0653";
+		set "b" "1500";
+		set "f" "2534";
+		set "d" "6258";
+		set "a" "1549";
+		set "e" "1551";
+		empty
+		)
+	)
+
+# Test get
+(
+\\obj=
+	(
+	set "a" 1;
+	set "b" 2;
+	empty
+	)
+
+try get
+try (get (I "a"))
+try (get 3)
+try (get (I "a") 3)
+try (get (I "a") (I obj))
+try (get "a" obj "NO" \val ["YES" val])
+try (get "b" obj "NO" \val ["YES" val])
+try (get "c" obj "NO" \val ["YES" val])
+try (get "a" empty "NO" \val ["YES" val])
+try (get "c" (set "c" 3; obj) "NO" \val ["YES" val])
+)
