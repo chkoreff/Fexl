@@ -1,7 +1,6 @@
 extern value QI;
 extern value QT;
 extern value QF;
-extern value QY;
 extern value Qvoid;
 extern value Qnull;
 extern void clear_T(value f);

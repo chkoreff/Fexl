@@ -6,7 +6,6 @@
 value QI;
 value QT;
 value QF;
-value QY;
 value Qvoid;
 value Qnull;
 
@@ -213,7 +212,6 @@ void beg_basic(void)
 	QI = Q(&type_I,0);
 	QT = Q(&type_T,0);
 	QF = Q(&type_F,0);
-	QY = Q(&type_Y,0);
 	Qvoid = Q(&type_void,0);
 	Qnull = Q(&type_null,0);
 	}
@@ -237,7 +235,6 @@ void end_basic(void)
 	drop(QI);
 	drop(QT);
 	drop(QF);
-	drop(QY);
 	drop(Qvoid);
 	drop(Qnull);
 	}
