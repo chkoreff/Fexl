@@ -3,7 +3,6 @@
 
 #include <basic.h>
 #include <convert.h>
-#include <die.h>
 #include <input.h>
 #include <memory.h>
 #include <type_num.h>
