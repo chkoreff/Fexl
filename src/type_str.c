@@ -15,7 +15,7 @@ string get_str(value x)
 
 value type_str(value f)
 	{
-	return type_atom(f);
+	return type_data(f);
 	}
 
 static void clear_str(value f)
@@ -25,8 +25,8 @@ static void clear_str(value f)
 
 value Qstr(string x)
 	{
-	static struct value atom = {{.N=0}, {.clear=clear_str}};
-	return V(type_str,&atom,(value)x);
+	static struct value clear = {{.N=0}, {.clear=clear_str}};
+	return V(type_str,&clear,(value)x);
 	}
 
 value Qstr0(const char *data)

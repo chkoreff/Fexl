@@ -23,7 +23,7 @@ value Qstderr;
 
 value type_file(value f)
 	{
-	return type_atom(f);
+	return type_data(f);
 	}
 
 /* Automatically close the file handle unless it's stdin, stdout, or stderr.
@@ -42,8 +42,8 @@ static void clear_file(value f)
 
 value Qfile(FILE *fh)
 	{
-	static struct value atom = {{.N=0}, {.clear=clear_file}};
-	return V(type_file,&atom,(value)fh);
+	static struct value clear = {{.N=0}, {.clear=clear_file}};
+	return V(type_file,&clear,(value)fh);
 	}
 
 FILE *get_fh(value x)

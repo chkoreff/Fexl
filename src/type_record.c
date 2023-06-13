@@ -67,8 +67,8 @@ value type_record(value f)
 
 static value Qrecord(struct record *rec)
 	{
-	static struct value atom = {{.N=0}, {.clear=clear_record}};
-	return V(type_record,&atom,(value)rec);
+	static struct value clear = {{.N=0}, {.clear=clear_record}};
+	return V(type_record,&clear,(value)rec);
 	}
 
 static struct record *new_record(unsigned long count, unsigned long extra)

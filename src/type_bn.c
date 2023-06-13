@@ -18,7 +18,7 @@ struct bn *get_bn(value x)
 
 value type_bn(value f)
 	{
-	return type_atom(f);
+	return type_data(f);
 	}
 
 static void clear_bn(value f)
@@ -28,8 +28,8 @@ static void clear_bn(value f)
 
 value Qbn(struct bn *x)
 	{
-	static struct value atom = {{.N=0}, {.clear=clear_bn}};
-	return V(type_bn,&atom,(value)x);
+	static struct value clear = {{.N=0}, {.clear=clear_bn}};
+	return V(type_bn,&clear,(value)x);
 	}
 
 static value op_pred(value f, int op(const struct bn *x))

@@ -42,15 +42,15 @@ static void clear_form(value f)
 
 value type_form(value f)
 	{
-	return type_atom(f);
+	return type_data(f);
 	}
 
 value Qform(struct form form)
 	{
-	static struct value atom = {{.N=0}, {.clear=clear_form}};
+	static struct value clear = {{.N=0}, {.clear=clear_form}};
 	struct form *p = new_memory(sizeof(struct form));
 	*p = form;
-	return V(type_form,&atom,(value)p);
+	return V(type_form,&clear,(value)p);
 	}
 
 struct form form_null(void)
@@ -232,8 +232,8 @@ static void clear_pattern(value f)
 
 static value wrap_pattern(value pattern)
 	{
-	static struct value atom = {{.N=0}, {.clear=clear_pattern}};
-	return V(type_pattern,&atom,pattern);
+	static struct value clear = {{.N=0}, {.clear=clear_pattern}};
+	return V(type_pattern,&clear,pattern);
 	}
 
 // Abstract the name from the body.

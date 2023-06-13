@@ -8,7 +8,7 @@
 
 value type_lib(value f)
 	{
-	return type_atom(f);
+	return type_data(f);
 	}
 
 static void clear_lib(value f)
@@ -18,8 +18,8 @@ static void clear_lib(value f)
 
 value Qlib(void *lib)
 	{
-	static struct value atom = {{.N=0}, {.clear=clear_lib}};
-	return V(type_lib,&atom,(value)lib);
+	static struct value clear = {{.N=0}, {.clear=clear_lib}};
+	return V(type_lib,&clear,(value)lib);
 	}
 
 /* (dlopen name) Open the named library, or return void if not successful.  */

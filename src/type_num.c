@@ -16,13 +16,13 @@ static void clear_num(value f)
 
 value type_num(value f)
 	{
-	return type_atom(f);
+	return type_data(f);
 	}
 
 value Qnum(double x)
 	{
-	static struct value atom = {{.N=0}, {.clear=clear_num}};
-	return V_double(type_num,&atom,x);
+	static struct value clear = {{.N=0}, {.clear=clear_num}};
+	return Qdouble(type_num,&clear,x);
 	}
 
 value Qnum_str0(const char *name)

@@ -28,8 +28,8 @@ static void clear_istr(value f)
 
 value Qistr(value x)
 	{
-	static struct value atom = {{.N=0}, {.clear=clear_istr}};
-	return V(type_istr,&atom,(value)istr_new(x));
+	static struct value clear = {{.N=0}, {.clear=clear_istr}};
+	return V(type_istr,&clear,(value)istr_new(x));
 	}
 
 int sgetc(struct istr *in)
@@ -51,7 +51,7 @@ struct istr *get_istr(value x)
 
 value type_istr(value f)
 	{
-	return type_atom(f);
+	return type_data(f);
 	}
 
 /* (readstr str) returns an iterator on the string. */

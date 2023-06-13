@@ -42,7 +42,7 @@ value type_Y(value f)
 	return AV(arg(f->R),hold(f));
 	}
 
-value type_atom(value f)
+value type_data(value f)
 	{
 	if (!f->L->N) return 0;
 	return hold(Qvoid);
