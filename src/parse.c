@@ -46,8 +46,8 @@ string  =>  tilde_string
 The parser reads an expression from the input until it reaches end of file or
 the special token "\\" which acts like end of file.  It skips white space and
 comments which appear before syntactic elements.  White space is any character
-with an ASCII value less than ' ' (SPACE).  A comment starts with '#' and
-continues through end of line.
+with an ASCII value less than or equal to ' ' (SPACE).  A comment starts with
+'#' and continues through end of line.
 
 The "empty" element means end of file.
 
