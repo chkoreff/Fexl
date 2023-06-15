@@ -37,19 +37,11 @@ static void define_num_num(const char *name, double op(double))
 
 static value apply_num_num_num(value f, value x)
 	{
-	x = eval(x);
 	if (f->L == 0)
-		{
-		if (x->T == &type_num)
-			return V(f->T,hold(f),x);
-		else
-			{
-			drop(x);
-			return hold(Qvoid);
-			}
-		}
+		return need(f,x,&type_num);
 	else
 		{
+		x = eval(x);
 		if (x->T == &type_num)
 			{
 			double (*op)(double,double) = f->L->v_ptr;

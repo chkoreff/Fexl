@@ -36,19 +36,11 @@ value Qstr0(const char *data)
 
 static value apply_str_str_str(value f, value x)
 	{
-	x = eval(x);
 	if (f->L == 0)
-		{
-		if (x->T == &type_str)
-			return V(f->T,hold(f),x);
-		else
-			{
-			drop(x);
-			return hold(Qvoid);
-			}
-		}
+		return need(f,x,&type_str);
 	else
 		{
+		x = eval(x);
 		if (x->T == &type_str)
 			{
 			string (*op)(string,string) = f->L->v_ptr;

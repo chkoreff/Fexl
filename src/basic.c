@@ -9,6 +9,23 @@ value QF;
 value Qvoid;
 value Qnull;
 
+value keep(value f, value x)
+	{
+	return V(f->T,hold(f),x);
+	}
+
+value need(value f, value x, type T)
+	{
+	x = eval(x);
+	if (x->T == T)
+		return keep(f,x);
+	else
+		{
+		drop(x);
+		return hold(Qvoid);
+		}
+	}
+
 // (I x) = x
 static value apply_I(value f, value x)
 	{
@@ -22,7 +39,7 @@ static struct type type_I = { 0, apply_I, no_clear };
 static value apply_T(value f, value x)
 	{
 	if (f->L == 0)
-		return V(f->T,hold(f),x);
+		return keep(f,x);
 	else
 		{
 		drop(x);
@@ -149,7 +166,7 @@ struct type type_list = { 0, apply_list, clear_A };
 static value apply_cons(value f, value x)
 	{
 	if (f->L == 0)
-		return V(f->T,hold(f),x);
+		return keep(f,x);
 	else
 		return V(&type_list,hold(f->R),x);
 	}

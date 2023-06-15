@@ -54,16 +54,7 @@ static struct type type_benchmark = { 0, apply_benchmark, no_clear };
 static value apply_show(value f, value x)
 	{
 	if (f->L == 0)
-		{
-		x = eval(x);
-		if (x->T == &type_record)
-			return V(f->T,hold(f),x);
-		else
-			{
-			drop(x);
-			return hold(Qvoid);
-			}
-		}
+		return need(f,x,&type_record);
 	else
 		{
 		show_in(f->R,x);

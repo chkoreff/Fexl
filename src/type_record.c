@@ -15,7 +15,7 @@
 
 struct type type_record = { 0, apply_void, clear_T };
 
-value set(value key, value val, value obj) // TODO
+value set(value key, value val, value obj)
 	{
 	if (obj->L == 0)
 		return V(&type_record,A(key,val),obj);
@@ -43,18 +43,9 @@ value set(value key, value val, value obj) // TODO
 static value apply_set(value f, value x)
 	{
 	if (f->L == 0)
-		{
-		x = eval(x);
-		if (x->T == &type_str)
-			return V(f->T,hold(f),x);
-		else
-			{
-			drop(x);
-			return hold(Qvoid);
-			}
-		}
+		return need(f,x,&type_str);
 	else if (f->L->L == 0)
-		return V(f->T,hold(f),x);
+		return keep(f,x);
 	else
 		{
 		x = eval(x);
@@ -73,16 +64,7 @@ static struct type type_set = { 0, apply_set, clear_T };
 static value apply_get(value f, value x)
 	{
 	if (f->L == 0)
-		{
-		x = eval(x);
-		if (x->T == &type_str)
-			return V(f->T,hold(f),x);
-		else
-			{
-			drop(x);
-			return hold(Qvoid);
-			}
-		}
+		return need(f,x,&type_str);
 	else
 		{
 		x = eval(x);
@@ -147,16 +129,7 @@ static value chain(value new, value old)
 static value apply_chain(value f, value x)
 	{
 	if (f->L == 0)
-		{
-		x = eval(x);
-		if (x->T == &type_record)
-			return V(f->T,hold(f),x);
-		else
-			{
-			drop(x);
-			return hold(Qvoid);
-			}
-		}
+		return need(f,x,&type_record);
 	else
 		{
 		x = eval(x);

@@ -3,6 +3,8 @@ extern value QT;
 extern value QF;
 extern value Qvoid;
 extern value Qnull;
+extern value keep(value f, value x);
+extern value need(value f, value x, type T);
 extern void clear_T(value f);
 extern value apply_void(value f, value x);
 extern value subst(value p, value e, value x);

@@ -35,7 +35,7 @@ void beg_context(void)
 	{
 	beg_basic();
 
-	cx_std = V(&type_record,0,0); // empty stack // TODO Qempty
+	cx_std = Q(&type_record,0); // empty stack
 
 	use_basic();
 	use_num();

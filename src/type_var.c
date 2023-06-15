@@ -25,20 +25,12 @@ static value op_var_new(void)
 
 static value apply_var_put(value f, value x)
 	{
-	x = eval(x);
 	if (f->L == 0)
-		{
-		if (x->T == &type_var)
-			return V(f->T,hold(f),x);
-		else
-			{
-			drop(x);
-			return hold(Qvoid);
-			}
-		}
+		return need(f,x,&type_var);
 	else
 		{
 		value v = f->R;
+		x = eval(x);
 		drop(v->R);
 		v->R = x;
 		return hold(QI);

@@ -608,16 +608,7 @@ static value do_restrict(value cx, value form)
 static value apply_restrict(value f, value x)
 	{
 	if (f->L == 0)
-		{
-		x = eval(x);
-		if (x->T == &type_record)
-			return V(f->T,hold(f),x);
-		else
-			{
-			drop(x);
-			return hold(Qvoid);
-			}
-		}
+		return need(f,x,&type_record);
 	else
 		{
 		x = eval(x);
