@@ -1,11 +1,8 @@
 #include <str.h>
 #include <value.h>
 
-#include <stdio.h> // TODO
-
 #include <basic.h>
 #include <context.h>
-#include <parse.h> // TODO find_item
 #include <type_str.h>
 
 #include <type_record.h>
@@ -62,6 +59,20 @@ value type_set(value fun, value arg)
 		}
 	}
 
+value get(string name, value obj)
+	{
+	while (obj->L)
+		{
+		int cmp = str_cmp(name, obj->L->L->v_ptr);
+		if (cmp < 0)
+			break;
+		if (cmp == 0)
+			return hold(obj->L->R);
+		obj = obj->R;
+		}
+	return 0;
+	}
+
 value type_get(value fun, value arg)
 	{
 	if (fun->L == 0)
@@ -71,8 +82,7 @@ value type_get(value fun, value arg)
 		arg = eval(arg);
 		if (arg->T == type_record)
 			{
-			// TODO Need to use the ordering property!
-			value g = maybe(find_item(fun->R->v_ptr,arg));
+			value g = maybe(get(fun->R->v_ptr,arg));
 			drop(fun);
 			drop(arg);
 			return g;

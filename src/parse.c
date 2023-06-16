@@ -4,16 +4,13 @@
 #include <value.h>
 
 #include <basic.h>
-#include <context.h> // TODO
+#include <context.h>
 #include <die.h>
 #include <stdio.h>
 #include <stream.h>
-#include <string.h> // strcmp TODO
 #include <type_num.h>
 #include <type_str.h>
 #include <type_record.h>
-
-#include <show.h> // TODO
 
 #include <parse.h>
 
@@ -142,27 +139,11 @@ static value tuple(value exp)
 	return appv(type_tuple,pre(hold(QI)),exp);
 	}
 
-static void put_error_location(unsigned long line, const char *label)
-	{
-	fprintf(stderr," on line %lu", line);
-	if (label[0])
-		fprintf(stderr," of %s\n", label);
-	else
-		fprintf(stderr,"\n");
-	}
-
 static void syntax_error(const char *code, unsigned long line)
 	{
 	fprintf(stderr,"%s",code);
 	put_error_location(line,str_data(cur_label));
 	die(0);
-	}
-
-static void undefined_symbol(const char *name, unsigned long line,
-	const char *label)
-	{
-	fprintf(stderr,"Undefined symbol %s",name);
-	put_error_location(line,label);
 	}
 
 static value parse_term(void);
@@ -274,7 +255,8 @@ static string parse_name(void)
 	return buf_clear(&buf);
 	}
 
-value find_item(string name, value cx)
+// Search for name in unordered list.
+static value find_item(string name, value cx)
 	{
 	while (cx->L)
 		{
@@ -337,18 +319,25 @@ static value parse_def(void)
 	return def;
 	}
 
-static value find_pattern(const char *key, value map)
+// TODO change map structure and use "get" from type_record.
+static value get_map(string name, value obj)
 	{
-	while (map->T == 0)
+	while (obj->T == 0)
 		{
-		int cmp = strcmp(key, str_data(map->L->L->L)); // TODO str_cmp
+		int cmp = str_cmp(name,obj->L->L->L->v_ptr);
 		if (cmp < 0)
 			break;
 		if (cmp == 0)
-			return map->L->R;
-		map = map->R;
+			return hold(obj->L->R);
+		obj = obj->R;
 		}
-	return QF;
+	return 0;
+	}
+
+static value find_pattern(string name, value map)
+	{
+	value pattern = get_map(name,map);
+	return pattern ? pattern : hold(QF);
 	}
 
 // Pop the pattern out of the map, returning a new map with QF on the left of
@@ -371,9 +360,9 @@ static value pop_lam(value pattern, value map)
 
 static value abstract(string name, value exp, type type)
 	{
-	value pattern = find_pattern(name->data,exp->L);
+	value pattern = find_pattern(name,exp->L);
 	value map = pop_lam(pattern,exp->L);
-	value body = V(type,hold(pattern),hold(exp->R));
+	value body = V(type,pattern,hold(exp->R));
 	drop(exp);
 	return A(map,body);
 	}
@@ -409,11 +398,6 @@ static value parse_lambda(unsigned long first_line, type type)
 
 	return exp;
 	}
-	}
-
-value type_form(value fun, value arg)
-	{
-	return type_void(fun,arg);
 	}
 
 static value parse_form(void)
@@ -537,104 +521,13 @@ FILE *open_source(const char *name)
 	return fh;
 	}
 
-value parse_fexl_fh(value label, FILE *fh)
+value parse_fh(value label, FILE *fh)
 	{
 	cur_fh = fh;
 	{
 	value exp = parse_fexl(label,get_fh);
 	fclose(fh);
 	cur_fh = 0;
-	return exp;
+	return V(type_form,label,exp);
 	}
-	}
-
-static value do_restrict(value cx, value form)
-	{
-	value label = form->L;
-	value exp = form->R;
-	value map = exp->L;
-	value body = hold(exp->R);
-	int has_undef = 0;
-
-	while (map->T == 0)
-		{
-		if (cx->L == 0)
-			{
-			value sym = map->L->L->L;
-			unsigned long line = map->L->L->R->v_double;
-			undefined_symbol(str_data(sym),line,str_data(label)); // TODO
-			has_undef = 1;
-			map = map->R;
-			}
-		else
-			{
-			value key = cx->L->L;
-			value sym = map->L->L->L;
-			int cmp = str_cmp(key->v_ptr,sym->v_ptr);
-
-			if (cmp < 0)
-				cx = cx->R;
-			else if (cmp == 0)
-				{
-				value val = cx->L->R;
-				value pattern = map->L->R;
-				value new = subst(pattern,body,val);
-				drop(body);
-				body = new;
-				cx = cx->R;
-				map = map->R;
-				}
-			else
-				{
-				unsigned long line = map->L->L->R->v_double;
-				undefined_symbol(str_data(sym),line,str_data(label));
-				has_undef = 1;
-				map = map->R;
-				}
-			}
-		}
-	if (has_undef)
-		{
-		if (0) // TODO
-			{
-			drop(body);
-			body = hold(Qvoid);
-			}
-		else
-			die(0);
-		}
-
-	drop(form);
-	return body;
-	}
-
-value type_restrict(value fun, value arg)
-	{
-	if (fun->L == 0)
-		return need(fun,arg,type_record);
-	else
-		{
-		arg = eval(arg);
-		if (arg->T == type_form)
-			{
-			value exp = do_restrict(fun->R, arg);
-			drop(fun);
-			return exp;
-			}
-		else
-			return type_void(fun,arg);
-		}
-	}
-
-void use_parse(void) // TODO don't like this here
-	{
-	define("restrict",Q(type_restrict));
-	}
-
-value load(value cx, const char *name, FILE *fh) // TODO
-	{
-	value label = Qstr0(name);
-	value exp = parse_fexl_fh(label,fh);
-	value form = V(type_form,label,exp);
-	return A(A(Q(type_restrict),hold(cx)),form);
 	}

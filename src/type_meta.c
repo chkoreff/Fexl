@@ -56,10 +56,8 @@ value type_read(value fun, value arg)
 		{
 		const char *name = str_data(arg);
 		FILE *fh = open_source(name);
-		value exp = parse_fexl_fh(arg,fh);
-		exp = V(type_form,hold(arg),exp);
+		value exp = parse_fh(arg,fh);
 		drop(fun);
-		drop(arg);
 		return exp;
 		}
 	else

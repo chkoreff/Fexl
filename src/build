@@ -11,6 +11,7 @@ make limit
 make memory
 make output
 make parse
+make run
 make show
 make str
 make stream
