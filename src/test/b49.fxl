@@ -7,7 +7,7 @@
 	put " = "
 	get sym cx
 		(say "no")
-		(\val put "(" put "yes " show cx val put ")" nl)
+		(\val put "(" put "yes " show val put ")" nl)
 	)
 
 try std (I "fred")

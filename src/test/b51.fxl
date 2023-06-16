@@ -1,5 +1,5 @@
 #
-show std (\; say "hello") nl
+show (\; say "hello") nl
 restrict
 (
 set "double" (* 2);

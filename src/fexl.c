@@ -66,7 +66,6 @@ int main(int argc, const char *argv[])
 	beg_signal();
 	beg_context();
 
-	(void) type_form;// TODO
 	drop(eval(load(cx_std,name,fh)));
 
 	end_context();

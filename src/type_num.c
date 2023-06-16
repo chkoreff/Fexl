@@ -9,11 +9,20 @@
 
 #include <type_num.h>
 
-struct type type_num = { 0, apply_void, no_clear };
+static void clear_num(value f)
+	{
+	(void)f;
+	}
+
+value type_num(value fun, value arg)
+	{
+	return type_void(fun,arg);
+	}
 
 value Qnum(double x)
 	{
-	return Qdouble(&type_num,x);
+	static struct value clear = {{.N=0}, {.clear=clear_num}};
+	return Qdouble(type_num,&clear,x);
 	}
 
 value Qnum_str0(const char *name)
@@ -33,25 +42,21 @@ unsigned long get_ulong(value x)
 	return n >= 0 ? n : 0;
 	}
 
-static value apply_num_str(value f, value x)
+value type_num_str(value fun, value arg)
 	{
-	x = eval(x);
-	if (x->T == &type_num)
+	arg = eval(arg);
+	if (arg->T == type_num)
 		{
-		f = Qstr(str_new_data0(format_double(x->v_double)));
-		drop(x);
-		return f;
+		double x = arg->v_double;
+		drop(fun);
+		drop(arg);
+		return Qstr(str_new_data0(format_double(x)));
 		}
 	else
-		{
-		drop(x);
-		return hold(Qvoid);
-		}
+		return type_void(fun,arg);
 	}
-
-static struct type type_num_str = { 0, apply_num_str, no_clear };
 
 void use_num(void)
 	{
-	define("num_str", Q(&type_num_str,0));
+	define("num_str", Q(type_num_str));
 	}

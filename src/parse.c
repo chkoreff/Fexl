@@ -88,16 +88,16 @@ static value ref(value name, unsigned long line)
 static value merge(value fun, value arg)
 	{
 	int cmp;
-	if (fun->T == &type_A)
+	if (fun->T == 0)
 		{
-		if (arg->T == &type_A)
+		if (arg->T == 0)
 			cmp = str_cmp(fun->L->L->L->v_ptr, arg->L->L->L->v_ptr);
 		else
 			cmp = -1;
 		}
 	else
 		{
-		if (arg->T != &type_A)
+		if (arg->T != 0)
 			return hold(arg);
 		cmp = 1;
 		}
@@ -129,17 +129,17 @@ static value appv(type t, value fun, value arg)
 
 static value app(value fun, value arg)
 	{
-	return appv(&type_A,fun,arg);
+	return appv(0,fun,arg);
 	}
 
 static value cons(value fun, value arg)
 	{
-	return appv(&type_list,fun,arg);
+	return appv(type_list,fun,arg);
 	}
 
 static value tuple(value exp)
 	{
-	return appv(&type_tuple,pre(hold(QI)),exp);
+	return appv(type_tuple,pre(hold(QI)),exp);
 	}
 
 static void put_error_location(unsigned long line, const char *label)
@@ -339,7 +339,7 @@ static value parse_def(void)
 
 static value find_pattern(const char *key, value map)
 	{
-	while (map->T == &type_A)
+	while (map->T == 0)
 		{
 		int cmp = strcmp(key, str_data(map->L->L->L)); // TODO str_cmp
 		if (cmp < 0)
@@ -355,7 +355,7 @@ static value find_pattern(const char *key, value map)
 // each pattern.
 static value pop_lam(value pattern, value map)
 	{
-	if (map->T == &type_A)
+	if (map->T == 0)
 		{
 		value item = map->L;
 		value tail = pop_lam(pattern,map->R);
@@ -411,11 +411,14 @@ static value parse_lambda(unsigned long first_line, type type)
 	}
 	}
 
-struct type type_form = { 0, apply_void, clear_A };
+value type_form(value fun, value arg)
+	{
+	return type_void(fun,arg);
+	}
 
 static value parse_form(void)
 	{
-	return pre(V(&type_form,hold(cur_label),parse_scope(hold(QI))));
+	return pre(V(type_form,hold(cur_label),parse_scope(hold(QI))));
 	}
 
 // Parse the next factor of an expression, if any.
@@ -440,11 +443,11 @@ static value parse_factor(void)
 			}
 		else
 			{
-			type type = &type_D; // direct
+			type type = type_D; // direct
 			if (cur_ch == '\\')
 				{
 				skip();
-				type = &type_E; // eager
+				type = type_E; // eager
 				}
 
 			skip_filler();
@@ -553,7 +556,7 @@ static value do_restrict(value cx, value form)
 	value body = hold(exp->R);
 	int has_undef = 0;
 
-	while (map->T == &type_A)
+	while (map->T == 0)
 		{
 		if (cx->L == 0)
 			{
@@ -605,37 +608,33 @@ static value do_restrict(value cx, value form)
 	return body;
 	}
 
-static value apply_restrict(value f, value x)
+value type_restrict(value fun, value arg)
 	{
-	if (f->L == 0)
-		return need(f,x,&type_record);
+	if (fun->L == 0)
+		return need(fun,arg,type_record);
 	else
 		{
-		x = eval(x);
-		if (x->T == &type_form)
-			return do_restrict(f->R, x);
-		else
+		arg = eval(arg);
+		if (arg->T == type_form)
 			{
-			drop(x);
-			return hold(Qvoid);
+			value exp = do_restrict(fun->R, arg);
+			drop(fun);
+			return exp;
 			}
+		else
+			return type_void(fun,arg);
 		}
 	}
 
-static struct type type_restrict = { 0, apply_restrict, clear_T };
-
 void use_parse(void) // TODO don't like this here
 	{
-	define("restrict",Q(&type_restrict,0));
+	define("restrict",Q(type_restrict));
 	}
 
 value load(value cx, const char *name, FILE *fh) // TODO
 	{
 	value label = Qstr0(name);
 	value exp = parse_fexl_fh(label,fh);
-	value form = V(&type_form,label,exp);
-	//return A(A(Q(&type_restrict,0),hold(cx)),form); // TODO
-	value result = do_restrict(cx,form);
-	//show_line("result = ",result);
-	return result;
+	value form = V(type_form,label,exp);
+	return A(A(Q(type_restrict),hold(cx)),form);
 	}

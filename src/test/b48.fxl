@@ -1,6 +1,4 @@
 # Test tuples
-\show=(show std)
-
 (
 say "= test_8501"
 {"a" "b" "c"} \a\b\c

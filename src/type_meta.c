@@ -10,89 +10,68 @@
 #include <type_record.h>
 #include <type_str.h>
 
-#include <die.h> // TODO
-#include <output.h> // TODO
-
 #include <type_meta.h>
 
-// Benchmark version which counts eval calls.
-static unsigned long cur_steps = 0;
-
-static value count_step_A(value f)
-	{
-	cur_steps++;
-	return step_A(f);
-	}
-
-static value apply_benchmark(value f, value x)
+static value op_benchmark(value fun, value arg, FILE *fh)
 	{
 	clear_free_list();
-
 	{
 	unsigned long beg_steps = cur_steps;
 	unsigned long beg_bytes = cur_bytes;
 
 	cur_steps = 0;
-
-	type_A.step = count_step_A;
-	x = eval(x);
-	type_A.step = step_A;
+	arg = eval(arg);
 
 	{
-	unsigned long num_bytes = cur_bytes - beg_bytes;
-	FILE *fh = f->v_ptr;
-
-	fprintf(fh,"steps %lu bytes %lu\n",cur_steps,num_bytes);
+	long num_bytes = cur_bytes - beg_bytes;
+	fprintf(fh,"steps %lu bytes %ld\n",cur_steps,num_bytes);
 	cur_steps += beg_steps;
-	return x;
+	drop(fun);
+	return arg;
 	}
 	}
 	}
 
-static struct type type_benchmark = { 0, apply_benchmark, no_clear };
-
-static value apply_show(value f, value x)
+value type_show_benchmark(value fun, value arg)
 	{
-	if (f->L == 0)
-		return need(f,x,&type_record);
-	else
-		{
-		show_in(f->R,x);
-		drop(x);
-		return hold(QI);
-		}
+	return op_benchmark(fun,arg,stdout);
 	}
 
-static struct type type_show = { 0, apply_show, clear_T };
-
-static value apply_read(value f, value x)
+value type_trace_benchmark(value fun, value arg)
 	{
-	(void)f;
-	x = eval(x);
-	if (x->T == &type_str)
+	return op_benchmark(fun,arg,stderr);
+	}
+
+value type_show(value fun, value arg)
+	{
+	(void)fun;
+	show(arg);
+	return type_F(fun,arg);
+	}
+
+value type_read(value fun, value arg)
+	{
+	arg = eval(arg);
+	if (arg->T == type_str)
 		{
-		const char *name = str_data(x);
+		const char *name = str_data(arg);
 		FILE *fh = open_source(name);
-		value exp = parse_fexl_fh(x,fh);
-		exp = V(&type_form,hold(x),exp);
-		drop(x);
+		value exp = parse_fexl_fh(arg,fh);
+		exp = V(type_form,hold(arg),exp);
+		drop(fun);
+		drop(arg);
 		return exp;
 		}
 	else
-		{
-		drop(x);
-		return hold(Qvoid);
-		}
+		return type_void(fun,arg);
 	}
-
-static struct type type_read = { 0, apply_read, no_clear }; // TODO move to parse
 
 void use_meta(void)
 	{
 	// LATER introspection functions
 	// LATER die
-	define("show_benchmark", Q(&type_benchmark,stdout));
-	define("trace_benchmark", Q(&type_benchmark,stderr));
-	define("show", Q(&type_show,0));
-	define("read", Q(&type_read,0));
+	define("show_benchmark", Q(type_show_benchmark));
+	define("trace_benchmark", Q(type_trace_benchmark));
+	define("show", Q(type_show));
+	define("read", Q(type_read));
 	}

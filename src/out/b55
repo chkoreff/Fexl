@@ -1,6 +1,6 @@
 : restrict
 : void
-: (? restrict empty)
+: (restrict restrict empty)
 : void
 : 27
 Undefined symbol say on line 10 of test/b55.fxl

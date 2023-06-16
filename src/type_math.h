@@ -1,1 +1,16 @@
+extern value type_round(value fun, value arg);
+extern value type_ceil(value fun, value arg);
+extern value type_trunc(value fun, value arg);
+extern value type_abs(value fun, value arg);
+extern value type_sqrt(value fun, value arg);
+extern value type_exp(value fun, value arg);
+extern value type_log(value fun, value arg);
+extern value type_sin(value fun, value arg);
+extern value type_cos(value fun, value arg);
+extern value type_add(value fun, value arg);
+extern value type_sub(value fun, value arg);
+extern value type_mul(value fun, value arg);
+extern value type_div(value fun, value arg);
+extern value type_pow(value fun, value arg);
+extern value type_xor(value fun, value arg);
 extern void use_math(void);

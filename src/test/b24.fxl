@@ -8,4 +8,4 @@ show_benchmark;
 \\d=(. (() "a") 3)
 \_ a b c d
 )
-put "END exp = " show std exp nl
+put "END exp = " show exp nl

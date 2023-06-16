@@ -1,5 +1,5 @@
 # Test records
-\try=(\\exp put ": " show std exp nl)
+\try=(\\exp put ": " show exp nl)
 
 try empty
 try (set (I "x"))

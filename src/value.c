@@ -1,7 +1,72 @@
 #include <memory.h>
+
 #include <value.h>
 
+/*
+The value structure is defined as follows.
+
+Let f be a pointer to a struct value.
+
+f->N is the reference count.
+
+f->T is the type, a C routine which reduces the value during evaluation.
+
+f->next links values on the free list after f->N drops to 0.
+
+Every value f is one of three classes: atom, data, or tree.
+
+1. atom : (f->L == 0 && f->R == 0)
+
+An atom value is a primary function with no arguments.
+
+2. data : (f->L != 0 && f->L->N == 0)
+
+A data value has data that resides in the union which follows f->L.  The
+f->L->clear field is a function that frees the data when f->N drops to 0.
+
+3. tree : (f->L != 0 && f->L->N > 0)
+
+A tree value is a combination of values f->L and f->R.
+
+The "recycle" routine below succinctly reflects these rules.
+
+Note that on most machines, (sizeof(struct value) == 32).
+*/
+
 static value free_list = 0;
+
+static value new_value(type T, value L)
+	{
+	value f = free_list;
+	if (f)
+		free_list = f->next;
+	else
+		f = new_memory(sizeof(struct value));
+	f->N = 1;
+	f->T = T;
+	f->L = L;
+	return f;
+	}
+
+// Recycle a value f with reference count 0, putting f on the free list and
+// dropping its content.  If f is data, its data is freed.  If f is a tree, its
+// L and R reference counts are decremented and those are also recycled if
+// their counts reach 0.
+static void recycle(value f)
+	{
+	if (f->L)
+		{
+		if (f->L->N)
+			{
+			drop(f->L);
+			drop(f->R);
+			}
+		else
+			f->L->clear(f);
+		}
+	f->next = free_list;
+	free_list = f;
+	}
 
 // Increment the reference count.
 value hold(value f)
@@ -14,11 +79,7 @@ value hold(value f)
 void drop(value f)
 	{
 	if (--f->N == 0)
-		{
-		f->T->clear(f);
-		f->next = free_list;
-		free_list = f;
-		}
+		recycle(f);
 	}
 
 void clear_free_list(void)
@@ -31,20 +92,6 @@ void clear_free_list(void)
 		}
 	}
 
-static value new_value(type T, value L)
-	{
-	value f = free_list;
-	if (f)
-		free_list = f->next;
-	else
-		f = new_memory(sizeof(struct value));
-
-	f->N = 1;
-	f->T = T;
-	f->L = L;
-	return f;
-	}
-
 // Return a value of type T with the given left and right side.
 value V(type T, value L, value R)
 	{
@@ -53,67 +100,38 @@ value V(type T, value L, value R)
 	return f;
 	}
 
-// Create an atom of type T with data pointer p.
-value Q(type T, void *p)
+// Create an atom of type T.
+value Q(type T)
 	{
-	value f = new_value(T,0);
-	f->v_ptr = p;
-	return f;
+	return V(T,0,0);
 	}
 
-// Create an atom of type T with double value x.
-value Qdouble(type T, double x)
+// Create data of type T with double value x.
+value Qdouble(type T, value L, double x)
 	{
-	value f = new_value(T,0);
+	value f = new_value(T,L);
 	f->v_double = x;
 	return f;
 	}
 
-// The type for function application
-value step_A(value f)
-	{
-	value g = eval(hold(f->L));
-	value h = g->T->apply(g,hold(f->R));
-	drop(g); // TODO
-	drop(f);
-	return h;
-	}
-
-void clear_A(value f)
-	{
-	drop(f->L);
-	drop(f->R);
-	}
-
-struct type type_A = { step_A, 0, clear_A };
-
 // Apply x to y.
 value A(value x, value y)
 	{
-	return V(&type_A,x,y);
+	return V(0,x,y);
 	}
 
-void no_clear(value f)
-	{
-	(void)f;
-	}
+unsigned long cur_steps;
 
-// Nullary functions
-
-static value step_Z(value f)
-	{
-	value (*op)(void) = f->v_ptr;
-	value g = op();
-	drop(f);
-	return g;
-	}
-
-struct type type_Z = { step_Z, 0, no_clear };
-
-// Reduce the value until done.
+// Reduce the value until done if possible.
 value eval(value f)
 	{
-	while (f->T->step)
-		f = f->T->step(f);
+	while (f->T == 0)
+		{
+		value fun = eval(hold(f->L));
+		value arg = hold(f->R);
+		drop(f);
+		f = fun->T(fun,arg);
+		cur_steps++;
+		}
 	return f;
 	}

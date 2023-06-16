@@ -7,28 +7,36 @@
 
 #include <type_limit.h>
 
-static value apply_limit(value f, value x)
+static value op_limit(value fun, value arg, void op(unsigned long))
 	{
-	x = eval(x);
-	if (x->T == &type_num)
+	arg = eval(arg);
+	if (arg->T == type_num)
 		{
-		void (*op)(unsigned long) = f->v_ptr;
-		op(get_ulong(x));
-		drop(x);
-		return hold(QI);
+		op(get_ulong(arg));
+		return type_F(fun,arg);
 		}
 	else
-		{
-		drop(x);
-		return hold(Qvoid);
-		}
+		return type_void(fun,arg);
 	}
 
-static struct type type_limit = { 0, apply_limit, no_clear };
+value type_limit_time(value fun, value arg)
+	{
+	return op_limit(fun,arg,limit_time);
+	}
+
+value type_limit_stack(value fun, value arg)
+	{
+	return op_limit(fun,arg,limit_stack);
+	}
+
+value type_limit_memory(value fun, value arg)
+	{
+	return op_limit(fun,arg,limit_memory);
+	}
 
 void use_limit(void)
 	{
-	define("limit_time", Q(&type_limit,limit_time));
-	define("limit_stack", Q(&type_limit,limit_stack));
-	define("limit_memory", Q(&type_limit,limit_memory));
+	define("limit_time", Q(type_limit_time));
+	define("limit_stack", Q(type_limit_stack));
+	define("limit_memory", Q(type_limit_memory));
 	}

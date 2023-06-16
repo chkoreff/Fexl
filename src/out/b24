@@ -1,2 +1,2 @@
-steps 18 bytes 656
-END exp = (D F (A (A (A (? . "a") "abcdefg") void) void))
+steps 18 bytes 219
+END exp = (D F (A (A (A (. . "a") "abcdefg") void) void))

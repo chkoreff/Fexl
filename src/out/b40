@@ -18,4 +18,4 @@ hello
 "hello"
 ~(1) "hello"~(1)
 ~(2) ~(1) "hello"~(1)~(2)
-steps 103 bytes 1472
+steps 105 bytes 1116

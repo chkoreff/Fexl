@@ -3,4 +3,4 @@
 show_benchmark;
 (\\x \y x) (T 10 20)
 )
-put "END exp = " show std exp nl
+put "END exp = " show exp nl

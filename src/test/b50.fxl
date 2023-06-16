@@ -1,5 +1,5 @@
 #
-\do_show=(\x put ": " show std x nl)
+\do_show=(\x put ": " show x nl)
 
 (
 # Test yield

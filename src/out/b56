@@ -1,6 +1,5 @@
 Hello
-: hello
-: fred
+: (A say "Hello")
 : (A say "I am Fred.")
 I am Fred.
 I am Wilma.

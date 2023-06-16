@@ -1,2 +1,2 @@
-steps 14 bytes 96
-END exp = (? T (A @ T))
+steps 14 bytes 64
+END exp = (T T (A @ T))

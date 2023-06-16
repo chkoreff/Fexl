@@ -1,6 +1,5 @@
 # Test read file
 (
-\show=(show std)
 \try=
 	(\name
 	put "read " show name nl
@@ -14,7 +13,7 @@ try "test/b44_1.fxl"
 try 3 # not a file name
 )
 (
-\try=(\\exp put ": " show std exp nl)
+\try=(\\exp put ": " show exp nl)
 try read
 try (read 3)
 try (read (I "test/b45_1.fxl"))

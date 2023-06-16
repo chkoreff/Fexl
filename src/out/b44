@@ -1,6 +1,6 @@
 read "test/b44_1.fxl"
 Hello
-exp = pi
+exp = 3.14159265358979
 
 read 3
 exp = void

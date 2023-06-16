@@ -24,18 +24,13 @@ void define(const char *key, value val)
 	cx_std = set(Qstr0(key),val,cx_std);
 	}
 
-void define_op(const char *name, value op(void))
-	{
-	define(name, Q(&type_Z,op));
-	}
-
 // Define initial context.
 
 void beg_context(void)
 	{
 	beg_basic();
 
-	cx_std = Q(&type_record,0); // empty stack
+	cx_std = Q(type_record); // empty stack
 
 	use_basic();
 	use_num();

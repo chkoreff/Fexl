@@ -31,14 +31,14 @@ c = c
 : a b
 : a b c
 : a b c d
-steps 144 bytes 416
+steps 149 bytes 352
 = test_8877
 : 37
 x = a
 y = b
 : 37
 : void
-steps 44 bytes 352
+steps 44 bytes 288
 = test_0114
 : {}
 : {1}
@@ -53,5 +53,5 @@ steps 44 bytes 352
 : a
 : a b
 : a b c d e
-steps 126 bytes 512
+steps 130 bytes 352
 END

@@ -1,7 +1,7 @@
 #
 (
 # Show the raw values.
-\try=(\\exp put ": " show std exp nl)
+\try=(\\exp put ": " show exp nl)
 
 say "=="
 try []

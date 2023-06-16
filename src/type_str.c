@@ -12,7 +12,10 @@ static void clear_str(value f)
 	str_free(f->v_ptr);
 	}
 
-struct type type_str = { 0, apply_void, clear_str };
+value type_str(value fun, value arg)
+	{
+	return type_void(fun,arg);
+	}
 
 string get_str(value x)
 	{
@@ -26,7 +29,8 @@ const char *str_data(value x)
 
 value Qstr(string x)
 	{
-	return Q(&type_str,x);
+	static struct value clear = {{.N=0}, {.clear=clear_str}};
+	return V(type_str,&clear,(value)x);
 	}
 
 value Qstr0(const char *data)
@@ -34,39 +38,29 @@ value Qstr0(const char *data)
 	return Qstr(str_new_data0(data));
 	}
 
-static value apply_str_str_str(value f, value x)
+// (. x y) is the concatenation of strings x and y.
+value type_concat(value fun, value arg)
 	{
-	if (f->L == 0)
-		return need(f,x,&type_str);
+	if (fun->L == 0)
+		return need(fun,arg,type_str);
 	else
 		{
-		x = eval(x);
-		if (x->T == &type_str)
+		arg = eval(arg);
+		if (arg->T == type_str)
 			{
-			string (*op)(string,string) = f->L->v_ptr;
-			f = Qstr(op(f->R->v_ptr, x->v_ptr));
-			drop(x);
-			return f;
+			value g = Qstr(str_concat(fun->R->v_ptr, arg->v_ptr));
+			drop(fun);
+			drop(arg);
+			return g;
 			}
 		else
-			{
-			drop(x);
-			return hold(Qvoid);
-			}
+			return type_void(fun,arg);
 		}
-	}
-
-static struct type type_str_str_str = { 0, apply_str_str_str, clear_T };
-
-static void define_str_str_str(const char *name, string op(string,string))
-	{
-	define(name, Q(&type_str_str_str, op));
 	}
 
 void use_str(void)
 	{
-	// (. x y) is the concatenation of strings x and y.
-	define_str_str_str(".",str_concat);
+	define(".", Q(type_concat));
 
 	// LATER length
 	// LATER slice

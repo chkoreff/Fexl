@@ -1,2 +1,2 @@
-steps 2 bytes 32
-END exp = (? T 3)
+steps 2 bytes -59
+END exp = (T T 3)

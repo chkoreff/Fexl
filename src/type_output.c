@@ -9,29 +9,12 @@
 
 #include <type_output.h>
 
-static value apply_print(value f, value x)
+static value op_print(value fun, value arg, void op(string))
 	{
-	x = eval(x);
-	if (x->T == &type_str)
-		{
-		void (*op)(string) = f->v_ptr;
-		op(x->v_ptr);
-		}
-	drop(x);
-	return hold(QI);
-	}
-
-static struct type type_print = { 0, apply_print, no_clear };
-
-static void define_print(const char *name, void op(string))
-	{
-	define(name, Q(&type_print,op));
-	}
-
-static value op_nl(void)
-	{
-	nl();
-	return hold(QI);
+	arg = eval(arg);
+	if (arg->T == type_str)
+		op(arg->v_ptr);
+	return type_F(fun,arg);
 	}
 
 static void say_str(string x)
@@ -40,10 +23,19 @@ static void say_str(string x)
 	nl();
 	}
 
+value type_say(value fun, value arg) { return op_print(fun,arg,say_str); }
+value type_put(value fun, value arg) { return op_print(fun,arg,put_str); }
+
+value type_nl(value fun, value arg)
+	{
+	nl();
+	return type_F(fun,arg);
+	}
+
 void use_output(void)
 	{
-	define_op("nl", op_nl);
-	define_print("say", say_str);
-	define_print("put", put_str);
+	define("nl", A(Q(type_nl), hold(QI)));
+	define("say", Q(type_say));
+	define("put", Q(type_put));
 	// LATER fput fsay
 	}

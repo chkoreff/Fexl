@@ -9,82 +9,62 @@ value QF;
 value Qvoid;
 value Qnull;
 
-value keep(value f, value x)
+value keep(value fun, value arg)
 	{
-	return V(f->T,hold(f),x);
+	return V(fun->T,fun,arg);
 	}
 
-value need(value f, value x, type T)
+value need(value fun, value arg, type T)
 	{
-	x = eval(x);
-	if (x->T == T)
-		return keep(f,x);
+	arg = eval(arg);
+	if (arg->T == T)
+		return keep(fun,arg);
 	else
-		{
-		drop(x);
-		return hold(Qvoid);
-		}
+		return type_void(fun,arg);
 	}
 
 // (I x) = x
-static value apply_I(value f, value x)
+value type_I(value fun, value arg)
 	{
-	(void)f;
-	return x;
+	drop(fun);
+	return arg;
 	}
-
-static struct type type_I = { 0, apply_I, no_clear };
 
 // (T x y) = x
-static value apply_T(value f, value x)
+value type_T(value fun, value arg)
 	{
-	if (f->L == 0)
-		return keep(f,x);
+	if (fun->L == 0)
+		return keep(fun,arg);
 	else
 		{
-		drop(x);
-		return hold(f->R);
+		value x = hold(fun->R);
+		drop(fun);
+		drop(arg);
+		return x;
 		}
 	}
-
-void clear_T(value f)
-	{
-	if (f->L)
-		{
-		drop(f->L);
-		drop(f->R);
-		}
-	}
-
-static struct type type_T = { 0, apply_T, clear_T };
 
 // (F x y) = y
-static value apply_F(value f, value x)
+value type_F(value fun, value arg)
 	{
-	(void)f;
-	drop(x);
+	drop(fun);
+	drop(arg);
 	return hold(QI);
 	}
 
-static struct type type_F = { 0, apply_F, no_clear };
-
-// (Y x) = (x (Y x))
-static value apply_Y(value f, value x)
+// (Y x) = (x (Y x))  # fixpoint operator
+value type_Y(value fun, value arg)
 	{
-	return A(x,A(hold(f),hold(x)));
+	return A(arg,A(fun,hold(arg)));
 	}
-
-static struct type type_Y = { 0, apply_Y, no_clear };
 
 // (void x) = void
-value apply_void(value f, value x)
+value type_void(value fun, value arg)
 	{
-	(void)f;
-	drop(x);
+	drop(fun);
+	drop(arg);
 	return hold(Qvoid);
 	}
-
-static struct type type_void = { 0, apply_void, no_clear };
 
 // Use pattern p to make a copy of expression e with argument x substituted in
 // the places designated by the pattern.
@@ -92,38 +72,39 @@ value subst(value p, value e, value x)
 	{
 	if (p == QF) return hold(e);
 	if (p == QT) return hold(x);
-	return V(e->T,subst(p->L,e->L,x),subst(p->R,e->R,x));
+	{
+	value L = subst(p->L,e->L,x);
+	value R = subst(p->R,e->R,x);
+	return V(e->T,L,R);
+	}
 	}
 
 // Direct substitution
-static value apply_D(value f, value x)
+value type_D(value fun, value arg)
 	{
-	f = subst(f->L,f->R,x);
-	drop(x);
-	return f;
+	value g = subst(fun->L,fun->R,arg);
+	drop(fun);
+	drop(arg);
+	return g;
 	}
 
 // Eager substitution
-static value apply_E(value f, value x)
+value type_E(value fun, value arg)
 	{
-	return apply_D(f,eval(x));
+	return type_D(fun,eval(arg));
 	}
 
-struct type type_D = { 0, apply_D, clear_A };
-struct type type_E = { 0, apply_E, clear_A };
-
-// Single
-
-static value apply_single(value f, value x)
+// (single x h) = (h x)
+value type_single(value fun, value arg)
 	{
-	return A(x,hold(f->R));
+	value x = hold(fun->R);
+	drop(fun);
+	return A(arg,x);
 	}
-
-struct type type_single = { 0, apply_single, clear_A };
 
 value single(value x)
 	{
-	return V(&type_single,hold(QI),x);
+	return V(type_single,hold(QI),x);
 	}
 
 value maybe(value x)
@@ -131,106 +112,114 @@ value maybe(value x)
 	if (x == 0)
 		return hold(QT);
 	else
-		return V(&type_T,hold(QT),single(x));
+		return V(type_T,hold(QT),single(x));
 	}
 
-static value apply_yield(value f, value x)
+value type_yield(value fun, value arg)
 	{
-	(void)f;
-	return single(x);
+	drop(fun);
+	return single(arg);
 	}
 
-static struct type type_yield = { 0, apply_yield, no_clear };
-
-// Pair
-
-static value apply_pair(value f, value x)
+// ((pair x y) h) = (h x y)
+value type_pair(value fun, value arg)
 	{
-	return A(A(x,hold(f->L)),hold(f->R));
+	value x = hold(fun->L);
+	value y = hold(fun->R);
+	value h = arg;
+	drop(fun);
+	return A(A(h,x),y);
 	}
 
-struct type type_pair = { 0, apply_pair, clear_A };
-
-// List
-
-struct type type_null = { 0, apply_T, clear_T };
-
-static value apply_list(value f, value x)
+// (null x y) = x
+value type_null(value fun, value arg)
 	{
-	drop(x);
-	return V(&type_pair,hold(f->L),hold(f->R));
+	return type_T(fun,arg);
 	}
 
-struct type type_list = { 0, apply_list, clear_A };
-
-static value apply_cons(value f, value x)
+// ((list x y) h) = (pair x y)
+value type_list(value fun, value arg)
 	{
-	if (f->L == 0)
-		return keep(f,x);
+	value x = hold(fun->L);
+	value y = hold(fun->R);
+	drop(fun);
+	drop(arg);
+	return V(type_pair,x,y);
+	}
+
+// (cons x y) = (list x y)
+value type_cons(value fun, value arg)
+	{
+	if (fun->L == 0)
+		return keep(fun,arg);
 	else
-		return V(&type_list,hold(f->R),x);
+		{
+		value x = hold(fun->R);
+		value y = arg;
+		drop(fun);
+		return V(type_list,x,y);
+		}
 	}
-
-static struct type type_cons = { 0, apply_cons, clear_T };
 
 // Tuples
 
-static value apply_tuple(value f, value x)
+value type_tuple(value fun, value arg)
 	{
-	value list = hold(f->R);
+	value list = hold(fun->R);
 	while (1)
 		{
 		list = eval(list);
-		if (list->T == &type_null)
+		if (list->T == type_null)
 			{
 			drop(list);
-			return x;
+			drop(fun);
+			return arg;
 			}
-		else if (list->T == &type_list)
+		else if (list->T == type_list)
 			{
 			value item = hold(list->L);
 			value tail = hold(list->R);
 			drop(list);
-			x = A(x,item);
+			arg = A(arg,item);
 			list = tail;
 			}
 		else
-			return A(x,list); // improper list tail
+			{
+			drop(fun);
+			return A(arg,list); // improper list tail
+			}
 		}
 	}
 
-struct type type_tuple = { 0, apply_tuple, clear_A };
-
 // Convert list to tuple, e.g. [1 2 3] to {1 2 3}.
-static value apply_list_to_tuple(value f, value x)
+value type_list_to_tuple(value fun, value arg)
 	{
-	(void)f;
-	return V(&type_tuple,hold(QI),x);
+	drop(fun);
+	return V(type_tuple,hold(QI),arg);
 	}
-
-struct type type_list_to_tuple = { 0, apply_list_to_tuple, clear_T };
 
 // Convert to tuple to list, e.g. {1 2 3} to [1 2 3].
-static value apply_tuple_to_list(value f, value x)
+value type_tuple_to_list(value fun, value arg)
 	{
-	x = eval(x);
-	if (x->T == &type_tuple)
-		f = hold(x->R);
+	arg = eval(arg);
+	if (arg->T == type_tuple)
+		{
+		value list = hold(arg->R);
+		drop(fun);
+		drop(arg);
+		return list;
+		}
 	else
-		f = hold(Qvoid);
-	drop(x);
-	return f;
+		return type_void(fun,arg);
 	}
-
-struct type type_tuple_to_list = { 0, apply_tuple_to_list, clear_T };
 
 void beg_basic(void)
 	{
-	QI = Q(&type_I,0);
-	QT = Q(&type_T,0);
-	QF = Q(&type_F,0);
-	Qvoid = Q(&type_void,0);
-	Qnull = Q(&type_null,0);
+	QI = Q(type_I);
+	QT = Q(type_T);
+	QF = Q(type_F);
+	Qvoid = Q(type_void);
+	Qnull = Q(type_null);
 	}
 
 void use_basic(void)
@@ -238,13 +227,13 @@ void use_basic(void)
 	define("I", hold(QI));
 	define("T", hold(QT));
 	define("F", hold(QF));
-	define("@", Q(&type_Y,0));
+	define("@", Q(type_Y));
 	define("void", hold(Qvoid));
 	define("null", hold(Qnull));
-	define("yield", Q(&type_yield,0));
-	define("cons", Q(&type_cons,0));
-	define("list_to_tuple", Q(&type_list_to_tuple,0));
-	define("tuple_to_list", Q(&type_tuple_to_list,0));
+	define("yield", Q(type_yield));
+	define("cons", Q(type_cons));
+	define("list_to_tuple", Q(type_list_to_tuple));
+	define("tuple_to_list", Q(type_tuple_to_list));
 	}
 
 void end_basic(void)

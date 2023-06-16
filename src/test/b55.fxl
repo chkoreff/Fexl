@@ -1,6 +1,6 @@
 # TODO Will need to change this because later will die on undefined symbol.
 
-\try=(\\exp put ": " show std exp nl)
+\try=(\\exp put ": " show exp nl)
 
 try restrict
 try (restrict (I 3))

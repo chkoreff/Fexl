@@ -12,51 +12,56 @@ static void clear_var(value f)
 	drop(f->R);
 	}
 
-struct type type_var = { 0, apply_void, clear_var };
+value type_var(value fun, value arg)
+	{
+	return type_void(fun,arg);
+	}
 
 // Create variable
-
-static value op_var_new(void)
+value type_var_new(value fun, value arg)
 	{
-	return Q(&type_var,hold(Qvoid));
+	drop(fun);
+	drop(arg);
+	{
+	static struct value clear = {{.N=0}, {.clear=clear_var}};
+	return V(type_var,&clear,hold(Qvoid));
+	}
 	}
 
 // Put value in variable
-
-static value apply_var_put(value f, value x)
+value type_var_put(value fun, value arg)
 	{
-	if (f->L == 0)
-		return need(f,x,&type_var);
+	if (fun->L == 0)
+		return need(fun,arg,type_var);
 	else
 		{
-		value v = f->R;
-		x = eval(x);
+		value v = fun->R;
+		arg = eval(arg);
 		drop(v->R);
-		v->R = x;
+		v->R = arg;
+		drop(fun);
 		return hold(QI);
 		}
 	}
 
-static struct type type_var_put = { 0, apply_var_put, clear_T };
-
 // Get value from variable
-
-static value apply_var_get(value f, value x)
+value type_var_get(value fun, value arg)
 	{
-	x = eval(x);
-	if (x->T == &type_var)
-		f = hold(x->R);
+	arg = eval(arg);
+	if (arg->T == type_var)
+		{
+		value g = hold(arg->R);
+		drop(fun);
+		drop(arg);
+		return g;
+		}
 	else
-		f = hold(Qvoid);
-	drop(x);
-	return f;
+		return type_void(fun,arg);
 	}
-
-static struct type type_var_get = { 0, apply_var_get, no_clear };
 
 void use_var(void)
 	{
-	define_op("var_new", op_var_new);
-	define("var_put", Q(&type_var_put,0));
-	define("var_get", Q(&type_var_get,0));
+	define("var_new", A(Q(type_var_new),hold(QI)));
+	define("var_put", Q(type_var_put));
+	define("var_get", Q(type_var_get));
 	}

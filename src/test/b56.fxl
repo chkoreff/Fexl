@@ -28,11 +28,10 @@ std
 value std \;
 value std \;
 
-\try=(\cx\exp put ": " show cx exp nl)
+\try=(\exp put ": " show exp nl)
 hello
-try std hello
-try std fred
-try (set "say" say; empty) fred # TODO need del to delete "fred" from std
+try hello
+try fred
 fred
 wilma
 say "END"

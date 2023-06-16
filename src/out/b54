@@ -1,16 +1,16 @@
 : empty
-: (? set "x")
+: (set set "x")
 : void
-: (? (? set "x") (A say "HI"))
+: (set (set set "x") (A say "HI"))
 : void
 : (set "x" (A say "HI"); empty)
 : (set "x" 1; set "y" 2; empty)
 : (set "x" 1; set "y" 2; empty)
 : (set "x" 1; empty)
 : (set "a" "0970"; set "b" "1500"; set "c" "0653"; set "d" "7631"; set "e" "1551"; set "f" "2534"; empty)
-: (set "+" +; set "nl" nl; set "num_str" num_str; set "put" put; set "say" say; empty)
+: (set "+" +; set "nl" (A nl I); set "num_str" num_str; set "put" put; set "say" say; empty)
 : ::
-: (? :: empty)
+: (:: :: empty)
 : void
 : void
 : (set "a" "3549"; empty)
@@ -20,10 +20,10 @@
 : (set "a" "3549"; set "b" "3160"; empty)
 : (set "a" "0970"; set "aa" "0853"; set "b" "1500"; set "c" "2609"; set "d" "7631"; set "e" "7709"; set "f" "2534"; set "x" "0205"; empty)
 : get
-: (? get "a")
+: (get get "a")
 : void
 : void
-: (? T (single I 1))
+: (T T (single I 1))
 : ["YES" 1]
 : ["YES" 2]
 : "NO"

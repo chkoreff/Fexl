@@ -9,59 +9,49 @@
 
 // Unary operators
 
-static value apply_num_num(value f, value x)
+static value op1(value fun, value arg, double op(double))
 	{
-	x = eval(x);
-	if (x->T == &type_num)
+	arg = eval(arg);
+	if (arg->T == type_num)
 		{
-		double (*op)(double) = f->v_ptr;
-		f = Qnum(op(x->v_double));
-		drop(x);
-		return f;
+		value g = Qnum(op(arg->v_double));
+		drop(fun);
+		drop(arg);
+		return g;
 		}
 	else
-		{
-		drop(x);
-		return hold(Qvoid);
-		}
+		return type_void(fun,arg);
 	}
 
-static struct type type_num_num = { 0, apply_num_num, no_clear };
-
-static void define_num_num(const char *name, double op(double))
-	{
-	define(name, Q(&type_num_num,op));
-	}
+value type_round(value fun, value arg) { return op1(fun,arg,round); }
+value type_ceil(value fun, value arg) { return op1(fun,arg,ceil); }
+value type_trunc(value fun, value arg) { return op1(fun,arg,trunc); }
+value type_abs(value fun, value arg) { return op1(fun,arg,fabs); }
+value type_sqrt(value fun, value arg) { return op1(fun,arg,sqrt); }
+value type_exp(value fun, value arg) { return op1(fun,arg,exp); }
+value type_log(value fun, value arg) { return op1(fun,arg,log); }
+value type_sin(value fun, value arg) { return op1(fun,arg,sin); }
+value type_cos(value fun, value arg) { return op1(fun,arg,cos); }
 
 // Binary operators
 
-static value apply_num_num_num(value f, value x)
+static value op2(value fun, value arg, double op(double,double))
 	{
-	if (f->L == 0)
-		return need(f,x,&type_num);
+	if (fun->L == 0)
+		return need(fun,arg,type_num);
 	else
 		{
-		x = eval(x);
-		if (x->T == &type_num)
+		arg = eval(arg);
+		if (arg->T == type_num)
 			{
-			double (*op)(double,double) = f->L->v_ptr;
-			f = Qnum(op(f->R->v_double, x->v_double));
-			drop(x);
-			return f;
+			value g = Qnum(op(fun->R->v_double, arg->v_double));
+			drop(fun);
+			drop(arg);
+			return g;
 			}
 		else
-			{
-			drop(x);
-			return hold(Qvoid);
-			}
+			return type_void(fun,arg);
 		}
-	}
-
-static struct type type_num_num_num = { 0, apply_num_num_num, clear_T };
-
-static void define_num_num_num(const char *name, double op(double,double))
-	{
-	define(name, Q(&type_num_num_num,op));
 	}
 
 static double add(double x, double y) { return x + y; }
@@ -70,24 +60,31 @@ static double mul(double x, double y) { return x * y; }
 static double div(double x, double y) { return x / y; }
 static double xor(double x, double y) { return (long)x ^ (long)y; }
 
+value type_add(value fun, value arg) { return op2(fun,arg,add); }
+value type_sub(value fun, value arg) { return op2(fun,arg,sub); }
+value type_mul(value fun, value arg) { return op2(fun,arg,mul); }
+value type_div(value fun, value arg) { return op2(fun,arg,div); }
+value type_pow(value fun, value arg) { return op2(fun,arg,pow); }
+value type_xor(value fun, value arg) { return op2(fun,arg,xor); }
+
 void use_math(void)
 	{
 	define("pi", Qnum(M_PI));
 
-	define_num_num("round", round);
-	define_num_num("ceil", ceil);
-	define_num_num("trunc", trunc);
-	define_num_num("abs", fabs);
-	define_num_num("sqrt", sqrt);
-	define_num_num("exp", exp);
-	define_num_num("log", log);
-	define_num_num("sin", sin);
-	define_num_num("cos", cos);
+	define("round", Q(type_round));
+	define("ceil", Q(type_ceil));
+	define("trunc", Q(type_trunc));
+	define("abs", Q(type_abs));
+	define("sqrt", Q(type_sqrt));
+	define("exp", Q(type_exp));
+	define("log", Q(type_log));
+	define("sin", Q(type_sin));
+	define("cos", Q(type_cos));
 
-	define_num_num_num("+", add);
-	define_num_num_num("-", sub);
-	define_num_num_num("*", mul);
-	define_num_num_num("/", div);
-	define_num_num_num("^", pow);
-	define_num_num_num("xor", xor);
+	define("+", Q(type_add));
+	define("-", Q(type_sub));
+	define("*", Q(type_mul));
+	define("/", Q(type_div));
+	define("^", Q(type_pow));
+	define("xor", Q(type_xor));
 	}
