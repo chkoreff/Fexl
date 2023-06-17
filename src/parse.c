@@ -21,12 +21,10 @@ exp     =>  empty
 exp     =>  exp factor
 
 factor  =>  "\;" exp
-factor  =>  "\" lambda
-factor  =>  "\\" lambda
+factor  =>  "\" name def exp
+factor  =>  "\\" name def exp
 factor  =>  ";" exp
 factor  =>  term
-
-lambda  =>  name def exp
 
 def     =>  empty
 def     =>  "=" term
