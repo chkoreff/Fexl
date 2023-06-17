@@ -19,11 +19,9 @@ exp     =>  exp factor
 
 factor  =>  "\;" exp
 factor  =>  "\=" exp
-factor  =>  "\" lambda
+factor  =>  "\" name def exp
 factor  =>  ";" exp
 factor  =>  term
-
-lambda  =>  name def exp
 
 def     =>  empty
 def     =>  "=" term
