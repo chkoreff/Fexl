@@ -58,7 +58,7 @@ other than QU, followed by a closing QU.
 A "tilde_string" is a sequence of arbitrary characters enclosed within a pair
 of delimiters of your choice.  It starts with a delimiter, which is a '~'
 (tilde), then zero or more non white characters, then a single white space
-which ends the delimter and is ignored.  That initial delimiter is followed by
+which ends the delimiter and is ignored.  That initial delimiter is followed by
 a sequence of characters which constitute the actual content of the string,
 terminated by a repeat occurrence of the delimiter.
 */
