@@ -2,7 +2,6 @@
 #include <str.h>
 #include <value.h>
 
-
 #include <basic.h>
 #include <die.h>
 #include <type_limit.h>
@@ -107,7 +106,7 @@ value type_restrict(value fun, value arg)
 		}
 	}
 
-value cx_std; // Current context
+static value cx_std; // Current context
 
 static void define(const char *key, value val)
 	{
@@ -217,7 +216,7 @@ static void use_var(void)
 	define("var_get", Q(type_var_get));
 	}
 
-void beg_context(void)
+value std(void)
 	{
 	cx_std = Q(type_record); // empty stack
 
@@ -237,9 +236,5 @@ void beg_context(void)
 	// LATER time
 	// LATER rand
 	// LATER crypto
-	}
-
-void end_context(void)
-	{
-	drop(cx_std);
+	return cx_std;
 	}

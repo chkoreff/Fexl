@@ -4,6 +4,7 @@
 
 #include <basic.h>
 #include <context.h> // TODO
+// TODO type_restrict
 #include <memory.h>
 #include <parse.h>
 #include <type_str.h>
@@ -14,29 +15,18 @@ static void run_fh(const char *name, FILE *fh)
 	{
 	value label = Qstr0(name);
 	value exp = parse_fh(label,fh);
-	exp = A(A(Q(type_restrict),hold(cx_std)),exp);
+	value cx = std();
+	exp = A(A(Q(type_restrict),cx),exp);
 	exp = eval(exp);
 	drop(exp);
-	}
-
-static void beg_const(void)
-	{
-	beg_basic();
-	beg_context();
-	}
-
-static void end_const(void)
-	{
-	end_basic();
-	end_context();
 	}
 
 void run(const char *name)
 	{
 	FILE *fh = open_source(name);
-	beg_const();
+	beg_basic();
 	run_fh(name,fh);
-	end_const();
+	end_basic();
 	clear_free_list();
 	end_memory();
 	}
