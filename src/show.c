@@ -3,10 +3,8 @@
 #include <value.h>
 
 #include <basic.h>
-#include <context.h> // TODO
-// TODO type_form
-// TODO type_restrict
 #include <output.h>
+#include <type_form.h>
 #include <type_math.h>
 #include <type_meta.h>
 #include <type_num.h>

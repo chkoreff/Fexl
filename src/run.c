@@ -4,9 +4,9 @@
 
 #include <basic.h>
 #include <context.h> // TODO
-// TODO type_restrict
 #include <memory.h>
 #include <parse.h>
+#include <type_form.h>
 #include <type_str.h>
 
 #include <run.h>

@@ -4,15 +4,12 @@
 #include <value.h>
 
 #include <basic.h>
-#include <context.h> // TODO
-// TODO put_error_location
-// TODO type_form
 #include <die.h>
 #include <stdio.h>
 #include <stream.h>
+#include <type_form.h>
 #include <type_num.h>
 #include <type_str.h>
-#include <type_record.h>
 
 #include <parse.h>
 

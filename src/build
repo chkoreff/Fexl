@@ -15,6 +15,7 @@ make run
 make show
 make str
 make stream
+make type_form
 make type_limit
 make type_math
 make type_meta

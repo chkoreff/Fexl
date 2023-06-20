@@ -6,7 +6,6 @@
 #include <memory.h>
 #include <parse.h>
 #include <show.h>
-#include <type_record.h>
 #include <type_str.h>
 
 #include <type_meta.h>
