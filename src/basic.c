@@ -43,7 +43,7 @@ value type_T(value fun, value arg)
 		}
 	}
 
-// (F x y) = y
+// (F x) = I
 value type_F(value fun, value arg)
 	{
 	drop(fun);
