@@ -26,5 +26,4 @@ extern value type_tuple(value fun, value arg);
 extern value type_list_to_tuple(value fun, value arg);
 extern value type_tuple_to_list(value fun, value arg);
 extern void beg_basic(void);
-extern void use_basic(void);
 extern void end_basic(void);

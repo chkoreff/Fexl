@@ -3,7 +3,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <context.h>
 #include <output.h>
 #include <type_str.h>
 
@@ -30,12 +29,4 @@ value type_nl(value fun, value arg)
 	{
 	nl();
 	return type_F(fun,arg);
-	}
-
-void use_output(void)
-	{
-	define("nl", A(Q(type_nl), hold(QI)));
-	define("say", Q(type_say));
-	define("put", Q(type_put));
-	// LATER fput fsay
 	}

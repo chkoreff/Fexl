@@ -13,4 +13,4 @@ extern value type_mul(value fun, value arg);
 extern value type_div(value fun, value arg);
 extern value type_pow(value fun, value arg);
 extern value type_xor(value fun, value arg);
-extern void use_math(void);
+extern const double num_pi;

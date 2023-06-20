@@ -2,7 +2,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <context.h>
 #include <type_str.h>
 
 #include <type_record.h>
@@ -202,14 +201,4 @@ value type_record_pairs(value fun, value arg)
 		}
 	else
 		return type_void(fun,arg);
-	}
-
-void use_record(void)
-	{
-	define("empty", Q(type_record));
-	define("def", Q(type_def));
-	define("set", Q(type_set));
-	define("get", Q(type_get));
-	define("::", Q(type_chain));
-	define("record_pairs", Q(type_record_pairs));
 	}

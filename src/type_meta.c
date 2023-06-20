@@ -3,7 +3,7 @@
 #include <value.h>
 
 #include <basic.h>
-#include <context.h>
+#include <context.h> // TODO
 #include <memory.h>
 #include <parse.h>
 #include <show.h>
@@ -62,14 +62,4 @@ value type_read(value fun, value arg)
 		}
 	else
 		return type_void(fun,arg);
-	}
-
-void use_meta(void)
-	{
-	// LATER introspection functions
-	// LATER die
-	define("show_benchmark", Q(type_show_benchmark));
-	define("trace_benchmark", Q(type_trace_benchmark));
-	define("show", Q(type_show));
-	define("read", Q(type_read));
 	}

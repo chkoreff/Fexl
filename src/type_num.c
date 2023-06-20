@@ -2,7 +2,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <context.h>
 #include <format.h>
 #include <stdlib.h> // strtod
 #include <type_str.h>
@@ -54,9 +53,4 @@ value type_num_str(value fun, value arg)
 		}
 	else
 		return type_void(fun,arg);
-	}
-
-void use_num(void)
-	{
-	define("num_str", Q(type_num_str));
 	}

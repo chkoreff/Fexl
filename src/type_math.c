@@ -1,7 +1,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <context.h>
 #include <math.h> // pow fabs sqrt exp log sin cos M_PI
 #include <type_num.h>
 
@@ -67,24 +66,4 @@ value type_div(value fun, value arg) { return op2(fun,arg,div); }
 value type_pow(value fun, value arg) { return op2(fun,arg,pow); }
 value type_xor(value fun, value arg) { return op2(fun,arg,xor); }
 
-void use_math(void)
-	{
-	define("pi", Qnum(M_PI));
-
-	define("round", Q(type_round));
-	define("ceil", Q(type_ceil));
-	define("trunc", Q(type_trunc));
-	define("abs", Q(type_abs));
-	define("sqrt", Q(type_sqrt));
-	define("exp", Q(type_exp));
-	define("log", Q(type_log));
-	define("sin", Q(type_sin));
-	define("cos", Q(type_cos));
-
-	define("+", Q(type_add));
-	define("-", Q(type_sub));
-	define("*", Q(type_mul));
-	define("/", Q(type_div));
-	define("^", Q(type_pow));
-	define("xor", Q(type_xor));
-	}
+const double num_pi = M_PI;

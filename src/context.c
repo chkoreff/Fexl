@@ -109,13 +109,113 @@ value type_restrict(value fun, value arg)
 
 value cx_std; // Current context
 
-void define(const char *key, value val)
+static void define(const char *key, value val)
 	{
 	// TODO use chain on the individual contexts
 	cx_std = def(Qstr0(key),val,cx_std);
 	}
 
 // Define initial context.
+
+static void use_basic(void)
+	{
+	define("I", hold(QI));
+	define("T", hold(QT));
+	define("F", hold(QF));
+	define("@", Q(type_Y));
+	define("void", hold(Qvoid));
+	define("null", hold(Qnull));
+	define("yield", Q(type_yield));
+	define("cons", Q(type_cons));
+	define("list_to_tuple", Q(type_list_to_tuple));
+	define("tuple_to_list", Q(type_tuple_to_list));
+	}
+
+static void use_num(void)
+	{
+	define("num_str", Q(type_num_str));
+	}
+
+static void use_str(void)
+	{
+	define(".", Q(type_concat));
+
+	// LATER length
+	// LATER slice
+	// LATER search
+	// LATER str_num
+	// LATER ord
+	// LATER chr
+	// LATER char_width
+	// LATER dirname
+	// LATER basename
+	// LATER length_common
+	// LATER compare_at
+	}
+
+static void use_math(void)
+	{
+	define("pi", Qnum(num_pi));
+
+	define("round", Q(type_round));
+	define("ceil", Q(type_ceil));
+	define("trunc", Q(type_trunc));
+	define("abs", Q(type_abs));
+	define("sqrt", Q(type_sqrt));
+	define("exp", Q(type_exp));
+	define("log", Q(type_log));
+	define("sin", Q(type_sin));
+	define("cos", Q(type_cos));
+
+	define("+", Q(type_add));
+	define("-", Q(type_sub));
+	define("*", Q(type_mul));
+	define("/", Q(type_div));
+	define("^", Q(type_pow));
+	define("xor", Q(type_xor));
+	}
+
+static void use_output(void)
+	{
+	define("nl", A(Q(type_nl), hold(QI)));
+	define("say", Q(type_say));
+	define("put", Q(type_put));
+	// LATER fput fsay
+	}
+
+static void use_meta(void)
+	{
+	// LATER introspection functions
+	// LATER die
+	define("show_benchmark", Q(type_show_benchmark));
+	define("trace_benchmark", Q(type_trace_benchmark));
+	define("show", Q(type_show));
+	define("read", Q(type_read));
+	}
+
+static void use_limit(void)
+	{
+	define("limit_time", Q(type_limit_time));
+	define("limit_stack", Q(type_limit_stack));
+	define("limit_memory", Q(type_limit_memory));
+	}
+
+static void use_record(void)
+	{
+	define("empty", Q(type_record));
+	define("def", Q(type_def));
+	define("set", Q(type_set));
+	define("get", Q(type_get));
+	define("::", Q(type_chain));
+	define("record_pairs", Q(type_record_pairs));
+	}
+
+static void use_var(void)
+	{
+	define("var_new", A(Q(type_var_new),hold(QI)));
+	define("var_put", Q(type_var_put));
+	define("var_get", Q(type_var_get));
+	}
 
 void beg_context(void)
 	{

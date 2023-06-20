@@ -3,7 +3,7 @@
 #include <value.h>
 
 #include <basic.h>
-#include <context.h>
+#include <context.h> // TODO
 #include <output.h>
 #include <type_math.h>
 #include <type_meta.h>
@@ -44,7 +44,7 @@ static void show_pairs(value f)
 	while (f->L)
 		{
 		put_ch('{');
-		put_quote(get_str(f->L->L));
+		put_quote(f->L->L->v_ptr);
 		put_ch(' ');
 		show(f->L->R);
 		put_ch('}');
@@ -102,7 +102,7 @@ void show(value f)
 	if (f->T == type_num)
 		put_double(f->v_double);
 	else if (f->T == type_str)
-		put_quote(get_str(f));
+		put_quote(f->v_ptr);
 	else if (f->T == type_list)
 		{
 		put_ch('[');

@@ -1,7 +1,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <context.h>
 
 #include <type_var.h>
 
@@ -57,11 +56,4 @@ value type_var_get(value fun, value arg)
 		}
 	else
 		return type_void(fun,arg);
-	}
-
-void use_var(void)
-	{
-	define("var_new", A(Q(type_var_new),hold(QI)));
-	define("var_put", Q(type_var_put));
-	define("var_get", Q(type_var_get));
 	}

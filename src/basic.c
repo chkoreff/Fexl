@@ -1,5 +1,4 @@
 #include <value.h>
-#include <context.h>
 
 #include <basic.h>
 
@@ -225,20 +224,6 @@ void beg_basic(void)
 	QF = Q(type_F);
 	Qvoid = Q(type_void);
 	Qnull = Q(type_null);
-	}
-
-void use_basic(void)
-	{
-	define("I", hold(QI));
-	define("T", hold(QT));
-	define("F", hold(QF));
-	define("@", Q(type_Y));
-	define("void", hold(Qvoid));
-	define("null", hold(Qnull));
-	define("yield", Q(type_yield));
-	define("cons", Q(type_cons));
-	define("list_to_tuple", Q(type_list_to_tuple));
-	define("tuple_to_list", Q(type_tuple_to_list));
 	}
 
 void end_basic(void)

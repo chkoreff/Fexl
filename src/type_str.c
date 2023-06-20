@@ -2,7 +2,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <context.h>
 #include <memory.h>
 
 #include <type_str.h>
@@ -17,14 +16,9 @@ value type_str(value fun, value arg)
 	return type_void(fun,arg);
 	}
 
-string get_str(value x)
-	{
-	return x->v_ptr;
-	}
-
 const char *str_data(value x)
 	{
-	return get_str(x)->data;
+	return ((string)x->v_ptr)->data;
 	}
 
 value Qstr(string x)
@@ -56,21 +50,4 @@ value type_concat(value fun, value arg)
 		else
 			return type_void(fun,arg);
 		}
-	}
-
-void use_str(void)
-	{
-	define(".", Q(type_concat));
-
-	// LATER length
-	// LATER slice
-	// LATER search
-	// LATER str_num
-	// LATER ord
-	// LATER chr
-	// LATER char_width
-	// LATER dirname
-	// LATER basename
-	// LATER length_common
-	// LATER compare_at
 	}
