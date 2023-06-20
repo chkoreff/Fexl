@@ -4,4 +4,5 @@ extern value type_def(value fun, value arg);
 extern value type_set(value fun, value arg);
 extern value type_get(value fun, value arg);
 extern value type_chain(value fun, value arg);
+extern value type_record_pairs(value fun, value arg);
 extern void use_record(void);

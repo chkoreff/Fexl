@@ -7,8 +7,6 @@
 
 #include <type_record.h>
 
-// TODO record_pairs converts to list of pairs
-
 static value get(string name, value obj)
 	{
 	while (obj->L)
@@ -181,6 +179,31 @@ value type_chain(value fun, value arg)
 		}
 	}
 
+// Get the list of pairs from a record (lazily).
+value type_record_pairs(value fun, value arg)
+	{
+	arg = eval(arg);
+	if (arg->T == type_record)
+		{
+		if (arg->L == 0)
+			{
+			drop(fun);
+			drop(arg);
+			return hold(Qnull);
+			}
+		else
+			{
+			value item = hold(arg->L);
+			value tail = A(fun,hold(arg->R));
+			value g = V(type_list,item,tail);
+			drop(arg);
+			return g;
+			}
+		}
+	else
+		return type_void(fun,arg);
+	}
+
 void use_record(void)
 	{
 	define("empty", Q(type_record));
@@ -188,4 +211,5 @@ void use_record(void)
 	define("set", Q(type_set));
 	define("get", Q(type_get));
 	define("::", Q(type_chain));
+	define("record_pairs", Q(type_record_pairs));
 	}

@@ -181,3 +181,40 @@ try (obj "b")
 try (obj (I "a"))
 try (obj 3)
 )
+
+# Test record_pairs
+(
+try record_pairs
+try (record_pairs (I []))
+try (record_pairs (I empty))
+
+\\obj=
+	(
+	def "hello" (say "Hello");
+	set "a" (+ 1 2);
+	set "b" (* 4 7);
+	set "c" (+ 2 3);
+	empty
+	)
+
+try (record_pairs obj)
+
+# Force evaluation of a list.
+\\expand=
+	(@\loop\xs
+	xs [] \x\xs
+	\\tail=(loop xs)
+	[x;tail]
+	)
+
+try (expand; record_pairs obj)
+
+try (obj "a")
+try (obj "b")
+try (obj "c")
+try (obj "d")
+try (obj "hello")
+try (get "a" obj)
+try (get "d" obj)
+try (get "hello" obj)
+)

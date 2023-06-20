@@ -45,3 +45,17 @@ CALC
 : 28
 : 3
 : void
+: record_pairs
+: void
+: []
+: [(pair "a" 3); (A record_pairs (record [{"b" 28} {"c" 5} {"hello" (A say "Hello")}]))]
+: [(pair "a" 3) (pair "b" 28) (pair "c" 5) (pair "hello" (A say "Hello"))]
+: 3
+: 28
+: 5
+: void
+Hello
+: I
+: (T T (single I 3))
+: T
+: (T T (single I (A say "Hello")))

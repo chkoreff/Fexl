@@ -78,8 +78,9 @@ static const char *type_name(type t)
 	if (t == type_form) return "form";
 	if (t == type_def) return "def";
 	if (t == type_set) return "set";
-	if (t == type_chain) return "::";
 	if (t == type_get) return "get";
+	if (t == type_chain) return "::";
+	if (t == type_record_pairs) return "record_pairs";
 	if (t == type_restrict) return "restrict";
 	if (t == type_cons) return "cons";
 	if (t == type_say) return "say";
