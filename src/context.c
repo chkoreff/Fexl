@@ -14,39 +14,40 @@
 
 #include <context.h>
 
-static value cx_std; // Current context
-
-static void define(const char *key, value val)
+static value def0(const char *key, value val, value cx)
 	{
-	// TODO use chain on the individual contexts
-	cx_std = def(Qstr0(key),val,cx_std);
+	return def(Qstr0(key),val,cx);
 	}
 
 // Define initial context.
 
-static void use_basic(void)
+static value cx_basic(void)
 	{
-	define("I", hold(QI));
-	define("T", hold(QT));
-	define("F", hold(QF));
-	define("@", Q(type_Y));
-	define("void", hold(Qvoid));
-	define("null", hold(Qnull));
-	define("yield", Q(type_yield));
-	define("cons", Q(type_cons));
-	define("list_to_tuple", Q(type_list_to_tuple));
-	define("tuple_to_list", Q(type_tuple_to_list));
+	value cx = hold(Qempty);
+	cx = def0("I", hold(QI),cx);
+	cx = def0("T", hold(QT),cx);
+	cx = def0("F", hold(QF),cx);
+	cx = def0("@", Q(type_Y),cx);
+	cx = def0("void", hold(Qvoid),cx);
+	cx = def0("null", hold(Qnull),cx);
+	cx = def0("yield", Q(type_yield),cx);
+	cx = def0("cons", Q(type_cons),cx);
+	cx = def0("list_to_tuple", Q(type_list_to_tuple),cx);
+	cx = def0("tuple_to_list", Q(type_tuple_to_list),cx);
+	return cx;
 	}
 
-static void use_num(void)
+static value cx_num(void)
 	{
-	define("num_str", Q(type_num_str));
+	value cx = hold(Qempty);
+	cx = def0("num_str", Q(type_num_str),cx);
+	return cx;
 	}
 
-static void use_str(void)
+static value cx_str(void)
 	{
-	define(".", Q(type_concat));
-
+	value cx = hold(Qempty);
+	cx = def0(".", Q(type_concat),cx);
 	// LATER length
 	// LATER slice
 	// LATER search
@@ -58,91 +59,109 @@ static void use_str(void)
 	// LATER basename
 	// LATER length_common
 	// LATER compare_at
+	return cx;
 	}
 
-static void use_math(void)
+static value cx_math(void)
 	{
-	define("pi", Qnum(num_pi));
+	value cx = hold(Qempty);
+	cx = def0("pi", Qnum(num_pi),cx);
 
-	define("round", Q(type_round));
-	define("ceil", Q(type_ceil));
-	define("trunc", Q(type_trunc));
-	define("abs", Q(type_abs));
-	define("sqrt", Q(type_sqrt));
-	define("exp", Q(type_exp));
-	define("log", Q(type_log));
-	define("sin", Q(type_sin));
-	define("cos", Q(type_cos));
+	cx = def0("round", Q(type_round),cx);
+	cx = def0("ceil", Q(type_ceil),cx);
+	cx = def0("trunc", Q(type_trunc),cx);
+	cx = def0("abs", Q(type_abs),cx);
+	cx = def0("sqrt", Q(type_sqrt),cx);
+	cx = def0("exp", Q(type_exp),cx);
+	cx = def0("log", Q(type_log),cx);
+	cx = def0("sin", Q(type_sin),cx);
+	cx = def0("cos", Q(type_cos),cx);
 
-	define("+", Q(type_add));
-	define("-", Q(type_sub));
-	define("*", Q(type_mul));
-	define("/", Q(type_div));
-	define("^", Q(type_pow));
-	define("xor", Q(type_xor));
+	cx = def0("+", Q(type_add),cx);
+	cx = def0("-", Q(type_sub),cx);
+	cx = def0("*", Q(type_mul),cx);
+	cx = def0("/", Q(type_div),cx);
+	cx = def0("^", Q(type_pow),cx);
+	cx = def0("xor", Q(type_xor),cx);
+	return cx;
 	}
 
-static void use_output(void)
+static value cx_output(void)
 	{
-	define("nl", A(Q(type_nl), hold(QI)));
-	define("say", Q(type_say));
-	define("put", Q(type_put));
+	value cx = hold(Qempty);
+	cx = def0("nl", A(Q(type_nl), hold(QI)),cx);
+	cx = def0("say", Q(type_say),cx);
+	cx = def0("put", Q(type_put),cx);
 	// LATER fput fsay
+	return cx;
 	}
 
-static void use_meta(void)
+static value cx_meta(void)
 	{
+	value cx = hold(Qempty);
 	// LATER introspection functions
 	// LATER die
-	define("show_benchmark", Q(type_show_benchmark));
-	define("trace_benchmark", Q(type_trace_benchmark));
-	define("show", Q(type_show));
-	define("read", Q(type_read));
+	cx = def0("show_benchmark", Q(type_show_benchmark),cx);
+	cx = def0("trace_benchmark", Q(type_trace_benchmark),cx);
+	cx = def0("show", Q(type_show),cx);
+	cx = def0("read", Q(type_read),cx);
+	return cx;
 	}
 
-static void use_limit(void)
+static value cx_limit(void)
 	{
-	define("limit_time", Q(type_limit_time));
-	define("limit_stack", Q(type_limit_stack));
-	define("limit_memory", Q(type_limit_memory));
+	value cx = hold(Qempty);
+	cx = def0("limit_time", Q(type_limit_time),cx);
+	cx = def0("limit_stack", Q(type_limit_stack),cx);
+	cx = def0("limit_memory", Q(type_limit_memory),cx);
+	return cx;
 	}
 
-static void use_record(void)
+static value cx_var(void)
 	{
-	define("empty", Q(type_record));
-	define("def", Q(type_def));
-	define("set", Q(type_set));
-	define("get", Q(type_get));
-	define("::", Q(type_chain));
-	define("record_pairs", Q(type_record_pairs));
+	value cx = hold(Qempty);
+	cx = def0("var_new", A(Q(type_var_new),hold(QI)),cx);
+	cx = def0("var_put", Q(type_var_put),cx);
+	cx = def0("var_get", Q(type_var_get),cx);
+	return cx;
 	}
 
-static void use_var(void)
+static value cx_record(void)
 	{
-	define("var_new", A(Q(type_var_new),hold(QI)));
-	define("var_put", Q(type_var_put));
-	define("var_get", Q(type_var_get));
+	value cx = hold(Qempty);
+	cx = def0("empty", hold(Qempty),cx);
+	cx = def0("def", Q(type_def),cx);
+	cx = def0("set", Q(type_set),cx);
+	cx = def0("get", Q(type_get),cx);
+	cx = def0("::", Q(type_chain),cx);
+	cx = def0("record_pairs", Q(type_record_pairs),cx);
+	return cx;
 	}
+
+static value cx_form(void)
+	{
+	value cx = hold(Qempty);
+	cx = def0("restrict",Q(type_restrict),cx);
+	return cx;
+	}
+
+// LATER time
+// LATER rand
+// LATER crypto
 
 value std(void)
 	{
-	cx_std = Q(type_record); // empty stack
-
-	use_basic();
-	use_num();
-	use_str();
-	use_math();
-	use_output();
-	use_meta();
-	use_limit();
-	use_var();
-	use_record();
-
-	define("restrict",Q(type_restrict));
-	define("std",hold(cx_std));
-
-	// LATER time
-	// LATER rand
-	// LATER crypto
-	return cx_std;
+	value cx = hold(Qempty);
+	cx = chain(cx_basic(), cx);
+	cx = chain(cx_num(), cx);
+	cx = chain(cx_str(), cx);
+	cx = chain(cx_math(), cx);
+	cx = chain(cx_output(), cx);
+	cx = chain(cx_meta(), cx);
+	cx = chain(cx_limit(), cx);
+	cx = chain(cx_var(), cx);
+	cx = chain(cx_record(), cx);
+	cx = chain(cx_form(), cx);
+	cx = def0("std",hold(cx),cx);
+	return cx;
 	}

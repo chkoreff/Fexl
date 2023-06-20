@@ -6,6 +6,8 @@
 
 #include <type_record.h>
 
+value Qempty;
+
 static value get(string name, value obj)
 	{
 	while (obj->L)
@@ -118,7 +120,7 @@ value type_get(value fun, value arg)
 		}
 	}
 
-static value chain(value new, value old)
+value chain(value new, value old)
 	{
 	if (new->L == 0)
 		{
@@ -201,4 +203,14 @@ value type_record_pairs(value fun, value arg)
 		}
 	else
 		return type_void(fun,arg);
+	}
+
+void beg_record(void)
+	{
+	Qempty = Q(type_record);
+	}
+
+void end_record(void)
+	{
+	drop(Qempty);
 	}
