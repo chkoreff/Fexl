@@ -38,25 +38,28 @@ static void show_items(value f)
 		}
 	}
 
+static void show_pairs(value f)
+	{
+	put_ch('[');
+	while (f->L)
+		{
+		put_ch('{');
+		put_quote(get_str(f->L->L));
+		put_ch(' ');
+		show(f->L->R);
+		put_ch('}');
+		f = f->R;
+		if (f->L)
+			put_ch(' ');
+		}
+	put_ch(']');
+	}
+
 static void show_record(value f)
 	{
-	if (f->L)
-		{
-		put_ch('(');
-		while (f->L)
-			{
-			put("set ");
-			put_quote(get_str(f->L->L));
-			put_ch(' ');
-			show(f->L->R);
-			put("; ");
-			f = f->R;
-			}
-		put("empty");
-		put_ch(')');
-		}
-	else
-		put("empty");
+	put("(record ");
+	show_pairs(f);
+	put_ch(')');
 	}
 
 static const char *type_name(type t)
@@ -73,6 +76,7 @@ static const char *type_name(type t)
 	if (t == type_single) return "single";
 	if (t == type_pair) return "pair";
 	if (t == type_form) return "form";
+	if (t == type_def) return "def";
 	if (t == type_set) return "set";
 	if (t == type_chain) return "::";
 	if (t == type_get) return "get";

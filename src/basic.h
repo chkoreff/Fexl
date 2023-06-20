@@ -18,6 +18,7 @@ extern value single(value x);
 extern value maybe(value x);
 extern value type_yield(value fun, value arg);
 extern value type_pair(value fun, value arg);
+extern value Qpair(value x, value y);
 extern value type_null(value fun, value arg);
 extern value type_list(value fun, value arg);
 extern value type_cons(value fun, value arg);

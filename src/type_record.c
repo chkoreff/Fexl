@@ -7,37 +7,77 @@
 
 #include <type_record.h>
 
-value type_record(value fun, value arg)
+// TODO record_pairs converts to list of pairs
+
+static value get(string name, value obj)
 	{
-	return type_void(fun,arg);
+	while (obj->L)
+		{
+		int cmp = str_cmp(name, obj->L->L->v_ptr);
+		if (cmp < 0)
+			break;
+		if (cmp == 0)
+			return hold(obj->L->R);
+		obj = obj->R;
+		}
+	return 0;
 	}
 
-value set(value key, value val, value obj)
+value type_record(value fun, value arg)
+	{
+	arg = eval(arg);
+	if (arg->T == type_str)
+		{
+		value val = get(arg->v_ptr,fun);
+		if (val)
+			{
+			drop(fun);
+			drop(arg);
+			return val;
+			}
+		else
+			return type_void(fun,arg);
+		}
+	else
+		return type_void(fun,arg);
+	}
+
+static value Qrecord(value pair, value obj)
+	{
+	return V(type_record,pair,obj);
+	}
+
+value def(value key, value val, value obj)
 	{
 	if (obj->L == 0)
-		return V(type_record,A(key,val),obj);
+		return Qrecord(Qpair(key,val),obj);
 	else
 		{
 		int cmp = str_cmp(key->v_ptr,obj->L->L->v_ptr);
 		if (cmp < 0)
-			return V(type_record,A(key,val),obj);
+			return Qrecord(Qpair(key,val),obj);
 		else if (cmp == 0)
 			{
 			value tail = hold(obj->R);
 			drop(obj);
-			return V(type_record,A(key,val),tail);
+			return Qrecord(Qpair(key,val),tail);
 			}
 		else
 			{
 			value pair = hold(obj->L);
 			value tail = hold(obj->R);
 			drop(obj);
-			return V(type_record,pair,set(key,val,tail));
+			return Qrecord(pair,def(key,val,tail));
 			}
 		}
 	}
 
-value type_set(value fun, value arg)
+static value set(value key, value val, value obj)
+	{
+	return def(key,eval(val),obj);
+	}
+
+static value op_def(value fun, value arg, value op(value,value,value))
 	{
 	if (fun->L == 0)
 		return need(fun,arg,type_str);
@@ -52,26 +92,15 @@ value type_set(value fun, value arg)
 			value val = hold(fun->R);
 			value obj = arg;
 			drop(fun);
-			return set(key,val,obj);
+			return op(key,val,obj);
 			}
 		else
 			return type_void(fun,arg);
 		}
 	}
 
-value get(string name, value obj)
-	{
-	while (obj->L)
-		{
-		int cmp = str_cmp(name, obj->L->L->v_ptr);
-		if (cmp < 0)
-			break;
-		if (cmp == 0)
-			return hold(obj->L->R);
-		obj = obj->R;
-		}
-	return 0;
-	}
+value type_def(value fun, value arg) { return op_def(fun,arg,def); }
+value type_set(value fun, value arg) { return op_def(fun,arg,set); }
 
 value type_get(value fun, value arg)
 	{
@@ -112,7 +141,7 @@ static value chain(value new, value old)
 			value new_pair = hold(new->L);
 			value new_tail = hold(new->R);
 			drop(new);
-			return V(type_record,new_pair,chain(new_tail,old));
+			return Qrecord(new_pair,chain(new_tail,old));
 			}
 		else if (cmp == 0)
 			{
@@ -121,14 +150,14 @@ static value chain(value new, value old)
 			value old_tail = hold(old->R);
 			drop(old);
 			drop(new);
-			return V(type_record,new_pair,chain(new_tail,old_tail));
+			return Qrecord(new_pair,chain(new_tail,old_tail));
 			}
 		else
 			{
 			value old_pair = hold(old->L);
 			value old_tail = hold(old->R);
 			drop(old);
-			return V(type_record,old_pair,chain(new,old_tail));
+			return Qrecord(old_pair,chain(new,old_tail));
 			}
 		}
 	}
@@ -155,6 +184,7 @@ value type_chain(value fun, value arg)
 void use_record(void)
 	{
 	define("empty", Q(type_record));
+	define("def", Q(type_def));
 	define("set", Q(type_set));
 	define("get", Q(type_get));
 	define("::", Q(type_chain));

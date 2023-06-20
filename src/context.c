@@ -112,7 +112,7 @@ value cx_std; // Current context
 void define(const char *key, value val)
 	{
 	// TODO use chain on the individual contexts
-	cx_std = set(Qstr0(key),val,cx_std);
+	cx_std = def(Qstr0(key),val,cx_std);
 	}
 
 // Define initial context.

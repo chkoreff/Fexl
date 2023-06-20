@@ -7,10 +7,10 @@
 (
 restrict
 (
-set "fred" fred;
-set "wilma" wilma;
-set "barney" barney;
-set "betty" betty;
+def "fred" fred;
+def "wilma" wilma;
+def "barney" barney;
+def "betty" betty;
 std
 )
 ;
@@ -21,8 +21,8 @@ nl
 (
 restrict
 (
-set "wilma" wilma;
-set "double" (* 2);
+def "wilma" wilma;
+def "double" (* 2);
 std
 )
 \;

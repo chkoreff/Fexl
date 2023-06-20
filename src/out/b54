@@ -1,24 +1,24 @@
-: empty
-: (set set "x")
+: (record [])
+: (def def "x")
 : void
-: (set (set set "x") (A say "HI"))
+: (def (def def "x") (A say "HI"))
 : void
-: (set "x" (A say "HI"); empty)
-: (set "x" 1; set "y" 2; empty)
-: (set "x" 1; set "y" 2; empty)
-: (set "x" 1; empty)
-: (set "a" "0970"; set "b" "1500"; set "c" "0653"; set "d" "7631"; set "e" "1551"; set "f" "2534"; empty)
-: (set "+" +; set "nl" (A nl I); set "num_str" num_str; set "put" put; set "say" say; empty)
+: (record [{"x" (A say "HI")}])
+: (record [{"x" 1} {"y" 2}])
+: (record [{"x" 1} {"y" 2}])
+: (record [{"x" 1}])
+: (record [{"a" "0970"} {"b" "1500"} {"c" "0653"} {"d" "7631"} {"e" "1551"} {"f" "2534"}])
+: (record [{"+" +} {"nl" (A nl I)} {"num_str" num_str} {"put" put} {"say" say}])
 : ::
-: (:: :: empty)
+: (:: :: (record []))
 : void
 : void
-: (set "a" "3549"; empty)
-: (set "a" "3549"; empty)
-: (set "a" "3549"; set "b" "3160"; empty)
-: (set "a" "3549"; empty)
-: (set "a" "3549"; set "b" "3160"; empty)
-: (set "a" "0970"; set "aa" "0853"; set "b" "1500"; set "c" "2609"; set "d" "7631"; set "e" "7709"; set "f" "2534"; set "x" "0205"; empty)
+: (record [{"a" "3549"}])
+: (record [{"a" "3549"}])
+: (record [{"a" "3549"} {"b" "3160"}])
+: (record [{"a" "3549"}])
+: (record [{"a" "3549"} {"b" "3160"}])
+: (record [{"a" "0970"} {"aa" "0853"} {"b" "1500"} {"c" "2609"} {"d" "7631"} {"e" "7709"} {"f" "2534"} {"x" "0205"}])
 : get
 : (get get "a")
 : void
@@ -29,3 +29,19 @@
 : "NO"
 : "NO"
 : ["YES" 3]
+
+: 1
+: 2
+: void
+: void
+: void
+
+: set
+: void
+: (set set "a")
+: (set (set set "a") (A (A (A (A say "CALC") +) 1) 2))
+CALC
+: (record [{"a" 3} {"b" 28}])
+: 28
+: 3
+: void

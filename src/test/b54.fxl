@@ -2,51 +2,51 @@
 \try=(\\exp put ": " show exp nl)
 
 try empty
-try (set (I "x"))
-try (set (I 3))
-try (set (I "x") (say "HI"))
-try (set (I "x") (say "HI"); I 3)
-try (set (I "x") (say "HI"); I empty)
+try (def (I "x"))
+try (def (I 3))
+try (def (I "x") (say "HI"))
+try (def (I "x") (say "HI"); I 3)
+try (def (I "x") (say "HI"); I empty)
 try
 	(
-	set "x" 1;
-	set "y" 2;
+	def "x" 1;
+	def "y" 2;
 	empty
 	)
 try
 	(
-	set "y" 2;
-	set "x" 1;
-	empty
-	)
-
-try
-	(
-	set "x" 1;
-	set "x" 2;
+	def "y" 2;
+	def "x" 1;
 	empty
 	)
 
 try
 	(
-	set "a" "0970";
-	set "d" "7631";
-	set "c" "0653";
-	set "b" "1500";
-	set "f" "2534";
-	set "d" "6258";
-	set "a" "1549";
-	set "e" "1551";
+	def "x" 1;
+	def "x" 2;
 	empty
 	)
 
 try
 	(
-	set "say" say;
-	set "+" +;
-	set "nl" nl;
-	set "put" put;
-	set "num_str" num_str;
+	def "a" "0970";
+	def "d" "7631";
+	def "c" "0653";
+	def "b" "1500";
+	def "f" "2534";
+	def "d" "6258";
+	def "a" "1549";
+	def "e" "1551";
+	empty
+	)
+
+try
+	(
+	def "say" say;
+	def "+" +;
+	def "nl" nl;
+	def "put" put;
+	def "num_str" num_str;
 	empty
 	)
 
@@ -55,13 +55,13 @@ try ::
 try (:: (I empty))
 try (:: (I 3))
 try (:: (I empty) (I 3))
-try (:: (I empty) (I; set "a" "3549"; empty))
+try (:: (I empty) (I; def "a" "3549"; empty))
 
 try
 	(
 	::
 		(
-		set "a" "3549";
+		def "a" "3549";
 		empty
 		)
 		empty
@@ -71,24 +71,11 @@ try
 	(
 	::
 		(
-		set "a" "3549";
+		def "a" "3549";
 		empty
 		)
 		(
-		set "b" "3160";
-		empty
-		)
-	)
-
-try
-	(
-	::
-		(
-		set "a" "3549";
-		empty
-		)
-		(
-		set "a" "3160";
+		def "b" "3160";
 		empty
 		)
 	)
@@ -97,11 +84,11 @@ try
 	(
 	::
 		(
-		set "b" "3160";
+		def "a" "3549";
 		empty
 		)
 		(
-		set "a" "3549";
+		def "a" "3160";
 		empty
 		)
 	)
@@ -110,22 +97,35 @@ try
 	(
 	::
 		(
-		set "x" "0205";
-		set "e" "7709";
-		set "c" "2609";
-		set "aa" "0853";
-		set "x" "2380";
+		def "b" "3160";
 		empty
 		)
 		(
-		set "a" "0970";
-		set "d" "7631";
-		set "c" "0653";
-		set "b" "1500";
-		set "f" "2534";
-		set "d" "6258";
-		set "a" "1549";
-		set "e" "1551";
+		def "a" "3549";
+		empty
+		)
+	)
+
+try
+	(
+	::
+		(
+		def "x" "0205";
+		def "e" "7709";
+		def "c" "2609";
+		def "aa" "0853";
+		def "x" "2380";
+		empty
+		)
+		(
+		def "a" "0970";
+		def "d" "7631";
+		def "c" "0653";
+		def "b" "1500";
+		def "f" "2534";
+		def "d" "6258";
+		def "a" "1549";
+		def "e" "1551";
 		empty
 		)
 	)
@@ -134,8 +134,8 @@ try
 (
 \\obj=
 	(
-	set "a" 1;
-	set "b" 2;
+	def "a" 1;
+	def "b" 2;
 	empty
 	)
 
@@ -148,5 +148,36 @@ try (get "a" obj "NO" \val ["YES" val])
 try (get "b" obj "NO" \val ["YES" val])
 try (get "c" obj "NO" \val ["YES" val])
 try (get "a" empty "NO" \val ["YES" val])
-try (get "c" (set "c" 3; obj) "NO" \val ["YES" val])
+try (get "c" (def "c" 3; obj) "NO" \val ["YES" val])
+)
+
+# Test using record as function
+(
+\obj=
+	(
+	def "a" 1;
+	def "b" 2;
+	empty
+	)
+nl
+try (obj (I "a"))
+try (obj "b")
+try (obj "c")
+try (obj 3)
+try (empty "a")
+nl
+)
+
+# Test the set function which evaluates the val.
+(
+try set
+try (set 3)
+try (set "a")
+try (set "a" (say "CALC" + 1 2))
+
+\\obj=(set "a" (say "CALC" + 1 2); set "b" (* 4 7); empty)
+try obj
+try (obj "b")
+try (obj (I "a"))
+try (obj 3)
 )

@@ -26,8 +26,8 @@ try std "fred"
 (
 \cx=
 	(
-	set "fred" 32;
-	set "wilma" 64;
+	def "fred" 32;
+	def "wilma" 64;
 	empty
 	)
 

@@ -10,7 +10,7 @@
 	restrict
 		(
 		#say "RESOLVE" # TODO
-		set "fred" (say "I am Fred.");
+		def "fred" (say "I am Fred.");
 		empty
 		)
 		demo
@@ -18,7 +18,7 @@
 
 restrict
 (
-set "demo" demo;
+def "demo" demo;
 std
 )
 \;

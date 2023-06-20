@@ -36,7 +36,7 @@ try
 	(
 	restrict
 	(
-	set "say" say;
+	def "say" say;
 	empty
 	)
 	\;
@@ -56,7 +56,7 @@ try
 	(
 	restrict
 	(
-	set "SAY" say;
+	def "SAY" say;
 	empty
 	)
 	\;
@@ -77,9 +77,9 @@ try
 	(
 	restrict
 	(
-	set "say" say;
-	set "put" put;
-	set "nl" nl;
+	def "say" say;
+	def "put" put;
+	def "nl" nl;
 	empty
 	)
 	\;
@@ -93,10 +93,10 @@ try
 	(
 	restrict
 	(
-	set "say" say;
-	set "put" put;
-	set "nl" nl;
-	set "num_str" num_str;
+	def "say" say;
+	def "put" put;
+	def "nl" nl;
+	def "num_str" num_str;
 	empty
 	)
 	\;

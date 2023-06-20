@@ -1,6 +1,6 @@
 : restrict
 : void
-: (restrict restrict empty)
+: (restrict restrict (record []))
 : void
 : 27
 Undefined symbol say on line 10 of test/b55.fxl

@@ -2,7 +2,7 @@
 show (\; say "hello") nl
 restrict
 (
-set "double" (* 2);
+def "double" (* 2);
 std
 )
 \;

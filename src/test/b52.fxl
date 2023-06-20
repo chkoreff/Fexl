@@ -4,7 +4,7 @@
 
 \value= # TODO in C
 	(\cx
-	restrict (set "std" cx; cx)
+	restrict (def "std" cx; cx)
 	)
 
 # Run the Flintstones demo.

@@ -1,26 +1,26 @@
 #
 \value= # TODO in C
 	(\cx
-	restrict (set "std" cx; cx)
+	restrict (def "std" cx; cx)
 	)
 
 \std=
 	(
-	set "value" value;
+	def "value" value;
 	std
 	)
 
 \flintstones=
 	(
-	set "fred" (say "I am Fred.");
-	set "wilma" (say "I am Wilma.");
+	def "fred" (say "I am Fred.");
+	def "wilma" (say "I am Wilma.");
 	empty
 	)
 
 value
 (
 :: flintstones;
-set "hello" (say "Hello");
+def "hello" (say "Hello");
 std
 )
 \;

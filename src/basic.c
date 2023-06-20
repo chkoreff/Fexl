@@ -131,6 +131,11 @@ value type_pair(value fun, value arg)
 	return A(A(h,x),y);
 	}
 
+value Qpair(value x, value y)
+	{
+	return V(type_pair,x,y);
+	}
+
 // (null x y) = x
 value type_null(value fun, value arg)
 	{
@@ -144,7 +149,7 @@ value type_list(value fun, value arg)
 	value y = hold(fun->R);
 	drop(fun);
 	drop(arg);
-	return V(type_pair,x,y);
+	return Qpair(x,y);
 	}
 
 // (cons x y) = (list x y)
