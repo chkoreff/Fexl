@@ -26,9 +26,5 @@ make type_str
 make type_var
 make value
 
-#make format
-#make type_convert
-#make type_meta
-
 make fexl
 link fexl

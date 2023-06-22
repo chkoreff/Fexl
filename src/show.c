@@ -5,6 +5,7 @@
 #include <basic.h>
 #include <output.h>
 #include <type_form.h>
+#include <type_limit.h>
 #include <type_math.h>
 #include <type_meta.h>
 #include <type_num.h>
@@ -86,6 +87,9 @@ static const char *type_name(type t)
 	if (t == type_say) return "say";
 	if (t == type_put) return "put";
 	if (t == type_nl) return "nl";
+	if (t == type_limit_time) return "limit_time";
+	if (t == type_limit_stack) return "limit_stack";
+	if (t == type_limit_memory) return "limit_memory";
 	if (t == type_show_benchmark) return "show_benchmark";
 	if (t == type_trace_benchmark) return "trace_benchmark";
 	if (t == type_add) return "+";
