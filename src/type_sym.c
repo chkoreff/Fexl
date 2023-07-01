@@ -410,7 +410,7 @@ value type_value(value f)
 value type_resolve(value f)
 	{
 	f = type_value(f);
-	if (f) f = AV(hold(Qyield),f);
+	if (f) f = yield(f);
 	return f;
 	}
 

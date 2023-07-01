@@ -47,7 +47,7 @@ value type_var_getf(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_var)
-		f = A(hold(Qyield),hold(x->R));
+		f = yield(hold(x->R));
 	else
 		f = hold(Qvoid);
 	drop(x);

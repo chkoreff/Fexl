@@ -239,6 +239,41 @@
 	)
 	)
 
+\test_11==
+	(
+	say "= test_11"
+	# Test setf and get.
+
+	show_benchmark;
+
+	\obj=
+		(
+		set "x" (say "CALC" + 2 3);
+		setf "fred" (say "I am Fred.");
+		setf "wilma" (say "I am Wilma.");
+		empty
+		)
+	say ["x = "(obj "x")]
+	obj "fred"
+	obj "wilma"
+	nl
+
+	# Look up a key value and run it if found.
+	\try==
+		(\key
+		get key obj
+			(say ["NO "key])
+			(\val
+			say ["YES "key]
+			val
+			)
+		)
+
+	try "xfred"
+	try "fred"
+	try "wilma"
+	)
+
 say "BEG"
 test_1
 test_2
@@ -250,4 +285,5 @@ test_7
 test_8
 test_9
 test_10
+test_11
 say "END"

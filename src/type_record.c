@@ -199,10 +199,7 @@ value record_empty(void)
 	return Qrecord(new_record_bump(0));
 	}
 
-/* (set key val obj) Set key to val in record obj, returning a record like obj
-but with key mapped to val.  It modifies obj inline if there are no other
-references to it; otherwise it returns a modified copy of obj. */
-value type_set(value f)
+static value op_set(value f, value op(value))
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
 	{
@@ -212,13 +209,49 @@ value type_set(value f)
 		value z = arg(f->R);
 		if (z->T == type_record)
 			{
-			value y = arg(f->L->R);
+			value y = op(f->L->R);
 			f = set(x,y,z);
 			drop(y);
 			}
 		else
 			f = hold(Qvoid);
 		drop(z);
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	}
+	}
+
+/* (set key val obj) Set key to val in record obj, returning a record like obj
+but with key mapped to val.  It modifies obj inline if there are no other
+references to it; otherwise it returns a modified copy of obj. */
+value type_set(value f)
+	{
+	return op_set(f,arg);
+	}
+
+// Set the value without evaluating it.
+value type_setf(value f)
+	{
+	return op_set(f,hold);
+	}
+
+// Look up key in record and return either no or (yes val).
+value type_get(value f)
+	{
+	if (!f->L || !f->L->L) return 0;
+	{
+	value x = arg(f->L->R);
+	if (x->T == type_str)
+		{
+		value y = arg(f->R);
+		if (y->T == type_record)
+			f = maybe(find(get_record(y),get_str(x),0));
+		else
+			f = hold(Qvoid);
+		drop(y);
 		}
 	else
 		f = hold(Qvoid);

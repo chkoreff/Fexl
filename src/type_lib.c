@@ -75,7 +75,7 @@ value type_dlsym(value f)
 		if (t == 0)
 			f = hold(Qvoid);
 		else
-			f = AV(hold(Qyield),V(t,0,0));
+			f = yield(V(t,0,0));
 		}
 	else
 		f = hold(Qvoid);

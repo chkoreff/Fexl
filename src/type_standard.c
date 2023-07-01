@@ -214,6 +214,8 @@ static value standard(void)
 	/* record */
 	if (match("empty")) return hold(Qempty);
 	if (match("set")) return Q(type_set);
+	if (match("setf")) return Q(type_setf);
+	if (match("get")) return Q(type_get);
 	if (match("record_count")) return Q(type_record_count);
 	if (match("record_item")) return Q(type_record_item);
 

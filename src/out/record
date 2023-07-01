@@ -117,6 +117,18 @@ at 4 = void
 ]
 steps 3729 bytes 8384
 = test_10
+= test_11
+CALC
+x = 5
+I am Fred.
+I am Wilma.
+
+NO xfred
+YES fred
+I am Fred.
+YES wilma
+I am Wilma.
+steps 155 bytes 896
 END
 ~
 \err=

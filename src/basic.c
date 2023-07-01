@@ -123,6 +123,20 @@ value type_yield(value f)
 	return AV(arg(f->R),hold(f->L->R));
 	}
 
+value yield(value x)
+	{
+	return AV(hold(Qyield),x);
+	}
+
+// Return either no or (yes x).
+value maybe(value x)
+	{
+	if (x == 0)
+		return hold(QT);
+	else
+		return AV(hold(QT),yield(hold(x)));
+	}
+
 value boolean(int x)
 	{
 	return hold(x ? QT : QF);

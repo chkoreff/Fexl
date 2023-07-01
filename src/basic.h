@@ -22,6 +22,8 @@ extern value type_null(value f);
 extern value type_eval(value f);
 extern value type_once(value f);
 extern value type_yield(value f);
+extern value yield(value x);
+extern value maybe(value x);
 extern value boolean(int x);
 extern value type_is_defined(value f);
 extern value type_is_undef(value f);
