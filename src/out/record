@@ -129,7 +129,31 @@ I am Fred.
 YES wilma
 I am Wilma.
 steps 155 bytes 896
-END
+= test_12
+val = 0
+val = 3
+val = 4
+val = 8
+steps 219 bytes 3552
+
+val = 0
+val = 3
+val = 4
+val = 8
+steps 218 bytes 3552
+
+val = 0
+val = 3
+val = 4
+val = 8
+steps 218 bytes 3552
+
+val = 0
+val = 3
+val = 4
+val = 8
+steps 218 bytes 3520
+
 ~
 \err=
 ~

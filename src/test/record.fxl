@@ -274,6 +274,126 @@
 	try "wilma"
 	)
 
+\test_12==
+(
+# Demonstrate object-oriented functional programming (OOFP).
+#
+# This demo uses a Smalltalk messaging style, but avoids dispatch overhead by
+# grabbing method handles up front.  It does "multi-level hashes" like Perl,
+# but in a more precisely controlled way.  It demonstrates "inheritance" by
+# extending the new_slot routine.
+
+say "= test_12"
+
+\getf== # LATER 20230702 Do in type_record.c
+	(\key\obj
+	get key obj void
+	)
+
+# Return a new slot with initial value.
+\new_slot==
+	(\val
+
+	\v=var_new
+	var_put v val
+
+	setf "get" (var_get v);
+	set "put" (var_put v);
+	empty
+	)
+
+# Return a new tree with a function to create a new value when needed.
+\new_tree==
+	(\new_val
+
+	\v=var_new
+	var_put v empty
+
+	# This "auto-vivifies" an entry at the given key.
+	setf "at"
+		(\key
+		get key (var_get v)
+			(
+			\val=new_val
+			var_put v (setf key val (var_get v))
+			val
+			)
+			()
+		);
+	# LATER 20230702 Implement a "del" function in type_record.c and provide a
+	# "del" method here.
+	empty
+	)
+
+# Extend slot with a "mod" routine to apply a function to the value.
+\new_slot==
+	(\val
+	\obj=(new_slot val)
+	getf "put" obj \put
+	getf "get" obj \val
+
+	setf "mod" (\f put (f val));
+	obj
+	)
+
+# Extend slot with a "show" routine.
+\new_slot==
+	(\val
+	\obj=(new_slot val)
+	getf "get" obj \val
+
+	setf "show" (say ["val = "(as_str val)]);
+	obj
+	)
+
+# Run a test on a given object.
+\run_test==
+	(\obj
+	getf "put" obj \put
+	getf "show" obj \show
+	getf "mod" obj \mod
+
+	(
+	show_benchmark;
+	show
+	put 3
+	show
+	put 4
+	show
+	mod (* 2)
+	show
+	)
+	nl
+	)
+
+# Level 0
+(
+\obj=(new_slot 0)
+run_test obj
+)
+
+# Level 1
+(
+\obj=(new_tree; new_slot 0)
+\obj=(obj "at" "x")
+run_test obj
+)
+
+# Level 2
+(
+\obj=(new_tree; new_tree; new_slot 0)
+\obj=(obj "at" "x" "at" "y")
+run_test obj
+)
+
+# Level 3
+(
+\obj=(new_tree; new_tree; new_tree; new_slot 0)
+\obj=(obj "at" "x" "at" "y" "at" "z")
+run_test obj
+)
+)
+
 say "BEG"
 test_1
 test_2
@@ -286,4 +406,4 @@ test_8
 test_9
 test_10
 test_11
-say "END"
+test_12
