@@ -1,0 +1,21 @@
+\out=
+~
+= Direct substitution
+x = (CALC) 5
+x = (CALC) 5
+
+x = (CALC) 5
+x = (CALC) 5
+
+= Eager substitution
+(CALC) x = 5
+x = 5
+
+(CALC) x = 5
+x = 5
+
+~
+\err=
+~
+~
+\status=0

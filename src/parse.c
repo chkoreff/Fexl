@@ -63,6 +63,20 @@ a sequence of characters which constitute the actual content of the string,
 terminated by a repeat occurrence of the delimiter.
 */
 
+/*
+NOTE 20230707: This parser now implements a transition to the new preferred
+syntax.  If you start a file with the exact comment "#use_new_syntax", it uses
+the new syntax.  The difference in grammar is:
+
+factor  =>  "\" name def exp
+factor  =>  "\\" name def exp
+
+def     =>  empty
+def     =>  "=" term
+*/
+
+static int use_new_syntax;
+
 static value cur_label; // label of current input stream
 
 static void syntax_error(const char *code, unsigned long line)
@@ -233,7 +247,7 @@ static struct form parse_term(void)
 	}
 
 // Parse a lambda form following the initial '\' character.
-static struct form parse_lambda(unsigned long first_line)
+static struct form parse_old_lambda(unsigned long first_line)
 	{
 	string name = parse_name();
 	if (name == 0)
@@ -263,6 +277,42 @@ static struct form parse_lambda(unsigned long first_line)
 		skip();
 	else
 		type = type_E; // eager
+
+	skip_filler();
+	def = parse_term();
+	if (def.exp == 0)
+		syntax_error("Missing definition", first_line);
+
+	exp = form_lam(type,name,parse_exp());
+	return form_appv(exp,def);
+	}
+	}
+
+// Parse a lambda form following the initial '\' character.
+static struct form parse_new_lambda(unsigned long first_line, type type)
+	{
+	string name = parse_name();
+	if (name == 0)
+		syntax_error("Missing name after '\\'", first_line);
+
+	// Lambda name cannot be a numeric constant.
+	{
+	value n = Qnum_str0(name->data);
+	if (n)
+		syntax_error("Lambda name cannot be a number", first_line);
+	}
+
+	skip_filler();
+	if (cur_ch != '=')
+		return form_lam(type,name,parse_exp()); // No definition
+
+	first_line = cur_line;
+	skip();
+
+	// Parse the definition.
+	{
+	struct form def;
+	struct form exp;
 
 	skip_filler();
 	def = parse_term();
@@ -309,8 +359,23 @@ static struct form parse_factor(void)
 			}
 		else
 			{
-			skip_filler();
-			return parse_lambda(first_line);
+			if (use_new_syntax)
+				{
+				type type = type_D; // direct
+				if (cur_ch == '\\')
+					{
+					skip();
+					type = type_E; // eager
+					}
+
+				skip_filler();
+				return parse_new_lambda(first_line,type);
+				}
+			else
+				{
+				skip_filler();
+				return parse_old_lambda(first_line);
+				}
 			}
 		}
 	else if (cur_ch == ';')
@@ -340,13 +405,50 @@ static struct form parse_exp(void)
 		}
 	}
 
+// Set the use_new_syntax flag to true if and only if the stream starts with a
+// commented magic token.
+static void check_magic_token(const char *magic_token)
+	{
+	if (cur_ch == '#')
+		{
+		const char *p = magic_token;
+		int matched = 1;
+
+		skip();
+		while (cur_ch != '\n' && cur_ch != -1)
+			{
+			if (matched)
+				{
+				if (*p)
+					{
+					matched = (*p == cur_ch);
+					p++;
+					}
+				else
+					matched = 0;
+				}
+
+			skip();
+			}
+
+		if (*p) matched = 0;
+
+		use_new_syntax = matched;
+		}
+	else
+		use_new_syntax = 0;
+	}
+
 static value type_parse_fexl(value f)
+	{
+	check_magic_token("use_new_syntax");
 	{
 	value exp = parse_form();
 	if (cur_ch != -1)
 		syntax_error("Extraneous input", cur_line);
 	(void)f;
 	return exp;
+	}
 	}
 
 // Parse a top level form.

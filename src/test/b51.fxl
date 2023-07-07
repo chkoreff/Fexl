@@ -1,0 +1,39 @@
+#use_new_syntax
+(
+say "= Direct substitution"
+(
+\x=(put "(CALC) " + 2 3)
+say ["x = "x]
+say ["x = "x]
+nl
+)
+(
+\try=
+	(\x
+	say ["x = "x]
+	say ["x = "x]
+	)
+try (put "(CALC) " + 2 3)
+nl
+)
+)
+
+(
+say "= Eager substitution"
+(
+\\x=(put "(CALC) " + 2 3)
+say ["x = "x]
+say ["x = "x]
+nl
+)
+(
+\try=
+	(\\x
+	say ["x = "x]
+	say ["x = "x]
+	)
+try (put "(CALC) " + 2 3)
+nl
+)
+)
+
