@@ -10,7 +10,6 @@ value Qvoid;
 value Qlist;
 value Qcons;
 value Qnull;
-value Qeval;
 value Qonce;
 value Qyield;
 
@@ -278,7 +277,6 @@ void beg_basic(void)
 	Qlist = Q(type_list);
 	Qcons = Q(type_cons);
 	Qnull = Q(type_null);
-	Qeval = Q(type_eval);
 	Qonce = Q(type_once);
 	Qyield = Q(type_yield);
 	}
@@ -293,7 +291,6 @@ void end_basic(void)
 	drop(Qlist);
 	drop(Qcons);
 	drop(Qnull);
-	drop(Qeval);
 	drop(Qonce);
 	drop(Qyield);
 	}

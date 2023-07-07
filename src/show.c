@@ -36,7 +36,8 @@ static void put_type(type t)
 	else if (t == type_def) put("def");
 	else if (t == type_value) put("value");
 	else if (t == type_resolve) put("resolve");
-	else if (t == type_subst) put("subst");
+	else if (t == type_D) put("D");
+	else if (t == type_E) put("E");
 	else if (t == type_pattern) put("pattern");
 
 	else if (t == type_put) put("put");

@@ -76,7 +76,7 @@ static value standard(void)
 	if (match("void")) return hold(Qvoid);
 	if (match("cons")) return hold(Qcons);
 	if (match("null")) return hold(Qnull);
-	if (match("eval")) return hold(Qeval);
+	if (match("eval")) return Q(type_eval);
 	if (match("yield")) return hold(Qyield);
 
 	if (match("is_defined")) return Q(type_is_defined);

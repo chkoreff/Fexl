@@ -237,11 +237,11 @@ static value wrap_pattern(value pattern)
 	}
 
 // Abstract the name from the body.
-struct form form_lam(string name, struct form body)
+struct form form_lam(type type, string name, struct form body)
 	{
 	value pattern = wrap_pattern(table_pop(name,body.table));
 	str_free(name);
-	body.exp = V(type_subst,pattern,body.exp);
+	body.exp = V(type,pattern,body.exp);
 	return body;
 	}
 
@@ -255,11 +255,23 @@ static value subst(value p, value e, value x)
 	return V(e->T,subst(p->L,e->L,x),subst(p->R,e->R,x));
 	}
 
-// (subst p e x) Calls substitute.
-value type_subst(value f)
+// Direct substitution
+value type_D(value f)
 	{
 	if (f->L->T == type_pattern) return 0;
 	return subst(f->L->L->R,f->L->R,f->R);
+	}
+
+// Eager substitution
+value type_E(value f)
+	{
+	if (f->L->T == type_pattern) return 0;
+	{
+	value x = arg(f->R);
+	f = subst(f->L->L->R,f->L->R,x);
+	drop(x);
+	return f;
+	}
 	}
 
 static int is_closed(struct table *xt)

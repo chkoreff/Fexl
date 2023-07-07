@@ -248,32 +248,29 @@ static struct form parse_lambda(unsigned long first_line)
 
 	skip_filler();
 	if (cur_ch != '=')
-		return form_lam(name,parse_exp()); // No definition
+		return form_lam(type_D,name,parse_exp()); // No definition
 
 	first_line = cur_line;
 	skip();
 
 	// Parse the definition.
 	{
-	int eager = 0;
+	type type = type_D; // direct
 	struct form def;
 	struct form exp;
 
 	if (cur_ch == '=')
 		skip();
 	else
-		eager = 1;
+		type = type_E; // eager
 
 	skip_filler();
 	def = parse_term();
 	if (def.exp == 0)
 		syntax_error("Missing definition", first_line);
 
-	exp = form_lam(name,parse_exp());
-	if (eager)
-		return form_appv(form_appv(form_val(hold(Qeval)),def),exp);
-	else
-		return form_appv(exp,def);
+	exp = form_lam(type,name,parse_exp());
+	return form_appv(exp,def);
 	}
 	}
 

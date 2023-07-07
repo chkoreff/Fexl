@@ -299,7 +299,7 @@ x = 4
 x = 2
 x = 1
 
-steps 992 bytes 1664
+steps 976 bytes 1632
 ==
 x = 81
 ==
@@ -912,7 +912,7 @@ end "  abcd   " = "  abcd"
 
 ]
 = test_eq_data
-steps 4286 bytes 2976
+steps 4144 bytes 2912
 ["a" "b" "c" "d" "e"]
 {"a" "b" "c" "d" "e"}
 

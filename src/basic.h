@@ -6,7 +6,6 @@ extern value Qvoid;
 extern value Qlist;
 extern value Qcons;
 extern value Qnull;
-extern value Qeval;
 extern value Qonce;
 extern value Qyield;
 extern value type_I(value f);
