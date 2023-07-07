@@ -1402,5 +1402,5 @@ hello
 say "]"
 )
 
-\\
+\#
 Extra stuff not parsed.

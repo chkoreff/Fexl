@@ -42,7 +42,7 @@ string  =>  tilde_string
 ]
 
 The parser reads an expression from the input until it reaches end of file or
-the special token "\\" which acts like end of file.  It skips white space and
+the special token "\#" which acts like end of file.  It skips white space and
 comments which appear before syntactic elements.  White space is any character
 with an ASCII value less than or equal to ' ' (SPACE).  A comment starts with
 '#' and continues through end of line.
@@ -292,9 +292,9 @@ static struct form parse_factor(void)
 		{
 		unsigned long first_line = cur_line;
 		skip();
-		if (cur_ch == '\\')
+		if (cur_ch == '#')
 			{
-			cur_ch = -1; // Two backslashes simulates end of file.
+			cur_ch = -1; // "\#" simulates end of file.
 			return form_null();
 			}
 		else if (cur_ch == ';')

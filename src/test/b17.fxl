@@ -100,7 +100,7 @@ say "hello"
 say ["x = "(as_str x)]
 trace "complain"
 error "oops"
-\\
+\#
 \a=(+ 246 3)
 \b=47
 (* a b)
