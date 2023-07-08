@@ -1,3 +1,4 @@
+#use_new_syntax
 # Skip matching characters.
 \skip_match=
 	(\is_match
@@ -8,7 +9,7 @@
 # Collect characters up to an ending condition.
 \collect_to=
 	(\is_end
-	\buf=buf_new
+	\\buf=buf_new
 	@\loop
 	is_end (buf_get buf);
 	buf_keep buf
@@ -17,11 +18,11 @@
 
 \read_file=(\name read_stream (fopen name "r"))
 
-\read_chars=
+\\read_chars=
 	(
-	\flatten=
+	\\flatten=
 		(
-		\buf=buf_new
+		\\buf=buf_new
 		@\loop\xs
 		xs (buf_get buf) \x\xs
 		buf_put buf x

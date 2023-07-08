@@ -1,6 +1,6 @@
-#
+#use_new_syntax
 (
-\n=time
+\\n=time
 say ["time "n" "(localtime n)]
 
 \try=
@@ -8,15 +8,15 @@ say ["time "n" "(localtime n)]
 say (as_str [name (readlink name) (file_size name) (localtime; mod_time name)])
 )
 
-\_=(remove "test/obj")
-\_=(symlink "../../obj" "test/obj")
+\\_=(remove "test/obj")
+\\_=(symlink "../../obj" "test/obj")
 
 try "test/obj"
 try "test/var.fxl"
 try "nothing"
 try "value.c"
 
-\_=(remove "test/obj")
+\\_=(remove "test/obj")
 )
 
 (
@@ -41,7 +41,7 @@ run_process
 \child_in\child_out
 
 (@\loop
-\text=(fread child_out 4)
+\\text=(fread child_out 4)
 eq text "" ();
 say ["read: "(as_str text)]
 loop

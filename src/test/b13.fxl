@@ -1,10 +1,10 @@
-#
-\test_context==
+#use_new_syntax
+\test_context=
 (\context
 
 \try=
 	(\name
-	\ok=(is_closed; context; parse name "")
+	\\ok=(is_closed; context; parse name "")
 	say ["name "name" : "ok]
 	)
 

@@ -1,7 +1,8 @@
+#use_new_syntax
 # Rendering C code.
 
 # Indent content in a block enclosed with braces.
-\scope==
+\scope=
 	(\content
 	indent
 		(

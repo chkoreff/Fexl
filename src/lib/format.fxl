@@ -1,23 +1,22 @@
+#use_new_syntax
 # Repeat string x n times
 \repeat_str=
 	(\x
-	\buf=buf_new
-	@\loop \n
-	\n=n
+	\\buf=buf_new
+	@\loop\\n
 	le n 0 (buf_get buf);
 	buf_put buf x
 	loop (- n 1)
 	)
 
-\format_num=
+\\format_num=
 (
 # Split string x into groups of three with the given separator.
 \split3=
-	(\sep @\loop \x
-	\x=x
-	\len=(length x)
+	(\sep @\loop\\x
+	\\len=(length x)
 	le len 3 x
-	\pos=(- len 3)
+	\\pos=(- len 3)
 	\prefix=(slice x 0 pos)
 	\suffix=(slice x pos 3)
 	. (loop prefix) (. sep suffix)
@@ -26,24 +25,23 @@
 # Format number x to n decimal places, with an optional separator for the
 # integer part.
 \format_num=
-	(\n\sep\x
+	(\\n\\sep\\x
 	# Get the list of all digits without the decimal point.
-	\n=n
-	\x=x
+
 	\factor=(^ 10 n)
-	\digits=(num_str; round; * factor (abs x))
+	\\digits=(num_str; round; * factor (abs x))
 
 	# Pad 0s on the front as needed.
 	\pad=(repeat_str "0" (+ 1 (- n (length digits))))
-	\digits=(. pad digits)
+	\\digits=(. pad digits)
 
 	# Extract integer and fractional part.
-	\pos=(- (length digits) n)
-	\xi=(slice digits 0 pos)
-	\xf=(slice digits pos n)
+	\\pos=(- (length digits) n)
+	\\xi=(slice digits 0 pos)
+	\\xf=(slice digits pos n)
 
 	# Insert separator if desired.
-	\xi=(eq sep "" xi (split3 sep xi))
+	\\xi=(eq sep "" xi (split3 sep xi))
 
 	# Put a "." in front of any fractional part.
 	\xf=(eq xf "" "" (. "." xf))
@@ -56,41 +54,39 @@
 format_num
 )
 
-\format_money=(format_num 2 ",")
+\\format_money=(format_num 2 ",")
 
 # Quote a string, enclosing it within terminators to make it suitable for
 # reading as a Fexl string.
 \fexl_quote=
-	(\x
-	\x=x
-	\term=
+	(\\x
+	\\term=
 		(
 		\check=(\y is_void (search x y 0) y)
 		check QU;
 		check "~";
-		(@\loop\count
-		\term=(. "~"; num_str count)
+		(@\loop\\count
+		\\term=(. "~"; num_str count)
 		check term;
-		\count=(+ count 1)
-		loop count
+		loop (+ count 1)
 		) 1
 		)
 	. term; . (eq term QU "" " "); . x; term
 	)
 
 # Convert ASCII string to upper-case.
-\uc=
+\\uc=
 	(
 	str_map \ch
-	\n=(ord ch)
+	\\n=(ord ch)
 	and (ge n 97) (le n 122) (chr; - n 32) ch
 	)
 
 # Convert string to lower-case.
-\lc=
+\\lc=
 	(
 	str_map \ch
-	\n=(ord ch)
+	\\n=(ord ch)
 	and (ge n 65) (le n 90) (chr; + n 32) ch
 	)
 
@@ -98,12 +94,11 @@ format_num
 # Render x on a single line using the given output function.
 \render_data=
 	(\put
-	@\render\x
-	\x=x
+	@\render\\x
 	is_str x (put (fexl_quote x));
 	is_num x (put (num_str x));
 
-	\show_items==
+	\show_items=
 		(\xs
 		xs () \x
 		render x;
@@ -122,13 +117,13 @@ format_num
 	put "?"
 	)
 
-\put_data=(render_data put)
+\\put_data=(render_data put)
 \fput_data=(\fh render_data (fput fh))
 
 \as_str=
 	(\x
-	\buf=buf_new
-	\put=(buf_put buf)
+	\\buf=buf_new
+	\\put=(buf_put buf)
 	render_data put x
 	buf_get buf
 	)
@@ -146,47 +141,46 @@ format_num
 # the start or end of the string.
 \count_match=
 	(\at_beg\match\str
-	\max=(- (length str) 1)
-	\index=(at_beg () (- max))
-	(@\loop\N
+	\\max=(- (length str) 1)
+	\\index=(at_beg () (- max))
+	(@\loop\\N
 	gt N max N;
-	\ch=(slice str (index N) 1)
-	match ch (\N=(+ N 1) loop N) N
+	\\ch=(slice str (index N) 1)
+	match ch (loop (+ N 1)) N
 	) 0
 	)
 
 # Trim matching characters at the start and/or end of the string.
 \str_trim=
-	(\match\at_beg\at_end\str
-	\str=str
-	\beg=(at_beg (count_match T match str) 0)
-	\end=(at_end (count_match F match str) 0)
-	\len=(max 0; - (length str) (+ beg end))
+	(\match\at_beg\at_end\\str
+	\\beg=(at_beg (count_match T match str) 0)
+	\\end=(at_end (count_match F match str) 0)
+	\\len=(max 0; - (length str) (+ beg end))
 	slice str beg len
 	)
 
-\str_trim_spaces=(str_trim (\ch le ch " "))
+\\str_trim_spaces=(str_trim (\ch le ch " "))
 
 # Trim spaces at the start and end of the string.  A space is defined as any
 # ASCII character less than or equal to the space character, which includes all
 # control characters.
-\trim_spaces=(str_trim_spaces T T)
+\\trim_spaces=(str_trim_spaces T T)
 
 # Trim spaces at the start of the string.
-\trim_beg_spaces=(str_trim_spaces T F)
+\\trim_beg_spaces=(str_trim_spaces T F)
 
 # Trim spaces at the end of the string.
-\trim_end_spaces=(str_trim_spaces F T)
+\\trim_end_spaces=(str_trim_spaces F T)
 
 # Get a string of random digits 0-9 with a length from 0 to 15.
 \random_digits=
 	(\len
 	lt len 0 void;
 	gt len 15 void;
-	\r=random_double
-	\r=(eq 1 r 0 r)
-	\r=(format_num len "" r)
-	\r=(slice r 2 len)
+	\\r=random_double
+	\\r=(eq 1 r 0 r)
+	\\r=(format_num len "" r)
+	\\r=(slice r 2 len)
 	r
 	)
 

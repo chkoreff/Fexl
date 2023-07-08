@@ -1,31 +1,30 @@
+#use_new_syntax
 # Test assoc list.
 
 show_benchmark;
 
-\add_random_keys=
-	(@\loop\count\seed\obj
+\\add_random_keys=
+	(@\loop\\count\seed\obj
 	le count 0 obj;
-	\hash=(sha512 seed)
-	\key=(unpack; slice hash 0 8)
-	\val=(unpack; slice hash 32 8)
-	#\obj=(put_key key val obj)
-	\obj=(push_key key val obj)
-	\count=(- count 1)
-	loop count hash obj
+	\\hash=(sha512 seed)
+	\\key=(unpack; slice hash 0 8)
+	\\val=(unpack; slice hash 32 8)
+	\\obj=(push_key key val obj)
+	loop (- count 1) hash obj
 	)
 
 \obj=(add_random_keys 8192 "abcd" [])
-\obj=(sort_pairs obj)
+\\obj=(sort_pairs obj)
 
 (
 \key="7d13f23fa2b9a6fd"
-\val=(get_key key obj)
+\\val=(get_key key obj)
 say_data {key val}
-\obj=(put_key key "ffff" obj)
-\val=(get_key key obj)
+\\obj=(put_key key "ffff" obj)
+\\val=(get_key key obj)
 say_data {key val}
-\obj=(update_key key (. "aaaa") obj)
-\val=(get_key key obj)
+\\obj=(update_key key (. "aaaa") obj)
+\\val=(get_key key obj)
 say_data {key val}
 )
 
@@ -46,7 +45,7 @@ say_data pair
 say "= group_items"
 \xs=["A" "b" "c" "b" "a" "a" "a" "B" "c" "d" "C" "b" "a" "a"]
 say ["xs = "(as_str xs)]
-\ys=(group_items lc xs)
+\\ys=(group_items lc xs)
 say ["ys = "(as_str ys)]
 )
 
@@ -67,7 +66,7 @@ say ["R  = "(as_str R)]
 say "= map_bytes_to_double"
 \try=
 	(\bytes
-	\x=(map_bytes_to_double bytes)
+	\\x=(map_bytes_to_double bytes)
 	say [(as_str bytes)" => "x]
 	)
 try [0 0 0 0 0 0 0] # 0

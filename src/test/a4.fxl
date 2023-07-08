@@ -1,13 +1,11 @@
-#
+#use_new_syntax
 show_benchmark;
 
-\run==
+\run=
 	(
-	(@\loop\x
+	(@\loop\\x
 	ge x 1000000 ();
-	#ge x 5000000 ();
-	\x=(+ x 1)
-	loop x
+	loop (+ 1 x)
 	) 1
 	)
 

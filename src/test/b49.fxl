@@ -1,3 +1,4 @@
+#use_new_syntax
 # Notation for test constants:
 # B = 2^32
 # s_max_n = B^n-1
@@ -16,10 +17,10 @@
 
 \test_op=
 	(\sym\op\xs\ys
-	\x=(bn_from_dec xs)
-	\y=(bn_from_dec ys)
-	\z1=(op x y)
-	\z2=(op y x)
+	\\x=(bn_from_dec xs)
+	\\y=(bn_from_dec ys)
+	\\z1=(op x y)
+	\\z2=(op y x)
 	say ["x   = "x]
 	say ["y   = "y]
 	say ["x"sym"y = "z1]
@@ -27,9 +28,9 @@
 	nl
 	)
 
-\test_all_add==
+\test_all_add=
 (
-\try=(test_op "+" bn_add)
+\\try=(test_op "+" bn_add)
 
 say "== add"
 
@@ -49,9 +50,9 @@ try "483" "-500"
 try "-483" "-500"
 )
 
-\test_all_mul==
+\test_all_mul=
 (
-\try=(test_op "*" bn_mul)
+\\try=(test_op "*" bn_mul)
 
 say "== mul"
 
@@ -73,9 +74,9 @@ try "0" "-3"
 try "-2" "-3"
 )
 
-\test_all_sub==
+\test_all_sub=
 (
-\try=(test_op "-" bn_sub)
+\\try=(test_op "-" bn_sub)
 
 say "== sub"
 
@@ -117,12 +118,12 @@ try "-65524498470661708942927990500" "59039978300582461559430136553"
 try "-65524498470661708942927990500" "-59039978300582461559430136553"
 )
 
-\test_all_div==
+\test_all_div=
 (
 \try=
 	(\xs\ys
-	\x=(bn_from_dec xs)
-	\y=(bn_from_dec ys)
+	\\x=(bn_from_dec xs)
+	\\y=(bn_from_dec ys)
 
 	say ["x = "x]
 	say ["y = "y]
@@ -222,11 +223,11 @@ try
 "1461501637330902918203684832716283019655932542975"
 )
 
-\test_all_from_dec==
+\test_all_from_dec=
 (
 \try=
 	(\s
-	\x=(bn_from_dec s)
+	\\x=(bn_from_dec s)
 	say ["s = "(as_str s)]
 	say ["x = "x]
 	nl
@@ -274,11 +275,11 @@ try s_max_5
 try s_n_max_5
 )
 
-\test_all_to_dec==
+\test_all_to_dec=
 (
 \try=
 	(\s
-	\x=(bn_from_dec s)
+	\\x=(bn_from_dec s)
 	say ["s = "(as_str s)]
 	say ["x = "(bn_to_dec x)]
 	nl
@@ -297,35 +298,35 @@ try "12345678901234567890123"
 try "-1234.xyz"
 )
 
-\test_all_cmp==
+\test_all_cmp=
 (
 \try=
 	(\xs\ys
-	\x=(bn_from_dec xs)
-	\y=(bn_from_dec ys)
+	\\x=(bn_from_dec xs)
+	\\y=(bn_from_dec ys)
 
 	say ["x   = "x]
 	say ["y   = "y]
 
-	\z=(bn_cmp x y)
+	\\z=(bn_cmp x y)
 	say ["cmp = "z]
 
-	\z=(bn_lt x y)
+	\\z=(bn_lt x y)
 	say ["lt  = "z]
 
-	\z=(bn_le x y)
+	\\z=(bn_le x y)
 	say ["le  = "z]
 
-	\z=(bn_eq x y)
+	\\z=(bn_eq x y)
 	say ["eq  = "z]
 
-	\z=(bn_ne x y)
+	\\z=(bn_ne x y)
 	say ["ne  = "z]
 
-	\z=(bn_ge x y)
+	\\z=(bn_ge x y)
 	say ["ge  = "z]
 
-	\z=(bn_gt x y)
+	\\z=(bn_gt x y)
 	say ["gt  = "z]
 
 	nl
@@ -354,8 +355,8 @@ try "0" "-0"
 
 \try=
 	(\sx\sy
-	\x=(. sx  x)
-	\y=(. sy  y)
+	\\x=(. sx  x)
+	\\y=(. sy  y)
 	try x x
 	try x y
 	try y x

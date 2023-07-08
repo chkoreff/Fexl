@@ -1,6 +1,6 @@
+#use_new_syntax
 # Test dynamic libraries.
-# Skipping a couple lines here to preserve
-# the original line numbers.
+# Skipping a line here to preserve the original line numbers.
 value; std; load "show"; \;
 
 show ()
@@ -10,17 +10,17 @@ show (\x\y y x)
 
 show (\; a (b c))
 
-\x==(say "Hello.")
+\x=(say "Hello.")
 show x
 
-\x=x
+\\x=x
 show x
 
-\x=(with "a" 1; with "b" 2; void)
+\\x=(with "a" 1; with "b" 2; void)
 show x
 
-\x==(+ 2 3)
+\x=(+ 2 3)
 show x
 
-\x=x
+\\x=x
 show x

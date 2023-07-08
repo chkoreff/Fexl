@@ -1,10 +1,10 @@
-#
+#use_new_syntax
 value; std; (value; std; use "test.fxl") \;
 
 # Echo the characters from the input.
 \echo=
 	(\get @\loop
-	\ch=get
+	\\ch=get
 	is_undef ch ();
 	say ["ch = '" ch "'"]
 	loop
@@ -19,7 +19,7 @@ echo (fget stdin)
 \str="abcåabcüdef封x"
 (
 say ["Get from string [" str "]"]
-\in=(readstr str)
+\\in=(readstr str)
 echo (sget in)
 )
 (
@@ -32,13 +32,13 @@ show_list (str_chars str)
 \str="AOOab~åüää≠封小xyz"
 (
 say ["Show logical characters in [" str "]"]
-\in=(readstr str)
+\\in=(readstr str)
 echo (sget in)
 )
 (
 say ["Show individual hex bytes in [" str "]"]
-\in=(readstr str)
-echo (\ch=(sgetc in) hex_byte; ord ch)
+\\in=(readstr str)
+echo (\\ch=(sgetc in) hex_byte; ord ch)
 )
 )
 

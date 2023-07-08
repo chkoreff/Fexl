@@ -1,21 +1,21 @@
-#
-\try_keys==
+#use_new_syntax
+\try_keys=
 	(
-	\keys==["a" "b" "c" "d" "e"]
+	\keys=["a" "b" "c" "d" "e"]
 	\obj
 	say ["count "(as_str; record_count obj)]
 	each keys
 		(\key
-		\v=(obj key)
+		\\v=(obj key)
 		say [key" = "(as_str v)]
 		)
 	nl
 	)
 
-\test_1==
+\test_1=
 	(
 	say "= test_1"
-	\obj=
+	\\obj=
 		(
 		set "b" (put "!" 2);
 		empty
@@ -24,10 +24,10 @@
 	try_keys obj
 	)
 
-\test_2==
+\test_2=
 	(
 	say "= test_2"
-	\obj=
+	\\obj=
 		(
 		# Modified inline
 		set "b" 222;
@@ -39,54 +39,54 @@
 	try_keys obj
 	)
 
-\test_3==
+\test_3=
 	(
 	say "= test_3"
 
-	\obj=empty
-	\obj=(set "b" (put "!" 2) obj)
-	\obj=(set "b" 22 obj)
+	\\obj=empty
+	\\obj=(set "b" (put "!" 2) obj)
+	\\obj=(set "b" 22 obj)
 
 	try_keys obj
 	)
 
-\test_4==
+\test_4=
 	(
 	say "= test_4"
 
-	\obj=empty
-	\obj=(set "d" 4 obj)
-	\obj=(set "d" 44 obj)
-	\obj=(set "b" 2 obj)
-	\obj=(set "c" 3 obj)
-	\obj=(set "c" 33 obj)
-	\obj=(set "a" 1 obj)
+	\\obj=empty
+	\\obj=(set "d" 4 obj)
+	\\obj=(set "d" 44 obj)
+	\\obj=(set "b" 2 obj)
+	\\obj=(set "c" 3 obj)
+	\\obj=(set "c" 33 obj)
+	\\obj=(set "a" 1 obj)
 
 	try_keys obj
 	)
 
-\test_5==
+\test_5=
 	(
 	say "= test_5"
 
-	\obj=empty
-	\obj=(set "d" 4 obj)
-	\obj=(set "d" 44 obj)
-	\obj=(set "b" 2 obj)
-	\obj=(set "c" 3 obj)
-	\obj=(set "c" 33 obj)
-	\obj=(set "a" 11 obj)
-	\obj=(set "a" 1 obj)
-	\obj=(set "e" 5 obj)
+	\\obj=empty
+	\\obj=(set "d" 4 obj)
+	\\obj=(set "d" 44 obj)
+	\\obj=(set "b" 2 obj)
+	\\obj=(set "c" 3 obj)
+	\\obj=(set "c" 33 obj)
+	\\obj=(set "a" 11 obj)
+	\\obj=(set "a" 1 obj)
+	\\obj=(set "e" 5 obj)
 
 	try_keys obj
 	)
 
-\test_6==
+\test_6=
 	(
 	say "= test_6"
 
-	\obj=
+	\\obj=
 	(
 	set "e" 5;
 	set "a" 1;
@@ -102,34 +102,34 @@
 	try_keys obj
 	)
 
-\test_7==
+\test_7=
 	(
 	say "= test_7"
 
-	\obj_2810=
+	\\obj_2810=
 		(
 		set "d" 44;
 		set "d" 4;
 		empty
 		)
 
-	\obj_3043=
+	\\obj_3043=
 		(
 		set "c" 3;
 		set "b" 2;
 		obj_2810
 		)
 
-	\obj_7892=
+	\\obj_7892=
 		(
-		\obj=(set "c" 33 obj_3043)
-		\obj=(set "a" 11 obj)
+		\\obj=(set "c" 33 obj_3043)
+		\\obj=(set "a" 11 obj)
 		set "e" 5;
 		set "a" 1;
 		obj
 		)
 
-	\obj_8237=
+	\\obj_8237=
 		(
 		set "e" 5;
 		I obj_2810
@@ -152,24 +152,24 @@
 	)
 
 # Test chain function
-\test_8==
+\test_8=
 	(
 	say "= test_8"
 
-	\f1=
+	\\f1=
 		(
 		set "a" 1;
 		set "b" 2;
 		empty
 		)
 
-	\f2=
+	\\f2=
 		(
 		set "c" 3;
 		empty
 		)
 
-	\f=(chain f1 f2)
+	\\f=(chain f1 f2)
 
 	show_benchmark;
 	try_keys f
@@ -177,25 +177,25 @@
 
 # Return the lazy list of pairs in a record.
 \record_pairs=
-	(\obj
-	\count=(record_count obj)
+	(\\obj
+	\\count=(record_count obj)
 	(@\loop\pos
 	ge pos count [];
-	\item=(record_item obj pos)
-	\pos=(+ 1 pos)
+	\\item=(record_item obj pos)
+	\\pos=(+ 1 pos)
 	[item;\= loop pos]
 	)
 	0
 	)
 
-\test_9==
+\test_9=
 	(
 	say "= test_9"
 
 	say (as_str; record_count empty)
 	say (as_str; record_count void)
 
-	\obj=
+	\\obj=
 	(
 	set "e" 5;
 	set "a" 1;
@@ -213,40 +213,40 @@
 
 	each ["x" void -1 2.6 99; range 0 (record_count obj)]
 		(\pos
-		\item=(record_item obj pos)
+		\\item=(record_item obj pos)
 		say ["at "(as_str pos)" = "(as_str item)]
 		)
 
-	\pairs=(record_pairs obj)
+	\\pairs=(record_pairs obj)
 	say_data pairs
 	say_data pairs
 	)
 
-\test_10==
+\test_10=
 	(
 	say "= test_10"
 	# Test former leak with inline update.
 	(
-	\z1=(set "a" 1 empty)
-	\z2==(I z1)
-	\z3=(set "a" z2 z2)
+	\\z1=(set "a" 1 empty)
+	\z2=(I z1)
+	\\z3=(set "a" z2 z2)
 	)
 	# Test former leak with inline insert.
 	(
-	\z1=(set "a" 1 empty)
-	\z2==(I z1)
-	\z3=(set "b" z2 z2)
+	\\z1=(set "a" 1 empty)
+	\z2=(I z1)
+	\\z3=(set "b" z2 z2)
 	)
 	)
 
-\test_11==
+\test_11=
 	(
 	say "= test_11"
 	# Test setf and get.
 
 	show_benchmark;
 
-	\obj=
+	\\obj=
 		(
 		set "x" (say "CALC" + 2 3);
 		setf "fred" (say "I am Fred.");
@@ -259,7 +259,7 @@
 	nl
 
 	# Look up a key value and run it if found.
-	\try==
+	\try=
 		(\key
 		get key obj
 			(say ["NO "key])
@@ -274,7 +274,7 @@
 	try "wilma"
 	)
 
-\test_12==
+\test_12=
 (
 # Demonstrate object-oriented functional programming (OOFP).
 #
@@ -285,16 +285,16 @@
 
 say "= test_12"
 
-\getf== # LATER 20230702 Do in type_record.c
+\getf= # LATER 20230702 Do in type_record.c
 	(\key\obj
 	get key obj void
 	)
 
 # Return a new slot with initial value.
-\new_slot==
+\new_slot=
 	(\val
 
-	\v=var_new
+	\\v=var_new
 	var_put v val
 
 	setf "get" (var_get v);
@@ -303,10 +303,10 @@ say "= test_12"
 	)
 
 # Return a new tree with a function to create a new value when needed.
-\new_tree==
+\new_tree=
 	(\new_val
 
-	\v=var_new
+	\\v=var_new
 	var_put v empty
 
 	# This "auto-vivifies" an entry at the given key.
@@ -314,7 +314,7 @@ say "= test_12"
 		(\key
 		get key (var_get v)
 			(
-			\val=new_val
+			\\val=new_val
 			var_put v (setf key val (var_get v))
 			val
 			)
@@ -326,9 +326,9 @@ say "= test_12"
 	)
 
 # Extend slot with a "mod" routine to apply a function to the value.
-\new_slot==
+\new_slot=
 	(\val
-	\obj=(new_slot val)
+	\\obj=(new_slot val)
 	getf "put" obj \put
 	getf "get" obj \val
 
@@ -337,9 +337,9 @@ say "= test_12"
 	)
 
 # Extend slot with a "show" routine.
-\new_slot==
+\new_slot=
 	(\val
-	\obj=(new_slot val)
+	\\obj=(new_slot val)
 	getf "get" obj \val
 
 	setf "show" (say ["val = "(as_str val)]);
@@ -347,7 +347,7 @@ say "= test_12"
 	)
 
 # Run a test on a given object.
-\run_test==
+\run_test=
 	(\obj
 	getf "put" obj \put
 	getf "show" obj \show
@@ -368,28 +368,28 @@ say "= test_12"
 
 # Level 0
 (
-\obj=(new_slot 0)
+\\obj=(new_slot 0)
 run_test obj
 )
 
 # Level 1
 (
-\obj=(new_tree; new_slot 0)
-\obj=(obj "at" "x")
+\\obj=(new_tree; new_slot 0)
+\\obj=(obj "at" "x")
 run_test obj
 )
 
 # Level 2
 (
-\obj=(new_tree; new_tree; new_slot 0)
-\obj=(obj "at" "x" "at" "y")
+\\obj=(new_tree; new_tree; new_slot 0)
+\\obj=(obj "at" "x" "at" "y")
 run_test obj
 )
 
 # Level 3
 (
-\obj=(new_tree; new_tree; new_tree; new_slot 0)
-\obj=(obj "at" "x" "at" "y" "at" "z")
+\\obj=(new_tree; new_tree; new_tree; new_slot 0)
+\\obj=(obj "at" "x" "at" "y" "at" "z")
 run_test obj
 )
 )

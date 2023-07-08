@@ -1,9 +1,8 @@
-#
+#use_new_syntax
 value; std; (value; std; use "test.fxl") \;
 
 \show=
-	(\x
-	\x=x
+	(\\x
 	\type=(\t put [t " "] say x)
 	is_str x (type "str");
 	is_num x (type "num");
@@ -16,24 +15,24 @@ value; std; (value; std; use "test.fxl") \;
 \eval_str=(\str value; std; parse str "")
 
 (
-\ping==(say "ping")
+\ping=(say "ping")
 div
 ping
 div
 I ping
 
 div
-\talk==(ping)
-\talk==(talk talk talk)
-\talk==(talk talk)
-\talk==(talk talk)
+\talk=(ping)
+\talk=(talk talk talk)
+\talk=(talk talk)
+\talk=(talk talk)
 talk
 
 div
 # Should say PING six times.
-\ping==(say "ping")
-\other==(\= ping)
-\talk==(ping other)
+\ping=(say "ping")
+\other=(\= ping)
+\talk=(ping other)
 talk
 talk
 talk
@@ -178,16 +177,15 @@ say "== test char_width"
 
 # Return the list of UTF-8 chars starting from the given position.
 \str_chars=
-	(\str @\loop \pos
-	\pos=pos
+	(\str @\loop\\pos
 	ge pos (length str) [];
-	\n=(char_width str pos)
-	\ch=(slice str pos n)
+	\\n=(char_width str pos)
+	\\ch=(slice str pos n)
 	[ch; loop (+ pos n)]
 	)
 
 \str="hej åabcüdef üä 1≠0 包子x"
-\list=(str_chars str 0)
+\\list=(str_chars str 0)
 
 say ["str " str]
 each list (\ch say ["ch " ch])
@@ -195,9 +193,9 @@ each list (\ch say ["ch " ch])
 
 (
 say "== test buf"
-\buf=buf_new
-\put=(buf_put buf)
-\get==(say [": " (buf_get buf)])
+\\buf=buf_new
+\\put=(buf_put buf)
+\get=(say [": " (buf_get buf)])
 put "abc"
 put "defg"
 get
@@ -299,10 +297,10 @@ And the world is mine to win. ..."
 # Test single evaluation.
 (
 div
-\show==
+\show=
 	(
 	(\=say "(CALC)")
-	\x=(* 5 6)
+	\\x=(* 5 6)
 	say ["x = " x]
 	)
 
@@ -314,7 +312,7 @@ show
 say "]"
 
 (
-\x==(\=put "(CALC)" + 2 (* 7 6))
+\x=(\=put "(CALC)" + 2 (* 7 6))
 
 \make_square=
 	(\x
@@ -348,7 +346,8 @@ eval_file "hailstone.fxl"
 
 div
 eval_str ~END
-\x=(+ 33 48)
+#use_new_syntax
+\\x=(+ 33 48)
 say ["x = " x]
 ~END
 
@@ -405,26 +404,26 @@ div
 (
 \x="1234567890123456"
 # Now make a string with length 16*(2^20) = 16,777,216 bytes.
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
-\x=(. x x)
+\\x=(. x x)
+\\x=(. x x)
+\\x=(. x x)
+\\x=(. x x)
+\\x=(. x x)
+\\x=(. x x)
+\\x=(. x x)
+\\x=(. x x)
+\\x=(. x x)
+\\x=(. x x)
+\\x=(. x x)
+\\x=(. x x)
+\\x=(. x x)
+\\x=(. x x)
+\\x=(. x x)
+\\x=(. x x)
+\\x=(. x x)
+\\x=(. x x)
+\\x=(. x x)
+\\x=(. x x)
 put "length is " put (length x) nl
 )
 
@@ -485,7 +484,7 @@ say (trunc -7.8)
 
 # Test ceil
 (
-\try=(\x \y=(ceil x) say ["ceil "x" = "y])
+\try=(\x \\y=(ceil x) say ["ceil "x" = "y])
 \try=(\x try x try (neg x))
 try 0
 try 0.1
@@ -540,10 +539,10 @@ show "list_2" list_2
 div
 \x=T say (is_bool x)
 \x=F say (is_bool x)
-\x=(T 1) say (is_bool x)
-\x=(F 1) say (is_bool x)
-\x=(T 1 2) say (is_num x)
-\x=(F 1 2) say (is_num x)
+\\x=(T 1) say (is_bool x)
+\\x=(F 1) say (is_bool x)
+\\x=(T 1 2) say (is_num x)
+\\x=(F 1 2) say (is_num x)
 
 div
 (
@@ -579,12 +578,12 @@ say (is_void void)
 say (is_void ( (\; f x) 3) )
 # Evaluate a form.
 (
-\x=(value; std; \; + 3 4)
+\\x=(value; std; \; + 3 4)
 say ["x = "(as_str x)]
 )
 # Evaluate a non-form.
 (
-\x=(value; std; + 3 4)
+\\x=(value; std; + 3 4)
 say ["x = "(as_str x)]
 )
 
@@ -593,10 +592,9 @@ say "== tuples"
 say_data (list_to_tuple; map (\x chr; + x 96); range 1 6)
 (
 \try=
-	(\x
-	\x=x
-	\y=(list_to_tuple x)
-	\z=(tuple_to_list y)
+	(\\x
+	\\y=(list_to_tuple x)
+	\\z=(tuple_to_list y)
 	say_data x
 	say_data y
 	say_data z
@@ -635,9 +633,9 @@ say ["a""b"(/ 6 4)]
 say ([] 4)
 say (["a" "b"] 4)
 
-(\x=(* 77 44) say ["x = " x])
+(\\x=(* 77 44) say ["x = " x])
 
-(\x=(* 77 44) \y=(* 66 55)
+(\\x=(* 77 44) \\y=(* 66 55)
 say [["x = "x]", "["y = "y]]
 )
 
@@ -650,9 +648,9 @@ say (T 1)
 say (F 1)
 
 (
-\list=[(. "Hell" "o") " " (+ 4 5) NL "Bye" NL]
-\list=(append list list)
-\list=(append list list)
+\\list=[(. "Hell" "o") " " (+ 4 5) NL "Bye" NL]
+\\list=(append list list)
+\\list=(append list list)
 put list
 )
 
@@ -667,7 +665,7 @@ put list
 (
 # Demonstrate the repetition of side effects.
 div
-\talk==(say (^ (put "(L)" (+ 1 1)) (say "(R)" (- 8 5))))
+\talk=(say (^ (put "(L)" (+ 1 1)) (say "(R)" (- 8 5))))
 talk
 talk
 talk
@@ -675,7 +673,7 @@ talk
 
 \test_context=
 (
-\case_1==
+\case_1=
 	(
 	say "["
 	say "== resolve"
@@ -700,10 +698,10 @@ talk
 	say "]"
 	)
 
-\case_2==
+\case_2=
 	(
 	say "["
-	\form=(parse "say (+ 7 8)" "")
+	\\form=(parse "say (+ 7 8)" "")
 
 	say "Run in standard context."
 	value (std form)
@@ -719,7 +717,7 @@ talk
 	say "]"
 	)
 
-\case_3==
+\case_3=
 	(
 	resolve (std; \; say "PING") \run
 	say "["
@@ -738,7 +736,7 @@ test_context
 
 (
 div
-\try==
+\try=
 (
 (\=say "Let's parse.")
 eval_file "hello.fxl"
@@ -751,7 +749,7 @@ try
 
 (
 div
-\try==
+\try=
 (
 \source=
 ~~
@@ -767,34 +765,34 @@ try 7.2
 try -1.3
 )
 
-\test_file==
+\test_file=
 (
 \tmp_name="tmp.txt"
-\tmp_file=(path_under dir_local tmp_name)
+\\tmp_file=(path_under dir_local tmp_name)
 
 \write_file=
 	(\content
-	\fh=(fopen tmp_file "w")
+	\\fh=(fopen tmp_file "w")
 	fput fh content
 	)
 
 \show_chars=
 	(\f
-	\fh=(fopen tmp_file "r")
+	\\fh=(fopen tmp_file "r")
 	@\loop
-	\ch=(fget fh)
+	\\ch=(fget fh)
 	is_undef ch ();
 	f ch
 	loop
 	)
 
-\remove_file==
+\remove_file=
 	(
-	\code=(remove tmp_file)
+	\\code=(remove tmp_file)
 	say [(eq code 0 "Removed" "Could not remove") " " tmp_name]
 	)
 
-\test_1==
+\test_1=
 	(
 	div
 	say ["Write " tmp_name ":"]
@@ -809,7 +807,7 @@ here
 	remove_file
 	)
 
-\test_2==
+\test_2=
 	(
 	div
 	write_file
@@ -829,13 +827,13 @@ This also goes to the file.
 
 # Here I test interleaved writes and reads to the same file, which acts like a
 # queue.
-\test_3==
+\test_3=
 	(
 	div
 
-	\open==(fopen tmp_file)
-	\fh_w==(\= open "w")
-	\fh_r==(\= open "r")
+	\open=(fopen tmp_file)
+	\fh_w=(\= open "w")
+	\fh_r=(\= open "r")
 
 	\put=
 		(\x
@@ -844,9 +842,9 @@ This also goes to the file.
 		fflush fh_w  # You must do this.
 		)
 
-	\get==
+	\get=
 		(
-		\ch=(fget fh_r)
+		\\ch=(fget fh_r)
 		say ["get " (is_undef ch ((clearerr fh_r) "void") ch)]
 		)
 
@@ -871,13 +869,13 @@ test_3
 
 test_file
 
-\test_var==
+\test_var=
 (
 # In this test I created a little "assembly language" where I hide all the var
 # operations in one place.
 
 # The "!" function creates a read and write pair.
-\!==(\v=var_new {(\x=(var_get v) {x}) (var_put v)})
+\!=(\\v=var_new {(\\x=(var_get v) {x}) (var_put v)})
 
 \fib=
 	(\max
@@ -909,8 +907,8 @@ fib 5
 
 div
 (
-\v=var_new
-\x=(var_get v)
+\\v=var_new
+\\x=(var_get v)
 var_put v x
 say "Passed var test of 20150907."
 )
@@ -924,7 +922,7 @@ eval_file "var.fxl"
 (
 div
 put "("
-\x==(put "x=" 3)
+\x=(put "x=" 3)
 put ")"
 say x
 say x
@@ -933,7 +931,7 @@ say x
 (
 div
 put "("
-\x=(put "x=" 3) # Force the evaluation.
+\\x=(put "x=" 3) # Force the evaluation.
 put ")"
 say x
 say x
@@ -941,10 +939,10 @@ say x
 )
 (
 div
-\x==(say "hi" 3)
-\x=x # The effect only happens once.
-\x=x
-\x=x
+\x=(say "hi" 3)
+\\x=x # The effect only happens once.
+\\x=x
+\\x=x
 )
 )
 
@@ -975,21 +973,21 @@ try 3 "," 0.159265
 
 (
 div
-\talk==(say "Hi")
+\talk=(say "Hi")
 talk
 talk
-)
-
-(
-div
-\talk==(say "Hi")
-\x=talk
-\x=talk
 )
 
 (
 div
 \talk=(say "Hi")
+\\x=talk
+\\x=talk
+)
+
+(
+div
+\\talk=(say "Hi")
 talk
 talk
 )
@@ -1006,19 +1004,18 @@ try (reverse; range 1 5)
 
 (
 div
-\indent=
-	(@\loop\n
-	\n=n
+\\indent=
+	(@\loop\\n
 	le n 0 ();
 	put " ";
 	loop (- n 1)
 	)
 
-\test_quote=
+\\test_quote=
 	(@\loop\x\n
 	le n 0 nl;
-	\x=(fexl_quote x)
-	\n=(- n 1)
+	\\x=(fexl_quote x)
+	\\n=(- n 1)
 	indent (* 3 n); say x
 	loop x n
 	)
@@ -1032,7 +1029,7 @@ test_quote ~1 a"b"~2c~1 4
 div
 \x = ~ a & "b" 1<3~
 say x
-\x=(quote x)
+\\x=(quote x)
 say x
 say (is_str x)
 )
@@ -1053,19 +1050,19 @@ div
 
 (
 # Test drop buffer without getting its content.
-\buf=buf_new
+\\buf=buf_new
 buf_put buf "x"
 )
 
 # Now test redirecting output to a buffer.
-\result==
+\result=
 (
-\buf=buf_new
+\\buf=buf_new
 \put=(\x buf_put buf; to_str x)
-\nl==(buf_put buf NL)
+\nl=(buf_put buf NL)
 \say=(\x put x nl)
 (
-\hello==(say "Hello")
+\hello=(say "Hello")
 hello
 say ["line " 1]
 say "line 2"
@@ -1083,7 +1080,7 @@ div
 # Here I test the existence of the flock_ and limit_ function calls, though I'm
 # not yet testing their effects.
 
-\fh=(fopen (path_under dir_local "hello.fxl") "r")
+\\fh=(fopen (path_under dir_local "hello.fxl") "r")
 say (is_good fh)
 say (is_good; flock_ex fh)
 say (is_good; flock_sh fh)
@@ -1098,7 +1095,7 @@ limit_time 20
 limit_memory 1000000
 limit_stack 20000
 # The following would test either out of memory or stack overflow.
-#\list=(@\list append list list)
+#\\list=(@\list append list list)
 #each list say
 )
 )
@@ -1135,7 +1132,7 @@ try "fsay" (fsay stdout)
 (
 \try=
 	(\f1\f2
-	\base=(path_under dir_base)
+	\\base=(path_under dir_base)
 	say ["is_newer "f1" "f2" = "(is_newer (base f1) (base f2))]
 	)
 
@@ -1156,8 +1153,8 @@ try "missing" "missing"
 (
 \try=
 	(\path
-	\q_path=(path_under dir_base path)
-	\type=
+	\\q_path=(path_under dir_base path)
+	\\type=
 		(
 		is_file q_path "f";
 		is_dir q_path "d";
@@ -1182,14 +1179,14 @@ say (oct "775")
 say (hex "af01A")
 
 (
-\local=(path_under dir_local)
+\\local=(path_under dir_local)
 \mkdir=(\path mkdir (local path) (oct "755"))
 \rmdir=(\path rmdir (local path))
 
-\code=(mkdir "zzz")
+\\code=(mkdir "zzz")
 say ["mkdir : "code]
 
-\code=(rmdir "zzz")
+\\code=(rmdir "zzz")
 say ["rmdir : "code]
 )
 
@@ -1214,19 +1211,19 @@ try "   "
 try "  abcd   "
 )
 
-\test_eq_data==
+\test_eq_data=
 (
 say "= test_eq_data"
 
-\try=
+\\try=
 	(
 	\eq_bool=(\x\y is_bool x (is_bool y (x y (not y)) F) F)
 
 	\x\y\expect
-	\result=(eq_data x y)
+	\\result=(eq_data x y)
 	eq_bool result expect ();
 
-	\show==(\k\v say [k" = "(as_str v)])
+	\show=(\k\v say [k" = "(as_str v)])
 	say "ERROR"
 	show "x" x
 	show "y" y
@@ -1237,7 +1234,7 @@ say "= test_eq_data"
 
 \try_app=
 	(\x
-	\y=(x "a")
+	\\y=(x "a")
 	try x y F
 	)
 
@@ -1278,10 +1275,10 @@ test_eq_data
 
 # Test filler after "\", which is allowed but not recommended.
 (
-\  x==1
+\  x=1
 
 \  # comment
-   x==1
+   x=1
 )
 
 # Test some sequences with ";" tails.  This has always been allowed in lists
@@ -1290,21 +1287,21 @@ test_eq_data
 \try=(\x say (as_str x))
 # list
 (
-\x==["a" "b" "c"; cons "d"; cons "e"; null]
+\x=["a" "b" "c"; cons "d"; cons "e"; null]
 try x
 try (list_to_tuple x)
 nl
 )
 # tuple
 (
-\x=={"a" "b" "c"; cons "d"; cons "e"; null}
+\x={"a" "b" "c"; cons "d"; cons "e"; null}
 try x
 try (tuple_to_list x)
 nl
 )
 # no initial terms
 (
-\x==[; cons "d"; cons "e"; null]
+\x=[; cons "d"; cons "e"; null]
 try x
 try (list_to_tuple x)
 nl
@@ -1313,9 +1310,9 @@ nl
 
 # Test form with table->count == 0.
 (
-\form=(\; \x x)
+\\form=(\; \x x)
 say (is_closed form)
-\f=(value form)
+\\f=(value form)
 )
 
 # Try parsing invalid source.
@@ -1326,7 +1323,7 @@ say ({} "x")
 
 # Test expansion of tuple items.
 (
-\x=={"a"; append ["b" "c"] ["d"]}
+\x={"a"; append ["b" "c"] ["d"]}
 x \a\b\c\d
 put "a = " put (as_str a) nl
 put "b = " put (as_str b) nl
@@ -1354,7 +1351,7 @@ append (map (. "x") ["e" "f"]);
 
 (
 say "= test_compare"
-\try==
+\try=
 	(\x\y
 	compare x y (put "lt") (put "eq") (put "gt")
 	say [" "(as_str x)" "(as_str y)]
@@ -1393,7 +1390,7 @@ sort
 
 (
 # Test var_putf and var_getf
-\v=var_new
+\\v=var_new
 var_putf v (say "Hello")
 var_getf v \hello
 say "["

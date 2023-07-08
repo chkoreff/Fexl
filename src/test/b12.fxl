@@ -1,3 +1,4 @@
+#use_new_syntax
 # Test reading CSV and SSV data.
 
 \try_read=
@@ -10,12 +11,12 @@
 	try_read read (path_under dir_local name)
 	)
 
-\test_csv==
+\test_csv=
 (
 say "== test_csv"
 
 (
-\try=(try_read read_csv_chars)
+\\try=(try_read read_csv_chars)
 try []
 try
 [
@@ -55,7 +56,7 @@ try ["a" "b" "," "c" ","]
 )
 
 (
-\try=(try_read read_csv_string)
+\\try=(try_read read_csv_string)
 
 try
 ~
@@ -72,15 +73,15 @@ cd","3.14",-48.7
 )
 
 (
-\try=(try_read_file read_csv_file)
+\\try=(try_read_file read_csv_file)
 try "test.csv"
 )
 )
 
-\test_tsv==
+\test_tsv=
 (
 say "== test_tsv"
-\try=(try_read read_tsv_string)
+\\try=(try_read read_tsv_string)
 
 try
 ~
@@ -96,12 +97,12 @@ cd"	"3.14"	-48.7
 ~
 )
 
-\test_ssv==
+\test_ssv=
 (
 say "== test_ssv"
 
 (
-\try=(try_read read_ssv_chars)
+\\try=(try_read read_ssv_chars)
 try []
 try ["a" "b" " " "x" "z" "z" " " "d" " " "e" " " "f" " " CR LF "g" " " "h" "i"]
 try ["a" "b" " " "c" " " "q" " " LF "d"]
@@ -146,7 +147,7 @@ try ["~" "E" "N" "D" " " "a" "~" "E" "N"]
 )
 
 (
-\try=(try_read read_ssv_string)
+\\try=(try_read read_ssv_string)
 try
 ~TEST
 ab xzz d e f
@@ -182,16 +183,16 @@ try
 )
 
 (
-\try=(try_read_file read_ssv_file)
+\\try=(try_read_file read_ssv_file)
 try "test.ssv"
 try "missing"
 )
 )
 
-\test_xsv==
+\test_xsv=
 (
 # Test with pipe delimiter.
-\try=(try_read (read_xsv_string "|"))
+\\try=(try_read (read_xsv_string "|"))
 say "== test_xsv"
 try
 ~

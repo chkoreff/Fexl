@@ -1,12 +1,12 @@
-#
-\cx=(value; std; use "lib/b15/context.fxl")
+#use_new_syntax
+\\cx=(value; std; use "lib/b15/context.fxl")
 value; std; cx; \;
 
 # Sort unique pairs, keeping the latest one.
-\sort_pairs=(combine_keys (\x\y y))
+\\sort_pairs=(combine_keys (\x\y y))
 
 # Compare values.
-\eq_val==
+\eq_val=
 	(\x\y
 	is_undef x (is_undef y);
 	is_undef y F;
@@ -14,7 +14,7 @@ value; std; cx; \;
 	)
 
 # Compare lists of string pairs.
-\eq_pairs==
+\\eq_pairs=
 	(@\loop\xs\ys
 	xs (ys T \_\_ F) \x\xs
 	ys F \y\ys
@@ -29,11 +29,11 @@ value; std; cx; \;
 
 # (index_do index pairs)
 # Add or delete a list of {key val} pairs.
-\index_do=
+\\index_do=
 	(@\loop\index\pairs
 	pairs index \pair\pairs
 	pair \key\val
-	\index=
+	\\index=
 		(
 		is_defined val
 			(index_put key val)
@@ -43,23 +43,23 @@ value; std; cx; \;
 	loop index pairs
 	)
 
-\test_pairs==
+\test_pairs=
 	(\pairs
 
 	# Get the expected list of {key val} pairs to check.
-	\check_pairs=(sort_pairs pairs)
+	\\check_pairs=(sort_pairs pairs)
 
 	# Create the index.
-	\index=(index_do [] pairs)
+	\\index=(index_do [] pairs)
 
 	# Ensure that the list of pairs in the index is correct.
 	(
-	\ok=
+	\\ok=
 		(
 		# Get the list of pairs defined in the index.
-		\list_pairs==(index_pairs index)
+		\list_pairs=(index_pairs index)
 		# Get the expected list of defined pairs.
-		\expect_pairs==(filter (\p p \_ is_defined) check_pairs)
+		\expect_pairs=(filter (\p p \_ is_defined) check_pairs)
 		# Ensure that they're equal.
 		eq_pairs list_pairs expect_pairs
 		)
@@ -70,18 +70,18 @@ value; std; cx; \;
 
 	# Ensure that index_get matches the values in check_pairs.
 	(
-	\get_errors==
+	\\get_errors=
 		(@\loop\pairs
 		pairs [] \pair\pairs
 		pair \key\val
-		\val2=(index_get key index)
+		\\val2=(index_get key index)
 		eq_val val val2
 			(loop pairs)
 			[{key val val2}; loop pairs]
 		)
 
 	put "get: "
-	\errors==(get_errors check_pairs)
+	\errors=(get_errors check_pairs)
 	is_null errors
 		(say "GOOD")
 		(
@@ -91,11 +91,11 @@ value; std; cx; \;
 	)
 	)
 
-\test_0249==
+\test_0249=
 	(
 	say "= test_0249"
 
-	\index=
+	\\index=
 	(
 	index_do []
 	[
@@ -134,13 +134,13 @@ value; std; cx; \;
 	say_index index
 
 	say "pairs:"
-	\pairs=(index_pairs index)
+	\\pairs=(index_pairs index)
 	say_pairs pairs
 	)
 
 	# Test delete.
 	say "delete:"
-	\index=
+	\\index=
 	(
 	index_do index
 	[
@@ -172,7 +172,7 @@ value; std; cx; \;
 	say_index index
 	)
 
-\test_5437==
+\test_5437=
 	(
 	say "= test_5437"
 	test_pairs
@@ -195,7 +195,7 @@ value; std; cx; \;
 	]
 	)
 
-\test_8924==
+\test_8924=
 	(
 	say "= test_8924"
 	test_pairs
@@ -206,7 +206,7 @@ value; std; cx; \;
 	]
 	)
 
-\test_3650==
+\test_3650=
 	(
 	say "= test_3650"
 	test_pairs
@@ -229,11 +229,11 @@ value; std; cx; \;
 	]
 	)
 
-\test_6051==
+\test_6051=
 	(
 	say "= test_6051"
 
-	\index=
+	\\index=
 	(
 	index_do []
 	[
@@ -309,7 +309,7 @@ value; std; cx; \;
 	say_pairs (index_pairs index)
 	nl
 
-	\index=
+	\\index=
 	(
 	index_do index
 	[
@@ -359,7 +359,7 @@ value; std; cx; \;
 	nl
 	)
 
-\test_3215==
+\test_3215=
 	(
 	say "= test_3215"
 	test_pairs
@@ -372,7 +372,7 @@ value; std; cx; \;
 	]
 	)
 
-\test_0236==
+\test_0236=
 	(
 	say "= test_0236"
 	test_pairs
@@ -455,27 +455,27 @@ value; std; cx; \;
 	)
 
 # Generate a list of {key val} pairs with an iterated seed.
-\gen_pairs==
+\gen_pairs=
 	(\iterate @\loop\n\seed
 	lt n 1 [];
 	iterate seed \key\val\seed
-	\n=(- n 1)
-	\tail=(loop n seed)
+	\\n=(- n 1)
+	\\tail=(loop n seed)
 	[{key val}; tail]
 	)
 
-\test_3517==
+\test_3517=
 	(
 	say "= test_3517"
 
-	\pairs=
+	\\pairs=
 		(
 		gen_pairs
 		(\seed
-		\seed=(sha256 seed)
-		\q_seed=(unpack seed)
-		\key=(slice q_seed 0 16)
-		\val=(slice q_seed 16 4)
+		\\seed=(sha256 seed)
+		\\q_seed=(unpack seed)
+		\\key=(slice q_seed 0 16)
+		\\val=(slice q_seed 16 4)
 		{key val seed}
 		)
 		1000
@@ -483,7 +483,7 @@ value; std; cx; \;
 		)
 
 	# Add a few more keys to test override.
-	\pairs==
+	\pairs=
 	[
 	{"abc" "1027"}
 	{"abc" "2866"}
@@ -515,7 +515,7 @@ value; std; cx; \;
 	)
 
 # Test rendering errors.
-\test_2744==
+\test_2744=
 	(
 	say "= test_2744"
 	say_errors

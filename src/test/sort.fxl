@@ -1,15 +1,13 @@
-#
+#use_new_syntax
 value; std; (value; std; use "test.fxl") \;
 
 show_benchmark;
 
 # (tower f n x) is the result of applying f to x n times.
 \tower=
-	(\f @\loop\n\x
+	(\f @\loop\\n\\x
 	le n 0 x;
-	\n=(- n 1)
-	\x=(f x)
-	loop n x
+	loop (- n 1) (f x)
 	)
 
 # Test restricted evaluation by defining only the necessary functions.
@@ -23,7 +21,7 @@ def "unique" unique;
 # Here I test the sort.
 
 # A list of 30 random words from diceware.com.
-\list =
+\list=
 	[
 	"when"
 	"scud"
@@ -58,7 +56,7 @@ def "unique" unique;
 	]
 
 # The number of times to double the list for the unique sort.
-\N=
+\\N=
 	(
 	# NOTE: If you time these you'll see that the sort time is O(N).
 	#7  # 3840 words
@@ -72,7 +70,7 @@ def "unique" unique;
 	)
 
 # (exp_list n xs) Make 2^n copies of list xs.
-\exp_list=(tower (\x append x x))
+\\exp_list=(tower (\x append x x))
 
 \show=show_list
 

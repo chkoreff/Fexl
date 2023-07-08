@@ -1,3 +1,4 @@
+#use_new_syntax
 # Quote a character for embedding in HTML.
 \quote_ch=
 	(\ch
@@ -11,11 +12,11 @@
 # LATER 20181230 Accelerate the quote_str function in C.
 
 # Quote a string for embedding in HTML.
-\quote_str=(str_map quote_ch)
+\\quote_str=(str_map quote_ch)
 
 # Quote arbitrary data.
-\quote=
-	(@\quote\x \x=x
+\\quote=
+	(@\quote\\x
 	is_str x (quote_str x);
 	is_num x x;
 	is_tuple x (list_to_tuple; map quote; tuple_to_list x);
@@ -33,9 +34,9 @@
 
 \tag_enclosure=
 	(\desc
-	\beg=(to_str desc)
-	\pos=(search beg " " 0)
-	\end=(is_good pos (slice beg 0 pos) beg)
+	\\beg=(to_str desc)
+	\\pos=(search beg " " 0)
+	\\end=(is_good pos (slice beg 0 pos) beg)
 	{ beg end }
 	)
 
@@ -62,12 +63,12 @@
 	nl
 	)
 
-\tr=(tag "tr")
+\\tr=(tag "tr")
 
-\put_quote_data=(render_data (\x put (quote x)))
+\\put_quote_data=(render_data (\x put (quote x)))
 
 # https://en.wikipedia.org/wiki/Percent-encoding
-\uri_escape=
+\\uri_escape=
 	(str_map \ch
 
 	eq ch " " "+"; # Special rule for space
@@ -107,11 +108,11 @@
 
 \uri_unescape=
 	(\str
-	\buf=buf_new
-	\source=(readstr str)
+	\\buf=buf_new
+	\\source=(readstr str)
 
 	@\loop
-	\ch=(sget source)
+	\\ch=(sget source)
 	is_undef ch (buf_get buf);
 	eq ch "+"
 		(
@@ -120,8 +121,8 @@
 		);
 	eq ch "%"
 		(
-		\x==(hex_digit_to_dec (sget source))
-		\y==(hex_digit_to_dec (sget source))
+		\x=(hex_digit_to_dec (sget source))
+		\y=(hex_digit_to_dec (sget source))
 		buf_put buf (chr; + (* 16 x) y)
 		loop
 		);
@@ -134,15 +135,15 @@
 	\params=
 		(map_good
 			(\pair pair \key\val
-			\val=(is_num val (num_str val) val)
+			\\val=(is_num val (num_str val) val)
 			eq val "" void;
-			\q_key=(uri_escape key)
-			\q_val=(uri_escape val)
+			\\q_key=(uri_escape key)
+			\\q_val=(uri_escape val)
 			[q_key"="q_val]
 			)
 			params)
 
-	\url=(join "&amp;" params)
+	\\url=(join "&amp;" params)
 	\url=(eq url "" "." (. "?" url))
 	url
 	)

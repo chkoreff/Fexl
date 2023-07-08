@@ -1,3 +1,4 @@
+#use_new_syntax
 # Demonstrate a technique for loading modules once on demand by putting the
 # dependency graph in one place.
 
@@ -10,7 +11,7 @@ eq name "util.fxl"
 (\;
 \check_sym=
 	(\sym
-	\form=(use_base; parse sym "")
+	\\form=(use_base; parse sym "")
 	say ["defined "sym" = "(is_closed form)]
 	)
 
@@ -31,10 +32,10 @@ check_sym "remove"
 check_sym "use"
 check_sym "std"
 
-\fred==(say "I am Fred.")
-\wilma==(say "I am Wilma.")
-\barney==(say "I am Barney.")
-\betty==(say "I am Betty.")
+\fred=(say "I am Fred.")
+\wilma=(say "I am Wilma.")
+\barney=(say "I am Barney.")
+\betty=(say "I am Betty.")
 
 \form
 def "fred" fred;
@@ -63,7 +64,7 @@ show_benchmark;
 # Build the dependency graph.
 
 # Run in a highly restrictive context.
-\use_base==
+\use_base=
 	(\form
 	def "say" say;
 	def "put" put;
@@ -76,7 +77,7 @@ show_benchmark;
 	form
 	)
 
-\use_util==
+\use_util=
 	(\=
 	value;
 	use_base;
@@ -84,7 +85,7 @@ show_benchmark;
 	use "util.fxl"
 	)
 
-\use_flintstones==
+\use_flintstones=
 	(\=
 	value;
 	use_base;
@@ -92,7 +93,7 @@ show_benchmark;
 	use "flintstones.fxl"
 	)
 
-\use_main==
+\use_main=
 	(
 	value;
 	use_base;
@@ -101,10 +102,10 @@ show_benchmark;
 	use "main.fxl"
 	)
 
-\try==
+\try=
 	(
 	say "==============="
-	\x=use_main
+	\\x=use_main
 	say ["x = "x]
 	)
 

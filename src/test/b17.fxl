@@ -1,7 +1,7 @@
-#
+#use_new_syntax
 value; std; (value; std; use "test.fxl") \;
 
-\show_result=
+\\show_result=
 	(
 	\show=
 		(\label\text
@@ -20,7 +20,7 @@ value; std; (value; std; use "test.fxl") \;
 	nl
 	)
 
-\test_run_function==
+\test_run_function=
 (
 run_test "test_run_function";
 
@@ -33,7 +33,7 @@ try
 	(
 	say "hello"
 	trace "complain 1"
-	\x=(value; std; parse stdin "")
+	\\x=(value; std; parse stdin "")
 	say ["x = "(as_str x)]
 
 	trace "complain 2"
@@ -60,7 +60,7 @@ try
 	limit_stack  1000000
 
 	# Make a nasty function that consumes an unbounded amount of memory.
-	\inf==
+	\inf=
 		(
 		\S=(\x\y\z x z; y z)  # Define the "fusion" operator.
 		@ S S S  # Apply fixpoint to the fusion operator in a weird way.
@@ -84,7 +84,7 @@ try
 )
 )
 
-\test_run_program==
+\test_run_program=
 (
 run_test "test_run_program";
 
@@ -114,10 +114,10 @@ say "END"
 ~
 )
 
-\test_big_output==
+\test_big_output=
 (
 run_test "test_big_output";
-\out=(grab_output; each (range 1 200000) (\_ put "x"))
+\\out=(grab_output; each (range 1 200000) (\_ put "x"))
 say ["grabbed "(length out)" bytes"]
 )
 

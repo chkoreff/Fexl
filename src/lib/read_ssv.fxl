@@ -1,5 +1,6 @@
+#use_new_syntax
 # Parse the SSV (space-separated value) format.
-\get_plain_item==
+\get_plain_item=
 	(
 	collect_to
 		(
@@ -11,20 +12,20 @@
 		)
 	)
 
-\get_quote_item==
+\get_quote_item=
 	(
 	skip
-	\buf=buf_new
+	\\buf=buf_new
 	collect_to_ch buf QU (buf_get buf) void
 	)
 
-\get_tilde_item==
+\get_tilde_item=
 	(
-	\buf=buf_new
+	\\buf=buf_new
 	eq 1 (collect_tilde_string buf) (buf_get buf) void
 	)
 
-\get_item==
+\get_item=
 	(
 	at_eof void;
 	at_ch QU get_quote_item;
@@ -33,29 +34,29 @@
 	get_plain_item
 	)
 
-\get_row==
+\get_row=
 	(@\loop
 	skip_match (at_eol F; at_white)
-	\item=get_item
+	\\item=get_item
 	is_undef item void;
-	\row=loop
+	\\row=loop
 	is_undef row [item] [item;row]
 	)
 
-\get_rows==
+\get_rows=
 	(@\loop
 	skip_white
-	\row=get_row
+	\\row=get_row
 	is_undef row [];
-	\rows=loop
+	\\rows=loop
 	[row;rows]
 	)
 
 \parse=(\read\x read x get_rows)
 
-\read_ssv_string=(parse read_stream)
-\read_ssv_chars=(parse read_chars)
-\read_ssv_file=(parse read_file)
+\\read_ssv_string=(parse read_stream)
+\\read_ssv_chars=(parse read_chars)
+\\read_ssv_file=(parse read_file)
 
 \form
 def "read_ssv_string" read_ssv_string;

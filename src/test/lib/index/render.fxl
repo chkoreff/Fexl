@@ -1,5 +1,5 @@
-#
-\say_index=
+#use_new_syntax
+\\say_index=
 	(@\say_index
 	say_list
 		(\row

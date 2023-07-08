@@ -1,3 +1,4 @@
+#use_new_syntax
 # (Sat 2018-07-28 In memoriam, Charlie the cat, thank you little friend.)
 
 \get_key=
@@ -13,25 +14,22 @@
 	list [] \pair\list
 	pair \this_key\this_val
 	eq key this_key list;
-	\list=(loop list)
+	\\list=(loop list)
 	[pair;list]
 	)
 
 \put_key=
-	(\key\val
-	\val=val
+	(\key\\val
 	@\loop \list
 	list [{key val}] \pair\list
 	pair \this_key\this_val
 	eq key this_key [{this_key val};list];
-	\list=(loop list)
+	\\list=(loop list)
 	[pair;list]
 	)
 
 \push_key=
-	(\key\val\list
-	\val=val
-	\list=list
+	(\key\\val\\list
 	[{key val};list]
 	)
 
@@ -39,17 +37,17 @@
 	(\key\update @\loop \list
 	list
 		(
-		\val=(update void)
+		\\val=(update void)
 		[{key val}]
 		)
 	\pair\list
 	pair \this_key\this_val
 	eq key this_key
 		(
-		\val=(update this_val)
+		\\val=(update this_val)
 		[{this_key val};list]
 		);
-	\list=(loop list)
+	\\list=(loop list)
 	[pair;list]
 	)
 
@@ -63,32 +61,32 @@
 	map
 		(\pair
 		pair \key\val
-		\val=(update key val)
+		\\val=(update key val)
 		{key val}
 		)
 	)
 
 # (sort_pairs list) Sort the list of pairs by key.
-\sort_pairs=(sort_all (\p p \k\_ k))
+\\sort_pairs=(sort_all (\p p \k\_ k))
 
 \put_default=
 	(\key\dval\list
-	\val=(get_key key list)
+	\\val=(get_key key list)
 	is_defined val list;
 	[{key dval};list]
 	)
 
-\name_columns=
+\\name_columns=
 	(@\loop\keys\vals
 	keys [] \key\keys
 	vals [] \val\vals
-	\tail=(loop keys vals)
+	\\tail=(loop keys vals)
 	[{key val};tail]
 	)
 
 \make_assoc=
 	(\extract\xs
-	\xs=(map (\x \k=(extract x) {k x}) xs)
+	\\xs=(map (\x \\k=(extract x) {k x}) xs)
 	combine_keys (\x\_ x) xs # Keep the first.
 	)
 

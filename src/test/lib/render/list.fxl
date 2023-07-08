@@ -1,5 +1,5 @@
-#
-\say_list==
+#use_new_syntax
+\say_list=
 	(\say_row\list
 	say "["
 	each list say_row

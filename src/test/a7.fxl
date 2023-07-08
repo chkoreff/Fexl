@@ -1,4 +1,4 @@
-#
+#use_new_syntax
 resolve (std; \; xsay "Hello") \hello
 say "beg"
 hello

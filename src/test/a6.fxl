@@ -1,10 +1,10 @@
-#
+#use_new_syntax
 value; std; (value; std; use "test.fxl") \;
 
 \parse=
 	(\type\source
 	say "(parsing)"
-	\form=
+	\\form=
 		(
 		eq type "file" (use source);
 		eq type "string" (parse source "");
@@ -31,16 +31,16 @@ value; std; (value; std; use "test.fxl") \;
 	f
 	)
 
-\test_1==(do_test; parse "file" "hello.fxl")
-\test_2==(do_test; parse "string" ~ say "HI"~)
-\test_3==
+\test_1=(do_test; parse "file" "hello.fxl")
+\test_2=(do_test; parse "string" ~ say "HI"~)
+\test_3=
 (
 div
 \program=
 ~
 say ["x = " (+ 3 4)]
 ~
-\get=(readstr program)
+\\get=(readstr program)
 parse "stream" get \fn
 say "got it"
 fn

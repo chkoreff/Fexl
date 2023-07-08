@@ -1,3 +1,4 @@
+#use_new_syntax
 # https://en.wikipedia.org/wiki/Hofstadter_sequence#Hofstadter_Female_and_Male_sequences
 
 # Splice two functions into a feedback loop.
@@ -6,20 +7,19 @@
 # Create the base of a male/female function.
 \create=
 	(\base
-	\memo=cache
+	\\memo=cache
 	\other
-	@\this\n
-	\n=n
+	@\this\\n
 	le n 0 base;
 	memo n;
 	- n (other (this (- n 1)))
 	)
 
-\f1=(create 1)
-\f0=(create 0)
+\\f1=(create 1)
+\\f0=(create 0)
 
-\male=   (splice f0 f1)
-\female= (splice f1 f0)
+\\male=   (splice f0 f1)
+\\female= (splice f1 f0)
 
 #trace_elapsed;
 show_benchmark;
@@ -36,4 +36,4 @@ show_benchmark;
 
 show_sequence "female" female
 show_sequence "male" male
-show_sequence "diff" (\n - (female n) (male n))
+show_sequence "diff" (\\n - (female n) (male n))

@@ -1,3 +1,4 @@
+#use_new_syntax
 # Run a child function with the given input.  Collect the stdout as it runs,
 # and collect the stderr after it terminates.  Return the output, error, and
 # status.
@@ -8,10 +9,10 @@
 	fput child_in input
 	fclose child_in
 
-	\out=(file_content child_out)
+	\\out=(file_content child_out)
 
 	\status
-	\err=(file_content child_err)
+	\\err=(file_content child_err)
 	{ out err status }
 	)
 
@@ -47,8 +48,8 @@
 \stop_server=
 	(\ip\port
 	\argv=["/usr/bin/lsof" (to_str ["-i4TCP@"ip":"port]) "-t"]
-	\out=(run_function (exec argv) "" \out\err\status out)
-	\list_pid=(map str_num; filter (ne ""); split NL out)
+	\\out=(run_function (exec argv) "" \out\err\status out)
+	\\list_pid=(map str_num; filter (ne ""); split NL out)
 
 	each list_pid
 		(\pid
@@ -59,8 +60,8 @@
 \run_server=
 	(\option\ip\port\error_log\interact
 
-	\start_server==(start_server ip port error_log interact)
-	\stop_server==(stop_server ip port)
+	\start_server=(start_server ip port error_log interact)
+	\stop_server=(stop_server ip port)
 
 	\ok=
 		(

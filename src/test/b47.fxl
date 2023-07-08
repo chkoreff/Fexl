@@ -1,31 +1,31 @@
-#
+#use_new_syntax
 show_benchmark;
 
-\x=[]
-\x=(put_key "a" 0 x)
-\x=(put_key "b" 0 x)
-\x=(put_key "c" 0 x)
+\\x=[]
+\\x=(put_key "a" 0 x)
+\\x=(put_key "b" 0 x)
+\\x=(put_key "c" 0 x)
 
-\x=(put_key "a" 1 x)
-\x=(put_key "b" 2 x)
-\x=(put_key "c" 3 x)
+\\x=(put_key "a" 1 x)
+\\x=(put_key "b" 2 x)
+\\x=(put_key "c" 3 x)
 
-\x=(push_key "d" 4 x)
-\x=(push_key "e" 5 x)
+\\x=(push_key "d" 4 x)
+\\x=(push_key "e" 5 x)
 
 say_data x
-\x=(del_key "x" x)
-\x=(del_key "d" x)
-\x=(del_key "c" x)
+\\x=(del_key "x" x)
+\\x=(del_key "d" x)
+\\x=(del_key "c" x)
 say_data x
 
-\x=(update_key "a" (* 10) x)
-\x=(update_key "b" (+ 5) x)
-\x=(add_key "c" 1 x)
-\x=(add_key "c" 20 x)
+\\x=(update_key "a" (* 10) x)
+\\x=(update_key "b" (+ 5) x)
+\\x=(add_key "c" 1 x)
+\\x=(add_key "c" 20 x)
 say_data x
 
-\x=
+\\x=
 	(
 	update_values
 		(\key\val
@@ -36,12 +36,12 @@ say_data x
 	)
 say_data x
 
-\x=(put_default "c" 0 x)
-\x=(put_default "d" 4 x)
+\\x=(put_default "c" 0 x)
+\\x=(put_default "d" 4 x)
 say_data x
 
-\y=(name_columns ["a" "b" "c"] [1 2 3])
+\\y=(name_columns ["a" "b" "c"] [1 2 3])
 say_data y
 
-\x=(sort_pairs x)
+\\x=(sort_pairs x)
 say_data x

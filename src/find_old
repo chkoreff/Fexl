@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Find all Fexl files that do not contain "use_new_syntax".
+
+find . -name "*.fxl" | sort | \
+while read name; do
+	code=`grep -l use_new_syntax $name`
+	code=$?
+	if [ $code -eq 1 ]; then
+		echo $name
+	fi
+done

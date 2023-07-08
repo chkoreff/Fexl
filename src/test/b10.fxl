@@ -1,3 +1,4 @@
+#use_new_syntax
 # Testing with a version that prints "get " when it reads a char.
 \fgetc=
 	(\fh
@@ -5,30 +6,30 @@
 	fgetc fh
 	)
 
-\fh_entropy==
+\fh_entropy=
 	(\=
 	\source="/dev/urandom" # Normally you'd use this.
 	\source="/dev/zero" # Tests all zeroes.
 
 	# Testing with fixed file contents.
-	\source=(path_under dir_base "src/test/chars.fxl")
+	\\source=(path_under dir_base "src/test/data.txt")
 
-	\fh=(fopen source "r")
+	\\fh=(fopen source "r")
 	is_undef fh (error ["Could not open "source]);
 	fh
 	)
 
-\list_entropy==(stream_values (fgetc fh_entropy))
+\list_entropy=(stream_values (fgetc fh_entropy))
 
 # Yield the next n bytes from the entropy source.  The list is created only on
 # demand, and is also a _fixed_ list, so I can print it repeatedly and see the
 # same thing each time.
 \get_bytes=(\n yield; \= first n; list_entropy)
 
-\get_random_id==
+\get_random_id=
 	(
 	get_bytes 16 \bytes
-	\bytes=(map (\ch hex_byte (ord ch)) bytes)
+	\\bytes=(map (\ch hex_byte (ord ch)) bytes)
 	to_str bytes
 	)
 
@@ -39,7 +40,7 @@
 	say "]"
 	)
 
-\show_bytes==
+\show_bytes=
 	(
 	get_bytes 16 \bytes
 	show bytes
@@ -48,9 +49,9 @@
 	nl
 	)
 
-\show_id==
+\show_id=
 	(
-	\x=get_random_id
+	\\x=get_random_id
 	say x
 	say x
 	say x

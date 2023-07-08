@@ -1,5 +1,5 @@
-#
-\div==(say "==")
+#use_new_syntax
+\div=(say "==")
 \show_list=(\xs say "[" (each xs say) say "]")
 
 \run_test=

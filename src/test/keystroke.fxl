@@ -1,14 +1,15 @@
+#use_new_syntax
 # Echo the characters from the input.
 \echo=
 	(\get @\loop
-	\ch=get
+	\\ch=get
 	is_undef ch ();
 	eq (ord ch) 4 ();
 	say ["ch = "(unpack ch)]
 	loop
 	)
 
-\interact==
+\interact=
 	(
 	set_alarm 20
 	say "Press Ctrl-D to stop."

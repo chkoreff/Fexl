@@ -1,9 +1,9 @@
-#
+#use_new_syntax
 say "=== Test new rules for numeric constants"
 
 \try=
 	(\x
-	\n=(str_num x)
+	\\n=(str_num x)
 	say ["str_num "QU x QU" = "(is_undef n "void" n)]
 	)
 

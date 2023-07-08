@@ -1,7 +1,7 @@
-#
+#use_new_syntax
 # Infinite list of null strings.
-\list==(@; cons "")
-\list==(first 100000 list)
+\list=(@; cons "")
+\list=(first 100000 list)
 
 (
 show_benchmark;

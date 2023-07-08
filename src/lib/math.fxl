@@ -1,20 +1,18 @@
-#
-\neg=(- 0)
+#use_new_syntax
+\\neg=(- 0)
 \max=(\x\y gt x y x y)
 \min=(\x\y lt x y x y)
 
 # Compute x modulo n.
 \mod=(\x\n - x; * n; trunc; / x n)
 
-\tau=(* 2 pi)
+\\tau=(* 2 pi)
 
 \round2=(\x / (round (* 100 x)) 100)
 
 # Greatest common denominator for non-negative numbers.
-\bn_gcd=
-	(@\bn_gcd\a\b
-	\a=a
-	\b=b
+\\bn_gcd=
+	(@\bn_gcd\\a\\b
 	bn_eq0 a b;
 	bn_eq0 b a;
 	bn_lt a b

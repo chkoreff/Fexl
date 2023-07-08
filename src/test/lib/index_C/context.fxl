@@ -1,7 +1,8 @@
+#use_new_syntax
 # Compile an index into C code.
-\cx_index=(value; std; use "lib/index/index.fxl")
-\cx_render=(value; std; use "lib/render/base.fxl")
-\cx_render_C=(value; std; cx_render; use "lib/render/C.fxl")
+\\cx_index=(value; std; use "lib/index/index.fxl")
+\\cx_render=(value; std; use "lib/render/base.fxl")
+\\cx_render_C=(value; std; cx_render; use "lib/render/C.fxl")
 
 value;
 std;
@@ -11,23 +12,23 @@ cx_render_C;
 \;
 
 # Process all the rows in an index.
-\do_rows=
+\\do_rows=
 	(@\do_rows \checked_bound\pos\rows
 	rows () \row\rows
 	row \is_leaf\key\val
 
-	\check_ch==
+	\check_ch=
 		(
-		\ch=(slice key pos 1)
+		\\ch=(slice key pos 1)
 		checked_bound () (say ["if (n <= "(num_str pos)") return 0;"])
 		say ["if (x["(num_str pos)"] == '"ch"')"]
 		)
 
-	\len=(length key)
+	\\len=(length key)
 
 	is_leaf
 		(
-		\do_strncmp==
+		\do_strncmp=
 			(
 			say ["if (n == "(num_str len)" && strncmp(x,"
 				(fexl_quote key)",n) == 0)"]
@@ -69,7 +70,7 @@ cx_render_C;
 
 # (compile_index index)
 # Return C code which implements the index.
-\compile_index==
+\compile_index=
 	(\index
 	say "const char *lookup(const char *x, unsigned long n)"
 	scope
@@ -89,19 +90,19 @@ cx_render_C;
 
 # (index_put_pairs pairs index)
 # Put all the {key val} pairs into the index.
-\index_put_pairs=
+\\index_put_pairs=
 	(@\loop\pairs\index
 	pairs index \pair\pairs
 	pair \key\val
-	\index=(index_put key val index)
+	\\index=(index_put key val index)
 	loop pairs index
 	)
 
 # (compile_pairs pairs)
 # Return C code which looks up the key value pairs.
-\compile_pairs==
+\compile_pairs=
 	(\pairs
-	\index=(index_put_pairs pairs [])
+	\\index=(index_put_pairs pairs [])
 	compile_index index
 	)
 

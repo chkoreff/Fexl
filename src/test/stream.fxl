@@ -1,8 +1,9 @@
+#use_new_syntax
 # Test stream operations.
 
-\test_1==
+\test_1=
 (
-\read==
+\read=
 	(
 	say "READ"
 	(@\loop
@@ -15,7 +16,7 @@
 		(
 		put "("
 		(
-		\fh==(readstr "12")
+		\fh=(readstr "12")
 		read_stream fh;
 		@\loop
 		at_eof ();
@@ -34,17 +35,17 @@
 
 \try=
 	(\fh
-	\result=(read_stream fh read)
+	\\result=(read_stream fh read)
 	say ["result = "(as_str result)]
 	nl
 	)
 
 # Test the default empty stream.
-\test_empty==
+\test_empty=
 	(
 	say "EMPTY"
 	say ["line "line]
-	\try==
+	\try=
 		(
 		say ["x = "(as_str look)]
 		skip
@@ -69,7 +70,7 @@ line 2
 line 3~
 )
 
-\test_2==
+\test_2=
 (
 (
 # Empty stream

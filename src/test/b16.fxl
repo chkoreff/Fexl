@@ -1,6 +1,7 @@
+#use_new_syntax
 # Test run_filter.
 
-\get_date==(trim_end_spaces; run_filter ["/bin/date"] "")
+\get_date=(trim_end_spaces; run_filter ["/bin/date"] "")
 
 # Calculate the message digest with a given algorithm, e.g. MD5, SHA1, SHA256,
 # etc.
@@ -12,17 +13,17 @@
 		str
 	)
 
-\gpg_sha256=(gpg_digest "sha256")
+\\gpg_sha256=(gpg_digest "sha256")
 
 #say ["date "(as_str get_date)]
 #say (run_filter ["/usr/bin/gpg" "--print-mds"] "")
 
-\test_gpg_sha256==
+\test_gpg_sha256=
 (
 say "= test_gpg_sha256"
 \try=
 	(\text\expect
-	\result=(gpg_sha256 text)
+	\\result=(gpg_sha256 text)
 	say ["result "(as_str result)]
 	if (ne result expect)
 		(

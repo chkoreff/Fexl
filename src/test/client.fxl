@@ -1,12 +1,13 @@
+#use_new_syntax
 # This client connects to the server created by test/server.fxl.
 
 # (inc_ch ch) Increments the character by calling the server.
-\inc_ch=
+\\inc_ch=
 	(
-	\fh=(connect "127.0.0.1" 2186)
+	\\fh=(connect "127.0.0.1" 2186)
 	if (is_undef fh) (error "Could not connect")
 	\ch
-	\ch=(slice ch 0 1)
+	\\ch=(slice ch 0 1)
 	is_undef ch void;
 	eq ch "" "";
 	fput fh ch
@@ -15,14 +16,14 @@
 
 \try=
 	(\ch
-	\ch2=(inc_ch ch)
+	\\ch2=(inc_ch ch)
 	say ["inc "(unpack ch)" = "(unpack ch2)]
 	)
 
 say "Enter chars: (Ctrl-D to quit)"
 (@\loop
 set_alarm 30
-\ch=(fgetc stdin)
+\\ch=(fgetc stdin)
 is_undef ch ();
 try ch
 loop

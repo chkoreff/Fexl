@@ -1,21 +1,21 @@
-#
-\test_add_sub_mul==
+#use_new_syntax
+\test_add_sub_mul=
 (
 say "= test_add_sub_mul"
 \try=
 	(\x\y
-	\x=(bn_from_dec x)
-	\y=(bn_from_dec y)
+	\\x=(bn_from_dec x)
+	\\y=(bn_from_dec y)
 	say ["x   = "x]
 	say ["y   = "y]
 
-	\z=(bn_add x y)
+	\\z=(bn_add x y)
 	say ["x+y = "z]
 
-	\z=(bn_sub x y)
+	\\z=(bn_sub x y)
 	say ["x-y = "z]
 
-	\z=(bn_mul x y)
+	\\z=(bn_mul x y)
 	say ["x*y = "z]
 
 	nl
@@ -43,14 +43,14 @@ try "1" "9999999"
 try "876543210" "876543210"
 )
 
-\test_div==
+\test_div=
 (
 say "= test_div"
 
 \check_result=
 	(\x\y\q\r
 
-	\z=(bn_add r; bn_mul q y)
+	\\z=(bn_add r; bn_mul q y)
 	\ok1=(bn_eq z x)
 	\ok2=(or (bn_eq0 y) (bn_lt r y))
 	\ok=(and ok1 ok2)
@@ -64,10 +64,10 @@ say "= test_div"
 		)
 	)
 
-\try==
+\try=
 	(\x\y
-	\x=(bn_from_dec x)
-	\y=(bn_from_dec y)
+	\\x=(bn_from_dec x)
+	\\y=(bn_from_dec y)
 
 	bn_div x y \q\r
 
@@ -336,7 +336,7 @@ try "4" "2"
 \y="1197507627300036"
 try x y
 
-\z=(bn_to_dec; bn_add (bn_from_dec "1234567");
+\\z=(bn_to_dec; bn_add (bn_from_dec "1234567");
 	bn_mul (bn_from_dec x) (bn_from_dec y))
 try z x
 )
@@ -357,15 +357,15 @@ try
 "1"
 )
 
-\test_gcd==
+\test_gcd=
 (
 say "= test_gcd"
 
-\try==
+\try=
 	(\a\b
-	\a=(bn_from_dec a)
-	\b=(bn_from_dec b)
-	\d=(bn_gcd a b)
+	\\a=(bn_from_dec a)
+	\\b=(bn_from_dec b)
+	\\d=(bn_gcd a b)
 	say ["a = "a]
 	say ["b = "b]
 	say ["d = "d]
@@ -380,15 +380,15 @@ try "18" "48"
 try "48" "48"
 
 (
-\x=(bn_from_dec "9774116588529608940783989389983056228593747")
-\y=(bn_from_dec "1197507627300036")
-\d=(bn_from_dec "301576419113008467374")
+\\x=(bn_from_dec "9774116588529608940783989389983056228593747")
+\\y=(bn_from_dec "1197507627300036")
+\\d=(bn_from_dec "301576419113008467374")
 
-\a=(bn_mul x d)
-\b=(bn_mul y d)
+\\a=(bn_mul x d)
+\\b=(bn_mul y d)
 
-\a=(bn_to_dec a)
-\b=(bn_to_dec b)
+\\a=(bn_to_dec a)
+\\b=(bn_to_dec b)
 try a b
 )
 )

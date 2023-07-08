@@ -1,3 +1,4 @@
+#use_new_syntax
 # divide even by 2
 # odd: multiply by 3 and add 1
 
@@ -5,8 +6,8 @@
 
 # https://en.wikipedia.org/wiki/Collatz_conjecture
 # The "hailstone sequence"
-\hailstone=
-	(@\loop\x \x=x
+\\hailstone=
+	(@\loop\\x
 	[x; le x 1 []; loop (is_even x (/ x 2) (+ 1; * x 3))]
 	)
 

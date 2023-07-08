@@ -1,7 +1,7 @@
-#
-\echo==
+#use_new_syntax
+\echo=
 	(@\echo
-	\ch=(fgetc stdin)
+	\\ch=(fgetc stdin)
 	is_undef ch ();
 	say ["ch " (hex_byte; ord ch)]
 	echo
