@@ -1,4 +1,4 @@
-#use_new_syntax
+#use_syntax_2
 \long_month_names=
 [
 "January"
@@ -15,7 +15,7 @@
 "December"
 ]
 
-\\short_month_names=(map (\name slice name 0 3) long_month_names)
+\short_month_names=(map (\name slice name 0 3) long_month_names)
 
 \long_month_name=(\n list_at long_month_names (- n 1))
 \short_month_name=(\n list_at short_month_names (- n 1))
@@ -26,18 +26,18 @@
 # Get the date components as strings.
 \date_ymd=
 	(\date
-	\\y=(slice date 0 4)
-	\\m=(slice date 4 2)
-	\\d=(slice date 6 2)
+	\y=(slice date 0 4)
+	\m=(slice date 4 2)
+	\d=(slice date 6 2)
 	{y m d}
 	)
 
 # Get the date components as numbers.
 \split_date=
 	(\date
-	\\y=(str_num; slice date 0 4)
-	\\m=(str_num; slice date 4 2)
-	\\d=(str_num; slice date 6 2)
+	\y=(str_num; slice date 0 4)
+	\m=(str_num; slice date 4 2)
+	\d=(str_num; slice date 6 2)
 	{y m d}
 	)
 
@@ -60,8 +60,8 @@
 
 \month_ym=
 	(\month
-	\\y=(str_num; slice month 0 4)
-	\\m=(str_num; slice month 4 2)
+	\y=(str_num; slice month 0 4)
+	\m=(str_num; slice month 4 2)
 	{y m}
 	)
 
@@ -132,9 +132,9 @@
 	(\date
 	eq (length date) 6
 		(
-		\\y=(str_num; slice date 0 4)
-		\\m=(str_num; slice date 4 2)
-		\\d=(ym_num_days y m)
+		\y=(str_num; slice date 0 4)
+		\m=(str_num; slice date 4 2)
+		\d=(ym_num_days y m)
 		ymd_date y m d
 		);
 	date
@@ -144,15 +144,15 @@
 	(\date
 	split_date date \y\m\d
 	\max=(ym_num_days y m)
-	\\d=(+ d 1)
+	\d=(+ d 1)
 
 	\ymd=
 		(
 		le d max { y m d };
-		\\m=(+ m 1)
+		\m=(+ m 1)
 		\d=1
 		le m 12 { y m d };
-		\\y=(+ y 1)
+		\y=(+ y 1)
 		\m=1
 		{ y m d }
 		)
@@ -170,13 +170,13 @@
 	(\date
 	eq date "" "";
 	split_date date \y\m\d
-	\\q=(+ 1; trunc; / (- m 1) 3)
+	\q=(+ 1; trunc; / (- m 1) 3)
 	eq q 1
 		{ (- y 1) 4 }
 		{ y (- q 1) }
 	\y\q
-	\\m=(* q 3)
-	\\d=(ym_num_days y m)
+	\m=(* q 3)
+	\d=(ym_num_days y m)
 	ymd_date y m d
 	)
 
@@ -200,9 +200,9 @@
 # Assumes month and day are valid.
 \day_in_year=
 	(\year\month\day
-	(@\loop\\total\\this_month
+	(@\\loop\total\this_month
 	ge this_month month (+ total day);
-	\\days=(ym_num_days year this_month)
+	\days=(ym_num_days year this_month)
 	loop (+ total days) (+ this_month 1)
 	) 0 1
 	)
@@ -215,9 +215,9 @@
 	split_date end \y1\m1\d1
 
 	# Compute the total number of days in years y0 through (- y1 1).
-	\\total_days=
+	\total_days=
 		(
-		(@\loop\\total\\x
+		(@\\loop\total\x
 		eq x y1 total;
 		loop (+ total (year_num_days x)) (+ x 1)
 		) 0 y0
@@ -244,20 +244,20 @@
 \day_of_week=
 	(\date
 	\ref_date="20160104" # a Monday
-	\\count=(count_days ref_date date)
-	\\n=(mod count 7)
+	\count=(count_days ref_date date)
+	\n=(mod count 7)
 	\n=(+ 1; lt n 0 (+ 7 n) n)
 	n
 	)
 
 # Add count days to the begin date.
 # LATER 20170427 Use a faster method.
-\\add_days=
-	(@\loop\\beg\\count
+\add_days=
+	(@\\loop\beg\count
 	split_date beg \y\m\d
 	lt count 0
 		(
-		\\count=(+ d count)
+		\count=(+ d count)
 		ge count 1
 			(ymd_date y m count)
 			(
@@ -266,8 +266,8 @@
 			)
 		)
 		(
-		\\count=(+ d count)
-		\\max=(ym_num_days y m)
+		\count=(+ d count)
+		\max=(ym_num_days y m)
 		le count max
 			(ymd_date y m count)
 			(
@@ -283,7 +283,7 @@
 \add_year=
 	(\date
 	split_date date \y\m\d
-	\\y=(+ y 1)
+	\y=(+ y 1)
 	ymd_date y m d
 	)
 

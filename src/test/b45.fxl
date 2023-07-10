@@ -1,13 +1,13 @@
-#use_new_syntax
+#use_syntax_2
 # Demonstrate built-in "with".
 
 # Convert a value to a string with no indentation.
-\\val_str=
+\val_str=
 	(
 	# The single "=" above means I use the same buffer every time.
-	\\buf=buf_new
-	\\put=(buf_put buf)
-	\nl=(put NL)
+	\buf=buf_new
+	\put=(buf_put buf)
+	\\nl=(put NL)
 
 	\show_key=
 		(\key
@@ -16,13 +16,13 @@
 		put "?"
 		)
 
-	\\obj
+	\obj
 
-	\show_pairs=
-		(@\show_pairs\obj
+	\\show_pairs=
+		(@\\show_pairs\obj
 
-		\show_val=
-			(@\show_val\val
+		\\show_val=
+			(@\\show_val\val
 
 			is_obj val
 				(
@@ -36,7 +36,7 @@
 			is_str val (put (fexl_quote val));
 			is_bool val (put (val "T" "F"));
 
-			\show_list=
+			\\show_list=
 				(\beg\val\end
 				put beg nl
 				each val (\item show_val item nl)
@@ -50,7 +50,7 @@
 
 		is_obj obj
 			(
-			split_obj obj \\key\\val\obj
+			split_obj obj \key\val\obj
 
 			put "with "
 			show_key key
@@ -77,7 +77,7 @@
 
 show_benchmark;
 
-\\obj=
+\obj=
 	(
 	\q="q"
 
@@ -108,16 +108,16 @@ show_benchmark;
 	(I I)
 	)
 
-\test_1=
+\\test_1=
 	(
 	say "= test_1"
 	\try=
 		(\x
-		\\y=(obj x)
+		\y=(obj x)
 		say [x" => "y]
 		)
 
-	\run=
+	\\run=
 		(
 		try "x"
 		try 3
@@ -132,12 +132,12 @@ show_benchmark;
 	run
 	)
 
-\test_2=
+\\test_2=
 	(
 	say "= test_2"
 	\try=
 		(\obj
-		\\str=(val_str obj)
+		\str=(val_str obj)
 		say "===="
 		put str
 		)

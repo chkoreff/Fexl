@@ -1,4 +1,4 @@
-#use_new_syntax
+#use_syntax_2
 # Parse the CSV (comma-separated value) format.
 # NOTE: https://www.ietf.org/rfc/rfc4180.txt
 # "Spaces are considered part of a field and should not be ignored."
@@ -16,11 +16,11 @@
 # Get a quoted item.  A single QU char is treated as end of string.  Two QU
 # chars in a row are treated as a single QU character which appears in the
 # string.
-\get_quote_item=
+\\get_quote_item=
 	(
 	skip
-	\\buf=buf_new
-	@\loop
+	\buf=buf_new
+	@\\loop
 	at_ch QU
 		(
 		skip
@@ -45,13 +45,13 @@
 
 \get_row=
 	(\sep
-	@\loop
-	\\item=(get_item sep)
+	@\\loop
+	\item=(get_item sep)
 	is_undef item void;
 	at_ch sep
 		(
 		skip
-		\\row=loop
+		\row=loop
 		is_undef row [item] [item;row]
 		)
 		[item]
@@ -59,30 +59,30 @@
 
 \get_rows=
 	(\sep
-	@\loop
+	@\\loop
 	skip_match at_eol
-	\\row=(get_row sep)
+	\row=(get_row sep)
 	is_undef row [];
-	\\rows=loop
+	\rows=loop
 	[row;rows]
 	)
 
 \parse=(\read\sep\x read x (get_rows sep))
 
 # Use arbitrary separator.
-\\read_xsv_string=(parse read_stream)
-\\read_xsv_chars=(parse read_chars)
-\\read_xsv_file=(parse read_file)
+\read_xsv_string=(parse read_stream)
+\read_xsv_chars=(parse read_chars)
+\read_xsv_file=(parse read_file)
 
 # comma-separated
-\\read_csv_string=(read_xsv_string ",")
-\\read_csv_chars=(read_xsv_chars ",")
-\\read_csv_file=(read_xsv_file ",")
+\read_csv_string=(read_xsv_string ",")
+\read_csv_chars=(read_xsv_chars ",")
+\read_csv_file=(read_xsv_file ",")
 
 # tab-separated
-\\read_tsv_string=(read_xsv_string TAB)
-\\read_tsv_chars=(read_xsv_chars TAB)
-\\read_tsv_file=(read_xsv_file TAB)
+\read_tsv_string=(read_xsv_string TAB)
+\read_tsv_chars=(read_xsv_chars TAB)
+\read_tsv_file=(read_xsv_file TAB)
 
 \form
 def "read_xsv_string" read_xsv_string;

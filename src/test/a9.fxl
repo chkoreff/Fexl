@@ -1,41 +1,41 @@
-#use_new_syntax
-\test_1=
+#use_syntax_2
+\\test_1=
 (
 say "== test_1" # says PING 1 time
-\ping=(\= say "PING")
+\\ping=(\= say "PING")
 I
 ping
 ping
 ping
 )
 
-\test_2=
+\\test_2=
 (
 say "== test_2" # says PING 5 times
-\ping=(say "PING")
-\other=(\= ping)
-\talk=(ping other)
-\talk=(talk talk)
-\talk=(talk talk)
+\\ping=(say "PING")
+\\other=(\= ping)
+\\talk=(ping other)
+\\talk=(talk talk)
+\\talk=(talk talk)
 talk
 )
 
-\test_3=
+\\test_3=
 (
 say "== test_3" # says PING 3 times
-\ping=(say "PING")
-\talk=(\\x=ping x)
+\\ping=(say "PING")
+\\talk=(\x=ping x)
 talk talk talk
 )
 
-\test_4=
+\\test_4=
 (
 say "== test_4" # says PING pong PING PING PING
-\ping=(say "PING")
-\pong=(\= say "pong")
-\talk=(ping pong)
-\talk=(talk talk)
-\talk=(talk talk)
+\\ping=(say "PING")
+\\pong=(\= say "pong")
+\\talk=(ping pong)
+\\talk=(talk talk)
+\\talk=(talk talk)
 talk
 )
 

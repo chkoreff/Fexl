@@ -1,5 +1,5 @@
-#use_new_syntax
-resolve (std; \; xsay "Hello") \hello
+#use_syntax_2
+resolve (std; \; xsay "Hello") \\hello
 say "beg"
 hello
 hello

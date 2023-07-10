@@ -1,7 +1,7 @@
-#use_new_syntax
+#use_syntax_2
 \bottles=
 	(\n\wall
-	\s=(eq n 1 "" "s")
+	\\s=(eq n 1 "" "s")
 	say [n " bottle"s " of beer" (wall (" on the wall") "")]
 	)
 

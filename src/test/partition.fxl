@@ -1,4 +1,4 @@
-#use_new_syntax
+#use_syntax_2
 # This demo was inspired by the Mathologer on Youtube.
 
 \use_bn=T # Use big numbers if true.
@@ -6,7 +6,7 @@
 use_bn
 (
 \add=bn_add
-\\one=(bn_from_dec "1")
+\one=(bn_from_dec "1")
 \rep=bn_to_dec
 {add one rep}
 )
@@ -19,13 +19,13 @@ use_bn
 
 \add\one\rep
 
-\\partition=
+\partition=
 	(
-	\\memo=(remember 2)
-	@\partition\\n\\m
+	\memo=(remember 2)
+	@\\partition\n\m
 	le n 1 one;
 	le m 1 one;
-	\\m=(min n m)
+	\m=(min n m)
 	memo n m;
 	add (partition (- n m) m) (partition n (- m 1))
 	)
@@ -35,7 +35,7 @@ use_bn
 
 \show=
 	(\n
-	\\v=(partition n)
+	\v=(partition n)
 	say [n" "(rep v)]
 	)
 

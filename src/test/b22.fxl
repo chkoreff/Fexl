@@ -1,13 +1,13 @@
-#use_new_syntax
+#use_syntax_2
 value; std; (value; std; use "test.fxl") \;
 
 say "== test Fibonacci"
 
 # (fib n) returns the nth Fibonacci number starting at 0.
-\\fib=
+\fib=
 	(
-	\\memo=cache
-	@\fib\\n
+	\memo=cache
+	@\\fib\n
 	le n 1 (eq n 1 1 0);
 	memo n;
 	+ (fib (- n 1)) (fib (- n 2))

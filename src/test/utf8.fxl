@@ -1,4 +1,4 @@
-#use_new_syntax
+#use_syntax_2
 # Demonstrate UTF-8 chars.
 \f = "hej
 åabcüdef

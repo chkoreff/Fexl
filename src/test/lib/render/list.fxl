@@ -1,4 +1,4 @@
-#use_new_syntax
+#use_syntax_2
 \say_list=
 	(\say_row\list
 	say "["

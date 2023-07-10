@@ -1,11 +1,11 @@
-#use_new_syntax
+#use_syntax_2
 # Demonstrate the use of vars to maintain an evolving state.
 
 ## Here is the "API".
 
-\\v_list=var_new
-\\v_count=var_new
-\\v_map=var_new
+\v_list=var_new
+\v_count=var_new
+\v_map=var_new
 
 var_put v_list []
 var_put v_count 0
@@ -13,7 +13,7 @@ var_put v_map void
 
 \update=
 	(\v\f
-	\\x=(var_get v)
+	\x=(var_get v)
 	var_put v (f x)
 	)
 
@@ -22,8 +22,8 @@ var_put v_map void
 	update v (cons x)
 	)
 
-\pairs=(var_get v_list)
-\count=(var_get v_count)
+\\pairs=(var_get v_list)
+\\count=(var_get v_count)
 
 \update_map=
 	(\v\key\val
@@ -39,7 +39,7 @@ var_put v_map void
 	(\v\n
 	update v
 		(\x
-		\\y=(+ n x)
+		\y=(+ n x)
 		say ["  add: " x " => " y]
 		y
 		)
@@ -53,11 +53,11 @@ var_put v_map void
 	update_map v_map key val
 	)
 
-\get=(var_get v_map)
+\\get=(var_get v_map)
 
 ## Now do some operations.
 
-\show_pairs=
+\\show_pairs=
 (
 \show_pair=(\pair pair \key\val say ["{ " key " " val " }"])
 say "["
@@ -71,14 +71,14 @@ say "]"
 	)
 
 (
-\set_xyz=
+\\set_xyz=
 (
 set "x" "3"
 set "y" "4"
 set "z" "5"
 )
 
-\set_q=
+\\set_q=
 (
 set "q" "0"
 )

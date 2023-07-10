@@ -1,87 +1,87 @@
-#use_new_syntax
+#use_syntax_2
 # Run the user's script given by argv[1] in the enhanced standard context.
 
 # (check x d) = x if x is good, otherwise d.
-\check=(\\x is_defined x x)
+\check=(\x is_defined x x)
 # (default d x) = x if x is good, otherwise d.
-\default=(\d\\x is_defined x x d)
+\default=(\\d\x is_defined x x d)
 
 # Use the context only if the form has open symbols.
 \::=
-	(\cx\\form
+	(\\cx\form
 	is_closed form form;
 	cx form
 	)
 
 # Define key to refer to a context.
 \defc=
-	(\key\\cx
-	@\self\form
+	(\\key\cx
+	@\\self\\form
 	cx; def key self; form
 	)
 
 \path_under=(\dir\name . (. dir "/") name)
 
 # Establish paths based on command arguments.
-\\dir_base=(dirname; dirname; argv 0)
-\\script_name=(default ""; argv 1)
+\dir_base=(dirname; dirname; argv 0)
+\script_name=(default ""; argv 1)
 
-\\trace=(fsay stderr)
+\trace=(fsay stderr)
 \error=(\msg trace msg die)
 
 # Define some extra functions.
-\extra=
+\\extra=
 (\=
 # (if x y) = y if x is true, other I.
-\if=(\x\y x y I)
+\if=(\\x\\y x y I)
 
-\\dir_local=(dirname script_name)
+\dir_local=(dirname script_name)
 
 # Make a cache which remembers the values of a function with n arguments.
 \remember=
 	(\n
-	\\v=var_new
+	\v=var_new
 
-	(@\loop\\n
+	(@\\loop\n
 	le n 1 fetch;
-	\\f=(loop (- n 1))
+	\f=(loop (- n 1))
 
 	\v\k
-	\\v=(fetch v k var_new)
+	\v=(fetch v k var_new)
 	f v
 	) n v
 	)
 
 # Equivalent to (remember 1).
-\cache=(\\v=var_new fetch v)
+\\cache=(\v=var_new fetch v)
 
 \NL="
 "
 \TAB="	"
-\\CR=(chr 13)
+\CR=(chr 13)
 \LF=NL
 \QU=~ "~
 
 \run_benchmark=
-	(\show\f
+	(\\show\\f
 	fexl_benchmark f \val\steps\bytes
 	show ["steps "steps" bytes "bytes]
 	val
 	)
 
-\\do_benchmark=(run_benchmark trace)
-\\show_benchmark=(run_benchmark say)
+\do_benchmark=(run_benchmark trace)
+\show_benchmark=(run_benchmark say)
 
 # Use a file in the directory which contains the user's script.
 \use=(\name use_file; path_under dir_local name)
 
 # Map a dynamic get function to a fixed stream of values.
 \stream_get=
-	(\get
+	(\\get
 	yield;
 	\=
-	@\loop
-	\\x=get
+	@\\loop
+	\x=get
 	is_undef x [] [x;\=loop]
 	)
 
@@ -116,42 +116,42 @@ form
 )
 
 # Enhance the standard context to load libraries on demand.
-\\std=
+\std=
 (
-\\dir_lib=(path_under dir_base "src/lib")
+\dir_lib=(path_under dir_base "src/lib")
 \use=(\name use_file; path_under dir_lib name)
 
-\bool=(\= value; std; use "bool.fxl")
-\math=(\= value; std; use "math.fxl")
-\list=(\= value; std; bool; use "list.fxl")
-\format=(\= value; std; extra; bool; math; list; use "format.fxl")
-\indent=(\= value; std; extra; format; use "indent.fxl")
-\assoc=(\= value; std; list; use "assoc.fxl")
-\hex=(\= value; std; bool; math; list; use "hex.fxl")
-\html=(\= value; std; extra; list; format; hex; use "html.fxl")
-\time=(\= value; std; extra; use "time.fxl")
-\date=(\= value; std; math; list; use "date.fxl")
-\run=(\= value; std; extra; bool; list; use "run.fxl")
-\read=(\= value; std; extra; use "read.fxl")
-\read_csv=(\= value; std; extra; read; use "read_csv.fxl")
-\read_ssv=(\= value; std; extra; read; use "read_ssv.fxl")
+\\bool=(\= value; std; use "bool.fxl")
+\\math=(\= value; std; use "math.fxl")
+\\list=(\= value; std; bool; use "list.fxl")
+\\format=(\= value; std; extra; bool; math; list; use "format.fxl")
+\\indent=(\= value; std; extra; format; use "indent.fxl")
+\\assoc=(\= value; std; list; use "assoc.fxl")
+\\hex=(\= value; std; bool; math; list; use "hex.fxl")
+\\html=(\= value; std; extra; list; format; hex; use "html.fxl")
+\\time=(\= value; std; extra; use "time.fxl")
+\\date=(\= value; std; math; list; use "date.fxl")
+\\run=(\= value; std; extra; bool; list; use "run.fxl")
+\\read=(\= value; std; extra; use "read.fxl")
+\\read_csv=(\= value; std; extra; read; use "read_csv.fxl")
+\\read_ssv=(\= value; std; extra; read; use "read_ssv.fxl")
 
 \load=
 	(\module
 
-	\\path=(path_under dir_base (. "lib/"; . module ".so"))
-	\\lib=(dlopen path)
+	\path=(path_under dir_base (. "lib/"; . module ".so"))
+	\lib=(dlopen path)
 	is_void lib (error dlerror);
 
-	\\sym=(. "type_cx_" module)
-	\\entry=(dlsym lib sym)
+	\sym=(. "type_cx_" module)
+	\entry=(dlsym lib sym)
 	is_void entry (error ["Could not find symbol "sym]);
 
-	entry \cx cx
+	entry \\cx cx
 	)
 
 defc "std";
-\form
+\\form
 :: read_ssv;
 :: read_csv;
 :: run;

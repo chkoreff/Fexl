@@ -1,9 +1,9 @@
-#use_new_syntax
-\div=(say "==")
+#use_syntax_2
+\\div=(say "==")
 \show_list=(\xs say "[" (each xs say) say "]")
 
 \run_test=
-	(\label\code
+	(\label\\code
 	say ["[ "label]
 	code
 	say "]"

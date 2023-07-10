@@ -1,4 +1,4 @@
-#use_new_syntax
+#use_syntax_2
 \list_all=
 [
 "a1"
@@ -72,24 +72,24 @@
 ]
 
 # Gather any individually specified tests.
-\\list=
+\list=
 	(
-	(@\loop\n
-	\\x=(argv n)
+	(@\\loop\n
+	\x=(argv n)
 	is_undef x [];
-	\\n=(+ 1 n)
+	\n=(+ 1 n)
 	[x;loop n]
 	) 2
 	)
 
-\\list=(is_null list list_all list)
+\list=(is_null list list_all list)
 
 # Run a shell command with no input.
 \sh=(\cmd run_program ["/bin/sh" "-c" (to_str cmd)] "")
 
-\refresh=
+\\refresh=
 	(
-	\\_=(mkdir "new" (oct "775"))
+	\_=(mkdir "new" (oct "775"))
 	each list
 		(\name
 		say ["refresh "name" "]
@@ -98,7 +98,7 @@
 		)
 	)
 
-\check=
+\\check=
 	(
 	each list
 		(\name

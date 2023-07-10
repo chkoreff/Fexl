@@ -1,4 +1,4 @@
-#use_new_syntax
+#use_syntax_2
 show_benchmark;
 (
 \try=
@@ -68,13 +68,13 @@ nl
 # Test round-trip
 (
 \data=["a" QU (T 23 46) {1 2} [T F ~ "hi"~ void] -2.3]
-\\data=(append data data)
+\data=(append data data)
 
-\\str1=(as_str data)
+\str1=(as_str data)
 say str1
 
-\\data=(str_to_data str1)
-\\str2=(as_str data)
+\data=(str_to_data str1)
+\str2=(as_str data)
 say str2
 say (eq str1 str2)
 )
@@ -82,17 +82,17 @@ say (eq str1 str2)
 
 (
 say "= test file_content"
-\\fh=(fopen (path_under dir_local "data.txt") "r")
-\\str=(file_content fh)
-\\str=(slice str 0 28)
+\fh=(fopen (path_under dir_local "data.txt") "r")
+\str=(file_content fh)
+\str=(slice str 0 28)
 put str
 nl
 )
 (
 say "= test file_bytes"
-\\source=(path_under dir_base "src/test/hello.fxl")
-\\fh=(fopen source "r")
-\\bytes=(file_bytes fh)
+\source=(path_under dir_base "src/test/hello.fxl")
+\fh=(fopen source "r")
+\bytes=(file_bytes fh)
 say (as_str bytes)
 say (as_str bytes)
 nl
@@ -106,13 +106,13 @@ nl
 ["c" "orange" 2]
 ]
 
-\\get_color=(match_column 0 1 rows)
-\\get_qty=(match_column 0 2 rows)
+\get_color=(match_column 0 1 rows)
+\get_qty=(match_column 0 2 rows)
 
 \try=
 	(\key
-	\\color=(get_color key)
-	\\qty=(get_qty key)
+	\color=(get_color key)
+	\qty=(get_qty key)
 	say ["key "key" color "color" qty "qty]
 	)
 
@@ -127,15 +127,15 @@ nl
 \try=
 	(\sep\list
 
-	\\str=(join sep list)
+	\str=(join sep list)
 
 	put "sep   " put_data sep nl
 	put "str   " put_data str nl
 
-	\\list=(split sep str)
+	\list=(split sep str)
 	put "list  "put_data list nl
 
-	\\_str=(join sep list)
+	\_str=(join sep list)
 	if (ne str _str) (say ["BAD   "_str])
 	nl
 	)
@@ -169,18 +169,18 @@ try "//" ["" "" ""]
 
 (
 # Demonstrate the equivalence of:
-#   \\x=D F
-#   (\\x F) D
-
-( \\x=(put "!" 4) say (+ x x) )
-( (\\x say (+ x x)) (put "!" 4) )
-
-# Demonstrate the equivalence of:
 #   \x=D F
 #   (\x F) D
 
 ( \x=(put "!" 4) say (+ x x) )
 ( (\x say (+ x x)) (put "!" 4) )
+
+# Demonstrate the equivalence of:
+#   \\x=D F
+#   (\\x F) D
+
+( \\x=(put "!" 4) say (+ x x) )
+( (\\x say (+ x x)) (put "!" 4) )
 )
 
 (
@@ -197,7 +197,7 @@ say (uc (put "!" "abc"))
 put_data (put "!" { 1 2 3 }) nl
 say_data (put "!" ["a" "b" "c"])
 
-\\list=(str_chars "abc")
+\list=(str_chars "abc")
 say_data list
 say_data list
 say_data void
@@ -217,7 +217,7 @@ say (make_url
 	]
 	)
 
-\\x=
+\x=
 	(
 	\alpha="abcdefghijklmnopqrstuvwxyz"
 	to_str
@@ -240,7 +240,7 @@ say ["QU "(ord QU)]
 
 (
 say "= is_var"
-\\v=var_new
+\v=var_new
 var_put v [1 2 3]
 say (is_var v)
 say (is_good v)
@@ -252,28 +252,28 @@ say (is_list (var_get v))
 
 (
 say "= str_bytes"
-\\str=(list_str; map chr; range 251 260)
+\str=(list_str; map chr; range 251 260)
 say ["length is "(length str)]
 each (str_bytes str)
 	(\ch
-	\\n=(ord ch)
+	\n=(ord ch)
 	say ["byte "n]
 	)
 )
 (
 say "= get_str"
 \str="abcdefg"
-\\in=(readstr str)
-\\x=(get_str (sgetc in))
+\in=(readstr str)
+\x=(get_str (sgetc in))
 say_data x
 )
 (
 say "= uri_escape"
 \try=
 	(\x
-	\\x=(to_str x)
-	\\y=(uri_escape x)
-	\\z=(uri_unescape y)
+	\x=(to_str x)
+	\y=(uri_escape x)
+	\z=(uri_unescape y)
 
 	say ["\x="(as_str x)]
 	say ["\y="(as_str y)]
@@ -330,7 +330,7 @@ LF
 say "= microtime"
 \try=
 	(\x\y
-	\\elapse=(subtract_microtime x y)
+	\elapse=(subtract_microtime x y)
 	say (as_str {x y elapse})
 	)
 \try=
@@ -352,9 +352,9 @@ say "= convert time"
 	\num_to_str
 
 	\try=
-		(\\x
-		\\n=(str_to_num x)
-		\\y=(num_to_str n)
+		(\x
+		\n=(str_to_num x)
+		\y=(num_to_str n)
 
 		say (as_str [x n y])
 		)
@@ -373,13 +373,13 @@ if F (run timelocal localtime) # Result depends on your local time zone.
 )
 
 (
-\\try=
+\try=
 	(
-	\\memo=cache \a memo a;
+	\memo=cache \a memo a;
 	say ["  1 : "a]
-	\\memo=cache \b memo b;
+	\memo=cache \b memo b;
 	say ["  2 : "b]
-	\\memo=cache \c memo c;
+	\memo=cache \c memo c;
 	say ["  3 : "c]
 	)
 
@@ -410,13 +410,13 @@ try "a" "x" "e"
 
 (
 say "== fetch"
-\\try=
+\try=
 	(
-	\\v=var_new
-	\v=(I v) # test eval of first arg
+	\v=var_new
+	\\v=(I v) # test eval of first arg
 	\k
 	say ["= try "(as_str k)]
-	\\x=
+	\x=
 		(
 		fetch v k;
 		say "  compute"
@@ -441,7 +441,7 @@ try void
 (
 say "= import"
 # Extract specific functions from a context.
-\\cx=(value; std; use "test.fxl")
+\cx=(value; std; use "test.fxl")
 value (cx (\; {div show_hex show_str})) \div\show_hex\show_str
 # Evaluate with alternative names.
 value;
@@ -459,7 +459,7 @@ test.show_str "abcd"
 say "=="
 \list=["a" ["b" ["c" {3 4} T [F T]] "d" [] "e" "f"]]
 say (as_str list)
-\\list=(flatten list)
+\list=(flatten list)
 say (as_str list)
 
 \table=

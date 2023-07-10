@@ -1,17 +1,17 @@
-#use_new_syntax
-\test_rand=
+#use_syntax_2
+\\test_rand=
 (
 say "== test_rand"
 
 # This is an infinite list of random values, but it says "get" every time it
 # gets the next value.
-stream_get (say "get" rand) \xs
+stream_get (say "get" rand) \\xs
 
 # This is the first three items of the infinite list.  Note again that I use ==
 # to avoid getting the first value right away.
-\xs=(\= first 3 xs)
+\\xs=(\= first 3 xs)
 
-\show=
+\\show=
 	(
 	say "["
 	each xs say
@@ -24,20 +24,20 @@ show
 show
 )
 
-\test_readstr=
+\\test_readstr=
 (
 say "== test_readstr"
 
 \stream_string=
 	(\str
-	\\fh=(readstr str)
+	\fh=(readstr str)
 	stream_get (put "!" sgetc fh)
 	)
 
 say "BEG"
-stream_string "abcdef" \xs
+stream_string "abcdef" \\xs
 say "END"
-\xs=(first 3 xs)
+\\xs=(first 3 xs)
 say ["xs = "(as_str xs)]
 say ["xs = "(as_str xs)]
 )

@@ -1,18 +1,18 @@
-#use_new_syntax
+#use_syntax_2
 # Run a child function with the given input.  Collect the stdout as it runs,
 # and collect the stderr after it terminates.  Return the output, error, and
 # status.
 \run_function=
-	(\child_fn\input
+	(\\child_fn\\input
 	spawn child_fn \child_in\child_out\child_err
 
 	fput child_in input
 	fclose child_in
 
-	\\out=(file_content child_out)
+	\out=(file_content child_out)
 
 	\status
-	\\err=(file_content child_err)
+	\err=(file_content child_err)
 	{ out err status }
 	)
 
@@ -25,7 +25,7 @@
 # Run a function with the given input, returning the output as a string.  If
 # there was any error, show that on stderr and die.
 \run_function_filter=
-	(\child_fn\input
+	(\\child_fn\\input
 	run_function child_fn input \out\err\status
 	if (ne status 0) (error err)
 	out
@@ -39,7 +39,7 @@
 
 # Grab the output of a function, passing in null input.
 \grab_output=
-	(\child_fn
+	(\\child_fn
 	run_function_filter child_fn ""
 	)
 
@@ -48,8 +48,8 @@
 \stop_server=
 	(\ip\port
 	\argv=["/usr/bin/lsof" (to_str ["-i4TCP@"ip":"port]) "-t"]
-	\\out=(run_function (exec argv) "" \out\err\status out)
-	\\list_pid=(map str_num; filter (ne ""); split NL out)
+	\out=(run_function (exec argv) "" \out\err\status out)
+	\list_pid=(map str_num; filter (ne ""); split NL out)
 
 	each list_pid
 		(\pid
@@ -58,10 +58,10 @@
 	)
 
 \run_server=
-	(\option\ip\port\error_log\interact
+	(\option\ip\port\error_log\\interact
 
-	\start_server=(start_server ip port error_log interact)
-	\stop_server=(stop_server ip port)
+	\\start_server=(start_server ip port error_log interact)
+	\\stop_server=(stop_server ip port)
 
 	\ok=
 		(

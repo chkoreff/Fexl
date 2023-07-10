@@ -1,4 +1,4 @@
-#use_new_syntax
+#use_syntax_2
 \cx=(value; std; use "lib/index_C/context.fxl")
 value; std; cx \;
 
@@ -9,7 +9,7 @@ value; std; cx \;
 	nl
 	)
 
-\test_0870=
+\\test_0870=
 	(
 	say "= test_0870"
 
@@ -18,7 +18,7 @@ value; std; cx \;
 	]
 	)
 
-\test_0745=
+\\test_0745=
 	(
 	say "= test_0745"
 
@@ -32,7 +32,7 @@ value; std; cx \;
 	]
 	)
 
-\test_1197=
+\\test_1197=
 	(
 	say "= test_1197"
 

@@ -1,16 +1,16 @@
-#use_new_syntax
+#use_syntax_2
 # Append lists xs and ys.
 \append=
-	(\xs\ys
-	(@\loop\xs
-	xs ys \x\xs
+	(\\xs\\ys
+	(@\\loop\\xs
+	xs ys \\x\\xs
 	[x;\=loop xs]
 	) xs
 	)
 
 # Flatten a nested list into a list of scalars.
-\\flatten=
-	(@\flatten\xs
+\flatten=
+	(@\\flatten\xs
 	xs [] \x\xs
 	is_list x (append (flatten x)) (cons x);
 	flatten xs
@@ -19,57 +19,57 @@
 # Do f for each item in list xs.
 \each=
 	(\xs\f
-	(@\loop\xs xs () \x f x loop)
+	(@\\loop\\xs xs () \x f x loop)
 	xs
 	)
 
 # Apply f to each element in list xs.
 \map=
-	(\f @\loop \xs
-	xs [] \x\xs
-	\\x=(f x)
+	(\\f @\\loop \\xs
+	xs [] \x\\xs
+	\x=(f x)
 	[x;\=loop xs]
 	)
 
 # Eager map.
 \map_eager=
-	(\f @\loop \xs
-	xs [] \x\xs
-	\\x=(f x)
-	\\xs=(loop xs)
+	(\\f @\\loop \\xs
+	xs [] \x\\xs
+	\x=(f x)
+	\xs=(loop xs)
 	[x;xs]
 	)
 
 # Apply f to each element in list xs, but only keep the good results.
 \map_good=
-	(\fn @\loop \xs
-	xs [] \x\xs
-	\\y=(fn x)
+	(\\fn @\\loop \\xs
+	xs [] \x\\xs
+	\y=(fn x)
 	is_good y (cons y) ();
 	\=loop xs
 	)
 
 # (filter f xs) is the list of items x in xs for which (f x) is true.
 \filter=
-	(\f @\loop \xs
-	xs [] \x\xs
+	(\\f @\\loop \\xs
+	xs [] \x\\xs
 	f x (cons x) ();
 	\=loop xs
 	)
 
 # Reverse list xs.
-\\reverse=((@\loop\ys\xs xs ys \x loop [x;ys]) [])
+\reverse=((@\\loop\ys\xs xs ys \x loop [x;ys]) [])
 
 # Append a list of lists together.
-\\append_all=
-	(@\loop\list
-	list [] \top\list
+\append_all=
+	(@\\loop\\list
+	list [] \top\\list
 	append top;
 	loop list
 	)
 
 # Shift the first item off a list.
-\shift=(\xs xs {void []} \x\xs {x xs})
+\shift=(\\xs xs {void []} \x\\xs {x xs})
 
 # Sort the list of {key val} pairs xs.  Use the combine function to combine
 # values with the same key.
@@ -77,8 +77,8 @@
 	(\combine\xs
 
 	# Merge two segments together.  A segment is a list of groups.
-	\\merge_segments=
-		(@\loop\xs\ys
+	\merge_segments=
+		(@\\loop\xs\ys
 		xs ys \x\xt
 		ys xs \y\yt
 
@@ -86,35 +86,35 @@
 		y \ky\vy
 
 		compare kx ky
-			(\\tail=(loop xt ys) [x;tail])
+			(\tail=(loop xt ys) [x;tail])
 			(
-			\\vx=(combine vx vy)
-			\\tail=(loop xt yt)
+			\vx=(combine vx vy)
+			\tail=(loop xt yt)
 			[{kx vx};tail]
 			)
-			(\\tail=(loop xs yt) [y;tail])
+			(\tail=(loop xs yt) [y;tail])
 		)
 
 	# Merge each adjoining pair of segments in a list of segments.
-	\\merge_adjoining_segments=
-		(@\loop\xs
+	\merge_adjoining_segments=
+		(@\\loop\xs
 		xs [] \x\ys
 		ys xs \y\zs
-		\\z=(merge_segments x y)
-		\\zs=(loop zs)
+		\z=(merge_segments x y)
+		\zs=(loop zs)
 		[z;zs]
 		)
 
 	# Merge all the segments in a list into a single segment.
-	\\merge_all_segments=
-		(@\loop\xs
+	\merge_all_segments=
+		(@\\loop\xs
 		xs [] \x\ys
-		ys x \_\_
-		\\xs=(merge_adjoining_segments xs)
+		ys x \_\\_
+		\xs=(merge_adjoining_segments xs)
 		loop xs
 		)
 
-	\\segments=(map (\x [x]) xs)
+	\segments=(map (\x [x]) xs)
 	merge_all_segments segments
 	)
 
@@ -133,7 +133,7 @@
 # this case the val is (combine vx vy), where vx is the x value and vy is the
 # y value.
 \merge_keys=
-	(\combine @\loop\xs\ys
+	(\combine @\\loop\xs\ys
 	xs {[] [] ys} \x\xt
 	ys {xs [] []} \y\yt
 
@@ -144,7 +144,7 @@
 		(loop xt ys \L\M\R {[x;L] M R})
 		(
 		loop xt yt \L\M\R
-		\\v=(combine vx vy)
+		\v=(combine vx vy)
 		{L [{kx v};M] R}
 		)
 		(loop xs yt \L\M\R {L M [y;R]})
@@ -157,72 +157,72 @@
 # listed in ascending order of key.
 \group_items=
 	(\extract\xs
-	\\xs=(map (\x \\k=(extract x) {k [x]}) xs)
+	\xs=(map (\x \k=(extract x) {k [x]}) xs)
 	combine_keys append xs
 	)
 
 # Get the list of keys from a list of pairs.
-\\get_keys=(map (\p p \k\_ k))
+\get_keys=(map (\p p \k\_ k))
 
 # Get the list of values from a list of pairs.
-\\get_values=(map (\p p \_\v v))
+\get_values=(map (\p p \_\v v))
 
 # Sort all items with a key extraction function.
 \sort_all=
-	(\extract\xs
-	\\xs=(group_items extract xs)
+	(\extract\\xs
+	\xs=(group_items extract xs)
 	append_all; get_values xs
 	)
 
 # Sort unique items with a key extraction function.
 \sort_unique=
-	(\extract\xs
-	\\xs=(map (\x \\k=(extract x) {k x}) xs)
-	\\xs=(combine_keys (\x\_ x) xs) # Keep the first.
+	(\extract\\xs
+	\xs=(map (\x \k=(extract x) {k x}) xs)
+	\xs=(combine_keys (\x\_ x) xs) # Keep the first.
 	get_values xs
 	)
 
 # The sort and unique functions operate on lists whose elements are all either
 # strings or numbers.
-\\sort=(sort_all I)
-\\unique=(sort_unique I)
+\sort=(sort_all I)
+\unique=(sort_unique I)
 
 # Using function f and starting value z, run the function forward for each
 # element in the list.
 \fold=
-	(\f @\loop \z\xs
+	(\f @\\loop \z\\xs
 	xs z \x
-	\\z=(f z x)
+	\z=(f z x)
 	loop z
 	)
 
 # Return the first n items of a list.
-\\first=
-	(@\loop\\n\xs
+\first=
+	(@\\loop\n\\xs
 	le n 0 [];
-	xs [] \x\xs
+	xs [] \x\\xs
 	[x;loop (- n 1) xs]
 	)
 
 # (drop n xs) Drop the first n items in list xs.
-\\drop=
-	(@\loop\\n\xs
+\drop=
+	(@\\loop\n\\xs
 	le n 0 xs;
-	xs [] \x
+	xs [] \\x
 	loop (- n 1)
 	)
 
-\\list_sum=(fold + 0)
-\\list_length=(fold (\n\_ + 1 n) 0)
-\is_null=(\xs xs T \_\_ F)
+\list_sum=(fold + 0)
+\list_length=(fold (\n\\_ + 1 n) 0)
+\is_null=(\\xs xs T \\_\\_ F)
 
 # Produce the list of values in the range x through y.
 \range=
 	(\x\y
-	\\x=(round x)
-	\\y=(round y)
-	\\d=(le x y 1 -1)
-	(@\loop\\x
+	\x=(round x)
+	\y=(round y)
+	\d=(le x y 1 -1)
+	(@\\loop\x
 	cons x;
 	eq x y [];
 	loop (+ x d)
@@ -230,9 +230,9 @@
 	)
 
 # (list_at xs n) is the item at position n in list xs, counting from 0.
-\\list_at=
-	(@\loop\xs\\n
-	xs void \x\xs
+\list_at=
+	(@\\loop\\xs\n
+	xs void \\x\\xs
 	compare n 0
 		void
 		x
@@ -241,10 +241,10 @@
 
 # Combine the elements of two lists pairwise.
 \list_combine=
-	(\f @\loop\xs\ys
-	xs ys \x\xt
-	ys xs \y\yt
-	\\z=(f x y)
+	(\\f @\\loop\\xs\\ys
+	xs ys \\x\\xt
+	ys xs \\y\\yt
+	\z=(f x y)
 	[z;loop xt yt]
 	)
 
@@ -254,11 +254,11 @@
 # Given a list of rows, return a function which maps the key at key_pos to the
 # value at val_pos.
 \match_column=
-	(\key_pos\val_pos @\loop \rows
-	rows void \row\rows
+	(\key_pos\val_pos @\\loop \\rows
+	rows void \row\\rows
 
-	\\key=(list_at row key_pos)
-	\\val=(list_at row val_pos)
+	\key=(list_at row key_pos)
+	\val=(list_at row val_pos)
 
 	with key val;
 	loop rows
@@ -267,25 +267,25 @@
 # (stream_values get) is the infinite list of values of function get.  This is
 # useful for generating streams of random values.
 \stream_values=
-	(\get @\loop
-	\\x=get
+	(\\get @\\loop
+	\x=get
 	[x;\=loop]
 	)
 
 # Gather input items into a list.  This is equivalent to stream_values except
 # that it terminates when it sees a void value.
 \get_list=
-	(\get @\loop
-	\\x=get
+	(\\get @\\loop
+	\x=get
 	is_undef x [] [x;\=loop]
 	)
 
 # Flatten a piece of data (string, number, boolean, or list) into a string.
 \to_str=
 	(\x
-	\\buf=buf_new
-	\\put=(buf_put buf)
-	(@\loop\\x
+	\buf=buf_new
+	\put=(buf_put buf)
+	(@\\loop\x
 	is_str x (put x);
 	is_num x (put (num_str x));
 	is_bool x (put (x "T" "F"));
@@ -296,68 +296,68 @@
 
 # Gather input strings into a string.
 \get_str=
-	(\get
-	\\buf=buf_new
-	@\loop
-	\\x=get
+	(\\get
+	\buf=buf_new
+	@\\loop
+	\x=get
 	is_undef x (buf_get buf);
 	buf_put buf x
 	loop
 	)
 
 # Gather a list of strings into a string.
-\list_str=
+\\list_str=
 	(
-	\\buf=buf_new
-	@\loop\xs
+	\buf=buf_new
+	@\\loop\\xs
 	xs (buf_get buf) \x
 	buf_put buf x
 	loop
 	)
 
 # Convert a string to a list with a given function.
-\get_str_list=
-	(\get\str
-	\\in=(readstr str)
+\\get_str_list=
+	(\\get\str
+	\in=(readstr str)
 	get_list (get in)
 	)
 
 # Return the list of individual bytes in a string.
-\\str_bytes=(get_str_list sgetc)
+\str_bytes=(get_str_list sgetc)
 
 # Return the list of UTF-8 characters in a string.
-\\str_chars=(get_str_list sget)
+\str_chars=(get_str_list sget)
 
 # Apply a function to each logical character of a string.
 \str_map=(\f\str list_str; map f; str_chars str)
 
 # Insert separators between elements of a list.
 \join_list=
-	(\sep\xs
-	xs [] \x\xs
-	[x; (@\loop\xs xs [] \x\xs [sep x; loop xs]) xs]
+	(\sep\\xs
+	xs [] \x\\xs
+	[x; (@\\loop\\xs xs [] \x\\xs [sep x; loop xs]) xs ]
 	)
 
 # Insert separators between elements of a list and flatten into a string.
-\join=(\sep\xs to_str; join_list sep xs)
+\join=(\sep\\xs to_str; join_list sep xs)
 
-\\join_path=(join "/")
+\join_path=(join "/")
 
 \split=
 	(\sep\str
-	\\len_sep=(length sep)
+	\len_sep=(length sep)
 	eq len_sep 0 [str];
 
-	(@\loop\\offset
-	\\pos=(search str sep offset)
+	(@\\loop\offset
+	\pos=(search str sep offset)
 	is_undef pos
 		(
 		\len_str=(length str)
-		\\top=(slice str offset (- len_str offset))
+		\top=(slice str offset (- len_str offset))
 		[top]
 		);
 
-	\\top=(slice str offset (- pos offset))
+	\top=(slice str offset (- pos offset))
 	cons top;
 	loop (+ pos len_sep)
 	) 0
@@ -369,9 +369,9 @@
 # Return the entire string contained within a file.
 \file_content=
 	(\fh
-	\\buf=buf_new
-	@\loop
-	\\text=(fread fh 8192)
+	\buf=buf_new
+	@\\loop
+	\text=(fread fh 8192)
 	eq text "" (buf_get buf);
 	buf_put buf text
 	loop
@@ -387,8 +387,8 @@
 \ends_with=
 	(\suffix\str
 	eq "" suffix T;
-	\\start=(- (length str) (length suffix))
-	\\pos=(search str suffix start)
+	\start=(- (length str) (length suffix))
+	\pos=(search str suffix start)
 	is_undef pos F;
 	eq pos start
 	)
@@ -403,28 +403,28 @@
 # [255 255 255 255 255 255 127] => 0.5
 # [255 255 255 255 255 255 191] => 0.75
 # [255 255 255 255 255 255 255] => 1
-\\map_bytes_to_double=(fold (\x\b / (+ x b) 256) 0)
+\map_bytes_to_double=(fold (\x\b / (+ x b) 256) 0)
 
 # Get a random double-precision floating point value in the range 0 to 1
 # inclusive.
-\random_double=
+\\random_double=
 	(
-	\\bytes=(map ord; str_bytes; random_bytes 7)
+	\bytes=(map ord; str_bytes; random_bytes 7)
 	map_bytes_to_double bytes
 	)
 
 # Return true if data items x and y are equal.
-\\eq_data=
+\eq_data=
 	(
 	\eq_list=
-		(\eq_data\x\y
+		(\\eq_data\x\y
 		x (y T \_\_ F) \xh\xt
 		y F \yh\yt
 		eq_data xh yh (eq_data xt yt) F
 		)
 
-	@\eq_data\\x\\y
-	\check_type=(\is_type\compare is_type x (is_type y compare F))
+	@\\eq_data\x\y
+	\\check_type=(\is_type\\compare is_type x (is_type y compare F))
 
 	check_type is_str (eq x y);
 	check_type is_num (eq x y);

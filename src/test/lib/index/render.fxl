@@ -1,6 +1,6 @@
-#use_new_syntax
-\\say_index=
-	(@\say_index
+#use_syntax_2
+\say_index=
+	(@\\say_index
 	say_list
 		(\row
 		row \is_leaf\key\val

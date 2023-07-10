@@ -1,12 +1,12 @@
-#use_new_syntax
+#use_syntax_2
 # Run an individual test and print its stdout, stderr, and exit status.
 \block_quote=
-	(\\x
-	\\term=
+	(\x
+	\term=
 		(
-		\check=(\\y is_void (search x y 0) y)
+		\check=(\y is_void (search x y 0) y)
 		check "~";
-		(@\loop\\count
+		(@\\loop\count
 		check (. "~"; num_str count);
 		loop (+ 1 count)
 		) 1
@@ -16,7 +16,7 @@
 
 \run=
 	(\cmd\input
-	\\cmd=(to_str cmd)
+	\cmd=(to_str cmd)
 	\argv=["/bin/sh" "-c" cmd]
 	run_program argv input \out\err\status
 	say "\out="
@@ -25,7 +25,7 @@
 	say (block_quote err)
 	# Showing status more portably here.  Sometimes error codes on abnormal
 	# termination can vary between systems.
-	\\status=
+	\status=
 		(
 		eq status 0 0;
 		eq status 256 1;
@@ -35,9 +35,9 @@
 	)
 
 \run_script=(\name run ["../bin/fexl test/"name".fxl"])
-\\run_filter=(run ["../bin/fexl"])
+\run_filter=(run ["../bin/fexl"])
 
-\\name=(argv 2)
+\name=(argv 2)
 is_undef name (error "Missing test name");
 
 \lparen="(" \rparen=")"

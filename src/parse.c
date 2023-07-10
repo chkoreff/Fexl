@@ -372,6 +372,18 @@ static struct form parse_factor(void)
 				skip_filler();
 				return parse_new_lambda(first_line,type);
 				}
+			else if (use_new_syntax == 2)
+				{
+				type type = type_E; // eager
+				if (cur_ch == '\\')
+					{
+					skip();
+					type = type_D; // direct
+					}
+
+				skip_filler();
+				return parse_new_lambda(first_line,type);
+				}
 			else
 				{
 				skip_filler();
@@ -422,6 +434,8 @@ static void check_magic_token(void)
 		line = buf_clear(&buf);
 		if (strcmp(line->data,"use_new_syntax") == 0)
 			use_new_syntax = 1;
+		else if (strcmp(line->data,"use_syntax_2") == 0)
+			use_new_syntax = 2;
 		str_free(line);
 		}
 	}

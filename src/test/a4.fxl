@@ -1,9 +1,9 @@
-#use_new_syntax
+#use_syntax_2
 show_benchmark;
 
-\run=
+\\run=
 	(
-	(@\loop\\x
+	(@\\loop\x
 	ge x 1000000 ();
 	loop (+ 1 x)
 	) 1

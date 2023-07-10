@@ -1,7 +1,7 @@
-#use_new_syntax
+#use_syntax_2
 # (SAT n f) return a list of solutions for function f with n variables.
-\\SAT=
-	(@\SAT\\n\\f
+\SAT=
+	(@\\SAT\n\f
 	le n 0 (f [[]] []);
 	\try=(\x map (cons x) (SAT (- n 1) (f x)))
 	append (try T) (try F)
@@ -9,7 +9,7 @@
 
 # Print the solutions.
 \show_solutions=
-	(\list
+	(\\list
 	say "["
 	each list
 		(\vars
@@ -21,7 +21,7 @@
 # Demo function.
 \SAT=
 	(\n\f
-	\list=(SAT n f)
+	\\list=(SAT n f)
 	show_solutions list
 	nl
 	)

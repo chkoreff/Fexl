@@ -1,9 +1,9 @@
-#use_new_syntax
-\test_count_days=
+#use_syntax_2
+\\test_count_days=
 	(
 	\try=
 		(\beg\end
-		\\count=(count_days beg end)
+		\count=(count_days beg end)
 		say ["count_days " beg " " end " = " count]
 		)
 	\try=
@@ -20,12 +20,12 @@
 	try "20160229" "20160208" # -21
 	)
 
-\test_add_days=
+\\test_add_days=
 	(
 	\try=
 		(\beg\count
-		\\date=(add_days beg count)
-		\\n=(count_days beg date)
+		\date=(add_days beg count)
+		\n=(count_days beg date)
 		say ["add_days " beg " " count " = "date "  check "n "  "
 			(eq n count "good" "BAD")]
 		)
@@ -50,11 +50,11 @@
 	try "20160302" -365
 	)
 
-\test_day_of_week=
+\\test_day_of_week=
 	(
 	\try=
 		(\date
-		\\n=(day_of_week date)
+		\n=(day_of_week date)
 		say ["dow " date " = "n]
 		)
 
@@ -99,11 +99,11 @@
 	nl
 	)
 
-\test_add_year=
+\\test_add_year=
 	(
 	\try=
 		(\date
-		\\x=(add_year date)
+		\x=(add_year date)
 		say ["add_year " date " = "x]
 		)
 	try "20000228"

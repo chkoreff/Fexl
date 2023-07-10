@@ -1,4 +1,4 @@
-#use_new_syntax
+#use_syntax_2
 # Format data in a nested indented format.
 
 # Return true if the item is a scalar.
@@ -14,34 +14,34 @@
 # (i_render_data put nl x)
 # Render x in an indented format using the given output functions.
 \i_render_data=
-	(\put\nl
+	(\put\\nl
 
-	\\render=
-	(@\render\top_prefix\x
+	\render=
+	(@\\render\top_prefix\x
 
 	is_str x (put (fexl_quote x));
 	is_num x (put (num_str x));
 	is_bool x (put (x "T" "F"));
 	is_undef x (put "void");
 
-	\\show_items=
+	\show_items=
 		(
 		\loop_nested=
 			(\prefix
-			@\loop\xs
-			xs (nl put top_prefix) \\x
+			@\\loop\xs
+			xs (nl put top_prefix) \x
 			nl put prefix
 			render prefix x
 			loop
 			)
 
 		\xs
-		xs () \\x
+		xs () \x
 		is_scalar x
 			(
 			render top_prefix x
-			@\loop\xs
-			xs () \\x
+			@\\loop\xs
+			xs () \x
 			is_scalar x
 				(
 				put " " # Separator between scalars
@@ -49,7 +49,7 @@
 				loop
 				)
 				(
-				\\prefix=(. top_prefix "  ") # Indent at non-scalar
+				\prefix=(. top_prefix "  ") # Indent at non-scalar
 				\xt
 				loop_nested prefix [x;xt]
 				)
@@ -66,17 +66,17 @@
 	put "?"
 	)
 
-	\\x
+	\x
 	render "" x nl
 	)
 
-\\say_data=(i_render_data put nl)
+\say_data=(i_render_data put nl)
 \fsay_data=(\fh i_render_data (fput fh) (fnl fh))
-\\trace_data=(fsay_data stderr)
+\trace_data=(fsay_data stderr)
 
 \i_as_str=
 	(\x
-	\\buf=buf_new
+	\buf=buf_new
 	\put=(buf_put buf)
 	i_render_data put (put NL) x
 	buf_get buf

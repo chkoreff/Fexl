@@ -1,11 +1,11 @@
-#use_new_syntax
+#use_syntax_2
 value; std; (value; std; use "test.fxl") \;
 
 show_benchmark;
 
 # (tower f n x) is the result of applying f to x n times.
 \tower=
-	(\f @\loop\\n\\x
+	(\f @\\loop\n\x
 	le n 0 x;
 	loop (- n 1) (f x)
 	)
@@ -56,7 +56,7 @@ def "unique" unique;
 	]
 
 # The number of times to double the list for the unique sort.
-\\N=
+\N=
 	(
 	# NOTE: If you time these you'll see that the sort time is O(N).
 	#7  # 3840 words
@@ -70,7 +70,7 @@ def "unique" unique;
 	)
 
 # (exp_list n xs) Make 2^n copies of list xs.
-\\exp_list=(tower (\x append x x))
+\exp_list=(tower (\x append x x))
 
 \show=show_list
 

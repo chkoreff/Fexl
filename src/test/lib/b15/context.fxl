@@ -1,8 +1,8 @@
-#use_new_syntax
-\\cx_render=(value; std; use "lib/render/base.fxl")
-\\cx_render_list=(value; std; cx_render; use "lib/render/list.fxl")
+#use_syntax_2
+\cx_render=(value; std; use "lib/render/base.fxl")
+\cx_render_list=(value; std; cx_render; use "lib/render/list.fxl")
 
-\\cx_render_local=
+\cx_render_local=
 (
 value;
 std;
@@ -15,7 +15,7 @@ cx_render_list;
 	is_defined val (fexl_quote val) "void"
 	)
 
-\\say_pairs=
+\say_pairs=
 	(
 	say_list
 		(\row
@@ -24,7 +24,7 @@ cx_render_list;
 		)
 	)
 
-\\say_errors=
+\say_errors=
 	(
 	say_list
 		(\row
@@ -39,7 +39,7 @@ def "say_errors" say_errors;
 form
 )
 
-\\cx_render_index=
+\cx_render_index=
 	(
 	value;
 	std;
@@ -55,7 +55,7 @@ cx_render_index;
 form
 )
 
-\\cx_index=(value; std; use "lib/index/index.fxl")
+\cx_index=(value; std; use "lib/index/index.fxl")
 
 \form
 cx_index;

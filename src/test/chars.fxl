@@ -1,15 +1,15 @@
-#use_new_syntax
+#use_syntax_2
 value; std; (value; std; use "test.fxl") \;
 
 \try=
 	(\str
-	\\raw=(pack str)
-	\\test=(unpack raw)
+	\raw=(pack str)
+	\test=(unpack raw)
 	say [str " " raw " " test]
 	)
 
 div
-\\doubled=(str_map (\ch . ch ch) "封a小")
+\doubled=(str_map (\ch . ch ch) "封a小")
 say doubled
 say (is_str doubled)
 div

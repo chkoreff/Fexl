@@ -1,4 +1,4 @@
-#use_new_syntax
+#use_syntax_2
 # INDEX OPERATIONS
 #
 # An index is a highly efficient structure for mapping string keys to arbitrary
@@ -20,8 +20,8 @@
 # Return the value associated with key, or void if not found.
 \index_get=
 	(\new_key
-	\\len_new_key=(length new_key)
-	(@\loop\pos\index
+	\len_new_key=(length new_key)
+	(@\\loop\pos\index
 	index void \row\tail
 	row \is_leaf\old_key\val
 
@@ -31,7 +31,7 @@
 		is_leaf
 			(eq old_key new_key val void)
 			(
-			\\len_old_key=(length old_key)
+			\len_old_key=(length old_key)
 			lt len_new_key len_old_key
 				void
 				(loop len_old_key val)
@@ -46,7 +46,7 @@
 # Return a new index with key mapped to val.
 \index_put=
 	(\new_key\new_val
-	(@\loop\pos\index
+	(@\\loop\pos\index
 
 	index [{T new_key new_val}] \row\tail
 	row \is_leaf\old_key\old_val
@@ -54,7 +54,7 @@
 	compare_at pos new_key old_key
 		[{T new_key new_val}; index]
 		(
-		\\len_common=(length_common new_key old_key)
+		\len_common=(length_common new_key old_key)
 		eq (length old_key) len_common
 			(
 			# old_key is a prefix of new_key
@@ -65,12 +65,12 @@
 					[{T old_key new_val}; tail]
 					(
 					# old_key is a proper prefix of new_key
-					\\child=(loop len_common [row])
+					\child=(loop len_common [row])
 					[{F old_key child}; tail]
 					)
 				)
 				(
-				\\child=(loop len_common old_val)
+				\child=(loop len_common old_val)
 				[{F old_key child}; tail]
 				)
 			)
@@ -78,19 +78,19 @@
 			eq (length new_key) len_common
 				(
 				# new_key is a proper prefix of old_key
-				\\child=(loop len_common [row])
+				\child=(loop len_common [row])
 				[{F new_key child}; tail]
 				)
 				(
 				# old_key and new_key share a common proper prefix
-				\\prefix=(slice old_key 0 len_common)
-				\\child=(loop len_common [row])
+				\prefix=(slice old_key 0 len_common)
+				\child=(loop len_common [row])
 				[{F prefix child}; tail]
 				)
 			)
 		)
 		(
-		\\tail=(loop pos tail)
+		\tail=(loop pos tail)
 		[row;tail]
 		)
 	)
@@ -101,7 +101,7 @@
 # Return a new index with key deleted.
 \index_del=
 	(\new_key
-	(@\loop\pos\index
+	(@\\loop\pos\index
 
 	index [] \row\tail
 	row \is_leaf\old_key\old_val
@@ -109,7 +109,7 @@
 	compare_at pos new_key old_key
 		index
 		(
-		\\len_common=(length_common new_key old_key)
+		\len_common=(length_common new_key old_key)
 		eq (length old_key) len_common
 			(
 			# old_key is a prefix of new_key
@@ -122,7 +122,7 @@
 					index
 				)
 				(
-				\\child=(loop len_common old_val)
+				\child=(loop len_common old_val)
 				# Detect child with a single row as a special case.
 				child
 					tail
@@ -138,7 +138,7 @@
 			index
 		)
 		(
-		\\tail=(loop pos tail)
+		\tail=(loop pos tail)
 		[row;tail]
 		)
 	)
@@ -147,8 +147,8 @@
 
 # (index_pairs index)
 # Return the list of {key val} pairs in the index.
-\\index_pairs=
-	(@\loop\index
+\index_pairs=
+	(@\\loop\index
 	index [] \row\tail
 	row \is_leaf\key\val
 	is_leaf

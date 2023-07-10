@@ -1,16 +1,16 @@
-#use_new_syntax
+#use_syntax_2
 # This server reads a single character, increments it, and sends that back to
 # the client.  You can connect to this using test/client.fxl.
 
 run_server (argv 2) "127.0.0.1" 2186 "test/error_log"
-	(@\loop
-	\\ch=(fgetc stdin)
+	(@\\loop
+	\ch=(fgetc stdin)
 	is_undef ch ();
 	if (eq ch "a")
 		(
 		trace ["SAW: "(unpack ch)]
 		)
-	\\ch=(chr; + 1; ord ch)
+	\ch=(chr; + 1; ord ch)
 	put ch
 	loop
 	)

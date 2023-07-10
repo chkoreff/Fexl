@@ -1,18 +1,18 @@
-#use_new_syntax
+#use_syntax_2
 say "hello"
-\\x=(+ 4 3)
+\x=(+ 4 3)
 
 \talk=
 	(\out\label
-	\\put=(fput out)
-	\\say=(fsay out)
-	\nl=(fnl out)
+	\put=(fput out)
+	\say=(fsay out)
+	\\nl=(fnl out)
 	say ["This goes to "label"."]
 	put ["x = " x]
 	nl
 	)
 
-\talk=
+\\talk=
 	(
 	talk stderr "stderr"
 	talk stdout "stdout"

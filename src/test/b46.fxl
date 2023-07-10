@@ -1,4 +1,4 @@
-#use_new_syntax
+#use_syntax_2
 \list=
 [
 {"0793" F "1b03" -0.00626248}
@@ -34,7 +34,7 @@ show_benchmark;
 say_data list
 say (eq_data list list)
 
-\\x=(i_as_str list)
+\x=(i_as_str list)
 say ["length = "(length x)]
 
 \x=

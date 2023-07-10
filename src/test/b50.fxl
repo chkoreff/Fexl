@@ -1,4 +1,4 @@
-#use_new_syntax
+#use_syntax_2
 # More big number tests.
 
 # Convert x to bn.
@@ -14,22 +14,22 @@
 \op2=(\f\x\y f (to_bn x) (to_bn y))
 
 # Redefine math operations.
-\\is_neg=(op1 bn_is_neg)
-\\neg=(op1 bn_neg)
-\\+=(op2 bn_add)
-\\-=(op2 bn_sub)
-\\*=(op2 bn_mul)
-\\/=(op2 bn_div)
-\\mod=(op2 bn_mod)
-\\gcd=(op2 bn_gcd)
+\is_neg=(op1 bn_is_neg)
+\neg=(op1 bn_neg)
+\+=(op2 bn_add)
+\-=(op2 bn_sub)
+\*=(op2 bn_mul)
+\/=(op2 bn_div)
+\mod=(op2 bn_mod)
+\gcd=(op2 bn_gcd)
 
-\test_neg=
+\\test_neg=
 (
 say "= test_neg"
 
 \try=
-	(\\x
-	\\n=(neg x)
+	(\x
+	\n=(neg x)
 	say ["x = "x" "(is_neg x)]
 	say ["n = "n" "(is_neg n)]
 	nl
@@ -40,13 +40,13 @@ try "12345678901234567890"
 try "-12345678901234567890"
 )
 
-\test_mod=
+\\test_mod=
 (
 say "= test_mod"
 
 \try=
-	(\\x\\y
-	\\r=(mod x y)
+	(\x\y
+	\r=(mod x y)
 	say ["x = "x]
 	say ["y = "y]
 	say ["r = "r]
@@ -55,7 +55,7 @@ say "= test_mod"
 
 \try_remain=
 	(\r\x\y
-	\\x=(+ r; * x y)
+	\x=(+ r; * x y)
 	try x y
 
 	try (neg x) y
@@ -80,13 +80,13 @@ try_remain
 "472380607152644796929990208481229628125327307202280723444810"
 )
 
-\test_gcd=
+\\test_gcd=
 (
 say "= test_gcd"
 
 \try=
-	(\\a\\b
-	\\d=(gcd a b)
+	(\a\b
+	\d=(gcd a b)
 	say ["a = "a]
 	say ["b = "b]
 	say ["d = "d]

@@ -1,13 +1,13 @@
-#use_new_syntax
+#use_syntax_2
 # NOTE If you fopen with "a+", you cannot seek, and output is always at end of
 # file.
 
 \show_base_dir=
 	(\path
 	say ["directory "path]
-	\\path=(path_under dir_base path)
+	\path=(path_under dir_base path)
 	# Exclude hidden files.
-	\\names=(sort; filter (\x not; starts_with "." x); dir_names path)
+	\names=(sort; filter (\x not; starts_with "." x); dir_names path)
 	say "["
 	each names say
 	say "]"
@@ -32,10 +32,10 @@
 # the reference output to its true expected value, and live with this small
 # break on my own system.  I'll consider it correctness test for /bin/ls.
 
-\test_ls=
+\\test_ls=
 	(
 	\path="src/lib"
-	\\path=(path_under dir_base path)
+	\path=(path_under dir_base path)
 	\cmd=
 		[
 		(put "(1)" "/bin/ls")
@@ -55,13 +55,13 @@
 
 \demo_seek=
 	(\path
-	\\path=(path_under dir_local path)
+	\path=(path_under dir_local path)
 
-	\\fh=
+	\fh=
 		(
-		\\fh=(mkfile path (oct "664")) # Create and open the file atomically.
+		\fh=(mkfile path (oct "664")) # Create and open the file atomically.
 		is_good fh (say ["Created "path] fh);
-		\\fh=(fopen path "r+") # Open the existing file.
+		\fh=(fopen path "r+") # Open the existing file.
 		is_good fh (say ["Opened "path] fh);
 		error ["Could not create or open "path]
 		)
@@ -83,18 +83,18 @@
 			void
 			)
 		\name=["seek_"type]
-		\\code=(fn fh pos)
+		\code=(fn fh pos)
 		if (eq code -1) (error [name" failed"])
 		show_pos [name" "pos]
 		)
 
-	\\seek_set=(seek "set")
-	\\seek_cur=(seek "cur")
-	\\seek_end=(seek "end")
+	\seek_set=(seek "set")
+	\seek_cur=(seek "cur")
+	\seek_end=(seek "end")
 
 	\truncate=
 		(\size
-		\\code=(ftruncate fh size)
+		\code=(ftruncate fh size)
 		\name="truncate"
 		if (eq code -1) (error [name" failed"])
 		show_pos [name" "size]
@@ -108,7 +108,7 @@
 
 	\read=
 		(\size
-		\\str=(fread fh size)
+		\str=(fread fh size)
 		show_pos ["read "(length str)" bytes "(fexl_quote str)]
 		)
 
@@ -133,7 +133,7 @@
 		def "sleep" sleep;
 		form
 		)
-	\\code=(remove path)
+	\code=(remove path)
 	say [(eq code 0 "Removed" "Could not remove")" "path]
 	fclose fh
 	)
@@ -168,10 +168,10 @@ read 10
 )
 
 # Test the flook and slook functions.
-\try_look=
+\\try_look=
 (
 \run=
-(\get\look
+(\\get\\look
 get
 get
 look
@@ -189,21 +189,21 @@ look
 )
 
 \try=
-	(\get\look\in
+	(\\get\\look\\in
 
-	\get =(\\ch=(get in)  say ["get "ch])
-	\look=(\\ch=(look in) say ["at  "ch])
+	\\get =(\ch=(get in)  say ["get "ch])
+	\\look=(\ch=(look in) say ["at  "ch])
 
 	run get look
 	)
 
-\try_file=
+\\try_file=
 	(
 	say "= file"
-	\\source=(path_under dir_base "src/test/data.txt")
+	\source=(path_under dir_base "src/test/data.txt")
 
-	\\fh=(
-		\\fh=(fopen source "r")
+	\fh=(
+		\fh=(fopen source "r")
 		if (is_undef fh) (error ["Could not open "source])
 		fh
 		)
@@ -211,11 +211,11 @@ look
 	try fgetc flook fh
 	)
 
-\try_str=
+\\try_str=
 	(
 	say "= str"
 	\str="#abcdefghijklmnopqrstuvwxyz"
-	\\in=(readstr str)
+	\in=(readstr str)
 	try sgetc slook in
 	)
 

@@ -1,3 +1,5 @@
 #!/bin/sh
-# Find all Fexl files that do not contain "use_new_syntax".
-find . -name "*.fxl" | sort | xargs grep -F -L use_new_syntax
+# Find all Fexl files not using the latest syntax.
+find . -name "*.fxl" | sort | xargs grep -F -L use_syntax_2
+
+#find . -name "*.fxl" | sort | xargs grep -F -L use_new_syntax

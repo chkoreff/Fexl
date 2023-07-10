@@ -1,15 +1,15 @@
-#use_new_syntax
+#use_syntax_2
 (
 say "= Direct substitution"
 (
-\x=(put "(CALC) " + 2 3)
+\\x=(put "(CALC) " + 2 3)
 say ["x = "x]
 say ["x = "x]
 nl
 )
 (
 \try=
-	(\x
+	(\\x
 	say ["x = "x]
 	say ["x = "x]
 	)
@@ -21,14 +21,14 @@ nl
 (
 say "= Eager substitution"
 (
-\\x=(put "(CALC) " + 2 3)
+\x=(put "(CALC) " + 2 3)
 say ["x = "x]
 say ["x = "x]
 nl
 )
 (
 \try=
-	(\\x
+	(\x
 	say ["x = "x]
 	say ["x = "x]
 	)

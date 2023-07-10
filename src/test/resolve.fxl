@@ -1,14 +1,14 @@
-#use_new_syntax
+#use_syntax_2
 # Test the defc function thoroughly.
-\test_0=
+\\test_0=
 (
-\\try=
+\try=
 	(
-	\cx=(say "Evaluating the context." std)
+	\\cx=(say "Evaluating the context." std)
 	\key\form
-	\key=(say "Evaluating the key." key)
-	\form=(say "Evaluating the form." form)
-	\\result=(value; defc key cx form)
+	\\key=(say "Evaluating the key." key)
+	\\form=(say "Evaluating the form." form)
+	\result=(value; defc key cx form)
 	say ["result "(is_undef result "void" "ok")]
 	nl
 	)
@@ -24,7 +24,7 @@ try (I "std") 3
 try (I "std") (\; say "Hello")
 )
 
-\test_1=
+\\test_1=
 (
 say "== test_1"
 show_benchmark;
@@ -33,7 +33,7 @@ value;
 defc (I "std")
 	(
 	say "Evaluating the context."
-	\form
+	\\form
 	std;
 	def "F" F;
 	def "if" if;
@@ -53,7 +53,7 @@ defc (I "std")
 	)
 )
 
-\test_2=
+\\test_2=
 (
 say "== test_2"
 show_benchmark;
@@ -65,7 +65,7 @@ value;
 defc "std";
 say "Evaluating the context."
 \speaker=(\name \x put name put " says " say x)
-\form
+\\form
 std;
 def "fred" (speaker "Fred");
 def "wilma" (speaker "Wilma");
