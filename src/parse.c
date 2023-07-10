@@ -6,6 +6,7 @@
 #include <parse.h>
 #include <report.h>
 #include <stream.h>
+#include <string.h>
 #include <type_num.h>
 #include <type_str.h>
 #include <type_sym.h>
@@ -65,11 +66,11 @@ terminated by a repeat occurrence of the delimiter.
 
 /*
 NOTE 20230707: This parser now implements a transition to the new preferred
-syntax.  If you start a file with the exact comment "#use_new_syntax", it uses
-the new syntax.  The difference in grammar is:
+syntax.  If you start a file with the comment "#use_new_syntax", it uses this
+syntax:
 
-factor  =>  "\" name def exp
-factor  =>  "\\" name def exp
+factor  =>  "\" name def exp      # direct substitution
+factor  =>  "\\" name def exp     # eager substitution
 
 def     =>  empty
 def     =>  "=" term
@@ -359,7 +360,7 @@ static struct form parse_factor(void)
 			}
 		else
 			{
-			if (use_new_syntax)
+			if (use_new_syntax == 1)
 				{
 				type type = type_D; // direct
 				if (cur_ch == '\\')
@@ -405,43 +406,29 @@ static struct form parse_exp(void)
 		}
 	}
 
-// Set the use_new_syntax flag to true if and only if the stream starts with a
-// commented magic token.
-static void check_magic_token(const char *magic_token)
+// Set use_new_syntax if the stream starts with a commented magic token.
+static void check_magic_token(void)
 	{
+	use_new_syntax = 0;
 	if (cur_ch == '#')
 		{
-		const char *p = magic_token;
-		int matched = 1;
+		struct buffer buf = {0};
+		string line;
 
 		skip();
 		while (cur_ch != '\n' && cur_ch != -1)
-			{
-			if (matched)
-				{
-				if (*p)
-					{
-					matched = (*p == cur_ch);
-					p++;
-					}
-				else
-					matched = 0;
-				}
+			buf_keep(&buf);
 
-			skip();
-			}
-
-		if (*p) matched = 0;
-
-		use_new_syntax = matched;
+		line = buf_clear(&buf);
+		if (strcmp(line->data,"use_new_syntax") == 0)
+			use_new_syntax = 1;
+		str_free(line);
 		}
-	else
-		use_new_syntax = 0;
 	}
 
 static value type_parse_fexl(value f)
 	{
-	check_magic_token("use_new_syntax");
+	check_magic_token();
 	{
 	value exp = parse_form();
 	if (cur_ch != -1)
