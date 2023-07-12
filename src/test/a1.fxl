@@ -346,7 +346,7 @@ eval_file "hailstone.fxl"
 
 div
 eval_str ~END
-#use_new_syntax
+#use_syntax_2
 \x=(+ 33 48)
 say ["x = " x]
 ~END
