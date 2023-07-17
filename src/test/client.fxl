@@ -1,4 +1,3 @@
-#use_syntax_2
 # This client connects to the server created by test/server.fxl.
 
 # (inc_ch ch) Increments the character by calling the server.

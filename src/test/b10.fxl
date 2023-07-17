@@ -1,4 +1,3 @@
-#use_syntax_2
 # Testing with a version that prints "get " when it reads a char.
 \fgetc=
 	(\fh

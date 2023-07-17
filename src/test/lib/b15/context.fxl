@@ -1,4 +1,4 @@
-#use_syntax_2
+#
 \cx_render=(value; std; use "lib/render/base.fxl")
 \cx_render_list=(value; std; cx_render; use "lib/render/list.fxl")
 

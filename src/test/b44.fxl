@@ -1,4 +1,3 @@
-#use_syntax_2
 # Infinite list of null strings.
 \\list=(@; cons "")
 \\list=(first 100000 list)

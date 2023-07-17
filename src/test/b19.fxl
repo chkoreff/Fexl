@@ -1,4 +1,3 @@
-#use_syntax_2
 # Test assoc list.
 
 show_benchmark;

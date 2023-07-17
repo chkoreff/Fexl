@@ -1,4 +1,3 @@
-#use_syntax_2
 # Test reading CSV and SSV data.
 
 \try_read=

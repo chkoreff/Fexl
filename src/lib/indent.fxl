@@ -1,4 +1,3 @@
-#use_syntax_2
 # Format data in a nested indented format.
 
 # Return true if the item is a scalar.

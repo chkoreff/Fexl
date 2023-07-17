@@ -1,4 +1,4 @@
-#use_syntax_2
+#
 \say_index=
 	(@\\say_index
 	say_list

@@ -1,4 +1,4 @@
-#use_syntax_2
+#
 value; std; (value; std; use "test.fxl") \;
 
 show_benchmark;

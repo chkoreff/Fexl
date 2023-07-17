@@ -1,4 +1,3 @@
-#use_syntax_2
 # Compile an index into C code.
 \cx_index=(value; std; use "lib/index/index.fxl")
 \cx_render=(value; std; use "lib/render/base.fxl")

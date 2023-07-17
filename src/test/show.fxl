@@ -1,4 +1,3 @@
-#use_syntax_2
 # Run an individual test and print its stdout, stderr, and exit status.
 \block_quote=
 	(\x

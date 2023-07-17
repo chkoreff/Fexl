@@ -1,4 +1,4 @@
-#use_syntax_2
+#
 #trace_elapsed;
 show_benchmark;
 

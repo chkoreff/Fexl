@@ -1,4 +1,3 @@
-#use_syntax_2
 # Run the user's script given by argv[1] in the enhanced standard context.
 
 # (check x d) = x if x is good, otherwise d.

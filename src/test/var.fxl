@@ -1,4 +1,3 @@
-#use_syntax_2
 # Demonstrate the use of vars to maintain an evolving state.
 
 ## Here is the "API".

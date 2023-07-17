@@ -1,4 +1,3 @@
-#use_syntax_2
 # Demonstrate a technique for loading modules once on demand by putting the
 # dependency graph in one place.
 

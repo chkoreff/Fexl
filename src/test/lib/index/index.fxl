@@ -1,4 +1,3 @@
-#use_syntax_2
 # INDEX OPERATIONS
 #
 # An index is a highly efficient structure for mapping string keys to arbitrary

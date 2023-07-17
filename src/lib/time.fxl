@@ -1,4 +1,3 @@
-#use_syntax_2
 # Split a microtime value into {s u}, where s is the whole number of seconds
 # and u is the whole number of microseconds.
 \split_microtime=

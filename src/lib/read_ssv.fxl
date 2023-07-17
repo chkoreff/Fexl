@@ -1,4 +1,3 @@
-#use_syntax_2
 # Parse the SSV (space-separated value) format.
 \\get_plain_item=
 	(

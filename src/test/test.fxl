@@ -1,4 +1,4 @@
-#use_syntax_2
+#
 \\div=(say "==")
 \show_list=(\xs say "[" (each xs say) say "]")
 

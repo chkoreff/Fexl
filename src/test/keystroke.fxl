@@ -1,4 +1,3 @@
-#use_syntax_2
 # Echo the characters from the input.
 \echo=
 	(\\get @\\loop

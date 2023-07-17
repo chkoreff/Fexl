@@ -1,4 +1,3 @@
-#use_syntax_2
 # This demo was inspired by the Mathologer on Youtube.
 
 \use_bn=T # Use big numbers if true.

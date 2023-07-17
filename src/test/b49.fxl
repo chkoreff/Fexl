@@ -1,4 +1,3 @@
-#use_syntax_2
 # Notation for test constants:
 # B = 2^32
 # s_max_n = B^n-1

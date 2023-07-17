@@ -1,4 +1,3 @@
-#use_syntax_2
 # This server reads a single character, increments it, and sends that back to
 # the client.  You can connect to this using test/client.fxl.
 

@@ -1,4 +1,4 @@
-#use_syntax_2
+#
 \try_keys=
 	(
 	\keys=["a" "b" "c" "d" "e"]

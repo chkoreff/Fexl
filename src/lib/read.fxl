@@ -1,4 +1,3 @@
-#use_syntax_2
 # Skip matching characters.
 \skip_match=
 	(\\is_match

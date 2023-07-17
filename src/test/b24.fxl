@@ -1,4 +1,3 @@
-#use_syntax_2
 # Test the "die" function.
 say "hi"
 die

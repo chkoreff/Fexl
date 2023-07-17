@@ -1,4 +1,3 @@
-#use_syntax_2
 # NOTE If you fopen with "a+", you cannot seek, and output is always at end of
 # file.
 

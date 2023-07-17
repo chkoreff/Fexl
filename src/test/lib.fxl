@@ -1,4 +1,4 @@
-#use_syntax_2
+#
 # Test dynamic libraries.
 # Skipping a line here to preserve the original line numbers.
 value; std; load "show"; \;

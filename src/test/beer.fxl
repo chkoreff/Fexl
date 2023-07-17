@@ -1,4 +1,4 @@
-#use_syntax_2
+#
 \bottles=
 	(\n\wall
 	\\s=(eq n 1 "" "s")

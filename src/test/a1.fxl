@@ -1,4 +1,4 @@
-#use_syntax_2
+#
 value; std; (value; std; use "test.fxl") \;
 
 \show=
@@ -346,7 +346,6 @@ eval_file "hailstone.fxl"
 
 div
 eval_str ~END
-#use_syntax_2
 \x=(+ 33 48)
 say ["x = " x]
 ~END

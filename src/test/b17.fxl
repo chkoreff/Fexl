@@ -1,4 +1,4 @@
-#use_syntax_2
+#
 value; std; (value; std; use "test.fxl") \;
 
 \show_result=
@@ -95,7 +95,6 @@ run_test "test_run_program";
 
 try
 ~
-#use_syntax_2
 say "hello"
 \x=(value; std; parse stdin "")
 say ["x = "(as_str x)]

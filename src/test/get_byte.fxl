@@ -1,4 +1,4 @@
-#use_syntax_2
+#
 \\echo=
 	(@\\echo
 	\ch=(fgetc stdin)

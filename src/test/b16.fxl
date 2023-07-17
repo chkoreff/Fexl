@@ -1,4 +1,3 @@
-#use_syntax_2
 # Test run_filter.
 
 \\get_date=(trim_end_spaces; run_filter ["/bin/date"] "")

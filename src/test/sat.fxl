@@ -1,4 +1,3 @@
-#use_syntax_2
 # (SAT n f) return a list of solutions for function f with n variables.
 \SAT=
 	(@\\SAT\n\f
