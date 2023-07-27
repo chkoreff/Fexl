@@ -35,13 +35,16 @@ Note that on most machines, (sizeof(struct value) == 32).
 
 static value free_list = 0;
 
-static value new_value(void)
+static value new_value(type T, value L)
 	{
 	value f = free_list;
 	if (f)
 		free_list = f->next;
 	else
 		f = new_memory(sizeof(struct value));
+	f->N = 1;
+	f->T = T;
+	f->L = L;
 	return f;
 	}
 
@@ -98,10 +101,7 @@ void end_value(void)
 // Return a value of type T with the given left and right side.
 value V(type T, value L, value R)
 	{
-	value f = new_value();
-	f->N = 1;
-	f->T = T;
-	f->L = L;
+	value f = new_value(T,L);
 	f->R = R;
 	return f;
 	}
@@ -115,10 +115,7 @@ value Q(type T)
 // Create data of type T with double value x.
 value Qdouble(type T, value L, double x)
 	{
-	value f = new_value();
-	f->N = 1;
-	f->T = T;
-	f->L = L;
+	value f = new_value(T,L);
 	f->v_double = x;
 	return f;
 	}
@@ -149,7 +146,7 @@ value A(value x, value y)
 	return V(type_A,x,y);
 	}
 
-unsigned long cur_steps = 0;
+unsigned long cur_steps;
 
 // Reduce the value until done.
 value eval(value f)
@@ -157,11 +154,12 @@ value eval(value f)
 	while (1)
 		{
 		value g = f->T(f);
-		if (g == 0) return f;
+		if (g == 0) break;
 		cur_steps++;
 		drop(f);
 		f = g;
 		}
+	return f;
 	}
 
 value arg(value f)
