@@ -149,7 +149,7 @@ value A(value x, value y)
 	return V(type_A,x,y);
 	}
 
-unsigned long num_steps = 0;
+unsigned long cur_steps = 0;
 
 // Reduce the value until done.
 value eval(value f)
@@ -158,7 +158,7 @@ value eval(value f)
 		{
 		value g = f->T(f);
 		if (g == 0) return f;
-		num_steps++;
+		cur_steps++;
 		drop(f);
 		f = g;
 		}

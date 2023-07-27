@@ -561,19 +561,19 @@ value type_fexl_benchmark(value f)
 	if (!f->L || !f->L->L) return 0;
 	clear_free_list();
 	{
-	unsigned long save_num_steps = num_steps;
-	unsigned long save_cur_bytes = cur_bytes;
+	unsigned long beg_steps = cur_steps;
+	unsigned long beg_bytes = cur_bytes;
 
-	num_steps = 0;
+	cur_steps = 0;
 
 	{
 	value x = arg(f->L->R);
-	double steps = (double)num_steps;
-	double bytes = (double)cur_bytes - (double)save_cur_bytes;
+	double steps = (double)cur_steps;
+	double bytes = (double)cur_bytes - (double)beg_bytes;
 	f = A(A(A(hold(f->R),x),Qnum(steps)),Qnum(bytes));
 	}
 
-	num_steps += save_num_steps;
+	cur_steps += beg_steps;
 	return f;
 	}
 	}
