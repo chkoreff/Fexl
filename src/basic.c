@@ -105,14 +105,11 @@ value type_eval(value f)
 	}
 	}
 
-/* Evaluate x once, replacing the right side with the final value. */
+// Evaluate x once, replacing the right side with the final value.
 value type_once(value f)
 	{
-	value x = arg(f->R);
-	drop(f->R);
 	f->T = type_I;
-	f->R = hold(x);
-	return x;
+	return hold(f->R = eval(f->R));
 	}
 
 /* (yield x f) = (f x)  Used for returning an unevaluated function. */
