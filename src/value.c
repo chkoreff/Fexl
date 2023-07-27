@@ -149,19 +149,20 @@ value A(value x, value y)
 	return V(type_A,x,y);
 	}
 
+unsigned long num_steps = 0;
+
 // Reduce the value until done.
-static value eval_normal(value f)
+value eval(value f)
 	{
 	while (1)
 		{
 		value g = f->T(f);
 		if (g == 0) return f;
+		num_steps++;
 		drop(f);
 		f = g;
 		}
 	}
-
-value (*eval)(value f) = eval_normal;
 
 value arg(value f)
 	{
