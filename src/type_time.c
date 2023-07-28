@@ -1,4 +1,4 @@
-/* The define ensures that strptime is accessible. */
+// The define ensures that strptime is accessible.
 #define _GNU_SOURCE
 #include <stdint.h>
 #include <sys/time.h>
@@ -13,8 +13,8 @@
 #include <type_str.h>
 #include <type_time.h>
 
-/* Return the current time as the number of seconds since the Epoch,
-1970-01-01 00:00:00 +0000 (UTC). */
+// Return the current time as the number of seconds since the Epoch,
+// 1970-01-01 00:00:00 +0000 (UTC).
 value type_time(value f)
 	{
 	time_t n;
@@ -25,7 +25,7 @@ value type_time(value f)
 
 static const char *time_format = "%Y-%m-%d %H:%M:%S";
 
-/* Format an epoch time as "YYYY-MM-DD HH:MM:SS". */
+// Format an epoch time as "YYYY-MM-DD HH:MM:SS".
 static value op_strftime(value f, struct tm *(*convert)(const time_t *))
 	{
 	if (!f->L) return 0;
@@ -46,7 +46,7 @@ static value op_strftime(value f, struct tm *(*convert)(const time_t *))
 	}
 	}
 
-/* Convert "YYYY-MM-DD HH:MM:SS" to an epoch time. */
+// Convert "YYYY-MM-DD HH:MM:SS" to an epoch time.
 static value op_strptime(value f, time_t (*convert)(struct tm *tm))
 	{
 	if (!f->L) return 0;
@@ -69,25 +69,25 @@ static value op_strptime(value f, time_t (*convert)(struct tm *tm))
 	}
 	}
 
-/* Convert epoch to string in local time zone. */
+// Convert epoch to string in local time zone.
 value type_localtime(value f)
 	{
 	return op_strftime(f,localtime);
 	}
 
-/* Convert epoch to string in UTC time zone. */
+// Convert epoch to string in UTC time zone.
 value type_gmtime(value f)
 	{
 	return op_strftime(f,gmtime);
 	}
 
-/* Convert string to epoch in local time zone. */
+// Convert string to epoch in local time zone.
 value type_timelocal(value f)
 	{
 	return op_strptime(f,timelocal);
 	}
 
-/* Convert string to epoch in UTC time zone. */
+// Convert string to epoch in UTC time zone.
 value type_timegm(value f)
 	{
 	return op_strptime(f,timegm);

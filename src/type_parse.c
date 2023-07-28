@@ -13,8 +13,8 @@
 #include <type_parse.h>
 #include <type_str.h>
 
-/* (parse stream label) Parse the stream, using the given label for any syntax
-error messages, and return the resulting form. */
+// (parse stream label) Parse the stream, using the given label for any syntax
+// error messages, and return the resulting form.
 value type_parse(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
@@ -29,8 +29,8 @@ value type_parse(value f)
 	}
 	}
 
-/* Parse a named file.  Note that if name designates a directory the fopen will
-succeed, but it will behave like an empty file. */
+// Parse a named file.  Note that if name designates a directory the fopen will
+// succeed, but it will behave like an empty file.
 static value use_file(value name)
 	{
 	const char *name_s = str_data(name);
@@ -44,7 +44,7 @@ static value use_file(value name)
 	return parse_fexl(Qfile(fh),name);
 	}
 
-/* (use_file name) Parse the named file. */
+// (use_file name) Parse the named file.
 value type_use_file(value f)
 	{
 	if (!f->L) return 0;

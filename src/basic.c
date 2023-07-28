@@ -13,28 +13,28 @@ value Qnull;
 value Qonce;
 value Qyield;
 
-/* (I x) = x */
+// (I x) = x
 value type_I(value f)
 	{
 	if (!f->L) return 0;
 	return hold(f->R);
 	}
 
-/* (T x y) = x */
+// (T x y) = x
 value type_T(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	return hold(f->L->R);
 	}
 
-/* (F x y) = y */
+// (F x y) = y
 value type_F(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
 	return hold(f->R);
 	}
 
-/* (Y x) = (x (Y x)) */
+// (Y x) = (x (Y x))
 value type_Y(value f)
 	{
 	if (!f->L) return 0;
@@ -47,14 +47,14 @@ value type_data(value f)
 	return hold(Qvoid);
 	}
 
-/* (void x) = void */
+// (void x) = void
 value type_void(value f)
 	{
 	if (!f->L) return 0;
 	return hold(Qvoid);
 	}
 
-/* Wrap list function around data if necessary. */
+// Wrap list function around data if necessary.
 value wrap(value x)
 	{
 	if (x->T == 0)
@@ -63,7 +63,7 @@ value wrap(value x)
 		return hold(x);
 	}
 
-/* ([x;y] a b) = (b x y) */
+// ([x;y] a b) = (b x y)
 value type_list(value f)
 	{
 	if (!f->L->L || !f->L->L->L) return 0;
@@ -76,7 +76,7 @@ value type_list(value f)
 	}
 	}
 
-/* (cons x y a b) = (b x y) */
+// (cons x y a b) = (b x y)
 value type_cons(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
@@ -89,13 +89,13 @@ value type_cons(value f)
 	}
 	}
 
-/* (null a b) = a */
+// (null a b) = a
 value type_null(value f)
 	{
 	return type_T(f);
 	}
 
-/* (eval x f) = (f y), where y is the final value of x. */
+// (eval x f) = (f y), where y is the final value of x.
 value type_eval(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
@@ -112,7 +112,7 @@ value type_once(value f)
 	return hold(f->R = eval(f->R));
 	}
 
-/* (yield x f) = (f x)  Used for returning an unevaluated function. */
+// (yield x f) = (f x)  Used for returning an unevaluated function.
 value type_yield(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
@@ -199,7 +199,7 @@ value type_is_good(value f) { return op_predicate(f,is_good); }
 value type_is_bool(value f) { return op_predicate(f,is_bool); }
 value type_is_list(value f) { return op_predicate(f,is_list); }
 
-/* \chain==(\a\b\x \x=x \v=(a x) is_defined v v (b x)) */
+// \chain==(\a\b\x \x=x \v=(a x) is_defined v v (b x))
 value type_chain(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
@@ -215,7 +215,7 @@ value type_chain(value f)
 	}
 	}
 
-/* Expand the list data f->R inline. */
+// Expand the list data f->R inline.
 value expand(value f)
 	{
 	value p = f;
@@ -232,7 +232,7 @@ value expand(value f)
 
 		if (x->T == type_cons && x->L && x->L->L && !x->L->L->L)
 			{
-			/* Change x inline from type_cons to type_list. */
+			// Change x inline from type_cons to type_list.
 			value data = V(0,hold(x->L->R),arg(x->R));
 			drop(x->L);
 			drop(x->R);
@@ -255,7 +255,7 @@ value expand(value f)
 			}
 		else
 			{
-			/* Replace non-list tail with null. */
+			// Replace non-list tail with null.
 			drop(x);
 			p->R = hold(Qnull);
 			break;

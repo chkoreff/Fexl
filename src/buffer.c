@@ -2,7 +2,7 @@
 
 #include <buffer.h>
 #include <memory.h>
-#include <string.h> /* memcpy */
+#include <string.h> // memcpy
 
 buffer buf_new(void)
 	{
@@ -20,7 +20,7 @@ static struct chunk *new_chunk(struct chunk *next, const unsigned long size)
 	return new;
 	}
 
-/* Add a single char to the buffer. */
+// Add a single char to the buffer.
 void buf_add(buffer buf, char ch)
 	{
 	struct chunk *top = buf->top;
@@ -34,8 +34,8 @@ void buf_add(buffer buf, char ch)
 	top->str->data[top->pos++] = ch;
 	}
 
-/* To add a whole string I simply add the characters one at a time.  I could
-optimize it later, but it's fine for now. */
+// To add a whole string I simply add the characters one at a time.  I could
+// optimize it later, but it's fine for now.
 void buf_addn(buffer buf, const char *str, unsigned long len)
 	{
 	unsigned long pos;
@@ -43,13 +43,13 @@ void buf_addn(buffer buf, const char *str, unsigned long len)
 		buf_add(buf, str[pos]);
 	}
 
-/* Add a string to the buffer. */
+// Add a string to the buffer.
 void buf_put(buffer buf, string str)
 	{
 	buf_addn(buf,str->data,str->len);
 	}
 
-/* Clear the buffer, discarding its contents. */
+// Clear the buffer, discarding its contents.
 void buf_discard(buffer buf)
 	{
 	struct chunk *chunk = buf->top;
@@ -75,7 +75,7 @@ unsigned long buf_length(buffer buf)
 	return len;
 	}
 
-/* Clear the buffer and return its content in a string. */
+// Clear the buffer and return its content in a string.
 string buf_clear(buffer buf)
 	{
 	struct chunk *chunk = buf->top;
@@ -94,7 +94,7 @@ string buf_clear(buffer buf)
 	return result;
 	}
 
-/* Free a dynamically allocated buffer. */
+// Free a dynamically allocated buffer.
 void buf_free(buffer buf)
 	{
 	buf_discard(buf);

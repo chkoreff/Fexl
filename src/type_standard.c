@@ -6,7 +6,7 @@
 #include <basic.h>
 #include <crypto.h>
 #include <stdio.h>
-#include <string.h> /* strcmp */
+#include <string.h> // strcmp
 #include <type_bn.h>
 #include <type_buf.h>
 #include <type_cmp.h>
@@ -33,7 +33,7 @@
 #include <type_var.h>
 #include <type_with.h>
 
-/* Resolve standard names. */
+// Resolve standard names.
 static value standard(void)
 	{
 	if (match("put")) return hold(Qput);
@@ -146,7 +146,7 @@ static value standard(void)
 	if (match("symlink")) return Q(type_symlink);
 	if (match("rename")) return Q(type_rename);
 
-	/* stream */
+	// stream
 	if (match("at_eof")) return Q(type_at_eof);
 	if (match("at_white")) return Q(type_at_white);
 	if (match("skip_white")) return Q(type_skip_white);
@@ -211,7 +211,7 @@ static value standard(void)
 	if (match("unpack")) return Q(type_unpack);
 	if (match("pack")) return Q(type_pack);
 
-	/* record */
+	// record
 	if (match("empty")) return hold(Qempty);
 	if (match("set")) return Q(type_set);
 	if (match("setf")) return Q(type_setf);
@@ -219,7 +219,7 @@ static value standard(void)
 	if (match("record_count")) return Q(type_record_count);
 	if (match("record_item")) return Q(type_record_item);
 
-	/* crypto functions */
+	// crypto functions
 	if (match("random_bytes")) return Q(type_random_bytes);
 	if (match("random_nonce")) return Q(type_random_nonce);
 	if (match("random_secret_key")) return Q(type_random_secret_key);
@@ -237,7 +237,7 @@ static value standard(void)
 	if (match("hmac_sha512")) return Q(type_hmac_sha512);
 	if (match("hmac_sha256")) return Q(type_hmac_sha256);
 
-	/* big numbers */
+	// big numbers
 	if (match("bn_eq0")) return Q(type_bn_eq0);
 	if (match("bn_is_neg")) return Q(type_bn_is_neg);
 	if (match("bn_neg")) return Q(type_bn_neg);
@@ -263,7 +263,7 @@ static value standard(void)
 	if (match("connect")) return Q(type_connect);
 	if (match("receive_keystrokes")) return Q(type_receive_keystrokes);
 
-	/* dynamic libraries */
+	// dynamic libraries
 	if (match("dlopen")) return Q(type_dlopen);
 	if (match("dlerror")) return Q(type_dlerror);
 	if (match("dlsym")) return Q(type_dlsym);
@@ -296,52 +296,51 @@ static void end_const(void)
 	close_random();
 	}
 
-/*
-Evaluate the user's script.  Read the script from the file named by argv[1] if
-present, or from stdin otherwise.
+// Evaluate the user's script.  Read the script from the file named by argv[1]
+// if present, or from stdin otherwise.
+//
+// If this program is running as "fexl0", it runs your script directly.  If it
+// is running as "fexl", it first runs the local script "src/main.fxl", which
+// then runs your script within an extended library context.
+//
+// The purpose of "fexl0" is to give you the option of bypassing src/main.fxl
+// altogether, defining any extensions beyond the built-in C standard context
+// as you please.
+//
+// In a future release I will make fexl0 the default behavior, so it always
+// reads your script directly without loading any default library.  Predefined
+// libraries such as the current main.fxl will be provided in the lib directory
+// so you can pull them in with a one-liner.
+//
+// I am making this change because the one-size-fits-all approach to a standard
+// library is a losing proposition.  Eventually I might even factor out the
+// currently built-in C functions into independent libraries loaded on demand.
+// Then you could build an entirely separate C library, put it in your own
+// directory somewhere, and load it from within Fexl.  That would even give you
+// the power to generate binary code on the fly and run it immediately.
 
-If this program is running as "fexl0", it runs your script directly.  If it is
-running as "fexl", it first runs the local script "src/main.fxl", which then
-runs your script within an extended library context.
-
-The purpose of "fexl0" is to give you the option of bypassing src/main.fxl
-altogether, defining any extensions beyond the built-in C standard context as
-you please.
-
-In a future release I will make fexl0 the default behavior, so it always reads
-your script directly without loading any default library.  Predefined libraries
-such as the current main.fxl will be provided in the lib directory so you can
-pull them in with a one-liner.
-
-I am making this change because the one-size-fits-all approach to a standard
-library is a losing proposition.  Eventually I might even factor out the
-currently built-in C functions into independent libraries loaded on demand.
-Then you could build an entirely separate C library, put it in your own
-directory somewhere, and load it from within Fexl.  That would even give you
-the power to generate binary code on the fly and run it immediately.
-*/
 static void eval_script(void)
 	{
 	value f;
 	unsigned long len = strlen(main_argv[0]);
 	if (len >= 5 && strcmp(main_argv[0]+len-5,"fexl0") == 0)
 		{
-		/* Running as fexl0, so run the user's script directly. */
+		// Running as fexl0, so run the user's script directly.
 		const char *name = main_argc > 1 ? main_argv[1] : "";
 		f = Qstr0(name);
 		}
 	else
 		{
-		/* Get the name of the currently running executable. */
+		// Get the name of the currently running executable.
 		f = Qstr0(main_argv[0]);
-		/* Go two directories up, right above the bin directory. */
+		// Go two directories up, right above the bin directory.
 		f = AV(Q(type_dirname),f);
 		f = AV(Q(type_dirname),f);
-		/* Concatenate the name of the main script. */
+		// Concatenate the name of the main script.
 		f = AV(AV(Q(type_concat),f),Qstr0("/src/main.fxl"));
 		}
 
-	/* Now evaluate the script. */
+	// Now evaluate the script.
 	f = AV(Q(type_use_file),f);
 	f = AV(Q(type_std),f);
 	f = AV(Q(type_value),f);

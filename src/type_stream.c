@@ -48,7 +48,7 @@ value type_at_ch(value f)
 	}
 	}
 
-/* Return the current character. */
+// Return the current character.
 value type_look(value f)
 	{
 	if (cur_ch < 0)
@@ -61,7 +61,7 @@ value type_look(value f)
 	return f;
 	}
 
-/* Skip to the next character. */
+// Skip to the next character.
 value type_skip(value f)
 	{
 	(void)f;
@@ -69,7 +69,7 @@ value type_skip(value f)
 	return hold(QI);
 	}
 
-/* Return the current line number. */
+// Return the current line number.
 value type_line(value f)
 	{
 	(void)f;
@@ -123,7 +123,7 @@ value type_collect_tilde_string(value f)
 	}
 	}
 
-/* (read_stream stream read) */
+// (read_stream stream read)
 value type_read_stream(value f)
 	{
 	if (!f->L || !f->L->L) return 0;

@@ -1,9 +1,9 @@
 #include <stdint.h>
 
 #include <format.h>
-#include <stdio.h> /* snprintf */
+#include <stdio.h> // snprintf
 
-static char buf[100]; /* Being careful here. */
+static char buf[100]; // Being careful here.
 
 const char *format_long(long x)
 	{
@@ -23,14 +23,12 @@ const char *format_uint64_t(uint64_t x)
 	return buf;
 	}
 
-/*
-I show 15 digits because that's what Perl does.  I considered using limits.h
-to determine a machine-specific precision.  The problem is, DECIMAL_DIG (in
-float.h) is only guaranteed to be at least 10, which is a pretty poor worst
-case.
-
-https://en.wikipedia.org/wiki/Double-precision_floating-point_format
-*/
+// I show 15 digits because that's what Perl does.  I considered using limits.h
+// to determine a machine-specific precision.  The problem is, DECIMAL_DIG (in
+// float.h) is only guaranteed to be at least 10, which is a pretty poor worst
+// case.
+//
+// https://en.wikipedia.org/wiki/Double-precision_floating-point_format
 const char *format_double(double x)
 	{
 	snprintf(buf, sizeof(buf), "%.15g", x);

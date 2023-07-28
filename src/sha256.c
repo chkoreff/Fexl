@@ -4,7 +4,7 @@
 
 #include <sha256.h>
 
-/* Reference: https://en.wikipedia.org/wiki/SHA-2 */
+// Reference: https://en.wikipedia.org/wiki/SHA-2
 
 static u32 R(u32 x, unsigned int n) { return (x >> n) | (x << (32-n)); }
 static u32 Ch(u32 x, u32 y, u32 z) { return (x & y) ^ (~x & z); }
@@ -14,7 +14,7 @@ static u32 Sigma1(u32 x) { return R(x, 6) ^ R(x,11) ^ R(x,25); }
 static u32 sigma0(u32 x) { return R(x, 7) ^ R(x,18) ^ (x >> 3); }
 static u32 sigma1(u32 x) { return R(x,17) ^ R(x,19) ^ (x >> 10); }
 
-/* Roll up n bytes from string x into a word in big-endian order. */
+// Roll up n bytes from string x into a word in big-endian order.
 static u64 roll_bytes(const u8 *x, unsigned int n)
 	{
 	unsigned int i;
@@ -24,7 +24,7 @@ static u64 roll_bytes(const u8 *x, unsigned int n)
 	return u;
 	}
 
-/* Fill n bytes from word u into string x in big-endian order. */
+// Fill n bytes from word u into string x in big-endian order.
 static void fill_bytes(u8 *x, u64 u, unsigned int n)
 	{
 	unsigned int i;
@@ -35,8 +35,8 @@ static void fill_bytes(u8 *x, u64 u, unsigned int n)
 		}
 	}
 
-/* Initialize array of round constants: first 32 bits of the fractional parts
-of the cube roots of the first 64 primes 2..311. */
+// Initialize array of round constants: first 32 bits of the fractional parts
+// of the cube roots of the first 64 primes 2..311.
 static const u32 k[64] =
 	{
 	0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,
@@ -64,17 +64,17 @@ static const u32 k[64] =
 	0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
 	};
 
-/* Process a 64-byte (512-bit) chunk of the message. */
+// Process a 64-byte (512-bit) chunk of the message.
 static void process_chunk(const u8 chunk[64], u32 h[8], u32 w[64])
 	{
 	u32 a[8];
 	unsigned int i;
 
-	/* Copy 512-bit chunk into first 16 words of schedule. */
+	// Copy 512-bit chunk into first 16 words of schedule.
 	for (i = 0; i < 16; i++)
 		w[i] = roll_bytes(chunk+i*4,4);
 
-	/* Extend the first 16 words into the remaining 48 words of schedule. */
+	// Extend the first 16 words into the remaining 48 words of schedule.
 	for (i = 16; i < 64; i++)
 		{
 		u32 s0 = sigma0(w[i-15]);
@@ -82,11 +82,11 @@ static void process_chunk(const u8 chunk[64], u32 h[8], u32 w[64])
 		w[i] = w[i-16] + s0 + w[i-7] + s1;
 		}
 
-	/* Initialize state to current hash value. */
+	// Initialize state to current hash value.
 	for (i = 0; i < 8; i++)
 		a[i] = h[i];
 
-	/* Compress the state. */
+	// Compress the state.
 	for (i = 0; i < 64; i++)
 		{
 		u32 S1 = Sigma1(a[4]);
@@ -95,7 +95,7 @@ static void process_chunk(const u8 chunk[64], u32 h[8], u32 w[64])
 		u32 S0 = Sigma0(a[0]);
 		u32 maj = Maj(a[0],a[1],a[2]);
 		unsigned int j;
-		/* Shift state to the right. */
+		// Shift state to the right.
 		for (j = 7; j > 0; j--)
 			a[j] = a[j-1];
 
@@ -103,70 +103,68 @@ static void process_chunk(const u8 chunk[64], u32 h[8], u32 w[64])
 		a[0] = T + S0 + maj;
 		}
 
-	/* Add compressed state to current hash. */
+	// Add compressed state to current hash.
 	for (i = 0; i < 8; i++)
 		h[i] += a[i];
 	}
 
-/*
-Note that the SHA256 specification allows a maximum of 2^61 data bytes.  That's
-because the length in bits is included in the padding at the end, and that can
-be at most 2^64.
-*/
+// Note that the SHA256 specification allows a maximum of 2^61 data bytes.
+// That's because the length in bits is included in the padding at the end, and
+// that can be at most 2^64.
 void sha256(u8 digest[32], const u8 *data, u64 n_data_byte)
 	{
-	/* Total number of data bits */
+	// Total number of data bits
 	const u64 n_data_bit = 8*n_data_byte;
 
-	/* Total number of 64-byte (512-bit) chunks */
+	// Total number of 64-byte (512-bit) chunks
 	const u64 n_chunk = 1 + (n_data_bit + 1 + 64) / 512;
 
-	/* Total number of bytes */
+	// Total number of bytes
 	const u64 n_total_byte = 64*n_chunk;
 
-	/* Number of full 64-byte data chunks */
+	// Number of full 64-byte data chunks
 	const u64 n_data_chunk = n_data_byte / 64;
 
-	/* Number of data bytes remaining after any full chunks. */
+	// Number of data bytes remaining after any full chunks.
 	const u64 n_remain =  n_data_byte % 64;
 
-	/* Number of zero padding bytes */
+	// Number of zero padding bytes
 	const u64 n_pad = n_total_byte - n_data_byte - 9;
 
-	u8 x[128]; /* Holds extra data after any full 64 byte blocks. */
+	u8 x[128]; // Holds extra data after any full 64 byte blocks.
 	u64 i;
 
-	/* Initialize hash values: first 32 bits of the fractional parts of the
-	square roots of the first 8 primes 2..19. */
+	// Initialize hash values: first 32 bits of the fractional parts of the
+	// square roots of the first 8 primes 2..19.
 	u32 h[8] =
 		{
 		0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
 		0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
 		};
 
-	u32 w[64]; /* message schedule array */
+	u32 w[64]; // message schedule array
 
-	/* Process any full 64-byte data chunks. */
+	// Process any full 64-byte data chunks.
 	for (i = 0; i < n_data_chunk; i++)
 		process_chunk(data+64*i,h,w);
 
-	/* Add any data bytes which remain after any full blocks. */
+	// Add any data bytes which remain after any full blocks.
 	for (i = 0; i < n_remain; i++)
 		x[i] = data[64*n_data_chunk+i];
 
-	/* Add padding. */
+	// Add padding.
 	x[n_remain] = 0x80;
 	for (i = n_remain+1; i < n_remain+n_pad+1; i++)
 		x[i] = 0;
 
-	/* Append n_data_bit as a 64-bit big-ending integer. */
+	// Append n_data_bit as a 64-bit big-ending integer.
 	fill_bytes(x+i,n_data_bit,8);
 
-	/* Note that (n_chunk-n_data_chunk) is either 1 or 2. */
+	// Note that (n_chunk-n_data_chunk) is either 1 or 2.
 	for (i = 0; i < n_chunk-n_data_chunk; i++)
 		process_chunk(x+64*i,h,w);
 
-	/* Flatten 32-bit words to bytes. */
+	// Flatten 32-bit words to bytes.
 	for (i = 0; i < 8; i++)
 		fill_bytes(digest+4*i,h[i],4);
 	}

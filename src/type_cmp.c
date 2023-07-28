@@ -31,8 +31,8 @@ static value op_cmp(value f, int op(int))
 	}
 	}
 
-/* (compare x y LT EQ GT)
-Compare the numbers or strings and return LT, EQ, or GT. */
+// (compare x y LT EQ GT)
+// Compare the numbers or strings and return LT, EQ, or GT.
 value type_compare(value f)
 	{
 	if (0

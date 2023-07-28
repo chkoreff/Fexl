@@ -1,12 +1,12 @@
-#include <math.h> /* pow fabs sqrt exp log sin cos M_PI */
+#include <math.h> // pow fabs sqrt exp log sin cos M_PI
 #include <value.h>
 
 #include <basic.h>
 #include <type_math.h>
 #include <type_num.h>
 
-/* Explicitly declare certain functions which are missing from math.h on some
-machines. */
+// Explicitly declare certain functions which are missing from math.h on some
+// machines.
 extern double round(double);
 extern double trunc(double);
 

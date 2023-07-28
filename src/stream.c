@@ -17,10 +17,10 @@ static int empty(void *source)
 	return -1;
 	}
 
-int cur_ch = -1; /* current character */
-unsigned long cur_line = 1; /* current line number */
-static input cur_get = empty; /* current input routine */
-static void *cur_source; /* current input source */
+int cur_ch = -1; // current character
+unsigned long cur_line = 1; // current line number
+static input cur_get = empty; // current input routine
+static void *cur_source; // current input source
 
 void skip(void)
 	{
@@ -40,21 +40,21 @@ void skip_white(void)
 		skip();
 	}
 
-/* Add the current character to the buffer. */
+// Add the current character to the buffer.
 void buf_keep(buffer buf)
 	{
 	buf_add(buf,cur_ch);
 	skip();
 	}
 
-/* Skip to end of line. */
+// Skip to end of line.
 static void skip_line(void)
 	{
 	while (cur_ch != '\n' && cur_ch != -1)
 		skip();
 	}
 
-/* Skip white space and comments. */
+// Skip white space and comments.
 void skip_filler(void)
 	{
 	while (1)
@@ -68,7 +68,7 @@ void skip_filler(void)
 		}
 	}
 
-/* Collect chars to the first white space.  Return true if found. */
+// Collect chars to the first white space.  Return true if found.
 int collect_to_white(buffer buf)
 	{
 	while (1)
@@ -85,7 +85,7 @@ int collect_to_white(buffer buf)
 		}
 	}
 
-/* Collect chars to t_ch.  Return true if found. */
+// Collect chars to t_ch.  Return true if found.
 int collect_to_ch(buffer buf, const char t_ch)
 	{
 	while (1)
@@ -102,10 +102,10 @@ int collect_to_ch(buffer buf, const char t_ch)
 		}
 	}
 
-/* Collect chars to a terminator string.  Return true if found. */
+// Collect chars to a terminator string.  Return true if found.
 int collect_string(buffer buf, const char *end, unsigned long len)
 	{
-	if (len == 1) /* Optimize this case. */
+	if (len == 1) // Optimize this case.
 		return collect_to_ch(buf,end[0]);
 	{
 	unsigned long pos = 0;
@@ -119,7 +119,7 @@ int collect_string(buffer buf, const char *end, unsigned long len)
 			}
 		else if (pos > 0)
 			{
-			/* Buffer the ones matched so far and start over. */
+			// Buffer the ones matched so far and start over.
 			buf_addn(buf,end,pos);
 			pos = 0;
 			}
@@ -132,13 +132,12 @@ int collect_string(buffer buf, const char *end, unsigned long len)
 	}
 	}
 
-/* Collect chars to a white space to get a terminator string.  Then collect
-chars to the next occurrence of that terminator.  Return:
-
-	-1 : if no terminator was found
-	 0 : if no occurrence of the terminator was found
-	 1 : if the terminator was found
-*/
+// Collect chars to a white space to get a terminator string.  Then collect
+// chars to the next occurrence of that terminator.  Return:
+//
+//   -1 : if no terminator was found
+//    0 : if no occurrence of the terminator was found
+//    1 : if the terminator was found
 int collect_tilde_string(buffer buf)
 	{
 	if (!collect_to_white(buf)) return -1;
@@ -150,7 +149,7 @@ int collect_tilde_string(buffer buf)
 	}
 	}
 
-/* Read input, saving and restoring the context to enable nested calls.*/
+// Read input, saving and restoring the context to enable nested calls.
 static value read_input(input get, void *source, value read)
 	{
 	value exp;
@@ -164,7 +163,7 @@ static value read_input(input get, void *source, value read)
 	cur_source = source;
 	skip();
 
-	exp = eval(read); /* Run the parse function */
+	exp = eval(read); // Run the parse function
 
 	cur_ch = save_cur_ch;
 	cur_line = save_cur_line;
@@ -174,7 +173,7 @@ static value read_input(input get, void *source, value read)
 	return exp;
 	}
 
-/* Read the stream, which may be type_file, type_istr, or type_str. */
+// Read the stream, which may be type_file, type_istr, or type_str.
 value read_stream(value stream, value read)
 	{
 	value exp;

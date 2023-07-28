@@ -4,14 +4,14 @@
 
 #include <base64.h>
 
-/* Reference: https://en.wikipedia.org/wiki/Base64 */
-/* Reference: https://tools.ietf.org/html/rfc4648#section-10 */
+// Reference: https://en.wikipedia.org/wiki/Base64
+// Reference: https://tools.ietf.org/html/rfc4648#section-10
 
-/* Unpack a 6-bit sextet (0-63) to a printable base64 character. */
+// Unpack a 6-bit sextet (0-63) to a printable base64 character.
 static const char *unpack_ch =
 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-/* Pack a printable base64 character to a 6-bit sextet (0-63). */
+// Pack a printable base64 character to a 6-bit sextet (0-63).
 static u8 pack_ch(u8 ch)
 	{
 	if (ch >= 'A' && ch <= 'Z') return ch - 'A';
@@ -22,10 +22,9 @@ static u8 pack_ch(u8 ch)
 	return 0;
 	}
 
-/* Unpack n bytes of raw data to base 64 characters.  The "in" array holds the
-raw data.  The "out" array holds the NUL-terminated result, and its size in
-bytes must be at least:  4*(n/3) + (n%3 == 0 ? 0 : 4) + 1.
-*/
+// Unpack n bytes of raw data to base 64 characters.  The "in" array holds the
+// raw data.  The "out" array holds the NUL-terminated result, and its size in
+// bytes must be at least:  4*(n/3) + (n%3 == 0 ? 0 : 4) + 1.
 void unpack64(u8 *out, const u8 *in, u64 n)
 	{
 	const u64 n_group = n / 3;
@@ -65,13 +64,12 @@ void unpack64(u8 *out, const u8 *in, u64 n)
 		}
 	}
 
-/* Pack n bytes of base 64 characters to raw data.  The "in" array holds the
-base 64 characters.  The "out" array holds the NUL-terminated result, and its
-size in bytes must be at least:  3*(n/4) + (n%4 == 0 ? 0 : n%4-1) + 1.
-
-Note that n does NOT include any trailing padding characters ('=').  The caller
-should decrement n as needed to ignore padding.
-*/
+// Pack n bytes of base 64 characters to raw data.  The "in" array holds the
+// base 64 characters.  The "out" array holds the NUL-terminated result, and
+// its size in bytes must be at least:  3*(n/4) + (n%4 == 0 ? 0 : n%4-1) + 1.
+//
+// Note that n does NOT include any trailing padding characters ('=').  The
+// caller should decrement n as needed to ignore padding.
 void pack64(u8 *out, const u8 *in, u64 n)
 	{
 	const u64 n_group = n / 4;

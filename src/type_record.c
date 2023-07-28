@@ -24,7 +24,7 @@ static void clear_record(value f)
 	{
 	struct record *rec = f->v_ptr;
 	unsigned long i;
-	/* Drop each item in record */
+	// Drop each item in record
 	for (i = 0; i < rec->count; i++)
 		{
 		struct item *item = &rec->item[i];
@@ -34,7 +34,7 @@ static void clear_record(value f)
 	free_memory(rec, record_size(rec->len));
 	}
 
-/* LATER 20221213 Perhaps use binary search. */
+// LATER 20221213 Perhaps use binary search.
 static value find(struct record *rec, string key, value result)
 	{
 	unsigned long i;
@@ -173,7 +173,7 @@ static value set(value x, value y, value z)
 		{
 		if (z->N <= 2)
 			{
-			/* Update inline */
+			// Update inline
 			drop(item->val);
 			item->val = hold(y);
 			return hold(z);
@@ -193,7 +193,7 @@ static value set(value x, value y, value z)
 		}
 	}
 
-/* Return an empty record. */
+// Return an empty record.
 value record_empty(void)
 	{
 	return Qrecord(new_record_bump(0));
@@ -224,9 +224,9 @@ static value op_set(value f, value op(value))
 	}
 	}
 
-/* (set key val obj) Set key to val in record obj, returning a record like obj
-but with key mapped to val.  It modifies obj inline if there are no other
-references to it; otherwise it returns a modified copy of obj. */
+// (set key val obj) Set key to val in record obj, returning a record like obj
+// but with key mapped to val.  It modifies obj inline if there are no other
+// references to it; otherwise it returns a modified copy of obj.
 value type_set(value f)
 	{
 	return op_set(f,arg);
@@ -260,7 +260,7 @@ value type_get(value f)
 	}
 	}
 
-/* Return the number of items in the record. */
+// Return the number of items in the record.
 value type_record_count(value f)
 	{
 	if (!f->L) return 0;
@@ -275,8 +275,8 @@ value type_record_count(value f)
 	}
 	}
 
-/* (record_item obj pos) Return the {key val} pair in record obj at offset pos,
-starting at zero. */
+// (record_item obj pos) Return the {key val} pair in record obj at offset pos,
+// starting at zero.
 value type_record_item(value f)
 	{
 	if (!f->L || !f->L->L) return 0;

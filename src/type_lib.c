@@ -22,7 +22,7 @@ value Qlib(void *lib)
 	return V(type_lib,&clear,(value)lib);
 	}
 
-/* (dlopen name) Open the named library, or return void if not successful.  */
+// (dlopen name) Open the named library, or return void if not successful.
 value type_dlopen(value f)
 	{
 	if (!f->L) return 0;

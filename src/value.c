@@ -1,37 +1,34 @@
 #include <memory.h>
-
 #include <value.h>
 
-/*
-The value structure is defined as follows.
-
-Let f be a pointer to a struct value.
-
-f->N is the reference count.
-
-f->T is the type, a C routine which reduces the value during evaluation.
-
-f->next links values on the free list after f->N drops to 0.
-
-Every value f is one of three classes: atom, data, or tree.
-
-1. atom : (f->L == 0 && f->R == 0)
-
-An atom value is a primary function with no arguments.
-
-2. data : (f->L != 0 && f->L->N == 0)
-
-A data value has data that resides in the union which follows f->L.  The
-f->L->clear field is a function that frees the data when f->N drops to 0.
-
-3. tree : (f->L != 0 && f->L->N > 0)
-
-A tree value is a combination of values f->L and f->R.
-
-The "recycle" routine below succinctly reflects these rules.
-
-Note that on most machines, (sizeof(struct value) == 32).
-*/
+// The value structure is defined as follows.
+//
+// Let f be a pointer to a struct value.
+//
+// f->N is the reference count.
+//
+// f->T is the type, a C routine which reduces the value during evaluation.
+//
+// f->next links values on the free list after f->N drops to 0.
+//
+// Every value f is one of three classes: atom, data, or tree.
+//
+// 1. atom : (f->L == 0 && f->R == 0)
+//
+// An atom value is a primary function with no arguments.
+//
+// 2. data : (f->L != 0 && f->L->N == 0)
+//
+// A data value has data that resides in the union which follows f->L.  The
+// f->L->clear field is a function that frees the data when f->N drops to 0.
+//
+// 3. tree : (f->L != 0 && f->L->N > 0)
+//
+// A tree value is a combination of values f->L and f->R.
+//
+// The "recycle" routine below succinctly reflects these rules.
+//
+// Note that on most machines, (sizeof(struct value) == 32).
 
 static value free_list = 0;
 

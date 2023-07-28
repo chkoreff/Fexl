@@ -21,7 +21,7 @@ static void clear_buf(value f)
 	buf_free(f->v_ptr);
 	}
 
-/* buf_new returns a new empty character buffer. */
+// buf_new returns a new empty character buffer.
 value type_buf_new(value f)
 	{
 	static struct value clear = {{.N=0}, {.clear=clear_buf}};
@@ -29,7 +29,7 @@ value type_buf_new(value f)
 	return V(type_buf,&clear,(value)buf_new());
 	}
 
-/* (buf_put buf str) Appends the string to the buffer. */
+// (buf_put buf str) Appends the string to the buffer.
 value type_buf_put(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
@@ -49,8 +49,8 @@ value type_buf_put(value f)
 	}
 	}
 
-/* (buf_get buf) Clear the buffer and return str, where str is the current
-content of the buffer. */
+// (buf_get buf) Clear the buffer and return str, where str is the current
+// content of the buffer.
 value type_buf_get(value f)
 	{
 	if (!f->L) return 0;

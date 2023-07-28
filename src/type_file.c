@@ -7,15 +7,15 @@
 
 #include <basic.h>
 #include <die.h>
-#include <dirent.h> /* opendir readdir closedir */
+#include <dirent.h> // opendir readdir closedir
 #include <memory.h>
-#include <sys/file.h> /* flock */
-#include <sys/stat.h> /* stat */
+#include <sys/file.h> // flock
+#include <sys/stat.h> // stat
 #include <type_file.h>
 #include <type_input.h>
 #include <type_num.h>
 #include <type_str.h>
-#include <unistd.h> /* readlink */
+#include <unistd.h> // readlink
 
 value Qstdin;
 value Qstdout;
@@ -26,9 +26,8 @@ value type_file(value f)
 	return type_data(f);
 	}
 
-/* Automatically close the file handle unless it's stdin, stdout, or stderr.
-That way I can still see any error message at the very end of the program.
-*/
+// Automatically close the file handle unless it's stdin, stdout, or stderr.
+// That way I can still see any error message at the very end of the program.
 static void fh_free(FILE *fh)
 	{
 	if (fileno(fh) > 2)
@@ -51,8 +50,8 @@ FILE *get_fh(value x)
 	return x->v_ptr;
 	}
 
-/* (fopen path mode) Open a file and return fh, where fh is the open file
-handle or void on failure. */
+// (fopen path mode) Open a file and return fh, where fh is the open file
+// handle or void on failure.
 value type_fopen(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
@@ -74,8 +73,8 @@ value type_fopen(value f)
 	}
 	}
 
-/* (fclose fh) Close the file handle, and set it to void so it doesn't core
-dump if you mistakenly try to close it again. */
+// (fclose fh) Close the file handle, and set it to void so it doesn't core
+// dump if you mistakenly try to close it again.
 value type_fclose(value f)
 	{
 	if (!f->L) return 0;
@@ -96,13 +95,13 @@ value type_fclose(value f)
 	}
 	}
 
-/* (fgetc fh) returns the next single byte from the file, or void if none. */
+// (fgetc fh) returns the next single byte from the file, or void if none.
 value type_fgetc(value f)
 	{
 	return op_getc(f,type_file,(input)fgetc);
 	}
 
-/* (fget fh) returns the next UTF-8 character from the file, or void if none. */
+// (fget fh) returns the next UTF-8 character from the file, or void if none.
 value type_fget(value f)
 	{
 	return op_get(f,type_file,(input)fgetc);
@@ -143,7 +142,7 @@ value type_feof(value f)
 	}
 	}
 
-/* (flook fh) returns the next byte from the file without consuming it. */
+// (flook fh) returns the next byte from the file without consuming it.
 value type_flook(value f)
 	{
 	if (!f->L) return 0;
@@ -169,8 +168,8 @@ value type_flook(value f)
 	}
 	}
 
-/* (remove path) Remove path from file system; return 0 if successful or -1
-otherwise. */
+// (remove path) Remove path from file system; return 0 if successful or -1
+// otherwise.
 value type_remove(value f)
 	{
 	if (!f->L) return 0;
@@ -189,20 +188,20 @@ value type_remove(value f)
 	}
 	}
 
-/* Return true if file1 is newer than file2.  If either file is missing, return
-true.  That makes the most sense for caching operations.
+// Return true if file1 is newer than file2.  If either file is missing, return
+// true.  That makes the most sense for caching operations.
+//
+// NOTE: Formerly I included the nanosecond resolution using the following
+// code, but that doesn't compile on older machines so I'm sticking with whole
+// second resolution.
+//
+// if (status_1.st_mtim.tv_sec > status_2.st_mtim.tv_sec)
+//     return 1;
+//
+// if (status_1.st_mtim.tv_sec == status_2.st_mtim.tv_sec &&
+//     status_1.st_mtim.tv_nsec > status_2.st_mtim.tv_nsec)
+//     return 1;
 
-NOTE: Formerly I included the nanosecond resolution using the following code,
-but that doesn't compile on older machines so I'm sticking with whole second
-resolution.
-
-	if (status_1.st_mtim.tv_sec > status_2.st_mtim.tv_sec)
-		return 1;
-
-	if (status_1.st_mtim.tv_sec == status_2.st_mtim.tv_sec &&
-		status_1.st_mtim.tv_nsec > status_2.st_mtim.tv_nsec)
-		return 1;
-*/
 static int is_newer(const char *file1, const char *file2)
 	{
 	int ret;
@@ -259,13 +258,13 @@ static value op_stat_type(value f, mode_t mask)
 	}
 	}
 
-/* (is_file path) Return true if the path is a regular file. */
+// (is_file path) Return true if the path is a regular file.
 value type_is_file(value f)
 	{
 	return op_stat_type(f,S_IFREG);
 	}
 
-/* (is_dir path) Return true if the path is a directory. */
+// (is_dir path) Return true if the path is a directory.
 value type_is_dir(value f)
 	{
 	return op_stat_type(f,S_IFDIR);
@@ -293,18 +292,18 @@ static value op_flock(value f, int operation)
 	}
 	}
 
-/* (flock_ex fh) Obtain an exclusive lock on the file handle, blocking as long
-as necessary. */
+// (flock_ex fh) Obtain an exclusive lock on the file handle, blocking as long
+// as necessary.
 value type_flock_ex(value f) { return op_flock(f,LOCK_EX); }
 
-/* (flock_sh fh) Obtain a shared lock on the file handle, blocking as long
-as necessary. */
+// (flock_sh fh) Obtain a shared lock on the file handle, blocking as long
+// as necessary.
 value type_flock_sh(value f) { return op_flock(f,LOCK_SH); }
 
-/* (flock_un fh) Unlock the file handle. */
+// (flock_un fh) Unlock the file handle.
 value type_flock_un(value f) { return op_flock(f,LOCK_UN); }
 
-/* Call readlink, returning a string. */
+// Call readlink, returning a string.
 static string safe_readlink(const char *path)
 	{
 	char *buf;
@@ -318,14 +317,14 @@ static string safe_readlink(const char *path)
 
 		if (len == size)
 			{
-			/* Used all available space, so the result might be truncated. */
+			// Used all available space, so the result might be truncated.
 			free_memory(buf, size);
 			size = 2 * size;
 			}
 		else
 			{
-			/* Used less than available space, so the result fits just fine.
-			Return null string on system error (len == -1). */
+			// Used less than available space, so the result fits just fine.
+			// Return null string on system error (len == -1).
 			string result = str_new_data(buf,(len < 0 ? 0 : len));
 			free_memory(buf, size);
 			return result;
@@ -347,8 +346,8 @@ value type_readlink(value f)
 	}
 	}
 
-/* \code=(mkdir path mode) Attempt to create a directory named path.
-See mkdir(2) for details.  An example for mode is (oct "775"). */
+// \code=(mkdir path mode) Attempt to create a directory named path.
+// See mkdir(2) for details.  An example for mode is (oct "775").
 value type_mkdir(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
@@ -370,8 +369,8 @@ value type_mkdir(value f)
 	}
 	}
 
-/* \code=(rmdir path) Deletes a directory, which must be empty.
-See rmdir(2) for details. */
+// \code=(rmdir path) Deletes a directory, which must be empty.
+// See rmdir(2) for details.
 value type_rmdir(value f)
 	{
 	if (!f->L) return 0;
@@ -390,7 +389,7 @@ value type_rmdir(value f)
 	}
 	}
 
-/* \code=(ftruncate fh len) Truncate a file to the given length. */
+// \code=(ftruncate fh len) Truncate a file to the given length.
 value type_ftruncate(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
@@ -433,12 +432,12 @@ static value op_seek(value f, int whence)
 	}
 	}
 
-/* \code=(fseek_set fh offset) */
+// \code=(fseek_set fh offset)
 value type_fseek_set(value f) { return op_seek(f,SEEK_SET); }
 value type_fseek_cur(value f) { return op_seek(f,SEEK_CUR); }
 value type_fseek_end(value f) { return op_seek(f,SEEK_END); }
 
-/* \offset=(ftell fh) */
+// \offset=(ftell fh)
 value type_ftell(value f)
 	{
 	if (!f->L) return 0;
@@ -457,7 +456,7 @@ value type_ftell(value f)
 	}
 	}
 
-/* \n=(fileno fh) */
+// \n=(fileno fh)
 value type_fileno(value f)
 	{
 	if (!f->L) return 0;
@@ -476,8 +475,8 @@ value type_fileno(value f)
 	}
 	}
 
-/* \str=(fread fh size) Read at most size bytes from the file, clipping if it
-reaches end of file. */
+// \str=(fread fh size) Read at most size bytes from the file, clipping if it
+// reaches end of file.
 value type_fread(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
@@ -506,8 +505,8 @@ value type_fread(value f)
 	}
 	}
 
-/* \fh=(mkfile path mode) Atomically create and open a file for reading and
-writing.  Returns void if the file already existed. */
+// \fh=(mkfile path mode) Atomically create and open a file for reading and
+// writing.  Returns void if the file already existed.
 value type_mkfile(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
@@ -537,8 +536,8 @@ static value dir_names(DIR *dir)
 	return V(0,Qstr0(entry->d_name),dir_names(dir));
 	}
 
-/* \names=(dir_names path) Return the list of names in a directory.  The names
-are returned in arbitrary order and include the special files "." and "..". */
+// \names=(dir_names path) Return the list of names in a directory.  The names
+// are returned in arbitrary order and include the special files "." and "..".
 value type_dir_names(value f)
 	{
 	if (!f->L) return 0;
@@ -593,20 +592,20 @@ static value op_stat(value f, unsigned long op(struct stat *status))
 	}
 	}
 
-/* Return the modification time of a file in epoch seconds. */
+// Return the modification time of a file in epoch seconds.
 value type_mod_time(value f)
 	{
 	return op_stat(f,get_st_mtime);
 	}
 
-/* Return the size of a file. */
+// Return the size of a file.
 value type_file_size(value f)
 	{
 	return op_stat(f,get_st_size);
 	}
 
-/* (symlink target linkpath) Create a symbolic link named linkpath which points
-to target.  Return the numeric result of calling symlink(2). */
+// (symlink target linkpath) Create a symbolic link named linkpath which points
+// to target.  Return the numeric result of calling symlink(2).
 value type_symlink(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
@@ -623,8 +622,8 @@ value type_symlink(value f)
 	}
 	}
 
-/* (rename source target) Rename source path as target path.  Return the
-numeric value of calling rename(2). */
+// (rename source target) Rename source path as target path.  Return the
+// numeric value of calling rename(2).
 value type_rename(value f)
 	{
 	if (!f->L || !f->L->L) return 0;

@@ -2,7 +2,7 @@
 
 #include <die.h>
 #include <file.h>
-#include <stdlib.h> /* exit */
+#include <stdlib.h> // exit
 
 void die(const char *msg)
 	{

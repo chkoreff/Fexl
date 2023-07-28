@@ -9,7 +9,7 @@
 #include <type_istr.h>
 #include <type_str.h>
 
-/* An istr structure is used to iterate through a string. */
+// An istr structure is used to iterate through a string.
 
 static struct istr *istr_new(value x)
 	{
@@ -54,7 +54,7 @@ value type_istr(value f)
 	return type_data(f);
 	}
 
-/* (readstr str) returns an iterator on the string. */
+// (readstr str) returns an iterator on the string.
 value type_readstr(value f)
 	{
 	if (!f->L) return 0;
@@ -69,20 +69,19 @@ value type_readstr(value f)
 	}
 	}
 
-/* (sgetc in) returns the next single byte from the string, or void if none. */
+// (sgetc in) returns the next single byte from the string, or void if none.
 value type_sgetc(value f)
 	{
 	return op_getc(f,type_istr,(input)sgetc);
 	}
 
-/* (sget in) returns the next UTF-8 character from the string, or void if none.
-*/
+// (sget in) returns the next UTF-8 character from the string, or void if none.
 value type_sget(value f)
 	{
 	return op_get(f,type_istr,(input)sgetc);
 	}
 
-/* (slook in) returns the next byte from the string without consuming it. */
+// (slook in) returns the next byte from the string without consuming it.
 value type_slook(value f)
 	{
 	if (!f->L) return 0;

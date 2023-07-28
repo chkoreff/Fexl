@@ -5,7 +5,7 @@
 #include <type_hex.h>
 #include <type_str.h>
 
-/* Map number 0-15 to a hex digit. */
+// Map number 0-15 to a hex digit.
 static unsigned char nibble_to_hex(unsigned char n)
 	{
 	if (n < 10)
@@ -14,14 +14,14 @@ static unsigned char nibble_to_hex(unsigned char n)
 		return n - 10 + 'a';
 	}
 
-/* Map hex digit to a number 0-15. */
+// Map hex digit to a number 0-15.
 static unsigned char hex_to_nibble(unsigned char n)
 	{
-	if (n >= 48 && n <= 57) /* '0'-'9' */
+	if (n >= 48 && n <= 57) // '0'-'9'
 		return n - 48;
-	else if (n >= 97 && n <= 102) /* 'a'-'f' */
+	else if (n >= 97 && n <= 102) // 'a'-'f'
 		return n - 87;
-	else if (n >= 65 && n <= 70) /* 'A'-'F' */
+	else if (n >= 65 && n <= 70) // 'A'-'F'
 		return n - 55;
 	else
 		return 0;
@@ -53,7 +53,7 @@ static string pack(string str_hex)
 	return str_raw;
 	}
 
-/* Map raw bytes to their hexadecimal values. */
+// Map raw bytes to their hexadecimal values.
 value type_unpack(value f)
 	{
 	if (!f->L) return 0;
@@ -68,7 +68,7 @@ value type_unpack(value f)
 	}
 	}
 
-/* Map a string specified in hexadecimal into the raw bytes. */
+// Map a string specified in hexadecimal into the raw bytes.
 value type_pack(value f)
 	{
 	if (!f->L) return 0;

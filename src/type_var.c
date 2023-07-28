@@ -3,9 +3,9 @@
 #include <basic.h>
 #include <type_var.h>
 
-/* A var is a mutable variable where you can put and get values.  This can help
-with things like caching, simulating a dynamic entity such as a file system or
-human user, redefining print to capture output in a memory buffer, etc. */
+// A var is a mutable variable where you can put and get values.  This can help
+// with things like caching, simulating a dynamic entity such as a file system
+// or human user, redefining print to capture output in a memory buffer, etc.
 
 value type_var(value f)
 	{

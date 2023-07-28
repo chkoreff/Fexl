@@ -7,20 +7,18 @@
 #include <buffer.h>
 #include <die.h>
 #include <memory.h>
-#include <string.h> /* strlen */
+#include <string.h> // strlen
 
-/*
-These routines manipulate signed integers of arbitrary size.
+// These routines manipulate signed integers of arbitrary size.
+//
+// Numbers are represented in base B = 2^32, as a sequence of u32 words with a
+// maximum length of (B-1).  That allows a number as high as B^(B-1)-1, which
+// would require 2^34 bytes to store (over 17 GB).
+//
+// Most of the vector routines run in constant time for given operand sizes,
+// with the exceptions of vec_nsd, vec_cmp, and vec_div.
 
-Numbers are represented in base B = 2^32, as a sequence of u32 words with a
-maximum length of (B-1).  That allows a number as high as B^(B-1)-1, which
-would require 2^34 bytes to store (over 17 GB).
-
-Most of the vector routines run in constant time for given operand sizes, with
-the exceptions of vec_nsd, vec_cmp, and vec_div.
-*/
-
-/* Return the number of significant digits in x. */
+// Return the number of significant digits in x.
 static u32 vec_nsd(u32 n, const u32 *x)
 	{
 	while (n > 0 && x[n-1] == 0)
@@ -28,7 +26,7 @@ static u32 vec_nsd(u32 n, const u32 *x)
 	return n;
 	}
 
-/* Fill x with the constant value v. */
+// Fill x with the constant value v.
 static void vec_fill(u32 n, u32 *x, u32 v)
 	{
 	u32 i;
@@ -36,13 +34,13 @@ static void vec_fill(u32 n, u32 *x, u32 v)
 		x[i] = v;
 	}
 
-/* Fill x with 0. */
+// Fill x with 0.
 static void vec_zero(u32 n, u32 *x)
 	{
 	vec_fill(n,x,0);
 	}
 
-/* Copy x to y. */
+// Copy x to y.
 static void vec_copy(u32 n, const u32 *x, u32 *y)
 	{
 	u32 i;
@@ -50,11 +48,10 @@ static void vec_copy(u32 n, const u32 *x, u32 *y)
 		y[i] = x[i];
 	}
 
-/* Compare x and y, returning the sign s where:
-  (s =  0 and x = y) or
-  (s =  1 and x > y) or
-  (s = -1 and x < y)
-*/
+// Compare x and y, returning the sign s where:
+//   (s =  0 and x = y) or
+//   (s =  1 and x > y) or
+//   (s = -1 and x < y)
 static int vec_cmp(u32 n, const u32 *x, const u32 *y)
 	{
 	while (n > 0)
@@ -78,7 +75,7 @@ static int nat_cmp(const struct bn *x, const struct bn *y)
 		return vec_cmp(x->nsd,x->vec,y->vec);
 	}
 
-/* Add u32 digit to vector and return carry. */
+// Add u32 digit to vector and return carry.
 static u32 vec_add_u32(u32 n, const u32 *x, u32 carry, u32 *z)
 	{
 	u32 i;
@@ -91,7 +88,7 @@ static u32 vec_add_u32(u32 n, const u32 *x, u32 carry, u32 *z)
 	return carry;
 	}
 
-/* Add i32 digit to vector and return carry. */
+// Add i32 digit to vector and return carry.
 static i32 vec_add_i32(u32 n, const u32 *x, i32 carry, u32 *z)
 	{
 	u32 i;
@@ -104,7 +101,7 @@ static i32 vec_add_i32(u32 n, const u32 *x, i32 carry, u32 *z)
 	return carry;
 	}
 
-/* Add vectors of the same size and return carry. */
+// Add vectors of the same size and return carry.
 static u32 vec_add_same(u32 n, const u32 *x, const u32 *y, u32 *z)
 	{
 	u32 carry = 0;
@@ -118,7 +115,7 @@ static u32 vec_add_same(u32 n, const u32 *x, const u32 *y, u32 *z)
 	return carry;
 	}
 
-/* Subtract vectors of the same size and return carry. */
+// Subtract vectors of the same size and return carry.
 static i32 vec_sub_same(u32 n, const u32 *x, const u32 *y, u32 *z)
 	{
 	i32 carry = 0;
@@ -132,7 +129,7 @@ static i32 vec_sub_same(u32 n, const u32 *x, const u32 *y, u32 *z)
 	return carry;
 	}
 
-/* Add vectors where xn >= yn. */
+// Add vectors where xn >= yn.
 static void vec_add(u32 xn, const u32 *x, u32 yn, const u32 *y, u32 *z)
 	{
 	u32 carry = vec_add_same(yn,x,y,z);
@@ -140,14 +137,14 @@ static void vec_add(u32 xn, const u32 *x, u32 yn, const u32 *y, u32 *z)
 	z[xn] = carry;
 	}
 
-/* Subtract vectors where xn >= yn. */
+// Subtract vectors where xn >= yn.
 static void vec_sub(u32 xn, const u32 *x, u32 yn, const u32 *y, u32 *z)
 	{
 	i32 carry = vec_sub_same(yn,x,y,z);
 	vec_add_i32(xn-yn,x+yn,carry,z+yn);
 	}
 
-/* Set z = x*y. */
+// Set z = x*y.
 static void vec_mul(u32 xn, const u32 *x, u32 yn, const u32 *y, u32 *z)
 	{
 	u32 i,j;
@@ -167,7 +164,7 @@ static void vec_mul(u32 xn, const u32 *x, u32 yn, const u32 *y, u32 *z)
 		}
 	}
 
-/* Set x = x*scale + digit. */
+// Set x = x*scale + digit.
 static void vec_append(u32 n, u32 *x, u32 scale, u32 digit)
 	{
 	u32 i;
@@ -180,10 +177,10 @@ static void vec_append(u32 n, u32 *x, u32 scale, u32 digit)
 	x[n] = digit;
 	}
 
-/* Convert a string of decimal digits to a number. */
+// Convert a string of decimal digits to a number.
 static void vec_from_dec(const char *s, u32 n, u32 *x)
 	{
-	const u8 max_chunk = 9; /* Must be in range 1-9. */
+	const u8 max_chunk = 9; // Must be in range 1-9.
 	u64 pos = 0;
 
 	vec_zero(n,x);
@@ -211,15 +208,15 @@ static void vec_from_dec(const char *s, u32 n, u32 *x)
 		if (scale == 1)
 			break;
 
-		vec_append(n-1,x,scale,digit); /* Leave room for carry. */
+		vec_append(n-1,x,scale,digit); // Leave room for carry.
 		}
 	}
 
-/* Set r = r - y*qd, where r >= y*qd. */
+// Set r = r - y*qd, where r >= y*qd.
 static void vec_sub_mul(u32 *r, u32 yn, const u32 *y, u32 qd)
 	{
-	u32 c_prod = 0; /* carry for product */
-	i32 c_diff = 0; /* carry for difference */
+	u32 c_prod = 0; // carry for product
+	i32 c_diff = 0; // carry for difference
 	u32 i;
 
 	for (i = 0; i < yn; i++)
@@ -232,7 +229,7 @@ static void vec_sub_mul(u32 *r, u32 yn, const u32 *y, u32 qd)
 		c_diff = (diff >> 32);
 		}
 
-	/* If final carry is nonzero then r[yn] is guaranteed to exist. */
+	// If final carry is nonzero then r[yn] is guaranteed to exist.
 	{
 	i64 carry = (i64)c_diff - (i64)c_prod;
 	if (carry)
@@ -240,17 +237,15 @@ static void vec_sub_mul(u32 *r, u32 yn, const u32 *y, u32 qd)
 	}
 	}
 
-/*
-Divide x by y, and return quotient q and remainder r where:
-	x = q*y + r  and  (y=0 or 0 <= r < y)
-
-I do not optimize the case where y=1 because I want constant time operation as
-far as possible and you probably don't divide by 1 too often anyway.
-
-On each round I calculate a guess with digits {qd qn} where:
-   (qd = 0 and x < y) or
-   (qd > 0 and x >= (y * qd * base^qn))
-*/
+// Divide x by y, and return quotient q and remainder r where:
+//   x = q*y + r  and  (y=0 or 0 <= r < y)
+//
+// I do not optimize the case where y=1 because I want constant time operation
+// as far as possible and you probably don't divide by 1 too often anyway.
+//
+// On each round I calculate a guess with digits {qd qn} where:
+//   (qd = 0 and x < y) or
+//   (qd > 0 and x >= (y * qd * base^qn))
 static void vec_div
 	(
 	u32 xn, const u32 *x,
@@ -296,19 +291,19 @@ static void vec_div
 	}
 	}
 
-/* Divide x by y and return remainder without computing quotient. */
+// Divide x by y and return remainder without computing quotient.
 static void vec_mod(u32 xn, const u32 *x, u32 yn, const u32 *y, u32 *r)
 	{
 	vec_div(xn,x,yn,y,0,r);
 	}
 
-/* Return the number of bytes needed to store a bn of the given length. */
+// Return the number of bytes needed to store a bn of the given length.
 static u64 bn_size(u64 n)
 	{
 	return sizeof(struct bn) + sizeof(u32[n]);
 	}
 
-/* Create an uninitialized bn of length n, where (0 <= n <= UINT32_MAX). */
+// Create an uninitialized bn of length n, where (0 <= n <= UINT32_MAX).
 struct bn *bn_new(u64 n)
 	{
 	if (n > UINT32_MAX)
@@ -371,7 +366,7 @@ static void set_nsd(struct bn *x)
 	x->nsd = vec_nsd(x->len,x->vec);
 	}
 
-/* Return x+y where x->nsd >= y->nsd, ignoring sign. */
+// Return x+y where x->nsd >= y->nsd, ignoring sign.
 static struct bn *nat_add(const struct bn *x, const struct bn *y)
 	{
 	struct bn *z = bn_new(x->nsd+1);
@@ -380,7 +375,7 @@ static struct bn *nat_add(const struct bn *x, const struct bn *y)
 	return z;
 	}
 
-/* Return x-y where x >= y, ignoring sign. */
+// Return x-y where x >= y, ignoring sign.
 static struct bn *nat_sub(const struct bn *x, const struct bn *y)
 	{
 	struct bn *z = bn_new(x->nsd);
@@ -406,19 +401,19 @@ static struct bn *bn_add_sub(int add, const struct bn *x, const struct bn *y)
 		}
 	}
 
-/* Return z = x+y. */
+// Return z = x+y.
 struct bn *bn_add(const struct bn *x, const struct bn *y)
 	{
 	return bn_add_sub((x->sign == y->sign), x, y);
 	}
 
-/* Return z = x-y. */
+// Return z = x-y.
 struct bn *bn_sub(const struct bn *x, const struct bn *y)
 	{
 	return bn_add_sub((x->sign != y->sign), x, y);
 	}
 
-/* Return z = x*y. */
+// Return z = x*y.
 struct bn *bn_mul(const struct bn *x, const struct bn *y)
 	{
 	u64 xn = x->nsd;
@@ -431,43 +426,42 @@ struct bn *bn_mul(const struct bn *x, const struct bn *y)
 	return z;
 	}
 
-/*
-Construct an integer from a string of decimal digits.
+// Construct an integer from a string of decimal digits.
+//
+// The string may start with a leading '-' or '+'.  After that, a NUL or any
+// other non-digit is treated as the end of the string.
+//
+// The maximum number of decimal digits is 38,654,705,654, which ensures that I
+// can represent the result.  The routine dies if that limit is exceeded.
+//
+// NOTE:  I estimate the size of the result in advance as follows.
+//
+// Let B = 2^32, the base I use for numbers.
+// Let len = strlen(s).  Note that len >= 0.
+// The maximum possible number is M = 10^len-1, assuming all digits are '9'.
+// Let xn = 1 + floor(len/9).
+// It is now guaranteed that M <= B^xn-1, so M fits in the result.
+//
+// Proof by contradiction:
+//
+// Define logB(x) = ln(x)/ln(B).
+// Define q = logB(10).  Note that q < 1/9.
+//
+// : M > B^xn - 1  # Assume the contrary.
+// : 10^len - 1 > B^xn - 1
+// : 10^len > B^xn
+// : (B^q)^len > B^xn
+// : B^(q*len) > B^xn
+// : q*len > xn
+// : q*len > 1 + floor(len/9)
+// : q*len > 1 + (len/9 - 1)
+// : q*len > (1/9)*len
+// : (len=0 and 0>0) or (len>0 and q>1/9)
+// : (len=0 and false) or (len>0 and false)
+// : false or false
+// : false
+// QED
 
-The string may start with a leading '-' or '+'.  After that, a NUL or any other
-non-digit is treated as the end of the string.
-
-The maximum number of decimal digits is 38,654,705,654, which ensures that I
-can represent the result.  The routine dies if that limit is exceeded.
-
-NOTE:  I estimate the size of the result in advance as follows.
-
-Let B = 2^32, the base I use for numbers.
-Let len = strlen(s).  Note that len >= 0.
-The maximum possible number is M = 10^len-1, assuming all digits are '9'.
-Let xn = 1 + floor(len/9).
-It is now guaranteed that M <= B^xn-1, so M fits in the result.
-
-Proof by contradiction:
-
-Define logB(x) = ln(x)/ln(B).
-Define q = logB(10).  Note that q < 1/9.
-
-: M > B^xn - 1  # Assume the contrary.
-: 10^len - 1 > B^xn - 1
-: 10^len > B^xn
-: (B^q)^len > B^xn
-: B^(q*len) > B^xn
-: q*len > xn
-: q*len > 1 + floor(len/9)
-: q*len > 1 + (len/9 - 1)
-: q*len > (1/9)*len
-: (len=0 and 0>0) or (len>0 and q>1/9)
-: (len=0 and false) or (len>0 and false)
-: false or false
-: false
-QED
-*/
 struct bn *bn_from_dec(const char *s)
 	{
 	u32 sign = 0;
@@ -522,7 +516,7 @@ struct bn *bn_mod(const struct bn *x, const struct bn *y)
 	return r;
 	}
 
-/* Buffer the decimal digits in a base B number. */
+// Buffer the decimal digits in a base B number.
 static void vec_to_dec(buffer buf, u32 xn, const u32 *x, u32 *q, u32 *r)
 	{
 	u32 y[1] = {10};
@@ -542,7 +536,7 @@ static void vec_to_dec(buffer buf, u32 xn, const u32 *x, u32 *q, u32 *r)
 		}
 	}
 
-/* Reverse a string in place. */
+// Reverse a string in place.
 static void reverse_string(unsigned long len, char *s)
 	{
 	unsigned long mid = len / 2;

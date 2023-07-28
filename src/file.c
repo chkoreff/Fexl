@@ -3,7 +3,7 @@
 
 #include <file.h>
 #include <format.h>
-#include <string.h> /* strlen */
+#include <string.h> // strlen
 
 void fputd(FILE *fh, const char *data, unsigned long len)
 	{

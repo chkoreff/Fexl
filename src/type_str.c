@@ -107,13 +107,13 @@ value op_str3(value f, string op(string,string,string))
 	}
 	}
 
-/* (. x y) is the concatenation of strings x and y. */
+// (. x y) is the concatenation of strings x and y.
 value type_concat(value f)
 	{
 	return op_str2(f,str_concat);
 	}
 
-/* (length x) is the length of string x */
+// (length x) is the length of string x
 value type_length(value f)
 	{
 	if (!f->L) return 0;
@@ -128,8 +128,8 @@ value type_length(value f)
 	}
 	}
 
-/* (slice str pos len) calls str_slice, except it returns void if pos or len is
-negative. */
+// (slice str pos len) calls str_slice, except it returns void if pos or len is
+// negative.
 value type_slice(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
@@ -155,7 +155,7 @@ value type_slice(value f)
 	}
 	}
 
-/* (search haystack needle offset) calls str_search. */
+// (search haystack needle offset) calls str_search.
 value type_search(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
@@ -188,7 +188,7 @@ value type_search(value f)
 	}
 	}
 
-/* Convert string to number if possible. */
+// Convert string to number if possible.
 value type_str_num(value f)
 	{
 	if (!f->L) return 0;
@@ -209,7 +209,7 @@ value type_str_num(value f)
 	}
 	}
 
-/* (ord x) is the ordinal number of the first ASCII character of string x. */
+// (ord x) is the ordinal number of the first ASCII character of string x.
 value type_ord(value f)
 	{
 	if (!f->L) return 0;
@@ -227,7 +227,7 @@ value type_ord(value f)
 	}
 	}
 
-/* (chr x) is the ASCII character whose ordinal number is x. */
+// (chr x) is the ASCII character whose ordinal number is x.
 value type_chr(value f)
 	{
 	if (!f->L) return 0;
@@ -246,8 +246,8 @@ value type_chr(value f)
 	}
 	}
 
-/* (char_width str pos) Return the width of the UTF-8 character which starts at
-the given position. */
+// (char_width str pos) Return the width of the UTF-8 character which starts at
+// the given position.
 value type_char_width(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
@@ -283,8 +283,8 @@ value type_char_width(value f)
 value type_dirname(value f) { return op_str(f,dirname); }
 value type_basename(value f) { return op_str(f,basename); }
 
-/* (length_common x y) Return the number of initial bytes which x and y have in
-common. */
+// (length_common x y) Return the number of initial bytes which x and y have in
+// common.
 value type_length_common(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
@@ -301,16 +301,15 @@ value type_length_common(value f)
 	}
 	}
 
-/* (compare_at pos x y LT EQ GT)
-Compare the corresponding characters at offset pos and return LT, EQ, or GT.
-Equivalent to:
-
-	(\pos\x\y\LT\EQ\GT
-	\cx=(slice x pos 1)
-	\cy=(slice y pos 1)
-	gt cx cy GT; lt cx cy LT; EQ
-	)
-*/
+// (compare_at pos x y LT EQ GT)
+// Compare the corresponding characters at offset pos and return LT, EQ, or GT.
+// Equivalent to:
+//
+//     (\pos\x\y\LT\EQ\GT
+//     \cx=(slice x pos 1)
+//     \cy=(slice y pos 1)
+//     gt cx cy GT; lt cx cy LT; EQ
+//     )
 value type_compare_at(value f)
 	{
 	if (0
@@ -368,8 +367,8 @@ static unsigned long list_length(value p)
 	return len;
 	}
 
-/* Collect a vector of raw (char *) strings from a list and pass it to the op
-function.  Any item that is not a string ends the list. */
+// Collect a vector of raw (char *) strings from a list and pass it to the op
+// function.  Any item that is not a string ends the list.
 value op_argv(value f, value op(const char *const *argv))
 	{
 	if (!f->L) return 0;
@@ -389,7 +388,7 @@ value op_argv(value f, value op(const char *const *argv))
 		argv[pos++] = str_data(item);
 		p = p->R;
 		}
-	argv[pos] = 0; /* ending sentinel */
+	argv[pos] = 0; // ending sentinel
 
 	f = op(argv);
 

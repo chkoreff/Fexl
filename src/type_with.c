@@ -17,7 +17,7 @@ static int cmp_key(value x, value y)
 		return 0;
 	}
 
-/* Look up the value associated with a key. */
+// Look up the value associated with a key.
 value type_assoc(value f)
 	{
 	if (!f->L->L->L->L) return 0;
@@ -45,11 +45,10 @@ static value Qassoc(value key, value val, value obj)
 	return V(type_assoc,A(A(hold(QI),key),val),obj);
 	}
 
-/* (with key val obj)
-Return a function like obj but with key defined as val.
-Equivalent to:
-\with=(\key\val\obj \obj=obj \x eq x key val; obj x)
-*/
+// (with key val obj)
+// Return a function like obj but with key defined as val.
+// Equivalent to:
+// \with=(\key\val\obj \obj=obj \x eq x key val; obj x)
 value type_with(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;
@@ -66,8 +65,8 @@ value type_is_obj(value f)
 	return op_is_type(f,type_assoc);
 	}
 
-/* (split_obj obj next) = (next key val tail), where key and val are the first
-pair in the object, and tail is the value following the first pair. */
+// (split_obj obj next) = (next key val tail), where key and val are the first
+// pair in the object, and tail is the value following the first pair.
 value type_split_obj(value f)
 	{
 	if (!f->L || !f->L->L) return 0;
@@ -88,19 +87,18 @@ value type_split_obj(value f)
 	}
 	}
 
-/* (fetch v k x)
-Return the value at key k in index v.  If no value, store the value of x in
-the index so you get the same value next time.  Equivalent to:
-
-\fetch=
-	(\v\k\x
-	\y=(var_get v k)
-	is_defined y y;
-	\x=x
-	var_put v (with k x; var_get v)
-	x
-	)
-*/
+// (fetch v k x)
+// Return the value at key k in index v.  If no value, store the value of x in
+// the index so you get the same value next time.  Equivalent to:
+//
+// \fetch=
+//     (\v\k\x
+//     \y=(var_get v k)
+//     is_defined y y;
+//     \x=x
+//     var_put v (with k x; var_get v)
+//     x
+//     )
 value type_fetch(value f)
 	{
 	if (!f->L || !f->L->L || !f->L->L->L) return 0;

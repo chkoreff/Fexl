@@ -1,5 +1,5 @@
-/* Reference https://nacl.cr.yp.to/ */
-/* Reference https://tweetnacl.cr.yp.to/software.html */
+// Reference https://nacl.cr.yp.to/
+// Reference https://tweetnacl.cr.yp.to/software.html
 
 #include <stdint.h>
 
@@ -13,8 +13,8 @@
 #include <nacl.h>
 #include <sha256.h>
 #include <sha512.h>
-#include <stdio.h> /* fopen */
-#include <string.h> /* memcpy memset */
+#include <stdio.h> // fopen
+#include <string.h> // memcpy memset
 
 static FILE *fh_random;
 
@@ -43,7 +43,7 @@ static void read_random_bytes(u8 *result, unsigned long num_bytes)
 	}
 	}
 
-/* Return a string of n random bytes. */
+// Return a string of n random bytes.
 string str_random_bytes(unsigned long num_bytes)
 	{
 	string str = str_new(num_bytes);
@@ -51,13 +51,13 @@ string str_random_bytes(unsigned long num_bytes)
 	return str;
 	}
 
-/* Return a string of 24 random bytes. */
+// Return a string of 24 random bytes.
 string str_random_nonce(void)
 	{
 	return str_random_bytes(24);
 	}
 
-/* Return a string of 32 random bytes. */
+// Return a string of 32 random bytes.
 string str_random_secret_key(void)
 	{
 	return str_random_bytes(32);
@@ -76,17 +76,15 @@ static string op_public(void op(u8 *pk, const u8 *sk), string secret_key)
 	}
 	}
 
-/* Map the 32-byte secret_key to the corresponding 32-byte public box key.  */
+// Map the 32-byte secret_key to the corresponding 32-byte public box key.
 string str_nacl_box_public(string secret_key)
 	{ return op_public(nacl_box_public,secret_key); }
 
-/*
-Combine the 32-byte public and secret key into a 32-byte composite key which is
-used with str_nacl_box_seal and str_nacl_box_open.
-
-When sending, use the recipient's public key and the sender's secret key.
-When receiving, use the sender's public key and the recipient's secret key.
-*/
+// Combine the 32-byte public and secret key into a 32-byte composite key which
+// is used with str_nacl_box_seal and str_nacl_box_open.
+//
+// When sending, use the recipient's public key and the sender's secret key.
+// When receiving, use the sender's public key and the recipient's secret key.
 string str_nacl_box_prepare(string public_key, string secret_key)
 	{
 	if (public_key->len != 32) return 0;
@@ -146,20 +144,20 @@ static string op_box_pad
 	}
 	}
 
-/* Encrypt the plain text. */
+// Encrypt the plain text.
 string str_nacl_box_seal(string text, string nonce, string key)
 	{ return op_box_pad(nacl_box_seal,32,16,text,nonce,key); }
 
-/* Decrypt the crypt text. */
+// Decrypt the crypt text.
 string str_nacl_box_open(string crypt_text, string nonce, string key)
 	{ return op_box_pad(nacl_box_open,16,32,crypt_text,nonce,key); }
 
-/* Map the 32-byte secret_key to the corresponding 32-byte public sign key. */
+// Map the 32-byte secret_key to the corresponding 32-byte public sign key.
 string str_nacl_sign_public(string secret_key)
 	{ return op_public(nacl_sign_public,secret_key); }
 
-/* Return the 64-byte signature of the text using the 32-byte public_key and
-32-byte secret_key. */
+// Return the 64-byte signature of the text using the 32-byte public_key and
+// 32-byte secret_key.
 string str_nacl_sign_seal(string text, string public_key, string secret_key)
 	{
 	string result;
@@ -182,7 +180,7 @@ string str_nacl_sign_seal(string text, string public_key, string secret_key)
 	return result;
 	}
 
-/* Validate the signature on the text and return 1 if valid or 0 if invalid. */
+// Validate the signature on the text and return 1 if valid or 0 if invalid.
 int str_nacl_sign_open(string text, string public_key, string signature)
 	{
 	int ok;
@@ -207,7 +205,7 @@ int str_nacl_sign_open(string text, string public_key, string signature)
 	return ok;
 	}
 
-/* Return the 32 byte SHA-256 hash of the text. */
+// Return the 32 byte SHA-256 hash of the text.
 string str_sha256(string text)
 	{
 	string hash = str_new(32);
@@ -215,7 +213,7 @@ string str_sha256(string text)
 	return hash;
 	}
 
-/* Return the 64 byte SHA-512 hash of the text. */
+// Return the 64 byte SHA-512 hash of the text.
 string str_sha512(string text)
 	{
 	string hash = str_new(64);
@@ -223,7 +221,7 @@ string str_sha512(string text)
 	return hash;
 	}
 
-/* Pack a base 64 format string into raw bytes. */
+// Pack a base 64 format string into raw bytes.
 string str_pack64(string text)
 	{
 	u64 n = text->len;
@@ -239,7 +237,7 @@ string str_pack64(string text)
 	return out;
 	}
 
-/* Unpack raw bytes into a base 64 format string. */
+// Unpack raw bytes into a base 64 format string.
 string str_unpack64(string text)
 	{
 	u64 n = text->len;
@@ -249,11 +247,10 @@ string str_unpack64(string text)
 	return out;
 	}
 
-/* Compute the HMAC value of the text using the key, using the given hash
-function and blocksize.  If the key is longer than blocksize, only the first
-blocksize bytes of the key are used.  If you want to use a key longer than
-blocksize bytes, you should hash it first.
-*/
+// Compute the HMAC value of the text using the key, using the given hash
+// function and blocksize.  If the key is longer than blocksize, only the first
+// blocksize bytes of the key are used.  If you want to use a key longer than
+// blocksize bytes, you should hash it first.
 static string str_hmac
 	(
 	void (*hash)(u8 digest[], const u8 *data, u64 n_data_byte),
@@ -296,13 +293,13 @@ static string str_hmac
 	return mac;
 	}
 
-/* Compute the HMAC-SHA512 value of the text using the key. */
+// Compute the HMAC-SHA512 value of the text using the key.
 string str_hmac_sha512(string text, string key)
 	{
 	return str_hmac(sha512,128,text,key);
 	}
 
-/* Compute the HMAC-SHA256 value of the text using the key. */
+// Compute the HMAC-SHA256 value of the text using the key.
 string str_hmac_sha256(string text, string key)
 	{
 	return str_hmac(sha256,64,text,key);

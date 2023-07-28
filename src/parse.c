@@ -12,57 +12,55 @@
 #include <type_sym.h>
 #include <type_tuple.h>
 
-/*
-Fexl grammar:
-[
-exp     =>  empty
-exp     =>  exp factor
-
-factor  =>  "\;" exp
-factor  =>  "\=" exp
-factor  =>  "\" name def exp      # eager substitution
-factor  =>  "\\" name def exp     # direct substitution
-factor  =>  ";" exp
-factor  =>  term
-
-def     =>  empty
-def     =>  "=" term
-
-term    =>  "(" exp ")"
-term    =>  "[" items "]"
-term    =>  "{" items "}"
-term    =>  string
-term    =>  name
-
-items   =>  empty
-items   =>  term items
-items   =>  ";" exp
-
-string  =>  quote_string
-string  =>  tilde_string
-]
-
-The parser reads an expression from the input until it reaches end of file or
-the special token "\#" which acts like end of file.  It skips white space and
-comments which appear before syntactic elements.  White space is any character
-with an ASCII value less than or equal to ' ' (SPACE).  A comment starts with
-'#' and continues through end of line.
-
-The "empty" element means end of file.
-
-A "name" is any sequence of characters other than white space or these:
-	\ ( ) [ ] { } ; " ~ # =
-
-A "quote_string" starts with a '"' (QU), followed by any sequence of characters
-other than QU, followed by a closing QU.
-
-A "tilde_string" is a sequence of arbitrary characters enclosed within a pair
-of delimiters of your choice.  It starts with a delimiter, which is a '~'
-(tilde), then zero or more non white characters, then a single white space
-which ends the delimiter and is ignored.  That initial delimiter is followed by
-a sequence of characters which constitute the actual content of the string,
-terminated by a repeat occurrence of the delimiter.
-*/
+// Fexl grammar:
+// [
+// exp     =>  empty
+// exp     =>  exp factor
+//
+// factor  =>  "\;" exp
+// factor  =>  "\=" exp
+// factor  =>  "\" name def exp      # eager substitution
+// factor  =>  "\\" name def exp     # direct substitution
+// factor  =>  ";" exp
+// factor  =>  term
+//
+// def     =>  empty
+// def     =>  "=" term
+//
+// term    =>  "(" exp ")"
+// term    =>  "[" items "]"
+// term    =>  "{" items "}"
+// term    =>  string
+// term    =>  name
+//
+// items   =>  empty
+// items   =>  term items
+// items   =>  ";" exp
+//
+// string  =>  quote_string
+// string  =>  tilde_string
+// ]
+//
+// The parser reads an expression from the input until it reaches end of file
+// or the special token "\#" which acts like end of file.  It skips white space
+// and comments which appear before syntactic elements.  White space is any
+// character with an ASCII value less than or equal to ' ' (SPACE).  A comment
+// starts with '#' and continues through end of line.
+//
+// The "empty" element means end of file.
+//
+// A "name" is any sequence of characters other than white space or these:
+//   \ ( ) [ ] { } ; " ~ # =
+//
+// A "quote_string" starts with a '"' (QU), followed by any sequence of
+// characters other than QU, followed by a closing QU.
+//
+// A "tilde_string" is a sequence of arbitrary characters enclosed within a
+// pair of delimiters of your choice.  It starts with a delimiter, which is a
+// '~' (tilde), then zero or more non white characters, then a single white
+// space which ends the delimiter and is ignored.  That initial delimiter is
+// followed by a sequence of characters which constitute the actual content of
+// the string, terminated by a repeat occurrence of the delimiter.
 
 static value cur_label; // label of current input stream
 
