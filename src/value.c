@@ -95,6 +95,11 @@ void end_value(void)
 	end_memory();
 	}
 
+value keep(value fun, value f)
+	{
+	return V(fun->T,hold(fun),hold(f->R));
+	}
+
 // Return a value of type T with the given left and right side.
 value V(type T, value L, value R)
 	{
@@ -117,30 +122,10 @@ value Qdouble(type T, value L, double x)
 	return f;
 	}
 
-// Apply x to y where x is known to be already evaluated.
-value AV(value x, value y)
-	{
-	return V(x->T,x,y);
-	}
-
-// The type for function application
-value type_A(value f)
-	{
-	value x = arg(f->L);
-	if (x == f->L)
-		{
-		f->T = x->T;
-		drop(x);
-		return hold(f);
-		}
-	else
-		return AV(x,hold(f->R));
-	}
-
 // Apply x to y.
 value A(value x, value y)
 	{
-	return V(type_A,x,y);
+	return V(0,x,y);
 	}
 
 unsigned long cur_steps;
@@ -148,13 +133,14 @@ unsigned long cur_steps;
 // Reduce the value until done.
 value eval(value f)
 	{
-	while (1)
+	while (f->T == 0)
 		{
-		value g = f->T(f);
-		if (g == 0) break;
-		cur_steps++;
+		value fun = eval(hold(f->L));
+		value g = fun->T(fun,f);
+		drop(fun);
 		drop(f);
 		f = g;
+		cur_steps++;
 		}
 	return f;
 	}

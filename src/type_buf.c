@@ -11,9 +11,9 @@ buffer get_buf(value x)
 	return x->v_ptr;
 	}
 
-value type_buf(value f)
+value type_buf(value fun, value f)
 	{
-	return type_data(f);
+	return type_data(fun,f);
 	}
 
 static void clear_buf(value f)
@@ -22,19 +22,20 @@ static void clear_buf(value f)
 	}
 
 // buf_new returns a new empty character buffer.
-value type_buf_new(value f)
+value type_buf_new(value fun, value f)
 	{
 	static struct value clear = {{.N=0}, {.clear=clear_buf}};
+	(void)fun;
 	(void)f;
 	return V(type_buf,&clear,(value)buf_new());
 	}
 
 // (buf_put buf str) Appends the string to the buffer.
-value type_buf_put(value f)
+value type_buf_put(value fun, value f)
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (fun->L == 0) return keep(fun,f);
 	{
-	value x = arg(f->L->R);
+	value x = arg(fun->R);
 	value y = arg(f->R);
 	if (x->T == type_buf && y->T == type_str)
 		{
@@ -51,16 +52,14 @@ value type_buf_put(value f)
 
 // (buf_get buf) Clear the buffer and return str, where str is the current
 // content of the buffer.
-value type_buf_get(value f)
-	{
-	if (!f->L) return 0;
+value type_buf_get(value fun, value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_buf)
 		f = Qstr(buf_clear(get_buf(x)));
 	else
 		f = hold(Qvoid);
+	(void)fun;
 	drop(x);
 	return f;
-	}
 	}

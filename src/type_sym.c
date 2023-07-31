@@ -40,9 +40,9 @@ static void clear_form(value f)
 	free_memory(form,sizeof(struct form));
 	}
 
-value type_form(value f)
+value type_form(value fun, value f)
 	{
-	return type_data(f);
+	return type_data(fun,f);
 	}
 
 value Qform(struct form form)
@@ -178,7 +178,7 @@ struct form form_appv(struct form fun, struct form arg)
 // Apply function to argument.
 struct form form_app(struct form fun, struct form arg)
 	{
-	return form_join(type_A,fun,arg);
+	return form_join(0,fun,arg);
 	}
 
 // Delete the symbol with the given name and return the associated pattern.
@@ -219,27 +219,10 @@ static value table_pop(string name, struct table *xt)
 	return pattern;
 	}
 
-value type_pattern(value f)
-	{
-	(void)f;
-	return 0;
-	}
-
-static void clear_pattern(value f)
-	{
-	drop(f->R);
-	}
-
-static value wrap_pattern(value pattern)
-	{
-	static struct value clear = {{.N=0}, {.clear=clear_pattern}};
-	return V(type_pattern,&clear,pattern);
-	}
-
 // Abstract the name from the body.
 struct form form_lam(type type, string name, struct form body)
 	{
-	value pattern = wrap_pattern(table_pop(name,body.table));
+	value pattern = table_pop(name,body.table);
 	str_free(name);
 	body.exp = V(type,pattern,body.exp);
 	return body;
@@ -247,7 +230,6 @@ struct form form_lam(type type, string name, struct form body)
 
 // Use pattern p to make a copy of expression e with argument x substituted in
 // the places designated by the pattern.
-
 static value subst(value p, value e, value x)
 	{
 	if (p == QF) return hold(e);
@@ -256,22 +238,18 @@ static value subst(value p, value e, value x)
 	}
 
 // Direct substitution
-value type_D(value f)
+value type_D(value fun, value f)
 	{
-	if (f->L->T == type_pattern) return 0;
-	return subst(f->L->L->R,f->L->R,f->R);
+	return subst(fun->L,fun->R,f->R);
 	}
 
 // Eager substitution
-value type_E(value f)
-	{
-	if (f->L->T == type_pattern) return 0;
+value type_E(value fun, value f)
 	{
 	value x = arg(f->R);
-	f = subst(f->L->L->R,f->L->R,x);
+	value g = subst(fun->L,fun->R,x);
 	drop(x);
-	return f;
-	}
+	return g;
 	}
 
 static int is_closed(struct table *xt)
@@ -280,9 +258,7 @@ static int is_closed(struct table *xt)
 	}
 
 // Return true if the form has no undefined symbols.
-value type_is_closed(value f)
-	{
-	if (!f->L) return 0;
+value type_is_closed(value fun, value f)
 	{
 	value exp = arg(f->R);
 	if (exp->T == type_form)
@@ -293,8 +269,8 @@ value type_is_closed(value f)
 	else
 		f = hold(Qvoid);
 	drop(exp);
+	(void)fun;
 	return f;
-	}
 	}
 
 // Define key as val in a form.
@@ -363,16 +339,17 @@ static value def(const char *key, value val, value exp)
 		}
 	}
 
-value type_def(value f)
+value type_def(value fun, value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	if (fun->L == 0) return keep(fun,f);
+	if (fun->L->L == 0) return keep(fun,f);
 	{
-	value key = arg(f->L->L->R);
+	value key = arg(fun->L->R);
 	if (key->T == type_str)
 		{
 		value exp = arg(f->R);
 		if (exp->T == type_form)
-			f = def(str_data(key),f->L->R,exp);
+			f = def(str_data(key),fun->R,exp);
 		else
 			f = hold(Qvoid);
 		drop(exp);
@@ -386,9 +363,7 @@ value type_def(value f)
 
 // Evaluate the form if all symbols are defined, otherwise report the undefined
 // symbols and die.
-value type_value(value f)
-	{
-	if (!f->L) return 0;
+value type_value(value fun, value f)
 	{
 	value exp = arg(f->R);
 	if (exp->T == type_form)
@@ -413,15 +388,15 @@ value type_value(value f)
 	else
 		f = hold(Qvoid);
 	drop(exp);
+	(void)fun;
 	return f;
-	}
 	}
 
 // Like type_value, except it yields the form value to the caller without
 // evaluating it.
-value type_resolve(value f)
+value type_resolve(value fun, value f)
 	{
-	f = type_value(f);
+	f = type_value(fun,f);
 	if (f) f = yield(f);
 	return f;
 	}
@@ -433,9 +408,7 @@ int match(const char *other)
 	return strcmp(cur_name,other) == 0;
 	}
 
-value op_resolve(value f, value define(void))
-	{
-	if (!f->L) return 0;
+value op_resolve(value fun, value f, value define(void))
 	{
 	value exp = arg(f->R);
 	if (exp->T == type_form)
@@ -495,6 +468,6 @@ value op_resolve(value f, value define(void))
 	else
 		f = hold(Qvoid);
 	drop(exp);
+	(void)fun;
 	return f;
-	}
 	}

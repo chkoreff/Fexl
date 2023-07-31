@@ -1,12 +1,12 @@
 \out=
 ~
 == benchmark nested
-inner: val 479 steps 12 bytes 96
-outer: val 479 steps 53 bytes 704
+inner: val 479 steps 8 bytes 160
+outer: val 479 steps 36 bytes 736
 == benchmark large list
-result: val 32768 steps 885137 bytes 1574048
+result: val 32768 steps 688373 bytes 1574080
 == benchmark negative memory usage
-result: val  steps 3 bytes -9
+result: val  steps 2 bytes 32
 ~
 \err=
 ~

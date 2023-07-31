@@ -14,9 +14,9 @@ static void clear_num(value f)
 	(void)f;
 	}
 
-value type_num(value f)
+value type_num(value fun, value f)
 	{
-	return type_data(f);
+	return type_data(fun,f);
 	}
 
 value Qnum(double x)
@@ -40,9 +40,7 @@ unsigned long get_ulong(value x)
 	return n >= 0 ? n : 0;
 	}
 
-value type_num_str(value f)
-	{
-	if (!f->L) return 0;
+value type_num_str(value fun, value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
@@ -50,11 +48,11 @@ value type_num_str(value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
+	(void)fun;
 	return f;
 	}
-	}
 
-value type_is_num(value f)
+value type_is_num(value fun, value f)
 	{
-	return op_is_type(f,type_num);
+	return op_is_type(fun,f,type_num);
 	}

@@ -15,13 +15,13 @@
 
 // (parse stream label) Parse the stream, using the given label for any syntax
 // error messages, and return the resulting form.
-value type_parse(value f)
+value type_parse(value fun, value f)
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (fun->L == 0) return keep(fun,f);
 	{
 	value label = arg(f->R);
 	if (label->T == type_str)
-		f = parse_fexl(arg(f->L->R),label);
+		f = parse_fexl(arg(fun->R),label);
 	else
 		f = hold(Qvoid);
 	drop(label);
@@ -45,9 +45,7 @@ static value use_file(value name)
 	}
 
 // (use_file name) Parse the named file.
-value type_use_file(value f)
-	{
-	if (!f->L) return 0;
+value type_use_file(value fun, value f)
 	{
 	value name = arg(f->R);
 	if (name->T == type_str)
@@ -55,6 +53,6 @@ value type_use_file(value f)
 	else
 		f = hold(Qvoid);
 	drop(name);
+	(void)fun;
 	return f;
-	}
 	}

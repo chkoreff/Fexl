@@ -43,9 +43,7 @@ void init_signal(void)
 // server processes so they don't wait forever for input from the client.  If
 // the alarm goes off it will interrupt the system call (fget, fread, etc.) and
 // the process can exit.
-value type_set_alarm(value f)
-	{
-	if (!f->L) return 0;
+value type_set_alarm(value fun, value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
@@ -56,6 +54,6 @@ value type_set_alarm(value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
+	(void)fun;
 	return f;
-	}
 	}

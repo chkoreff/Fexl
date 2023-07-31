@@ -54,9 +54,7 @@ static string pack(string str_hex)
 	}
 
 // Map raw bytes to their hexadecimal values.
-value type_unpack(value f)
-	{
-	if (!f->L) return 0;
+value type_unpack(value fun, value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
@@ -64,14 +62,12 @@ value type_unpack(value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
+	(void)fun;
 	return f;
-	}
 	}
 
 // Map a string specified in hexadecimal into the raw bytes.
-value type_pack(value f)
-	{
-	if (!f->L) return 0;
+value type_pack(value fun, value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
@@ -79,6 +75,6 @@ value type_pack(value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
+	(void)fun;
 	return f;
-	}
 	}

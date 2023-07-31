@@ -22,17 +22,17 @@
 int main_argc;
 const char **main_argv;
 
-value type_die(value f)
+value type_die(value fun, value f)
 	{
 	die(0);
-	return f;
+	(void)fun;
+	(void)f;
+	return hold(QI);
 	}
 
 // (argv i) Return the command line argument at position i (starting at 0), or
 // void if no such position.
-value type_argv(value f)
-	{
-	if (!f->L) return 0;
+value type_argv(value fun, value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
@@ -46,13 +46,11 @@ value type_argv(value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
+	(void)fun;
 	return f;
 	}
-	}
 
-static value op_sleep(value f, unsigned int op(unsigned int))
-	{
-	if (!f->L) return 0;
+static value op_sleep(value fun, value f, unsigned int op(unsigned int))
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
@@ -64,20 +62,20 @@ static value op_sleep(value f, unsigned int op(unsigned int))
 	else
 		f = hold(Qvoid);
 	drop(x);
+	(void)fun;
 	return f;
-	}
 	}
 
 // (sleep n) Sleep for the specified number of seconds.
-value type_sleep(value f)
+value type_sleep(value fun, value f)
 	{
-	return op_sleep(f,sleep);
+	return op_sleep(fun,f,sleep);
 	}
 
 // (usleep n) Sleep for the specified number of microseconds.
-value type_usleep(value f)
+value type_usleep(value fun, value f)
 	{
-	return op_sleep(f,(unsigned int (*)(unsigned int))usleep);
+	return op_sleep(fun,f,(unsigned int (*)(unsigned int))usleep);
 	}
 
 static void do_pipe(int fd[])
@@ -128,9 +126,9 @@ static int do_wait(pid_t pid)
 // handler function which receives the child's exit status when the child
 // process terminates.
 
-static value op_process(value f, int catch_stderr)
+static value op_process(value fun, value f, int catch_stderr)
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (fun->L == 0) return keep(fun,f);
 	{
 	// Flush the parent's stdout and stderr to prevent any pending output from
 	// being accidentally pushed into the child's input.  I've noticed this can
@@ -175,7 +173,7 @@ static value op_process(value f, int catch_stderr)
 			do_close(pe_ce[0]);
 
 		// Evaluate the child, interacting with parent.
-		drop(eval(hold(f->L->R)));
+		drop(eval(hold(fun->R)));
 
 		// Exit to avoid continuing with evaluation.
 		exit(0);
@@ -203,7 +201,7 @@ static value op_process(value f, int catch_stderr)
 		// Wait for child to complete and pass in the status.
 		{
 		int status = do_wait(pid);
-		return AV(exp,Qnum(status));
+		return A(exp,Qnum(status));
 		}
 		}
 	}
@@ -219,18 +217,18 @@ static value op_process(value f, int catch_stderr)
 // The child's stderr goes to the same destination as the parent's stderr,
 // which is typically what you want when implementing a server with an error
 // log.
-value type_run_process(value f)
+value type_run_process(value fun, value f)
 	{
-	return op_process(f,0);
+	return op_process(fun,f,0);
 	}
 
 // (spawn fn_child fn_parent)
 //
 // Interact with the fn_child function as a separate process, with the
 // fn_parent receiving handles to the child's stdin, stdout, and stderr.
-value type_spawn(value f)
+value type_spawn(value fun, value f)
 	{
-	return op_process(f,1);
+	return op_process(fun,f,1);
 	}
 
 static void die_perror(const char *msg)
@@ -373,13 +371,15 @@ static void server_process(value v_interact, int fd_listen)
 // Also:
 // lsof -i4TCP@127.0.0.1:2186 -t
 
-value type_start_server(value f)
+value type_start_server(value fun, value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
+	if (fun->L == 0) return keep(fun,f);
+	if (fun->L->L == 0) return keep(fun,f);
+	if (fun->L->L->L == 0) return keep(fun,f);
 	{
-	value v_ip = arg(f->L->L->L->R);
-	value v_port = arg(f->L->L->R);
-	value v_error_log = arg(f->L->R);
+	value v_ip = arg(fun->L->L->R);
+	value v_port = arg(fun->L->R);
+	value v_error_log = arg(fun->R);
 	value v_interact = hold(f->R);
 
 	if (v_ip->T == type_str &&
@@ -439,11 +439,11 @@ value type_start_server(value f)
 	}
 
 // (kill pid sig)
-value type_kill(value f)
+value type_kill(value fun, value f)
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (fun->L == 0) return keep(fun,f);
 	{
-	value v_pid = arg(f->L->R);
+	value v_pid = arg(fun->R);
 	value v_sig = arg(f->R);
 	if (v_pid->T == type_num && v_sig->T == type_num)
 		{
@@ -469,11 +469,11 @@ value type_kill(value f)
 
 // (connect ip port) Connect to the ip address and port and return the file
 // handle for the connection.
-value type_connect(value f)
+value type_connect(value fun, value f)
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (fun->L == 0) return keep(fun,f);
 	{
-	value x = arg(f->L->R);
+	value x = arg(fun->R);
 	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_num)
 		{
@@ -519,16 +519,14 @@ static value do_exec(const char *const *argv)
 
 // (exec argv) Call execv with the given argument list.  The first argument is
 // the full path of the executable program.  This call does not return.
-value type_exec(value f)
+value type_exec(value fun, value f)
 	{
-	return op_argv(f,do_exec);
+	return op_argv(fun,f,do_exec);
 	}
 
 // (receive_keystrokes fn)
 // Run the function while receiving individual keystrokes.
-value type_receive_keystrokes(value f)
-	{
-	if (!f->L) return 0;
+value type_receive_keystrokes(value fun, value f)
 	{
 	struct termios attr;
 	tcflag_t save_c_lflag;
@@ -547,16 +545,16 @@ value type_receive_keystrokes(value f)
 	attr.c_lflag = save_c_lflag;
 	tcsetattr(0, TCSANOW, &attr);
 
+	(void)fun;
 	return f;
-	}
 	}
 
 // (fexl_benchmark x next) Evaluate x and return (next val steps bytes), where
 // val is the value of x, steps is the number of reduction steps, and bytes is
 // the number of memory bytes used.
-value type_fexl_benchmark(value f)
+value type_fexl_benchmark(value fun, value f)
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (fun->L == 0) return keep(fun,f);
 	clear_free_list();
 	{
 	unsigned long beg_steps = cur_steps;
@@ -565,7 +563,7 @@ value type_fexl_benchmark(value f)
 	cur_steps = 0;
 
 	{
-	value x = arg(f->L->R);
+	value x = arg(fun->R);
 	double steps = (double)cur_steps;
 	double bytes = (double)cur_bytes - (double)beg_bytes;
 	f = A(A(A(hold(f->R),x),Qnum(steps)),Qnum(bytes));

@@ -14,114 +14,119 @@ value Qonce;
 value Qyield;
 
 // (I x) = x
-value type_I(value f)
+value type_I(value fun, value f)
 	{
-	if (!f->L) return 0;
+	(void)fun;
+	(void)f;
 	return hold(f->R);
 	}
 
 // (T x y) = x
-value type_T(value f)
+value type_T(value fun, value f)
 	{
-	if (!f->L || !f->L->L) return 0;
-	return hold(f->L->R);
+	if (fun->L == 0) return keep(fun,f);
+	return hold(fun->R);
 	}
 
 // (F x y) = y
-value type_F(value f)
+value type_F(value fun, value f)
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (fun->L == 0) return keep(fun,f);
 	return hold(f->R);
 	}
 
 // (Y x) = (x (Y x))
-value type_Y(value f)
+value type_Y(value fun, value f)
 	{
-	if (!f->L) return 0;
-	return AV(arg(f->R),hold(f));
+	return A(hold(f->R),A(hold(fun),hold(f->R)));
 	}
 
-value type_data(value f)
+value type_data(value fun, value f)
 	{
-	if (!f->L->N) return 0;
+	(void)fun;
+	(void)f;
 	return hold(Qvoid);
 	}
 
 // (void x) = void
-value type_void(value f)
+value type_void(value fun, value f)
 	{
-	if (!f->L) return 0;
+	(void)fun;
+	(void)f;
 	return hold(Qvoid);
+	}
+
+// LATER 20230731 The type_link is never called, and is only used for direct
+// linked lists.  I will simplify the handling of lists eliminate this.
+value type_link(value fun, value f)
+	{
+	return keep(fun,f);
 	}
 
 // Wrap list function around data if necessary.
 value wrap(value x)
 	{
-	if (x->T == 0)
-		return AV(hold(Qlist),hold(x));
+	if (x->T == type_link)
+		return V(type_list,hold(Qlist),hold(x));
 	else
 		return hold(x);
 	}
 
 // ([x;y] a b) = (b x y)
-value type_list(value f)
+value type_list(value fun, value f)
 	{
-	if (!f->L->L || !f->L->L->L) return 0;
+	if (fun->L->L == 0) return keep(fun,f);
 	{
-	value z = f->L->L->R;
-	value x = hold(z->L);
-	value y = wrap(z->R);
-
-	return AV(eval(AV(arg(f->R),x)),y);
+	value x = hold(fun->L->R->L);
+	value y = wrap(fun->L->R->R);
+	return A(A(hold(f->R),x),y);
 	}
 	}
 
 // (cons x y a b) = (b x y)
-value type_cons(value f)
+value type_cons(value fun, value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L || !f->L->L->L->L) return 0;
+	if (fun->L == 0) return keep(fun,f);
+	if (fun->L->L == 0) return keep(fun,f);
+	if (fun->L->L->L == 0) return keep(fun,f);
 	{
-	value z = f->L->L;
-	value x = hold(z->L->R);
-	value y = hold(z->R);
-
-	return AV(eval(AV(arg(f->R),x)),y);
+	value x = hold(fun->L->L->R);
+	value y = hold(fun->L->R);
+	value g = A(A(hold(f->R),x),y);
+	return g;
 	}
 	}
 
 // (null a b) = a
-value type_null(value f)
+value type_null(value fun, value f)
 	{
-	return type_T(f);
+	return type_T(fun,f);
 	}
 
 // (eval x f) = (f y), where y is the final value of x.
-value type_eval(value f)
+value type_eval(value fun, value f)
 	{
-	if (!f->L || !f->L->L) return 0;
-	{
-	value y = arg(f->L->R);
-	return AV(arg(f->R),y);
-	}
+	if (fun->L == 0) return keep(fun,f);
+	return A(hold(f->R),arg(fun->R));
 	}
 
 // Evaluate x once, replacing the right side with the final value.
-value type_once(value f)
+value type_once(value fun, value f)
 	{
-	f->T = type_I;
-	return hold(f->R = eval(f->R));
+	(void)fun;
+	return (f->R = hold(eval(f->R)));
 	}
 
 // (yield x f) = (f x)  Used for returning an unevaluated function.
-value type_yield(value f)
+value type_yield(value fun, value f)
 	{
-	if (!f->L || !f->L->L) return 0;
-	return AV(arg(f->R),hold(f->L->R));
+	if (fun->L == 0) return keep(fun,f);
+	return A(hold(f->R),hold(fun->R));
 	}
 
 value yield(value x)
 	{
-	return AV(hold(Qyield),x);
+	return V(type_yield,hold(Qyield),x);
 	}
 
 // Return either no or (yes x).
@@ -130,7 +135,7 @@ value maybe(value x)
 	if (x == 0)
 		return hold(QT);
 	else
-		return AV(hold(QT),yield(hold(x)));
+		return V(type_T,hold(QT),yield(hold(x)));
 	}
 
 value boolean(int x)
@@ -138,43 +143,39 @@ value boolean(int x)
 	return hold(x ? QT : QF);
 	}
 
-value type_is_defined(value f)
+value type_is_defined(value fun, value f)
 	{
-	if (!f->L) return 0;
+	(void)fun;
 	return boolean(f->R->T != type_void);
 	}
 
-value type_is_undef(value f)
+value type_is_undef(value fun, value f)
 	{
-	if (!f->L) return 0;
+	(void)fun;
 	return boolean(f->R->T == type_void);
 	}
 
-value op_is_type(value f, type t)
-	{
-	if (!f->L) return 0;
+value op_is_type(value fun, value f, type t)
 	{
 	value x = arg(f->R);
 	f = boolean(x->T == t);
 	drop(x);
+	(void)fun;
 	return f;
 	}
+
+value type_is_void(value fun, value f)
+	{
+	return op_is_type(fun,f,type_void);
 	}
 
-value type_is_void(value f)
-	{
-	return op_is_type(f,type_void);
-	}
-
-static value op_predicate(value f, int op(value x))
-	{
-	if (!f->L) return 0;
+static value op_predicate(value fun, value f, int op(value))
 	{
 	value x = arg(f->R);
 	f = boolean(op(x));
 	drop(x);
+	(void)fun;
 	return f;
-	}
 	}
 
 static int is_good(value x)
@@ -195,23 +196,24 @@ static int is_list(value x)
 		(x->T == type_null && !x->L);
 	}
 
-value type_is_good(value f) { return op_predicate(f,is_good); }
-value type_is_bool(value f) { return op_predicate(f,is_bool); }
-value type_is_list(value f) { return op_predicate(f,is_list); }
+value type_is_good(value fun, value f) { return op_predicate(fun,f,is_good); }
+value type_is_bool(value fun, value f) { return op_predicate(fun,f,is_bool); }
+value type_is_list(value fun, value f) { return op_predicate(fun,f,is_list); }
 
 // \chain==(\a\b\x \x=x \v=(a x) is_defined v v (b x))
-value type_chain(value f)
+value type_chain(value fun, value f)
 	{
-	if (!f->L || !f->L->L || !f->L->L->L) return 0;
+	if (fun->L == 0) return keep(fun,f);
+	if (fun->L->L == 0) return keep(fun,f);
 	{
 	value x = arg(f->R);
-	value v = eval(AV(arg(f->L->L->R),x));
+	value v = eval(A(hold(fun->L->R),x));
 
 	if (v->T != type_void)
 		return v;
 
 	drop(v);
-	return eval(AV(arg(f->L->R),hold(x)));
+	return A(hold(fun->R),hold(x));
 	}
 	}
 
@@ -222,7 +224,7 @@ value expand(value f)
 	while (1)
 		{
 		value x = p->R;
-		if (x->T == 0)
+		if (x->T == type_link)
 			{
 			p = x;
 			continue;
@@ -233,7 +235,7 @@ value expand(value f)
 		if (x->T == type_cons && x->L && x->L->L && !x->L->L->L)
 			{
 			// Change x inline from type_cons to type_list.
-			value data = V(0,hold(x->L->R),arg(x->R));
+			value data = V(type_link,hold(x->L->R),arg(x->R));
 			drop(x->L);
 			drop(x->R);
 			x->T = type_list;
@@ -262,6 +264,12 @@ value expand(value f)
 			}
 		}
 	return f->R;
+	}
+
+// Create a nullary function, supplying a dummy argument.
+value Q0(type T)
+	{
+	return A(Q(T),hold(QI));
 	}
 
 void beg_basic(void)

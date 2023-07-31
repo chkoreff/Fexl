@@ -147,27 +147,27 @@ static value standard(void)
 	if (match("rename")) return Q(type_rename);
 
 	// stream
-	if (match("at_eof")) return Q(type_at_eof);
-	if (match("at_white")) return Q(type_at_white);
-	if (match("skip_white")) return Q(type_skip_white);
-	if (match("at_eol")) return Q(type_at_eol);
+	if (match("at_eof")) return Q0(type_at_eof);
+	if (match("at_white")) return Q0(type_at_white);
+	if (match("skip_white")) return Q0(type_skip_white);
+	if (match("at_eol")) return Q0(type_at_eol);
 	if (match("at_ch")) return Q(type_at_ch);
-	if (match("look")) return Q(type_look);
-	if (match("skip")) return Q(type_skip);
-	if (match("line")) return Q(type_line);
+	if (match("look")) return Q0(type_look);
+	if (match("skip")) return Q0(type_skip);
+	if (match("line")) return Q0(type_line);
 	if (match("buf_keep")) return Q(type_buf_keep);
 	if (match("collect_to_ch")) return Q(type_collect_to_ch);
 	if (match("collect_tilde_string")) return Q(type_collect_tilde_string);
 	if (match("read_stream")) return Q(type_read_stream);
 
-	if (match("time")) return Q(type_time);
+	if (match("time")) return Q0(type_time);
 	if (match("localtime")) return Q(type_localtime);
 	if (match("gmtime")) return Q(type_gmtime);
 	if (match("timelocal")) return Q(type_timelocal);
 	if (match("timegm")) return Q(type_timegm);
-	if (match("microtime")) return Q(type_microtime);
+	if (match("microtime")) return Q0(type_microtime);
 
-	if (match("die")) return Q(type_die);
+	if (match("die")) return Q0(type_die);
 	if (match("argv")) return Q(type_argv);
 	if (match("sleep")) return Q(type_sleep);
 	if (match("usleep")) return Q(type_usleep);
@@ -177,7 +177,7 @@ static value standard(void)
 	if (match("fexl_benchmark")) return Q(type_fexl_benchmark);
 
 	if (match("seed_rand")) return Q(type_seed_rand);
-	if (match("rand")) return Q(type_rand);
+	if (match("rand")) return Q0(type_rand);
 
 	if (match("parse")) return Q(type_parse);
 	if (match("use_file")) return Q(type_use_file);
@@ -188,7 +188,7 @@ static value standard(void)
 	if (match("value")) return Q(type_value);
 	if (match("resolve")) return Q(type_resolve);
 
-	if (match("buf_new")) return Q(type_buf_new);
+	if (match("buf_new")) return Q0(type_buf_new);
 	if (match("buf_put")) return Q(type_buf_put);
 	if (match("buf_get")) return Q(type_buf_get);
 
@@ -197,7 +197,7 @@ static value standard(void)
 	if (match("sget")) return Q(type_sget);
 	if (match("slook")) return Q(type_slook);
 
-	if (match("var_new")) return Q(type_var_new);
+	if (match("var_new")) return Q0(type_var_new);
 	if (match("var_get")) return Q(type_var_get);
 	if (match("var_getf")) return Q(type_var_getf);
 	if (match("var_put")) return Q(type_var_put);
@@ -221,8 +221,8 @@ static value standard(void)
 
 	// crypto functions
 	if (match("random_bytes")) return Q(type_random_bytes);
-	if (match("random_nonce")) return Q(type_random_nonce);
-	if (match("random_secret_key")) return Q(type_random_secret_key);
+	if (match("random_nonce")) return Q0(type_random_nonce);
+	if (match("random_secret_key")) return Q0(type_random_secret_key);
 	if (match("nacl_box_public")) return Q(type_nacl_box_public);
 	if (match("nacl_box_prepare")) return Q(type_nacl_box_prepare);
 	if (match("nacl_box_seal")) return Q(type_nacl_box_seal);
@@ -265,15 +265,15 @@ static value standard(void)
 
 	// dynamic libraries
 	if (match("dlopen")) return Q(type_dlopen);
-	if (match("dlerror")) return Q(type_dlerror);
+	if (match("dlerror")) return Q0(type_dlerror);
 	if (match("dlsym")) return Q(type_dlsym);
 
 	return 0;
 	}
 
-value type_std(value f)
+value type_std(value fun, value f)
 	{
-	return op_resolve(f,standard);
+	return op_resolve(fun,f,standard);
 	}
 
 static void beg_const(void)
@@ -334,16 +334,16 @@ static void eval_script(void)
 		// Get the name of the currently running executable.
 		f = Qstr0(main_argv[0]);
 		// Go two directories up, right above the bin directory.
-		f = AV(Q(type_dirname),f);
-		f = AV(Q(type_dirname),f);
+		f = A(Q(type_dirname),f);
+		f = A(Q(type_dirname),f);
 		// Concatenate the name of the main script.
-		f = AV(AV(Q(type_concat),f),Qstr0("/src/main.fxl"));
+		f = A(A(Q(type_concat),f),Qstr0("/src/main.fxl"));
 		}
 
 	// Now evaluate the script.
-	f = AV(Q(type_use_file),f);
-	f = AV(Q(type_std),f);
-	f = AV(Q(type_value),f);
+	f = A(Q(type_use_file),f);
+	f = A(Q(type_std),f);
+	f = A(Q(type_value),f);
 	f = eval(f);
 	drop(f);
 	}

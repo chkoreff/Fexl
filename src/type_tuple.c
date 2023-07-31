@@ -6,33 +6,27 @@
 
 value Qtuple;
 
-value type_tuple(value f)
+value type_tuple(value fun, value f)
 	{
-	if (!f->L->L)
-		{
-		expand(f);
-		return 0;
-		}
+	expand(fun);
 	{
 	value exp = hold(f->R);
-	value args = f->L->R;
-	while (args->T == 0)
+	value args = fun->R;
+	while (args->T == type_link)
 		{
-		exp = AV(eval(exp),hold(args->L));
+		exp = A(exp,hold(args->L));
 		args = args->R;
 		}
 	return exp;
 	}
 	}
 
-value type_is_tuple(value f)
+value type_is_tuple(value fun, value f)
 	{
-	return op_is_type(f,type_tuple);
+	return op_is_type(fun,f,type_tuple);
 	}
 
-value type_tuple_to_list(value f)
-	{
-	if (!f->L) return 0;
+value type_tuple_to_list(value fun, value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_tuple)
@@ -40,19 +34,21 @@ value type_tuple_to_list(value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
+	(void)fun;
 	return f;
 	}
-	}
 
-value type_list_to_tuple(value f)
+value type_list_to_tuple(value fun, value f)
 	{
-	if (!f->L) return 0;
-	return AV(hold(Qtuple),hold(f->R));
+	(void)fun;
+	return V(type_tuple,hold(Qtuple),hold(f->R));
 	}
 
 value pair(value x, value y)
 	{
-	return AV(hold(Qtuple),V(0,x,V(0,y,hold(Qnull))));
+	return V(type_tuple,hold(Qtuple),
+		V(type_link,x,
+		V(type_link,y,hold(Qnull))));
 	}
 
 void beg_tuple(void)

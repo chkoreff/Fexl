@@ -7,9 +7,9 @@
 // with things like caching, simulating a dynamic entity such as a file system
 // or human user, redefining print to capture output in a memory buffer, etc.
 
-value type_var(value f)
+value type_var(value fun, value f)
 	{
-	return type_data(f);
+	return type_data(fun,f);
 	}
 
 static void clear_var(value f)
@@ -18,17 +18,16 @@ static void clear_var(value f)
 	}
 
 // (var_new) Return a new variable with a void value.
-value type_var_new(value f)
+value type_var_new(value fun, value f)
 	{
 	static struct value clear = {{.N=0}, {.clear=clear_var}};
+	(void)fun;
 	(void)f;
 	return V(type_var,&clear,hold(Qvoid));
 	}
 
 // (var_get var) Return the current value of var.
-value type_var_get(value f)
-	{
-	if (!f->L) return 0;
+value type_var_get(value fun, value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_var)
@@ -36,14 +35,12 @@ value type_var_get(value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
+	(void)fun;
 	return f;
-	}
 	}
 
 // (var_getf var) Yield the current value of var.
-value type_var_getf(value f)
-	{
-	if (!f->L) return 0;
+value type_var_getf(value fun, value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_var)
@@ -51,15 +48,15 @@ value type_var_getf(value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
+	(void)fun;
 	return f;
 	}
-	}
 
-static value op_put(value f, value op(value))
+static value op_put(value fun, value f, value op(value))
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (fun->L == 0) return keep(fun,f);
 	{
-	value x = arg(f->L->R);
+	value x = arg(fun->R);
 	if (x->T == type_var)
 		{
 		value v = op(f->R);
@@ -75,18 +72,18 @@ static value op_put(value f, value op(value))
 	}
 
 // (var_put var x) Put the value of x into var.
-value type_var_put(value f)
+value type_var_put(value fun, value f)
 	{
-	return op_put(f,arg);
+	return op_put(fun,f,arg);
 	}
 
 // (var_putf var x) Put x into var.
-value type_var_putf(value f)
+value type_var_putf(value fun, value f)
 	{
-	return op_put(f,hold);
+	return op_put(fun,f,hold);
 	}
 
-value type_is_var(value f)
+value type_is_var(value fun, value f)
 	{
-	return op_is_type(f,type_var);
+	return op_is_type(fun,f,type_var);
 	}

@@ -1398,5 +1398,18 @@ hello
 say "]"
 )
 
+(
+# Test the legacy eval function.
+eval
+	(say "HI" + 2 3)
+	(\\x say ["x = "x])
+)
+(
+yield (put "(CALC)" + 2 3)
+	(\\x
+	say ["x = "x]
+	)
+)
+
 \#
 Extra stuff not parsed.

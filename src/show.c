@@ -29,8 +29,8 @@
 
 static void put_type(type t)
 	{
-	if (t == type_A) put_ch('A');
-	else if (t == 0) put_ch('0');
+	if (t == 0) put_ch('A');
+	else if (t == type_link) put("link");
 
 	else if (t == type_is_closed) put("is_closed");
 	else if (t == type_def) put("def");
@@ -38,7 +38,6 @@ static void put_type(type t)
 	else if (t == type_resolve) put("resolve");
 	else if (t == type_D) put("D");
 	else if (t == type_E) put("E");
-	else if (t == type_pattern) put("pattern");
 
 	else if (t == type_put) put("put");
 	else if (t == type_nl) put("nl");
@@ -255,8 +254,6 @@ static void show_atom(value f)
 		show_form(f->v_ptr);
 	else if (f->T == type_record)
 		show_record(get_record(f));
-	else if (f->T == type_pattern)
-		limit_show(f->R);
 	else
 		put_ch('?');
 	}
@@ -306,9 +303,9 @@ void show_line(const char *name, value f)
 	put(name);show(f);nl();
 	}
 
-static value type_show(value f)
+static value type_show(value fun, value f)
 	{
-	if (!f->R) return 0;
+	(void)fun;
 	show(f->R);nl();
 	return hold(QI);
 	}
@@ -319,7 +316,7 @@ static value define(void)
 	return 0;
 	}
 
-value type_cx_show(value f)
+value type_cx_show(value fun, value f)
 	{
-	return op_resolve(f,define);
+	return op_resolve(fun,f,define);
 	}

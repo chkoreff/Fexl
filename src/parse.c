@@ -181,7 +181,7 @@ static struct form parse_items(void)
 		if (term.exp == 0)
 			return form_val(hold(Qnull));
 		else
-			return form_join(0,term,parse_items());
+			return form_join(type_link,term,parse_items());
 		}
 	}
 
@@ -199,7 +199,7 @@ static struct form parse_seq(value which, const char t_ch, const char *msg)
 		syntax_error(msg, first_line);
 	skip();
 
-	if (exp.exp->T == 0 || which->T == type_tuple)
+	if (exp.exp->T == type_link || which->T == type_tuple)
 		return form_appv(form_val(hold(which)),exp);
 	else
 		return exp;
@@ -263,7 +263,7 @@ static struct form parse_lambda(unsigned long first_line, type type)
 		syntax_error("Missing definition", first_line);
 
 	exp = form_lam(type,name,parse_exp());
-	return form_appv(exp,def);
+	return form_app(exp,def);
 	}
 	}
 
@@ -298,7 +298,7 @@ static struct form parse_factor(void)
 		else if (cur_ch == '=')
 			{
 			skip();
-			return form_appv(form_val(hold(Qonce)),parse_exp());
+			return form_app(form_val(hold(Qonce)),parse_exp());
 			}
 		else
 			{
@@ -340,11 +340,12 @@ static struct form parse_exp(void)
 		}
 	}
 
-static value type_parse_fexl(value f)
+static value type_parse_fexl(value fun, value f)
 	{
 	value exp = parse_form();
 	if (cur_ch != -1)
 		syntax_error("Extraneous input", cur_line);
+	(void)fun;
 	(void)f;
 	return exp;
 	}
@@ -353,5 +354,5 @@ static value type_parse_fexl(value f)
 value parse_fexl(value stream, value label)
 	{
 	cur_label = label;
-	return read_stream(stream,V(type_parse_fexl,0,0));
+	return read_stream(stream, Q0(type_parse_fexl));
 	}

@@ -7,9 +7,7 @@
 #include <type_input.h>
 #include <type_str.h>
 
-value op_getc(value f, type t, input get)
-	{
-	if (!f->L) return 0;
+value op_getc(value fun, value f, type t, input get)
 	{
 	value x = arg(f->R);
 	if (x->T == t)
@@ -27,13 +25,11 @@ value op_getc(value f, type t, input get)
 	else
 		f = hold(Qvoid);
 	drop(x);
+	(void)fun;
 	return f;
 	}
-	}
 
-value op_get(value f, type t, input get)
-	{
-	if (!f->L) return 0;
+value op_get(value fun, value f, type t, input get)
 	{
 	value x = arg(f->R);
 	if (x->T == t)
@@ -45,6 +41,6 @@ value op_get(value f, type t, input get)
 	else
 		f = hold(Qvoid);
 	drop(x);
+	(void)fun;
 	return f;
-	}
 	}

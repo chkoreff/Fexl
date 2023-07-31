@@ -20,13 +20,13 @@ value Qnl;
 value Qfput;
 value Qfnl;
 
-static value op_put(FILE *fh, value f)
+static value op_put(FILE *fh, value fun, value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_cons && x->L && x->L->L && !x->L->L->L)
-		f = A(AV(hold(f->L),hold(x->L->R)),AV(hold(f->L),hold(x->R)));
+		f = A(A(hold(fun),hold(x->L->R)),A(hold(fun),hold(x->R)));
 	else if (x->T == type_list && !x->L->L)
-		f = A(AV(hold(f->L),hold(x->R->L)),AV(hold(f->L),wrap(x->R->R)));
+		f = A(A(hold(fun),hold(x->R->L)),A(hold(fun),wrap(x->R->R)));
 	else
 		{
 		if (x->T == type_str)
@@ -50,32 +50,32 @@ static value op_put(FILE *fh, value f)
 	return f;
 	}
 
-value type_put(value f)
+value type_put(value fun, value f)
 	{
-	if (!f->L) return 0;
-	return op_put(stdout,f);
+	return op_put(stdout,fun,f);
 	}
 
-value type_nl(value f)
+value type_nl(value fun, value f)
 	{
+	(void)fun;
 	(void)f;
 	fnl(stdout);
 	return hold(QI);
 	}
 
-value type_say(value f)
+value type_say(value fun, value f)
 	{
-	if (!f->L) return 0;
-	return A(AV(hold(Qput),hold(f->R)),hold(Qnl));
+	(void)fun;
+	return A(A(hold(Qput),hold(f->R)),hold(Qnl));
 	}
 
-value type_fput(value f)
+value type_fput(value fun, value f)
 	{
-	if (!f->L || !f->L->L) return 0;
+	if (fun->L == 0) return keep(fun,f);
 	{
-	value out = arg(f->L->R);
+	value out = arg(fun->R);
 	if (out->T == type_file)
-		f = op_put(get_fh(out),f);
+		f = op_put(get_fh(out),fun,f);
 	else
 		f = hold(Qvoid);
 	drop(out);
@@ -83,9 +83,7 @@ value type_fput(value f)
 	}
 	}
 
-value type_fnl(value f)
-	{
-	if (!f->L) return 0;
+value type_fnl(value fun, value f)
 	{
 	value out = arg(f->R);
 	if (out->T == type_file)
@@ -96,20 +94,18 @@ value type_fnl(value f)
 	else
 		f = hold(Qvoid);
 	drop(out);
+	(void)fun;
 	return f;
 	}
+
+value type_fsay(value fun, value f)
+	{
+	if (fun->L == 0) return keep(fun,f);
+	return A(A(A(hold(Qfput),hold(fun->R)),hold(f->R)),
+		A(hold(Qfnl),hold(fun->R)));
 	}
 
-value type_fsay(value f)
-	{
-	if (!f->L || !f->L->L) return 0;
-	return A(A(AV(hold(Qfput),hold(f->L->R)),hold(f->R)),
-		AV(hold(Qfnl),hold(f->L->R)));
-	}
-
-value type_fflush(value f)
-	{
-	if (!f->L) return 0;
+value type_fflush(value fun, value f)
 	{
 	value out = arg(f->R);
 	if (out->T == type_file)
@@ -120,14 +116,14 @@ value type_fflush(value f)
 	else
 		f = hold(Qvoid);
 	drop(out);
+	(void)fun;
 	return f;
-	}
 	}
 
 void beg_output(void)
 	{
 	Qput = Q(type_put);
-	Qnl = Q(type_nl);
+	Qnl = Q0(type_nl);
 	Qfput = Q(type_fput);
 	Qfnl = Q(type_fnl);
 	}

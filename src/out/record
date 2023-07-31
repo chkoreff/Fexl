@@ -82,7 +82,7 @@ c = 3
 d = void
 e = void
 
-steps 446 bytes 4512
+steps 295 bytes 4448
 = test_9
 0
 void
@@ -115,7 +115,7 @@ at 4 = void
 {"d" 44}
 {"e" 5}
 ]
-steps 3468 bytes 7424
+steps 2259 bytes 7424
 = test_10
 = test_11
 CALC
@@ -128,31 +128,31 @@ YES fred
 I am Fred.
 YES wilma
 I am Wilma.
-steps 154 bytes 896
+steps 103 bytes 896
 = test_12
 val = 0
 val = 3
 val = 4
 val = 8
-steps 203 bytes 3488
+steps 133 bytes 3456
 
 val = 0
 val = 3
 val = 4
 val = 8
-steps 202 bytes 3488
+steps 133 bytes 3456
 
 val = 0
 val = 3
 val = 4
 val = 8
-steps 202 bytes 3488
+steps 133 bytes 3456
 
 val = 0
 val = 3
 val = 4
 val = 8
-steps 202 bytes 3456
+steps 133 bytes 3424
 
 ~
 \err=
