@@ -71,18 +71,25 @@ value wrap(value x)
 		return hold(x);
 	}
 
-// ([x;y] a b) = (b x y)
-value type_list(value fun, value f)
+// ((pair x y) h) = (h x y)
+value type_pair(value fun, value f)
 	{
-	if (fun->L->L == 0) return keep(fun,f);
-	{
-	value x = hold(fun->L->R->L);
-	value y = wrap(fun->L->R->R);
-	return A(A(hold(f->R),x),y);
-	}
+	value x = hold(fun->L);
+	value y = hold(fun->R);
+	value h = hold(f->R);
+	return A(A(h,x),y);
 	}
 
-// (cons x y) = [x;y]
+// ((list x y) h) = (pair x y)
+value type_list(value fun, value f)
+	{
+	value x = hold(fun->R->L);
+	value y = wrap(fun->R->R);
+	(void)f;
+	return V(type_pair,x,y);
+	}
+
+// (cons x y) = (list x y)
 value type_cons(value fun, value f)
 	{
 	if (fun->L == 0) return keep(fun,f);
@@ -93,7 +100,7 @@ value type_cons(value fun, value f)
 	}
 	}
 
-// (null a b) = a
+// (null x y) = x
 value type_null(value fun, value f)
 	{
 	if (fun->L == 0)
@@ -188,9 +195,7 @@ static int is_bool(value x)
 
 static int is_list(value x)
 	{
-	return
-		(x->T == type_list && !x->L->L) ||
-		(x->T == type_null);
+	return x->T == type_list || x->T == type_null;
 	}
 
 value type_is_good(value fun, value f) { return op_predicate(fun,f,is_good); }
@@ -229,7 +234,7 @@ value expand(value f)
 
 		x = eval(x);
 
-		if (x->T == type_list && !x->L->L)
+		if (x->T == type_list)
 			{
 			value data = hold(x->R);
 			drop(x);

@@ -74,6 +74,7 @@ static void put_type(type t)
 	else if (t == type_F) put_ch('F');
 	else if (t == type_Y) put_ch('@');
 	else if (t == type_void) put("void");
+	else if (t == type_pair) put("pair");
 	else if (t == type_list) put("list");
 	else if (t == type_cons) put("cons");
 	else if (t == type_null) put("null");

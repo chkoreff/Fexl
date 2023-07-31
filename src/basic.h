@@ -15,6 +15,7 @@ extern value type_data(value fun, value f);
 extern value type_void(value fun, value f);
 extern value type_link(value fun, value f);
 extern value wrap(value x);
+extern value type_pair(value fun, value f);
 extern value type_list(value fun, value f);
 extern value type_cons(value fun, value f);
 extern value type_null(value fun, value f);
