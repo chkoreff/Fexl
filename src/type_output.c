@@ -23,9 +23,7 @@ value Qfnl;
 static value op_put(FILE *fh, value fun, value f)
 	{
 	value x = arg(f->R);
-	if (x->T == type_cons && x->L && x->L->L && !x->L->L->L)
-		f = A(A(hold(fun),hold(x->L->R)),A(hold(fun),hold(x->R)));
-	else if (x->T == type_list && !x->L->L)
+	if (x->T == type_list && !x->L->L)
 		f = A(A(hold(fun),hold(x->R->L)),A(hold(fun),wrap(x->R->R)));
 	else
 		{

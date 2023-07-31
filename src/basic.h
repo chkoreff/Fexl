@@ -4,7 +4,6 @@ extern value QF;
 extern value QY;
 extern value Qvoid;
 extern value Qlist;
-extern value Qcons;
 extern value Qnull;
 extern value Qonce;
 extern value Qyield;

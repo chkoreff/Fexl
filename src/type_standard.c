@@ -74,7 +74,7 @@ static value standard(void)
 	if (match("F")) return hold(QF);
 	if (match("@")) return hold(QY);
 	if (match("void")) return hold(Qvoid);
-	if (match("cons")) return hold(Qcons);
+	if (match("cons")) return Q(type_cons);
 	if (match("null")) return hold(Qnull);
 	if (match("eval")) return Q(type_eval);
 	if (match("yield")) return hold(Qyield);
