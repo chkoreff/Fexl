@@ -30,6 +30,8 @@
 //
 // Note that on most machines, (sizeof(struct value) == 32).
 
+#include <stdio.h> // TODO
+
 static value free_list = 0;
 
 static value new_value(type T, value L)
@@ -97,7 +99,13 @@ void end_value(void)
 
 value keep(value fun, value f)
 	{
-	return V(fun->T,hold(fun),hold(f->R));
+	if (fun == f->L)
+		{
+		f->T = fun->T;
+		return hold(f);
+		}
+	else
+		return V(fun->T,hold(fun),hold(f->R));
 	}
 
 // Return a value of type T with the given left and right side.

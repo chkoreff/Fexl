@@ -25,7 +25,7 @@ main says: Hello.
 : I am Barney.
 : I am Betty.
 x = 42
-steps 592 bytes 4256
+steps 476 bytes 3264
 ~
 \err=
 ~
