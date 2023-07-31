@@ -30,8 +30,6 @@
 //
 // Note that on most machines, (sizeof(struct value) == 32).
 
-#include <stdio.h> // TODO
-
 static value free_list = 0;
 
 static value new_value(type T, value L)
