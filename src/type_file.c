@@ -511,7 +511,7 @@ static value dir_names(DIR *dir)
 	{
 	struct dirent *entry = readdir(dir);
 	if (!entry) return hold(Qnull);
-	return V(type_link,Qstr0(entry->d_name),dir_names(dir));
+	return V(type_list,Qstr0(entry->d_name),dir_names(dir));
 	}
 
 // \names=(dir_names path) Return the list of names in a directory.  The names
@@ -525,7 +525,7 @@ value type_dir_names(value fun, value f)
 		DIR *dir = opendir(path);
 		if (dir)
 			{
-			f = V(type_list,hold(Qlist),dir_names(dir));
+			f = dir_names(dir);
 			closedir(dir);
 			}
 		else

@@ -24,7 +24,7 @@ static value op_put(FILE *fh, value fun, value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_list)
-		f = A(A(hold(fun),hold(x->R->L)),A(hold(fun),wrap(x->R->R)));
+		f = A(A(hold(fun),hold(x->L)),A(hold(fun),hold(x->R)));
 	else
 		{
 		if (x->T == type_str)

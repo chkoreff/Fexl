@@ -1,8 +1,8 @@
 \out=
 ~
 [I]
-[list [list] [link [str "a"] [link [str "b"] [null]]]]
-[tuple [tuple] [link [str "a"] [link [str "b"] [null]]]]
+[list [str "a"] [list [str "b"] [null]]]
+[tuple [tuple] [list [str "a"] [list [str "b"] [null]]]]
 [D [A [F] [A [F] [T]]] [D [A [T] [F]] [A [I] [I]]]]
 [form "test/lib.fxl" [[sym a 11 [A [T] [F]]] [sym b 11 [A [F] [A [T] [F]]]] [sym c 11 [A [F] [A [F] [T]]]] ] [A [I] [A [I] [I]]]]
 [A [say] [str "Hello."]]

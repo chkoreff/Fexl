@@ -348,7 +348,7 @@ value type_is_str(value fun, value f)
 static unsigned long list_length(value p)
 	{
 	unsigned long len = 0;
-	while (p->T == type_link)
+	while (p->T == type_list)
 		{
 		len++;
 		p = p->R;
@@ -367,7 +367,7 @@ value op_argv(value fun, value f, value op(const char *const *argv))
 	value p = items;
 	unsigned long pos = 0;
 
-	while (p->T == type_link)
+	while (p->T == type_list)
 		{
 		value item = (p->L = eval(p->L));
 		if (item->T != type_str)

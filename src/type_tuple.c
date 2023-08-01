@@ -12,7 +12,7 @@ value type_tuple(value fun, value f)
 	{
 	value exp = hold(f->R);
 	value args = fun->R;
-	while (args->T == type_link)
+	while (args->T == type_list)
 		{
 		exp = A(exp,hold(args->L));
 		args = args->R;
@@ -30,7 +30,7 @@ value type_tuple_to_list(value fun, value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_tuple)
-		f = wrap(x->R);
+		f = hold(x->R);
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -47,8 +47,8 @@ value type_list_to_tuple(value fun, value f)
 value pair(value x, value y)
 	{
 	return V(type_tuple,hold(Qtuple),
-		V(type_link,x,
-		V(type_link,y,hold(Qnull))));
+		V(type_list,x,
+		V(type_list,y,hold(Qnull))));
 	}
 
 void beg_tuple(void)

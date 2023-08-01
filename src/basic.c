@@ -7,7 +7,6 @@ value QT;
 value QF;
 value QY;
 value Qvoid;
-value Qlist;
 value Qnull;
 value Qonce;
 value Qyield;
@@ -55,22 +54,6 @@ value type_void(value fun, value f)
 	return hold(Qvoid);
 	}
 
-// LATER 20230731 The type_link is never called, and is only used for direct
-// linked lists.  I will simplify the handling of lists eliminate this.
-value type_link(value fun, value f)
-	{
-	return keep(fun,f);
-	}
-
-// Wrap list function around data if necessary.
-value wrap(value x)
-	{
-	if (x->T == type_link)
-		return V(type_list,hold(Qlist),hold(x));
-	else
-		return hold(x);
-	}
-
 // ((pair x y) h) = (h x y)
 value type_pair(value fun, value f)
 	{
@@ -83,8 +66,8 @@ value type_pair(value fun, value f)
 // ((list x y) h) = (pair x y)
 value type_list(value fun, value f)
 	{
-	value x = hold(fun->R->L);
-	value y = wrap(fun->R->R);
+	value x = hold(fun->L);
+	value y = hold(fun->R);
 	(void)f;
 	return V(type_pair,x,y);
 	}
@@ -96,7 +79,7 @@ value type_cons(value fun, value f)
 	{
 	value x = hold(fun->R);
 	value y = hold(f->R);
-	return V(type_list,hold(Qlist),V(type_link,x,y));
+	return V(type_list,x,y);
 	}
 	}
 
@@ -226,31 +209,15 @@ value expand(value f)
 	while (1)
 		{
 		value x = p->R;
-		if (x->T == type_link)
-			{
-			p = x;
-			continue;
-			}
-
-		x = eval(x);
-
 		if (x->T == type_list)
-			{
-			value data = hold(x->R);
-			drop(x);
-			p->R = data;
-			}
-		else if (x->T == type_null)
-			{
-			p->R = x;
-			break;
-			}
+			p = x;
 		else
 			{
-			// Replace non-list tail with null.
-			drop(x);
-			p->R = hold(Qnull);
-			break;
+			x = eval(x);
+			if (x->T == type_list)
+				p->R = x;
+			else
+				break;
 			}
 		}
 	return f->R;
@@ -269,7 +236,6 @@ void beg_basic(void)
 	QF = Q(type_F);
 	QY = Q(type_Y);
 	Qvoid = Q(type_void);
-	Qlist = Q(type_list);
 	Qnull = Q(type_null);
 	Qonce = Q(type_once);
 	Qyield = Q(type_yield);
@@ -282,7 +248,6 @@ void end_basic(void)
 	drop(QF);
 	drop(QY);
 	drop(Qvoid);
-	drop(Qlist);
 	drop(Qnull);
 	drop(Qonce);
 	drop(Qyield);

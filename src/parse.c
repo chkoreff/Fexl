@@ -181,38 +181,21 @@ static struct form parse_items(void)
 		if (term.exp == 0)
 			return form_val(hold(Qnull));
 		else
-			return form_join(type_link,term,parse_items());
+			return form_join(type_list,term,parse_items());
 		}
 	}
 
-static struct form parse_seq(value which, const char t_ch, const char *msg)
+static struct form parse_seq(const char t_ch, const char *msg)
 	{
-	struct form exp;
 	unsigned long first_line = cur_line;
-
 	skip();
-	skip_filler();
-
-	exp = parse_items();
-
+	{
+	struct form exp = parse_items();
 	if (cur_ch != t_ch)
 		syntax_error(msg, first_line);
 	skip();
-
-	if (exp.exp->T == type_link || which->T == type_tuple)
-		return form_appv(form_val(hold(which)),exp);
-	else
-		return exp;
+	return exp;
 	}
-
-static struct form parse_list(void)
-	{
-	return parse_seq(Qlist,']',"Unclosed bracket");
-	}
-
-static struct form parse_tuple(void)
-	{
-	return parse_seq(Qtuple,'}',"Unclosed brace");
 	}
 
 static struct form parse_term(void)
@@ -220,9 +203,10 @@ static struct form parse_term(void)
 	if (cur_ch == '(')
 		return parse_nested();
 	else if (cur_ch == '[')
-		return parse_list();
+		return parse_seq(']',"Unclosed bracket");
 	else if (cur_ch == '{')
-		return parse_tuple();
+		return form_appv(form_val(hold(Qtuple)),
+			parse_seq('}',"Unclosed brace"));
 	else if (cur_ch == '"')
 		return parse_quote_string();
 	else if (cur_ch == '~')

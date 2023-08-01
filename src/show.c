@@ -30,7 +30,6 @@
 static void put_type(type t)
 	{
 	if (t == 0) put_ch('A');
-	else if (t == type_link) put("link");
 
 	else if (t == type_is_closed) put("is_closed");
 	else if (t == type_def) put("def");
