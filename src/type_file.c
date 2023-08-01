@@ -525,7 +525,7 @@ value type_dir_names(value fun, value f)
 		DIR *dir = opendir(path);
 		if (dir)
 			{
-			f =  V(type_list,hold(Qlist),dir_names(dir));
+			f = V(type_list,hold(Qlist),dir_names(dir));
 			closedir(dir);
 			}
 		else

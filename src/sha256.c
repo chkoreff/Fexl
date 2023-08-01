@@ -126,7 +126,7 @@ void sha256(u8 digest[32], const u8 *data, u64 n_data_byte)
 	const u64 n_data_chunk = n_data_byte / 64;
 
 	// Number of data bytes remaining after any full chunks.
-	const u64 n_remain =  n_data_byte % 64;
+	const u64 n_remain = n_data_byte % 64;
 
 	// Number of zero padding bytes
 	const u64 n_pad = n_total_byte - n_data_byte - 9;
