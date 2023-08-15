@@ -129,6 +129,8 @@ does not have to do any symbol lookups or bindings during evaluation.
 
 "On the Building Blocks of Mathematical Logic", Moses Schönfinkel, 1924
 
+"The Calculi of Lambda-Conversion", Alonzo Church, 1941
+
 "Typed Representation of Objects by Functions", Jørgen Steensgaard-Madsen, 1989
 
 ## License
