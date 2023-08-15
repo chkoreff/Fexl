@@ -161,10 +161,10 @@
 	)
 
 # Get the list of keys from a list of pairs.
-\get_keys=(map (\p p \k\_ k))
+\get_keys=(map (\p p \k\\_ k))
 
 # Get the list of values from a list of pairs.
-\get_values=(map (\p p \_\v v))
+\get_values=(map (\p p \\_\v v))
 
 # Sort all items with a key extraction function.
 \sort_all=
