@@ -89,7 +89,7 @@ value type_split_obj(value fun, value f)
 // the index so you get the same value next time.  Equivalent to:
 //
 // \fetch=
-//     (\v\k\x
+//     (\v\k\\x
 //     \y=(var_get v k)
 //     is_defined y y;
 //     \x=x
