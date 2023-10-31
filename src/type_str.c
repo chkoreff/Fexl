@@ -356,32 +356,35 @@ static unsigned long list_length(value p)
 	return len;
 	}
 
-// Expand the list data f->R inline.  (LATER 20231031 eliminate)
-static value expand(value f)
+// Expand a list of strings, stopping if a non-string is found.
+static value expand(value list)
 	{
-	value p = f;
-	while (1)
+	list = eval(list);
+	if (list->T == type_list)
 		{
-		value x = p->R;
-		if (x->T == type_list)
-			p = x;
+		value head = arg(list->L);
+		if (head->T == type_str)
+			{
+			value tail = hold(list->R);
+			drop(list);
+			return V(type_list,head,expand(tail));
+			}
 		else
 			{
-			x = eval(x);
-			if (x->T == type_list)
-				p->R = x;
-			else
-				break;
+			drop(head);
+			drop(list);
+			return hold(Qnull);
 			}
 		}
-	return f->R;
+	else
+		return list;
 	}
 
 // Collect a vector of raw (char *) strings from a list and pass it to the op
 // function.  Any item that is not a string ends the list.
 value op_argv(value fun, value f, value op(const char *const *argv))
 	{
-	value items = hold(expand(f));
+	value items = expand(hold(f->R));
 	unsigned long len = list_length(items);
 	unsigned long size = (len+1) * sizeof(char *);
 	const char **argv = new_memory(size);
@@ -390,10 +393,7 @@ value op_argv(value fun, value f, value op(const char *const *argv))
 
 	while (p->T == type_list)
 		{
-		value item = (p->L = eval(p->L));
-		if (item->T != type_str)
-			break;
-		argv[pos++] = str_data(item);
+		argv[pos++] = str_data(p->L);
 		p = p->R;
 		}
 	argv[pos] = 0; // ending sentinel

@@ -1337,14 +1337,26 @@ value; std; load "test"; \;
 test_argv []
 test_argv ["a" "b"]
 
-# This includes a non-string (the number 3), which clips the list.
+# Test old problem with inline list expansion.
+test_argv ["a"; () []]
+# Test evaluate list.
+test_argv (append ["a"] ["b" "c"])
+# Test malformed list tail.
+test_argv ["a"; 3]
+
+# This includes a non-string which clips the list.
 test_argv
 [
 (I "a") "b"
 ;
 append ["c" "d"];
 append (map (. "x") ["e" "f"]);
-["g" (I "h") 3 "i" "j"]
+["g"
+	(I "h")
+	3  # This non-string clips the list.
+	(say "NO" "i")  # Not evaluated
+	"j"
+	]
 ]
 )
 
@@ -1413,7 +1425,7 @@ yield (put "(CALC)" + 2 3)
 
 div
 (
-# Test problem with inline list expansion.
+# Test old problem with inline list expansion.
 {"a"; () []} \x say ["x = "x]
 )
 nl

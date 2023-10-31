@@ -940,6 +940,20 @@ d = "d"
 = test_argv
 [
 0 : a
+]
+= test_argv
+[
+0 : a
+1 : b
+2 : c
+]
+= test_argv
+[
+0 : a
+]
+= test_argv
+[
+0 : a
 1 : b
 2 : c
 3 : d
