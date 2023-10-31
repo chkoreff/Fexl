@@ -1411,5 +1411,25 @@ yield (put "(CALC)" + 2 3)
 	)
 )
 
+div
+(
+# Test problem with inline list expansion.
+{"a"; () []} \x say ["x = "x]
+)
+nl
+(
+# Test evaluate list.
+list_to_tuple (append ["a"] ["b" "c"]) \a\b\c
+say ["a = "a]
+say ["b = "b]
+say ["c = "c]
+)
+nl
+(
+# Test malformed list tail.
+\val=({"a"; 3} \x say ["x = "x])
+say (is_undef val)
+)
+
 \#
 Extra stuff not parsed.

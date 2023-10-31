@@ -973,6 +973,14 @@ Hello
 HI
 x = 5
 x = (CALC)5
+==
+x = a
+
+a = a
+b = b
+c = c
+
+T
 ~6
 \err=
 ~

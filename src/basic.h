@@ -30,7 +30,6 @@ extern value type_is_good(value fun, value f);
 extern value type_is_bool(value fun, value f);
 extern value type_is_list(value fun, value f);
 extern value type_chain(value fun, value f);
-extern value expand(value y);
 extern value Q0(type T);
 extern void beg_basic(void);
 extern void end_basic(void);

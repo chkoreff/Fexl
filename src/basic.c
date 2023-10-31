@@ -202,27 +202,6 @@ value type_chain(value fun, value f)
 	}
 	}
 
-// Expand the list data f->R inline.
-value expand(value f)
-	{
-	value p = f;
-	while (1)
-		{
-		value x = p->R;
-		if (x->T == type_list)
-			p = x;
-		else
-			{
-			x = eval(x);
-			if (x->T == type_list)
-				p->R = x;
-			else
-				break;
-			}
-		}
-	return f->R;
-	}
-
 // Create a nullary function, supplying a dummy argument.
 value Q0(type T)
 	{

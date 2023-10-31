@@ -8,17 +8,32 @@ value Qtuple;
 
 value type_tuple(value fun, value f)
 	{
-	expand(fun);
-	{
+	value args = hold(fun->R);
 	value exp = hold(f->R);
-	value args = fun->R;
-	while (args->T == type_list)
+
+	while (1)
 		{
-		exp = A(exp,hold(args->L));
-		args = args->R;
+		args = eval(args);
+		if (args->T == type_list)
+			{
+			value head = hold(args->L);
+			value tail = hold(args->R);
+			exp = A(exp,head);
+			drop(args);
+			args = tail;
+			}
+		else if (args->T == type_null)
+			{
+			drop(args);
+			return exp;
+			}
+		else
+			{
+			drop(exp);
+			drop(args);
+			return hold(Qvoid);
+			}
 		}
-	return exp;
-	}
 	}
 
 value type_is_tuple(value fun, value f)

@@ -356,6 +356,27 @@ static unsigned long list_length(value p)
 	return len;
 	}
 
+// Expand the list data f->R inline.  (LATER 20231031 eliminate)
+static value expand(value f)
+	{
+	value p = f;
+	while (1)
+		{
+		value x = p->R;
+		if (x->T == type_list)
+			p = x;
+		else
+			{
+			x = eval(x);
+			if (x->T == type_list)
+				p->R = x;
+			else
+				break;
+			}
+		}
+	return f->R;
+	}
+
 // Collect a vector of raw (char *) strings from a list and pass it to the op
 // function.  Any item that is not a string ends the list.
 value op_argv(value fun, value f, value op(const char *const *argv))
