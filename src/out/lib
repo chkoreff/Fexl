@@ -8,7 +8,7 @@
 [A [say] [str "Hello."]]
 Hello.
 [I]
-[assoc [A [A [I] [str "a"]] [num 1]] [assoc [A [A [I] [str "b"]] [num 2]] [void]]]
+[assoc [pair [str "a"] [num 1]] [assoc [pair [str "b"] [num 2]] [void]]]
 [A [A [add] [num 2]] [num 3]]
 [num 5]
 ~

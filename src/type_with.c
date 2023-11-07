@@ -23,7 +23,7 @@ value type_assoc(value obj, value f)
 	value x = arg(f->R);
 	while (1)
 		{
-		value key = obj->L->L->R;
+		value key = obj->L->L;
 		if (cmp_key(key,x))
 			{
 			drop(x);
@@ -38,13 +38,13 @@ value type_assoc(value obj, value f)
 
 static value Qassoc(value key, value val, value obj)
 	{
-	return V(type_assoc,A(A(hold(QI),key),val),obj);
+	return V(type_assoc,V(type_pair,key,val),obj);
 	}
 
 // (with key val obj)
 // Return a function like obj but with key defined as val.
 // Equivalent to:
-// \with=(\key\val\obj \obj=obj \x eq x key val; obj x)
+// \with=(\key\\val\obj \x eq x key val; obj x)
 value type_with(value fun, value f)
 	{
 	if (fun->L == 0) return keep(fun,f);
@@ -71,7 +71,7 @@ value type_split_obj(value fun, value f)
 	value x = arg(fun->R);
 	if (x->T == type_assoc)
 		{
-		value key = hold(x->L->L->R);
+		value key = hold(x->L->L);
 		value val = hold(x->L->R);
 		value obj = hold(x->R);
 		value next = hold(f->R);
