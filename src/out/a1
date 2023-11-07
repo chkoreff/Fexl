@@ -912,7 +912,7 @@ end "  abcd   " = "  abcd"
 
 ]
 = test_eq_data
-steps 2382 bytes 2976
+steps 2382 bytes 3040
 ["a" "b" "c" "d" "e"]
 {"a" "b" "c" "d" "e"}
 

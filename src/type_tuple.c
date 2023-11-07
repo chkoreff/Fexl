@@ -38,7 +38,11 @@ value type_tuple(value fun, value f)
 
 value type_is_tuple(value fun, value f)
 	{
-	return op_is_type(fun,f,type_tuple);
+	value x = arg(f->R);
+	f = boolean(x->T == type_tuple || x->T == type_pair);
+	drop(x);
+	(void)fun;
+	return f;
 	}
 
 value type_tuple_to_list(value fun, value f)
@@ -46,6 +50,8 @@ value type_tuple_to_list(value fun, value f)
 	value x = arg(f->R);
 	if (x->T == type_tuple)
 		f = hold(x->R);
+	else if (x->T == type_pair)
+		f = V(type_list,hold(x->L),V(type_list,hold(x->R),hold(Qnull)));
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -61,9 +67,7 @@ value type_list_to_tuple(value fun, value f)
 
 value pair(value x, value y)
 	{
-	return V(type_tuple,hold(Qtuple),
-		V(type_list,x,
-		V(type_list,y,hold(Qnull))));
+	return V(type_pair,x,y);
 	}
 
 void beg_tuple(void)

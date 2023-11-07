@@ -198,15 +198,57 @@ static struct form parse_seq(const char t_ch, const char *msg)
 	}
 	}
 
+static struct form parse_tuple(void)
+	{
+	struct form list = parse_seq('}',"Unclosed brace");
+	value exp = list.exp;
+	// If the list is exactly two items change it to type_pair.
+	if (1
+		&& exp->T == type_list
+		&& exp->R->T == type_list
+		&& exp->R->R->T == type_null
+		)
+		{
+		struct table *table = list.table;
+		if (table)
+			{
+			unsigned long i;
+			for (i = 0; i < table->count; i++)
+				{
+				struct symbol *sym = &table->vec[i];
+				if (sym->pattern->R->T == 0)
+					{
+					value p = hold(sym->pattern->R->L);
+					drop(sym->pattern->R);
+					sym->pattern->R = p;
+					}
+				}
+			}
+		{
+		value R = hold(exp->R->L);
+		drop(exp->R);
+		exp->R = R;
+		exp->T = type_pair;
+		}
+		return list;
+		}
+	else
+		return form_appv(form_val(hold(Qtuple)),list);
+	}
+
+static struct form parse_list(void)
+	{
+	return parse_seq(']',"Unclosed bracket");
+	}
+
 static struct form parse_term(void)
 	{
 	if (cur_ch == '(')
 		return parse_nested();
 	else if (cur_ch == '[')
-		return parse_seq(']',"Unclosed bracket");
+		return parse_list();
 	else if (cur_ch == '{')
-		return form_appv(form_val(hold(Qtuple)),
-			parse_seq('}',"Unclosed brace"));
+		return parse_tuple();
 	else if (cur_ch == '"')
 		return parse_quote_string();
 	else if (cur_ch == '~')

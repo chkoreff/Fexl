@@ -24,3 +24,17 @@ show x
 
 \x=x
 show x
+
+(
+nl
+\x=1
+\y=2
+\z=3
+
+show {x}
+show {x y}
+show {x y; z}
+show {x y z}
+show {(+ x x) (* y y)}
+show [{"a" 1} {"b" 2} {"c" 3}]
+)

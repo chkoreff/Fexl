@@ -2,7 +2,7 @@
 ~
 [I]
 [list [str "a"] [list [str "b"] [null]]]
-[tuple [tuple] [list [str "a"] [list [str "b"] [null]]]]
+[pair [str "a"] [str "b"]]
 [D [A [F] [A [F] [T]]] [D [A [T] [F]] [A [I] [I]]]]
 [form "test/lib.fxl" [[sym a 11 [A [T] [F]]] [sym b 11 [A [F] [A [T] [F]]]] [sym c 11 [A [F] [A [F] [T]]]] ] [A [I] [A [I] [I]]]]
 [A [say] [str "Hello."]]
@@ -11,6 +11,13 @@ Hello.
 [assoc [pair [str "a"] [num 1]] [assoc [pair [str "b"] [num 2]] [void]]]
 [A [A [add] [num 2]] [num 3]]
 [num 5]
+
+[tuple [tuple] [list [num 1] [null]]]
+[pair [num 1] [num 2]]
+[tuple [tuple] [list [num 1] [list [num 2] [num 3]]]]
+[tuple [tuple] [list [num 1] [list [num 2] [list [num 3] [null]]]]]
+[pair [A [A [add] [num 1]] [num 1]] [A [A [mul] [num 2]] [num 2]]]
+[list [pair [str "a"] [num 1]] [list [pair [str "b"] [num 2]] [list [pair [str "c"] [num 3]] [null]]]]
 ~
 \err=
 ~
