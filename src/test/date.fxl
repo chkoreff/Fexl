@@ -97,6 +97,13 @@
 	try "23040303"
 	try "23040306"
 	nl
+
+	say_data (dow 2023 11 14)
+	# Try some errors.
+	say_data (dow "2023" 11 14)
+	say_data (dow 2023 "11" 14)
+	say_data (dow 2023 11 "14")
+	nl
 	)
 
 \\test_add_year=

@@ -243,11 +243,10 @@
 # 1:Mon 2:Tue 3:Wed 4:Thu 5:Fri 6:Sat 7:Sun
 \day_of_week=
 	(\date
-	\ref_date="20160104" # a Monday
-	\count=(count_days ref_date date)
-	\n=(mod count 7)
-	\n=(+ 1; lt n 0 (+ 7 n) n)
-	n
+	\\y=(str_num; slice date 0 4)
+	\\m=(str_num; slice date 4 2)
+	\\d=(str_num; slice date 6 2)
+	dow y m d
 	)
 
 # Add count days to the begin date.

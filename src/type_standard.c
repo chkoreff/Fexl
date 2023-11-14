@@ -166,6 +166,7 @@ static value standard(void)
 	if (match("timelocal")) return Q(type_timelocal);
 	if (match("timegm")) return Q(type_timegm);
 	if (match("microtime")) return Q0(type_microtime);
+	if (match("dow")) return Q(type_dow);
 
 	if (match("die")) return Q0(type_die);
 	if (match("argv")) return Q(type_argv);

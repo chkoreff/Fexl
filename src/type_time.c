@@ -105,3 +105,40 @@ value type_microtime(value fun, value f)
 	(void)f;
 	return Qstr(microtime());
 	}
+
+// 1:Mon 2:Tue 3:Wed 4:Thu 5:Fri 6:Sat 0:Sun
+static int get_dow(int y, int m, int d)
+	{
+	static int t[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
+	if (m < 3)
+		y--;
+	return (y + y/4 - y/100 + y/400 + t[m-1] + d) % 7;
+	}
+
+// Return day of week for y,m,d.
+// 1:Mon 2:Tue 3:Wed 4:Thu 5:Fri 6:Sat 7:Sun
+value type_dow(value fun, value f)
+	{
+	if (fun->L == 0) return keep(fun,f);
+	if (fun->L->L == 0) return keep(fun,f);
+	{
+	value a1 = arg(fun->L->R);
+	value a2 = arg(fun->R);
+	value a3 = arg(f->R);
+	if (a1->T == type_num && a2->T == type_num && a3->T == type_num)
+		{
+		int y = a1->v_double;
+		int m = a2->v_double;
+		int d = a3->v_double;
+		int dow = get_dow(y,m,d);
+		if (dow == 0) dow = 7;
+		f = Qnum(dow);
+		}
+	else
+		f = hold(Qvoid);
+	drop(a1);
+	drop(a2);
+	drop(a3);
+	return f;
+	}
+	}

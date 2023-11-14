@@ -66,12 +66,17 @@ dow 23040302 = 3
 dow 23040303 = 4
 dow 23040306 = 7
 
+2
+void
+void
+void
+
 add_year 20000228 = 20010228
 add_year 20000229 = 20010229
 add_year 20150228 = 20160228
 add_year 20150301 = 20160301
 
-steps 214588 bytes 5632
+steps 15623 bytes 5152
 ~
 \err=
 ~
