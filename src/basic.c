@@ -86,9 +86,7 @@ value type_cons(value fun, value f)
 // (null x y) = x
 value type_null(value fun, value f)
 	{
-	if (fun->L == 0)
-		return V(type_T,hold(fun),hold(f->R));
-	return hold(fun->R);
+	return V(type_T,hold(fun),hold(f->R));
 	}
 
 // (eval x f) = (f y), where y is the final value of x.
