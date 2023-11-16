@@ -1,0 +1,34 @@
+# NOTE: There's a bug in ls on many Linux systems I have tried.  As it turns
+# out, there's also a corresponding bug in sort.
+#
+# You can run this test script as "./try".  When the bugs are fixed, there
+# should be no output.
+#
+# The man page says:
+# "Sort entries alphabetically if none of -cftuvSUX nor --sort is specified."
+#
+# Consequently if I run "ls -1 dir" I would expect the entries to be sorted
+# alphabetically.  However, on my machine I see this output:
+#
+# read_csv.fxl
+# read.fxl
+# read_ssv.fxl
+#
+# Clearly the "read.fxl" should appear first because '.' is less than '_'.  So
+# ls is not strictly doing what the man page says above.  The "read.fxl" is out
+# of order.
+#
+# Note that even piping the output through "sort" does not correct the order,
+# which implies a deeper problem in a library.  Indeed, when I reported this
+# finding to the PopOS maintainers at System76, they replied:
+#
+# "I notified the Pop!_OS maintainers. They let me know that we are using GNU
+# coreutils 8.13.  We will be changing to 9.xx soon.  I showed them the bug,
+# and they were just as excited as I was about it.  Such a strange bug, but
+# also I commend you for having the keen eye to catch something like this."
+
+# Try ls by itself.
+ls -1 dir | diff - correct
+
+# Try ls with sort.
+ls -1 dir | sort | diff - correct

@@ -36,12 +36,6 @@ So the "fexl" script in my search path runs the real executable right where I
 built it, setting argv[0] to its full path name, allowing it to resolve the
 names of any files it might need that come bundled with the distribution.
 
-Lately I've been using a shell alias instead, putting this in my
-`~/.bash_aliases`:
-```
-alias fexl=~/code/fexl/bin/fexl
-```
-
 ## Development Tools
 
 To build the code:
@@ -92,6 +86,12 @@ To source the handy shell aliases that I use for development:
 To see the current version number (http://semver.org):
 ```
 cat VERSION
+```
+
+## Test bug in GNU coreutils 8.13.
+
+```
+(cd test/ls_bug; ./try)
 ```
 
 ## Guide to source code

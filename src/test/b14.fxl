@@ -12,46 +12,6 @@
 	say "]"
 	)
 
-# NOTE: There's a bug in /bin/ls on my PopOS system.  The man page says:
-# "Sort entries alphabetically if none of -cftuvSUX nor --sort is specified."
-#
-# Consequently if I run "/bin/ls -1 -a src/lib" I would expect the entries to
-# be sorted alphabetically.  However, on my machine I see this within the
-# output:
-#
-#   read_csv.fxl
-#   read.fxl
-#   read_ssv.fxl
-#
-# Clearly the "read.fxl" should appear first because '.' is less than '_'.
-# So /bin/ls is not strictly doing what the man page says above.  Most of the
-# entries are sorted, but "read.fxl" is out of order.
-#
-# I could force a sort here, but for now I will just document the case, change
-# the reference output to its true expected value, and live with this small
-# break on my own system.  I'll consider it correctness test for /bin/ls.
-
-\\test_ls=
-	(
-	\path="src/lib"
-	\path=(path_under dir_base path)
-	\cmd=
-		[
-		(put "(1)" "/bin/ls")
-		;
-		cons (put "(2)" I;I;"-1");
-		[
-		(put "(3)" "-a")
-		#(\x x) # Test bad arg to exec.
-		(put "(4)" path)
-		; 33 # Test non-list tail.
-		]
-		]
-	run_program cmd "" \out\err\status
-	put out
-	put err
-	)
-
 \demo_seek=
 	(\path
 	\path=(path_under dir_local path)
@@ -137,12 +97,7 @@
 	fclose fh
 	)
 
-(
 show_base_dir "src/lib"
-#show_base_dir "src/test"
-#show_base_dir "src"
-test_ls # Test fflush in type_exec.
-)
 
 (
 demo_seek "vector" \;
