@@ -22,7 +22,12 @@ value type_num(value fun, value f)
 value Qnum(double x)
 	{
 	static struct value clear = {{.N=0}, {.clear=clear_num}};
-	return Qdouble(type_num,&clear,x);
+	value f = new_value();
+	f->N = 1;
+	f->T = type_num;
+	f->L = &clear;
+	f->v_double = x;
+	return f;
 	}
 
 value Qnum_str0(const char *name)

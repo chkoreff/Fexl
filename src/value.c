@@ -1,55 +1,58 @@
 #include <memory.h>
 #include <value.h>
 
-// The value structure is defined as follows.
-//
-// Let f be a pointer to a struct value.
-//
-// f->N is the reference count.
-//
-// f->T is the type, a C routine which reduces the value during evaluation.
-//
-// f->next links values on the free list after f->N drops to 0.
-//
-// Every value f is one of three classes: atom, data, or tree.
-//
-// 1. atom : (f->L == 0 && f->R == 0)
-//
-// An atom value is a primary function with no arguments.
-//
-// 2. data : (f->L != 0 && f->L->N == 0)
-//
-// A data value has data that resides in the union which follows f->L.  The
-// f->L->clear field is a function that frees the data when f->N drops to 0.
-//
-// 3. tree : (f->L != 0 && f->L->N > 0)
-//
-// A tree value is a combination of values f->L and f->R.
-//
-// The "recycle" routine below succinctly reflects these rules.
-//
-// Note that on most machines, (sizeof(struct value) == 32).
+/*
+The value structure is defined as follows.
+
+Let f be a pointer to a struct value.
+
+f->N is the reference count.
+
+f->T is the type, a C routine which reduces the value during evaluation.
+
+f->next links values on the free list after f->N drops to 0.
+
+Every value f is one of three classes: atom, data, or tree.
+
+1. atom : (f->L == 0 && f->R == 0)
+
+	An atom value is a primary function with no arguments.
+
+2. data : (f->L != 0 && f->L->N == 0)
+
+	A data value has data that resides in the union which follows f->L.  The
+	f->L->clear field is a function that frees the data when f->N drops to 0.
+
+3. tree : (f->L != 0 && f->L->N > 0)
+
+	A tree value is a combination of values f->L and f->R.
+
+The "discard" routine below succinctly reflects these rules.
+
+Note that on most machines, (sizeof(struct value) == 32).
+*/
 
 static value free_list = 0;
 
-static value new_value(type T, value L)
+value new_value(void)
 	{
 	value f = free_list;
 	if (f)
 		free_list = f->next;
 	else
 		f = new_memory(sizeof(struct value));
-	f->N = 1;
-	f->T = T;
-	f->L = L;
 	return f;
 	}
 
-// Recycle a value f with reference count 0, putting f on the free list and
-// dropping its content.  If f is data, its data is freed.  If f is a tree, its
-// L and R reference counts are decremented and those are also recycled if
-// their counts reach 0.
-static void recycle(value f)
+void recycle(value f)
+	{
+	f->next = free_list;
+	free_list = f;
+	}
+
+// Discard a value f with reference count 0.  This drops the L and R fields of
+// a tree value, or calls the clear routine of a data value, and recycles it.
+static void discard(value f)
 	{
 	if (f->L)
 		{
@@ -61,8 +64,7 @@ static void recycle(value f)
 		else
 			f->L->clear(f);
 		}
-	f->next = free_list;
-	free_list = f;
+	recycle(f);
 	}
 
 // Increment the reference count.
@@ -72,11 +74,11 @@ value hold(value f)
 	return f;
 	}
 
-// Decrement the reference count and recycle if it drops to zero.
+// Decrement the reference count and discard if it drops to zero.
 void drop(value f)
 	{
 	if (--f->N == 0)
-		recycle(f);
+		discard(f);
 	}
 
 void clear_free_list(void)
@@ -95,21 +97,13 @@ void end_value(void)
 	end_memory();
 	}
 
-value keep(value fun, value f)
-	{
-	if (fun == f->L)
-		{
-		f->T = fun->T;
-		return hold(f);
-		}
-	else
-		return V(fun->T,hold(fun),hold(f->R));
-	}
-
 // Return a value of type T with the given left and right side.
 value V(type T, value L, value R)
 	{
-	value f = new_value(T,L);
+	value f = new_value();
+	f->N = 1;
+	f->T = T;
+	f->L = L;
 	f->R = R;
 	return f;
 	}
@@ -120,18 +114,21 @@ value Q(type T)
 	return V(T,0,0);
 	}
 
-// Create data of type T with double value x.
-value Qdouble(type T, value L, double x)
-	{
-	value f = new_value(T,L);
-	f->v_double = x;
-	return f;
-	}
-
 // Apply x to y.
 value A(value x, value y)
 	{
 	return V(0,x,y);
+	}
+
+value keep(value fun, value f)
+	{
+	if (fun == f->L)
+		{
+		f->T = fun->T;
+		return hold(f);
+		}
+	else
+		return V(fun->T,hold(fun),hold(f->R));
 	}
 
 unsigned long cur_steps;
