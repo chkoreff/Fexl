@@ -1,7 +1,7 @@
 #include <str.h>
 #include <value.h>
 
-#include <buffer.h>
+#include <buf.h>
 
 #include <basic.h>
 #include <crypto.h>

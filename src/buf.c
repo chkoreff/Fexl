@@ -1,6 +1,6 @@
 #include <str.h>
 
-#include <buffer.h>
+#include <buf.h>
 #include <memory.h>
 #include <string.h> // memcpy
 

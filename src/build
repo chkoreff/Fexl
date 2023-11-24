@@ -13,7 +13,7 @@ make_lib show
 make base64
 make basic
 make bn
-make buffer
+make buf
 make convert
 make crypto
 make die

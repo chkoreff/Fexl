@@ -2,7 +2,7 @@
 #include <value.h>
 
 #include <basic.h>
-#include <buffer.h>
+#include <buf.h>
 #include <parse.h>
 #include <report.h>
 #include <stream.h>

@@ -4,7 +4,7 @@
 #include <types.h>
 
 #include <bn.h>
-#include <buffer.h>
+#include <buf.h>
 #include <die.h>
 #include <memory.h>
 #include <string.h> // strlen
