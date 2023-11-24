@@ -230,24 +230,24 @@ struct form form_lam(type type, string name, struct form body)
 
 // Use pattern p to make a copy of expression e with argument x substituted in
 // the places designated by the pattern.
-static value subst(value p, value e, value x)
+static value sub(value p, value e, value x)
 	{
 	if (p == QF) return hold(e);
 	if (p == QT) return hold(x);
-	return V(e->T,subst(p->L,e->L,x),subst(p->R,e->R,x));
+	return V(e->T,sub(p->L,e->L,x),sub(p->R,e->R,x));
 	}
 
 // Direct substitution
 value type_D(value fun, value f)
 	{
-	return subst(fun->L,fun->R,f->R);
+	return sub(fun->L,fun->R,f->R);
 	}
 
 // Eager substitution
 value type_E(value fun, value f)
 	{
 	value x = arg(f->R);
-	value g = subst(fun->L,fun->R,x);
+	value g = sub(fun->L,fun->R,x);
 	drop(x);
 	return g;
 	}
@@ -334,7 +334,7 @@ static value def(const char *key, value val, value exp)
 			}
 
 		return Qform((struct form){ yt,
-			subst(pattern,form->exp,val),
+			sub(pattern,form->exp,val),
 			hold(form->label) });
 		}
 	}
@@ -438,7 +438,7 @@ value op_resolve(value fun, value f, value define(void))
 
 				if (val)
 					{
-					value exp = subst(x->pattern,result,val);
+					value exp = sub(x->pattern,result,val);
 					drop(val);
 					drop(result);
 					result = exp;
