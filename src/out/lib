@@ -1,23 +1,23 @@
 \out=
 ~
-[I]
-[list [str "a"] [list [str "b"] [null]]]
-[pair [str "a"] [str "b"]]
-[D [A [F] [A [F] [T]]] [D [A [T] [F]] [A [I] [I]]]]
-[form "test/lib.fxl" [[sym a 11 [A [T] [F]]] [sym b 11 [A [F] [A [T] [F]]]] [sym c 11 [A [F] [A [F] [T]]]] ] [A [I] [A [I] [I]]]]
-[A [say] [str "Hello."]]
+hold(QI)
+list(Qstr0("a"),list(Qstr0("b"),Q(type_null)))
+V(type_pair,Qstr0("a"),Qstr0("b"))
+V(type_D,A(hold(QF),A(hold(QF),hold(QT))),V(type_D,A(hold(QT),hold(QF)),A(hold(QI),hold(QI))))
+[form "test/lib.fxl" [[sym a 11 A(hold(QT),hold(QF))] [sym b 11 A(hold(QF),A(hold(QT),hold(QF)))] [sym c 11 A(hold(QF),A(hold(QF),hold(QT)))] ] A(hold(QI),A(hold(QI),hold(QI)))]
+A(Q(type_say),Qstr0("Hello."))
 Hello.
-[I]
-[assoc [pair [str "a"] [num 1]] [assoc [pair [str "b"] [num 2]] [void]]]
-[A [A [add] [num 2]] [num 3]]
-[num 5]
+hold(QI)
+V(type_assoc,V(type_pair,Qstr0("a"),Qnum(1)),V(type_assoc,V(type_pair,Qstr0("b"),Qnum(2)),hold(Qvoid)))
+A(A(Q(type_add),Qnum(2)),Qnum(3))
+Qnum(5)
 
-[tuple [tuple] [list [num 1] [null]]]
-[pair [num 1] [num 2]]
-[tuple [tuple] [list [num 1] [list [num 2] [num 3]]]]
-[tuple [tuple] [list [num 1] [list [num 2] [list [num 3] [null]]]]]
-[pair [A [A [add] [num 1]] [num 1]] [A [A [mul] [num 2]] [num 2]]]
-[list [pair [str "a"] [num 1]] [list [pair [str "b"] [num 2]] [list [pair [str "c"] [num 3]] [null]]]]
+V(type_tuple,hold(Qtuple),list(Qnum(1),Q(type_null)))
+V(type_pair,Qnum(1),Qnum(2))
+V(type_tuple,hold(Qtuple),list(Qnum(1),list(Qnum(2),Qnum(3))))
+V(type_tuple,hold(Qtuple),list(Qnum(1),list(Qnum(2),list(Qnum(3),Q(type_null)))))
+V(type_pair,A(A(Q(type_add),Qnum(1)),Qnum(1)),A(A(Q(type_mul),Qnum(2)),Qnum(2)))
+list(V(type_pair,Qstr0("a"),Qnum(1)),list(V(type_pair,Qstr0("b"),Qnum(2)),list(V(type_pair,Qstr0("c"),Qnum(3)),Q(type_null))))
 ~
 \err=
 ~
