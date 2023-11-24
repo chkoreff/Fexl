@@ -4,8 +4,10 @@
 #include <str.h>
 #include <types.h>
 
-#include <bn.h>
 #include <buf.h>
+
+#include <bn.h>
+#include <buf_str.h>
 #include <die.h>
 #include <memory.h>
 #include <string.h> // strlen

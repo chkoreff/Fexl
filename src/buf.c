@@ -1,5 +1,4 @@
 #include <stddef.h>
-#include <str.h>
 
 #include <buf.h>
 #include <memory.h>
@@ -64,12 +63,6 @@ void buf_addn(buffer buf, const char *str, size_t len)
 	buf->len += len;
 	}
 
-// Add a string to the buffer.
-void buf_put(buffer buf, string str)
-	{
-	buf_addn(buf,str->data,str->len);
-	}
-
 // Discard buffer contents.
 void buf_discard(buffer buf)
 	{
@@ -80,13 +73,4 @@ void buf_discard(buffer buf)
 	buf->len = 0;
 	buf->size = 0;
 	buf->data = 0;
-	}
-
-// Clear the buffer and return its content in a string.
-string buf_clear(buffer buf)
-	{
-	string result = str_new(buf->len);
-	memcpy(result->data,buf->data,buf->len);
-	buf_discard(buf);
-	return result;
 	}

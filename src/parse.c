@@ -2,8 +2,10 @@
 #include <str.h>
 #include <value.h>
 
-#include <basic.h>
 #include <buf.h>
+
+#include <basic.h>
+#include <buf_str.h>
 #include <parse.h>
 #include <report.h>
 #include <stream.h>
