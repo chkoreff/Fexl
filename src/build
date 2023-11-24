@@ -1,19 +1,11 @@
 #!/bin/sh
 . ./lib_build
 
-# Build test code.
-make_PIC output
-make_PIC output_str
-objects=""
-
 # Build test.so
-need output
 make_PIC test
 make_lib test
 
 # Build show.so
-need output
-need output_str
 make_PIC show
 make_lib show
 

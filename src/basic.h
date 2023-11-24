@@ -10,7 +10,6 @@ extern value type_I(value fun, value f);
 extern value type_T(value fun, value f);
 extern value type_F(value fun, value f);
 extern value type_Y(value fun, value f);
-extern value type_data(value fun, value f);
 extern value type_void(value fun, value f);
 extern value type_pair(value fun, value f);
 extern value type_list(value fun, value f);

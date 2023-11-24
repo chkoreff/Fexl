@@ -1,8 +1,9 @@
+#include <stdio.h>
 #include <str.h>
 #include <value.h>
 
 #include <basic.h>
-#include <output.h>
+#include <file.h>
 #include <type_str.h>
 #include <type_sym.h>
 

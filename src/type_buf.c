@@ -13,7 +13,7 @@ buffer get_buf(value x)
 
 value type_buf(value fun, value f)
 	{
-	return type_data(fun,f);
+	return type_void(fun,f);
 	}
 
 static void clear_buf(value f)

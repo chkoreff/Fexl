@@ -8,7 +8,7 @@
 
 value type_lib(value fun, value f)
 	{
-	return type_data(fun,f);
+	return type_void(fun,f);
 	}
 
 static void clear_lib(value f)

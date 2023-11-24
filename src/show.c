@@ -5,8 +5,8 @@
 #include <buffer.h>
 
 #include <basic.h>
-#include <output.h>
-#include <output_str.h>
+#include <file.h>
+#include <file_str.h>
 #include <show.h>
 #include <type_buf.h>
 #include <type_cmp.h>

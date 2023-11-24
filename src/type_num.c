@@ -16,7 +16,7 @@ static void clear_num(value f)
 
 value type_num(value fun, value f)
 	{
-	return type_data(fun,f);
+	return type_void(fun,f);
 	}
 
 value Qnum(double x)

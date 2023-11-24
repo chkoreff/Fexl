@@ -15,7 +15,7 @@ string get_str(value x)
 
 value type_str(value fun, value f)
 	{
-	return type_data(fun,f);
+	return type_void(fun,f);
 	}
 
 static void clear_str(value f)

@@ -42,7 +42,7 @@ static void clear_form(value f)
 
 value type_form(value fun, value f)
 	{
-	return type_data(fun,f);
+	return type_void(fun,f);
 	}
 
 value Qform(struct form form)

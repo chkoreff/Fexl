@@ -39,13 +39,6 @@ value type_Y(value fun, value f)
 	return A(hold(f->R),A(hold(fun),hold(f->R)));
 	}
 
-value type_data(value fun, value f)
-	{
-	(void)fun;
-	(void)f;
-	return hold(Qvoid);
-	}
-
 // (void x) = void
 value type_void(value fun, value f)
 	{

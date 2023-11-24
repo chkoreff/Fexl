@@ -23,7 +23,7 @@ value Qstderr;
 
 value type_file(value fun, value f)
 	{
-	return type_data(fun,f);
+	return type_void(fun,f);
 	}
 
 // Automatically close the file handle unless it's stdin, stdout, or stderr.

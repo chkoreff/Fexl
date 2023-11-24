@@ -51,7 +51,7 @@ struct istr *get_istr(value x)
 
 value type_istr(value fun, value f)
 	{
-	return type_data(fun,f);
+	return type_void(fun,f);
 	}
 
 // (readstr str) returns an iterator on the string.
