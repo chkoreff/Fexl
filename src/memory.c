@@ -7,7 +7,7 @@
 
 // Track the amount of memory used so I can detect memory leaks.  Normally this
 // is impossible but I check it anyway in case of software error.
-static unsigned long cur_blocks = 0;
+unsigned long cur_blocks = 0;
 unsigned long cur_bytes = 0;
 
 // Return a new span of memory of size num_bytes, or die if not possible.

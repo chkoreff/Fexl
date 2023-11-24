@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <str.h>
 #include <value.h>
 
@@ -91,7 +92,7 @@ static string parse_name(void)
 		)
 		buf_keep(&buf);
 
-	if (!buf.top) return 0;
+	if (!buf.len) return 0;
 	return buf_clear(&buf);
 	}
 

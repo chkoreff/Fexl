@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <str.h>
 #include <value.h>
 
@@ -29,7 +30,7 @@ value type_buf_new(value fun, value f)
 	{
 	static struct value clear = {{.N=0}, {.clear=clear_buf}};
 	buffer buf = new_memory(sizeof(struct buffer));
-	buf->top = 0;
+	*buf = (struct buffer){0};
 	(void)fun;
 	(void)f;
 	return V(type_buf,&clear,(value)buf);
