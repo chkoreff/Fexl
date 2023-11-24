@@ -3,6 +3,7 @@
 
 #include <basic.h>
 #include <buf.h>
+#include <memory.h>
 #include <type_buf.h>
 #include <type_str.h>
 
@@ -18,16 +19,20 @@ value type_buf(value fun, value f)
 
 static void clear_buf(value f)
 	{
-	buf_free(f->v_ptr);
+	buffer buf = f->v_ptr;
+	buf_discard(buf);
+	free_memory(buf,sizeof(struct buffer));
 	}
 
 // buf_new returns a new empty character buffer.
 value type_buf_new(value fun, value f)
 	{
 	static struct value clear = {{.N=0}, {.clear=clear_buf}};
+	buffer buf = new_memory(sizeof(struct buffer));
+	buf->top = 0;
 	(void)fun;
 	(void)f;
-	return V(type_buf,&clear,(value)buf_new());
+	return V(type_buf,&clear,(value)buf);
 	}
 
 // (buf_put buf str) Appends the string to the buffer.

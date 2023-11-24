@@ -1,9 +1,8 @@
 #include <str.h>
 #include <value.h>
 
-#include <buf.h>
-
 #include <basic.h>
+#include <buf.h>
 #include <stream.h>
 #include <type_buf.h>
 #include <type_num.h>

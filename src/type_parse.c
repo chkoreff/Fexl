@@ -2,9 +2,8 @@
 #include <str.h>
 #include <value.h>
 
-#include <buf.h>
-
 #include <basic.h>
+#include <buf.h>
 #include <die.h>
 #include <file.h>
 #include <parse.h>

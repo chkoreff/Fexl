@@ -1,9 +1,8 @@
 #include <str.h>
 #include <value.h>
 
-#include <buf.h>
-
 #include <basic.h>
+#include <buf.h>
 #include <crypto.h>
 #include <stdio.h>
 #include <string.h> // strcmp

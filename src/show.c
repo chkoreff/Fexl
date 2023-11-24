@@ -2,9 +2,8 @@
 #include <str.h>
 #include <value.h>
 
-#include <buf.h>
-
 #include <basic.h>
+#include <buf.h>
 #include <file.h>
 #include <file_str.h>
 #include <show.h>

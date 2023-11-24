@@ -4,13 +4,6 @@
 #include <memory.h>
 #include <string.h> // memcpy
 
-buffer buf_new(void)
-	{
-	buffer buf = new_memory(sizeof(struct buffer));
-	buf->top = 0;
-	return buf;
-	}
-
 static struct chunk *new_chunk(struct chunk *next, const unsigned long size)
 	{
 	struct chunk *new = new_memory(sizeof(struct chunk));
@@ -92,11 +85,4 @@ string buf_clear(buffer buf)
 
 	buf_discard(buf);
 	return result;
-	}
-
-// Free a dynamically allocated buffer.
-void buf_free(buffer buf)
-	{
-	buf_discard(buf);
-	free_memory(buf,sizeof(struct buffer));
 	}
