@@ -1,10 +1,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <buf.h>
 #include <str.h>
 #include <types.h>
-
-#include <buf.h>
 
 #include <bn.h>
 #include <buf_str.h>
