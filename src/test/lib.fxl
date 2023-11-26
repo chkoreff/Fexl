@@ -7,8 +7,14 @@ show ()
 show ["a" "b"]
 show {"a" "b"}
 show (\\x\\y y x)
-
+nl
 show (\; a (b c))
+show (\; )
+show (\; ["a" "b"])
+show (\; say ["a" "b"])
+show (\; \\x\\y y x)
+show (\; \x\\y y x)
+nl
 
 \\x=(say "Hello.")
 show x
@@ -37,4 +43,45 @@ show {x y; z}
 show {x y z}
 show {(+ x x) (* y y)}
 show [{"a" 1} {"b" 2} {"c" 3}]
+)
+
+(
+nl
+show {"a" "b"}
+show {I "b"}
+show {"a" I}
+show {"a" I; say}
+show {1 2 3}
+show {}
+show {say}
+show {1 2 say}
+)
+
+(
+nl
+show {"a" "b"}
+show {I "b"}
+show {"a" I}
+show {say @}
+show {"a" I; say}
+show {"a" I; []}
+nl
+show {}
+show {1}
+show {1 2}
+show {1 2 3}
+nl
+show (\; {a b})
+show (\; {a 2})
+show (\; {1 b})
+show (\; {1 2})
+nl
+show (\; {a b c})
+show (\; {a b 3})
+show (\; {a 2 3})
+show (\; {1 2 3})
+nl
+show (\; {1 b c})
+show (\; {1 2 c})
+show (\; {1 2 3})
 )

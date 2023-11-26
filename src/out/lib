@@ -4,7 +4,14 @@ hold(QI)
 list(Qstr0("a"),list(Qstr0("b"),Q(type_null)))
 V(type_pair,Qstr0("a"),Qstr0("b"))
 V(type_D,A(hold(QF),A(hold(QF),hold(QT))),V(type_D,A(hold(QT),hold(QF)),A(hold(QI),hold(QI))))
+
 [form "test/lib.fxl" [[sym a 11 A(hold(QT),hold(QF))] [sym b 11 A(hold(QF),A(hold(QT),hold(QF)))] [sym c 11 A(hold(QF),A(hold(QF),hold(QT)))] ] A(hold(QI),A(hold(QI),hold(QI)))]
+[form "test/lib.fxl" [] hold(QI)]
+[form "test/lib.fxl" [] list(Qstr0("a"),list(Qstr0("b"),Q(type_null)))]
+[form "test/lib.fxl" [[sym say 14 A(hold(QT),hold(QF))] ] A(hold(QI),list(Qstr0("a"),list(Qstr0("b"),Q(type_null))))]
+[form "test/lib.fxl" [] V(type_D,A(hold(QF),A(hold(QF),hold(QT))),V(type_D,A(hold(QT),hold(QF)),A(hold(QI),hold(QI))))]
+[form "test/lib.fxl" [] V(type_E,A(hold(QF),A(hold(QF),hold(QT))),V(type_D,A(hold(QT),hold(QF)),A(hold(QI),hold(QI))))]
+
 A(Q(type_say),Qstr0("Hello."))
 Hello.
 hold(QI)
@@ -18,6 +25,41 @@ V(type_tuple,hold(Qtuple),list(Qnum(1),list(Qnum(2),Qnum(3))))
 V(type_tuple,hold(Qtuple),list(Qnum(1),list(Qnum(2),list(Qnum(3),Q(type_null)))))
 V(type_pair,A(A(Q(type_add),Qnum(1)),Qnum(1)),A(A(Q(type_mul),Qnum(2)),Qnum(2)))
 list(V(type_pair,Qstr0("a"),Qnum(1)),list(V(type_pair,Qstr0("b"),Qnum(2)),list(V(type_pair,Qstr0("c"),Qnum(3)),Q(type_null))))
+
+V(type_pair,Qstr0("a"),Qstr0("b"))
+V(type_pair,hold(QI),Qstr0("b"))
+V(type_pair,Qstr0("a"),hold(QI))
+V(type_tuple,hold(Qtuple),list(Qstr0("a"),list(hold(QI),Q(type_say))))
+V(type_tuple,hold(Qtuple),list(Qnum(1),list(Qnum(2),list(Qnum(3),Q(type_null)))))
+V(type_tuple,hold(Qtuple),Q(type_null))
+V(type_tuple,hold(Qtuple),list(Q(type_say),Q(type_null)))
+V(type_tuple,hold(Qtuple),list(Qnum(1),list(Qnum(2),list(Q(type_say),Q(type_null)))))
+
+V(type_pair,Qstr0("a"),Qstr0("b"))
+V(type_pair,hold(QI),Qstr0("b"))
+V(type_pair,Qstr0("a"),hold(QI))
+V(type_pair,Q(type_say),hold(QY))
+V(type_tuple,hold(Qtuple),list(Qstr0("a"),list(hold(QI),Q(type_say))))
+V(type_pair,Qstr0("a"),hold(QI))
+
+V(type_tuple,hold(Qtuple),Q(type_null))
+V(type_tuple,hold(Qtuple),list(Qnum(1),Q(type_null)))
+V(type_pair,Qnum(1),Qnum(2))
+V(type_tuple,hold(Qtuple),list(Qnum(1),list(Qnum(2),list(Qnum(3),Q(type_null)))))
+
+[form "test/lib.fxl" [[sym a 74 A(hold(QT),hold(QF))] [sym b 74 A(hold(QF),hold(QT))] ] V(type_pair,hold(QI),hold(QI))]
+[form "test/lib.fxl" [[sym a 75 A(hold(QT),hold(QF))] ] V(type_pair,hold(QI),Qnum(2))]
+[form "test/lib.fxl" [[sym b 76 A(hold(QF),hold(QT))] ] V(type_pair,Qnum(1),hold(QI))]
+[form "test/lib.fxl" [] V(type_pair,Qnum(1),Qnum(2))]
+
+[form "test/lib.fxl" [[sym a 79 A(hold(QF),A(hold(QT),hold(QF)))] [sym b 79 A(hold(QF),A(hold(QF),A(hold(QT),hold(QF))))] [sym c 79 A(hold(QF),A(hold(QF),A(hold(QF),A(hold(QT),hold(QF)))))] ] V(type_tuple,hold(Qtuple),list(hold(QI),list(hold(QI),list(hold(QI),Q(type_null)))))]
+[form "test/lib.fxl" [[sym a 80 A(hold(QF),A(hold(QT),hold(QF)))] [sym b 80 A(hold(QF),A(hold(QF),A(hold(QT),hold(QF))))] ] V(type_tuple,hold(Qtuple),list(hold(QI),list(hold(QI),list(Qnum(3),Q(type_null)))))]
+[form "test/lib.fxl" [[sym a 81 A(hold(QF),A(hold(QT),hold(QF)))] ] V(type_tuple,hold(Qtuple),list(hold(QI),list(Qnum(2),list(Qnum(3),Q(type_null)))))]
+[form "test/lib.fxl" [] V(type_tuple,hold(Qtuple),list(Qnum(1),list(Qnum(2),list(Qnum(3),Q(type_null)))))]
+
+[form "test/lib.fxl" [[sym b 84 A(hold(QF),A(hold(QF),A(hold(QT),hold(QF))))] [sym c 84 A(hold(QF),A(hold(QF),A(hold(QF),A(hold(QT),hold(QF)))))] ] V(type_tuple,hold(Qtuple),list(Qnum(1),list(hold(QI),list(hold(QI),Q(type_null)))))]
+[form "test/lib.fxl" [[sym c 85 A(hold(QF),A(hold(QF),A(hold(QF),A(hold(QT),hold(QF)))))] ] V(type_tuple,hold(Qtuple),list(Qnum(1),list(Qnum(2),list(hold(QI),Q(type_null)))))]
+[form "test/lib.fxl" [] V(type_tuple,hold(Qtuple),list(Qnum(1),list(Qnum(2),list(Qnum(3),Q(type_null)))))]
 ~
 \err=
 ~
