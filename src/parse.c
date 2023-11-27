@@ -103,7 +103,7 @@ static void error_unclosed(unsigned long first_line)
 	syntax_error("Unclosed string", first_line);
 	}
 
-static struct form parse_quote_string(void)
+static value parse_quote_string(void)
 	{
 	unsigned long first_line = cur_line;
 	struct buffer s_buf = {0};
@@ -116,10 +116,10 @@ static struct form parse_quote_string(void)
 		error_unclosed(first_line);
 		}
 
-	return form_val(Qstr(buf_clear(&s_buf)));
+	return quo(Qstr(buf_clear(&s_buf)));
 	}
 
-static struct form parse_tilde_string(void)
+static value parse_tilde_string(void)
 	{
 	unsigned long first_line = cur_line;
 	struct buffer buf = {0};
@@ -134,34 +134,34 @@ static struct form parse_tilde_string(void)
 			error_unclosed(first_line);
 		}
 
-	return form_val(Qstr(buf_clear(&buf)));
+	return quo(Qstr(buf_clear(&buf)));
 	}
 
-static struct form parse_symbol(void)
+static value parse_symbol(void)
 	{
 	unsigned long first_line = cur_line;
 	string name = parse_name();
-	if (name == 0) return form_null();
+	if (name == 0) return 0;
 	// See if it's a numeric constant.
 	{
 	value n = Qnum_str0(name->data);
 	if (n)
 		{
 		str_free(name);
-		return form_val(n);
+		return quo(n);
 		}
 	else
-		return form_ref(name,first_line);
+		return ref(name,first_line);
 	}
 	}
 
-static struct form parse_term(void);
-static struct form parse_exp(void);
+static value parse_term(void);
+static value parse_exp(void);
 
-static struct form parse_nested(void)
+static value parse_nested(void)
 	{
 	unsigned long first_line = cur_line;
-	struct form exp;
+	value exp;
 	skip();
 	exp = parse_exp();
 	if (cur_ch != ')')
@@ -170,7 +170,7 @@ static struct form parse_nested(void)
 	return exp;
 	}
 
-static struct form parse_items(void)
+static value parse_items(void)
 	{
 	skip_filler();
 	if (cur_ch == ';')
@@ -180,20 +180,20 @@ static struct form parse_items(void)
 		}
 	else
 		{
-		struct form term = parse_term();
-		if (term.exp == 0)
-			return form_val(hold(Qnull));
+		value term = parse_term();
+		if (term == 0)
+			return quo(hold(Qnull));
 		else
-			return form_join(type_list,term,parse_items());
+			return join(type_list,term,parse_items());
 		}
 	}
 
-static struct form parse_seq(const char t_ch, const char *msg)
+static value parse_seq(const char t_ch, const char *msg)
 	{
 	unsigned long first_line = cur_line;
 	skip();
 	{
-	struct form exp = parse_items();
+	value exp = parse_items();
 	if (cur_ch != t_ch)
 		syntax_error(msg, first_line);
 	skip();
@@ -201,50 +201,58 @@ static struct form parse_seq(const char t_ch, const char *msg)
 	}
 	}
 
-static struct form parse_tuple(void)
+static value parse_tuple(void)
 	{
-	struct form list = parse_seq('}',"Unclosed brace");
-	value exp = list.exp;
+	value list = parse_seq('}',"Unclosed brace");
+
 	// If the list is exactly two items change it to type_pair.
-	if (1
-		&& exp->T == type_list
-		&& exp->R->T == type_list
-		&& exp->R->R->T == type_null
-		)
+	int is_pair = 0;
+	value x1, x2;
+	{
+	value f = list;
+	if (f->T == type_quo) f = f->R;
+	if (f->T == type_list)
 		{
-		struct table *table = list.table;
-		if (table)
+		x1 = f->L;
+		f = f->R;
+		if (f->T == type_quo) f = f->R;
+		if (f->T == type_list)
 			{
-			unsigned long i;
-			for (i = 0; i < table->count; i++)
-				{
-				struct symbol *sym = &table->vec[i];
-				if (sym->pattern->R->T == 0)
-					{
-					value p = hold(sym->pattern->R->L);
-					drop(sym->pattern->R);
-					sym->pattern->R = p;
-					}
-				}
+			x2 = f->L;
+			f = f->R;
+			if (f->T == type_quo) f = f->R;
+			if (f->T == type_null)
+				is_pair = 1;
 			}
-		{
-		value R = hold(exp->R->L);
-		drop(exp->R);
-		exp->R = R;
-		exp->T = type_pair;
 		}
-		return list;
-		}
-	else
-		return form_appv(form_val(hold(Qtuple)),list);
 	}
 
-static struct form parse_list(void)
+	if (is_pair)
+		{
+		value pair;
+
+		hold(x2);
+		if (list->T != type_quo && list->R->T == type_quo)
+			x2 = quo(x2);
+
+		pair = join(type_pair,hold(x1),x2);
+
+		if (list->T == type_quo)
+			pair = quo(pair);
+
+		drop(list);
+		return pair;
+		}
+	else
+		return join(type_tuple,quo(hold(Qtuple)),list);
+	}
+
+static value parse_list(void)
 	{
 	return parse_seq(']',"Unclosed bracket");
 	}
 
-static struct form parse_term(void)
+static value parse_term(void)
 	{
 	if (cur_ch == '(')
 		return parse_nested();
@@ -261,7 +269,7 @@ static struct form parse_term(void)
 	}
 
 // Parse a lambda form following the initial '\' character.
-static struct form parse_lambda(unsigned long first_line, type type)
+static value parse_lambda(unsigned long first_line, type type)
 	{
 	string name = parse_name();
 	if (name == 0)
@@ -276,7 +284,7 @@ static struct form parse_lambda(unsigned long first_line, type type)
 
 	skip_filler();
 	if (cur_ch != '=')
-		return form_lam(type,name,parse_exp()); // No definition
+		return lam(type,name,parse_exp()); // No definition
 
 	first_line = cur_line;
 	skip();
@@ -284,27 +292,25 @@ static struct form parse_lambda(unsigned long first_line, type type)
 
 	// Parse the definition.
 	{
-	struct form def = parse_term();
-	if (def.exp == 0)
+	value def = parse_term();
+	if (def == 0)
 		syntax_error("Missing definition", first_line);
-	return form_app(form_lam(type,name,parse_exp()),def);
+	return app(lam(type,name,parse_exp()),def);
 	}
 	}
 
 // Parse a form (unresolved symbolic expression).
 static value parse_form(void)
 	{
-	struct form exp = parse_exp();
-	exp.label = hold(cur_label);
-	return Qform(exp);
+	return Qform(hold(cur_label),parse_exp());
 	}
 
 // Parse the next factor of an expression, if any.
-static struct form parse_factor(void)
+static value parse_factor(void)
 	{
 	skip_filler();
 	if (cur_ch == -1)
-		return form_null();
+		return 0;
 	else if (cur_ch == '\\')
 		{
 		unsigned long first_line = cur_line;
@@ -312,17 +318,17 @@ static struct form parse_factor(void)
 		if (cur_ch == '#')
 			{
 			cur_ch = -1; // "\#" simulates end of file.
-			return form_null();
+			return 0;
 			}
 		else if (cur_ch == ';')
 			{
 			skip();
-			return form_val(parse_form());
+			return quo(parse_form());
 			}
 		else if (cur_ch == '=')
 			{
 			skip();
-			return form_app(form_val(hold(Qonce)),parse_exp());
+			return app(quo(hold(Qonce)),parse_exp());
 			}
 		else
 			{
@@ -344,7 +350,7 @@ static struct form parse_factor(void)
 		}
 	else
 		{
-		struct form factor = parse_term();
+		value factor = parse_term();
 		if (cur_ch == '=')
 			syntax_error("Missing name declaration before '='", cur_line);
 		return factor;
@@ -352,15 +358,15 @@ static struct form parse_factor(void)
 	}
 
 // Parse an expression.
-static struct form parse_exp(void)
+static value parse_exp(void)
 	{
-	struct form exp = parse_factor();
-	if (exp.exp == 0) return form_val(hold(QI));
+	value exp = parse_factor();
+	if (exp == 0) return quo(hold(QI));
 	while (1)
 		{
-		struct form factor = parse_factor();
-		if (factor.exp == 0) return exp;
-		exp = form_app(exp,factor);
+		value factor = parse_factor();
+		if (factor == 0) return exp;
+		exp = app(exp,factor);
 		}
 	}
 

@@ -9,35 +9,110 @@
 #include <type_str.h>
 #include <type_sym.h>
 
-static unsigned long table_size(unsigned long len)
+value type_quo(value fun, value f)
 	{
-	return sizeof(struct table) + sizeof(struct symbol[len]);
+	return type_void(fun,f);
 	}
 
-static void table_free(struct table *table)
+value type_ref(value fun, value f)
 	{
-	unsigned long i;
-	// Drop each symbol in vec.
-	for (i = 0; i < table->count; i++)
+	return type_void(fun,f);
+	}
+
+static void clear_quo(value f)
+	{
+	drop(f->R);
+	}
+
+value quo(value val)
+	{
+	static struct value clear = {{.N=0}, {.clear=clear_quo}};
+	return V(type_quo,&clear,val);
+	}
+
+static void clear_ref(value f)
+	{
+	value x = f->R;
+	str_free(x->v_ptr);
+	recycle(x);
+	}
+
+value ref(string name, unsigned long line)
+	{
+	static struct value clear = {{.N=0}, {.clear=clear_ref}};
+	value x = new_value();
+	x->v_ptr = name;
+	x->N = line;
+	return V(type_ref,&clear,x);
+	}
+
+static value unquo(value f)
+	{
+	value x = hold(f->R);
+	drop(f);
+	return x;
+	}
+
+value join(type t, value x, value y)
+	{
+	if (x->T == type_quo && y->T == type_quo)
+		return quo(V(t,unquo(x),unquo(y)));
+	else
+		return V(t,x,y);
+	}
+
+value app(value x, value y)
+	{
+	return join(0,x,y);
+	}
+
+static value get_pattern(string name, value e)
+	{
+	if (e->T == type_quo)
+		return hold(QF);
+	else if (e->T == type_ref)
 		{
-		struct symbol *sym = &table->vec[i];
-		drop(sym->name);
-		drop(sym->pattern);
+		if (str_eq(name,get_str(e->R)))
+			return hold(QT);
+		else
+			return hold(QF);
 		}
-	free_memory(table, table_size(table->len));
+	else
+		{
+		value L = get_pattern(name,e->L);
+		value R = get_pattern(name,e->R);
+		if (L == QF && R == QF)
+			{
+			drop(L);
+			drop(R);
+			return hold(QF);
+			}
+		else
+			return A(L,R);
+		}
 	}
 
-static void clear_form(value f)
+// Substitute into a form.
+static value subf(value p, value e, value x)
 	{
-	struct form *form = f->v_ptr;
+	if (p == QF) return hold(e);
+	if (p == QT) return hold(x);
+	return join(e->T,subf(p->L,e->L,x),subf(p->R,e->R,x));
+	}
 
-	drop(form->exp);
-	drop(form->label);
-
-	if (form->table)
-		table_free(form->table);
-
-	free_memory(form,sizeof(struct form));
+value lam(type type, string name, value e)
+	{
+	value p = get_pattern(name,e);
+	value x = quo(hold(QI));
+	value f = subf(p,e,x);
+	drop(x);
+	if (f->T == type_quo)
+		f = quo(V(type,p,unquo(f)));
+	else
+		f = V(type,quo(p),f);
+	str_free(name);
+	drop(e);
+	return f;
 	}
 
 value type_form(value fun, value f)
@@ -45,187 +120,9 @@ value type_form(value fun, value f)
 	return type_void(fun,f);
 	}
 
-value Qform(struct form form)
+value Qform(value label, value exp)
 	{
-	static struct value clear = {{.N=0}, {.clear=clear_form}};
-	struct form *p = new_memory(sizeof(struct form));
-	*p = form;
-	return V(type_form,&clear,(value)p);
-	}
-
-struct form form_null(void)
-	{
-	return (struct form){ 0, 0, 0 };
-	}
-
-// Make a reference to a fixed value with no symbols.
-struct form form_val(value exp)
-	{
-	return (struct form){ 0, exp, 0 };
-	}
-
-static struct table *table_ref(string name, unsigned long line)
-	{
-	struct table *table;
-	struct symbol *sym;
-
-	table = new_memory(table_size(1));
-	table->count = 1;
-	table->len = 1;
-
-	sym = &table->vec[0];
-	sym->name = Qstr(name);
-	sym->pattern = hold(QT);
-	sym->line = line;
-	return table;
-	}
-
-// Make a reference to a symbol on a given line.
-struct form form_ref(string name, unsigned long line)
-	{
-	struct table *table = table_ref(name,line);
-	return (struct form){ table, hold(QI), 0 };
-	}
-
-// Merge the tables and combine patterns where they intersect.
-static struct table *table_merge(struct table *xt, struct table *yt)
-	{
-	struct table *zt = 0;
-	unsigned long xn = xt ? xt->count : 0;
-	unsigned long yn = yt ? yt->count : 0;
-	unsigned long zn = xn + yn;
-
-	if (zn != 0)
-	{
-	unsigned long xi = 0;
-	unsigned long yi = 0;
-	unsigned long zi = 0;
-
-	zt = new_memory(table_size(zn));
-	zt->len = zn;
-
-	while (1)
-		{
-		struct symbol *x = &xt->vec[xi];
-		struct symbol *y = &yt->vec[yi];
-		struct symbol *z = &zt->vec[zi];
-
-		int cmp;
-		if (xi < xn)
-			{
-			if (yi < yn)
-				cmp = strcmp(str_data(x->name),str_data(y->name));
-			else
-				cmp = -1;
-			}
-		else if (yi < yn)
-			cmp = 1;
-		else
-			break;
-
-		if (cmp < 0)
-			{
-			z->name = hold(x->name);
-			z->pattern = A(hold(x->pattern),hold(QF));
-			z->line = x->line;
-			xi++;
-			}
-		else if (cmp == 0)
-			{
-			z->name = hold(x->name);
-			z->pattern = A(hold(x->pattern),hold(y->pattern));
-			z->line = x->line;
-			xi++;
-			yi++;
-			}
-		else
-			{
-			z->name = hold(y->name);
-			z->pattern = A(hold(QF),hold(y->pattern));
-			z->line = y->line;
-			yi++;
-			}
-
-		zi++;
-		}
-
-	zt->count = zi;
-	}
-
-	if (xt) table_free(xt);
-	if (yt) table_free(yt);
-
-	return zt;
-	}
-
-// Make an applicative form with the given type.
-struct form form_join(type t, struct form fun, struct form arg)
-	{
-	return (struct form)
-		{
-		table_merge(fun.table,arg.table),
-		V(t,fun.exp,arg.exp),
-		0
-		};
-	}
-
-// Apply function to argument, keeping the type of the function.
-struct form form_appv(struct form fun, struct form arg)
-	{
-	return form_join(fun.exp->T,fun,arg);
-	}
-
-// Apply function to argument.
-struct form form_app(struct form fun, struct form arg)
-	{
-	return form_join(0,fun,arg);
-	}
-
-// Delete the symbol with the given name and return the associated pattern.
-static value table_pop(string name, struct table *xt)
-	{
-	value pattern = 0;
-	if (xt != 0)
-		{
-		unsigned long xi = 0;
-		unsigned long yi = 0;
-
-		while (xi < xt->count)
-			{
-			struct symbol *x = &xt->vec[xi];
-			int cmp = pattern ? 1 : strcmp(name->data,str_data(x->name));
-
-			if (cmp == 0)
-				{
-				pattern = x->pattern;
-				drop(x->name);
-				}
-			else
-				{
-				struct symbol *y = &xt->vec[yi];
-				y->name = x->name;
-				y->pattern = A(hold(QF),x->pattern);
-				y->line = x->line;
-				yi++;
-				}
-			xi++;
-			}
-
-		xt->count = yi;
-		}
-
-	if (pattern == 0)
-		pattern = hold(QF); // not found
-	return pattern;
-	}
-
-// Abstract the name from the body.
-struct form form_lam(type type, string name, struct form body)
-	{
-	value pattern = table_pop(name,body.table);
-	str_free(name);
-	body.exp = V(type,pattern,body.exp);
-	return body;
+	return V(type_form,label,exp);
 	}
 
 // Use pattern p to make a copy of expression e with argument x substituted in
@@ -252,9 +149,9 @@ value type_E(value fun, value f)
 	return g;
 	}
 
-static int is_closed(struct table *xt)
+static int is_closed(value exp)
 	{
-	return (xt == 0 || xt->count == 0);
+	return exp->R->T == type_quo;
 	}
 
 // Return true if the form has no undefined symbols.
@@ -262,10 +159,7 @@ value type_is_closed(value fun, value f)
 	{
 	value exp = arg(f->R);
 	if (exp->T == type_form)
-		{
-		struct form *form = exp->v_ptr;
-		f = boolean(is_closed(form->table));
-		}
+		f = boolean(is_closed(exp));
 	else
 		f = hold(Qvoid);
 	drop(exp);
@@ -274,69 +168,23 @@ value type_is_closed(value fun, value f)
 	}
 
 // Define key as val in a form.
-static value def(const char *key, value val, value exp)
+static value def(string key, value val, value exp)
 	{
-	struct form *form = exp->v_ptr;
-	struct table *xt = form->table;
-	value pattern = 0;
+	value pattern = get_pattern(key,exp->R);
+	value result;
 
-	if (xt != 0)
-		{
-		unsigned long xi = 0;
-
-		while (xi < xt->count)
-			{
-			struct symbol *x = &xt->vec[xi];
-			int cmp = strcmp(key,str_data(x->name));
-			if (cmp > 0)
-				xi++;
-			else
-				{
-				if (cmp == 0)
-					pattern = x->pattern;
-				break;
-				}
-			}
-		}
-
-	if (pattern == 0)
-		return hold(exp);
+	if (pattern == QF)
+		result = hold(exp);
 	else
 		{
-		// Copy the symbols except the one with the given pattern.
-		struct table *yt;
-		unsigned long yn = xt->count - 1;
-
-		if (yn == 0)
-			yt = 0;
-		else
-			{
-			unsigned long xi = 0;
-			unsigned long yi = 0;
-
-			yt = new_memory(table_size(yn));
-			yt->count = yn;
-			yt->len = yn;
-
-			while (xi < xt->count)
-				{
-				struct symbol *x = &xt->vec[xi];
-				if (x->pattern != pattern)
-					{
-					struct symbol *y = &yt->vec[yi];
-					y->name = hold(x->name);
-					y->pattern = hold(x->pattern);
-					y->line = x->line;
-					yi++;
-					}
-				xi++;
-				}
-			}
-
-		return Qform((struct form){ yt,
-			sub(pattern,form->exp,val),
-			hold(form->label) });
+		value x = quo(hold(val));
+		value new = subf(pattern,exp->R,x);
+		drop(x);
+		result = Qform(hold(exp->L),new);
 		}
+
+	drop(pattern);
+	return result;
 	}
 
 value type_def(value fun, value f)
@@ -349,7 +197,7 @@ value type_def(value fun, value f)
 		{
 		value exp = arg(f->R);
 		if (exp->T == type_form)
-			f = def(str_data(key),fun->R,exp);
+			f = def(get_str(key),fun->R,exp);
 		else
 			f = hold(Qvoid);
 		drop(exp);
@@ -361,6 +209,19 @@ value type_def(value fun, value f)
 	}
 	}
 
+static void report_undef(const char *label, value exp)
+	{
+	if (exp->T == type_quo)
+		;
+	else if (exp->T == type_ref)
+		undefined_symbol(str_data(exp->R),exp->R->N,label);
+	else
+		{
+		report_undef(label,exp->L);
+		report_undef(label,exp->R);
+		}
+	}
+
 // Evaluate the form if all symbols are defined, otherwise report the undefined
 // symbols and die.
 value type_value(value fun, value f)
@@ -368,20 +229,11 @@ value type_value(value fun, value f)
 	value exp = arg(f->R);
 	if (exp->T == type_form)
 		{
-		struct form *form = exp->v_ptr;
-		struct table *xt = form->table;
-
-		if (is_closed(xt))
-			f = hold(form->exp);
+		if (is_closed(exp))
+			f = hold(exp->R->R);
 		else
 			{
-			const char *label = str_data(form->label);
-			unsigned long i;
-			for (i = 0; i < xt->count; i++)
-				{
-				struct symbol *x = &xt->vec[i];
-				undefined_symbol(str_data(x->name),x->line,label);
-				}
+			report_undef(str_data(exp->L),exp->R);
 			die(0);
 			}
 		}
@@ -390,6 +242,13 @@ value type_value(value fun, value f)
 	drop(exp);
 	(void)fun;
 	return f;
+	}
+
+static const char *cur_name;
+
+int match(const char *other)
+	{
+	return strcmp(cur_name,other) == 0;
 	}
 
 // Like type_value, except it yields the form value to the caller without
@@ -401,11 +260,64 @@ value type_resolve(value fun, value f)
 	return f;
 	}
 
-const char *cur_name;
+static value cache = 0;
 
-int match(const char *other)
+static value find(string name)
 	{
-	return strcmp(cur_name,other) == 0;
+	value pos = cache;
+	while (pos)
+		{
+		if (str_eq(name,get_str(pos->L->R)))
+			return hold(pos->R);
+		pos = pos->next;
+		}
+	return 0;
+	}
+
+static void clear_cache(void)
+	{
+	while (cache)
+		{
+		value next = cache->next;
+		drop(cache->L);
+		drop(cache->R);
+		recycle(cache);
+		cache = next;
+		}
+	}
+
+static value do_resolve(value exp, value define())
+	{
+	if (exp->T == type_quo)
+		return hold(exp);
+	else if (exp->T == type_ref)
+		{
+		string name = get_str(exp->R);
+		value val = find(name);
+		if (val)
+			return val;
+		else
+			{
+			cur_name = name->data;
+			val = define();
+			if (val)
+				{
+				value top = new_value();
+				val = quo(val);
+				top->L = hold(exp);
+				top->R = hold(val);
+				top->next = cache;
+				cache = top;
+				return val;
+				}
+			else
+				return hold(exp);
+			}
+		}
+	else
+		return join(exp->T,
+			do_resolve(exp->L,define),
+			do_resolve(exp->R,define));
 	}
 
 value op_resolve(value fun, value f, value define(void))
@@ -413,56 +325,13 @@ value op_resolve(value fun, value f, value define(void))
 	value exp = arg(f->R);
 	if (exp->T == type_form)
 		{
-		struct form *form = exp->v_ptr;
-		struct table *xt = form->table;
-
-		if (is_closed(xt))
+		if (is_closed(exp))
 			f = hold(exp);
 		else
 			{
-			value result = hold(form->exp);
-			struct table *yt;
-			unsigned long xi = 0;
-			unsigned long yi = 0;
-
-			yt = new_memory(table_size(xt->count));
-			yt->len = xt->count;
-
-			while (xi < xt->count)
-				{
-				struct symbol *x = &xt->vec[xi];
-				value val;
-
-				cur_name = str_data(x->name);
-				val = define();
-
-				if (val)
-					{
-					value exp = sub(x->pattern,result,val);
-					drop(val);
-					drop(result);
-					result = exp;
-					}
-				else
-					{
-					struct symbol *y = &yt->vec[yi];
-					y->name = hold(x->name);
-					y->pattern = hold(x->pattern);
-					y->line = x->line;
-					yi++;
-					}
-				xi++;
-				}
-
-			yt->count = yi;
-
-			if (yi == 0)
-				{
-				table_free(yt);
-				yt = 0;
-				}
-
-			f = Qform((struct form){ yt, result, hold(form->label) });
+			value new = do_resolve(exp->R,define);
+			clear_cache();
+			f = Qform(hold(exp->L),new);
 			}
 		}
 	else

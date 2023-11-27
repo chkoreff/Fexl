@@ -4,6 +4,8 @@
 \err=
 ~
 Undefined symbol a on line 1
+Undefined symbol a on line 2
 Undefined symbol c on line 2
+Undefined symbol c on line 3
 ~
 \status=1

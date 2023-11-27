@@ -1,39 +1,17 @@
-struct symbol
-	{
-	value name;
-	value pattern;
-	unsigned long line;
-	};
-
-struct table
-	{
-	unsigned long count;
-	unsigned long len;
-	struct symbol vec[];
-	};
-
-struct form
-	{
-	struct table *table;
-	value exp;
-	value label;
-	};
-
+extern value type_quo(value fun, value f);
+extern value type_ref(value fun, value f);
+extern value quo(value val);
+extern value ref(string name, unsigned long line);
+extern value join(type t, value x, value y);
+extern value app(value x, value y);
+extern value lam(type type, string name, value exp);
 extern value type_form(value fun, value f);
-extern value Qform(struct form form);
-extern struct form form_null(void);
-extern struct form form_val(value exp);
-extern struct form form_ref(string name, unsigned long line);
-extern struct form form_join(type t, struct form fun, struct form arg);
-extern struct form form_appv(struct form fun, struct form arg);
-extern struct form form_app(struct form fun, struct form arg);
-extern struct form form_lam(type type, string name, struct form body);
+extern value Qform(value label, value exp);
 extern value type_D(value fun, value f);
 extern value type_E(value fun, value f);
 extern value type_is_closed(value fun, value f);
 extern value type_def(value fun, value f);
 extern value type_value(value fun, value f);
-extern const char *cur_name;
 extern int match(const char *other);
 extern value type_resolve(value fun, value f);
 extern value op_resolve(value fun, value f, value define(void));

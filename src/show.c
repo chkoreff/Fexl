@@ -38,43 +38,21 @@ static void show_str(value f)
 	put(")");
 	}
 
-static void show_table(struct table *table)
+static void show_quo(value f)
 	{
-	put_ch('[');
-	if (table)
-	{
-	unsigned long i;
-	for (i = 0; i < table->count; i++)
-		{
-		struct symbol *sym = &table->vec[i];
-		put_ch('[');
-		put("sym"); put_ch(' ');
-		put_str(get_str(sym->name)); put_ch(' ');
-		put_ulong(sym->line); put_ch(' ');
-		limit_show(sym->pattern);
-		put_ch(']');
-		put_ch(' ');
-		}
-	}
-	put_ch(']');
+	put("quo(");
+	limit_show(f->R);
+	put_ch(')');
 	}
 
-static void show_form(value f)
+static void show_ref(value f)
 	{
-	struct form *form = f->v_ptr;
-	put_ch('[');
-	put("form");
-	put_ch(' ');
-
-	if (form->label)
-		put_quote(get_str(form->label));
-	else
-		put_ch('0');
-	put_ch(' ');
-	show_table(form->table);
-	put_ch(' ');
-	limit_show(form->exp);
-	put_ch(']');
+	value x = f->R;
+	put("ref(");
+	put_quote(get_str(x));
+	put_ch(',');
+	put_ulong(x->N);
+	put_ch(')');
 	}
 
 static void show_data(value f)
@@ -83,8 +61,10 @@ static void show_data(value f)
 		show_num(f);
 	else if (f->T == type_str)
 		show_str(f);
-	else if (f->T == type_form)
-		show_form(f);
+	else if (f->T == type_quo)
+		show_quo(f);
+	else if (f->T == type_ref)
+		show_ref(f);
 	else
 		put("DATA");
 	}
@@ -143,33 +123,24 @@ static void show_atom(type t)
 		show_Q(t);
 	}
 
-static void show_args(value f)
-	{
-	limit_show(f->L);
-	put_ch(',');
-	limit_show(f->R);
-	put_ch(')');
-	}
-
 static void show_tree(value f)
 	{
 	if (f->T == 0)
-		{
 		put("A(");
-		show_args(f);
-		}
 	else if (f->T == type_list)
-		{
 		put("list(");
-		show_args(f);
-		}
+	else if (f->T == type_form)
+		put("Qform(");
 	else
 		{
 		put("V(");
 		show_type(f->T);
 		put_ch(',');
-		show_args(f);
 		}
+	limit_show(f->L);
+	put_ch(',');
+	limit_show(f->R);
+	put_ch(')');
 	}
 
 static unsigned long max_depth;
