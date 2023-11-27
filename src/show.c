@@ -15,15 +15,38 @@
 #include <type_tuple.h>
 #include <type_with.h>
 
-static void limit_show(value f);
-
-static void show_num(value f)
+static void put_type(type t)
 	{
-	put("Qnum(");
-	put_double(f->v_double);
-	put(")");
+	if (t == 0) put("A");
+	else if (t == type_num) put("num");
+	else if (t == type_str) put("str");
+
+	else if (t == type_form) put("form");
+	else if (t == type_quo) put("quo");
+	else if (t == type_ref) put("ref");
+
+	else if (t == type_T) put("T");
+	else if (t == type_F) put("F");
+	else if (t == type_I) put("I");
+	else if (t == type_Y) put("Y");
+	else if (t == type_once) put("once");
+	else if (t == type_void) put("void");
+	else if (t == type_concat) put("concat");
+	else if (t == type_say) put("say");
+	else if (t == type_add) put("add");
+	else if (t == type_mul) put("mul");
+	else if (t == type_list) put("list");
+	else if (t == type_D) put("D");
+	else if (t == type_E) put("E");
+	else if (t == type_pair) put("pair");
+	else if (t == type_null) put("null");
+	else if (t == type_tuple) put("tuple");
+	else if (t == type_assoc) put("assoc");
+
+	else put("TYPE");
 	}
 
+// LATER 20231127 Use tilde notation if string has embedded quotes.
 static void put_quote(string x)
 	{
 	put_ch('"');
@@ -31,116 +54,25 @@ static void put_quote(string x)
 	put_ch('"');
 	}
 
-static void show_str(value f)
-	{
-	put("Qstr0(");
-	put_quote(get_str(f));
-	put(")");
-	}
+static void limit_show(value f);
 
-static void show_quo(value f)
-	{
-	put("quo(");
-	limit_show(f->R);
-	put_ch(')');
-	}
-
-static void show_ref(value f)
-	{
-	value x = f->R;
-	put("ref(");
-	put_quote(get_str(x));
-	put_ch(',');
-	put_ulong(x->N);
-	put_ch(')');
-	}
-
-static void show_data(value f)
+static void put_data(value f)
 	{
 	if (f->T == type_num)
-		show_num(f);
+		put_double(f->v_double);
 	else if (f->T == type_str)
-		show_str(f);
+		put_quote(get_str(f));
 	else if (f->T == type_quo)
-		show_quo(f);
+		limit_show(f->R);
 	else if (f->T == type_ref)
-		show_ref(f);
+		{
+		value x = f->R;
+		put_quote(get_str(x));
+		put_ch(' ');
+		put_ulong(x->N);
+		}
 	else
 		put("DATA");
-	}
-
-static void show_type(type t)
-	{
-	if (t == type_T) put("type_T");
-	else if (t == type_F) put("type_F");
-	else if (t == type_I) put("type_I");
-	else if (t == type_Y) put("type_Y");
-	else if (t == type_once) put("type_once");
-	else if (t == type_void) put("type_void");
-	else if (t == type_concat) put("type_concat");
-	else if (t == type_say) put("type_say");
-	else if (t == type_add) put("type_add");
-	else if (t == type_mul) put("type_mul");
-	else if (t == type_list) put("type_list");
-	else if (t == type_D) put("type_D");
-	else if (t == type_E) put("type_E");
-	else if (t == type_pair) put("type_pair");
-	else if (t == type_null) put("type_null");
-	else if (t == type_tuple) put("type_tuple");
-	else if (t == type_assoc) put("type_assoc");
-	else put_ch('_');
-	}
-
-static void show_hold(const char *name)
-	{
-	put("hold(");
-	put(name);
-	put(")");
-	}
-
-static void show_Q(type t)
-	{
-	put("Q(");
-	show_type(t);
-	put(")");
-	}
-
-static void show_atom(type t)
-	{
-	if (t == type_T)
-		show_hold("QT");
-	else if (t == type_F)
-		show_hold("QF");
-	else if (t == type_I)
-		show_hold("QI");
-	else if (t == type_Y)
-		show_hold("QY");
-	else if (t == type_void)
-		show_hold("Qvoid");
-	else if (t == type_tuple)
-		show_hold("Qtuple");
-	else
-		show_Q(t);
-	}
-
-static void show_tree(value f)
-	{
-	if (f->T == 0)
-		put("A(");
-	else if (f->T == type_list)
-		put("list(");
-	else if (f->T == type_form)
-		put("Qform(");
-	else
-		{
-		put("V(");
-		show_type(f->T);
-		put_ch(',');
-		}
-	limit_show(f->L);
-	put_ch(',');
-	limit_show(f->R);
-	put_ch(')');
 	}
 
 static unsigned long max_depth;
@@ -157,15 +89,21 @@ static void limit_show(value f)
 	max_call--;
 	max_depth--;
 
+	put_ch('[');
+	put_type(f->T);
 	if (f->L)
 		{
+		put_ch(' ');
 		if (f->L->N)
-			show_tree(f);
+			{
+			limit_show(f->L);
+			put_ch(' ');
+			limit_show(f->R);
+			}
 		else
-			show_data(f);
+			put_data(f);
 		}
-	else
-		show_atom(f->T);
+	put_ch(']');
 
 	max_depth++;
 	}
