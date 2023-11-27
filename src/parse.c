@@ -280,19 +280,14 @@ static struct form parse_lambda(unsigned long first_line, type type)
 
 	first_line = cur_line;
 	skip();
+	skip_filler();
 
 	// Parse the definition.
 	{
-	struct form def;
-	struct form exp;
-
-	skip_filler();
-	def = parse_term();
+	struct form def = parse_term();
 	if (def.exp == 0)
 		syntax_error("Missing definition", first_line);
-
-	exp = form_lam(type,name,parse_exp());
-	return form_app(exp,def);
+	return form_app(form_lam(type,name,parse_exp()),def);
 	}
 	}
 
