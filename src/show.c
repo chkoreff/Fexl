@@ -15,35 +15,35 @@
 #include <type_tuple.h>
 #include <type_with.h>
 
-static void put_type(type t)
+static const char *type_name(type t)
 	{
-	if (t == 0) put("A");
-	else if (t == type_num) put("num");
-	else if (t == type_str) put("str");
+	if (t == 0) return "A";
+	if (t == type_num) return "num";
+	if (t == type_str) return "str";
 
-	else if (t == type_form) put("form");
-	else if (t == type_quo) put("quo");
-	else if (t == type_ref) put("ref");
+	if (t == type_form) return "form";
+	if (t == type_quo) return "quo";
+	if (t == type_ref) return "ref";
 
-	else if (t == type_T) put("T");
-	else if (t == type_F) put("F");
-	else if (t == type_I) put("I");
-	else if (t == type_Y) put("Y");
-	else if (t == type_once) put("once");
-	else if (t == type_void) put("void");
-	else if (t == type_concat) put("concat");
-	else if (t == type_say) put("say");
-	else if (t == type_add) put("add");
-	else if (t == type_mul) put("mul");
-	else if (t == type_list) put("list");
-	else if (t == type_D) put("D");
-	else if (t == type_E) put("E");
-	else if (t == type_pair) put("pair");
-	else if (t == type_null) put("null");
-	else if (t == type_tuple) put("tuple");
-	else if (t == type_assoc) put("assoc");
+	if (t == type_T) return "T";
+	if (t == type_F) return "F";
+	if (t == type_I) return "I";
+	if (t == type_Y) return "Y";
+	if (t == type_once) return "once";
+	if (t == type_void) return "void";
+	if (t == type_concat) return "concat";
+	if (t == type_say) return "say";
+	if (t == type_add) return "add";
+	if (t == type_mul) return "mul";
+	if (t == type_list) return "list";
+	if (t == type_D) return "D";
+	if (t == type_E) return "E";
+	if (t == type_pair) return "pair";
+	if (t == type_null) return "null";
+	if (t == type_tuple) return "tuple";
+	if (t == type_assoc) return "assoc";
 
-	else put("TYPE");
+	return "TYPE";
 	}
 
 // LATER 20231127 Use tilde notation if string has embedded quotes.
@@ -90,7 +90,7 @@ static void limit_show(value f)
 	max_depth--;
 
 	put_ch('[');
-	put_type(f->T);
+	put(type_name(f->T));
 	if (f->L)
 		{
 		put_ch(' ');
