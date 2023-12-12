@@ -9,7 +9,6 @@
 #include <type_bn.h>
 #include <type_num.h>
 #include <type_str.h>
-#include <type_tuple.h>
 
 struct bn *get_bn(value x)
 	{

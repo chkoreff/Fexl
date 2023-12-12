@@ -65,11 +65,6 @@ value type_list_to_tuple(value fun, value f)
 	return V(type_tuple,hold(Qtuple),hold(f->R));
 	}
 
-value pair(value x, value y)
-	{
-	return V(type_pair,x,y);
-	}
-
 void beg_tuple(void)
 	{
 	Qtuple = Q(type_tuple);

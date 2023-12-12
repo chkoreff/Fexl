@@ -21,6 +21,7 @@ extern value type_yield(value fun, value f);
 extern value yield(value x);
 extern value maybe(value x);
 extern value boolean(int x);
+extern value pair(value x, value y);
 extern value type_is_defined(value fun, value f);
 extern value type_is_undef(value fun, value f);
 extern value op_is_type(value fun, value f, type t);

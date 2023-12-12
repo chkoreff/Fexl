@@ -6,7 +6,6 @@
 #include <type_num.h>
 #include <type_record.h>
 #include <type_str.h>
-#include <type_tuple.h>
 
 value Qempty;
 

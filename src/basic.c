@@ -122,6 +122,11 @@ value boolean(int x)
 	return hold(x ? QT : QF);
 	}
 
+value pair(value x, value y)
+	{
+	return V(type_pair,x,y);
+	}
+
 value type_is_defined(value fun, value f)
 	{
 	(void)fun;
