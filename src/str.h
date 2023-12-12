@@ -9,6 +9,7 @@ struct string
 extern string str_new(unsigned long len);
 extern string str_new_data(const char *data, unsigned long len);
 extern string str_new_data0(const char *data);
+extern string str_copy(string x);
 extern void str_free(string x);
 extern string str_concat(string x, string y);
 extern int str_cmp(string x, string y);

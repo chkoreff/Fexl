@@ -1,0 +1,35 @@
+\out=
+~
+= test_1
+======
+steps 3 bytes 0
+[str "a"]
+======
+Hello
+I am Fred.
+I am Wilma.
+Bye
+I am Fred.
+I am Wilma.
+PING
+
+Bye
+steps 51 bytes 435
+[I]
+======
+steps 46 bytes 1290
+[list [str "a"] [list [list [str "b"] [list [str "c"] [null]]] [list [list [str "def"] [list [num 32] [null]]] [list [list [str "a"] [list [str "a"] [list [str "b"] [list [str "b"] [list [str "c"] [list [str "c"] [list [str "def"] [null]]]]]]]] [null]]]]]
+= test_2
+[form [str "test/b52.fxl"] [list [quo [str "a"]] [list [quo [str "a"]] [list [ref "b" 92] [list [ref "b" 93] [quo [list [str "c"] [null]]]]]]]]
+
+{"test/b52.fxl"
+  [
+  {"b" 92}
+  {"b" 93}
+  ]
+}
+~
+\err=
+~
+~
+\status=0

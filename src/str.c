@@ -33,6 +33,11 @@ string str_new_data0(const char *data)
 	return str_new_data(data, strlen(data));
 	}
 
+string str_copy(string x)
+	{
+	return str_new_data(x->data,x->len);
+	}
+
 void str_free(string x)
 	{
 	free_memory(x, str_size(x->len));

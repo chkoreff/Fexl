@@ -6,6 +6,7 @@
 #include <memory.h>
 #include <report.h>
 #include <string.h> // strcmp
+#include <type_num.h>
 #include <type_str.h>
 #include <type_sym.h>
 
@@ -258,64 +259,109 @@ value type_resolve(value fun, value f)
 	return yield(type_value(fun,f));
 	}
 
-static value cache = 0;
-
-static value find(string name)
+static int in_list(string s, value list)
 	{
-	value pos = cache;
-	while (pos)
+	while (list->T == type_list)
 		{
-		if (str_eq(name,get_str(pos->L->R)))
-			return hold(pos->R);
-		pos = pos->next;
+		if (str_eq(s,get_str(list->L)))
+			return 1;
+		list = list->R;
 		}
 	return 0;
 	}
 
-static void clear_cache(void)
+// Get the list of unique undefined symbols in exp.
+static value get_list_undef(value exp, value list)
 	{
-	while (cache)
+	if (exp->T == type_quo)
+		return list;
+	else if (exp->T == type_ref)
 		{
-		value next = cache->next;
-		drop(cache->L);
-		drop(cache->R);
-		recycle(cache);
-		cache = next;
+		string s = get_str(exp->R);
+		if (in_list(s,list))
+			return list;
+		else
+			{
+			value top = Qstr(str_copy(s));
+			return V(type_list,top,list);
+			}
+		}
+	else
+		{
+		list = get_list_undef(exp->R,list);
+		list = get_list_undef(exp->L,list);
+		return list;
 		}
 	}
 
-static value do_resolve(value exp, value define())
+static value get_def(string name, value define(void))
+	{
+	cur_name = name->data;
+	return define();
+	}
+
+// Map a list of symbols to a list of {name val} pairs, for all defined names.
+static value get_defs(value list, value define(void))
+	{
+	if (list->T == type_list)
+		{
+		string name = get_str(list->L);
+		value val = get_def(name,define);
+		value tail = get_defs(list->R,define);
+		if (val)
+			{
+			value top = pair(hold(list->L),val);
+			return V(type_list,top,tail);
+			}
+		else
+			return tail;
+		}
+	else
+		return hold(Qnull);
+	}
+
+// Get the list of {name val} pairs needed to resolve an expression.
+static value skim_context(value exp, value define(void))
+	{
+	value list = get_list_undef(exp,hold(Qnull));
+	value cx = get_defs(list,define);
+	drop(list);
+	return cx;
+	}
+
+static value resolve_name(value cx, string name)
+	{
+	while (cx->T == type_list)
+		{
+		value top = (cx->L = eval(cx->L));
+		if (top->T == type_pair)
+			{
+			value key = (top->L = eval(top->L));
+			if (key->T == type_str && str_eq(name,get_str(key)))
+				return hold(top->R);
+			}
+		cx = (cx->R = eval(cx->R));
+		}
+	return 0;
+	}
+
+static value do_resolve(value cx, value exp)
 	{
 	if (exp->T == type_quo)
 		return hold(exp);
 	else if (exp->T == type_ref)
 		{
 		string name = get_str(exp->R);
-		value val = find(name);
+		value val = resolve_name(cx,name);
 		if (val)
-			return val;
+			return quo(val);
 		else
-			{
-			cur_name = name->data;
-			val = define();
-			if (val)
-				{
-				value top = new_value();
-				val = quo(val);
-				top->L = hold(exp);
-				top->R = hold(val);
-				top->next = cache;
-				cache = top;
-				return val;
-				}
-			else
-				return hold(exp);
-			}
+			return hold(exp);
 		}
 	else
 		return join(exp->T,
-			do_resolve(exp->L,define),
-			do_resolve(exp->R,define));
+			do_resolve(cx,exp->L),
+			do_resolve(cx,exp->R));
 	}
 
 value op_resolve(value fun, value f, value define(void))
@@ -327,8 +373,9 @@ value op_resolve(value fun, value f, value define(void))
 			f = hold(exp);
 		else
 			{
-			value new = do_resolve(exp->R,define);
-			clear_cache();
+			value cx = skim_context(exp->R,define);
+			value new = do_resolve(cx,exp->R);
+			drop(cx);
 			f = Qform(hold(exp->L),new);
 			}
 		}
@@ -336,5 +383,96 @@ value op_resolve(value fun, value f, value define(void))
 		f = hold(Qvoid);
 	drop(exp);
 	(void)fun;
+	return f;
+	}
+
+// (resolve_pairs cx form) Partially resolve a form using the list of pairs cx.
+value type_resolve_pairs(value fun, value f)
+	{
+	if (fun->L == 0) return keep(fun,f);
+	{
+	value exp = arg(f->R);
+	if (exp->T == type_form)
+		{
+		value cx = arg(fun->R);
+		f = Qform(hold(exp->L),do_resolve(cx,exp->R));
+		drop(cx);
+		}
+	else
+		f = hold(Qvoid);
+	drop(exp);
+	return f;
+	}
+	}
+
+// (evaluate cx form) Resolve form using the list of pairs cx.  If fully
+// resolved, return the value, otherwise report undefined symbols and die.
+value type_evaluate(value fun, value f)
+	{
+	if (fun->L == 0) return keep(fun,f);
+	{
+	value exp = arg(f->R);
+	if (exp->T == type_form)
+		{
+		value cx = arg(fun->R);
+		f = do_resolve(cx,exp->R);
+		if (f->T == type_quo)
+			f = unquo(f);
+		else
+			{
+			report_undef(str_data(exp->L),f);
+			die(0);
+			}
+		drop(cx);
+		}
+	else
+		f = hold(Qvoid);
+	drop(exp);
+	return f;
+	}
+	}
+
+static value form_refs(value exp, value list)
+	{
+	if (exp->T == type_quo)
+		return list;
+	else if (exp->T == type_ref)
+		{
+		value x = exp->R;
+		value top = pair(Qstr(str_copy(get_str(x))),Qnum(x->N));
+		return V(type_list,top,list);
+		}
+	else
+		{
+		list = form_refs(exp->R,list);
+		list = form_refs(exp->L,list);
+		return list;
+		}
+	}
+
+// (form_undefs form) Return the list of unique undefined symbols in the form.
+value type_form_undefs(value fun, value f)
+	{
+	value exp = arg(f->R);
+	(void)fun;
+	if (exp->T == type_form)
+		f = get_list_undef(exp->R,hold(Qnull));
+	else
+		f = hold(Qvoid);
+	drop(exp);
+	return f;
+	}
+
+// (form_refs form) Return {label list}, where label is the name of the source
+// file and list is the list of {name line} symbol references in the form.
+value type_form_refs(value fun, value f)
+	{
+	value exp = arg(f->R);
+	(void)fun;
+	if (exp->T == type_form)
+		f = pair(hold(exp->L),form_refs(exp->R,hold(Qnull)));
+	else
+		f = hold(Qvoid);
+	drop(exp);
 	return f;
 	}
