@@ -255,9 +255,7 @@ int match(const char *other)
 // evaluating it.
 value type_resolve(value fun, value f)
 	{
-	f = type_value(fun,f);
-	if (f) f = yield(f);
-	return f;
+	return yield(type_value(fun,f));
 	}
 
 static value cache = 0;
