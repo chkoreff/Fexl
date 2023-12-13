@@ -181,7 +181,7 @@ value type_is_good(value fun, value f) { return op_predicate(fun,f,is_good); }
 value type_is_bool(value fun, value f) { return op_predicate(fun,f,is_bool); }
 value type_is_list(value fun, value f) { return op_predicate(fun,f,is_list); }
 
-// \chain==(\a\b\x \x=x \v=(a x) is_defined v v (b x))
+// \chain=(\\a\\b \x \v=(a x) is_defined v v (b x))
 value type_chain(value fun, value f)
 	{
 	if (fun->L == 0) return keep(fun,f);
