@@ -2,45 +2,22 @@
 value; std; load "show"; \;
 
 \try=
-	(\\x
-	say "======"
-	\x=
-		(
-		show_benchmark;
-		x
-		)
-	show x
+	(\form
+	show form
+	say_data (form_undefs form)
+	say_data (form_refs form)
+	nl
 	)
-
-\\test_1=
-(
-say "= test_1"
+show_benchmark;
 
 try
 	(
-	evaluate []
 	\;
 	() "a"
 	)
 
 try
 	(
-	evaluate
-	(
-	#T [];
-	I
-	[
-	(I { (I "say") say })
-	{ "put" put }
-	{ "nl" nl }
-	{ "fred" (say "I am Fred.") }
-	{ "wilma" (say "I am Wilma.") }
-	void
-	{ 3 I }
-	{ "ping" (\= say "PING") }
-	{ "void" void }
-	]
-	)
 	\;
 	say "Hello"
 	fred wilma
@@ -55,35 +32,11 @@ try
 
 try
 	(
-	\form=
-		(
-		\;
-		[a [b c] [def 32] [a a b b c c def]]
-		)
-
-	\list=(form_undefs form)
-
-	# All symbols defined as literal strings.
-	\cx=(map (\name {name name}) list)
-
-	evaluate cx form
-	)
-)
-
-\\test_2=
-(
-say "= test_2"
-\cx=
-	(
-	#T 3;
-	[
-	{"c" "c"}
-	{"a" "a"}
-	#{"b" "b"}
-	]
+	\;
+	[a [b c] [def 32] [a a b b c c def]]
 	)
 
-\form=
+try
 	(
 	\;
 	[
@@ -94,15 +47,3 @@ say "= test_2"
 	"c"
 	]
 	)
-
-\x=(resolve_pairs cx form)
-show x
-nl
-
-#\list=(form_refs form)
-\list=(form_refs x)
-say_data list
-)
-
-test_1
-test_2

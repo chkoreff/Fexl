@@ -15,7 +15,5 @@ extern value type_value(value fun, value f);
 extern int match(const char *other);
 extern value type_resolve(value fun, value f);
 extern value op_resolve(value fun, value f, value define(void));
-extern value type_resolve_pairs(value fun, value f);
-extern value type_evaluate(value fun, value f);
 extern value type_form_undefs(value fun, value f);
 extern value type_form_refs(value fun, value f);

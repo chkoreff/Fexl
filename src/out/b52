@@ -1,33 +1,60 @@
 \out=
 ~
-= test_1
-======
-steps 3 bytes 0
-[str "a"]
-======
-Hello
-I am Fred.
-I am Wilma.
-Bye
-I am Fred.
-I am Wilma.
-PING
+[form [str "test/b52.fxl"] [quo [A [I] [str "a"]]]]
+[]
+{"test/b52.fxl"
+  []
+}
 
-Bye
-steps 51 bytes 435
-[I]
-======
-steps 46 bytes 1290
-[list [str "a"] [list [list [str "b"] [list [str "c"] [null]]] [list [list [str "def"] [list [num 32] [null]]] [list [list [str "a"] [list [str "a"] [list [str "b"] [list [str "b"] [list [str "c"] [list [str "c"] [list [str "def"] [null]]]]]]]] [null]]]]]
-= test_2
-[form [str "test/b52.fxl"] [list [quo [str "a"]] [list [quo [str "a"]] [list [ref "b" 92] [list [ref "b" 93] [quo [list [str "c"] [null]]]]]]]]
-
+[form [str "test/b52.fxl"] [A [A [A [A [A [A [A [A [A [A [A _ _] [quo _]] [ref "nl" 24]] [ref "fred" 25]] [ref "wilma" 26]] [ref "ping" 27]] [ref "ping" 28]] [ref "say" 29]] [ref "void" 29]] [ref "say" 30]] [quo [str "Bye"]]]]
+["put" "nl" "fred" "wilma" "ping" "void" "say"]
 {"test/b52.fxl"
   [
-  {"b" 92}
-  {"b" 93}
+  {"say" 22}
+  {"fred" 23}
+  {"wilma" 23}
+  {"put" 24}
+  {"nl" 24}
+  {"fred" 25}
+  {"wilma" 26}
+  {"ping" 27}
+  {"ping" 28}
+  {"say" 29}
+  {"void" 29}
+  {"say" 30}
   ]
 }
+
+[form [str "test/b52.fxl"] [list [ref "a" 36] [list [list [ref "b" 36] [list [ref "c" 36] [quo [null]]]] [list [list [ref "def" 36] [quo [list [num 32] [null]]]] [list [list [ref "a" 36] [list [ref "a" 36] [list [ref "b" 36] [list [ref "b" 36] [list [ref "c" 36] [list [ref "c" 36] [list _ _]]]]]]] [quo [null]]]]]]]
+["a" "b" "c" "def"]
+{"test/b52.fxl"
+  [
+  {"a" 36}
+  {"b" 36}
+  {"c" 36}
+  {"def" 36}
+  {"a" 36}
+  {"a" 36}
+  {"b" 36}
+  {"b" 36}
+  {"c" 36}
+  {"c" 36}
+  {"def" 36}
+  ]
+}
+
+[form [str "test/b52.fxl"] [list [ref "a" 43] [list [ref "a" 44] [list [ref "b" 45] [list [ref "b" 46] [quo [list [str "c"] [null]]]]]]]]
+["a" "b"]
+{"test/b52.fxl"
+  [
+  {"a" 43}
+  {"a" 44}
+  {"b" 45}
+  {"b" 46}
+  ]
+}
+
+steps 4359 bytes 10048
 ~
 \err=
 ~
