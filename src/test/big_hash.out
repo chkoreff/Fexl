@@ -1,10 +1,10 @@
-time buffer = 9961378 us
-time sha512 = 4049748 us
+time buffer = 3820836 us
+time sha512 = 2386960 us
 sha512
 text = (the extremely-long message)
 hash = 64:[b47c933421ea2db149ad6e10fce6c7f93d0752380180ffd7f4629a712134831d77be6091b819ed352c2967a2e2d4fa5050723c9630691f1a05a7281dbe6c1086]
 
-time sha256 = 6294375 us
+time sha256 = 3529919 us
 sha256
 text = (the extremely-long message)
 hash = 32:[50e72a0e26442fe2552dc3938ac58658228c0cbfb1d2ca872ae435266fcd055e]
