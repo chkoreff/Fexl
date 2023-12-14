@@ -264,7 +264,7 @@ static value find_cache(string name)
 	while (pos)
 		{
 		if (str_eq(name,get_str(pos->L->R)))
-			return hold(pos->R);
+			return pos->R;
 		pos = pos->next;
 		}
 	return 0;
@@ -296,13 +296,29 @@ static value do_resolve(value exp, value define())
 		{
 		string name = get_str(exp->R);
 		value val = find_cache(name);
-		if (val != 0) return val;
-		cur_name = name->data;
-		val = define();
-		if (val == 0) return hold(exp);
-		val = quo(val);
-		push_cache(exp,val);
-		return val;
+		if (val != 0)
+			{
+			if (val->T == type_quo)
+				return hold(val);
+			else
+				return hold(exp);
+			}
+		else
+			{
+			cur_name = name->data;
+			val = define();
+			if (val != 0)
+				{
+				val = quo(val);
+				push_cache(exp,val);
+				return val;
+				}
+			else
+				{
+				push_cache(exp,Qvoid);
+				return hold(exp);
+				}
+			}
 		}
 	else
 		return join(exp->T,
