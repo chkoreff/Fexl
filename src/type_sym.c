@@ -233,6 +233,7 @@ value type_value(value fun, value f)
 			{
 			report_undef(str_data(form->L),form->R);
 			die(0);
+			f = hold(Qvoid); // not reached
 			}
 		}
 	else
@@ -326,6 +327,7 @@ static value do_resolve(value exp, value define())
 			do_resolve(exp->R,define));
 	}
 
+// This is used to resolve forms which use names defined in C code.
 value op_resolve(value fun, value f, value define(void))
 	{
 	value form = arg(f->R);
@@ -341,6 +343,116 @@ value op_resolve(value fun, value f, value define(void))
 	drop(form);
 	(void)fun;
 	return f;
+	}
+
+// Find the value associated with name in list.
+static value find_def(string name, value list)
+	{
+	while (list->T == type_list)
+		{
+		if (str_eq(name,get_str(list->L->L->R)))
+			return list->L->R;
+		list = list->R;
+		}
+	return 0;
+	}
+
+// Get the list of pairs {name val} for all distinct references in exp.
+static value get_defs(value cx, value exp, value list)
+	{
+	if (exp->T == type_quo)
+		return list;
+	else if (exp->T == type_ref)
+		{
+		string name = get_str(exp->R);
+		value val = find_def(name,list);
+		if (val == 0)
+			{
+			val = eval(A(A(hold(cx),Qstr(str_copy(name))),hold(Qyield)));
+			list = V(type_list,pair(hold(exp),val),list);
+			}
+		return list;
+		}
+	else
+		{
+		list = get_defs(cx,exp->L,list);
+		list = get_defs(cx,exp->R,list);
+		return list;
+		}
+	}
+
+// Check the definitions in list, reporting any undefined symbols and returning
+// true if any were found.
+static int check_defs(const char *label, value list)
+	{
+	value pos = list;
+	int has_undef = 0;
+	while (pos->T == type_list)
+		{
+		value val = pos->L->R;
+		if (val->L != Qyield)
+			{
+			value exp = pos->L->L;
+			undefined_symbol(str_data(exp->R),exp->R->N,label);
+			has_undef = 1;
+			}
+		pos = pos->R;
+		}
+	return has_undef;
+	}
+
+// Replace all the refs in exp with the value from list, which is guaranteed to
+// be of the form (yield val).  This yields a final evaluable function.
+static value replace(value exp, value list)
+	{
+	if (exp->T == type_quo)
+		return hold(exp->R);
+	else if (exp->T == type_ref)
+		{
+		string name = get_str(exp->R);
+		value val = find_def(name,list);
+		return hold(val->R);
+		}
+	else
+		return V(exp->T,replace(exp->L,list),replace(exp->R,list));
+	}
+
+// (evaluate cx form) Resolve the symbols in the form using the function cx.
+// The cx function maps a name to (yield val) if defined, otherwise void.
+// If all symbols are defined, return the fully resolved value and proceed with
+// evaluation.  Otherwise report the unique undefined symbols and die.
+value type_evaluate(value fun, value f)
+	{
+	if (fun->L == 0) return keep(fun,f);
+	{
+	value form = arg(f->R);
+	if (form->T == type_form)
+		{
+		value exp = form->R;
+		if (exp->T == type_quo)
+			f = hold(exp->R);
+		else
+			{
+			value cx = arg(fun->R);
+			value list = get_defs(cx,exp,hold(Qnull));
+			int has_undef = check_defs(str_data(form->L),list);
+			drop(cx);
+
+			if (has_undef)
+				{
+				die(0);
+				f = hold(Qvoid); // not reached
+				}
+			else
+				f = replace(exp,list);
+			drop(list);
+			}
+		}
+	else
+		f = hold(Qvoid);
+	drop(form);
+	return f;
+	}
 	}
 
 static int in_list(string s, value list)

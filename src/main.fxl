@@ -34,6 +34,11 @@
 # (if x y) = y if x is true, other I.
 \if=(\\x\\y x y I)
 
+\define=
+	(\key\\val
+	with key (yield val)
+	)
+
 \dir_local=(dirname script_name)
 
 # Make a cache which remembers the values of a function with n arguments.
@@ -85,6 +90,7 @@
 	)
 
 \form
+def "define" define;
 def "defc" defc;
 def "if" if;
 def "::" ::;

@@ -1,0 +1,76 @@
+#
+value; std; (value; std; use "test.fxl") \;
+
+\run_case=
+	(\label\text
+	run_test label (run_fexl_text text)
+	)
+
+(
+run_case "test_1"
+~
+evaluate
+(
+@\\loop
+define "std" loop;
+define "say" say;
+define "put" put;
+define "nl" nl;
+define "fred" (say "I am Fred.");
+define "wilma" (say "I am Wilma.");
+void
+)
+\;
+say "Hello"
+put "line 1" nl
+put "line 2" nl
+fred wilma
+fred wilma
+say "Bye"
+say "=="
+std "fred" \\fred
+fred fred
+~
+)
+
+(
+run_case "test_2"
+~
+evaluate
+(
+@\\loop
+#define "std" loop;
+#define "say" say;
+define "put" put;
+define "nl" nl;
+#define "fred" (say "I am Fred.");
+#define "wilma" (say "I am Wilma.");
+void
+)
+\;
+say "Hello"
+put "line 1" nl
+put "line 2" nl
+fred wilma
+fred wilma
+say "Bye"
+say "=="
+std "fred" \\fred
+fred fred
+~
+)
+
+(
+# Here's a case where the form has no symbols, so I don't even bother to
+# evaluate the context.
+run_case "test_3"
+~
+evaluate
+(
+say "HEY" # not printed
+void
+)
+\;
+() ["a" "b" 3.6]
+~
+)

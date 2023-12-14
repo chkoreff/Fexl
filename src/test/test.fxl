@@ -21,10 +21,51 @@
 	say [(length bytes)":["(unpack bytes)"]"]
 	)
 
+\block_quote=
+	(\x
+	\term=
+		(
+		\check=(\y is_void (search x y 0) y)
+		check "~";
+		(@\\loop\count
+		check (. "~"; num_str count);
+		loop (+ 1 count)
+		) 1
+		)
+	to_str [term NL x term]
+	)
+
+# Run a command and print its stdout, stderr, and exit status.
+\run_command=
+	(\cmd\input
+	\cmd=(to_str cmd)
+	\argv=["/bin/sh" "-c" cmd]
+	run_program argv input \out\err\status
+	say "\out="
+	say (block_quote out)
+	say "\err="
+	say (block_quote err)
+	# Showing status more portably here.  Sometimes error codes on abnormal
+	# termination can vary between systems.
+	\status=
+		(
+		eq status 0 0;
+		eq status 256 1;
+		-1
+		)
+	say ["\status="status]
+	)
+
+\run_fexl_file=(\name run_command ["../bin/fexl test/"name".fxl"])
+\run_fexl_text=(run_command ["../bin/fexl"])
+
 \form
 def "div" div;
 def "show_list" show_list;
 def "run_test" run_test;
 def "show_str" show_str;
 def "show_hex" show_hex;
+def "block_quote" block_quote;
+def "run_fexl_file" run_fexl_file;
+def "run_fexl_text" run_fexl_text;
 form

@@ -1,53 +1,13 @@
-# Run an individual test and print its stdout, stderr, and exit status.
-\block_quote=
-	(\x
-	\term=
-		(
-		\check=(\y is_void (search x y 0) y)
-		check "~";
-		(@\\loop\count
-		check (. "~"; num_str count);
-		loop (+ 1 count)
-		) 1
-		)
-	to_str [term NL x term]
-	)
-
-\run=
-	(\cmd\input
-	\cmd=(to_str cmd)
-	\argv=["/bin/sh" "-c" cmd]
-	run_program argv input \out\err\status
-	say "\out="
-	say (block_quote out)
-	say "\err="
-	say (block_quote err)
-	# Showing status more portably here.  Sometimes error codes on abnormal
-	# termination can vary between systems.
-	\status=
-		(
-		eq status 0 0;
-		eq status 256 1;
-		-1
-		)
-	say ["\status="status]
-	)
-
-\run_script=(\name run ["../bin/fexl test/"name".fxl"])
-\run_filter=(run ["../bin/fexl"])
+#
+value; std; (value; std; use "test.fxl") \;
 
 \name=(argv 2)
 is_undef name (error "Missing test name");
 
-\lparen="(" \rparen=")"
-\lbrace="{" \rbrace="]"
-\lbrack="[" \rbrack="]"
-
-(
-# Test interactive scripts.
+# Test interactive script.
 eq name "a2"
 (
-run_script name
+run_fexl_file name
 ~
 abc
 defg
@@ -58,9 +18,10 @@ hij
 ~
 );
 
+# Test interactive script.
 eq name "get_byte"
 (
-run_script name
+run_fexl_file name
 ~
 abcABC
 jjja小
@@ -69,48 +30,5 @@ jjja小
 ~
 );
 
-# Testing various syntax errors.
-eq name "b25" (run_filter "\3.14=pi say x3.14");
-eq name "b26" (run_filter QU);
-eq name "b27" (run_filter [NL QU "a" NL "b"]);
-eq name "b28" (run_filter "~| a");
-eq name "b29" (run_filter [NL NL "~END" NL "abc" "~EN"]);
-eq name "b30" (run_filter "~");
-eq name "b31" (run_filter ["~" NL]);
-eq name "b32" (run_filter "~EN");
-eq name "b33" (run_filter " = y");
-eq name "b34" (run_filter "ab cd e\");
-eq name "b35" (run_filter "\x=");
-eq name "b36" (run_filter [lparen NL "a" NL lparen "b"]);
-eq name "b37" (run_filter [lparen NL "a" NL lparen "b" rparen]);
-eq name "b38" (run_filter [lbrack NL "a" NL lbrack "b"]);
-eq name "b39" (run_filter [lbrace NL "a" NL lbrace "b"]);
-eq name "b40" (run_filter ["(ab cd e)" NL rparen]);
-
-eq name "b41"
-(
-run_filter
-~
-say (+ 4 6)
-( a b c ) ( b c d )
-( a b c ) ( b c d )
-put (- 12 7.2) nl
-x
-~
-);
-
-eq name "b42"
-(
-run_filter
-~
-value; def "b" (say "b"); \; a b
-a c
-c
-~
-);
-
-eq name "b43" (run_filter ~ use_file "missing.fxl" ~);
-
 # Other normal tests run here.
-run_script name ""
-)
+run_fexl_file name ""

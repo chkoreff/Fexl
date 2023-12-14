@@ -1,0 +1,49 @@
+\out=
+~1
+[ test_1
+\out=
+~
+Hello
+line 1
+line 2
+I am Fred.
+I am Wilma.
+I am Fred.
+I am Wilma.
+Bye
+==
+I am Fred.
+I am Fred.
+~
+\err=
+~
+~
+\status=0
+]
+[ test_2
+\out=
+~
+~
+\err=
+~
+Undefined symbol std on line 20
+Undefined symbol wilma on line 16
+Undefined symbol fred on line 16
+Undefined symbol say on line 13
+~
+\status=1
+]
+[ test_3
+\out=
+~
+~
+\err=
+~
+~
+\status=0
+]
+~1
+\err=
+~
+~
+\status=0

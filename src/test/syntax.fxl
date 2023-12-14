@@ -1,0 +1,42 @@
+#
+value; std; (value; std; use "test.fxl") \;
+
+\lparen="(" \rparen=")"
+\lbrace="{" \rbrace="]"
+\lbrack="[" \rbrack="]"
+
+# Testing various syntax errors.
+run_fexl_text "\3.14=pi say x3.14"
+run_fexl_text QU
+run_fexl_text [NL QU "a" NL "b"]
+run_fexl_text "~| a"
+run_fexl_text [NL NL "~END" NL "abc" "~EN"]
+run_fexl_text "~"
+run_fexl_text ["~" NL]
+run_fexl_text "~EN"
+run_fexl_text " = y"
+run_fexl_text "ab cd e\"
+run_fexl_text "\x="
+run_fexl_text [lparen NL "a" NL lparen "b"]
+run_fexl_text [lparen NL "a" NL lparen "b" rparen]
+run_fexl_text [lbrack NL "a" NL lbrack "b"]
+run_fexl_text [lbrace NL "a" NL lbrace "b"]
+run_fexl_text ["(ab cd e)" NL rparen]
+
+run_fexl_text
+~
+say (+ 4 6)
+( a b c ) ( b c d )
+( a b c ) ( b c d )
+put (- 12 7.2) nl
+x
+~
+
+run_fexl_text
+~
+value; def "b" (say "b"); \; a b
+a c
+c
+~
+
+run_fexl_text ~ use_file "missing.fxl" ~

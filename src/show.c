@@ -31,6 +31,7 @@ static const char *type_name(type t)
 	if (t == type_Y) return "Y";
 	if (t == type_once) return "once";
 	if (t == type_void) return "void";
+	if (t == type_yield) return "yield";
 	if (t == type_concat) return "concat";
 	if (t == type_say) return "say";
 	if (t == type_add) return "add";
@@ -38,6 +39,7 @@ static const char *type_name(type t)
 	if (t == type_list) return "list";
 	if (t == type_D) return "D";
 	if (t == type_E) return "E";
+	if (t == type_evaluate) return "evaluate";
 	if (t == type_pair) return "pair";
 	if (t == type_null) return "null";
 	if (t == type_tuple) return "tuple";

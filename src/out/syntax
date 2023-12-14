@@ -1,0 +1,174 @@
+\out=
+~1
+\out=
+~
+~
+\err=
+~
+Lambda name cannot be a number on line 1
+~
+\status=1
+\out=
+~
+~
+\err=
+~
+Unclosed string on line 1
+~
+\status=1
+\out=
+~
+~
+\err=
+~
+Unclosed string on line 2
+~
+\status=1
+\out=
+~
+~
+\err=
+~
+Unclosed string on line 1
+~
+\status=1
+\out=
+~
+~
+\err=
+~
+Unclosed string on line 3
+~
+\status=1
+\out=
+~
+~
+\err=
+~
+Incomplete string terminator on line 1
+~
+\status=1
+\out=
+~
+~
+\err=
+~
+Unclosed string on line 1
+~
+\status=1
+\out=
+~
+~
+\err=
+~
+Incomplete string terminator on line 1
+~
+\status=1
+\out=
+~
+~
+\err=
+~
+Missing name declaration before '=' on line 1
+~
+\status=1
+\out=
+~
+~
+\err=
+~
+Missing name after '\' on line 1
+~
+\status=1
+\out=
+~
+~
+\err=
+~
+Missing definition on line 1
+~
+\status=1
+\out=
+~
+~
+\err=
+~
+Unclosed parenthesis on line 3
+~
+\status=1
+\out=
+~
+~
+\err=
+~
+Unclosed parenthesis on line 1
+~
+\status=1
+\out=
+~
+~
+\err=
+~
+Unclosed bracket on line 3
+~
+\status=1
+\out=
+~
+~
+\err=
+~
+Unclosed brace on line 3
+~
+\status=1
+\out=
+~
+~
+\err=
+~
+Extraneous input on line 2
+~
+\status=1
+\out=
+~
+~
+\err=
+~
+Undefined symbol a on line 2
+Undefined symbol b on line 2
+Undefined symbol c on line 2
+Undefined symbol b on line 2
+Undefined symbol c on line 2
+Undefined symbol d on line 2
+Undefined symbol a on line 3
+Undefined symbol b on line 3
+Undefined symbol c on line 3
+Undefined symbol b on line 3
+Undefined symbol c on line 3
+Undefined symbol d on line 3
+Undefined symbol x on line 5
+~
+\status=1
+\out=
+~
+~
+\err=
+~
+Undefined symbol a on line 1
+Undefined symbol a on line 2
+Undefined symbol c on line 2
+Undefined symbol c on line 3
+~
+\status=1
+\out=
+~
+~
+\err=
+~
+Could not open source file missing.fxl
+~
+\status=1
+~1
+\err=
+~
+~
+\status=0
