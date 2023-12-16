@@ -3,7 +3,7 @@
 \get_key=
 	(\key @\\loop \list
 	list void \pair\list
-	pair \this_key\this_val
+	pair \this_key\\this_val
 	eq key this_key this_val;
 	loop list
 	)
@@ -11,7 +11,7 @@
 \del_key=
 	(\key @\\loop \list
 	list [] \pair\list
-	pair \this_key\this_val
+	pair \this_key\\this_val
 	eq key this_key list;
 	\list=(loop list)
 	[pair;list]
@@ -21,7 +21,7 @@
 	(\key\val
 	@\\loop \list
 	list [{key val}] \pair\list
-	pair \this_key\this_val
+	pair \this_key\\this_val
 	eq key this_key [{this_key val};list];
 	\list=(loop list)
 	[pair;list]
@@ -40,7 +40,7 @@
 		[{key val}]
 		)
 	\pair\list
-	pair \this_key\this_val
+	pair \this_key\\this_val
 	eq key this_key
 		(
 		\val=(update this_val)
@@ -59,7 +59,7 @@
 	(\update
 	map
 		(\pair
-		pair \key\val
+		pair \key\\val
 		\val=(update key val)
 		{key val}
 		)

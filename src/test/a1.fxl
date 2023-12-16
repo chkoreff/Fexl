@@ -1443,5 +1443,24 @@ nl
 say (is_undef val)
 )
 
+(
+# Test evaluation of right side in get_key.
+\cx=
+[
+{"a" (say "got a" 1)}
+{"b" (say "got b" 2)}
+]
+
+\try=
+	(\key
+	\val=(: key cx)
+	say [key" = "(as_str val)]
+	)
+
+try "a"
+try "b"
+try "c"
+)
+
 \#
 Extra stuff not parsed.

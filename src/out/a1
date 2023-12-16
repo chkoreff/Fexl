@@ -995,6 +995,11 @@ b = b
 c = c
 
 T
+got a
+a = 1
+got b
+b = 2
+c = void
 ~6
 \err=
 ~
