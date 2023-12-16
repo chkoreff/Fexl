@@ -14,7 +14,7 @@
 
 # Define key to refer to a context.
 \defc=
-	(\\key\cx
+	(\key\cx
 	@\\self\\form
 	cx; def key self; form
 	)

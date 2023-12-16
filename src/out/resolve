@@ -1,17 +1,17 @@
 \out=
 ~
 == test_0
-Evaluating the context.
 Evaluating the key.
+Evaluating the context.
 result void
 
-Evaluating the context.
 Evaluating the key.
+Evaluating the context.
 Evaluating the form.
 result void
 
-Evaluating the context.
 Evaluating the key.
+Evaluating the context.
 Evaluating the form.
 Hello
 result ok
@@ -21,7 +21,7 @@ steps 373 bytes 2848
 Evaluating the context.
 Evaluating the form.
 I am Fred.
-steps 388 bytes 2976
+steps 385 bytes 2976
 == test_2
 Evaluating the context.
 Evaluating the form.

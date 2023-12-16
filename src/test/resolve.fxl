@@ -4,7 +4,7 @@
 \try=
 	(
 	\\cx=(say "Evaluating the context." std)
-	\key\form
+	\\key\\form
 	\\key=(say "Evaluating the key." key)
 	\\form=(say "Evaluating the form." form)
 	\result=(value; defc key cx form)
