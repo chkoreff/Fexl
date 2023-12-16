@@ -1,6 +1,0 @@
-#
-resolve (std; \; xsay "Hello") \\hello
-say "beg"
-hello
-hello
-say "end"

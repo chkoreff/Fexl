@@ -718,7 +718,7 @@ talk
 
 \\case_3=
 	(
-	resolve (std; \; say "PING") \\run
+	value (std; \; yield; say "PING") \\run
 	say "["
 	run
 	run

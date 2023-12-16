@@ -252,7 +252,7 @@ int match(const char *other)
 
 // Like type_value, except it yields the form value to the caller without
 // evaluating it.
-value type_resolve(value fun, value f)
+value type_resolve(value fun, value f) // LATER 20231216 deprecated
 	{
 	return yield(type_value(fun,f));
 	}
