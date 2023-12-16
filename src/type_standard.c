@@ -187,7 +187,6 @@ static value standard(void)
 	if (match("def")) return Q(type_def);
 	if (match("std")) return Q(type_std);
 	if (match("value")) return Q(type_value);
-	if (match("resolve")) return Q(type_resolve);
 	if (match("evaluate")) return Q(type_evaluate);
 	if (match("form_undefs")) return Q(type_form_undefs);
 	if (match("form_refs")) return Q(type_form_refs);
