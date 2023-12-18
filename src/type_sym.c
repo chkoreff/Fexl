@@ -166,17 +166,28 @@ value type_is_closed(value fun, value f)
 // Define key as val in an expression.
 static value def(string key, value val, value exp)
 	{
-	value pattern = get_pattern(key,exp);
-	if (pattern == QF)
-		exp = hold(exp);
+	if (exp->T == type_quo)
+		return hold(exp);
+	else if (exp->T == type_ref)
+		{
+		if (str_eq(key,get_str(exp->R)))
+			return quo(hold(val));
+		else
+			return hold(exp);
+		}
 	else
 		{
-		value x = quo(hold(val));
-		exp = subf(pattern,exp,x);
-		drop(x);
+		value L = def(key,val,exp->L);
+		value R = def(key,val,exp->R);
+		if (L == exp->L && R == exp->R)
+			{
+			drop(L);
+			drop(R);
+			return hold(exp);
+			}
+		else
+			return join(exp->T,L,R);
 		}
-	drop(pattern);
-	return exp;
 	}
 
 // (def key val form) Return form with key defined as val.
