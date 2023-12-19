@@ -263,12 +263,23 @@
 	loop rows
 	)
 
-# (stream_values get) is the infinite list of values of function get.  This is
+# (stream_values get) is the infinite list of future values of get.  This is
 # useful for generating streams of random values.
 \stream_values=
 	(\\get @\\loop
 	\x=get
 	[x;\=loop]
+	)
+
+# (stream_get get) yields the list of future value of get, terminated by void.
+# This is useful for producing a stream of characters from a file get function.
+\stream_get=
+	(\\get
+	yield;
+	\=
+	@\\loop
+	\x=get
+	is_undef x [] [x;\=loop]
 	)
 
 # Gather input items into a list.  This is equivalent to stream_values except
@@ -434,6 +445,24 @@
 	F
 	)
 
+# Make a cache which remembers the values of a function with n arguments.
+\remember=
+	(\n
+	\v=var_new
+
+	(@\\loop\n
+	le n 1 fetch;
+	\f=(loop (- n 1))
+
+	\v\k
+	\v=(fetch v k var_new)
+	f v
+	) n v
+	)
+
+# Equivalent to (remember 1).
+\\cache=(\v=var_new fetch v)
+
 \form
 def "append" append;
 def "flatten" flatten;
@@ -466,6 +495,7 @@ def "list_combine" list_combine;
 def "column" column;
 def "match_column" match_column;
 def "stream_values" stream_values;
+def "stream_get" stream_get;
 def "get_list" get_list;
 def "to_str" to_str;
 def "get_str" get_str;
@@ -484,4 +514,6 @@ def "ends_with" ends_with;
 def "map_bytes_to_double" map_bytes_to_double;
 def "random_double" random_double;
 def "eq_data" eq_data;
+def "remember" remember;
+def "cache" cache;
 form

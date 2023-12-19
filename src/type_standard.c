@@ -33,6 +33,8 @@
 #include <type_var.h>
 #include <type_with.h>
 
+static value type_std(value fun, value f);
+
 // Resolve standard names.
 static value standard(void)
 	{
@@ -101,6 +103,7 @@ static value standard(void)
 	if (match("compare_at")) return Q(type_compare_at);
 	if (match("is_str")) return Q(type_is_str);
 	if (match("with")) return Q(type_with);
+	if (match("define")) return Q(type_define);
 	if (match("is_obj")) return Q(type_is_obj);
 	if (match("split_obj")) return Q(type_split_obj);
 	if (match("fetch")) return Q(type_fetch);
@@ -274,7 +277,7 @@ static value standard(void)
 	return 0;
 	}
 
-value type_std(value fun, value f)
+static value type_std(value fun, value f)
 	{
 	return op_resolve(fun,f,standard);
 	}

@@ -34,30 +34,7 @@
 # (if x y) = y if x is true, other I.
 \if=(\\x\\y x y I)
 
-\define=
-	(\key\\val
-	with key (yield val)
-	)
-
 \dir_local=(dirname script_name)
-
-# Make a cache which remembers the values of a function with n arguments.
-\remember=
-	(\n
-	\v=var_new
-
-	(@\\loop\n
-	le n 1 fetch;
-	\f=(loop (- n 1))
-
-	\v\k
-	\v=(fetch v k var_new)
-	f v
-	) n v
-	)
-
-# Equivalent to (remember 1).
-\\cache=(\v=var_new fetch v)
 
 \NL="
 "
@@ -79,18 +56,7 @@
 # Use a file in the directory which contains the user's script.
 \use=(\name use_file; path_under dir_local name)
 
-# Map a dynamic get function to a fixed stream of values.
-\stream_get=
-	(\\get
-	yield;
-	\=
-	@\\loop
-	\x=get
-	is_undef x [] [x;\=loop]
-	)
-
 \form
-def "define" define;
 def "defc" defc;
 def "if" if;
 def "::" ::;
@@ -112,11 +78,8 @@ def "CR" CR;
 def "LF" LF;
 def "QU" QU;
 
-def "remember" remember;
-def "cache" cache;
 def "do_benchmark" do_benchmark;
 def "show_benchmark" show_benchmark;
-def "stream_get" stream_get;
 form
 )
 
@@ -152,7 +115,7 @@ form
 	\entry=(dlsym lib sym)
 	is_void entry (error ["Could not find symbol "sym]);
 
-	entry \\cx cx
+	entry ()
 	)
 
 defc "std";

@@ -182,19 +182,24 @@ value type_is_bool(value fun, value f) { return op_predicate(fun,f,is_bool); }
 value type_is_list(value fun, value f) { return op_predicate(fun,f,is_list); }
 
 // \chain=(\\a\\b \x \v=(a x) is_defined v v (b x))
+// Return (a x) if that is defined, otherwise return (b x).
 value type_chain(value fun, value f)
 	{
 	if (fun->L == 0) return keep(fun,f);
 	if (fun->L->L == 0) return keep(fun,f);
 	{
 	value x = arg(f->R);
-	value v = eval(A(hold(fun->L->R),x));
+	value a = (fun->L->R = eval(fun->L->R));
+	value v = eval(A(hold(a),x));
 
 	if (v->T != type_void)
 		return v;
 
 	drop(v);
-	return A(hold(fun->R),hold(x));
+	{
+	value b = (fun->R = eval(fun->R));
+	return A(hold(b),hold(x));
+	}
 	}
 	}
 

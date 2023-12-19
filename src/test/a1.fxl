@@ -1307,7 +1307,7 @@ nl
 )
 )
 
-# Test form with table->count == 0.
+# Test closed form.
 (
 \form=(\; \x x)
 say (is_closed form)

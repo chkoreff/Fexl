@@ -41,10 +41,12 @@ static value Qassoc(value key, value val, value obj)
 	return V(type_assoc,V(type_pair,key,val),obj);
 	}
 
-// (with key val obj)
-// Return a function like obj but with key defined as val.
-// Equivalent to:
-// \with=(\key\\val\obj \x eq x key val; obj x)
+/*
+(with key val obj)
+Return a function like obj but with key defined as val.
+Equivalent to:
+\with=(\key\\val\obj \x eq x key val; obj x)
+*/
 value type_with(value fun, value f)
 	{
 	if (fun->L == 0) return keep(fun,f);
@@ -52,9 +54,21 @@ value type_with(value fun, value f)
 	{
 	value key = arg(fun->L->R);
 	value val = hold(fun->R);
-	value obj = arg(f->R);
+	value obj = hold(f->R = eval(f->R));
 	return Qassoc(key,val,obj);
 	}
+	}
+
+/*
+(define key val obj)
+\define=(\key\\val with key (yield val))
+*/
+value type_define(value fun, value f)
+	{
+	if (fun->L == 0) return keep(fun,f);
+	f->T = type_with;
+	f->R = yield(f->R);
+	return hold(f);
 	}
 
 value type_is_obj(value fun, value f)
@@ -84,18 +98,20 @@ value type_split_obj(value fun, value f)
 	}
 	}
 
-// (fetch v k x)
-// Return the value at key k in index v.  If no value, store the value of x in
-// the index so you get the same value next time.  Equivalent to:
-//
-// \fetch=
-//     (\v\k\\x
-//     \y=(var_get v k)
-//     is_defined y y;
-//     \x=x
-//     var_put v (with k x; var_get v)
-//     x
-//     )
+/*
+(fetch v k x)
+Return the value at key k in index v.  If no value, store the value of x in
+the index so you get the same value next time.  Equivalent to:
+
+\fetch=
+	(\v\k\\x
+	\y=(var_get v k)
+	is_defined y y;
+	\x=x
+	var_put v (with k x; var_get v)
+	x
+	)
+*/
 value type_fetch(value fun, value f)
 	{
 	if (fun->L == 0) return keep(fun,f);
@@ -110,13 +126,9 @@ value type_fetch(value fun, value f)
 			f = y;
 		else
 			{
-			value x = hold(f->R);
 			drop(y);
-			x = eval(x);
-			y = Qassoc(hold(k),hold(x),hold(v->R));
-			drop(v->R);
-			v->R = y;
-			f = x;
+			f = arg(f->R);
+			v->R = Qassoc(hold(k),hold(f),v->R);
 			}
 		drop(k);
 		}

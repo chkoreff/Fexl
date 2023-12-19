@@ -261,7 +261,7 @@ int match(const char *other)
 	return strcmp(cur_name,other) == 0;
 	}
 
-static value cache = 0;
+static value cache;
 
 static value find_cache(string name)
 	{
@@ -293,7 +293,7 @@ static void pop_cache(void)
 	cache = next;
 	}
 
-static value do_resolve(value exp, value define())
+static value resolve(value exp, value define())
 	{
 	if (exp->T == type_quo)
 		return hold(exp);
@@ -327,8 +327,8 @@ static value do_resolve(value exp, value define())
 		}
 	else
 		return join(exp->T,
-			do_resolve(exp->L,define),
-			do_resolve(exp->R,define));
+			resolve(exp->L,define),
+			resolve(exp->R,define));
 	}
 
 // This is used to resolve forms which use names defined in C code.
@@ -337,7 +337,7 @@ value op_resolve(value fun, value f, value define(void))
 	value form = arg(f->R);
 	if (form->T == type_form)
 		{
-		value exp = do_resolve(form->R,define);
+		value exp = resolve(form->R,define);
 		while (cache)
 			pop_cache();
 		f = Qform(hold(form->L),exp);
@@ -352,11 +352,11 @@ value op_resolve(value fun, value f, value define(void))
 // Find the value associated with name in list.
 static value find_def(string name, value list)
 	{
-	while (list->T == type_list)
+	while (list)
 		{
-		if (str_eq(name,get_str(list->L->L->R)))
-			return list->L->R;
-		list = list->R;
+		if (str_eq(name,get_str(list->L->R)))
+			return list->R;
+		list = list->next;
 		}
 	return 0;
 	}
@@ -373,7 +373,13 @@ static value get_defs(value cx, value exp, value list)
 		if (val == 0)
 			{
 			val = eval(A(A(hold(cx),Qstr(str_copy(name))),hold(Qyield)));
-			list = V(type_list,pair(hold(exp),val),list);
+			{
+			value top = new_value();
+			top->L = hold(exp);
+			top->R = val;
+			top->next = list;
+			list = top;
+			}
 			}
 		return list;
 		}
@@ -389,18 +395,17 @@ static value get_defs(value cx, value exp, value list)
 // true if any were found.
 static int check_defs(const char *label, value list)
 	{
-	value pos = list;
 	int has_undef = 0;
-	while (pos->T == type_list)
+	while (list)
 		{
-		value val = pos->L->R;
+		value val = list->R;
 		if (val->L != Qyield)
 			{
-			value exp = pos->L->L;
+			value exp = list->L;
 			undefined_symbol(str_data(exp->R),exp->R->N,label);
 			has_undef = 1;
 			}
-		pos = pos->R;
+		list = list->next;
 		}
 	return has_undef;
 	}
@@ -438,7 +443,7 @@ value type_evaluate(value fun, value f)
 		else
 			{
 			value cx = arg(fun->R);
-			value list = get_defs(cx,exp,hold(Qnull));
+			value list = get_defs(cx,exp,0);
 			int has_undef = check_defs(str_data(form->L),list);
 			drop(cx);
 
@@ -449,7 +454,15 @@ value type_evaluate(value fun, value f)
 				}
 			else
 				f = replace(exp,list);
-			drop(list);
+
+			while (list)
+				{
+				value next = list->next;
+				drop(list->L);
+				drop(list->R);
+				recycle(list);
+				list = next;
+				}
 			}
 		}
 	else
