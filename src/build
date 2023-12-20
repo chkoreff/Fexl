@@ -50,7 +50,6 @@ make type_rand
 make type_record
 make type_run
 make type_signal
-make type_standard
 make type_stream
 make type_str
 make type_sym
