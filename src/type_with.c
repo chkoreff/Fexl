@@ -59,18 +59,6 @@ value type_with(value fun, value f)
 	}
 	}
 
-/*
-(define key val obj)
-\define=(\key\\val with key (yield val))
-*/
-value type_define(value fun, value f)
-	{
-	if (fun->L == 0) return keep(fun,f);
-	f->T = type_with;
-	f->R = yield(f->R);
-	return hold(f);
-	}
-
 value type_is_obj(value fun, value f)
 	{
 	return op_is_type(fun,f,type_assoc);

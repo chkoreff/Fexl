@@ -33,18 +33,8 @@ Undefined symbol fred on line 17
 Undefined symbol wilma on line 17
 Undefined symbol say on line 18
 Undefined symbol say on line 19
-Undefined symbol std on line 20
 ~
 \status=1
-]
-[ test_3
-\out=
-~
-~
-\err=
-~
-~
-\status=0
 ]
 ~1
 \err=

@@ -102,7 +102,6 @@ static value std(void)
 	if (match("compare_at")) return Q(type_compare_at);
 	if (match("is_str")) return Q(type_is_str);
 	if (match("with")) return Q(type_with);
-	if (match("define")) return Q(type_define);
 	if (match("is_obj")) return Q(type_is_obj);
 	if (match("split_obj")) return Q(type_split_obj);
 	if (match("fetch")) return Q(type_fetch);
@@ -189,7 +188,6 @@ static value std(void)
 	if (match("def")) return Q(type_def);
 	if (match("std")) return Q(type_std);
 	if (match("value")) return Q(type_value);
-	if (match("evaluate")) return Q(type_evaluate);
 	if (match("form_undefs")) return Q(type_form_undefs);
 	if (match("form_refs")) return Q(type_form_refs);
 

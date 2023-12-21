@@ -293,7 +293,7 @@ static void pop_cache(void)
 	cache = next;
 	}
 
-static value do_resolve(value exp, value define())
+static value resolve(value exp, value define())
 	{
 	if (exp->T == type_quo)
 		return hold(exp);
@@ -313,8 +313,8 @@ static value do_resolve(value exp, value define())
 		}
 	else
 		return join(exp->T,
-			do_resolve(exp->L,define),
-			do_resolve(exp->R,define));
+			resolve(exp->L,define),
+			resolve(exp->R,define));
 	}
 
 // This is used to resolve forms which use names defined in C code.
@@ -323,7 +323,7 @@ value op_resolve(value fun, value f, value define(void))
 	value form = arg(f->R);
 	if (form->T == type_form)
 		{
-		value exp = do_resolve(form->R,define);
+		value exp = resolve(form->R,define);
 		while (cache)
 			pop_cache();
 		f = Qform(hold(form->L),exp);
@@ -333,70 +333,6 @@ value op_resolve(value fun, value f, value define(void))
 	drop(form);
 	(void)fun;
 	return f;
-	}
-
-static value resolve(value exp, value cx)
-	{
-	if (exp->T == type_quo)
-		return hold(exp);
-	else if (exp->T == type_ref)
-		{
-		string name = get_str(exp->R);
-		value val = find_cache(name);
-		if (val)
-			return (val->T == type_quo) ? hold(val) : hold(exp);
-		else
-			{
-			value val = eval(A(A(hold(cx),Qstr(str_copy(name))),hold(Qyield)));
-			value new = (val->L == Qyield) ? quo(hold(val->R)) : hold(exp);
-			drop(val);
-			push_cache(exp,new);
-			return new;
-			}
-		}
-	else
-		return join(exp->T,
-			resolve(exp->L,cx),
-			resolve(exp->R,cx));
-	}
-
-// (evaluate cx form) Resolve the symbols in the form using the function cx.
-// The cx function maps a name to (yield val) if defined, otherwise void.
-// If all symbols are defined, return the fully resolved value and proceed with
-// evaluation.  Otherwise report the unique undefined symbols and die.
-value type_evaluate(value fun, value f)
-	{
-	if (fun->L == 0) return keep(fun,f);
-	{
-	value form = arg(f->R);
-	if (form->T == type_form)
-		{
-		value exp = form->R;
-		if (exp->T == type_quo)
-			f = hold(exp->R);
-		else
-			{
-			value cx = arg(fun->R);
-			exp = resolve(exp,cx);
-			if (exp->T == type_quo)
-				f = unquo(exp);
-			else
-				{
-				report_undef(str_data(form->L),exp);
-				die(0);
-				drop(exp);
-				f = hold(Qvoid); // not reached
-				}
-			while (cache)
-				pop_cache();
-			drop(cx);
-			}
-		}
-	else
-		f = hold(Qvoid);
-	drop(form);
-	return f;
-	}
 	}
 
 static int in_list(string s, value list)

@@ -39,7 +39,6 @@ static const char *type_name(type t)
 	if (t == type_list) return "list";
 	if (t == type_D) return "D";
 	if (t == type_E) return "E";
-	if (t == type_evaluate) return "evaluate";
 	if (t == type_pair) return "pair";
 	if (t == type_null) return "null";
 	if (t == type_tuple) return "tuple";
