@@ -293,7 +293,7 @@ static void pop_cache(void)
 	cache = next;
 	}
 
-static value resolve(value exp, value define())
+static value do_resolve(value exp, value define())
 	{
 	if (exp->T == type_quo)
 		return hold(exp);
@@ -301,34 +301,20 @@ static value resolve(value exp, value define())
 		{
 		string name = get_str(exp->R);
 		value val = find_cache(name);
-		if (val != 0)
-			{
-			if (val->T == type_quo)
-				return hold(val);
-			else
-				return hold(exp);
-			}
+		if (val)
+			return (val->T == type_quo) ? hold(val) : hold(exp);
 		else
 			{
-			cur_name = name->data;
-			val = define();
-			if (val != 0)
-				{
-				val = quo(val);
-				push_cache(exp,val);
-				return val;
-				}
-			else
-				{
-				push_cache(exp,Qvoid);
-				return hold(exp);
-				}
+			value val = ((cur_name = name->data), define());
+			value new = val ? quo(val) : hold(exp);
+			push_cache(exp,new);
+			return new;
 			}
 		}
 	else
 		return join(exp->T,
-			resolve(exp->L,define),
-			resolve(exp->R,define));
+			do_resolve(exp->L,define),
+			do_resolve(exp->R,define));
 	}
 
 // This is used to resolve forms which use names defined in C code.
@@ -337,7 +323,7 @@ value op_resolve(value fun, value f, value define(void))
 	value form = arg(f->R);
 	if (form->T == type_form)
 		{
-		value exp = resolve(form->R,define);
+		value exp = do_resolve(form->R,define);
 		while (cache)
 			pop_cache();
 		f = Qform(hold(form->L),exp);
@@ -349,81 +335,29 @@ value op_resolve(value fun, value f, value define(void))
 	return f;
 	}
 
-// Find the value associated with name in list.
-static value find_def(string name, value list)
-	{
-	while (list)
-		{
-		if (str_eq(name,get_str(list->L->R)))
-			return list->R;
-		list = list->next;
-		}
-	return 0;
-	}
-
-// Get the list of pairs {name val} for all distinct references in exp.
-static value get_defs(value cx, value exp, value list)
+static value resolve(value exp, value cx)
 	{
 	if (exp->T == type_quo)
-		return list;
+		return hold(exp);
 	else if (exp->T == type_ref)
 		{
 		string name = get_str(exp->R);
-		value val = find_def(name,list);
-		if (val == 0)
+		value val = find_cache(name);
+		if (val)
+			return (val->T == type_quo) ? hold(val) : hold(exp);
+		else
 			{
-			val = eval(A(A(hold(cx),Qstr(str_copy(name))),hold(Qyield)));
-			{
-			value top = new_value();
-			top->L = hold(exp);
-			top->R = val;
-			top->next = list;
-			list = top;
+			value val = eval(A(A(hold(cx),Qstr(str_copy(name))),hold(Qyield)));
+			value new = (val->L == Qyield) ? quo(hold(val->R)) : hold(exp);
+			drop(val);
+			push_cache(exp,new);
+			return new;
 			}
-			}
-		return list;
 		}
 	else
-		{
-		list = get_defs(cx,exp->L,list);
-		list = get_defs(cx,exp->R,list);
-		return list;
-		}
-	}
-
-// Check the definitions in list, reporting any undefined symbols and returning
-// true if any were found.
-static int check_defs(const char *label, value list)
-	{
-	int has_undef = 0;
-	while (list)
-		{
-		value val = list->R;
-		if (val->L != Qyield)
-			{
-			value exp = list->L;
-			undefined_symbol(str_data(exp->R),exp->R->N,label);
-			has_undef = 1;
-			}
-		list = list->next;
-		}
-	return has_undef;
-	}
-
-// Replace all the refs in exp with the value from list, which is guaranteed to
-// be of the form (yield val).  This yields a final evaluable function.
-static value replace(value exp, value list)
-	{
-	if (exp->T == type_quo)
-		return hold(exp->R);
-	else if (exp->T == type_ref)
-		{
-		string name = get_str(exp->R);
-		value val = find_def(name,list);
-		return hold(val->R);
-		}
-	else
-		return V(exp->T,replace(exp->L,list),replace(exp->R,list));
+		return join(exp->T,
+			resolve(exp->L,cx),
+			resolve(exp->R,cx));
 	}
 
 // (evaluate cx form) Resolve the symbols in the form using the function cx.
@@ -443,26 +377,19 @@ value type_evaluate(value fun, value f)
 		else
 			{
 			value cx = arg(fun->R);
-			value list = get_defs(cx,exp,0);
-			int has_undef = check_defs(str_data(form->L),list);
-			drop(cx);
-
-			if (has_undef)
+			exp = resolve(exp,cx);
+			if (exp->T == type_quo)
+				f = unquo(exp);
+			else
 				{
+				report_undef(str_data(form->L),exp);
 				die(0);
+				drop(exp);
 				f = hold(Qvoid); // not reached
 				}
-			else
-				f = replace(exp,list);
-
-			while (list)
-				{
-				value next = list->next;
-				drop(list->L);
-				drop(list->R);
-				recycle(list);
-				list = next;
-				}
+			while (cache)
+				pop_cache();
+			drop(cx);
 			}
 		}
 	else
