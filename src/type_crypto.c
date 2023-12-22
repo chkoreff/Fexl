@@ -15,22 +15,22 @@ value type_random_bytes(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 value type_random_nonce(value fun, value f)
 	{
+	return Qstr(str_random_nonce());
 	(void)fun;
 	(void)f;
-	return Qstr(str_random_nonce());
 	}
 
 value type_random_secret_key(value fun, value f)
 	{
+	return Qstr(str_random_secret_key());
 	(void)fun;
 	(void)f;
-	return Qstr(str_random_secret_key());
 	}
 
 value type_nacl_box_public(value fun, value f)

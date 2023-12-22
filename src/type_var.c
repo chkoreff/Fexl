@@ -21,9 +21,9 @@ static void clear_var(value f)
 value type_var_new(value fun, value f)
 	{
 	static struct value clear = {{.N=0}, {.clear=clear_var}};
+	return V(type_var,&clear,hold(Qvoid));
 	(void)fun;
 	(void)f;
-	return V(type_var,&clear,hold(Qvoid));
 	}
 
 // (var_get var) Return the current value of var.
@@ -35,8 +35,8 @@ value type_var_get(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // (var_getf var) Yield the current value of var.
@@ -48,8 +48,8 @@ value type_var_getf(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 static value op_put(value fun, value f, value op(value))

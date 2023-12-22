@@ -25,9 +25,9 @@ const char **main_argv;
 value type_die(value fun, value f)
 	{
 	die(0);
+	return hold(QI);
 	(void)fun;
 	(void)f;
-	return hold(QI);
 	}
 
 // (argv i) Return the command line argument at position i (starting at 0), or
@@ -46,8 +46,8 @@ value type_argv(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 static value op_sleep(value fun, value f, unsigned int op(unsigned int))
@@ -62,8 +62,8 @@ static value op_sleep(value fun, value f, unsigned int op(unsigned int))
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // (sleep n) Sleep for the specified number of seconds.
@@ -545,8 +545,8 @@ value type_receive_keystrokes(value fun, value f)
 	attr.c_lflag = save_c_lflag;
 	tcsetattr(0, TCSANOW, &attr);
 
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // (fexl_benchmark x next) Evaluate x and return (next val steps bytes), where

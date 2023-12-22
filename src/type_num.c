@@ -53,8 +53,8 @@ value type_num_str(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 value type_is_num(value fun, value f)

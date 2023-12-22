@@ -55,16 +55,16 @@ value type_put(value fun, value f)
 
 value type_nl(value fun, value f)
 	{
-	(void)fun;
-	(void)f;
 	fnl(stdout);
 	return hold(QI);
+	(void)fun;
+	(void)f;
 	}
 
 value type_say(value fun, value f)
 	{
-	(void)fun;
 	return A(A(hold(Qput),hold(f->R)),hold(Qnl));
+	(void)fun;
 	}
 
 value type_fput(value fun, value f)
@@ -92,8 +92,8 @@ value type_fnl(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(out);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 value type_fsay(value fun, value f)
@@ -114,8 +114,8 @@ value type_fflush(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(out);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 void beg_output(void)

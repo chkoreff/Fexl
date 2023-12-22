@@ -89,8 +89,8 @@ value type_fclose(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(out);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // (fgetc fh) returns the next single byte from the file, or void if none.
@@ -117,8 +117,8 @@ value type_clearerr(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 value type_feof(value fun, value f)
@@ -132,8 +132,8 @@ value type_feof(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // (flook fh) returns the next byte from the file without consuming it.
@@ -156,8 +156,8 @@ value type_flook(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // (remove path) Remove path from file system; return 0 if successful or -1
@@ -174,8 +174,8 @@ value type_remove(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // Return true if file1 is newer than file2.  If either file is missing, return
@@ -242,8 +242,8 @@ static value op_stat_type(value fun, value f, mode_t mask)
 		f = hold(Qvoid);
 
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // (is_file path) Return true if the path is a regular file.
@@ -274,8 +274,8 @@ static value op_flock(value fun, value f, int operation)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // (flock_ex fh) Obtain an exclusive lock on the file handle, blocking as long
@@ -326,8 +326,8 @@ value type_readlink(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // \code=(mkdir path mode) Attempt to create a directory named path.
@@ -367,8 +367,8 @@ value type_rmdir(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // \code=(ftruncate fh len) Truncate a file to the given length.
@@ -432,8 +432,8 @@ value type_ftell(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // \n=(fileno fh)
@@ -449,8 +449,8 @@ value type_fileno(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // \str=(fread fh size) Read at most size bytes from the file, clipping if it
@@ -534,8 +534,8 @@ value type_dir_names(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 static unsigned long get_st_mtime(struct stat *status)
@@ -562,8 +562,8 @@ static value op_stat(value fun, value f, unsigned long op(struct stat *status))
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // Return the modification time of a file in epoch seconds.

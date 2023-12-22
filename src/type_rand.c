@@ -18,15 +18,15 @@ value type_seed_rand(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // rand returns x, where x is a weakly pseudo-random number with a uniform
 // distribution over 0 <= x <= 1.
 value type_rand(value fun, value f)
 	{
+	return Qnum(((double)rand()) / ((double)RAND_MAX));
 	(void)fun;
 	(void)f;
-	return Qnum(((double)rand()) / ((double)RAND_MAX));
 	}

@@ -62,8 +62,8 @@ value type_unpack(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // Map a string specified in hexadecimal into the raw bytes.
@@ -75,6 +75,6 @@ value type_pack(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}

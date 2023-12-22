@@ -52,6 +52,6 @@ value type_use_file(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(name);
-	(void)fun;
 	return f;
+	(void)fun;
 	}

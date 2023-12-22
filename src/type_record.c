@@ -266,8 +266,8 @@ value type_record_count(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // (record_item obj pos) Return the {key val} pair in record obj at offset pos,

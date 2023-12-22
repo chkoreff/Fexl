@@ -14,9 +14,9 @@ value Qyield;
 // (I x) = x
 value type_I(value fun, value f)
 	{
+	return hold(f->R);
 	(void)fun;
 	(void)f;
-	return hold(f->R);
 	}
 
 // (T x y) = x
@@ -42,9 +42,9 @@ value type_Y(value fun, value f)
 // (void x) = void
 value type_void(value fun, value f)
 	{
+	return hold(Qvoid);
 	(void)fun;
 	(void)f;
-	return hold(Qvoid);
 	}
 
 // ((pair x y) h) = (h x y)
@@ -61,8 +61,8 @@ value type_list(value fun, value f)
 	{
 	value x = hold(fun->L);
 	value y = hold(fun->R);
-	(void)f;
 	return V(type_pair,x,y);
+	(void)f;
 	}
 
 // (cons x y) = (list x y)
@@ -92,8 +92,8 @@ value type_eval(value fun, value f)
 // Evaluate x once, replacing the right side with the final value.
 value type_once(value fun, value f)
 	{
-	(void)fun;
 	return (f->R = hold(eval(f->R)));
+	(void)fun;
 	}
 
 // (yield x f) = (f x)  Used for returning an unevaluated function.
@@ -129,14 +129,14 @@ value pair(value x, value y)
 
 value type_is_defined(value fun, value f)
 	{
-	(void)fun;
 	return boolean(f->R->T != type_void);
+	(void)fun;
 	}
 
 value type_is_undef(value fun, value f)
 	{
-	(void)fun;
 	return boolean(f->R->T == type_void);
+	(void)fun;
 	}
 
 value op_is_type(value fun, value f, type t)
@@ -144,8 +144,8 @@ value op_is_type(value fun, value f, type t)
 	value x = arg(f->R);
 	f = boolean(x->T == t);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 value type_is_void(value fun, value f)
@@ -158,8 +158,8 @@ static value op_predicate(value fun, value f, int op(value))
 	value x = arg(f->R);
 	f = boolean(op(x));
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 static int is_good(value x)

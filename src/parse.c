@@ -377,9 +377,9 @@ static value type_parse_fexl(value fun, value f)
 	value exp = parse_form();
 	if (cur_ch != -1)
 		syntax_error("Extraneous input", cur_line);
+	return exp;
 	(void)fun;
 	(void)f;
-	return exp;
 	}
 
 // Parse a top level form.

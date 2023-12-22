@@ -25,8 +25,8 @@ value op_getc(value fun, value f, type t, input get)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 value op_get(value fun, value f, type t, input get)
@@ -41,6 +41,6 @@ value op_get(value fun, value f, type t, input get)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}

@@ -123,9 +123,9 @@ void show(const char *name, value f)
 
 static value type_show(value fun, value f)
 	{
-	(void)fun;
 	show_exp(f->R);nl();
 	return hold(QI);
+	(void)fun;
 	}
 
 static value define(void)

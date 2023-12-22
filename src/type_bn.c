@@ -39,8 +39,8 @@ static value op_pred(value fun, value f, int op(const struct bn *x))
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 value type_bn_eq0(value fun, value f)
@@ -61,8 +61,8 @@ value type_bn_neg(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 value type_bn_cmp(value fun, value f)
@@ -119,8 +119,8 @@ value type_bn_from_dec(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 value type_bn_to_dec(value fun, value f)
@@ -131,8 +131,8 @@ value type_bn_to_dec(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 static value op_2(value fun, value f,

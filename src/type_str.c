@@ -53,8 +53,8 @@ value op_str(value fun, value f, string op(string))
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 value op_str2(value fun, value f, string op(string,string))
@@ -121,8 +121,8 @@ value type_length(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // (slice str pos len) calls str_slice, except it returns void if pos or len is
@@ -202,8 +202,8 @@ value type_str_num(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // (ord x) is the ordinal number of the first ASCII character of string x.
@@ -218,8 +218,8 @@ value type_ord(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // (chr x) is the ASCII character whose ordinal number is x.
@@ -235,8 +235,8 @@ value type_chr(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // (char_width str pos) Return the width of the UTF-8 character which starts at
@@ -403,6 +403,6 @@ value op_argv(value fun, value f, value op(const char *const *argv))
 	free_memory((void *)argv,size);
 	drop(items);
 
-	(void)fun;
 	return f;
+	(void)fun;
 	}

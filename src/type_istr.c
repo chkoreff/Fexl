@@ -63,8 +63,8 @@ value type_readstr(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // (sgetc in) returns the next single byte from the string, or void if none.
@@ -97,6 +97,6 @@ value type_slook(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}

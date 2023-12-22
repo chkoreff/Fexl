@@ -12,31 +12,31 @@
 
 value type_at_eof(value fun, value f)
 	{
+	return boolean(cur_ch == -1);
 	(void)fun;
 	(void)f;
-	return boolean(cur_ch == -1);
 	}
 
 value type_at_white(value fun, value f)
 	{
+	return boolean(at_white());
 	(void)fun;
 	(void)f;
-	return boolean(at_white());
 	}
 
 value type_skip_white(value fun, value f)
 	{
-	(void)fun;
-	(void)f;
 	skip_white();
 	return hold(QI);
+	(void)fun;
+	(void)f;
 	}
 
 value type_at_eol(value fun, value f)
 	{
+	return boolean(cur_ch == '\n' || cur_ch == '\r');
 	(void)fun;
 	(void)f;
-	return boolean(cur_ch == '\n' || cur_ch == '\r');
 	}
 
 value type_at_ch(value fun, value f)
@@ -46,15 +46,13 @@ value type_at_ch(value fun, value f)
 		f = boolean(cur_ch == *str_data(x));
 	else
 		f = hold(Qvoid);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // Return the current character.
 value type_look(value fun, value f)
 	{
-	(void)fun;
-	(void)f;
 	if (cur_ch < 0)
 		return hold(Qvoid);
 	else
@@ -62,23 +60,25 @@ value type_look(value fun, value f)
 		char c = cur_ch;
 		return Qstr(str_new_data(&c,1));
 		}
+	(void)fun;
+	(void)f;
 	}
 
 // Skip to the next character.
 value type_skip(value fun, value f)
 	{
-	(void)fun;
-	(void)f;
 	skip();
 	return hold(QI);
+	(void)fun;
+	(void)f;
 	}
 
 // Return the current line number.
 value type_line(value fun, value f)
 	{
+	return Qnum(cur_line);
 	(void)fun;
 	(void)f;
-	return Qnum(cur_line);
 	}
 
 value type_buf_keep(value fun, value f)
@@ -92,8 +92,8 @@ value type_buf_keep(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 value type_collect_to_ch(value fun, value f)
@@ -120,8 +120,8 @@ value type_collect_tilde_string(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // (read_stream stream read)

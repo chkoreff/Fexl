@@ -159,8 +159,8 @@ value type_is_closed(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(form);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // Define key as val in an expression.
@@ -250,8 +250,8 @@ value type_value(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(form);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 static const char *cur_name;
@@ -331,8 +331,8 @@ value op_resolve(value fun, value f, value define(void))
 	else
 		f = hold(Qvoid);
 	drop(form);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 static int in_list(string s, value list)
@@ -379,8 +379,8 @@ value type_form_undefs(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(form);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 static value form_refs(value exp, value list)
@@ -411,6 +411,6 @@ value type_form_refs(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(form);
-	(void)fun;
 	return f;
+	(void)fun;
 	}

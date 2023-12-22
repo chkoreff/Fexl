@@ -18,8 +18,8 @@ static value op_num(value fun, value f, double op(double))
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 static value op_num_num(value fun, value f, double op(double,double))

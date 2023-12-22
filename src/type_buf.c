@@ -33,9 +33,9 @@ value type_buf_new(value fun, value f)
 	static struct value clear = {{.N=0}, {.clear=clear_buf}};
 	buffer buf = new_memory(sizeof(struct buffer));
 	*buf = (struct buffer){0};
+	return V(type_buf,&clear,(value)buf);
 	(void)fun;
 	(void)f;
-	return V(type_buf,&clear,(value)buf);
 	}
 
 // (buf_put buf str) Appends the string to the buffer.
@@ -67,7 +67,7 @@ value type_buf_get(value fun, value f)
 		f = Qstr(buf_clear(get_buf(x)));
 	else
 		f = hold(Qvoid);
-	(void)fun;
 	drop(x);
 	return f;
+	(void)fun;
 	}

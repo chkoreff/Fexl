@@ -18,10 +18,10 @@
 value type_time(value fun, value f)
 	{
 	time_t n;
-	(void)fun;
-	(void)f;
 	time(&n);
 	return Qnum(n);
+	(void)fun;
+	(void)f;
 	}
 
 static const char *time_format = "%Y-%m-%d %H:%M:%S";
@@ -41,8 +41,8 @@ static value op_strftime(value fun, value f, struct tm *(*convert)(const time_t 
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // Convert "YYYY-MM-DD HH:MM:SS" to an epoch time.
@@ -62,8 +62,8 @@ static value op_strptime(value fun, value f, time_t (*convert)(struct tm *tm))
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 // Convert epoch to string in local time zone.
@@ -101,9 +101,9 @@ static string microtime(void)
 
 value type_microtime(value fun, value f)
 	{
+	return Qstr(microtime());
 	(void)fun;
 	(void)f;
-	return Qstr(microtime());
 	}
 
 // 1:Mon 2:Tue 3:Wed 4:Thu 5:Fri 6:Sat 0:Sun

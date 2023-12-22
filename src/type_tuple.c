@@ -18,9 +18,9 @@ value type_tuple(value fun, value f)
 			{
 			value head = hold(args->L);
 			value tail = hold(args->R);
-			exp = A(exp,head);
 			drop(args);
 			args = tail;
+			exp = A(exp,head);
 			}
 		else if (args->T == type_null)
 			{
@@ -41,8 +41,8 @@ value type_is_tuple(value fun, value f)
 	value x = arg(f->R);
 	f = boolean(x->T == type_tuple || x->T == type_pair);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 value type_tuple_to_list(value fun, value f)
@@ -55,14 +55,14 @@ value type_tuple_to_list(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	(void)fun;
 	return f;
+	(void)fun;
 	}
 
 value type_list_to_tuple(value fun, value f)
 	{
-	(void)fun;
 	return V(type_tuple,hold(Qtuple),hold(f->R));
+	(void)fun;
 	}
 
 void beg_tuple(void)
