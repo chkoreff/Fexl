@@ -89,17 +89,16 @@
 	combine_keys (\x\_ x) xs # Keep the first.
 	)
 
-\form
-def ":" get_key; # Handy synonym
-def "get_key" get_key;
-def "del_key" del_key;
-def "put_key" put_key;
-def "push_key" push_key;
-def "update_key" update_key;
-def "add_key" add_key;
-def "update_values" update_values;
-def "sort_pairs" sort_pairs;
-def "put_default" put_default;
-def "name_columns" name_columns;
-def "make_assoc" make_assoc;
-form
+define ":" get_key; # Handy synonym
+define "get_key" get_key;
+define "del_key" del_key;
+define "put_key" put_key;
+define "push_key" push_key;
+define "update_key" update_key;
+define "add_key" add_key;
+define "update_values" update_values;
+define "sort_pairs" sort_pairs;
+define "put_default" put_default;
+define "name_columns" name_columns;
+define "make_assoc" make_assoc;
+void

@@ -1332,7 +1332,7 @@ put "d = " put (as_str d) nl
 
 # Test op_argv.
 (
-value; std; load "test"; \;
+value; std; (resolve; load "test"); \;
 
 test_argv []
 test_argv ["a" "b"]

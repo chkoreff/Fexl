@@ -81,10 +81,9 @@
 	buf_get buf
 	)
 
-\form
-def "i_render_data" i_render_data;
-def "say_data" say_data;
-def "fsay_data" fsay_data;
-def "trace_data" trace_data;
-def "i_as_str" i_as_str;
-form
+define "i_render_data" i_render_data;
+define "say_data" say_data;
+define "fsay_data" fsay_data;
+define "trace_data" trace_data;
+define "i_as_str" i_as_str;
+void

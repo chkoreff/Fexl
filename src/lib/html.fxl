@@ -147,15 +147,14 @@
 	url
 	)
 
-\form
-def "quote_ch" quote_ch;
-def "quote" quote;
-def "colgroup" colgroup;
-def "_tag" _tag;
-def "tag" tag;
-def "tr" tr;
-def "put_quote_data" put_quote_data;
-def "uri_escape" uri_escape;
-def "uri_unescape" uri_unescape;
-def "make_url" make_url;
-form
+define "quote_ch" quote_ch;
+define "quote" quote;
+define "colgroup" colgroup;
+define "_tag" _tag;
+define "tag" tag;
+define "tr" tr;
+define "put_quote_data" put_quote_data;
+define "uri_escape" uri_escape;
+define "uri_unescape" uri_unescape;
+define "make_url" make_url;
+void

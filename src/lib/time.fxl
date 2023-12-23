@@ -39,9 +39,8 @@
 	v
 	)
 
-\form
-def "split_microtime" split_microtime;
-def "subtract_microtime" subtract_microtime;
-def "show_microtime" show_microtime;
-def "trace_elapsed" trace_elapsed;
-form
+define "split_microtime" split_microtime;
+define "subtract_microtime" subtract_microtime;
+define "show_microtime" show_microtime;
+define "trace_elapsed" trace_elapsed;
+void

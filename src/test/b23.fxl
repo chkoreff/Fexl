@@ -1,7 +1,7 @@
 # Ensure automatic loading of libraries.  Each of these lines loads the next
 # library file in the standard search order.
 \_
-say std def # std
+say + - # core
 use if # extra
 and or not # bool
 neg max # math

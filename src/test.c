@@ -34,5 +34,5 @@ static value define(void)
 
 value type_cx_test(value fun, value f)
 	{
-	return op_resolve(fun,f,define);
+	return op_context(fun,f,define);
 	}

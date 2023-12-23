@@ -9,6 +9,9 @@
 #include <type_num.h>
 #include <type_str.h>
 #include <type_sym.h>
+#include <type_with.h>
+
+static value Qdef_std;
 
 value type_quo(value fun, value f)
 	{
@@ -191,6 +194,7 @@ static value def(string key, value val, value exp)
 	}
 
 // (def key val form) Return form with key defined as val.
+// LATER 20231223 "def" is deprecated
 value type_def(value fun, value f)
 	{
 	if (fun->L == 0) return keep(fun,f);
@@ -218,6 +222,34 @@ value type_def(value fun, value f)
 	}
 	}
 
+static const char *cur_name;
+
+int match(const char *other)
+	{
+	return strcmp(cur_name,other) == 0;
+	}
+
+// Use a C define function as a Fexl context function.
+value op_context(value fun, value f, value define(void))
+	{
+	value x = arg(f->R);
+	if (x->T == type_str)
+		{
+		value val;
+		cur_name = str_data(x);
+		val = define();
+		if (val)
+			f = yield(val);
+		else
+			f = hold(Qvoid);
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
+	(void)fun;
+	}
+
 static void report_undef(const char *label, value exp)
 	{
 	if (exp->T == type_quo)
@@ -233,6 +265,7 @@ static void report_undef(const char *label, value exp)
 
 // Evaluate the form if all symbols are defined, otherwise report the undefined
 // symbols and die.
+// LATER 20231223 "value" is deprecated
 value type_value(value fun, value f)
 	{
 	value form = arg(f->R);
@@ -252,13 +285,6 @@ value type_value(value fun, value f)
 	drop(form);
 	return f;
 	(void)fun;
-	}
-
-static const char *cur_name;
-
-int match(const char *other)
-	{
-	return strcmp(cur_name,other) == 0;
 	}
 
 static value cache;
@@ -284,16 +310,19 @@ static void push_cache(value exp, value val)
 	cache = top;
 	}
 
-static void pop_cache(void)
+static void clear_cache(void)
 	{
-	value next = cache->next;
-	drop(cache->L);
-	drop(cache->R);
-	recycle(cache);
-	cache = next;
+	while (cache)
+		{
+		value next = cache->next;
+		drop(cache->L);
+		drop(cache->R);
+		recycle(cache);
+		cache = next;
+		}
 	}
 
-static value resolve(value exp, value define())
+static value resolve(value exp, value cx)
 	{
 	if (exp->T == type_quo)
 		return hold(exp);
@@ -305,33 +334,90 @@ static value resolve(value exp, value define())
 			return (val->T == type_quo) ? hold(val) : hold(exp);
 		else
 			{
-			value val = ((cur_name = name->data), define());
-			value new = val ? quo(val) : hold(exp);
+			value val = eval(A(A(hold(cx),Qstr(str_copy(name))),hold(Qyield)));
+			value new = (val->L == Qyield) ? quo(hold(val->R)) : hold(exp);
+			drop(val);
 			push_cache(exp,new);
 			return new;
 			}
 		}
 	else
 		return join(exp->T,
-			resolve(exp->L,define),
-			resolve(exp->R,define));
+			resolve(exp->L,cx),
+			resolve(exp->R,cx));
 	}
 
-// This is used to resolve forms which use names defined in C code.
-value op_resolve(value fun, value f, value define(void))
+// (resolve cx form) Use context cx to resolve some symbols in the form.
+value type_resolve(value fun, value f)
+	{
+	if (fun->L == 0) return keep(fun,f);
 	{
 	value form = arg(f->R);
 	if (form->T == type_form)
 		{
-		value exp = resolve(form->R,define);
-		while (cache)
-			pop_cache();
-		f = Qform(hold(form->L),exp);
+		value exp = form->R;
+		if (exp->T == type_quo)
+			f = hold(form);
+		else
+			{
+			value cx = (fun->R = eval(fun->R));
+			exp = resolve(exp,cx);
+			clear_cache();
+
+			f = Qform(hold(form->L),exp);
+			}
 		}
 	else
 		f = hold(Qvoid);
 	drop(form);
 	return f;
+	}
+	}
+
+// (evaluate cx form) Resolve all the symbols in the form and return its value.
+// If there are any undefined symbols, report them all and die.
+// The cx function maps a name to (yield val) if defined, otherwise void.
+value type_evaluate(value fun, value f)
+	{
+	if (fun->L == 0) return keep(fun,f);
+	{
+	value form = arg(f->R);
+	if (form->T == type_form)
+		{
+		value exp = form->R;
+		if (exp->T == type_quo)
+			f = hold(exp->R);
+		else
+			{
+			value cx = (fun->R = eval(fun->R));
+			exp = resolve(exp,cx);
+			clear_cache();
+
+			if (exp->T == type_quo)
+				f = unquo(exp);
+			else
+				{
+				report_undef(str_data(form->L),exp);
+				drop(exp);
+				die(0);
+				f = hold(Qvoid); // not reached
+				}
+			}
+		}
+	else
+		f = hold(Qvoid);
+	drop(form);
+	return f;
+	}
+	}
+
+// \extend=(\cx evaluate (define "cx_std" cx; cx))
+value type_extend(value fun, value f)
+	{
+	value cx = (f->R = eval(f->R));
+	f->T = type_evaluate;
+	f->R = A(A(hold(Qdef_std),cx),hold(cx));
+	return hold(f);
 	(void)fun;
 	}
 
@@ -413,4 +499,14 @@ value type_form_refs(value fun, value f)
 	drop(form);
 	return f;
 	(void)fun;
+	}
+
+void beg_sym(void)
+	{
+	Qdef_std = A(Q(type_define),Qstr0("cx_std"));
+	}
+
+void end_sym(void)
+	{
+	drop(Qdef_std);
 	}

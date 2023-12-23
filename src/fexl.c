@@ -32,11 +32,17 @@
 #include <type_var.h>
 #include <type_with.h>
 
-static value type_std(value fun, value f);
+// LATER 20231223 "std" is deprecated
+// I will eliminate "std", using "cx_std" instead.  After that is done, I will
+// rename "cx_std" back to "std".
 
-// Resolve std names.
-static value std(void)
+static value type_cx_std(value fun, value f);
+
+// Resolve cx_std names.
+static value cx_std(void)
 	{
+	if (match("std")) return A(Q(type_resolve),Q(type_cx_std));
+
 	if (match("put")) return hold(Qput);
 	if (match("nl")) return hold(Qnl);
 	if (match("say")) return Q(type_say);
@@ -102,6 +108,7 @@ static value std(void)
 	if (match("compare_at")) return Q(type_compare_at);
 	if (match("is_str")) return Q(type_is_str);
 	if (match("with")) return Q(type_with);
+	if (match("define")) return Q(type_define);
 	if (match("is_obj")) return Q(type_is_obj);
 	if (match("split_obj")) return Q(type_split_obj);
 	if (match("fetch")) return Q(type_fetch);
@@ -185,8 +192,10 @@ static value std(void)
 	if (match("use_file")) return Q(type_use_file);
 
 	if (match("is_closed")) return Q(type_is_closed);
+	if (match("resolve")) return Q(type_resolve);
+	if (match("evaluate")) return Q(type_evaluate);
+	if (match("extend")) return Q(type_extend);
 	if (match("def")) return Q(type_def);
-	if (match("std")) return Q(type_std);
 	if (match("value")) return Q(type_value);
 	if (match("form_undefs")) return Q(type_form_undefs);
 	if (match("form_refs")) return Q(type_form_refs);
@@ -274,9 +283,9 @@ static value std(void)
 	return 0;
 	}
 
-static value type_std(value fun, value f)
+static value type_cx_std(value fun, value f)
 	{
-	return op_resolve(fun,f,std);
+	return op_context(fun,f,cx_std);
 	}
 
 static void beg_const(void)
@@ -286,6 +295,7 @@ static void beg_const(void)
 	beg_output();
 	beg_tuple();
 	beg_record();
+	beg_sym();
 	init_signal();
 	}
 
@@ -296,6 +306,7 @@ static void end_const(void)
 	end_output();
 	end_tuple();
 	end_record();
+	end_sym();
 	close_random();
 	}
 
@@ -346,9 +357,7 @@ static void eval_script(void)
 		}
 
 	// Now evaluate the script.
-	f = A(Q(type_use_file),f);
-	f = A(Q(type_std),f);
-	f = A(Q(type_value),f);
+	f = A(A(Q(type_extend),Q(type_cx_std)),A(Q(type_use_file),f));
 	f = eval(f);
 	drop(f);
 	}

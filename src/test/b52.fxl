@@ -1,5 +1,5 @@
 #
-value; std; load "show"; \;
+value; std; (resolve; load "show"); \;
 
 \try=
 	(\form

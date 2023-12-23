@@ -5,20 +5,6 @@
 # (default d x) = x if x is good, otherwise d.
 \default=(\\d\x is_defined x x d)
 
-# Use the context only if the form has open symbols.
-\::=
-	(\\cx\form
-	is_closed form form;
-	cx form
-	)
-
-# Define key to refer to a context.
-\defc=
-	(\key\cx
-	@\\self\\form
-	cx; def key self; form
-	)
-
 \path_under=(\dir\name . (. dir "/") name)
 
 # Establish paths based on command arguments.
@@ -31,6 +17,7 @@
 # Define some extra functions.
 \\extra=
 (\=
+
 # (if x y) = y if x is true, other I.
 \if=(\\x\\y x y I)
 
@@ -56,53 +43,136 @@
 # Use a file in the directory which contains the user's script.
 \use=(\name use_file; path_under dir_local name)
 
-\form
-def "defc" defc;
-def "if" if;
-def "::" ::;
-def "use" use;
+# Define key to refer to a context.
+\defc=
+	(\key\cx
+	@\\self\\form
+	cx; def key self; form
+	)
 
-def "check" check;
-def "default" default;
+# Use the context only if the form has open symbols.
+# LATER 20231223 "::" is deprecated
+\::=
+	(\\cx\form
+	is_closed form form;
+	cx form
+	)
 
-def "path_under" path_under;
-def "dir_base" dir_base;
-def "dir_local" dir_local;
+define "defc" defc;
+define "if" if;
+define "::" ::;
+define "use" use;
 
-def "trace" trace;
-def "error" error;
+define "check" check;
+define "default" default;
 
-def "TAB" TAB;
-def "NL" NL;
-def "CR" CR;
-def "LF" LF;
-def "QU" QU;
+define "path_under" path_under;
+define "dir_base" dir_base;
+define "dir_local" dir_local;
 
-def "do_benchmark" do_benchmark;
-def "show_benchmark" show_benchmark;
-form
+define "trace" trace;
+define "error" error;
+
+define "TAB" TAB;
+define "NL" NL;
+define "CR" CR;
+define "LF" LF;
+define "QU" QU;
+
+define "do_benchmark" do_benchmark;
+define "show_benchmark" show_benchmark;
+void
 )
 
 # Enhance the standard context to load libraries on demand.
-\std=
+\cx_std=
 (
 \dir_lib=(path_under dir_base "src/lib")
 \use=(\name use_file; path_under dir_lib name)
 
-\\bool=(\= value; std; use "bool.fxl")
-\\math=(\= value; std; use "math.fxl")
-\\list=(\= value; std; bool; use "list.fxl")
-\\format=(\= value; std; extra; bool; math; list; use "format.fxl")
-\\indent=(\= value; std; extra; format; use "indent.fxl")
-\\assoc=(\= value; std; list; use "assoc.fxl")
-\\hex=(\= value; std; bool; math; list; use "hex.fxl")
-\\html=(\= value; std; extra; list; format; hex; use "html.fxl")
-\\time=(\= value; std; extra; use "time.fxl")
-\\date=(\= value; std; math; list; use "date.fxl")
-\\run=(\= value; std; extra; bool; list; use "run.fxl")
-\\read=(\= value; std; extra; use "read.fxl")
-\\read_csv=(\= value; std; extra; read; use "read_csv.fxl")
-\\read_ssv=(\= value; std; extra; read; use "read_ssv.fxl")
+\\bool=
+	(\=
+	evaluate cx_std;
+	use "bool.fxl"
+	)
+
+\\math=
+	(\=
+	evaluate cx_std;
+	use "math.fxl"
+	)
+
+\\list=
+	(\=
+	evaluate (chain bool; cx_std);
+	use "list.fxl"
+	)
+
+\\format=
+	(\=
+	evaluate (chain list; chain math; chain bool; chain extra; cx_std);
+	use "format.fxl"
+	)
+
+\\indent=
+	(\=
+	evaluate (chain format; chain extra; cx_std);
+	use "indent.fxl"
+	)
+
+\\assoc=
+	(\=
+	evaluate (chain list; cx_std);
+	use "assoc.fxl"
+	)
+
+\\hex=
+	(\=
+	evaluate (chain list; chain math; chain bool; cx_std);
+	use "hex.fxl"
+	)
+
+\\html=
+	(\=
+	evaluate (chain hex; chain format; chain list; chain extra; cx_std);
+	use "html.fxl"
+	)
+
+\\time=
+	(\=
+	evaluate (chain extra; cx_std);
+	use "time.fxl"
+	)
+
+\\date=
+	(\=
+	evaluate (chain list; chain math; cx_std);
+	use "date.fxl"
+	)
+
+\\run=
+	(\=
+	evaluate (chain list; chain bool; chain extra; cx_std);
+	use "run.fxl"
+	)
+
+\\read=
+	(\=
+	evaluate cx_std;
+	use "read.fxl"
+	)
+
+\\read_csv=
+	(\=
+	evaluate (chain read; chain extra; cx_std);
+	use "read_csv.fxl"
+	)
+
+\\read_ssv=
+	(\=
+	evaluate (chain read; chain extra; cx_std);
+	use "read_ssv.fxl"
+	)
 
 \load=
 	(\module
@@ -118,27 +188,32 @@ form
 	entry ()
 	)
 
-defc "std";
-\\form
-:: read_ssv;
-:: read_csv;
-:: run;
-:: date;
-:: time;
-:: html;
-:: hex;
-:: assoc;
-:: indent;
-:: format;
-:: list;
-:: math;
-:: bool;
-:: extra;
-def "use_lib" use;
-def "load" load;
-std;
-form
+chain cx_std;
+define "load" load;
+define "use_lib" use;
+chain extra;
+chain bool;
+chain math;
+chain list;
+chain format;
+chain indent;
+chain assoc;
+chain hex;
+chain html;
+chain time;
+chain date;
+chain run;
+chain read_csv;
+chain read_ssv;
+void
+)
+
+# LATER 20231223 Keeping the old std for now.
+\cx_std=
+(
+define "std" (@\\std resolve (define "std" std; cx_std));
+cx_std
 )
 
 # Evaluate the user's script.
-value; std; use_file script_name
+extend cx_std; use_file script_name
