@@ -1,5 +1,5 @@
 #
-value; std; (value; std; use "test.fxl") \;
+evaluate (chain (evaluate cx_std; use "test.fxl"); cx_std) \;
 
 \run_case=
 	(\label\text
@@ -9,16 +9,14 @@ value; std; (value; std; use "test.fxl") \;
 (
 run_case "test_1"
 ~
-value;
+extend
 (
-defc "std" \form
-def "say" say;
-def "put" put;
-def "nl" nl;
-def "fred" (say "I am Fred.");
-def "wilma" (say "I am Wilma.");
-def "value" value;
-form
+define "say" say;
+define "put" put;
+define "nl" nl;
+define "fred" (say "I am Fred.");
+define "wilma" (say "I am Wilma.");
+void
 )
 \;
 say "Hello"
@@ -28,7 +26,7 @@ fred wilma
 fred wilma
 say "Bye"
 say "=="
-(value; std \; {fred}) \\fred
+cx_std "fred" \\fred
 fred fred
 ~
 )
@@ -36,16 +34,14 @@ fred fred
 (
 run_case "test_2"
 ~
-value;
+evaluate
 (
-defc "std" \form
-#def "say" say;
-def "put" put;
-def "nl" nl;
-#def "fred" (say "I am Fred.");
-#def "wilma" (say "I am Wilma.");
-def "value" value;
-form
+#define "say" say;
+define "put" put;
+define "nl" nl;
+#define "fred" (say "I am Fred.");
+#define "wilma" (say "I am Wilma.");
+void
 )
 \;
 say "Hello"
@@ -55,7 +51,22 @@ fred wilma
 fred wilma
 say "Bye"
 say "=="
-(value; std \; {fred}) \\fred
+cx_std "fred" \\fred
 fred fred
+~
+)
+
+(
+# Here's a case where the form has no symbols, so I don't even bother to
+# evaluate the context.
+run_case "test_3"
+~
+evaluate
+(
+say "HEY" # not printed
+void
+)
+\;
+() ["a" "b" 3.6]
 ~
 )

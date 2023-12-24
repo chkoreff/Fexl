@@ -1,6 +1,5 @@
 #
-\cx=(value; std; use "lib/index_C/context.fxl")
-value; std; cx \;
+evaluate (chain (extend cx_std; use "lib/index_C/context.fxl"); cx_std) \;
 
 \try_pairs=
 	(\pairs

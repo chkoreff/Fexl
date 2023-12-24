@@ -1,7 +1,9 @@
 #
-value;
-std;
-def "talk" (say "TALK");
+evaluate
+(
+define "talk" (say "TALK");
+cx_std
+)
 \;
 say "begin"
 talk

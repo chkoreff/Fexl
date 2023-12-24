@@ -1,7 +1,7 @@
 #
 # Test dynamic libraries.
 # Skipping a line here to preserve the original line numbers.
-value; std; (resolve; load "show"); \;
+evaluate (chain (load "show"); cx_std) \;
 
 show ()
 show ["a" "b"]

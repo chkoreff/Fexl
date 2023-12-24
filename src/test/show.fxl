@@ -1,5 +1,5 @@
 #
-value; std; (value; std; use "test.fxl") \;
+evaluate (chain (evaluate cx_std; use "test.fxl"); cx_std) \;
 
 \name=(argv 2)
 is_undef name (error "Missing test name");

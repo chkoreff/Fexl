@@ -286,7 +286,7 @@ try ["a" "x" "e"]
 2 [13 17 21]
 3 [14 18 22]
 4 [void void void]
-steps 60081 bytes 51635
+steps 60087 bytes 50931
 ~1
 \err=
 ~

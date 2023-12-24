@@ -440,14 +440,15 @@ try void
 # Test import.
 (
 say "= import"
-# Extract specific functions from a context.
-\cx=(value; std; use "test.fxl")
-value (cx (\; {div show_hex show_str})) \div\show_hex\show_str
 # Evaluate with alternative names.
-value;
-def "div" div;
-def "test.show_hex" show_hex;
-def "test.show_str" show_str;
+\cx=(evaluate cx_std; use "test.fxl")
+evaluate
+(
+with "div" (cx "div");
+with "test.show_hex" (cx "show_hex");
+with "test.show_str" (cx "show_str");
+void
+)
 \;
 div
 test.show_hex ""
@@ -455,6 +456,7 @@ test.show_hex "abcd"
 test.show_hex "123"
 test.show_str "abcd"
 )
+
 (
 say "=="
 \list=["a" ["b" ["c" {3 4} T [F T]] "d" [] "e" "f"]]

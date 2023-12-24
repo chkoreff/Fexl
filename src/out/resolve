@@ -1,27 +1,20 @@
 \out=
 ~
 == test_0
-Evaluating the key.
-Evaluating the context.
-result void
-
-Evaluating the key.
 Evaluating the context.
 Evaluating the form.
 result void
 
-Evaluating the key.
-Evaluating the context.
 Evaluating the form.
 Hello
 result ok
 
-steps 156 bytes 960
+steps 66 bytes 512
 == test_1
 Evaluating the context.
 Evaluating the form.
 I am Fred.
-steps 106 bytes 1056
+steps 80 bytes 544
 == test_2
 Evaluating the context.
 Evaluating the form.
@@ -31,7 +24,7 @@ T
 HEY: Fred says a
 Wilma says b
 Goodbye
-steps 143 bytes 2400
+steps 132 bytes 1088
 ~
 \err=
 ~

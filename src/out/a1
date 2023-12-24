@@ -560,12 +560,12 @@ y = 6
 8
 [
 == resolve
-symbol say
-symbol fred
-symbol wilma
-symbol is_void
-symbol void
 symbol barney
+symbol void
+symbol is_void
+symbol say
+symbol wilma
+symbol fred
 == run
 I am Fred.
 I am Wilma.

@@ -1,5 +1,5 @@
 #
-value; std; (resolve; load "show"); \;
+evaluate (chain (load "show"); cx_std) \;
 
 \try=
 	(\form

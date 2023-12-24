@@ -1,5 +1,5 @@
 #
-value; std; (value; std; use "test.fxl") \;
+evaluate (chain (evaluate cx_std; use "test.fxl"); cx_std) \;
 
 say "== test Fibonacci"
 

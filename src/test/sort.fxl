@@ -1,5 +1,5 @@
 #
-value; std; (value; std; use "test.fxl") \;
+evaluate (chain (evaluate cx_std; use "test.fxl"); cx_std) \;
 
 show_benchmark;
 
@@ -11,12 +11,15 @@ show_benchmark;
 	)
 
 # Test restricted evaluation by defining only the necessary functions.
-value;
-def "append" append;
-def "show_list" show_list;
-def "sort" sort;
-def "tower" tower;
-def "unique" unique;
+evaluate
+(
+define "append" append;
+define "show_list" show_list;
+define "sort" sort;
+define "tower" tower;
+define "unique" unique;
+void
+)
 \;
 # Here I test the sort.
 
