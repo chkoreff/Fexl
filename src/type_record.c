@@ -299,8 +299,8 @@ value type_record_item(value fun, value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	}
 	return f;
+	}
 	}
 
 void beg_record(void)
