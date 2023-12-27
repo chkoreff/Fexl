@@ -372,12 +372,18 @@ static value parse_exp(void)
 		}
 	}
 
-static value type_parse_fexl(value fun, value f)
+// Parse a top level form.
+static value parse_top(void)
 	{
 	value exp = parse_form();
 	if (cur_ch != -1)
 		syntax_error("Extraneous input", cur_line);
 	return exp;
+	}
+
+static value type_parse_fexl(value fun, value f)
+	{
+	return parse_top();
 	(void)fun;
 	(void)f;
 	}
