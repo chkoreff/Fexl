@@ -150,27 +150,37 @@ int collect_tilde_string(buffer buf)
 	}
 	}
 
-// Read input, saving and restoring the context to enable nested calls.
-static value read_input(input get, void *source, value read)
+struct stream
 	{
-	value exp;
+	int cur_ch;
+	unsigned long cur_line;
+	input cur_get;
+	void *cur_source;
+	};
 
-	int save_cur_ch = cur_ch;
-	unsigned long save_cur_line = cur_line;
-	input save_cur_get = cur_get;
-	void *save_cur_source = cur_source;
-
+static struct stream beg_stream(input get, void *source)
+	{
+	struct stream s = (struct stream){cur_ch, cur_line, cur_get, cur_source};
 	cur_get = get;
 	cur_source = source;
 	skip();
+	return s;
+	}
 
-	exp = eval(read); // Run the parse function
+static void end_stream(struct stream s)
+	{
+	cur_ch = s.cur_ch;
+	cur_line = s.cur_line;
+	cur_get = s.cur_get;
+	cur_source = s.cur_source;
+	}
 
-	cur_ch = save_cur_ch;
-	cur_line = save_cur_line;
-	cur_get = save_cur_get;
-	cur_source = save_cur_source;
-
+// Read input, saving and restoring the context to enable nested calls.
+static value read_input(input get, void *source, value read)
+	{
+	struct stream s = beg_stream(get,source);
+	value exp = eval(read); // Run the read function
+	end_stream(s);
 	return exp;
 	}
 
