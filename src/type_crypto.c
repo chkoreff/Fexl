@@ -79,5 +79,8 @@ value type_sha256(value fun, value f) { return op_str(fun,f,str_sha256); }
 value type_sha512(value fun, value f) { return op_str(fun,f,str_sha512); }
 value type_pack64(value fun, value f) { return op_str(fun,f,str_pack64); }
 value type_unpack64(value fun, value f) { return op_str(fun,f,str_unpack64); }
-value type_hmac_sha512(value fun, value f) { return op_str2(fun,f,str_hmac_sha512); }
-value type_hmac_sha256(value fun, value f) { return op_str2(fun,f,str_hmac_sha256); }
+
+value type_hmac_sha512(value fun, value f)
+	{ return op_str2(fun,f,str_hmac_sha512); }
+value type_hmac_sha256(value fun, value f)
+	{ return op_str2(fun,f,str_hmac_sha256); }
