@@ -22,7 +22,6 @@ make fexl
 make file
 make file_str
 make format
-make input
 make limit
 make memory
 make nacl

@@ -6,11 +6,10 @@
 #include <die.h>
 #include <memory.h>
 #include <netinet/in.h> // IPPROTO_TCP INADDR_ANY (BSD)
-#include <signal.h> // kill (BSD)
+#include <signal.h> // kill (BSD) pid_t
 #include <stdio.h>
 #include <stdlib.h> // exit
 #include <sys/socket.h>
-#include <sys/types.h> // pid_t
 #include <sys/wait.h> // wait
 #include <termios.h> // tcgetattr etc.
 #include <type_file.h>

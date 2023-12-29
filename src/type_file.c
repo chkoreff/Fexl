@@ -1,8 +1,5 @@
-#include <str.h>
-#include <sys/types.h>
-
-#include <input.h>
 #include <stdio.h>
+#include <str.h>
 #include <value.h>
 
 #include <basic.h>

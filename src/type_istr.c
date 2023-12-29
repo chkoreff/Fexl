@@ -1,6 +1,4 @@
 #include <str.h>
-
-#include <input.h>
 #include <value.h>
 
 #include <basic.h>

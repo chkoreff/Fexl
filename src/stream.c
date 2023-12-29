@@ -6,9 +6,9 @@
 
 #include <basic.h>
 #include <buf_str.h>
-#include <input.h>
 #include <stream.h>
 #include <type_file.h>
+#include <type_input.h>
 #include <type_istr.h>
 #include <type_str.h>
 

@@ -19,3 +19,4 @@ extern unsigned long str_search(string x, string y, unsigned long offset);
 extern string dirname(string path);
 extern string basename(string path);
 extern unsigned long length_common(string x, string y);
+extern unsigned char char_width(unsigned char ch);
