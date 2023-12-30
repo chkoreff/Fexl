@@ -343,8 +343,8 @@ static value resolve(value exp, value cx)
 		}
 	else
 		{
-		value R = resolve(exp->R,cx);
 		value L = resolve(exp->L,cx);
+		value R = resolve(exp->R,cx);
 		return join(exp->T,L,R);
 		}
 	}
