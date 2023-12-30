@@ -342,9 +342,18 @@ static value resolve(value exp, value cx)
 			}
 		}
 	else
-		return join(exp->T,
-			resolve(exp->L,cx),
-			resolve(exp->R,cx));
+		{
+		value R = resolve(exp->R,cx);
+		value L = resolve(exp->L,cx);
+		return join(exp->T,L,R);
+		}
+	}
+
+static value do_resolve(value exp, value cx)
+	{
+	exp = resolve(exp,cx);
+	clear_cache();
+	return exp;
 	}
 
 // (resolve cx form) Use context cx to resolve some symbols in the form.
@@ -361,9 +370,7 @@ value type_resolve(value fun, value f)
 		else
 			{
 			value cx = (fun->R = eval(fun->R));
-			exp = resolve(exp,cx);
-			clear_cache();
-
+			exp = do_resolve(exp,cx);
 			f = Qform(hold(form->L),exp);
 			}
 		}
@@ -390,8 +397,7 @@ value type_evaluate(value fun, value f)
 		else
 			{
 			value cx = (fun->R = eval(fun->R));
-			exp = resolve(exp,cx);
-			clear_cache();
+			exp = do_resolve(exp,cx);
 
 			if (exp->T == type_quo)
 				f = unquo(exp);
