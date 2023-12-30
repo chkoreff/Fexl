@@ -14,8 +14,8 @@
 
 static int empty(void *source)
 	{
-	(void)source;
 	return -1;
+	(void)source;
 	}
 
 int cur_ch = -1; // current character
