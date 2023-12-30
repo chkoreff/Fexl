@@ -287,72 +287,87 @@ value type_value(value fun, value f)
 	(void)fun;
 	}
 
-static value cache;
-
-static value find_cache(string name)
+static value find_cache(string name, value cache)
 	{
-	value pos = cache;
-	while (pos)
+	while (cache)
 		{
-		if (str_eq(name,get_str(pos->L->R)))
-			return pos->R;
-		pos = pos->next;
+		if (str_eq(name,get_str(cache->L->R)))
+			return cache->R;
+		cache = cache->next;
 		}
 	return 0;
 	}
 
-static void push_cache(value exp, value val)
+static value push_cache(value exp, value val, value cache)
 	{
 	value top = new_value();
-	top->L = hold(exp);
-	top->R = hold(val);
+	top->L = exp;
+	top->R = val;
 	top->next = cache;
-	cache = top;
+	return top;
 	}
 
-static void clear_cache(void)
+static void clear_cache(value cache)
 	{
 	while (cache)
 		{
 		value next = cache->next;
-		drop(cache->L);
 		drop(cache->R);
 		recycle(cache);
 		cache = next;
 		}
 	}
 
-static value resolve(value exp, value cx)
+// Build a cache of values for all symbols in exp using context cx.
+static value build_cache(value exp, value cx, value cache)
+	{
+	if (exp->T == type_quo)
+		return cache;
+	else if (exp->T == type_ref)
+		{
+		string name = get_str(exp->R);
+		value val = find_cache(name,cache);
+		if (val)
+			return cache;
+		else
+			{
+			value val = eval(A(A(hold(cx),Qstr(str_copy(name))),hold(Qyield)));
+			value new = (val->L == Qyield) ? quo(hold(val->R)) : hold(exp);
+			drop(val);
+			return push_cache(exp,new,cache);
+			}
+		}
+	else
+		{
+		cache = build_cache(exp->L,cx,cache);
+		cache = build_cache(exp->R,cx,cache);
+		return cache;
+		}
+	}
+
+static value resolve(value exp, value cache)
 	{
 	if (exp->T == type_quo)
 		return hold(exp);
 	else if (exp->T == type_ref)
 		{
 		string name = get_str(exp->R);
-		value val = find_cache(name);
-		if (val)
-			return (val->T == type_quo) ? hold(val) : hold(exp);
-		else
-			{
-			value val = eval(A(A(hold(cx),Qstr(str_copy(name))),hold(Qyield)));
-			value new = (val->L == Qyield) ? quo(hold(val->R)) : hold(exp);
-			drop(val);
-			push_cache(exp,new);
-			return new;
-			}
+		value val = find_cache(name,cache);
+		return (val->T == type_quo) ? hold(val) : hold(exp);
 		}
 	else
 		{
-		value L = resolve(exp->L,cx);
-		value R = resolve(exp->R,cx);
+		value L = resolve(exp->L,cache);
+		value R = resolve(exp->R,cache);
 		return join(exp->T,L,R);
 		}
 	}
 
 static value do_resolve(value exp, value cx)
 	{
-	exp = resolve(exp,cx);
-	clear_cache();
+	value cache = build_cache(exp,cx,0);
+	exp = resolve(exp,cache);
+	clear_cache(cache);
 	return exp;
 	}
 
