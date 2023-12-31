@@ -3,7 +3,6 @@
 
 #include <basic.h>
 #include <die.h>
-#include <memory.h>
 #include <report.h>
 #include <string.h> // strcmp
 #include <type_num.h>
