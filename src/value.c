@@ -133,18 +133,21 @@ value keep(value fun, value f)
 
 unsigned long cur_steps;
 
+static value step(value f)
+	{
+	value fun = eval(hold(f->L));
+	value g = fun->T(fun,f);
+	drop(fun);
+	drop(f);
+	cur_steps++;
+	return g;
+	}
+
 // Reduce the value until done.
 value eval(value f)
 	{
 	while (f->T == 0)
-		{
-		value fun = eval(hold(f->L));
-		value g = fun->T(fun,f);
-		drop(fun);
-		drop(f);
-		f = g;
-		cur_steps++;
-		}
+		f = step(f);
 	return f;
 	}
 

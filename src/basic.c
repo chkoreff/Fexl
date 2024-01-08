@@ -91,7 +91,7 @@ value type_eval(value fun, value f)
 // Evaluate x once, replacing the right side with the final value.
 value type_once(value fun, value f)
 	{
-	return (f->R = hold(eval(f->R)));
+	return hold(f->R = eval(f->R));
 	(void)fun;
 	}
 
