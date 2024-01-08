@@ -27,7 +27,8 @@ value type_time(value fun, value f)
 static const char *time_format = "%Y-%m-%d %H:%M:%S";
 
 // Format an epoch time as "YYYY-MM-DD HH:MM:SS".
-static value op_strftime(value fun, value f, struct tm *(*convert)(const time_t *))
+static value op_strftime(value fun, value f,
+	struct tm *(*convert)(const time_t *))
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
@@ -35,7 +36,7 @@ static value op_strftime(value fun, value f, struct tm *(*convert)(const time_t 
 		time_t n = x->v_double;
 		struct tm *tm = convert(&n);
 		char buf[32];
-		strftime(buf,32,time_format,tm);
+		strftime(buf,sizeof(buf),time_format,tm);
 		f = Qstr0(buf);
 		}
 	else
@@ -46,7 +47,8 @@ static value op_strftime(value fun, value f, struct tm *(*convert)(const time_t 
 	}
 
 // Convert "YYYY-MM-DD HH:MM:SS" to an epoch time.
-static value op_strptime(value fun, value f, time_t (*convert)(struct tm *tm))
+static value op_strptime(value fun, value f,
+	time_t (*convert)(struct tm *tm))
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
