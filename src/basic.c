@@ -16,7 +16,6 @@ value type_I(value fun, value f)
 	{
 	return hold(f->R);
 	(void)fun;
-	(void)f;
 	}
 
 // (T x y) = x
