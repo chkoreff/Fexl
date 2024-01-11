@@ -93,7 +93,7 @@ value type_fclose(value fun, value f)
 // (fgetc fh) returns the next single byte from the file, or void if none.
 value type_fgetc(value fun, value f)
 	{
-	return op_getc(fun, f,type_file,(input)fgetc);
+	return op_getc(fun,f,type_file,(input)fgetc);
 	}
 
 // (fget fh) returns the next UTF-8 character from the file, or void if none.
