@@ -1,4 +1,6 @@
 #
+evaluate (chain (evaluate cx_std; use "test.fxl"); cx_std) \;
+
 (
 \n=time
 say ["time "n" "(localtime n)]
@@ -17,12 +19,36 @@ try "nothing"
 try "value.c"
 
 \_=(remove "test/obj")
+nl
 )
 
 (
 say random_double
 say random_double
 say random_double
+nl
+)
+
+(
+usleep 100000
+
+say microtime
+say microtime
+
+nl
+show_hex random_nonce
+show_hex random_nonce
+
+nl
+show_hex random_secret_key
+show_hex random_secret_key
+
+nl
+show_hex (random_bytes 32)
+show_hex (random_bytes 16)
+show_hex (random_bytes 1)
+show_hex (random_bytes 0)
+nl
 )
 
 (
