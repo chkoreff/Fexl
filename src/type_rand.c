@@ -6,7 +6,7 @@
 #include <type_rand.h>
 
 // Seed rand with an arbitrary number between 0 and 1.
-value type_seed_rand(value fun, value f)
+value type_seed_rand(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
@@ -19,14 +19,12 @@ value type_seed_rand(value fun, value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
 // rand returns x, where x is a weakly pseudo-random number with a uniform
 // distribution over 0 <= x <= 1.
-value type_rand(value fun, value f)
+value type_rand(value f)
 	{
 	return Qnum(((double)rand()) / ((double)RAND_MAX));
-	(void)fun;
 	(void)f;
 	}

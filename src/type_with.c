@@ -18,8 +18,9 @@ static int cmp_key(value x, value y)
 	}
 
 // Look up the value associated with a key.
-value type_assoc(value obj, value f)
+value type_assoc(value f)
 	{
+	value obj = f->L;
 	value x = arg(f->R);
 	while (1)
 		{
@@ -47,13 +48,13 @@ Return a function like obj but with key defined as val.
 Equivalent to:
 \with=(\key\\val\obj \x eq x key val; obj x)
 */
-value type_with(value fun, value f)
+value type_with(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
-	if (fun->L->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
+	if (f->L->L->L == 0) return keep(f);
 	{
-	value key = arg(fun->L->R);
-	value val = hold(fun->R);
+	value key = arg(f->L->L->R);
+	value val = hold(f->L->R);
 	value obj = hold(f->R = eval(f->R));
 	return Qassoc(key,val,obj);
 	}
@@ -63,26 +64,26 @@ value type_with(value fun, value f)
 (define key val obj)
 \define=(\key\\val with key (yield val))
 */
-value type_define(value fun, value f)
+value type_define(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
 	f->T = type_with;
 	f->R = yield(f->R);
 	return hold(f);
 	}
 
-value type_is_obj(value fun, value f)
+value type_is_obj(value f)
 	{
-	return op_is_type(fun,f,type_assoc);
+	return op_is_type(f,type_assoc);
 	}
 
 // (split_obj obj next) = (next key val tail), where key and val are the first
 // pair in the object, and tail is the value following the first pair.
-value type_split_obj(value fun, value f)
+value type_split_obj(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
 	{
-	value x = arg(fun->R);
+	value x = arg(f->L->R);
 	if (x->T == type_assoc)
 		{
 		value key = hold(x->L->L);
@@ -112,15 +113,15 @@ the index so you get the same value next time.  Equivalent to:
 	x
 	)
 */
-value type_fetch(value fun, value f)
+value type_fetch(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
-	if (fun->L->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
+	if (f->L->L->L == 0) return keep(f);
 	{
-	value v = arg(fun->L->R);
+	value v = arg(f->L->L->R);
 	if (v->T == type_var)
 		{
-		value k = arg(fun->R);
+		value k = arg(f->L->R);
 		value y = eval(A(hold(v->R),hold(k)));
 		if (y->T != type_void)
 			f = y;

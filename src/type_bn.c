@@ -15,9 +15,9 @@ struct bn *get_bn(value x)
 	return x->v_ptr;
 	}
 
-value type_bn(value fun, value f)
+value type_bn(value f)
 	{
-	return type_void(fun,f);
+	return type_void(f);
 	}
 
 static void clear_bn(value f)
@@ -31,7 +31,7 @@ value Qbn(struct bn *x)
 	return V(type_bn,&clear,(value)x);
 	}
 
-static value op_pred(value fun, value f, int op(const struct bn *x))
+static value op_pred(value f, int op(const struct bn *x))
 	{
 	value x = arg(f->R);
 	if (x->T == type_bn)
@@ -40,20 +40,19 @@ static value op_pred(value fun, value f, int op(const struct bn *x))
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
-value type_bn_eq0(value fun, value f)
+value type_bn_eq0(value f)
 	{
-	return op_pred(fun,f,bn_eq0);
+	return op_pred(f,bn_eq0);
 	}
 
-value type_bn_is_neg(value fun, value f)
+value type_bn_is_neg(value f)
 	{
-	return op_pred(fun,f,bn_is_neg);
+	return op_pred(f,bn_is_neg);
 	}
 
-value type_bn_neg(value fun, value f)
+value type_bn_neg(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_bn)
@@ -62,14 +61,13 @@ value type_bn_neg(value fun, value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
-value type_bn_cmp(value fun, value f)
+value type_bn_cmp(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
 	{
-	value x = arg(fun->R);
+	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_bn && y->T == type_bn)
 		f = Qnum(bn_cmp(get_bn(x),get_bn(y)));
@@ -81,11 +79,11 @@ value type_bn_cmp(value fun, value f)
 	}
 	}
 
-static value op_cmp(value fun, value f, int op(int))
+static value op_cmp(value f, int op(int))
 	{
-	if (fun->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
 	{
-	value x = arg(fun->R);
+	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_bn && y->T == type_bn)
 		f = boolean(op(bn_cmp(get_bn(x),get_bn(y))));
@@ -104,14 +102,14 @@ static int ne(int x) { return x != 0; }
 static int ge(int x) { return x >= 0; }
 static int gt(int x) { return x > 0; }
 
-value type_bn_lt(value fun, value f) { return op_cmp(fun,f,lt); }
-value type_bn_le(value fun, value f) { return op_cmp(fun,f,le); }
-value type_bn_eq(value fun, value f) { return op_cmp(fun,f,eq); }
-value type_bn_ne(value fun, value f) { return op_cmp(fun,f,ne); }
-value type_bn_ge(value fun, value f) { return op_cmp(fun,f,ge); }
-value type_bn_gt(value fun, value f) { return op_cmp(fun,f,gt); }
+value type_bn_lt(value f) { return op_cmp(f,lt); }
+value type_bn_le(value f) { return op_cmp(f,le); }
+value type_bn_eq(value f) { return op_cmp(f,eq); }
+value type_bn_ne(value f) { return op_cmp(f,ne); }
+value type_bn_ge(value f) { return op_cmp(f,ge); }
+value type_bn_gt(value f) { return op_cmp(f,gt); }
 
-value type_bn_from_dec(value fun, value f)
+value type_bn_from_dec(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
@@ -120,10 +118,9 @@ value type_bn_from_dec(value fun, value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
-value type_bn_to_dec(value fun, value f)
+value type_bn_to_dec(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_bn)
@@ -132,15 +129,14 @@ value type_bn_to_dec(value fun, value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
-static value op_2(value fun, value f,
+static value op_2(value f,
 	struct bn *op(const struct bn *, const struct bn *))
 	{
-	if (fun->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
 	{
-	value x = arg(fun->R);
+	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_bn && y->T == type_bn)
 		f = Qbn(op(get_bn(x),get_bn(y)));
@@ -152,16 +148,16 @@ static value op_2(value fun, value f,
 	}
 	}
 
-value type_bn_add(value fun, value f) { return op_2(fun,f,bn_add); }
-value type_bn_sub(value fun, value f) { return op_2(fun,f,bn_sub); }
-value type_bn_mul(value fun, value f) { return op_2(fun,f,bn_mul); }
-value type_bn_mod(value fun, value f) { return op_2(fun,f,bn_mod); }
+value type_bn_add(value f) { return op_2(f,bn_add); }
+value type_bn_sub(value f) { return op_2(f,bn_sub); }
+value type_bn_mul(value f) { return op_2(f,bn_mul); }
+value type_bn_mod(value f) { return op_2(f,bn_mod); }
 
-value type_bn_div(value fun, value f)
+value type_bn_div(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
 	{
-	value x = arg(fun->R);
+	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_bn && y->T == type_bn)
 		{
@@ -178,7 +174,7 @@ value type_bn_div(value fun, value f)
 	}
 	}
 
-value type_is_bn(value fun, value f)
+value type_is_bn(value f)
 	{
-	return op_is_type(fun,f,type_bn);
+	return op_is_type(f,type_bn);
 	}

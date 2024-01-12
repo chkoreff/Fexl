@@ -36,7 +36,7 @@
 // I will eliminate "std", using "cx_std" instead.  After that is done, I will
 // rename "cx_std" back to "std".
 
-static value type_cx_std(value fun, value f);
+static value type_cx_std(value f);
 
 // Resolve cx_std names.
 static value cx_std(void)
@@ -283,9 +283,9 @@ static value cx_std(void)
 	return 0;
 	}
 
-static value type_cx_std(value fun, value f)
+static value type_cx_std(value f)
 	{
-	return op_context(fun,f,cx_std);
+	return op_context(f,cx_std);
 	}
 
 static void beg_const(void)

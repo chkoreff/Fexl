@@ -20,11 +20,11 @@ value Qnl;
 value Qfput;
 value Qfnl;
 
-static value op_put(FILE *fh, value fun, value f)
+static value op_put(FILE *fh, value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_list)
-		f = A(A(hold(fun),hold(x->L)),A(hold(fun),hold(x->R)));
+		f = A(A(hold(f->L),hold(x->L)),A(hold(f->L),hold(x->R)));
 	else
 		{
 		if (x->T == type_str)
@@ -48,32 +48,30 @@ static value op_put(FILE *fh, value fun, value f)
 	return f;
 	}
 
-value type_put(value fun, value f)
+value type_put(value f)
 	{
-	return op_put(stdout,fun,f);
+	return op_put(stdout,f);
 	}
 
-value type_nl(value fun, value f)
+value type_nl(value f)
 	{
 	fnl(stdout);
 	return hold(QI);
-	(void)fun;
 	(void)f;
 	}
 
-value type_say(value fun, value f)
+value type_say(value f)
 	{
 	return A(A(hold(Qput),hold(f->R)),hold(Qnl));
-	(void)fun;
 	}
 
-value type_fput(value fun, value f)
+value type_fput(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
 	{
-	value out = arg(fun->R);
+	value out = arg(f->L->R);
 	if (out->T == type_file)
-		f = op_put(get_fh(out),fun,f);
+		f = op_put(get_fh(out),f);
 	else
 		f = hold(Qvoid);
 	drop(out);
@@ -81,7 +79,7 @@ value type_fput(value fun, value f)
 	}
 	}
 
-value type_fnl(value fun, value f)
+value type_fnl(value f)
 	{
 	value out = arg(f->R);
 	if (out->T == type_file)
@@ -93,17 +91,16 @@ value type_fnl(value fun, value f)
 		f = hold(Qvoid);
 	drop(out);
 	return f;
-	(void)fun;
 	}
 
-value type_fsay(value fun, value f)
+value type_fsay(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
-	return A(A(A(hold(Qfput),hold(fun->R)),hold(f->R)),
-		A(hold(Qfnl),hold(fun->R)));
+	if (f->L->L == 0) return keep(f);
+	return A(A(A(hold(Qfput),hold(f->L->R)),hold(f->R)),
+		A(hold(Qfnl),hold(f->L->R)));
 	}
 
-value type_fflush(value fun, value f)
+value type_fflush(value f)
 	{
 	value out = arg(f->R);
 	if (out->T == type_file)
@@ -115,7 +112,6 @@ value type_fflush(value fun, value f)
 		f = hold(Qvoid);
 	drop(out);
 	return f;
-	(void)fun;
 	}
 
 void beg_output(void)

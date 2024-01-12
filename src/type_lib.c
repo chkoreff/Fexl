@@ -6,9 +6,9 @@
 #include <type_lib.h>
 #include <type_str.h>
 
-value type_lib(value fun, value f)
+value type_lib(value f)
 	{
-	return type_void(fun,f);
+	return type_void(f);
 	}
 
 static void clear_lib(value f)
@@ -23,7 +23,7 @@ value Qlib(void *lib)
 	}
 
 // (dlopen name) Open the named library, or return void if not successful.
-value type_dlopen(value fun, value f)
+value type_dlopen(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
@@ -39,22 +39,20 @@ value type_dlopen(value fun, value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
-value type_dlerror(value fun, value f)
+value type_dlerror(value f)
 	{
 	char *msg = dlerror();
 	return Qstr0(msg ? msg : "");
-	(void)fun;
 	(void)f;
 	}
 
-value type_dlsym(value fun, value f)
+value type_dlsym(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
 	{
-	value x = arg(fun->R);
+	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_lib && y->T == type_str)
 		{

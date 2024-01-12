@@ -47,13 +47,13 @@ struct istr *get_istr(value x)
 	return x->v_ptr;
 	}
 
-value type_istr(value fun, value f)
+value type_istr(value f)
 	{
-	return type_void(fun,f);
+	return type_void(f);
 	}
 
 // (readstr str) returns an iterator on the string.
-value type_readstr(value fun, value f)
+value type_readstr(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
@@ -62,23 +62,22 @@ value type_readstr(value fun, value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
 // (sgetc in) returns the next single byte from the string, or void if none.
-value type_sgetc(value fun, value f)
+value type_sgetc(value f)
 	{
-	return op_getc(fun,f,type_istr,(input)sgetc);
+	return op_getc(f,type_istr,(input)sgetc);
 	}
 
 // (sget in) returns the next UTF-8 character from the string, or void if none.
-value type_sget(value fun, value f)
+value type_sget(value f)
 	{
-	return op_get(fun,f,type_istr,(input)sgetc);
+	return op_get(f,type_istr,(input)sgetc);
 	}
 
 // (slook in) returns the next byte from the string without consuming it.
-value type_slook(value fun, value f)
+value type_slook(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_istr)
@@ -96,5 +95,4 @@ value type_slook(value fun, value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}

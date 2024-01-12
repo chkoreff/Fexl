@@ -5,7 +5,7 @@
 #include <type_input.h>
 #include <type_str.h>
 
-value op_getc(value fun, value f, type t, input get)
+value op_getc(value f, type t, input get)
 	{
 	value x = arg(f->R);
 	if (x->T == t)
@@ -24,7 +24,6 @@ value op_getc(value fun, value f, type t, input get)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
 // Get the next UTF-8 character from the given input, or 0 if none.
@@ -51,7 +50,7 @@ static string get_utf8(input get, void *source)
 	}
 	}
 
-value op_get(value fun, value f, type t, input get)
+value op_get(value f, type t, input get)
 	{
 	value x = arg(f->R);
 	if (x->T == t)
@@ -64,5 +63,4 @@ value op_get(value fun, value f, type t, input get)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}

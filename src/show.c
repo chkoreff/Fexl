@@ -125,11 +125,10 @@ void show(const char *name, value f)
 	put(name);show_exp(f);nl();
 	}
 
-static value type_show(value fun, value f)
+static value type_show(value f)
 	{
 	show_exp(f->R);nl();
 	return hold(QI);
-	(void)fun;
 	}
 
 static value define(void)
@@ -138,7 +137,7 @@ static value define(void)
 	return 0;
 	}
 
-value type_cx_show(value fun, value f)
+value type_cx_show(value f)
 	{
-	return op_context(fun,f,define);
+	return op_context(f,define);
 	}

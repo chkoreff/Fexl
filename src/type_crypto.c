@@ -7,7 +7,7 @@
 #include <type_num.h>
 #include <type_str.h>
 
-value type_random_bytes(value fun, value f)
+value type_random_bytes(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
@@ -16,48 +16,45 @@ value type_random_bytes(value fun, value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
-value type_random_nonce(value fun, value f)
+value type_random_nonce(value f)
 	{
 	return Qstr(str_random_nonce());
-	(void)fun;
 	(void)f;
 	}
 
-value type_random_secret_key(value fun, value f)
+value type_random_secret_key(value f)
 	{
 	return Qstr(str_random_secret_key());
-	(void)fun;
 	(void)f;
 	}
 
-value type_nacl_box_public(value fun, value f)
-	{ return op_str(fun,f,str_nacl_box_public); }
+value type_nacl_box_public(value f)
+	{ return op_str(f,str_nacl_box_public); }
 
-value type_nacl_box_prepare(value fun, value f)
-	{ return op_str2(fun,f,str_nacl_box_prepare); }
+value type_nacl_box_prepare(value f)
+	{ return op_str2(f,str_nacl_box_prepare); }
 
-value type_nacl_box_seal(value fun, value f)
-	{ return op_str3(fun,f,str_nacl_box_seal); }
+value type_nacl_box_seal(value f)
+	{ return op_str3(f,str_nacl_box_seal); }
 
-value type_nacl_box_open(value fun, value f)
-	{ return op_str3(fun,f,str_nacl_box_open); }
+value type_nacl_box_open(value f)
+	{ return op_str3(f,str_nacl_box_open); }
 
-value type_nacl_sign_public(value fun, value f)
-	{ return op_str(fun,f,str_nacl_sign_public); }
+value type_nacl_sign_public(value f)
+	{ return op_str(f,str_nacl_sign_public); }
 
-value type_nacl_sign_seal(value fun, value f)
-	{ return op_str3(fun,f,str_nacl_sign_seal); }
+value type_nacl_sign_seal(value f)
+	{ return op_str3(f,str_nacl_sign_seal); }
 
-value type_nacl_sign_open(value fun, value f)
+value type_nacl_sign_open(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
-	if (fun->L->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
+	if (f->L->L->L == 0) return keep(f);
 	{
-	value x = arg(fun->L->R);
-	value y = arg(fun->R);
+	value x = arg(f->L->L->R);
+	value y = arg(f->L->R);
 	value z = arg(f->R);
 	if (x->T == type_str && y->T == type_str && z->T == type_str)
 		{
@@ -75,12 +72,12 @@ value type_nacl_sign_open(value fun, value f)
 	}
 	}
 
-value type_sha256(value fun, value f) { return op_str(fun,f,str_sha256); }
-value type_sha512(value fun, value f) { return op_str(fun,f,str_sha512); }
-value type_pack64(value fun, value f) { return op_str(fun,f,str_pack64); }
-value type_unpack64(value fun, value f) { return op_str(fun,f,str_unpack64); }
+value type_sha256(value f) { return op_str(f,str_sha256); }
+value type_sha512(value f) { return op_str(f,str_sha512); }
+value type_pack64(value f) { return op_str(f,str_pack64); }
+value type_unpack64(value f) { return op_str(f,str_unpack64); }
 
-value type_hmac_sha512(value fun, value f)
-	{ return op_str2(fun,f,str_hmac_sha512); }
-value type_hmac_sha256(value fun, value f)
-	{ return op_str2(fun,f,str_hmac_sha256); }
+value type_hmac_sha512(value f)
+	{ return op_str2(f,str_hmac_sha512); }
+value type_hmac_sha256(value f)
+	{ return op_str2(f,str_hmac_sha256); }

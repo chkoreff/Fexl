@@ -164,7 +164,7 @@ cd~ "3.14" "-48.7"]
 [~ abc|def"ghi"jklmnopqrstuvwxyz~]
 ["    "]
 ]
-steps 35362 bytes 9216
+steps 35362 bytes 7168
 ~3
 \err=
 ~

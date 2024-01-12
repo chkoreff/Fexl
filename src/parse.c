@@ -380,10 +380,9 @@ static value parse_top(void)
 	return exp;
 	}
 
-static value type_parse_fexl(value fun, value f)
+static value type_parse_fexl(value f)
 	{
 	return parse_top();
-	(void)fun;
 	(void)f;
 	}
 

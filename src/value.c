@@ -120,24 +120,33 @@ value A(value x, value y)
 	return V(0,x,y);
 	}
 
-value keep(value fun, value f)
+value keep(value f)
 	{
-	if (fun == f->L)
-		{
-		f->T = fun->T;
-		return hold(f);
-		}
-	else
-		return V(fun->T,hold(fun),hold(f->R));
+	f->T = f->L->T;
+	return hold(f);
 	}
 
 unsigned long cur_steps;
 
 static value step(value f)
 	{
-	value fun = eval(hold(f->L));
-	value g = fun->T(fun,f);
-	drop(fun);
+	value g;
+	if (f->N == 1)
+		g = (f->L = eval(f->L));
+	else
+		{
+		g = eval(hold(f->L));
+		if (g == f->L)
+			drop(g);
+		else
+			{
+			value x = hold(f->R);
+			drop(f);
+			f = A(g,x);
+			}
+		}
+
+	g = g->T(f);
 	drop(f);
 	cur_steps++;
 	return g;

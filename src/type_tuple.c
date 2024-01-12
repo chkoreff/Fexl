@@ -6,9 +6,9 @@
 
 value Qtuple;
 
-value type_tuple(value fun, value f)
+value type_tuple(value f)
 	{
-	value args = hold(fun->R);
+	value args = hold(f->L->R);
 	value exp = hold(f->R);
 
 	while (1)
@@ -36,16 +36,15 @@ value type_tuple(value fun, value f)
 		}
 	}
 
-value type_is_tuple(value fun, value f)
+value type_is_tuple(value f)
 	{
 	value x = arg(f->R);
 	f = boolean(x->T == type_tuple || x->T == type_pair);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
-value type_tuple_to_list(value fun, value f)
+value type_tuple_to_list(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_tuple)
@@ -56,13 +55,11 @@ value type_tuple_to_list(value fun, value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
-value type_list_to_tuple(value fun, value f)
+value type_list_to_tuple(value f)
 	{
 	return V(type_tuple,hold(Qtuple),hold(f->R));
-	(void)fun;
 	}
 
 void beg_tuple(void)

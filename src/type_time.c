@@ -15,19 +15,18 @@
 
 // Return the current time as the number of seconds since the Epoch,
 // 1970-01-01 00:00:00 +0000 (UTC).
-value type_time(value fun, value f)
+value type_time(value f)
 	{
 	time_t n;
 	time(&n);
 	return Qnum(n);
-	(void)fun;
 	(void)f;
 	}
 
 static const char *time_format = "%Y-%m-%d %H:%M:%S";
 
 // Format an epoch time as "YYYY-MM-DD HH:MM:SS".
-static value op_strftime(value fun, value f,
+static value op_strftime(value f,
 	struct tm *(*convert)(const time_t *))
 	{
 	value x = arg(f->R);
@@ -43,11 +42,10 @@ static value op_strftime(value fun, value f,
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
 // Convert "YYYY-MM-DD HH:MM:SS" to an epoch time.
-static value op_strptime(value fun, value f,
+static value op_strptime(value f,
 	time_t (*convert)(struct tm *tm))
 	{
 	value x = arg(f->R);
@@ -65,31 +63,30 @@ static value op_strptime(value fun, value f,
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
 // Convert epoch to string in local time zone.
-value type_localtime(value fun, value f)
+value type_localtime(value f)
 	{
-	return op_strftime(fun,f,localtime);
+	return op_strftime(f,localtime);
 	}
 
 // Convert epoch to string in UTC time zone.
-value type_gmtime(value fun, value f)
+value type_gmtime(value f)
 	{
-	return op_strftime(fun,f,gmtime);
+	return op_strftime(f,gmtime);
 	}
 
 // Convert string to epoch in local time zone.
-value type_timelocal(value fun, value f)
+value type_timelocal(value f)
 	{
-	return op_strptime(fun,f,timelocal);
+	return op_strptime(f,timelocal);
 	}
 
 // Convert string to epoch in UTC time zone.
-value type_timegm(value fun, value f)
+value type_timegm(value f)
 	{
-	return op_strptime(fun,f,timegm);
+	return op_strptime(f,timegm);
 	}
 
 static string microtime(void)
@@ -101,10 +98,9 @@ static string microtime(void)
 	return str_new_data0(format_uint64_t(n));
 	}
 
-value type_microtime(value fun, value f)
+value type_microtime(value f)
 	{
 	return Qstr(microtime());
-	(void)fun;
 	(void)f;
 	}
 
@@ -119,13 +115,13 @@ static int get_dow(int y, int m, int d)
 
 // Return day of week for y,m,d.
 // 1:Mon 2:Tue 3:Wed 4:Thu 5:Fri 6:Sat 7:Sun
-value type_dow(value fun, value f)
+value type_dow(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
-	if (fun->L->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
+	if (f->L->L->L == 0) return keep(f);
 	{
-	value a1 = arg(fun->L->R);
-	value a2 = arg(fun->R);
+	value a1 = arg(f->L->L->R);
+	value a2 = arg(f->L->R);
 	value a3 = arg(f->R);
 	if (a1->T == type_num && a2->T == type_num && a3->T == type_num)
 		{

@@ -50,11 +50,11 @@ static value find(struct record *rec, string key, value result)
 	return result;
 	}
 
-value type_record(value fun, value f)
+value type_record(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
-		f = hold(find(get_record(fun),get_str(x),Qvoid));
+		f = hold(find(get_record(f->L),get_str(x),Qvoid));
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -195,18 +195,18 @@ value record_empty(void)
 	return Qrecord(new_record_bump(0));
 	}
 
-static value op_set(value fun, value f, value op(value))
+static value op_set(value f, value op(value))
 	{
-	if (fun->L == 0) return keep(fun,f);
-	if (fun->L->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
+	if (f->L->L->L == 0) return keep(f);
 	{
-	value x = arg(fun->L->R);
+	value x = arg(f->L->L->R);
 	if (x->T == type_str)
 		{
 		value z = arg(f->R);
 		if (z->T == type_record)
 			{
-			value y = op(fun->R);
+			value y = op(f->L->R);
 			f = set(x,y,z);
 			drop(y);
 			}
@@ -224,23 +224,23 @@ static value op_set(value fun, value f, value op(value))
 // (set key val obj) Set key to val in record obj, returning a record like obj
 // but with key mapped to val.  It modifies obj inline if there are no other
 // references to it; otherwise it returns a modified copy of obj.
-value type_set(value fun, value f)
+value type_set(value f)
 	{
-	return op_set(fun,f,arg);
+	return op_set(f,arg);
 	}
 
 // Set the value without evaluating it.
-value type_setf(value fun, value f)
+value type_setf(value f)
 	{
-	return op_set(fun,f,hold);
+	return op_set(f,hold);
 	}
 
 // Look up key in record and return either no or (yes val).
-value type_get(value fun, value f)
+value type_get(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
 	{
-	value x = arg(fun->R);
+	value x = arg(f->L->R);
 	if (x->T == type_str)
 		{
 		value y = arg(f->R);
@@ -258,7 +258,7 @@ value type_get(value fun, value f)
 	}
 
 // Return the number of items in the record.
-value type_record_count(value fun, value f)
+value type_record_count(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_record)
@@ -267,16 +267,15 @@ value type_record_count(value fun, value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
 // (record_item obj pos) Return the {key val} pair in record obj at offset pos,
 // starting at zero.
-value type_record_item(value fun, value f)
+value type_record_item(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
 	{
-	value x = arg(fun->R);
+	value x = arg(f->L->R);
 	if (x->T == type_record)
 		{
 		value y = arg(f->R);

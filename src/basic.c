@@ -12,96 +12,91 @@ value Qonce;
 value Qyield;
 
 // (I x) = x
-value type_I(value fun, value f)
+value type_I(value f)
 	{
 	return hold(f->R);
-	(void)fun;
 	}
 
 // (T x y) = x
-value type_T(value fun, value f)
+value type_T(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
-	return hold(fun->R);
+	if (f->L->L == 0) return keep(f);
+	return hold(f->L->R);
 	}
 
 // (F x y) = y
-value type_F(value fun, value f)
+value type_F(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
 	return hold(f->R);
 	}
 
 // (Y x) = (x (Y x))
-value type_Y(value fun, value f)
+value type_Y(value f)
 	{
-	return A(hold(f->R),A(hold(fun),hold(f->R)));
+	return A(hold(f->R),hold(f));
 	}
 
 // (void x) = void
-value type_void(value fun, value f)
+value type_void(value f)
 	{
 	return hold(Qvoid);
-	(void)fun;
 	(void)f;
 	}
 
 // ((pair x y) h) = (h x y)
-value type_pair(value fun, value f)
+value type_pair(value f)
 	{
-	value x = hold(fun->L);
-	value y = hold(fun->R);
+	value x = hold(f->L->L);
+	value y = hold(f->L->R);
 	value h = hold(f->R);
 	return A(A(h,x),y);
 	}
 
 // ((list x y) h) = (pair x y)
-value type_list(value fun, value f)
+value type_list(value f)
 	{
-	value x = hold(fun->L);
-	value y = hold(fun->R);
+	value x = hold(f->L->L);
+	value y = hold(f->L->R);
 	return V(type_pair,x,y);
-	(void)f;
 	}
 
 // (cons x y) = (list x y)
-value type_cons(value fun, value f)
+value type_cons(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
 	{
-	value x = hold(fun->R);
+	value x = hold(f->L->R);
 	value y = hold(f->R);
 	return V(type_list,x,y);
 	}
 	}
 
 // (null x y) = x
-value type_null(value fun, value f)
+value type_null(value f)
 	{
 	f->T = type_T;
 	return hold(f);
-	(void)fun;
 	}
 
 // (eval x f) = (f y), where y is the final value of x.
-value type_eval(value fun, value f)
+value type_eval(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
-	return A(hold(f->R),arg(fun->R));
+	if (f->L->L == 0) return keep(f);
+	return A(hold(f->R),arg(f->L->R));
 	}
 
 // Evaluate x once, replacing the right side with the final value.
-value type_once(value fun, value f)
+value type_once(value f)
 	{
 	return hold(f->R = eval(f->R));
-	(void)fun;
 	}
 
 // (yield x f) = (f x)  Used for returning an unevaluated function.
-value type_yield(value fun, value f)
+value type_yield(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
-	return A(hold(f->R),hold(fun->R));
+	if (f->L->L == 0) return keep(f);
+	return A(hold(f->R),hold(f->L->R));
 	}
 
 value yield(value x)
@@ -128,39 +123,35 @@ value pair(value x, value y)
 	return V(type_pair,x,y);
 	}
 
-value type_is_defined(value fun, value f)
+value type_is_defined(value f)
 	{
 	return boolean(f->R->T != type_void);
-	(void)fun;
 	}
 
-value type_is_undef(value fun, value f)
+value type_is_undef(value f)
 	{
 	return boolean(f->R->T == type_void);
-	(void)fun;
 	}
 
-value op_is_type(value fun, value f, type t)
+value op_is_type(value f, type t)
 	{
 	value x = arg(f->R);
 	f = boolean(x->T == t);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
-value type_is_void(value fun, value f)
+value type_is_void(value f)
 	{
-	return op_is_type(fun,f,type_void);
+	return op_is_type(f,type_void);
 	}
 
-static value op_predicate(value fun, value f, int op(value))
+static value op_predicate(value f, int op(value))
 	{
 	value x = arg(f->R);
 	f = boolean(op(x));
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
 static int is_good(value x)
@@ -178,19 +169,19 @@ static int is_list(value x)
 	return x->T == type_list || x->T == type_null;
 	}
 
-value type_is_good(value fun, value f) { return op_predicate(fun,f,is_good); }
-value type_is_bool(value fun, value f) { return op_predicate(fun,f,is_bool); }
-value type_is_list(value fun, value f) { return op_predicate(fun,f,is_list); }
+value type_is_good(value f) { return op_predicate(f,is_good); }
+value type_is_bool(value f) { return op_predicate(f,is_bool); }
+value type_is_list(value f) { return op_predicate(f,is_list); }
 
 // \chain=(\\a\\b \x \v=(a x) is_defined v v (b x))
 // Return (a x) if that is defined, otherwise return (b x).
-value type_chain(value fun, value f)
+value type_chain(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
-	if (fun->L->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
+	if (f->L->L->L == 0) return keep(f);
 	{
 	value x = arg(f->R);
-	value a = (fun->L->R = eval(fun->L->R));
+	value a = (f->L->L->R = eval(f->L->L->R));
 	value v = eval(A(hold(a),x));
 
 	if (v->T != type_void)
@@ -198,7 +189,7 @@ value type_chain(value fun, value f)
 
 	drop(v);
 	{
-	value b = (fun->R = eval(fun->R));
+	value b = (f->L->R = eval(f->L->R));
 	return A(hold(b),hold(x));
 	}
 	}

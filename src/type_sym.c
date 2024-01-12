@@ -12,14 +12,14 @@
 
 static value Qdef_std;
 
-value type_quo(value fun, value f)
+value type_quo(value f)
 	{
-	return type_void(fun,f);
+	return type_void(f);
 	}
 
-value type_ref(value fun, value f)
+value type_ref(value f)
 	{
-	return type_void(fun,f);
+	return type_void(f);
 	}
 
 static void clear_quo(value f)
@@ -118,9 +118,9 @@ value lam(type type, string name, value e)
 	return f;
 	}
 
-value type_form(value fun, value f)
+value type_form(value f)
 	{
-	return type_void(fun,f);
+	return type_void(f);
 	}
 
 value Qform(value label, value exp)
@@ -138,22 +138,22 @@ static value sub(value p, value e, value x)
 	}
 
 // Direct substitution
-value type_D(value fun, value f)
+value type_D(value f)
 	{
-	return sub(fun->L,fun->R,f->R);
+	return sub(f->L->L,f->L->R,f->R);
 	}
 
 // Eager substitution
-value type_E(value fun, value f)
+value type_E(value f)
 	{
 	value x = arg(f->R);
-	value g = sub(fun->L,fun->R,x);
+	value g = sub(f->L->L,f->L->R,x);
 	drop(x);
 	return g;
 	}
 
 // Return true if the form has no undefined symbols.
-value type_is_closed(value fun, value f)
+value type_is_closed(value f)
 	{
 	value form = arg(f->R);
 	if (form->T == type_form)
@@ -162,7 +162,6 @@ value type_is_closed(value fun, value f)
 		f = hold(Qvoid);
 	drop(form);
 	return f;
-	(void)fun;
 	}
 
 // Define key as val in an expression.
@@ -194,12 +193,12 @@ static value def(string key, value val, value exp)
 
 // (def key val form) Return form with key defined as val.
 // LATER 20231223 "def" is deprecated
-value type_def(value fun, value f)
+value type_def(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
-	if (fun->L->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
+	if (f->L->L->L == 0) return keep(f);
 	{
-	value key = arg(fun->L->R);
+	value key = arg(f->L->L->R);
 	if (key->T == type_str)
 		{
 		value form = arg(f->R);
@@ -208,7 +207,7 @@ value type_def(value fun, value f)
 			if (form->R->T == type_quo)
 				f = hold(form);
 			else
-				f = Qform(hold(form->L),def(get_str(key),fun->R,form->R));
+				f = Qform(hold(form->L),def(get_str(key),f->L->R,form->R));
 			}
 		else
 			f = hold(Qvoid);
@@ -229,7 +228,7 @@ int match(const char *other)
 	}
 
 // Use a C define function as a Fexl context function.
-value op_context(value fun, value f, value define(void))
+value op_context(value f, value define(void))
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
@@ -246,7 +245,6 @@ value op_context(value fun, value f, value define(void))
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
 static void report_undef(const char *label, value exp)
@@ -265,7 +263,7 @@ static void report_undef(const char *label, value exp)
 // Evaluate the form if all symbols are defined, otherwise report the undefined
 // symbols and die.
 // LATER 20231223 "value" is deprecated
-value type_value(value fun, value f)
+value type_value(value f)
 	{
 	value form = arg(f->R);
 	if (form->T == type_form)
@@ -283,7 +281,6 @@ value type_value(value fun, value f)
 		f = hold(Qvoid);
 	drop(form);
 	return f;
-	(void)fun;
 	}
 
 static value find_cache(string name, value cache)
@@ -371,9 +368,9 @@ static value do_resolve(value exp, value cx)
 	}
 
 // (resolve cx form) Use context cx to resolve some symbols in the form.
-value type_resolve(value fun, value f)
+value type_resolve(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
 	{
 	value form = arg(f->R);
 	if (form->T == type_form)
@@ -383,7 +380,7 @@ value type_resolve(value fun, value f)
 			f = hold(form);
 		else
 			{
-			value cx = (fun->R = eval(fun->R));
+			value cx = (f->L->R = eval(f->L->R));
 			exp = do_resolve(exp,cx);
 			f = Qform(hold(form->L),exp);
 			}
@@ -398,9 +395,9 @@ value type_resolve(value fun, value f)
 // (evaluate cx form) Resolve all the symbols in the form and return its value.
 // If there are any undefined symbols, report them all and die.
 // The cx function maps a name to (yield val) if defined, otherwise void.
-value type_evaluate(value fun, value f)
+value type_evaluate(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
 	{
 	value form = arg(f->R);
 	if (form->T == type_form)
@@ -410,7 +407,7 @@ value type_evaluate(value fun, value f)
 			f = hold(exp->R);
 		else
 			{
-			value cx = (fun->R = eval(fun->R));
+			value cx = (f->L->R = eval(f->L->R));
 			exp = do_resolve(exp,cx);
 
 			if (exp->T == type_quo)
@@ -432,13 +429,12 @@ value type_evaluate(value fun, value f)
 	}
 
 // \extend=(\cx evaluate (define "cx_std" cx; cx))
-value type_extend(value fun, value f)
+value type_extend(value f)
 	{
 	value cx = (f->R = eval(f->R));
 	f->T = type_evaluate;
 	f->R = A(A(hold(Qdef_std),cx),hold(cx));
 	return hold(f);
-	(void)fun;
 	}
 
 static int in_list(string s, value list)
@@ -477,7 +473,7 @@ static value form_undefs(value exp, value list)
 	}
 
 // (form_undefs form) Return the list of unique undefined symbols in the form.
-value type_form_undefs(value fun, value f)
+value type_form_undefs(value f)
 	{
 	value form = arg(f->R);
 	if (form->T == type_form)
@@ -486,7 +482,6 @@ value type_form_undefs(value fun, value f)
 		f = hold(Qvoid);
 	drop(form);
 	return f;
-	(void)fun;
 	}
 
 static value form_refs(value exp, value list)
@@ -509,7 +504,7 @@ static value form_refs(value exp, value list)
 
 // (form_refs form) Return {label list}, where label is the name of the source
 // file and list is the list of {name line} symbol references in the form.
-value type_form_refs(value fun, value f)
+value type_form_refs(value f)
 	{
 	value form = arg(f->R);
 	if (form->T == type_form)
@@ -518,7 +513,6 @@ value type_form_refs(value fun, value f)
 		f = hold(Qvoid);
 	drop(form);
 	return f;
-	(void)fun;
 	}
 
 void beg_sym(void)

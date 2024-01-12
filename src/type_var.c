@@ -7,9 +7,9 @@
 // with things like caching, simulating a dynamic entity such as a file system
 // or human user, redefining print to capture output in a memory buffer, etc.
 
-value type_var(value fun, value f)
+value type_var(value f)
 	{
-	return type_void(fun,f);
+	return type_void(f);
 	}
 
 static void clear_var(value f)
@@ -18,16 +18,15 @@ static void clear_var(value f)
 	}
 
 // (var_new) Return a new variable with a void value.
-value type_var_new(value fun, value f)
+value type_var_new(value f)
 	{
 	static struct value clear = {{.N=0}, {.clear=clear_var}};
 	return V(type_var,&clear,hold(Qvoid));
-	(void)fun;
 	(void)f;
 	}
 
 // (var_get var) Return the current value of var.
-value type_var_get(value fun, value f)
+value type_var_get(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_var)
@@ -36,11 +35,10 @@ value type_var_get(value fun, value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
 // (var_getf var) Yield the current value of var.
-value type_var_getf(value fun, value f)
+value type_var_getf(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_var)
@@ -49,14 +47,13 @@ value type_var_getf(value fun, value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
-static value op_put(value fun, value f, value op(value))
+static value op_put(value f, value op(value))
 	{
-	if (fun->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
 	{
-	value x = arg(fun->R);
+	value x = arg(f->L->R);
 	if (x->T == type_var)
 		{
 		value v = op(f->R);
@@ -72,18 +69,18 @@ static value op_put(value fun, value f, value op(value))
 	}
 
 // (var_put var x) Put the value of x into var.
-value type_var_put(value fun, value f)
+value type_var_put(value f)
 	{
-	return op_put(fun,f,arg);
+	return op_put(f,arg);
 	}
 
 // (var_putf var x) Put x into var.
-value type_var_putf(value fun, value f)
+value type_var_putf(value f)
 	{
-	return op_put(fun,f,hold);
+	return op_put(f,hold);
 	}
 
-value type_is_var(value fun, value f)
+value type_is_var(value f)
 	{
-	return op_is_type(fun,f,type_var);
+	return op_is_type(f,type_var);
 	}

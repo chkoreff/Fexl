@@ -10,36 +10,32 @@
 #include <type_str.h>
 #include <type_stream.h>
 
-value type_at_eof(value fun, value f)
+value type_at_eof(value f)
 	{
 	return boolean(cur_ch == -1);
-	(void)fun;
 	(void)f;
 	}
 
-value type_at_white(value fun, value f)
+value type_at_white(value f)
 	{
 	return boolean(at_white());
-	(void)fun;
 	(void)f;
 	}
 
-value type_skip_white(value fun, value f)
+value type_skip_white(value f)
 	{
 	skip_white();
 	return hold(QI);
-	(void)fun;
 	(void)f;
 	}
 
-value type_at_eol(value fun, value f)
+value type_at_eol(value f)
 	{
 	return boolean(cur_ch == '\n' || cur_ch == '\r');
-	(void)fun;
 	(void)f;
 	}
 
-value type_at_ch(value fun, value f)
+value type_at_ch(value f)
 	{
 	value x = f->R;
 	if (x->T == type_str)
@@ -47,11 +43,10 @@ value type_at_ch(value fun, value f)
 	else
 		f = hold(Qvoid);
 	return f;
-	(void)fun;
 	}
 
 // Return the current character.
-value type_look(value fun, value f)
+value type_look(value f)
 	{
 	if (cur_ch < 0)
 		return hold(Qvoid);
@@ -60,28 +55,25 @@ value type_look(value fun, value f)
 		char c = cur_ch;
 		return Qstr(str_new_data(&c,1));
 		}
-	(void)fun;
 	(void)f;
 	}
 
 // Skip to the next character.
-value type_skip(value fun, value f)
+value type_skip(value f)
 	{
 	skip();
 	return hold(QI);
-	(void)fun;
 	(void)f;
 	}
 
 // Return the current line number.
-value type_line(value fun, value f)
+value type_line(value f)
 	{
 	return Qnum(cur_line);
-	(void)fun;
 	(void)f;
 	}
 
-value type_buf_keep(value fun, value f)
+value type_buf_keep(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_buf)
@@ -93,14 +85,13 @@ value type_buf_keep(value fun, value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
-value type_collect_to_ch(value fun, value f)
+value type_collect_to_ch(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
 	{
-	value x = arg(fun->R);
+	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_buf && y->T == type_str)
 		f = boolean(collect_to_ch(get_buf(x),str_data(y)[0]));
@@ -112,7 +103,7 @@ value type_collect_to_ch(value fun, value f)
 	}
 	}
 
-value type_collect_tilde_string(value fun, value f)
+value type_collect_tilde_string(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_buf)
@@ -121,12 +112,11 @@ value type_collect_tilde_string(value fun, value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
 // (read_stream stream read)
-value type_read_stream(value fun, value f)
+value type_read_stream(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
-	return read_stream(arg(fun->R),hold(f->R));
+	if (f->L->L == 0) return keep(f);
+	return read_stream(arg(f->L->R),hold(f->R));
 	}

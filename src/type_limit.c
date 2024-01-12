@@ -5,7 +5,7 @@
 #include <type_limit.h>
 #include <type_num.h>
 
-static value op_limit(value fun, value f, void op(unsigned long))
+static value op_limit(value f, void op(unsigned long))
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
@@ -17,20 +17,19 @@ static value op_limit(value fun, value f, void op(unsigned long))
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
-value type_limit_time(value fun, value f)
+value type_limit_time(value f)
 	{
-	return op_limit(fun,f,limit_time);
+	return op_limit(f,limit_time);
 	}
 
-value type_limit_stack(value fun, value f)
+value type_limit_stack(value f)
 	{
-	return op_limit(fun,f,limit_stack);
+	return op_limit(f,limit_stack);
 	}
 
-value type_limit_memory(value fun, value f)
+value type_limit_memory(value f)
 	{
-	return op_limit(fun,f,limit_memory);
+	return op_limit(f,limit_memory);
 	}

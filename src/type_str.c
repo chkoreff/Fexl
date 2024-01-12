@@ -12,9 +12,9 @@ string get_str(value x)
 	return x->v_ptr;
 	}
 
-value type_str(value fun, value f)
+value type_str(value f)
 	{
-	return type_void(fun,f);
+	return type_void(f);
 	}
 
 static void clear_str(value f)
@@ -38,7 +38,7 @@ const char *str_data(value x)
 	return get_str(x)->data;
 	}
 
-value op_str(value fun, value f, string op(string))
+value op_str(value f, string op(string))
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
@@ -53,14 +53,13 @@ value op_str(value fun, value f, string op(string))
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
-value op_str2(value fun, value f, string op(string,string))
+value op_str2(value f, string op(string,string))
 	{
-	if (fun->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
 	{
-	value x = arg(fun->R);
+	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_str)
 		{
@@ -78,13 +77,13 @@ value op_str2(value fun, value f, string op(string,string))
 	}
 	}
 
-value op_str3(value fun, value f, string op(string,string,string))
+value op_str3(value f, string op(string,string,string))
 	{
-	if (fun->L == 0) return keep(fun,f);
-	if (fun->L->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
+	if (f->L->L->L == 0) return keep(f);
 	{
-	value x = arg(fun->L->R);
-	value y = arg(fun->R);
+	value x = arg(f->L->L->R);
+	value y = arg(f->L->R);
 	value z = arg(f->R);
 
 	if (x->T == type_str && y->T == type_str && z->T == type_str)
@@ -106,13 +105,13 @@ value op_str3(value fun, value f, string op(string,string,string))
 	}
 
 // (. x y) is the concatenation of strings x and y.
-value type_concat(value fun, value f)
+value type_concat(value f)
 	{
-	return op_str2(fun,f,str_concat);
+	return op_str2(f,str_concat);
 	}
 
 // (length x) is the length of string x
-value type_length(value fun, value f)
+value type_length(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
@@ -121,18 +120,17 @@ value type_length(value fun, value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
 // (slice str pos len) calls str_slice, except it returns void if pos or len is
 // negative.
-value type_slice(value fun, value f)
+value type_slice(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
-	if (fun->L->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
+	if (f->L->L->L == 0) return keep(f);
 	{
-	value x = arg(fun->L->R);
-	value y = arg(fun->R);
+	value x = arg(f->L->L->R);
+	value y = arg(f->L->R);
 	value z = arg(f->R);
 	if (x->T == type_str && y->T == type_num && z->T == type_num)
 		{
@@ -153,13 +151,13 @@ value type_slice(value fun, value f)
 	}
 
 // (search haystack needle offset) calls str_search.
-value type_search(value fun, value f)
+value type_search(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
-	if (fun->L->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
+	if (f->L->L->L == 0) return keep(f);
 	{
-	value x = arg(fun->L->R);
-	value y = arg(fun->R);
+	value x = arg(f->L->L->R);
+	value y = arg(f->L->R);
 	value z = arg(f->R);
 	if (x->T == type_str && y->T == type_str && z->T == type_num)
 		{
@@ -187,7 +185,7 @@ value type_search(value fun, value f)
 	}
 
 // Convert string to number if possible.
-value type_str_num(value fun, value f)
+value type_str_num(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
@@ -202,11 +200,10 @@ value type_str_num(value fun, value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
 // (ord x) is the ordinal number of the first ASCII character of string x.
-value type_ord(value fun, value f)
+value type_ord(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
@@ -218,11 +215,10 @@ value type_ord(value fun, value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
 // (chr x) is the ASCII character whose ordinal number is x.
-value type_chr(value fun, value f)
+value type_chr(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
@@ -235,16 +231,15 @@ value type_chr(value fun, value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	(void)fun;
 	}
 
 // (char_width str pos) Return the width of the UTF-8 character which starts at
 // the given position.
-value type_char_width(value fun, value f)
+value type_char_width(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
 	{
-	value x = arg(fun->R);
+	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_num)
 		{
@@ -272,16 +267,16 @@ value type_char_width(value fun, value f)
 	}
 	}
 
-value type_dirname(value fun, value f) { return op_str(fun,f,dirname); }
-value type_basename(value fun, value f) { return op_str(fun,f,basename); }
+value type_dirname(value f) { return op_str(f,dirname); }
+value type_basename(value f) { return op_str(f,basename); }
 
 // (length_common x y) Return the number of initial bytes which x and y have in
 // common.
-value type_length_common(value fun, value f)
+value type_length_common(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
 	{
-	value x = arg(fun->R);
+	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_str)
 		f = Qnum((double)length_common(get_str(x),get_str(y)));
@@ -302,17 +297,17 @@ value type_length_common(value fun, value f)
 //     \cy=(slice y pos 1)
 //     gt cx cy GT; lt cx cy LT; EQ
 //     )
-value type_compare_at(value fun, value f)
+value type_compare_at(value f)
 	{
-	if (fun->L == 0) return keep(fun,f);
-	if (fun->L->L == 0) return keep(fun,f);
-	if (fun->L->L->L == 0) return keep(fun,f);
-	if (fun->L->L->L->L == 0) return keep(fun,f);
-	if (fun->L->L->L->L->L == 0) return keep(fun,f);
+	if (f->L->L == 0) return keep(f);
+	if (f->L->L->L == 0) return keep(f);
+	if (f->L->L->L->L == 0) return keep(f);
+	if (f->L->L->L->L->L == 0) return keep(f);
+	if (f->L->L->L->L->L->L == 0) return keep(f);
 	{
-	value pos = arg(fun->L->L->L->L->R);
-	value x = arg(fun->L->L->L->R);
-	value y = arg(fun->L->L->R);
+	value pos = arg(f->L->L->L->L->L->R);
+	value x = arg(f->L->L->L->L->R);
+	value y = arg(f->L->L->L->R);
 
 	if (pos->T == type_num && x->T == type_str && y->T == type_str)
 		{
@@ -323,9 +318,9 @@ value type_compare_at(value fun, value f)
 		int cy = n < ys->len ? ys->data[n] : -1;
 
 		if (cx < cy)
-			f = hold(fun->L->R);
+			f = hold(f->L->L->R);
 		else if (cx == cy)
-			f = hold(fun->R);
+			f = hold(f->L->R);
 		else
 			f = hold(f->R);
 		}
@@ -339,9 +334,9 @@ value type_compare_at(value fun, value f)
 	}
 	}
 
-value type_is_str(value fun, value f)
+value type_is_str(value f)
 	{
-	return op_is_type(fun,f,type_str);
+	return op_is_type(f,type_str);
 	}
 
 static unsigned long list_length(value p)
@@ -381,7 +376,7 @@ static value expand(value list)
 
 // Collect a vector of raw (char *) strings from a list and pass it to the op
 // function.  Any item that is not a string ends the list.
-value op_argv(value fun, value f, value op(const char *const *argv))
+value op_argv(value f, value op(const char *const *argv))
 	{
 	value items = expand(hold(f->R));
 	unsigned long len = list_length(items);
@@ -403,5 +398,4 @@ value op_argv(value fun, value f, value op(const char *const *argv))
 	drop(items);
 
 	return f;
-	(void)fun;
 	}
