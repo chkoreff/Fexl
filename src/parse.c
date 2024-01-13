@@ -202,45 +202,41 @@ static value parse_seq(const char t_ch, const char *msg)
 	}
 	}
 
+// If a list is exactly two items then return a pair of those items.
+static value check_pair(const value list)
+	{
+	value p = list;
+	value x1, x2;
+
+	if (p->T == type_quo) p = p->R;
+	if (p->T != type_list) return 0;
+
+	x1 = p->L;
+	p = p->R;
+
+	if (p->T == type_quo) p = p->R;
+	if (p->T != type_list) return 0;
+
+	x2 = p->L;
+	p = p->R;
+
+	if (p->T == type_quo) p = p->R;
+	if (p->T != type_null) return 0;
+
+	if (list->T == type_quo)
+		return quo(V(type_pair,hold(x1),hold(x2)));
+	else if (list->R->T == type_quo)
+		return V(type_pair,hold(x1),quo(hold(x2)));
+	else
+		return join(type_pair,hold(x1),hold(x2));
+	}
+
 static value parse_tuple(void)
 	{
 	value list = parse_seq('}',"Unclosed brace");
-
-	// If the list is exactly two items change it to type_pair.
-	int is_pair = 0;
-	value x1, x2;
-	{
-	value f = list;
-	if (f->T == type_quo) f = f->R;
-	if (f->T == type_list)
+	value pair = check_pair(list);
+	if (pair)
 		{
-		x1 = f->L;
-		f = f->R;
-		if (f->T == type_quo) f = f->R;
-		if (f->T == type_list)
-			{
-			x2 = f->L;
-			f = f->R;
-			if (f->T == type_quo) f = f->R;
-			if (f->T == type_null)
-				is_pair = 1;
-			}
-		}
-	}
-
-	if (is_pair)
-		{
-		value pair;
-
-		hold(x2);
-		if (list->T != type_quo && list->R->T == type_quo)
-			x2 = quo(x2);
-
-		pair = join(type_pair,hold(x1),x2);
-
-		if (list->T == type_quo)
-			pair = quo(pair);
-
 		drop(list);
 		return pair;
 		}
