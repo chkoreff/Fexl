@@ -10,11 +10,6 @@
 #include <type_buf.h>
 #include <type_str.h>
 
-buffer get_buf(value x)
-	{
-	return x->v_ptr;
-	}
-
 value type_buf(value f)
 	{
 	return type_void(f);
@@ -46,7 +41,7 @@ value type_buf_put(value f)
 	value y = arg(f->R);
 	if (x->T == type_buf && y->T == type_str)
 		{
-		buf_put(get_buf(x),get_str(y));
+		buf_put(x->v_ptr,y->v_ptr);
 		f = hold(QI);
 		}
 	else
@@ -63,7 +58,7 @@ value type_buf_get(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_buf)
-		f = Qstr(buf_clear(get_buf(x)));
+		f = Qstr(buf_clear(x->v_ptr));
 	else
 		f = hold(Qvoid);
 	drop(x);

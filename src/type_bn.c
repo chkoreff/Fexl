@@ -10,11 +10,6 @@
 #include <type_num.h>
 #include <type_str.h>
 
-struct bn *get_bn(value x)
-	{
-	return x->v_ptr;
-	}
-
 value type_bn(value f)
 	{
 	return type_void(f);
@@ -35,7 +30,7 @@ static value op_pred(value f, int op(const struct bn *x))
 	{
 	value x = arg(f->R);
 	if (x->T == type_bn)
-		f = boolean(op(get_bn(x)));
+		f = boolean(op(x->v_ptr));
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -56,7 +51,7 @@ value type_bn_neg(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_bn)
-		f = Qbn(bn_neg(get_bn(x)));
+		f = Qbn(bn_neg(x->v_ptr));
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -70,7 +65,7 @@ value type_bn_cmp(value f)
 	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_bn && y->T == type_bn)
-		f = Qnum(bn_cmp(get_bn(x),get_bn(y)));
+		f = Qnum(bn_cmp(x->v_ptr,y->v_ptr));
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -86,7 +81,7 @@ static value op_cmp(value f, int op(int))
 	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_bn && y->T == type_bn)
-		f = boolean(op(bn_cmp(get_bn(x),get_bn(y))));
+		f = boolean(op(bn_cmp(x->v_ptr,y->v_ptr)));
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -124,7 +119,7 @@ value type_bn_to_dec(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_bn)
-		f = Qstr(bn_to_dec(get_bn(x)));
+		f = Qstr(bn_to_dec(x->v_ptr));
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -139,7 +134,7 @@ static value op_2(value f,
 	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_bn && y->T == type_bn)
-		f = Qbn(op(get_bn(x),get_bn(y)));
+		f = Qbn(op(x->v_ptr,y->v_ptr));
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -163,7 +158,7 @@ value type_bn_div(value f)
 		{
 		struct bn *q;
 		struct bn *r;
-		bn_div(get_bn(x),get_bn(y),&q,&r);
+		bn_div(x->v_ptr,y->v_ptr,&q,&r);
 		f = pair(Qbn(q),Qbn(r));
 		}
 	else

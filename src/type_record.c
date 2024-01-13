@@ -9,11 +9,6 @@
 
 value Qempty;
 
-struct record *get_record(value x)
-	{
-	return x->v_ptr;
-	}
-
 static unsigned long record_size(unsigned long len)
 	{
 	return sizeof(struct record) + sizeof(struct item[len]);
@@ -40,7 +35,7 @@ static value find(struct record *rec, string key, value result)
 	for (i = 0; i < rec->count; i++)
 		{
 		struct item *item = &rec->item[i];
-		int cmp = str_cmp(key,get_str(item->key));
+		int cmp = str_cmp(key,item->key->v_ptr);
 		if (cmp > 0)
 			continue;
 		if (cmp == 0)
@@ -54,7 +49,7 @@ value type_record(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
-		f = hold(find(get_record(f->L),get_str(x),Qvoid));
+		f = hold(find(f->L->v_ptr,x->v_ptr,Qvoid));
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -151,8 +146,8 @@ static value update_copy(struct record *old_rec, unsigned long pos, value y)
 
 static value set(value x, value y, value z)
 	{
-	string key = get_str(x);
-	struct record *old_rec = get_record(z);
+	string key = x->v_ptr;
+	struct record *old_rec = z->v_ptr;
 	unsigned long pos;
 	struct item *item;
 	int cmp = -1;
@@ -160,7 +155,7 @@ static value set(value x, value y, value z)
 	for (pos = 0; pos < old_rec->count; pos++)
 		{
 		item = &old_rec->item[pos];
-		cmp = str_cmp(key,get_str(item->key));
+		cmp = str_cmp(key,item->key->v_ptr);
 		if (cmp <= 0)
 			break;
 		}
@@ -245,7 +240,7 @@ value type_get(value f)
 		{
 		value y = arg(f->R);
 		if (y->T == type_record)
-			f = maybe(find(get_record(y),get_str(x),0));
+			f = maybe(find(y->v_ptr,x->v_ptr,0));
 		else
 			f = hold(Qvoid);
 		drop(y);
@@ -262,7 +257,7 @@ value type_record_count(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_record)
-		f = Qnum((double)get_record(x)->count);
+		f = Qnum((double)((struct record *)x->v_ptr)->count);
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -281,7 +276,7 @@ value type_record_item(value f)
 		value y = arg(f->R);
 		if (y->T == type_num)
 			{
-			struct record *rec = get_record(x);
+			struct record *rec = x->v_ptr;
 			unsigned long pos = get_ulong(y);
 			if (pos < rec->count)
 				{

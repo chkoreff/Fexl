@@ -42,11 +42,6 @@ value Qfile(FILE *fh)
 	return V(type_file,&clear,(value)fh);
 	}
 
-FILE *get_fh(value x)
-	{
-	return x->v_ptr;
-	}
-
 // (fopen path mode) Open a file and return fh, where fh is the open file
 // handle or void on failure.
 value type_fopen(value f)
@@ -77,7 +72,7 @@ value type_fclose(value f)
 	value out = arg(f->R);
 	if (out->T == type_file)
 		{
-		fclose(get_fh(out));
+		fclose(out->v_ptr);
 		out->T = type_void;
 		out->L = 0;
 		out->R = 0;
@@ -106,8 +101,7 @@ value type_clearerr(value f)
 	value x = arg(f->R);
 	if (x->T == type_file)
 		{
-		FILE *fh = get_fh(x);
-		clearerr(fh);
+		clearerr(x->v_ptr);
 		f = hold(QI);
 		}
 	else
@@ -120,10 +114,7 @@ value type_feof(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_file)
-		{
-		FILE *fh = get_fh(x);
-		f = boolean(feof(fh));
-		}
+		f = boolean(feof(x->v_ptr));
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -136,7 +127,7 @@ value type_flook(value f)
 	value x = arg(f->R);
 	if (x->T == type_file)
 		{
-		FILE *fh = get_fh(x);
+		FILE *fh = x->v_ptr;
 		int ch = fgetc(fh);
 		if (ch == -1)
 			f = hold(Qvoid);
@@ -254,7 +245,7 @@ static value op_flock(value f, int operation)
 	value x = arg(f->R);
 	if (x->T == type_file)
 		{
-		int code = flock(fileno(get_fh(x)),operation);
+		int code = flock(fileno(x->v_ptr),operation);
 		if (code < 0)
 			{
 			perror("flock");
@@ -368,7 +359,7 @@ value type_ftruncate(value f)
 	value y = arg(f->R);
 	if (x->T == type_file && y->T == type_num)
 		{
-		FILE *fh = get_fh(x);
+		FILE *fh = x->v_ptr;
 		unsigned long len = get_ulong(y);
 		int code = ftruncate(fileno(fh),len);
 		f = Qnum(code);
@@ -389,7 +380,7 @@ static value op_seek(value f, int whence)
 	value y = arg(f->R);
 	if (x->T == type_file && y->T == type_num)
 		{
-		FILE *fh = get_fh(x);
+		FILE *fh = x->v_ptr;
 		long offset = y->v_double;
 		int code = fseek(fh,offset,whence);
 		f = Qnum(code);
@@ -412,11 +403,7 @@ value type_ftell(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_file)
-		{
-		FILE *fh = get_fh(x);
-		long offset = ftell(fh);
-		f = Qnum(offset);
-		}
+		f = Qnum(ftell(x->v_ptr));
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -428,11 +415,7 @@ value type_fileno(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_file)
-		{
-		FILE *fh = get_fh(x);
-		int n = fileno(fh);
-		f = Qnum(n);
-		}
+		f = Qnum(fileno(x->v_ptr));
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -449,7 +432,7 @@ value type_fread(value f)
 	value y = arg(f->R);
 	if (x->T == type_file && y->T == type_num)
 		{
-		FILE *fh = get_fh(x);
+		FILE *fh = x->v_ptr;
 		unsigned long size = get_ulong(y);
 		string str = str_new(size);
 		size_t count = fread(str->data,1,size,fh);

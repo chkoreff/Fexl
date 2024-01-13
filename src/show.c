@@ -66,13 +66,13 @@ static void put_data(value f)
 	if (f->T == type_num)
 		put_double(f->v_double);
 	else if (f->T == type_str)
-		put_quote(get_str(f));
+		put_quote(f->v_ptr);
 	else if (f->T == type_quo)
 		limit_show(f->R);
 	else if (f->T == type_ref)
 		{
 		value x = f->R;
-		put_quote(get_str(x));
+		put_quote(x->v_ptr);
 		put_ch(' ');
 		put_ulong(x->N);
 		}

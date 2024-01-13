@@ -22,7 +22,7 @@ static value op_cmp(value f, int op(int))
 	if (x->T == type_num && y->T == type_num)
 		f = boolean(op(num_cmp(x->v_double,y->v_double)));
 	else if (x->T == type_str && y->T == type_str)
-		f = boolean(op(str_cmp(get_str(x),get_str(y))));
+		f = boolean(op(str_cmp(x->v_ptr,y->v_ptr)));
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -57,7 +57,7 @@ value type_compare(value f)
 		}
 	else if (x->T == type_str && y->T == type_str)
 		{
-		int cmp = str_cmp(get_str(x),get_str(y));
+		int cmp = str_cmp(x->v_ptr,y->v_ptr);
 
 		if (cmp < 0)
 			f = hold(f->L->L->R);

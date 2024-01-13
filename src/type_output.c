@@ -28,7 +28,7 @@ static value op_put(FILE *fh, value f)
 	else
 		{
 		if (x->T == type_str)
-			fput_str(fh,get_str(x));
+			fput_str(fh,x->v_ptr);
 		else if (x->T == type_num)
 			fput_double(fh,x->v_double);
 		else if (x->T == type_T && !x->L)
@@ -37,8 +37,7 @@ static value op_put(FILE *fh, value f)
 			fput_ch(fh,'F');
 		else if (x->T == type_bn)
 			{
-			struct bn *n = get_bn(x);
-			string s = bn_to_dec(n);
+			string s = bn_to_dec(x->v_ptr);
 			fput_str(fh,s);
 			str_free(s);
 			}
@@ -71,7 +70,7 @@ value type_fput(value f)
 	{
 	value out = arg(f->L->R);
 	if (out->T == type_file)
-		f = op_put(get_fh(out),f);
+		f = op_put(out->v_ptr,f);
 	else
 		f = hold(Qvoid);
 	drop(out);
@@ -84,7 +83,7 @@ value type_fnl(value f)
 	value out = arg(f->R);
 	if (out->T == type_file)
 		{
-		fnl(get_fh(out));
+		fnl(out->v_ptr);
 		f = hold(QI);
 		}
 	else
@@ -105,7 +104,7 @@ value type_fflush(value f)
 	value out = arg(f->R);
 	if (out->T == type_file)
 		{
-		fflush(get_fh(out));
+		fflush(out->v_ptr);
 		f = hold(QI);
 		}
 	else

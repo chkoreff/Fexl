@@ -58,9 +58,9 @@ value type_nacl_sign_open(value f)
 	value z = arg(f->R);
 	if (x->T == type_str && y->T == type_str && z->T == type_str)
 		{
-		string text = get_str(x);
-		string public_key = get_str(y);
-		string signature = get_str(z);
+		string text = x->v_ptr;
+		string public_key = y->v_ptr;
+		string signature = z->v_ptr;
 		f = boolean(str_nacl_sign_open(text,public_key,signature));
 		}
 	else

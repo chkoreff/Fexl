@@ -32,19 +32,14 @@ value Qistr(value x)
 
 int sgetc(struct istr *in)
 	{
-	string str = get_str(in->str);
+	string str = in->str->v_ptr;
 	return in->pos < str->len ? (unsigned char)str->data[in->pos++] : -1;
 	}
 
 static int slook(struct istr *in)
 	{
-	string str = get_str(in->str);
+	string str = in->str->v_ptr;
 	return in->pos < str->len ? (unsigned char)str->data[in->pos] : -1;
-	}
-
-struct istr *get_istr(value x)
-	{
-	return x->v_ptr;
 	}
 
 value type_istr(value f)
@@ -82,7 +77,7 @@ value type_slook(value f)
 	value x = arg(f->R);
 	if (x->T == type_istr)
 		{
-		int ch = slook(get_istr(x));
+		int ch = slook(x->v_ptr);
 		if (ch == -1)
 			f = hold(Qvoid);
 		else

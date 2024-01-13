@@ -10,7 +10,7 @@
 static int cmp_key(value x, value y)
 	{
 	if (x->T == type_str && y->T == type_str)
-		return (str_cmp(get_str(x),get_str(y)) == 0);
+		return (str_cmp(x->v_ptr,y->v_ptr) == 0);
 	else if (x->T == type_num && y->T == type_num)
 		return x->v_double == y->v_double;
 	else

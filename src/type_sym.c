@@ -75,7 +75,7 @@ static value get_pattern(string name, value e)
 		return hold(QF);
 	else if (e->T == type_ref)
 		{
-		if (str_eq(name,get_str(e->R)))
+		if (str_eq(name,e->R->v_ptr))
 			return hold(QT);
 		else
 			return hold(QF);
@@ -171,7 +171,7 @@ static value def(string key, value val, value exp)
 		return hold(exp);
 	else if (exp->T == type_ref)
 		{
-		if (str_eq(key,get_str(exp->R)))
+		if (str_eq(key,exp->R->v_ptr))
 			return quo(hold(val));
 		else
 			return hold(exp);
@@ -207,7 +207,7 @@ value type_def(value f)
 			if (form->R->T == type_quo)
 				f = hold(form);
 			else
-				f = Qform(hold(form->L),def(get_str(key),f->L->R,form->R));
+				f = Qform(hold(form->L),def(key->v_ptr,f->L->R,form->R));
 			}
 		else
 			f = hold(Qvoid);
@@ -287,7 +287,7 @@ static value find_cache(string name, value cache)
 	{
 	while (cache)
 		{
-		if (str_eq(name,get_str(cache->L->R)))
+		if (str_eq(name,cache->L->R->v_ptr))
 			return cache->R;
 		cache = cache->next;
 		}
@@ -321,7 +321,7 @@ static value build_cache(value exp, value cx, value cache)
 		return cache;
 	else if (exp->T == type_ref)
 		{
-		string name = get_str(exp->R);
+		string name = exp->R->v_ptr;
 		value val = find_cache(name,cache);
 		if (val)
 			return cache;
@@ -347,7 +347,7 @@ static value resolve(value exp, value cache)
 		return hold(exp);
 	else if (exp->T == type_ref)
 		{
-		string name = get_str(exp->R);
+		string name = exp->R->v_ptr;
 		value val = find_cache(name,cache);
 		return (val->T == type_quo) ? hold(val) : hold(exp);
 		}
@@ -441,7 +441,7 @@ static int in_list(string s, value list)
 	{
 	while (list->T == type_list)
 		{
-		if (str_eq(s,get_str(list->L)))
+		if (str_eq(s,list->L->v_ptr))
 			return 1;
 		list = list->R;
 		}
@@ -455,7 +455,7 @@ static value form_undefs(value exp, value list)
 		return list;
 	else if (exp->T == type_ref)
 		{
-		string s = get_str(exp->R);
+		string s = exp->R->v_ptr;
 		if (in_list(s,list))
 			return list;
 		else
@@ -491,7 +491,7 @@ static value form_refs(value exp, value list)
 	else if (exp->T == type_ref)
 		{
 		value x = exp->R;
-		value top = pair(Qstr(str_copy(get_str(x))),Qnum(x->N));
+		value top = pair(Qstr(str_copy(x->v_ptr)),Qnum(x->N));
 		return V(type_list,top,list);
 		}
 	else

@@ -12,7 +12,6 @@ struct record
 	};
 
 extern value Qempty;
-extern struct record *get_record(value x);
 extern value type_record(value f);
 extern value record_empty(void);
 extern value type_set(value f);

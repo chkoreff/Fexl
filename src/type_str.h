@@ -1,4 +1,3 @@
-extern string get_str(value x);
 extern value type_str(value f);
 extern value Qstr(string x);
 extern value Qstr0(const char *data);

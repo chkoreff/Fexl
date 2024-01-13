@@ -1,4 +1,3 @@
-extern struct bn *get_bn(value x);
 extern value type_bn(value f);
 extern value type_bn_eq0(value f);
 extern value type_bn_is_neg(value f);

@@ -58,7 +58,7 @@ value type_unpack(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
-		f = Qstr(unpack(get_str(x)));
+		f = Qstr(unpack(x->v_ptr));
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -70,7 +70,7 @@ value type_pack(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
-		f = Qstr(pack(get_str(x)));
+		f = Qstr(pack(x->v_ptr));
 	else
 		f = hold(Qvoid);
 	drop(x);

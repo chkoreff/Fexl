@@ -7,11 +7,6 @@
 #include <type_num.h>
 #include <type_str.h>
 
-string get_str(value x)
-	{
-	return x->v_ptr;
-	}
-
 value type_str(value f)
 	{
 	return type_void(f);
@@ -35,7 +30,7 @@ value Qstr0(const char *data)
 
 const char *str_data(value x)
 	{
-	return get_str(x)->data;
+	return ((string)x->v_ptr)->data;
 	}
 
 value op_str(value f, string op(string))
@@ -43,7 +38,7 @@ value op_str(value f, string op(string))
 	value x = arg(f->R);
 	if (x->T == type_str)
 		{
-		string result = op(get_str(x));
+		string result = op(x->v_ptr);
 		if (result)
 			f = Qstr(result);
 		else
@@ -63,7 +58,7 @@ value op_str2(value f, string op(string,string))
 	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_str)
 		{
-		string result = op(get_str(x),get_str(y));
+		string result = op(x->v_ptr,y->v_ptr);
 		if (result)
 			f = Qstr(result);
 		else
@@ -88,7 +83,7 @@ value op_str3(value f, string op(string,string,string))
 
 	if (x->T == type_str && y->T == type_str && z->T == type_str)
 		{
-		string result = op(get_str(x),get_str(y),get_str(z));
+		string result = op(x->v_ptr,y->v_ptr,z->v_ptr);
 		if (result)
 			f = Qstr(result);
 		else
@@ -115,7 +110,7 @@ value type_length(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
-		f = Qnum((double)get_str(x)->len);
+		f = Qnum((double)((string)x->v_ptr)->len);
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -137,7 +132,7 @@ value type_slice(value f)
 		double yn = y->v_double;
 		double zn = z->v_double;
 		if (yn >= 0 && zn >= 0)
-			f = Qstr(str_slice(get_str(x),yn,zn));
+			f = Qstr(str_slice(x->v_ptr,yn,zn));
 		else
 			f = hold(Qvoid);
 		}
@@ -164,8 +159,8 @@ value type_search(value f)
 		double zn = z->v_double;
 		if (zn >= 0)
 			{
-			string xs = get_str(x);
-			string ys = get_str(y);
+			string xs = x->v_ptr;
+			string ys = y->v_ptr;
 			unsigned long pos = str_search(xs,ys,zn);
 			if (pos < xs->len)
 				f = Qnum((double)pos);
@@ -208,7 +203,7 @@ value type_ord(value f)
 	value x = arg(f->R);
 	if (x->T == type_str)
 		{
-		string xs = get_str(x);
+		string xs = x->v_ptr;
 		f = Qnum((double) (xs->len == 0 ? 0 : (unsigned char)xs->data[0]) );
 		}
 	else
@@ -246,7 +241,7 @@ value type_char_width(value f)
 		double yn = y->v_double;
 		if (yn >= 0)
 			{
-			string xs = get_str(x);
+			string xs = x->v_ptr;
 			unsigned long pos = yn;
 			if (pos < xs->len)
 				{
@@ -279,7 +274,7 @@ value type_length_common(value f)
 	value x = arg(f->L->R);
 	value y = arg(f->R);
 	if (x->T == type_str && y->T == type_str)
-		f = Qnum((double)length_common(get_str(x),get_str(y)));
+		f = Qnum((double)length_common(x->v_ptr,y->v_ptr));
 	else
 		f = hold(Qvoid);
 	drop(x);
@@ -311,8 +306,8 @@ value type_compare_at(value f)
 
 	if (pos->T == type_num && x->T == type_str && y->T == type_str)
 		{
-		string xs = get_str(x);
-		string ys = get_str(y);
+		string xs = x->v_ptr;
+		string ys = y->v_ptr;
 		unsigned long n = get_ulong(pos);
 		int cx = n < xs->len ? xs->data[n] : -1;
 		int cy = n < ys->len ? ys->data[n] : -1;
