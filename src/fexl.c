@@ -197,8 +197,6 @@ static value cx_std(void)
 	if (match("extend")) return Q(type_extend);
 	if (match("def")) return Q(type_def);
 	if (match("value")) return Q(type_value);
-	if (match("form_undefs")) return Q(type_form_undefs);
-	if (match("form_refs")) return Q(type_form_refs);
 
 	if (match("buf_new")) return Q0(type_buf_new);
 	if (match("buf_put")) return Q(type_buf_put);

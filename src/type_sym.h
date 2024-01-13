@@ -17,7 +17,5 @@ extern value type_value(value f);
 extern value type_resolve(value f);
 extern value type_evaluate(value f);
 extern value type_extend(value f);
-extern value type_form_undefs(value f);
-extern value type_form_refs(value f);
 extern void beg_sym(void);
 extern void end_sym(void);
