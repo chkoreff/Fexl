@@ -1,13 +1,13 @@
-# Test the extend function.
+# Test the defc function.
 
 \\test_0=
 (
 \try=
 	(
-	\\cx=(say "Evaluating the context." cx_std)
+	\\cx=(say "Evaluating the context." std)
 	\\form
 	\\form=(say "Evaluating the form." form)
-	\result=(extend cx form)
+	\result=(value; cx; form)
 	say ["result "(is_undef result "void" "ok")]
 	nl
 	)
@@ -26,23 +26,25 @@ try (\; say "Hello")
 say "== test_1"
 show_benchmark;
 
-extend
+value;
 	(
+	defc "std";
 	say "Evaluating the context."
-	define "F" F;
-	define "if" if;
-	define "fred" (say "I am Fred.");
-	cx_std
+	\form
+	std;
+	def "F" F;
+	def "if" if;
+	def "fred" (say "I am Fred.");
+	form
 	)
 	(
 	say "Evaluating the form."
 	\;
-	# Extend cx_std several times.
-	extend cx_std \;
-	extend cx_std \;
-	extend cx_std \;
+	value; std; \;
+	value; std; \;
+	value; std; \;
 
-	if F cx_std
+	if F std
 	fred
 	)
 )
@@ -53,25 +55,26 @@ say "== test_2"
 show_benchmark;
 
 # Test fancy extended standard context.
-extend
+value;
 (
-# Define cx_std to include a few extra functions.
+defc "std";
+# Define std to include a few extra functions.
 say "Evaluating the context."
 \speaker=(\name \x put name put " says " say x)
-define "fred" (speaker "Fred");
-define "wilma" (speaker "Wilma");
-define "goodbye" (say "Goodbye");
-cx_std
+\\form
+std;
+def "fred" (speaker "Fred");
+def "wilma" (speaker "Wilma");
+def "goodbye" (say "Goodbye");
+form
 );
 
 say "Evaluating the form."
 \;
-# Now override one of the definitions.  Not extending this time.
-evaluate
-(
-define "fred" (put "HEY: " fred);
-cx_std
-)
+# Now override one of the definitions.
+value;
+std;
+def "fred" (put "HEY: " fred);
 \;
 
 # Now run this program in the enhanced context.

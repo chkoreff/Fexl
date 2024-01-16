@@ -1,5 +1,8 @@
 #
-evaluate (chain (evaluate cx_std; use "test.fxl"); cx_std) \;
+value;
+std;
+(value; std; use "test.fxl");
+\;
 
 \run_case=
 	(\label\text
@@ -9,15 +12,18 @@ evaluate (chain (evaluate cx_std; use "test.fxl"); cx_std) \;
 (
 run_case "test_1"
 ~
-extend
+value;
 (
-define "say" say;
-define "put" put;
-define "nl" nl;
-define "fred" (say "I am Fred.");
-define "wilma" (say "I am Wilma.");
-void
-)
+defc "std";
+\form
+def "value" value;
+def "say" say;
+def "put" put;
+def "nl" nl;
+def "fred" (say "I am Fred.");
+def "wilma" (say "I am Wilma.");
+form
+);
 \;
 say "Hello"
 put "line 1" nl
@@ -26,7 +32,7 @@ fred wilma
 fred wilma
 say "Bye"
 say "=="
-cx_std "fred" \\fred
+(value; std \; {fred}) \\fred
 fred fred
 ~
 )
@@ -34,15 +40,10 @@ fred fred
 (
 run_case "test_2"
 ~
-evaluate
-(
-#define "say" say;
-define "put" put;
-define "nl" nl;
-#define "fred" (say "I am Fred.");
-#define "wilma" (say "I am Wilma.");
-void
-)
+value;
+def "value" value;
+def "put" put;
+def "nl" nl;
 \;
 say "Hello"
 put "line 1" nl
@@ -51,7 +52,7 @@ fred wilma
 fred wilma
 say "Bye"
 say "=="
-cx_std "fred" \\fred
+(value; std \; {fred}) \\fred
 fred fred
 ~
 )
@@ -61,11 +62,12 @@ fred fred
 # evaluate the context.
 run_case "test_3"
 ~
-evaluate
-(
+value;
+(\form
+is_closed form ();
 say "HEY" # not printed
-void
-)
+form
+);
 \;
 () ["a" "b" 3.6]
 ~

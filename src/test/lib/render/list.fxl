@@ -6,5 +6,6 @@
 	say "]"
 	)
 
-define "say_list" say_list;
-void
+\form
+def "say_list" say_list;
+form

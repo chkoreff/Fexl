@@ -61,6 +61,11 @@ value type_list(value f)
 	return V(type_pair,x,y);
 	}
 
+value cons(value x, value y)
+	{
+	return V(type_list,x,y);
+	}
+
 // (cons x y) = (list x y)
 value type_cons(value f)
 	{
@@ -68,7 +73,7 @@ value type_cons(value f)
 	{
 	value x = hold(f->L->R);
 	value y = hold(f->R);
-	return V(type_list,x,y);
+	return cons(x,y);
 	}
 	}
 

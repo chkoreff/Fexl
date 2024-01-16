@@ -50,7 +50,7 @@ value type_tuple_to_list(value f)
 	if (x->T == type_tuple)
 		f = hold(x->R);
 	else if (x->T == type_pair)
-		f = V(type_list,hold(x->L),V(type_list,hold(x->R),hold(Qnull)));
+		f = cons(hold(x->L),cons(hold(x->R),hold(Qnull)));
 	else
 		f = hold(Qvoid);
 	drop(x);

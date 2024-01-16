@@ -3,10 +3,10 @@
 == test_full
 name say : T
 name is_defined : T
-name cx_std : F
+name std : T
 name + : T
 name @ : T
-name define : T
+name def : T
 name if : T
 name each : T
 name div : T
@@ -18,19 +18,19 @@ name dirname : T
 name hex_digit : T
 name read_ssv_file : T
 name read_csv_file : T
-name 2.5 : F
-name 0 : F
-name -3.56 : F
-name -3.56e-4 : F
+name 2.5 : T
+name 0 : T
+name -3.56 : T
+name -3.56e-4 : T
 name -3.56e-4x : F
 name x : F
 == test_restricted
 name say : T
 name is_defined : T
-name cx_std : F
+name std : F
 name + : F
 name @ : F
-name define : F
+name def : F
 name if : F
 name each : F
 name div : F
@@ -42,10 +42,10 @@ name dirname : F
 name hex_digit : F
 name read_ssv_file : F
 name read_csv_file : F
-name 2.5 : F
-name 0 : F
-name -3.56 : F
-name -3.56e-4 : F
+name 2.5 : T
+name 0 : T
+name -3.56 : T
+name -3.56e-4 : T
 name -3.56e-4x : F
 name x : F
 == test_run_restricted

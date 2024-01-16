@@ -5,12 +5,8 @@
 #include <die.h>
 #include <report.h>
 #include <string.h> // strcmp
-#include <type_num.h>
 #include <type_str.h>
 #include <type_sym.h>
-#include <type_with.h>
-
-static value Qdef_std;
 
 value type_quo(value f)
 	{
@@ -20,6 +16,16 @@ value type_quo(value f)
 value type_ref(value f)
 	{
 	return type_void(f);
+	}
+
+value type_form(value f)
+	{
+	return type_void(f);
+	}
+
+value Qform(value label, value exp)
+	{
+	return V(type_form,label,exp);
 	}
 
 static void clear_quo(value f)
@@ -118,16 +124,6 @@ value lam(type type, string name, value e)
 	return f;
 	}
 
-value type_form(value f)
-	{
-	return type_void(f);
-	}
-
-value Qform(value label, value exp)
-	{
-	return V(type_form,label,exp);
-	}
-
 // Use pattern p to make a copy of expression e with argument x substituted in
 // the places designated by the pattern.
 static value sub(value p, value e, value x)
@@ -192,7 +188,6 @@ static value def(string key, value val, value exp)
 	}
 
 // (def key val form) Return form with key defined as val.
-// LATER 20231223 "def" is deprecated
 value type_def(value f)
 	{
 	if (f->L->L == 0) return keep(f);
@@ -220,33 +215,6 @@ value type_def(value f)
 	}
 	}
 
-static const char *cur_name;
-
-int match(const char *other)
-	{
-	return strcmp(cur_name,other) == 0;
-	}
-
-// Use a C define function as a Fexl context function.
-value op_context(value f, value define(void))
-	{
-	value x = arg(f->R);
-	if (x->T == type_str)
-		{
-		value val;
-		cur_name = str_data(x);
-		val = define();
-		if (val)
-			f = yield(val);
-		else
-			f = hold(Qvoid);
-		}
-	else
-		f = hold(Qvoid);
-	drop(x);
-	return f;
-	}
-
 static void report_undef(const char *label, value exp)
 	{
 	if (exp->T == type_quo)
@@ -260,19 +228,19 @@ static void report_undef(const char *label, value exp)
 		}
 	}
 
-// Evaluate the form if all symbols are defined, otherwise report the undefined
-// symbols and die.
-// LATER 20231223 "value" is deprecated
+// Return the form expression if all symbols are defined, otherwise report the
+// undefined symbols and die.
 value type_value(value f)
 	{
 	value form = arg(f->R);
 	if (form->T == type_form)
 		{
-		if (form->R->T == type_quo)
-			f = hold(form->R->R);
+		value exp = form->R;
+		if (exp->T == type_quo)
+			f = hold(exp->R);
 		else
 			{
-			report_undef(str_data(form->L),form->R);
+			report_undef(str_data(form->L),exp);
 			die(0);
 			f = hold(Qvoid); // not reached
 			}
@@ -283,94 +251,32 @@ value type_value(value f)
 	return f;
 	}
 
-static value find_cache(string name, value cache)
+static const char *cur_name;
+
+int match(const char *other)
 	{
-	while (cache)
-		{
-		if (str_eq(name,cache->L->R->v_ptr))
-			return cache->R;
-		cache = cache->next;
-		}
-	return 0;
+	return strcmp(cur_name,other) == 0;
 	}
 
-static value push_cache(value exp, value val, value cache)
-	{
-	value top = new_value();
-	top->L = exp;
-	top->R = val;
-	top->next = cache;
-	return top;
-	}
-
-static void clear_cache(value cache)
-	{
-	while (cache)
-		{
-		value next = cache->next;
-		drop(cache->R);
-		recycle(cache);
-		cache = next;
-		}
-	}
-
-// Build a cache of values for all symbols in exp using context cx.
-static value build_cache(value exp, value cx, value cache)
-	{
-	if (exp->T == type_quo)
-		return cache;
-	else if (exp->T == type_ref)
-		{
-		string name = exp->R->v_ptr;
-		value val = find_cache(name,cache);
-		if (val)
-			return cache;
-		else
-			{
-			value val = eval(A(A(hold(cx),Qstr(str_copy(name))),hold(Qyield)));
-			value new = (val->L == Qyield) ? quo(hold(val->R)) : hold(exp);
-			drop(val);
-			return push_cache(exp,new,cache);
-			}
-		}
-	else
-		{
-		cache = build_cache(exp->L,cx,cache);
-		cache = build_cache(exp->R,cx,cache);
-		return cache;
-		}
-	}
-
-static value resolve(value exp, value cache)
+static value resolve(value exp, value define(void))
 	{
 	if (exp->T == type_quo)
 		return hold(exp);
 	else if (exp->T == type_ref)
 		{
-		string name = exp->R->v_ptr;
-		value val = find_cache(name,cache);
-		return (val->T == type_quo) ? hold(val) : hold(exp);
+		value val = (cur_name = str_data(exp->R), define());
+		return val ? quo(val) : hold(exp);
 		}
 	else
 		{
-		value L = resolve(exp->L,cache);
-		value R = resolve(exp->R,cache);
+		value L = resolve(exp->L,define);
+		value R = resolve(exp->R,define);
 		return join(exp->T,L,R);
 		}
 	}
 
-static value do_resolve(value exp, value cx)
-	{
-	value cache = build_cache(exp,cx,0);
-	exp = resolve(exp,cache);
-	clear_cache(cache);
-	return exp;
-	}
-
-// (resolve cx form) Use context cx to resolve some symbols in the form.
-value type_resolve(value f)
-	{
-	if (f->L->L == 0) return keep(f);
+// Use a C define function as a Fexl context function.
+value op_context(value f, value define(void))
 	{
 	value form = arg(f->R);
 	if (form->T == type_form)
@@ -379,70 +285,10 @@ value type_resolve(value f)
 		if (exp->T == type_quo)
 			f = hold(form);
 		else
-			{
-			value cx = (f->L->R = eval(f->L->R));
-			exp = do_resolve(exp,cx);
-			f = Qform(hold(form->L),exp);
-			}
+			f = Qform(hold(form->L),resolve(exp,define));
 		}
 	else
 		f = hold(Qvoid);
 	drop(form);
 	return f;
-	}
-	}
-
-// (evaluate cx form) Resolve all the symbols in the form and return its value.
-// If there are any undefined symbols, report them all and die.
-// The cx function maps a name to (yield val) if defined, otherwise void.
-value type_evaluate(value f)
-	{
-	if (f->L->L == 0) return keep(f);
-	{
-	value form = arg(f->R);
-	if (form->T == type_form)
-		{
-		value exp = form->R;
-		if (exp->T == type_quo)
-			f = hold(exp->R);
-		else
-			{
-			value cx = (f->L->R = eval(f->L->R));
-			exp = do_resolve(exp,cx);
-
-			if (exp->T == type_quo)
-				f = unquo(exp);
-			else
-				{
-				report_undef(str_data(form->L),exp);
-				drop(exp);
-				die(0);
-				f = hold(Qvoid); // not reached
-				}
-			}
-		}
-	else
-		f = hold(Qvoid);
-	drop(form);
-	return f;
-	}
-	}
-
-// \extend=(\cx evaluate (define "cx_std" cx; cx))
-value type_extend(value f)
-	{
-	value cx = (f->R = eval(f->R));
-	f->T = type_evaluate;
-	f->R = A(A(hold(Qdef_std),cx),hold(cx));
-	return hold(f);
-	}
-
-void beg_sym(void)
-	{
-	Qdef_std = A(Q(type_define),Qstr0("cx_std"));
-	}
-
-void end_sym(void)
-	{
-	drop(Qdef_std);
 	}

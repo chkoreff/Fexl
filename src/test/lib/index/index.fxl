@@ -155,8 +155,9 @@
 		(append (loop val) (loop tail))
 	)
 
-define "index_get" index_get;
-define "index_put" index_put;
-define "index_del" index_del;
-define "index_pairs" index_pairs;
-void
+\form
+def "index_get" index_get;
+def "index_put" index_put;
+def "index_del" index_del;
+def "index_pairs" index_pairs;
+form

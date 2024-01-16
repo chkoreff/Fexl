@@ -79,19 +79,19 @@
 		)
 
 	\form
-	evaluate
-		(
-		define "show_pos" show_pos;
-		define "seek_set" seek_set;
-		define "seek_cur" seek_cur;
-		define "seek_end" seek_end;
-		define "truncate" truncate;
-		define "write" write;
-		define "read" read;
-		define "sleep" sleep;
-		cx_std
-		)
-		form
+	(
+	value;
+	def "show_pos" show_pos;
+	def "seek_set" seek_set;
+	def "seek_cur" seek_cur;
+	def "seek_end" seek_end;
+	def "truncate" truncate;
+	def "write" write;
+	def "read" read;
+	def "sleep" sleep;
+	std;
+	form
+	)
 
 	\code=(remove path)
 	say [(eq code 0 "Removed" "Could not remove")" "path]

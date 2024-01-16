@@ -13,6 +13,7 @@ extern value type_Y(value f);
 extern value type_void(value f);
 extern value type_pair(value f);
 extern value type_list(value f);
+extern value cons(value x, value y);
 extern value type_cons(value f);
 extern value type_null(value f);
 extern value type_eval(value f);

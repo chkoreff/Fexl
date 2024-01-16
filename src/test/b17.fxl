@@ -1,5 +1,8 @@
 #
-extend (chain (evaluate cx_std; use "test.fxl"); cx_std) \;
+value;
+std;
+(value; std; use "test.fxl");
+\;
 
 \show_result=
 	(
@@ -33,7 +36,7 @@ try
 	(
 	say "hello"
 	trace "complain 1"
-	\x=(evaluate cx_std; parse stdin "")
+	\x=(value; std; parse stdin "")
 	say ["x = "(as_str x)]
 
 	trace "complain 2"
@@ -96,7 +99,7 @@ run_test "test_run_program";
 try
 ~
 say "hello"
-\x=(evaluate cx_std; parse stdin "")
+\x=(value; std; parse stdin "")
 say ["x = "(as_str x)]
 trace "complain"
 error "oops"

@@ -11,5 +11,6 @@
 		)
 	)
 
-define "scope" scope;
-void
+\form
+def "scope" scope;
+form

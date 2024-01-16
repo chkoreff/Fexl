@@ -356,7 +356,7 @@ static value expand(value list)
 			{
 			value tail = hold(list->R);
 			drop(list);
-			return V(type_list,head,expand(tail));
+			return cons(head,expand(tail));
 			}
 		else
 			{

@@ -1,5 +1,8 @@
 #
-evaluate (chain (evaluate cx_std; use "test.fxl"); cx_std) \;
+value;
+std;
+(value; std; use "test.fxl");
+\;
 
 \lparen="(" \rparen=")"
 \lbrace="{" \rbrace="]"
@@ -34,7 +37,7 @@ x
 
 run_fexl_text
 ~
-evaluate (define "b" (say "b"); void); \; a b
+value; def "b" (say "b") \; a b
 a c
 c
 ~

@@ -5,10 +5,10 @@
 [pair [str "a"] [str "b"]]
 [D [A [F] [A [F] [T]]] [D [A [T] [F]] [A [I] [I]]]]
 
-[form [str "test/lib.fxl"] [A [ref "a" 11] [A [ref "b" 11] [ref "c" 11]]]]
+[form [str "test/lib.fxl"] [A [ref "a" 9] [A [ref "b" 9] [ref "c" 9]]]]
 [form [str "test/lib.fxl"] [quo [I]]]
 [form [str "test/lib.fxl"] [quo [list [str "a"] [list [str "b"] [null]]]]]
-[form [str "test/lib.fxl"] [A [ref "say" 14] [quo [list [str "a"] [list [str "b"] [null]]]]]]
+[form [str "test/lib.fxl"] [A [ref "say" 12] [quo [list [str "a"] [list [str "b"] [null]]]]]]
 [form [str "test/lib.fxl"] [quo [D [A [F] [A [F] [T]]] [D [A [T] [F]] [A [I] [I]]]]]]
 [form [str "test/lib.fxl"] [quo [E [A [F] [A [F] [T]]] [D [A [T] [F]] [A [I] [I]]]]]]
 
@@ -47,18 +47,18 @@ Hello.
 [pair [num 1] [num 2]]
 [tuple [tuple] [list [num 1] [list [num 2] [list [num 3] [null]]]]]
 
-[form [str "test/lib.fxl"] [pair [ref "a" 74] [ref "b" 74]]]
-[form [str "test/lib.fxl"] [pair [ref "a" 75] [quo [num 2]]]]
-[form [str "test/lib.fxl"] [pair [quo [num 1]] [ref "b" 76]]]
+[form [str "test/lib.fxl"] [pair [ref "a" 72] [ref "b" 72]]]
+[form [str "test/lib.fxl"] [pair [ref "a" 73] [quo [num 2]]]]
+[form [str "test/lib.fxl"] [pair [quo [num 1]] [ref "b" 74]]]
 [form [str "test/lib.fxl"] [quo [pair [num 1] [num 2]]]]
 
-[form [str "test/lib.fxl"] [tuple [quo [tuple]] [list [ref "a" 79] [list [ref "b" 79] [list [ref "c" 79] [quo [null]]]]]]]
-[form [str "test/lib.fxl"] [tuple [quo [tuple]] [list [ref "a" 80] [list [ref "b" 80] [quo [list [num 3] [null]]]]]]]
-[form [str "test/lib.fxl"] [tuple [quo [tuple]] [list [ref "a" 81] [quo [list [num 2] [list [num 3] [null]]]]]]]
+[form [str "test/lib.fxl"] [tuple [quo [tuple]] [list [ref "a" 77] [list [ref "b" 77] [list [ref "c" 77] [quo [null]]]]]]]
+[form [str "test/lib.fxl"] [tuple [quo [tuple]] [list [ref "a" 78] [list [ref "b" 78] [quo [list [num 3] [null]]]]]]]
+[form [str "test/lib.fxl"] [tuple [quo [tuple]] [list [ref "a" 79] [quo [list [num 2] [list [num 3] [null]]]]]]]
 [form [str "test/lib.fxl"] [quo [tuple [tuple] [list [num 1] [list [num 2] [list [num 3] [null]]]]]]]
 
-[form [str "test/lib.fxl"] [tuple [quo [tuple]] [list [quo [num 1]] [list [ref "b" 84] [list [ref "c" 84] [quo [null]]]]]]]
-[form [str "test/lib.fxl"] [tuple [quo [tuple]] [list [quo [num 1]] [list [quo [num 2]] [list [ref "c" 85] [quo [null]]]]]]]
+[form [str "test/lib.fxl"] [tuple [quo [tuple]] [list [quo [num 1]] [list [ref "b" 82] [list [ref "c" 82] [quo [null]]]]]]]
+[form [str "test/lib.fxl"] [tuple [quo [tuple]] [list [quo [num 1]] [list [quo [num 2]] [list [ref "c" 83] [quo [null]]]]]]]
 [form [str "test/lib.fxl"] [quo [tuple [tuple] [list [num 1] [list [num 2] [list [num 3] [null]]]]]]]
 ~
 \err=

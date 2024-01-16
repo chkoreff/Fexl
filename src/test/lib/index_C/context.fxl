@@ -1,15 +1,13 @@
 # Compile an index into C code.
-\cx_index=(evaluate cx_std; use "lib/index/index.fxl")
-\cx_render=(evaluate cx_std; use "lib/render/base.fxl")
-\cx_render_C=(evaluate (chain cx_render; cx_std); use "lib/render/C.fxl")
+\cx_index=(value; std; use "lib/index/index.fxl")
+\cx_render=(value; std; use "lib/render/base.fxl")
+\cx_render_C=(value; std; cx_render; use "lib/render/C.fxl")
 
-evaluate
-(
-chain cx_render_C;
-chain cx_render;
-chain cx_index;
-cx_std
-)
+value;
+std;
+cx_index;
+cx_render;
+cx_render_C;
 \;
 
 # Process all the rows in an index.
@@ -107,7 +105,8 @@ cx_std
 	compile_index index
 	)
 
-define "compile_index" compile_index;
-define "index_put_pairs" index_put_pairs;
-define "compile_pairs" compile_pairs;
-void
+\form
+def "compile_index" compile_index;
+def "index_put_pairs" index_put_pairs;
+def "compile_pairs" compile_pairs;
+form

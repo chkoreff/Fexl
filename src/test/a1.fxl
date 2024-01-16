@@ -1,5 +1,8 @@
 #
-extend (chain (evaluate cx_std; use "test.fxl"); cx_std) \;
+value;
+std;
+(value; std; use "test.fxl");
+\;
 
 \show=
 	(\x
@@ -11,8 +14,8 @@ extend (chain (evaluate cx_std; use "test.fxl"); cx_std) \;
 	say "other"
 	)
 
-\eval_file=(\name evaluate cx_std; use name)
-\eval_str=(\str evaluate cx_std; parse str "")
+\eval_file=(\name value; std; use name)
+\eval_str=(\str value; std; parse str "")
 
 (
 \\ping=(say "ping")
@@ -352,11 +355,9 @@ say ["x = " x]
 
 div
 (
-evaluate
-(
-define "show" show;
-cx_std
-)
+value;
+def "show" show;
+std
 \;
 show "x"
 show (+ 2 3)
@@ -364,22 +365,19 @@ show (+ 2 3)
 
 div
 (
-evaluate
-(
-define "say" say;
-define "put" put;
-define "nl" nl;
-define "+" +;
-define "round" round;
-define "trunc" trunc;
-define "abs" abs;
-define "sqrt" sqrt;
-define "exp" exp;
-define "log" log;
-define "sin" sin;
-define "fred" (say "I am Fred.");
-void
-)
+value;
+def "say" say;
+def "put" put;
+def "nl" nl;
+def "+" +;
+def "round" round;
+def "trunc" trunc;
+def "abs" abs;
+def "sqrt" sqrt;
+def "exp" exp;
+def "log" log;
+def "sin" sin;
+def "fred" (say "I am Fred.");
 \;
 say "hi"
 fred
@@ -582,12 +580,12 @@ say (is_void void)
 say (is_void ( (\; f x) 3) )
 # Evaluate a form.
 (
-\x=(evaluate cx_std; \; + 3 4)
+\x=(value; std; \; + 3 4)
 say ["x = "(as_str x)]
 )
 # Evaluate a non-form.
 (
-\x=(evaluate cx_std; + 3 4)
+\x=(value; std; + 3 4)
 say ["x = "(as_str x)]
 )
 
@@ -683,17 +681,14 @@ talk
 	say "== resolve"
 
 	(
-	\define=(\key\\val with key (say ["symbol "key] yield val))
-	evaluate
-	(
-	define "say" say;
-	define "fred" (say "I am Fred.");
-	define "wilma" (say "I am Wilma.");
-	define "is_void" is_void;
-	define "void" void;
-	define "barney" (say "I am Barney.");
-	void
-	)
+	\def=(\key say ["symbol "key] def key)
+	value;
+	def "say" say;
+	def "fred" (say "I am Fred.");
+	def "wilma" (say "I am Wilma.");
+	def "is_void" is_void;
+	def "void" void;
+	def "barney" (say "I am Barney.");
 	\;
 	say "== run"
 	fred
@@ -711,23 +706,22 @@ talk
 	\form=(parse "say (+ 7 8)" "")
 
 	say "Run in standard context."
-	evaluate cx_std form
+	(value; std form)
 
 	say "Run in weird context."
-	evaluate
-		(
-		define "say" say;
-		define "+" *;
-		void
-		)
-		form
+	(
+	value;
+	def "say" say;
+	def "+" *;
+	form
+	)
 
 	say "]"
 	)
 
 \\case_3=
 	(
-	evaluate cx_std (\; yield; say "PING") \\run
+	(value; std (\; yield; say "PING")) \\run
 	say "["
 	run
 	run
@@ -1320,7 +1314,7 @@ nl
 (
 \form=(\; \x x)
 say (is_closed form)
-\f=(evaluate void form)
+\f=(value; form)
 )
 
 # Try parsing invalid source.
@@ -1341,7 +1335,10 @@ put "d = " put (as_str d) nl
 
 # Test op_argv.
 (
-evaluate (chain (load "test"); cx_std) \;
+value;
+std;
+(load "test");
+\;
 
 test_argv []
 test_argv ["a" "b"]

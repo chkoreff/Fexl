@@ -16,5 +16,6 @@
 		)
 	)
 
-define "say_index" say_index;
-void
+\form
+def "say_index" say_index;
+form

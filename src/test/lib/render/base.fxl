@@ -54,10 +54,11 @@
 
 set_output_fh stdout
 
-define "put" put;
-define "nl" nl;
-define "say" say;
-define "indent" indent;
-define "tab" tab;
-define "use_output_fh" use_output_fh;
-void
+\form
+def "put" put;
+def "nl" nl;
+def "say" say;
+def "indent" indent;
+def "tab" tab;
+def "use_output_fh" use_output_fh;
+form
