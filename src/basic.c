@@ -53,12 +53,15 @@ value type_pair(value f)
 	return A(A(h,x),y);
 	}
 
+value pair(value x, value y)
+	{
+	return V(type_pair,x,y);
+	}
+
 // ((list x y) h) = (pair x y)
 value type_list(value f)
 	{
-	value x = hold(f->L->L);
-	value y = hold(f->L->R);
-	return V(type_pair,x,y);
+	return pair(hold(f->L->L),hold(f->L->R));
 	}
 
 value cons(value x, value y)
@@ -70,11 +73,7 @@ value cons(value x, value y)
 value type_cons(value f)
 	{
 	if (f->L->L == 0) return keep(f);
-	{
-	value x = hold(f->L->R);
-	value y = hold(f->R);
-	return cons(x,y);
-	}
+	return cons(hold(f->L->R),hold(f->R));
 	}
 
 // (null x y) = x
@@ -121,11 +120,6 @@ value maybe(value x)
 value boolean(int x)
 	{
 	return hold(x ? QT : QF);
-	}
-
-value pair(value x, value y)
-	{
-	return V(type_pair,x,y);
 	}
 
 value type_is_defined(value f)
@@ -178,7 +172,7 @@ value type_is_good(value f) { return op_predicate(f,is_good); }
 value type_is_bool(value f) { return op_predicate(f,is_bool); }
 value type_is_list(value f) { return op_predicate(f,is_list); }
 
-// \chain=(\\a\\b \x \v=(a x) is_defined v v (b x))
+// \::=(\\a\\b \x \v=(a x) is_defined v v (b x))
 // Return (a x) if that is defined, otherwise return (b x).
 value type_chain(value f)
 	{

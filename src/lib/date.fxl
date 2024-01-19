@@ -286,7 +286,6 @@
 	ymd_date y m d
 	)
 
-\form
 def "long_month_names" long_month_names;
 def "short_month_names" short_month_names;
 def "long_month_name" long_month_name;
@@ -315,4 +314,4 @@ def "count_days" count_days;
 def "day_of_week" day_of_week;
 def "add_days" add_days;
 def "add_year" add_year;
-form
+void

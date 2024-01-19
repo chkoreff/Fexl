@@ -463,7 +463,6 @@
 # Equivalent to (remember 1).
 \\cache=(\v=var_new fetch v)
 
-\form
 def "append" append;
 def "flatten" flatten;
 def "each" each;
@@ -516,4 +515,4 @@ def "random_double" random_double;
 def "eq_data" eq_data;
 def "remember" remember;
 def "cache" cache;
-form
+void

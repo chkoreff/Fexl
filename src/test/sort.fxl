@@ -1,8 +1,5 @@
 #
-value;
-std;
-(value; std; use "test.fxl");
-\;
+value (:: (value std; use "test.fxl"); std) \;
 
 show_benchmark;
 
@@ -14,12 +11,15 @@ show_benchmark;
 	)
 
 # Test restricted evaluation by defining only the necessary functions.
-value;
+value
+(
 def "append" append;
 def "show_list" show_list;
 def "sort" sort;
 def "tower" tower;
 def "unique" unique;
+void
+)
 \;
 # Here I test the sort.
 

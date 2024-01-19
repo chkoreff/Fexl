@@ -129,10 +129,13 @@ format_num
 
 \str_to_data=
 	(\str
-	value;
+	value
+	(
 	def "T" T;
 	def "F" F;
 	def "void" void;
+	void
+	);
 	parse str ""
 	)
 
@@ -183,7 +186,6 @@ format_num
 	r
 	)
 
-\form
 def "repeat_str" repeat_str;
 def "format_num" format_num;
 def "format_money" format_money;
@@ -201,4 +203,4 @@ def "trim_spaces" trim_spaces;
 def "trim_beg_spaces" trim_beg_spaces;
 def "trim_end_spaces" trim_end_spaces;
 def "random_digits" random_digits;
-form
+void

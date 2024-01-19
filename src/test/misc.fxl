@@ -1,8 +1,5 @@
 #
-value;
-std;
-(value; std; use "test.fxl");
-\;
+value (:: (value std; use "test.fxl"); std) \;
 
 (
 \n=time

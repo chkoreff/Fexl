@@ -59,7 +59,6 @@
 \run_fexl_file=(\name run_command ["../bin/fexl test/"name".fxl"])
 \run_fexl_text=(run_command ["../bin/fexl"])
 
-\form
 def "div" div;
 def "show_list" show_list;
 def "run_test" run_test;
@@ -68,4 +67,4 @@ def "show_hex" show_hex;
 def "block_quote" block_quote;
 def "run_fexl_file" run_fexl_file;
 def "run_fexl_text" run_fexl_text;
-form
+void

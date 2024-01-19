@@ -88,7 +88,7 @@ static value std(void)
 	if (match("is_good")) return Q(type_is_good);
 	if (match("is_bool")) return Q(type_is_bool);
 	if (match("is_list")) return Q(type_is_list);
-	if (match("chain")) return Q(type_chain);
+	if (match("::")) return Q(type_chain);
 
 	if (match(".")) return Q(type_concat);
 	if (match("length")) return Q(type_length);
@@ -104,6 +104,7 @@ static value std(void)
 	if (match("compare_at")) return Q(type_compare_at);
 	if (match("is_str")) return Q(type_is_str);
 	if (match("with")) return Q(type_with);
+	if (match("def")) return Q(type_def);
 	if (match("is_obj")) return Q(type_is_obj);
 	if (match("split_obj")) return Q(type_split_obj);
 	if (match("fetch")) return Q(type_fetch);
@@ -187,7 +188,7 @@ static value std(void)
 	if (match("use_file")) return Q(type_use_file);
 
 	if (match("is_closed")) return Q(type_is_closed);
-	if (match("def")) return Q(type_def);
+	if (match("resolve")) return Q(type_resolve);
 	if (match("value")) return Q(type_value);
 
 	if (match("buf_new")) return Q0(type_buf_new);
@@ -345,9 +346,7 @@ static void eval_script(void)
 		}
 
 	// Now evaluate the script.
-	f = A(Q(type_use_file),f);
-	f = A(Q(type_std),f);
-	f = A(Q(type_value),f);
+	f = A(A(Q(type_value),Q(type_std)),A(Q(type_use_file),f));
 	f = eval(f);
 	drop(f);
 	}

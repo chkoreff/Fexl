@@ -1,8 +1,5 @@
 #
-value;
-std;
-(value; std; use "test.fxl");
-\;
+value (:: (value std; use "test.fxl"); std) \;
 
 # Reference: https://www.di-mgt.com.au/sha_testvectors.html
 # Test the extremely-long message.

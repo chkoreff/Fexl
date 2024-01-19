@@ -1,8 +1,5 @@
 #
-value;
-std;
-(value; std; use "test.fxl");
-\;
+value (:: (value std; use "test.fxl"); std) \;
 
 \run_case=
 	(\label\text
@@ -12,18 +9,16 @@ std;
 (
 run_case "test_1"
 ~
-value;
+value
 (
 defc "std";
-\form
-def "value" value;
 def "say" say;
 def "put" put;
 def "nl" nl;
 def "fred" (say "I am Fred.");
 def "wilma" (say "I am Wilma.");
-form
-);
+void
+)
 \;
 say "Hello"
 put "line 1" nl
@@ -32,7 +27,7 @@ fred wilma
 fred wilma
 say "Bye"
 say "=="
-(value; std \; {fred}) \\fred
+std "fred" \\fred
 fred fred
 ~
 )
@@ -40,10 +35,15 @@ fred fred
 (
 run_case "test_2"
 ~
-value;
-def "value" value;
+value
+(
+#def "say" say;
 def "put" put;
 def "nl" nl;
+#def "fred" (say "I am Fred.");
+#def "wilma" (say "I am Wilma.");
+void
+)
 \;
 say "Hello"
 put "line 1" nl
@@ -52,7 +52,7 @@ fred wilma
 fred wilma
 say "Bye"
 say "=="
-(value; std \; {fred}) \\fred
+std "fred" \\fred
 fred fred
 ~
 )
@@ -62,12 +62,11 @@ fred fred
 # evaluate the context.
 run_case "test_3"
 ~
-value;
-(\form
-is_closed form ();
+value
+(
 say "HEY" # not printed
-form
-);
+void
+)
 \;
 () ["a" "b" 3.6]
 ~

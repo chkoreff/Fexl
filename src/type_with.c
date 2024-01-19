@@ -39,7 +39,7 @@ value type_assoc(value f)
 
 static value Qassoc(value key, value val, value obj)
 	{
-	return V(type_assoc,V(type_pair,key,val),obj);
+	return V(type_assoc,pair(key,val),obj);
 	}
 
 /*
@@ -58,6 +58,18 @@ value type_with(value f)
 	value obj = hold(f->R = eval(f->R));
 	return Qassoc(key,val,obj);
 	}
+	}
+
+/*
+(def key val obj)
+\def=(\key\\val with key (yield val))
+*/
+value type_def(value f)
+	{
+	if (f->L->L == 0) return keep(f);
+	f->T = type_with;
+	f->R = yield(f->R);
+	return hold(f);
 	}
 
 value type_is_obj(value f)

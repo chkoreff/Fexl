@@ -17,15 +17,9 @@
 # Define key to refer to a context.
 \defc=
 	(\key\cx
-	@\\self\\form
-	cx; def key self; form
-	)
-
-# Use the context only if the form has open symbols.
-\::=
-	(\\cx\form
-	is_closed form form;
-	cx form
+	@\\self
+	def key self;
+	cx
 	)
 
 # Define some extra functions.
@@ -57,10 +51,8 @@
 # Use a file in the directory which contains the user's script.
 \use=(\name use_file; path_under dir_local name)
 
-\form
 def "defc" defc;
 def "if" if;
-def "::" ::;
 def "use" use;
 
 def "check" check;
@@ -81,7 +73,7 @@ def "QU" QU;
 
 def "do_benchmark" do_benchmark;
 def "show_benchmark" show_benchmark;
-form
+void
 )
 
 # Enhance the standard context to load libraries on demand.
@@ -90,20 +82,89 @@ form
 \dir_lib=(path_under dir_base "src/lib")
 \use=(\name use_file; path_under dir_lib name)
 
-\\bool=(\= value; std; use "bool.fxl")
-\\math=(\= value; std; use "math.fxl")
-\\list=(\= value; std; bool; use "list.fxl")
-\\format=(\= value; std; extra; bool; math; list; use "format.fxl")
-\\indent=(\= value; std; extra; format; use "indent.fxl")
-\\assoc=(\= value; std; list; use "assoc.fxl")
-\\hex=(\= value; std; bool; math; list; use "hex.fxl")
-\\html=(\= value; std; extra; list; format; hex; use "html.fxl")
-\\time=(\= value; std; extra; use "time.fxl")
-\\date=(\= value; std; math; list; use "date.fxl")
-\\run=(\= value; std; extra; bool; list; use "run.fxl")
-\\read=(\= value; std; use "read.fxl")
-\\read_csv=(\= value; std; extra; read; use "read_csv.fxl")
-\\read_ssv=(\= value; std; extra; read; use "read_ssv.fxl")
+\\bool=
+	(\=
+	value std;
+	use "bool.fxl"
+	)
+
+\\math=
+	(\=
+	value std;
+	use "math.fxl"
+	)
+
+\\list=
+	(\=
+	value (:: bool; std);
+	use "list.fxl"
+	)
+
+\\format=
+	(\=
+	value (:: list; :: math; :: bool; :: extra; std);
+	use "format.fxl"
+	)
+
+\\indent=
+	(\=
+	value (:: format; :: extra; std);
+	use "indent.fxl"
+	)
+
+\\assoc=
+	(\=
+	value (:: list; std);
+	use "assoc.fxl"
+	)
+
+\\hex=
+	(\=
+	value (:: list; :: math; :: bool; std);
+	use "hex.fxl"
+	)
+
+\\html=
+	(\=
+	value (:: hex; :: format; :: list; :: extra; std);
+	use "html.fxl"
+	)
+
+\\time=
+	(\=
+	value (:: extra; std);
+	use "time.fxl"
+	)
+
+\\date=
+	(\=
+	value (:: list; :: math; std);
+	use "date.fxl"
+	)
+
+\\run=
+	(\=
+	value (:: list; :: bool; :: extra; std);
+	use "run.fxl"
+	)
+
+\\read=
+	(\=
+	value std;
+	use "read.fxl"
+	)
+
+\\read_csv=
+	(\=
+	value (:: read; :: extra; std);
+	use "read_csv.fxl"
+	)
+
+\\read_ssv=
+	(\=
+	value (:: read; :: extra; std);
+	use "read_ssv.fxl"
+	)
 
 \load=
 	(\module
@@ -120,26 +181,25 @@ form
 	)
 
 defc "std";
-\form
-:: read_ssv;
-:: read_csv;
-:: run;
-:: date;
-:: time;
-:: html;
-:: hex;
-:: assoc;
-:: indent;
-:: format;
-:: list;
-:: math;
-:: bool;
-:: extra;
+:: std;
 def "load" load;
 def "use_lib" use;
-std;
-form
+:: extra;
+:: bool;
+:: math;
+:: list;
+:: format;
+:: indent;
+:: assoc;
+:: hex;
+:: html;
+:: time;
+:: date;
+:: run;
+:: read_csv;
+:: read_ssv;
+void
 )
 
 # Evaluate the user's script.
-value; std; use_file script_name
+value std; use_file script_name

@@ -224,9 +224,9 @@ static value check_pair(const value list)
 	if (p->T != type_null) return 0;
 
 	if (list->T == type_quo)
-		return quo(V(type_pair,hold(x1),hold(x2)));
+		return quo(pair(hold(x1),hold(x2)));
 	else if (list->R->T == type_quo)
-		return V(type_pair,hold(x1),quo(hold(x2)));
+		return pair(hold(x1),quo(hold(x2)));
 	else
 		return join(type_pair,hold(x1),hold(x2));
 	}

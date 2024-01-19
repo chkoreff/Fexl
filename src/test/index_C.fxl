@@ -1,9 +1,5 @@
 #
-value;
-std;
-(value; std; use "lib/index_C/context.fxl");
-;
-\;
+value (:: (value std; use "lib/index_C/context.fxl"); std) \;
 
 \try_pairs=
 	(\pairs

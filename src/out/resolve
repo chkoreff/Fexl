@@ -1,31 +1,30 @@
 \out=
 ~
 == test_0
-Evaluating the context.
 Evaluating the form.
 result void
 
-Evaluating the context.
 Evaluating the form.
+Evaluating the context.
 Hello
 result ok
 
-steps 221 bytes 2720
+steps 68 bytes 320
 == test_1
-Evaluating the context.
 Evaluating the form.
+Evaluating the context.
 I am Fred.
-steps 384 bytes 3008
+steps 95 bytes 736
 == test_2
-Evaluating the context.
 Evaluating the form.
+Evaluating the context.
 Hi
 57
 T
 HEY: Fred says a
 Wilma says b
 Goodbye
-steps 249 bytes 4224
+steps 145 bytes 1376
 ~
 \err=
 ~

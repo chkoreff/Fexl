@@ -11,6 +11,5 @@
 		)
 	)
 
-\form
 def "scope" scope;
-form
+void

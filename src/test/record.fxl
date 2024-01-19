@@ -169,7 +169,7 @@
 		empty
 		)
 
-	\f=(chain f1 f2)
+	\f=(:: f1 f2)
 
 	show_benchmark;
 	try_keys f

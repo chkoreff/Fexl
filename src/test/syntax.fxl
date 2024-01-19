@@ -1,8 +1,5 @@
 #
-value;
-std;
-(value; std; use "test.fxl");
-\;
+value (:: (value std; use "test.fxl"); std) \;
 
 \lparen="(" \rparen=")"
 \lbrace="{" \rbrace="]"
@@ -37,7 +34,7 @@ x
 
 run_fexl_text
 ~
-value; def "b" (say "b") \; a b
+value (def "b" (say "b"); void); \; a b
 a c
 c
 ~

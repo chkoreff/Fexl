@@ -89,7 +89,6 @@
 	combine_keys (\x\_ x) xs # Keep the first.
 	)
 
-\form
 def ":" get_key; # Handy synonym
 def "get_key" get_key;
 def "del_key" del_key;
@@ -102,4 +101,4 @@ def "sort_pairs" sort_pairs;
 def "put_default" put_default;
 def "name_columns" name_columns;
 def "make_assoc" make_assoc;
-form
+void

@@ -1,7 +1,9 @@
 #
-value;
-std;
+value
+(
 def "talk" (say "TALK");
+std
+)
 \;
 say "begin"
 talk

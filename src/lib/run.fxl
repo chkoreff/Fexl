@@ -76,7 +76,6 @@
 	if (eq option "start") start_server
 	)
 
-\form
 def "run_function" run_function;
 def "run_program" run_program;
 def "run_function_filter" run_function_filter;
@@ -84,4 +83,4 @@ def "run_filter" run_filter;
 def "grab_output" grab_output;
 def "stop_server" stop_server;
 def "run_server" run_server;
-form
+void

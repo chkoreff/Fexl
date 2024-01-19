@@ -441,21 +441,14 @@ try void
 (
 say "= import"
 # Evaluate with alternative names.
-\cx=
-	(
-	value;
-	def "def" def;
-	(value; std; use "test.fxl");
-	\;
-	\form
-	def "div" div;
-	def "test.show_hex" show_hex;
-	def "test.show_str" show_str;
-	form
-	)
-
-value;
-cx;
+\cx=(value std; use "test.fxl")
+value
+(
+with "div" (cx "div");
+with "test.show_hex" (cx "show_hex");
+with "test.show_str" (cx "show_str");
+void
+)
 \;
 div
 test.show_hex ""

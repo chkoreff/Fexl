@@ -6,6 +6,5 @@
 	say "]"
 	)
 
-\form
 def "say_list" say_list;
-form
+void
