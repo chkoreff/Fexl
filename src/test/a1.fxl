@@ -1472,5 +1472,18 @@ try "b"
 try "c"
 )
 
+(
+# Demonstrate holding onto a key directly when resolving a form.
+value
+(\key
+eq key "say" (yield say);
+eq key "message" (yield key);
+void
+)
+\;
+say message
+say message
+)
+
 \#
 Extra stuff not parsed.

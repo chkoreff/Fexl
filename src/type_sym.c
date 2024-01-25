@@ -231,8 +231,19 @@ static value resolve(value exp, value cx)
 			return (val->T == type_quo) ? hold(val) : hold(exp);
 		else
 			{
-			value val = eval(A(A(hold(cx),Qstr(str_copy(name))),hold(Qyield)));
+			value key = hold(Qstr(name));
+			value val = eval(A(A(hold(cx),key),hold(Qyield)));
 			value new = (val->L == Qyield) ? quo(hold(val->R)) : hold(exp);
+
+			if (key->N == 1)
+				recycle(key);
+			else
+				{
+				// Copy the string only if you held onto the key.
+				key->v_ptr = str_copy(name);
+				drop(key);
+				}
+
 			drop(val);
 			push_cache(exp,new);
 			return hold(new);

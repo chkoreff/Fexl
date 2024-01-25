@@ -1001,6 +1001,8 @@ a = 1
 got b
 b = 2
 c = void
+message
+message
 ~6
 \err=
 ~
