@@ -27,6 +27,12 @@
 # and they were just as excited as I was about it.  Such a strange bug, but
 # also I commend you for having the keen eye to catch something like this."
 
+# NOTE 20240229 I researched GNU coreutils and found this explanaton:
+# https://www.gnu.org/software/coreutils/faq/coreutils-faq.html#Sort-does-not-sort-in-normal-order_0021
+
+# The next line is the fix they give:
+export LC_ALL=C
+
 # Try ls by itself.
 ls -1 dir | diff - correct
 
