@@ -1,3 +1,13 @@
+#
+value
+(
+:: (load "hex.fxl");
+:: (load "format.fxl");
+:: (load "list.fxl");
+std
+)
+\;
+
 # Quote a character for embedding in HTML.
 \quote_ch=
 	(\ch

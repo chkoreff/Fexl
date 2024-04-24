@@ -1,4 +1,10 @@
 # Format data in a nested indented format.
+value
+(
+:: (load "format.fxl");
+std
+)
+\;
 
 # Return true if the item is a scalar.
 \is_scalar=

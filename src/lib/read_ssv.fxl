@@ -1,4 +1,11 @@
 # Parse the SSV (space-separated value) format.
+value
+(
+:: (load "read.fxl");
+std
+)
+\;
+
 \\get_plain_item=
 	(
 	collect_to

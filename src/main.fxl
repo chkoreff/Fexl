@@ -79,94 +79,24 @@ void
 # Enhance the standard context to load libraries on demand.
 \std=
 (
+# LATER 20240424 Use extend instead of defc.
+\extend=(\cx value (def "std" cx; cx))
+
 \dir_lib=(path_under dir_base "src/lib")
 \use=(\name use_file; path_under dir_lib name)
 
-\\bool=
-	(\=
-	value std;
-	use "bool.fxl"
-	)
+\v=var_new # Var for caching modules.
 
-\\math=
-	(\=
-	value std;
-	use "math.fxl"
-	)
-
-\\list=
-	(\=
-	value (:: bool; std);
-	use "list.fxl"
-	)
-
-\\format=
-	(\=
-	value (:: list; :: math; :: bool; :: extra; std);
-	use "format.fxl"
-	)
-
-\\indent=
-	(\=
-	value (:: format; :: extra; std);
-	use "indent.fxl"
-	)
-
-\\assoc=
-	(\=
-	value (:: list; std);
-	use "assoc.fxl"
-	)
-
-\\hex=
-	(\=
-	value (:: list; :: math; :: bool; std);
-	use "hex.fxl"
-	)
-
-\\html=
-	(\=
-	value (:: hex; :: format; :: list; :: extra; std);
-	use "html.fxl"
-	)
-
-\\time=
-	(\=
-	value (:: extra; std);
-	use "time.fxl"
-	)
-
-\\date=
-	(\=
-	value (:: list; :: math; std);
-	use "date.fxl"
-	)
-
-\\run=
-	(\=
-	value (:: list; :: bool; :: extra; std);
-	use "run.fxl"
-	)
-
-\\read=
-	(\=
-	value std;
-	use "read.fxl"
-	)
-
-\\read_csv=
-	(\=
-	value (:: read; :: extra; std);
-	use "read_csv.fxl"
-	)
-
-\\read_ssv=
-	(\=
-	value (:: read; :: extra; std);
-	use "read_ssv.fxl"
-	)
-
+# Load a Fexl module in src/lib.
 \load=
+	(@\\load\name
+	fetch v name;
+	extend (def "load" load; :: extra; std);
+	use name
+	)
+
+# Load a shared library in lib.
+\load_so=
 	(\module
 
 	\path=(path_under dir_base (. "lib/"; . module ".so"))
@@ -182,22 +112,22 @@ void
 
 defc "std";
 :: std;
-def "load" load;
+def "load" load_so; # LATER 20240424 Rename as "load_so".
 def "use_lib" use;
 :: extra;
-:: bool;
-:: math;
-:: list;
-:: format;
-:: indent;
-:: assoc;
-:: hex;
-:: html;
-:: time;
-:: date;
-:: run;
-:: read_csv;
-:: read_ssv;
+:: (load "bool.fxl");
+:: (load "math.fxl");
+:: (load "list.fxl");
+:: (load "format.fxl");
+:: (load "indent.fxl");
+:: (load "assoc.fxl");
+:: (load "hex.fxl");
+:: (load "html.fxl");
+:: (load "time.fxl");
+:: (load "date.fxl");
+:: (load "run.fxl");
+:: (load "read_csv.fxl");
+:: (load "read_ssv.fxl");
 void
 )
 
