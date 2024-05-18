@@ -1,12 +1,4 @@
 #
-value
-(
-:: (load "list.fxl");
-:: (load "math.fxl");
-std
-)
-\;
-
 \long_month_names=
 [
 "January"

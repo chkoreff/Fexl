@@ -1,12 +1,3 @@
-#
-value
-(
-:: (load "list.fxl");
-:: (load "bool.fxl");
-std
-)
-\;
-
 # Run a child function with the given input.  Collect the stdout as it runs,
 # and collect the stderr after it terminates.  Return the output, error, and
 # status.
