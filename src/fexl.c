@@ -14,8 +14,8 @@
 #include <type_file.h>
 #include <type_hex.h>
 #include <type_istr.h>
-#include <type_lib.h>
 #include <type_limit.h>
+#include <type_load.h>
 #include <type_math.h>
 #include <type_num.h>
 #include <type_output.h>
@@ -267,9 +267,7 @@ static value std(void)
 	if (match("receive_keystrokes")) return Q(type_receive_keystrokes);
 
 	// dynamic libraries
-	if (match("dlopen")) return Q(type_dlopen);
-	if (match("dlerror")) return Q0(type_dlerror);
-	if (match("dlsym")) return Q(type_dlsym);
+	if (match("load")) return Q(type_load);
 
 	return 0;
 	}

@@ -39,8 +39,8 @@ make type_file
 make type_hex
 make type_input
 make type_istr
-make type_lib
 make type_limit
+make type_load
 make type_math
 make type_num
 make type_output

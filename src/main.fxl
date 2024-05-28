@@ -166,24 +166,8 @@ void
 	use "read_ssv.fxl"
 	)
 
-# Load a shared library in lib.
-\load_so=
-	(\module
-
-	\path=(path_under dir_base (. "lib/"; . module ".so"))
-	\lib=(dlopen path)
-	is_void lib (error dlerror);
-
-	\sym=(. "type_cx_" module)
-	\entry=(dlsym lib sym)
-	is_void entry (error ["Could not find symbol "sym]);
-
-	entry ()
-	)
-
 defc "std";
 :: std;
-def "load" load_so; # LATER 20240424 Rename as "load_so".
 def "use_lib" use;
 :: extra;
 :: bool;

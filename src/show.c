@@ -137,7 +137,7 @@ static value define(void)
 	return 0;
 	}
 
-value type_cx_show(value f)
+value type_context(value f)
 	{
 	return op_context(f,define);
 	}

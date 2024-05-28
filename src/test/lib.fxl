@@ -1,5 +1,5 @@
 # Test dynamic libraries.
-value (:: (load "show"); std) \;
+value (:: (load "../lib/show.so"); std) \;
 
 show ()
 show ["a" "b"]
