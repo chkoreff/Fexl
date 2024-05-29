@@ -1,5 +1,5 @@
 #
-value (:: (value std; use "test.fxl"); std) \;
+\env env "test_20240529" \;
 
 show_benchmark;
 

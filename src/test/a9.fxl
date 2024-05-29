@@ -1,4 +1,5 @@
 #
+\env env "std_20240529" \;
 \\test_1=
 (
 say "== test_1" # says PING 1 time

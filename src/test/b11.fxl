@@ -1,4 +1,5 @@
 #
+\env env "test_20240529" \;
 show_benchmark;
 (
 \try=
@@ -90,7 +91,7 @@ nl
 )
 (
 say "= test file_bytes"
-\source=(path_under dir_base "src/test/hello.fxl")
+\source=(path_under dir_local "hello.fxl")
 \fh=(fopen source "r")
 \bytes=(file_bytes fh)
 say (as_str bytes)
@@ -441,12 +442,11 @@ try void
 (
 say "= import"
 # Evaluate with alternative names.
-\cx=(value std; use "test.fxl")
 value
 (
-with "div" (cx "div");
-with "test.show_hex" (cx "show_hex");
-with "test.show_str" (cx "show_str");
+def "div" div;
+def "test.show_hex" show_hex;
+def "test.show_str" show_str;
 void
 )
 \;

@@ -1,5 +1,5 @@
 #
-value (:: (value std; use "test.fxl"); std) \;
+\env env "test_20240529" \;
 
 \show_result=
 	(
@@ -95,6 +95,7 @@ run_test "test_run_program";
 
 try
 ~
+\env env "std_20240529" \;
 say "hello"
 \x=(value std; parse stdin "")
 say ["x = "(as_str x)]
@@ -108,6 +109,7 @@ error "oops"
 
 try
 ~
+\env env "std_20240529" \;
 say "BEG"
 trace "complain"
 say "END"

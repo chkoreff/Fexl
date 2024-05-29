@@ -1,4 +1,5 @@
 # Testing with a version that prints "get " when it reads a char.
+\env env "std_20240529" \;
 \fgetc=
 	(\fh
 	put "get "

@@ -1,4 +1,6 @@
-# Run the user's script given by argv[1] in the enhanced standard context.
+#
+\env env "core_20240529" \;
+# Define the enhanced standard context.
 
 # (check x d) = x if x is good, otherwise d.
 \check=(\x is_defined x x)
@@ -8,7 +10,6 @@
 \path_under=(\dir\name . (. dir "/") name)
 
 # Establish paths based on command arguments.
-\dir_base=(dirname; dirname; argv 0)
 \script_name=(default ""; argv 1)
 
 \trace=(fsay stderr)
@@ -59,7 +60,6 @@ def "check" check;
 def "default" default;
 
 def "path_under" path_under;
-def "dir_base" dir_base;
 def "dir_local" dir_local;
 
 def "trace" trace;
@@ -76,9 +76,14 @@ def "show_benchmark" show_benchmark;
 void
 )
 
+# TODO instead of load_base I'll use env tags
+\load_base=
+	(
+	\dir=(path_under dir_base "lib")
+	\name load (path_under dir name)
+	)
+
 # Enhance the standard context to load libraries on demand.
-\std=
-(
 \dir_lib=(path_under dir_base "src/lib")
 \use=(\name use_file; path_under dir_lib name)
 
@@ -168,7 +173,7 @@ void
 
 defc "std";
 :: std;
-def "use_lib" use;
+def "load_base" load_base;
 :: extra;
 :: bool;
 :: math;
@@ -184,7 +189,3 @@ def "use_lib" use;
 :: read_csv;
 :: read_ssv;
 void
-)
-
-# Evaluate the user's script.
-value std; use_file script_name

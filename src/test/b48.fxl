@@ -1,4 +1,5 @@
 #
+\env env "std_20240529" \;
 \\test_add_sub_mul=
 (
 say "= test_add_sub_mul"

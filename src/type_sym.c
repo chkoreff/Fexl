@@ -161,7 +161,7 @@ value type_is_closed(value f)
 	return f;
 	}
 
-static const char *cur_name;
+const char *cur_name;
 
 int match(const char *other)
 	{

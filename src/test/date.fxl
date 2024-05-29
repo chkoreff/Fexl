@@ -1,4 +1,5 @@
 #
+\env env "std_20240529" \;
 \\test_count_days=
 	(
 	\try=

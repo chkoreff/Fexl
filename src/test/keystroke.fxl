@@ -1,3 +1,4 @@
+\env env "core_20240529" \;
 # Echo the characters from the input.
 \echo=
 	(\\get @\\loop

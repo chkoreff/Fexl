@@ -1,5 +1,5 @@
 #
-value (:: (value std; use "test.fxl"); std) \;
+\env env "test_20240529" \;
 
 \lparen="(" \rparen=")"
 \lbrace="{" \rbrace="]"
@@ -25,7 +25,7 @@ run_fexl_text ["(ab cd e)" NL rparen]
 
 run_fexl_text
 ~
-say (+ 4 6)
+\env env "core_20240529" \; say (+ 4 6)
 ( a b c ) ( b c d )
 ( a b c ) ( b c d )
 put (- 12 7.2) nl
@@ -34,9 +34,16 @@ x
 
 run_fexl_text
 ~
-value (def "b" (say "b"); void); \; a b
+\env env "core_20240529" \; value (def "b" (say "b"); void); \; a b
 a c
 c
 ~
 
-run_fexl_text ~ use_file "missing.fxl" ~
+# Undefined context
+run_fexl_text
+~
+\env env "stuff" \;
+~
+
+# Missing file
+run_fexl_text ~ \env env "core_20240529" \; use_file "missing.fxl" ~

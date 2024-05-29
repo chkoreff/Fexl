@@ -1,4 +1,5 @@
 # This client connects to the server created by test/server.fxl.
+\env env "std_20240529" \;
 
 # (inc_ch ch) Increments the character by calling the server.
 \inc_ch=

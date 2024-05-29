@@ -1,4 +1,5 @@
 # Test stream operations.
+\env env "std_20240529" \;
 
 \\test_1=
 (

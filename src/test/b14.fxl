@@ -1,5 +1,6 @@
 # NOTE If you fopen with "a+", you cannot seek, and output is always at end of
 # file.
+\env env "std_20240529" \;
 
 \show_base_dir=
 	(\path

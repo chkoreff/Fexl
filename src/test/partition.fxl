@@ -1,4 +1,5 @@
 # This demo was inspired by the Mathologer on Youtube.
+\env env "std_20240529" \;
 
 \use_bn=T # Use big numbers if true.
 

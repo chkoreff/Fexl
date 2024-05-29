@@ -1,5 +1,5 @@
 #
-value (:: (value std; use "test.fxl"); std) \;
+\env env "test_20240529" \;
 
 \show=
 	(\x
@@ -1342,7 +1342,7 @@ put "d = " put (as_str d) nl
 
 # Test op_argv.
 (
-value (:: (load "../lib/test.so"); std) \;
+value (:: (load_base "test.so"); std) \;
 
 test_argv []
 test_argv ["a" "b"]

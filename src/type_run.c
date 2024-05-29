@@ -4,6 +4,7 @@
 #include <arpa/inet.h> // inet_addr
 #include <basic.h>
 #include <die.h>
+#include <fexl.h>
 #include <memory.h>
 #include <netinet/in.h> // IPPROTO_TCP INADDR_ANY (BSD)
 #include <signal.h> // kill (BSD) pid_t
@@ -17,9 +18,6 @@
 #include <type_run.h>
 #include <type_str.h>
 #include <unistd.h> // exec fork sleep
-
-int main_argc;
-const char **main_argv;
 
 value type_die(value f)
 	{

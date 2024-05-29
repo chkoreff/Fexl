@@ -1,4 +1,5 @@
 #
+\env env "std_20240529" \;
 say "=== Test new rules for numeric constants"
 
 \try=

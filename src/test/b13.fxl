@@ -1,4 +1,5 @@
 #
+\env env "test_20240529" \;
 \test_context=
 (\cx
 
@@ -35,7 +36,7 @@ try "x"
 )
 
 say "== test_full"
-test_context (:: (value std; use "test.fxl"); std)
+test_context std
 
 say "== test_restricted"
 test_context

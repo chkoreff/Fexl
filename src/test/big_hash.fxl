@@ -1,5 +1,5 @@
 #
-value (:: (value std; use "test.fxl"); std) \;
+\env env "test_20240529" \;
 
 # Reference: https://www.di-mgt.com.au/sha_testvectors.html
 # Test the extremely-long message.

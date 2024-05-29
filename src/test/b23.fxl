@@ -1,5 +1,6 @@
 # Ensure automatic loading of libraries.  Each of these lines loads the next
 # library file in the standard search order.
+\env env "std_20240529" \;
 \_
 say + - # core
 use if # extra

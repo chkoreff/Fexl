@@ -164,6 +164,14 @@ Undefined symbol c on line 3
 ~
 \err=
 ~
+Undefined context "stuff"
+~
+\status=1
+\out=
+~
+~
+\err=
+~
 Could not open source file missing.fxl
 ~
 \status=1

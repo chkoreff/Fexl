@@ -1,5 +1,6 @@
 # This server reads a single character, increments it, and sends that back to
 # the client.  You can connect to this using test/client.fxl.
+\env env "std_20240529" \;
 
 run_server (argv 2) "127.0.0.1" 2186 "test/error_log"
 	(@\\loop

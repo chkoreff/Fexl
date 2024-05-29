@@ -1,4 +1,5 @@
 # Infinite list of null strings.
+\env env "std_20240529" \;
 \\list=(@; cons "")
 \\list=(first 100000 list)
 

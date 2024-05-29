@@ -1,4 +1,5 @@
 # Test reading CSV and SSV data.
+\env env "std_20240529" \;
 
 \try_read=
 	(\read\in

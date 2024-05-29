@@ -1,4 +1,5 @@
 # Demonstrate built-in "with".
+\env env "std_20240529" \;
 
 # Convert a value to a string with no indentation.
 \val_str=

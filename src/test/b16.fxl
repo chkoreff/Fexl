@@ -1,4 +1,5 @@
 # Test run_filter.
+\env env "std_20240529" \;
 
 \\get_date=(trim_end_spaces; run_filter ["/bin/date"] "")
 

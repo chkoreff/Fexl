@@ -10,6 +10,7 @@ extern value Qform(value label, value exp);
 extern value type_D(value f);
 extern value type_E(value f);
 extern value type_is_closed(value f);
+extern const char *cur_name;
 extern int match(const char *other);
 extern value op_context(value f, value define(void));
 extern value type_resolve(value f);

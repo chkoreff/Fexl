@@ -1,4 +1,5 @@
 # Test the defc function.
+\env env "std_20240529" \;
 
 \\test_0=
 (

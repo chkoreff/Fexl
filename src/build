@@ -16,6 +16,7 @@ make bn
 make buf
 make buf_str
 make convert
+make core_20240529
 make crypto
 make die
 make fexl
@@ -58,4 +59,3 @@ make type_var
 make type_with
 make value
 link fexl
-ln -fs ../bin/fexl ../bin/fexl0

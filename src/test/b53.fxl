@@ -1,5 +1,5 @@
 #
-value (:: (value std; use "test.fxl"); std) \;
+\env env "test_20240529" \;
 
 \run_case=
 	(\label\text
@@ -9,6 +9,7 @@ value (:: (value std; use "test.fxl"); std) \;
 (
 run_case "test_1"
 ~
+\env env "std_20240529" \;
 value
 (
 defc "std";
@@ -35,9 +36,9 @@ fred fred
 (
 run_case "test_2"
 ~
+\env env "std_20240529" \;
 value
 (
-#def "say" say;
 def "put" put;
 def "nl" nl;
 #def "fred" (say "I am Fred.");
@@ -62,6 +63,7 @@ fred fred
 # evaluate the context.
 run_case "test_3"
 ~
+\env env "std_20240529" \;
 value
 (
 say "HEY" # not printed
