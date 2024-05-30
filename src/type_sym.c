@@ -7,7 +7,6 @@
 #include <string.h> // strcmp
 #include <type_str.h>
 #include <type_sym.h>
-#include <type_with.h>
 
 value type_quo(value f)
 	{
