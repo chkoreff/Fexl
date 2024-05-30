@@ -172,6 +172,14 @@ Undefined context "stuff"
 ~
 \err=
 ~
+Undefined context "stuff"
+~
+\status=1
+\out=
+~
+~
+\err=
+~
 Could not open source file missing.fxl
 ~
 \status=1

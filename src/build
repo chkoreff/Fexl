@@ -1,61 +1,136 @@
 #!/bin/sh
 . ./lib_build
 
+# Make objects.
+#[
+make_o crypto
+make_o base64
+make_o basic
+make_o bn
+make_o buf
+make_o buf_str
+make_o convert
+make_p core_20240529
+make_o die
+make_o fexl
+make_o file
+make_o file_str
+make_o format
+make_p limit
+make_o memory
+make_o nacl
+make_o parse
+make_o report
+make_o sha256
+make_o sha512
+make_p show
+make_o str
+make_o stream
+make_p test
+make_o type_bn
+make_p type_buf
+make_p type_cmp
+make_o type_crypto
+make_o type_file
+make_p type_hex
+make_o type_input
+make_o type_istr
+make_p type_limit
+make_p type_math
+make_o type_num
+make_o type_output
+make_o type_parse
+make_p type_rand
+make_o type_record
+make_p type_run
+make_o type_signal
+make_o type_str
+make_p type_stream
+make_o type_sym
+make_p type_time
+make_o type_tuple
+make_p type_var
+make_p type_with
+make_o value
+#]
+
+objects=""
+
 # Build test.so
-make_PIC test
-make_lib test
+#[
+push_o test
+make_so test
+#]
+
+# Build core_20240529.so
+#[
+push_o limit
+push_o type_buf
+push_o type_cmp
+push_o type_hex
+push_o type_limit
+push_o type_math
+push_o type_rand
+push_o type_run
+push_o type_stream
+push_o type_time
+push_o type_var
+push_o type_with
+push_o core_20240529
+# system lib math
+push_l m
+make_so core_20240529
+#]
 
 # Build show.so
-make_PIC show
-make_lib show
+#[
+push_o show
+push_so core_20240529
+make_so show
+#]
 
 # Build fexl.
-make base64
-make basic
-make bn
-make buf
-make buf_str
-make convert
-make core_20240529
-make crypto
-make die
-make fexl
-make file
-make file_str
-make format
-make limit
-make memory
-make nacl
-make parse
-make report
-make sha256
-make sha512
-make str
-make stream
-make type_bn
-make type_buf
-make type_cmp
-make type_crypto
-make type_file
-make type_hex
-make type_input
-make type_istr
-make type_limit
-make type_load
-make type_math
-make type_num
-make type_output
-make type_parse
-make type_rand
-make type_record
-make type_run
-make type_signal
-make type_stream
-make type_str
-make type_sym
-make type_time
-make type_tuple
-make type_var
-make type_with
-make value
+#[
+push_o crypto
+push_o base64
+push_o basic
+push_o bn
+push_o buf
+push_o buf_str
+push_o convert
+push_o die
+push_o fexl
+push_o file
+push_o file_str
+push_o format
+push_o memory
+push_o nacl
+push_o parse
+push_o report
+push_o sha256
+push_o sha512
+push_o str
+push_o stream
+push_o type_bn
+push_o type_crypto
+push_o type_file
+push_o type_input
+push_o type_istr
+push_o type_num
+push_o type_output
+push_o type_parse
+push_o type_record
+push_o type_signal
+push_o type_str
+push_o type_sym
+push_o type_tuple
+push_o value
+# system lib dynamic library
+push_l dl
+
+# Used in development to call show.
+#push_so show
+#push_so core_20240529
+
 link fexl
+#]

@@ -4,7 +4,6 @@
 
 #include <basic.h>
 #include <buf.h>
-#include <core_20240529.h>
 #include <crypto.h>
 #include <fexl.h>
 #include <stdio.h>
@@ -17,7 +16,6 @@
 #include <type_hex.h>
 #include <type_istr.h>
 #include <type_limit.h>
-#include <type_load.h>
 #include <type_math.h>
 #include <type_num.h>
 #include <type_output.h>
@@ -34,10 +32,12 @@
 #include <type_var.h>
 #include <type_with.h>
 
+value type_cx_core_20240529(value f);
+
 // Resolve std names.
 static value def_std(void)
 	{
-	if (match("std")) return Q(type_core_20240529);
+	if (match("std")) return Q(type_cx_core_20240529);
 
 	if (match("put")) return hold(Qput);
 	if (match("nl")) return hold(Qnl);
@@ -273,25 +273,7 @@ static value def_std(void)
 	return 0;
 	}
 
-void beg_core_20240529(void)
-	{
-	beg_file();
-	beg_output();
-	beg_tuple();
-	beg_record();
-	init_signal();
-	}
-
-void end_core_20240529(void)
-	{
-	end_file();
-	end_output();
-	end_tuple();
-	end_record();
-	close_random();
-	}
-
-value type_core_20240529(value f)
+value type_cx_core_20240529(value f)
 	{
 	return op_context(f,def_std);
 	}

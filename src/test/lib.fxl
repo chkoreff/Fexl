@@ -1,6 +1,6 @@
 # Test dynamic libraries.
 \env env "std_20240529" \;
-value (:: (load "../lib/show.so"); std) \;
+value (:: (load "show"); std) \;
 show ()
 show ["a" "b"]
 show {"a" "b"}

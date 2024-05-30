@@ -76,14 +76,7 @@ def "show_benchmark" show_benchmark;
 void
 )
 
-# TODO instead of load_base I'll use env tags
-\load_base=
-	(
-	\dir=(path_under dir_base "lib")
-	\name load (path_under dir name)
-	)
-
-# Enhance the standard context to load libraries on demand.
+# Enhance the standard context to use libraries on demand.
 \dir_lib=(path_under dir_base "src/lib")
 \use=(\name use_file; path_under dir_lib name)
 
@@ -173,7 +166,6 @@ void
 
 defc "std";
 :: std;
-def "load_base" load_base;
 :: extra;
 :: bool;
 :: math;

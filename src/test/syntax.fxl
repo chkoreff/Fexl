@@ -45,5 +45,12 @@ run_fexl_text
 \env env "stuff" \;
 ~
 
+# Undefined context
+run_fexl_text
+~
+\env env "core_20240529" \;
+\cx=(load "stuff")
+~
+
 # Missing file
 run_fexl_text ~ \env env "core_20240529" \; use_file "missing.fxl" ~
