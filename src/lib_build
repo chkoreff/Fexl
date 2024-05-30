@@ -91,29 +91,47 @@ compile()
 	fi
 	}
 
-make()
+# Make a normal object file.
+make_o()
 	{
 	local name="$1"
 	compile $name ""
 	}
 
-make_PIC()
+# Make a position independent object file for use in shared libraries.
+make_p()
 	{
 	local name="$1"
 	compile $name "-fPIC"
 	}
 
-# Include a name in the list of objects to be linked.
-need()
+# Push a .o file.
+push_o()
 	{
 	local name="$1"
-	local file_o=../obj/$name.o
-	objects="$objects $file_o"
+	local path=../obj/$name.o
+	objects="$objects $path"
+	}
+
+# Push a .so file.
+push_so()
+	{
+	local name="$1"
+	local path=../lib/$name.so
+	objects="$objects $path"
+	}
+
+# Push a system library, e.g. "-lm".
+push_l()
+	{
+	local name="$1"
+	local path=-l$name
+	objects="$objects $path"
 	}
 
 # Make a library.  I use -fPIC (Position Independent Code) so the object can
 # be linked into a shared library.
-make_lib()
+make_so()
 	{
 	local name="$1"
 	local file_so=../lib/$name.so
@@ -129,14 +147,14 @@ make_lib()
 	}
 
 # Link the object files if any is newer than the executable file.
-link()
+make_e()
 	{
 	local name="$1"
 	local file_e=../bin/$name
 	stale $file_e $objects
 	if [ $? -eq 1 ]; then
 		mkdir -p $(dirname $file_e)
-		run gcc -rdynamic -s $objects -o $file_e -lm -ldl
+		run gcc -rdynamic -s $objects -o $file_e
 	fi
 	objects=""
 	}
