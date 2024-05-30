@@ -1,7 +1,40 @@
 #!/bin/sh
 . ./lib_build
 
-# Make objects.
+# Build test.so
+#[
+make_p test
+make_so test
+#]
+
+# Build core_20240529.so
+#[
+make_p limit
+make_p type_buf
+make_p type_cmp
+make_p type_hex
+make_p type_limit
+make_p type_math
+make_p type_rand
+make_p type_run
+make_p type_stream
+make_p type_time
+make_p type_var
+make_p type_with
+make_p core_20240529
+# system lib math
+push_l m
+make_so core_20240529
+#]
+
+# Build show.so
+#[
+make_p show
+push_so core_20240529
+make_so show
+#]
+
+# Build fexl.
 #[
 make_o crypto
 make_o base64
@@ -10,121 +43,33 @@ make_o bn
 make_o buf
 make_o buf_str
 make_o convert
-make_p core_20240529
 make_o die
 make_o fexl
 make_o file
 make_o file_str
 make_o format
-make_p limit
 make_o memory
 make_o nacl
 make_o parse
 make_o report
 make_o sha256
 make_o sha512
-make_p show
 make_o str
 make_o stream
-make_p test
 make_o type_bn
-make_p type_buf
-make_p type_cmp
 make_o type_crypto
 make_o type_file
-make_p type_hex
 make_o type_input
 make_o type_istr
-make_p type_limit
-make_p type_math
 make_o type_num
 make_o type_output
 make_o type_parse
-make_p type_rand
 make_o type_record
-make_p type_run
 make_o type_signal
 make_o type_str
-make_p type_stream
 make_o type_sym
-make_p type_time
 make_o type_tuple
-make_p type_var
-make_p type_with
 make_o value
-#]
-
-objects=""
-
-# Build test.so
-#[
-push_o test
-make_so test
-#]
-
-# Build core_20240529.so
-#[
-push_o limit
-push_o type_buf
-push_o type_cmp
-push_o type_hex
-push_o type_limit
-push_o type_math
-push_o type_rand
-push_o type_run
-push_o type_stream
-push_o type_time
-push_o type_var
-push_o type_with
-push_o core_20240529
-# system lib math
-push_l m
-make_so core_20240529
-#]
-
-# Build show.so
-#[
-push_o show
-push_so core_20240529
-make_so show
-#]
-
-# Build fexl.
-#[
-push_o crypto
-push_o base64
-push_o basic
-push_o bn
-push_o buf
-push_o buf_str
-push_o convert
-push_o die
-push_o fexl
-push_o file
-push_o file_str
-push_o format
-push_o memory
-push_o nacl
-push_o parse
-push_o report
-push_o sha256
-push_o sha512
-push_o str
-push_o stream
-push_o type_bn
-push_o type_crypto
-push_o type_file
-push_o type_input
-push_o type_istr
-push_o type_num
-push_o type_output
-push_o type_parse
-push_o type_record
-push_o type_signal
-push_o type_str
-push_o type_sym
-push_o type_tuple
-push_o value
 # system lib dynamic library
 push_l dl
 

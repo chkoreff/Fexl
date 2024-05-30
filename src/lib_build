@@ -38,6 +38,12 @@ get_headers()
 	)
 	}
 
+# Push an object.
+push()
+	{
+	objects="$objects $1"
+	}
+
 # Compile a source file if it's newer than the object file.
 #
 # I compile with -O3 because that enables -finline-functions.  You can see
@@ -52,7 +58,7 @@ compile()
 	local options="$2"
 
 	local file_o=../obj/$name.o
-	objects="$objects $file_o"
+	push $file_o
 
 	local file_c=$name.c
 	local file_o=../obj/$name.o
@@ -105,28 +111,16 @@ make_p()
 	compile $name "-fPIC"
 	}
 
-# Push a .o file.
-push_o()
-	{
-	local name="$1"
-	local path=../obj/$name.o
-	objects="$objects $path"
-	}
-
 # Push a .so file.
 push_so()
 	{
-	local name="$1"
-	local path=../lib/$name.so
-	objects="$objects $path"
+	push ../lib/$1.so
 	}
 
 # Push a system library, e.g. "-lm".
 push_l()
 	{
-	local name="$1"
-	local path=-l$name
-	objects="$objects $path"
+	push -l$1
 	}
 
 # Make a library.  I use -fPIC (Position Independent Code) so the object can
