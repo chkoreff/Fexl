@@ -147,7 +147,7 @@ make_so()
 	}
 
 # Link the object files if any is newer than the executable file.
-link()
+make_e()
 	{
 	local name="$1"
 	local file_e=../bin/$name

@@ -132,5 +132,5 @@ push_l dl
 #push_so show
 #push_so core_20240529
 
-link fexl
+make_e fexl
 #]
