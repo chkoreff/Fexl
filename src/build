@@ -36,13 +36,13 @@ make_so show
 
 # Build fexl.
 #[
-make_o crypto
 make_o base64
 make_o basic
 make_o bn
 make_o buf
 make_o buf_str
 make_o convert
+make_o crypto
 make_o die
 make_o fexl
 make_o file
