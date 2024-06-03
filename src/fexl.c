@@ -47,14 +47,14 @@ static value read_env(const char *name)
 	return read_path(path);
 	}
 
-static value read_lib(const char *s_path, const char *sym_name)
+static value read_lib(const char *s_path)
 	{
 	value cx;
 	void *lib = dlopen(s_path,RTLD_NOW|RTLD_NODELETE);
 	if (lib == 0)
 		die(dlerror());
 	{
-	type t = dlsym(lib,sym_name);
+	type t = dlsym(lib,"type_context");
 	if (t == 0)
 		die(dlerror());
 	cx = Q(t);
@@ -63,12 +63,12 @@ static value read_lib(const char *s_path, const char *sym_name)
 	}
 	}
 
-static value read_base_lib(const char *lib_name, const char *sym_name)
+static value read_base_lib(const char *lib_name)
 	{
 	value dir_lib = eval(concat(hold(Qdir_base),Qstr0("/lib/")));
 	value path = eval(concat(dir_lib,Qstr0(lib_name)));
 	const char *s_path = str_data(path);
-	value cx = read_lib(s_path,sym_name);
+	value cx = read_lib(s_path);
 	drop(path);
 	return cx;
 	}
@@ -85,9 +85,8 @@ static value read_context(value name)
 	cur_name = str_data(name);
 
 	// core_20240529 = core C routines
-
 	if (match("core_20240529"))
-		return read_base_lib("core_20240529.so","type_cx_core_20240529");
+		return read_base_lib("core_20240529.so");
 
 	// std_20240529 = core_20240529 + lib extensions
 	if (match("std_20240529"))
@@ -117,11 +116,11 @@ static value load_context(value name)
 	cur_name = str_data(name);
 
 	if (match("show"))
-		return read_base_lib("show.so","type_cx_show");
+		return read_base_lib("show.so");
 	if (match("test"))
-		return read_base_lib("test.so","type_cx_test");
+		return read_base_lib("test.so");
 	if (match("core_20240529"))
-		return read_base_lib("core_20240529.so","type_cx_core_20240529");
+		return read_base_lib("core_20240529.so");
 
 	undefined_context();
 	return 0;

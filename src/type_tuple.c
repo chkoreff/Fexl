@@ -1,4 +1,3 @@
-#include <str.h>
 #include <value.h>
 
 #include <basic.h>

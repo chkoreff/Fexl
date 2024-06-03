@@ -32,12 +32,12 @@
 #include <type_var.h>
 #include <type_with.h>
 
-value type_cx_core_20240529(value f);
+value type_context(value f);
 
 // Resolve std names.
 static value def_std(void)
 	{
-	if (match("std")) return Q(type_cx_core_20240529);
+	if (match("std")) return Q(type_context);
 
 	if (match("put")) return hold(Qput);
 	if (match("nl")) return hold(Qnl);
@@ -273,7 +273,7 @@ static value def_std(void)
 	return 0;
 	}
 
-value type_cx_core_20240529(value f)
+value type_context(value f)
 	{
 	return op_context(f,def_std);
 	}

@@ -32,7 +32,7 @@ static value define(void)
 	return 0;
 	}
 
-value type_cx_test(value f)
+value type_context(value f)
 	{
 	return op_context(f,define);
 	}
