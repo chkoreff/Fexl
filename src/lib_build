@@ -38,6 +38,12 @@ get_headers()
 	)
 	}
 
+# Push a name onto the list of objects.
+push()
+	{
+	objects="$objects $1"
+	}
+
 # Compile a source file if it's newer than the object file.
 #
 # I compile with -O3 because that enables -finline-functions.  You can see
@@ -52,7 +58,7 @@ compile()
 	local options="$2"
 
 	local file_o=../obj/$name.o
-	objects="$objects $file_o"
+	push $file_o
 
 	local file_c=$name.c
 	local file_o=../obj/$name.o
@@ -92,69 +98,21 @@ compile()
 	}
 
 # Make a normal object file.
-make_o()
+make()
 	{
 	local name="$1"
 	compile $name ""
 	}
 
-# Make a position independent object file for use in shared libraries.
-make_p()
-	{
-	local name="$1"
-	compile $name "-fPIC"
-	}
-
-# Push a .o file.
-push_o()
-	{
-	local name="$1"
-	local path=../obj/$name.o
-	objects="$objects $path"
-	}
-
-# Push a .so file.
-push_so()
-	{
-	local name="$1"
-	local path=../lib/$name.so
-	objects="$objects $path"
-	}
-
-# Push a system library, e.g. "-lm".
-push_l()
-	{
-	local name="$1"
-	local path=-l$name
-	objects="$objects $path"
-	}
-
-# Make a library.  I use -fPIC (Position Independent Code) so the object can
-# be linked into a shared library.
-make_so()
-	{
-	local name="$1"
-	local file_so=../lib/$name.so
-
-	stale $file_so $objects
-	local update=$?
-
-	if [ $update -eq 1 ]; then
-		mkdir -p $(dirname $file_so)
-		run gcc -s -shared $objects -o $file_so
-	fi
-	objects=""
-	}
-
 # Link the object files if any is newer than the executable file.
-make_e()
+link()
 	{
 	local name="$1"
 	local file_e=../bin/$name
 	stale $file_e $objects
 	if [ $? -eq 1 ]; then
 		mkdir -p $(dirname $file_e)
-		run gcc -rdynamic -s $objects -o $file_e
+		run gcc -s $objects -o $file_e
 	fi
 	objects=""
 	}
@@ -162,7 +120,6 @@ make_e()
 erase()
 	{
 	rm -rf ../obj
-	rm -rf ../lib
 	rm -rf ../bin
 	}
 

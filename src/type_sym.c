@@ -160,30 +160,6 @@ value type_is_closed(value f)
 	return f;
 	}
 
-static const char *cur_name;
-
-int match(const char *other)
-	{
-	return strcmp(cur_name,other) == 0;
-	}
-
-// Use a C define function as a Fexl context function.
-value op_context(value f, value define(void))
-	{
-	value x = arg(f->R);
-	if (x->T == type_str)
-		{
-		value val;
-		cur_name = str_data(x);
-		val = define();
-		f = val ? yield(val) : hold(Qvoid);
-		}
-	else
-		f = hold(Qvoid);
-	drop(x);
-	return f;
-	}
-
 static value cache;
 
 static value find_cache(string name)

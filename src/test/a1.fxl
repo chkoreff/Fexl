@@ -1340,36 +1340,6 @@ put "c = " put (as_str c) nl
 put "d = " put (as_str d) nl
 )
 
-# Test op_argv.
-(
-value (:: (load "../lib/test.so"); std) \;
-
-test_argv []
-test_argv ["a" "b"]
-
-# Test old problem with inline list expansion.
-test_argv ["a"; () []]
-# Test evaluate list.
-test_argv (append ["a"] ["b" "c"])
-# Test malformed list tail.
-test_argv ["a"; 3]
-
-# This includes a non-string which clips the list.
-test_argv
-[
-(I "a") "b"
-;
-append ["c" "d"];
-append (map (. "x") ["e" "f"]);
-["g"
-	(I "h")
-	3  # This non-string clips the list.
-	(say "NO" "i")  # Not evaluated
-	"j"
-	]
-]
-)
-
 (
 say "= test_compare"
 \try=

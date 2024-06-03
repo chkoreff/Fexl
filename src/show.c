@@ -123,20 +123,3 @@ void show(const char *name, value f)
 	{
 	put(name);show_exp(f);nl();
 	}
-
-static value type_show(value f)
-	{
-	show_exp(f->R);nl();
-	return hold(QI);
-	}
-
-static value define(void)
-	{
-	if (match("show")) return Q(type_show);
-	return 0;
-	}
-
-value type_context(value f)
-	{
-	return op_context(f,define);
-	}

@@ -930,39 +930,6 @@ a = "a"
 b = "b"
 c = "c"
 d = "d"
-= test_argv
-[
-]
-= test_argv
-[
-0 : a
-1 : b
-]
-= test_argv
-[
-0 : a
-]
-= test_argv
-[
-0 : a
-1 : b
-2 : c
-]
-= test_argv
-[
-0 : a
-]
-= test_argv
-[
-0 : a
-1 : b
-2 : c
-3 : d
-4 : xe
-5 : xf
-6 : g
-7 : h
-]
 = test_compare
 eq 0 0
 lt 2 3

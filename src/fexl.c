@@ -15,7 +15,6 @@
 #include <type_hex.h>
 #include <type_istr.h>
 #include <type_limit.h>
-#include <type_load.h>
 #include <type_math.h>
 #include <type_num.h>
 #include <type_output.h>
@@ -32,13 +31,16 @@
 #include <type_var.h>
 #include <type_with.h>
 
-static value type_std(value f);
+static const char *cur_name;
 
-// Resolve std names.
-static value std(void)
+static int match(const char *other)
 	{
-	if (match("std")) return Q(type_std);
+	return strcmp(cur_name,other) == 0;
+	}
 
+// Resolve core names.
+static value def_core(void)
+	{
 	if (match("put")) return hold(Qput);
 	if (match("nl")) return hold(Qnl);
 	if (match("say")) return Q(type_say);
@@ -266,15 +268,23 @@ static value std(void)
 	if (match("connect")) return Q(type_connect);
 	if (match("receive_keystrokes")) return Q(type_receive_keystrokes);
 
-	// dynamic libraries
-	if (match("load")) return Q(type_load);
-
 	return 0;
 	}
 
-static value type_std(value f)
+static value type_cx_core(value f)
 	{
-	return op_context(f,std);
+	value x = arg(f->R);
+	if (x->T == type_str)
+		{
+		value val;
+		cur_name = str_data(x);
+		val = def_core();
+		f = val ? yield(val) : hold(Qvoid);
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
 	}
 
 static void beg_const(void)
@@ -297,62 +307,53 @@ static void end_const(void)
 	close_random();
 	}
 
+static value read_value(value cx, value name)
+	{
+	return A(A(Q(type_value),cx),A(Q(type_use_file),name));
+	}
+
+static value extend(value cx)
+	{
+	return A(A(A(Q(type_def),Qstr0("std")),hold(cx)),cx);
+	}
+
+// Return a path name relative to the base directory.
+static value get_base_name(const char *name_s)
+	{
+	// Get the name of the currently running executable.
+	value f = Qstr0(main_argv[0]);
+	// Go two directories up, right above the bin directory.
+	f = A(Q(type_dirname),f);
+	f = A(Q(type_dirname),f);
+	// Concatenate the name of the main script.
+	f = A(A(Q(type_concat),f),Qstr0(name_s));
+	return f;
+	}
+
+// Return the context for resolving scripts.
+static value script_context(void)
+	{
+	value cx_core = Q(type_cx_core);
+	value cx_lib = read_value(extend(hold(cx_core)),
+		get_base_name("/src/lib/main.fxl"));
+	value cx = A(A(Q(type_chain),cx_core),cx_lib);
+	return cx;
+	}
+
 /*
 Evaluate the user's script.  Read the script from the file named by argv[1] if
-present, or from stdin otherwise.
-
-If this program is running as "fexl0", it runs your script directly.  If it is
-running as "fexl", it first runs the local script "src/main.fxl", which then
-runs your script within an extended library context.
-
-The purpose of "fexl0" is to give you the option of bypassing src/main.fxl
-altogether, defining any extensions beyond the built-in C standard context as
-you please.
-
-In a future release I will make fexl0 the default behavior, so it always reads
-your script directly without loading any default library.  Predefined libraries
-such as the current main.fxl will be provided in the lib directory so you can
-pull them in with a one-liner.
-
-I am making this change because the one-size-fits-all approach to a standard
-library is a losing proposition.  Eventually I might even factor out the
-currently built-in C functions into independent libraries loaded on demand.
-Then you could build an entirely separate C library, put it in your own
-directory somewhere, and load it from within Fexl.  That would even give you
-the power to generate binary code on the fly and run it immediately.
+present, or from stdin otherwise.  If the name designates a directory it
+behaves like an empty file.
 */
-
 static void eval_script(void)
 	{
-	value f;
-	unsigned long len = strlen(main_argv[0]);
-	if (len >= 5 && strcmp(main_argv[0]+len-5,"fexl0") == 0)
-		{
-		// Running as fexl0, so run the user's script directly.
-		const char *name = main_argc > 1 ? main_argv[1] : "";
-		f = Qstr0(name);
-		}
-	else
-		{
-		// Get the name of the currently running executable.
-		f = Qstr0(main_argv[0]);
-		// Go two directories up, right above the bin directory.
-		f = A(Q(type_dirname),f);
-		f = A(Q(type_dirname),f);
-		// Concatenate the name of the main script.
-		f = A(A(Q(type_concat),f),Qstr0("/src/main.fxl"));
-		}
-
-	// Now evaluate the script.
-	f = A(A(Q(type_value),Q(type_std)),A(Q(type_use_file),f));
+	const char *name_s = main_argc > 1 ? main_argv[1] : "";
+	value cx = script_context();
+	value f = read_value(cx,Qstr0(name_s));
 	f = eval(f);
 	drop(f);
 	}
 
-/*
-Evaluate the named file.  Use stdin if the name is missing or empty.  If the
-name designates a directory it behaves like an empty file.
-*/
 int main(int argc, const char *argv[])
 	{
 	main_argc = argc;
