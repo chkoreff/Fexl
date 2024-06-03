@@ -3,7 +3,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <buf.h>
 #include <file.h>
 #include <file_str.h>
 #include <show.h>
