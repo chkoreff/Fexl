@@ -1,3 +1,2 @@
 #!/bin/sh
-./build || exit
-../bin/fexl test/show.fxl $1
+./fexl test/show.fxl $1

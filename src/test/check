@@ -1,3 +1,2 @@
 #!/bin/sh
-./build || exit
-../bin/fexl test/check.fxl $@
+./fexl test/check.fxl $@

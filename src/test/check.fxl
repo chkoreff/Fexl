@@ -72,7 +72,7 @@
 	each list
 		(\name
 		say ["refresh "name" "]
-		sh ["../bin/fexl test/show.fxl "name" >new/"name]
+		sh [(argv 0)" test/show.fxl "name" >new/"name]
 		\out\err\status
 		)
 	)
@@ -82,7 +82,7 @@
 	each list
 		(\name
 		put ["test "name" "]
-		sh ["../bin/fexl test/show.fxl "name" | diff - out/"name]
+		sh [(argv 0)" test/show.fxl "name" | diff - out/"name]
 		\out\err\status
 		eq 0 status
 			(say "good")

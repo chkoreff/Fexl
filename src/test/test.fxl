@@ -56,8 +56,8 @@
 	say ["\status="status]
 	)
 
-\run_fexl_file=(\name run_command ["../bin/fexl test/"name".fxl"])
-\run_fexl_text=(run_command ["../bin/fexl"])
+\run_fexl_file=(\name run_command [(argv 0)" test/"name".fxl"])
+\run_fexl_text=(run_command [(argv 0)])
 
 def "div" div;
 def "show_list" show_list;
