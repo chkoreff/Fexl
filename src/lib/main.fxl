@@ -24,7 +24,7 @@
 \\extra=
 (\=
 
-# (if x y) = y if x is true, other I.
+# (if x y) = y if x is true, otherwise I.
 \if=(\\x\\y x y I)
 
 \dir_local=(dirname script_name)
