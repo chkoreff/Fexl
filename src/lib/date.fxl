@@ -314,4 +314,4 @@ def "count_days" count_days;
 def "day_of_week" day_of_week;
 def "add_days" add_days;
 def "add_year" add_year;
-void
+std

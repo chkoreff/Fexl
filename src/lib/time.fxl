@@ -43,4 +43,4 @@ def "split_microtime" split_microtime;
 def "subtract_microtime" subtract_microtime;
 def "show_microtime" show_microtime;
 def "trace_elapsed" trace_elapsed;
-void
+std

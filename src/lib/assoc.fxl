@@ -101,4 +101,4 @@ def "sort_pairs" sort_pairs;
 def "put_default" put_default;
 def "name_columns" name_columns;
 def "make_assoc" make_assoc;
-void
+std
