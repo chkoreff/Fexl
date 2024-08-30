@@ -17,4 +17,4 @@
 	)
 
 def "say_index" say_index;
-void
+std

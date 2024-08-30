@@ -1,5 +1,5 @@
 #
-value (:: (value std; use "test.fxl"); std) \;
+extend (extend std; use "test.fxl") \;
 
 \run_case=
 	(\label\text
@@ -9,9 +9,8 @@ value (:: (value std; use "test.fxl"); std) \;
 (
 run_case "test_1"
 ~
-value
+extend
 (
-defc "std";
 def "say" say;
 def "put" put;
 def "nl" nl;

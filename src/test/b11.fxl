@@ -441,7 +441,7 @@ try void
 (
 say "= import"
 # Evaluate with alternative names.
-\cx=(value std; use "test.fxl")
+\cx=(extend std; use "test.fxl")
 value
 (
 with "div" (cx "div");

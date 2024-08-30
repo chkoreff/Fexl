@@ -1,4 +1,4 @@
-# Test the defc function.
+# Test the extend function.
 
 \\test_0=
 (
@@ -26,9 +26,8 @@ try (\; say "Hello")
 say "== test_1"
 show_benchmark;
 
-value
+extend
 	(
-	defc "std";
 	say "Evaluating the context."
 	def "F" F;
 	def "if" if;
@@ -38,9 +37,9 @@ value
 	(
 	say "Evaluating the form."
 	\;
-	value std \;
-	value std \;
-	value std \;
+	extend std \;
+	extend std \;
+	extend std \;
 
 	if F std
 	fred
@@ -53,11 +52,10 @@ say "== test_2"
 show_benchmark;
 
 # Test fancy extended standard context.
-value
+extend
 (
 # Define std to include a few extra functions.
 say "Evaluating the context."
-defc "std";
 \speaker=(\name \x put name put " says " say x)
 def "fred" (speaker "Fred");
 def "wilma" (speaker "Wilma");

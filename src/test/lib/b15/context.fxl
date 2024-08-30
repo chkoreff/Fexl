@@ -1,16 +1,10 @@
 #
-\cx_render=(value std; use "lib/render/base.fxl")
-\cx_render_list=(value (:: cx_render; std); use "lib/render/list.fxl")
+\std=(extend std; use "lib/render/base.fxl")
+\std=(extend std; use "lib/render/list.fxl")
+\std=(extend std; use "lib/index/render.fxl")
+\std=(extend std; use "lib/index/index.fxl")
 
-\cx_render_local=
-(
-value
-(
-:: cx_render_list;
-:: cx_render;
-std
-)
-\;
+extend std \;
 
 \render_val=
 	(\val
@@ -37,23 +31,4 @@ std
 
 def "say_pairs" say_pairs;
 def "say_errors" say_errors;
-void
-)
-
-\cx_render_index=
-	(
-	value
-	(
-	:: cx_render_list;
-	:: cx_render;
-	std
-	);
-	use "lib/index/render.fxl"
-	)
-
-\cx_output=(:: cx_render_index; cx_render_local)
-
-\cx_index=(value std; use "lib/index/index.fxl")
-
-:: cx_output;
-cx_index
+std

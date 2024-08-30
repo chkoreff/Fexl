@@ -1,5 +1,5 @@
 #
-value (:: (value std; use "test.fxl"); std) \;
+extend (extend std; use "test.fxl") \;
 
 \try_nacl_box_public=
 	(\secret_key

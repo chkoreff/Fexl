@@ -5,6 +5,7 @@
 #include <basic.h>
 #include <buf.h>
 #include <crypto.h>
+//#include <memory.h>
 #include <stdio.h>
 #include <string.h> // strcmp
 #include <type_bn.h>
@@ -334,10 +335,8 @@ static value get_base_name(const char *name_s)
 static value script_context(void)
 	{
 	value cx_core = Q(type_cx_core);
-	value cx_lib = read_value(extend(hold(cx_core)),
+	return read_value(extend(cx_core),
 		get_base_name("/src/lib/main.fxl"));
-	value cx = A(A(Q(type_chain),cx_core),cx_lib);
-	return cx;
 	}
 
 /*
@@ -360,6 +359,7 @@ int main(int argc, const char *argv[])
 	main_argv = argv;
 	beg_const();
 	eval_script();
+	//printf("END steps %lu bytes %lu\n",cur_steps,cur_bytes);
 	end_const();
 	end_value();
 	return 0;

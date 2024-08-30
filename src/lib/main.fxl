@@ -13,7 +13,7 @@
 \error=(\msg trace msg die)
 
 # Define key to refer to a context.
-\defc=
+\defc= # LATER 20240820 deprecated
 	(\key\cx
 	@\\self
 	def key self;
@@ -76,7 +76,7 @@ def "show_benchmark" show_benchmark;
 std
 )
 
-# Enhance the standard context to load libraries on demand.
+# Load libraries into the standard context.
 \dir_lib=(path_under dir_base "src/lib")
 \use=(\name use_file; path_under dir_lib name)
 

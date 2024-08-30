@@ -11,20 +11,20 @@ result ok
 
 steps 67 bytes 320
 == test_1
-Evaluating the form.
 Evaluating the context.
+Evaluating the form.
 I am Fred.
-steps 92 bytes 736
+steps 82 bytes 832
 == test_2
-Evaluating the form.
 Evaluating the context.
+Evaluating the form.
 Hi
 57
 T
 HEY: Fred says a
 Wilma says b
 Goodbye
-steps 137 bytes 1376
+steps 129 bytes 1856
 ~
 \err=
 ~

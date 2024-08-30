@@ -1,16 +1,9 @@
 # Compile an index into C code.
-\cx_index=(value std; use "lib/index/index.fxl")
-\cx_render=(value std; use "lib/render/base.fxl")
-\cx_render_C=(value (:: cx_render; std); use "lib/render/C.fxl")
+\std=(extend std; use "lib/index/index.fxl")
+\std=(extend std; use "lib/render/base.fxl")
+\std=(extend std; use "lib/render/C.fxl")
 
-value
-(
-:: cx_render_C;
-:: cx_render;
-:: cx_index;
-std
-)
-\;
+extend std \;
 
 # Process all the rows in an index.
 \do_rows=
@@ -110,4 +103,4 @@ std
 def "compile_index" compile_index;
 def "index_put_pairs" index_put_pairs;
 def "compile_pairs" compile_pairs;
-void
+std

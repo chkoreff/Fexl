@@ -60,4 +60,4 @@ def "say" say;
 def "indent" indent;
 def "tab" tab;
 def "use_output_fh" use_output_fh;
-void
+std

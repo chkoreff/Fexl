@@ -1,5 +1,5 @@
 #
-value (:: (value std; use "test.fxl"); std) \;
+extend (extend std; use "test.fxl") \;
 
 say "== test Fibonacci"
 
