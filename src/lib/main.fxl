@@ -20,8 +20,6 @@
 	cx
 	)
 
-\extend=(\cx value (def "std" cx; cx))
-
 # Define some extra functions.
 \std=
 (
@@ -51,7 +49,6 @@
 \use=(\name use_file; path_under dir_local name)
 
 def "defc" defc;
-def "extend" extend;
 def "if" if;
 def "use" use;
 

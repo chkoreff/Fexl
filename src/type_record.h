@@ -11,7 +11,6 @@ struct record
 	struct item item[];
 	};
 
-extern value Qempty;
 extern value type_record(value f);
 extern value record_empty(void);
 extern value type_set(value f);
@@ -19,5 +18,3 @@ extern value type_setf(value f);
 extern value type_get(value f);
 extern value type_record_count(value f);
 extern value type_record_item(value f);
-extern void beg_record(void);
-extern void end_record(void);

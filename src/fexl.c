@@ -193,6 +193,7 @@ static value def_core(void)
 	if (match("is_closed")) return Q(type_is_closed);
 	if (match("resolve")) return Q(type_resolve);
 	if (match("value")) return Q(type_value);
+	if (match("extend")) return Q(type_extend);
 
 	if (match("buf_new")) return Q0(type_buf_new);
 	if (match("buf_put")) return Q(type_buf_put);
@@ -218,7 +219,7 @@ static value def_core(void)
 	if (match("pack")) return Q(type_pack);
 
 	// record
-	if (match("empty")) return hold(Qempty);
+	if (match("empty")) return record_empty();
 	if (match("set")) return Q(type_set);
 	if (match("setf")) return Q(type_setf);
 	if (match("get")) return Q(type_get);
@@ -294,7 +295,7 @@ static void beg_const(void)
 	beg_file();
 	beg_output();
 	beg_tuple();
-	beg_record();
+	beg_sym();
 	init_signal();
 	}
 
@@ -304,22 +305,17 @@ static void end_const(void)
 	end_file();
 	end_output();
 	end_tuple();
-	end_record();
+	end_sym();
 	close_random();
 	}
 
 static value read_value(value cx, value name)
 	{
-	return A(A(Q(type_value),cx),A(Q(type_use_file),name));
-	}
-
-static value extend(value cx)
-	{
-	return A(A(A(Q(type_def),Qstr0("std")),hold(cx)),cx);
+	return A(A(Q(type_extend),cx),A(Q(type_use_file),name));
 	}
 
 // Return a path name relative to the base directory.
-static value get_base_name(const char *name_s)
+static value local_path(const char *name_s)
 	{
 	// Get the name of the currently running executable.
 	value f = Qstr0(main_argv[0]);
@@ -334,9 +330,7 @@ static value get_base_name(const char *name_s)
 // Return the context for resolving scripts.
 static value script_context(void)
 	{
-	value cx_core = Q(type_cx_core);
-	return read_value(extend(cx_core),
-		get_base_name("/src/lib/main.fxl"));
+	return read_value(Q(type_cx_core),local_path("/src/lib/main.fxl"));
 	}
 
 /*

@@ -7,8 +7,6 @@
 #include <type_record.h>
 #include <type_str.h>
 
-value Qempty;
-
 static unsigned long record_size(unsigned long len)
 	{
 	return sizeof(struct record) + sizeof(struct item[len]);
@@ -295,14 +293,4 @@ value type_record_item(value f)
 	drop(x);
 	return f;
 	}
-	}
-
-void beg_record(void)
-	{
-	Qempty = record_empty();
-	}
-
-void end_record(void)
-	{
-	drop(Qempty);
 	}

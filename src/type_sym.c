@@ -7,6 +7,9 @@
 #include <string.h> // strcmp
 #include <type_str.h>
 #include <type_sym.h>
+#include <type_with.h>
+
+static value Qstd;
 
 value type_quo(value f)
 	{
@@ -314,4 +317,27 @@ value type_value(value f)
 	drop(form);
 	return f;
 	}
+	}
+
+// \extend=(\cx value (def "std" cx; cx))
+value type_extend(value f)
+	{
+	if (f->L == 0) return keep(f);
+	{
+	value cx = eval(f->R);
+	cx = Qassoc(hold(Qstd),yield(hold(cx)),cx);
+	f->R = cx;
+	f->T = type_value;
+	return hold(f);
+	}
+	}
+
+void beg_sym(void)
+	{
+	Qstd = Qstr0("std");
+	}
+
+void end_sym(void)
+	{
+	drop(Qstd);
 	}

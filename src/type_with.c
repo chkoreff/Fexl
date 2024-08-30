@@ -37,7 +37,7 @@ value type_assoc(value f)
 		}
 	}
 
-static value Qassoc(value key, value val, value obj)
+value Qassoc(value key, value val, value obj)
 	{
 	return V(type_assoc,pair(key,val),obj);
 	}

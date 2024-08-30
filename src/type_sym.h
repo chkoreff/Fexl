@@ -12,3 +12,6 @@ extern value type_E(value f);
 extern value type_is_closed(value f);
 extern value type_resolve(value f);
 extern value type_value(value f);
+extern value type_extend(value f);
+extern void beg_sym(void);
+extern void end_sym(void);
