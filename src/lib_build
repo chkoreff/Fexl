@@ -61,7 +61,6 @@ compile()
 	push $file_o
 
 	local file_c=$name.c
-	local file_o=../obj/$name.o
 	mkdir -p $(dirname $file_o)
 
 	# Make sure header cache file obj/$name.dep is up to date.
