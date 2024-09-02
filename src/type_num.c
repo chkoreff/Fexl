@@ -5,7 +5,6 @@
 #include <basic.h>
 #include <convert.h>
 #include <format.h>
-#include <memory.h>
 #include <type_num.h>
 #include <type_str.h>
 
