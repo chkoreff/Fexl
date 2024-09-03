@@ -14,5 +14,6 @@ tag tr # html
 trace_elapsed # time
 split_date day_of_week # date
 grab_output # run
+read_file # read
 read_csv_file # read_csv
 read_ssv_file # read_ssv
