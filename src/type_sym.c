@@ -321,14 +321,11 @@ value type_value(value f)
 // \extend=(\cx value (def "std" cx; cx))
 value type_extend(value f)
 	{
-	if (f->L == 0) return keep(f);
-	{
 	value cx = eval(f->R);
 	cx = Qassoc(hold(Qstd),yield(hold(cx)),cx);
 	f->R = cx;
 	f->T = type_value;
 	return hold(f);
-	}
 	}
 
 void beg_sym(void)
