@@ -196,7 +196,7 @@ static void clear_cache(void)
 		}
 	}
 
-static value resolve(value exp, value cx)
+static value resolve(value exp, value cx, const char *label)
 	{
 	if (exp->T == type_quo)
 		return hold(exp);
@@ -210,7 +210,15 @@ static value resolve(value exp, value cx)
 			{
 			value key = hold(Qstr(name));
 			value val = eval(A(A(hold(cx),key),hold(Qyield)));
-			value new = (val->L == Qyield) ? quo(hold(val->R)) : hold(exp);
+			value new;
+
+			if (val->L == Qyield)
+				new = quo(hold(val->R));
+			else
+				{
+				undefined_symbol(str_data(exp->R),exp->R->N,label);
+				new = hold(exp);
+				}
 
 			if (key->N == 1)
 				recycle(key);
@@ -228,58 +236,20 @@ static value resolve(value exp, value cx)
 		}
 	else
 		{
-		value L = resolve(exp->L,cx);
-		value R = resolve(exp->R,cx);
+		value L = resolve(exp->L,cx,label);
+		value R = resolve(exp->R,cx,label);
 		return join(exp->T,L,R);
 		}
 	}
 
-static value do_resolve(value exp, value cx)
+static value do_resolve(value exp, value cx, const char *label)
 	{
 	value save_cache = cache;
 	cache = 0;
-	exp = resolve(exp,cx);
+	exp = resolve(exp,cx,label);
 	clear_cache();
 	cache = save_cache;
 	return exp;
-	}
-
-// (resolve cx form) Use context cx to resolve some symbols in the form.
-value type_resolve(value f)
-	{
-	if (f->L->L == 0) return keep(f);
-	{
-	value form = arg(f->R);
-	if (form->T == type_form)
-		{
-		value exp = form->R;
-		if (exp->T == type_quo)
-			f = hold(form);
-		else
-			{
-			value cx = (f->L->R = eval(f->L->R));
-			exp = do_resolve(exp,cx);
-			f = Qform(hold(form->L),exp);
-			}
-		}
-	else
-		f = hold(Qvoid);
-	drop(form);
-	return f;
-	}
-	}
-
-static void report_undef(const char *label, value exp)
-	{
-	if (exp->T == type_quo)
-		;
-	else if (exp->T == type_ref)
-		undefined_symbol(str_data(exp->R),exp->R->N,label);
-	else
-		{
-		report_undef(label,exp->L);
-		report_undef(label,exp->R);
-		}
 	}
 
 // (value cx form) Resolve all the symbols in the form and return its value.
@@ -297,14 +267,14 @@ value type_value(value f)
 			f = hold(exp->R);
 		else
 			{
+			const char *label = str_data(form->L);
 			value cx = (f->L->R = eval(f->L->R));
-			exp = do_resolve(exp,cx);
+			exp = do_resolve(exp,cx,label);
 
 			if (exp->T == type_quo)
 				f = unquo(exp);
 			else
 				{
-				report_undef(str_data(form->L),exp);
 				drop(exp);
 				die(0);
 				f = hold(Qvoid); // not reached

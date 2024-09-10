@@ -191,7 +191,6 @@ static value def_core(void)
 	if (match("use_file")) return Q(type_use_file);
 
 	if (match("is_closed")) return Q(type_is_closed);
-	if (match("resolve")) return Q(type_resolve);
 	if (match("value")) return Q(type_value);
 	if (match("extend")) return Q(type_extend);
 
