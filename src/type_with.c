@@ -45,7 +45,7 @@ value Qassoc(value key, value val, value obj)
 /*
 (with key val obj)
 Return a function like obj but with key defined as val.
-Equivalent to:
+
 \with=(\key\\val\obj \x eq x key val; obj x)
 */
 value type_with(value f)
@@ -62,7 +62,7 @@ value type_with(value f)
 
 /*
 (def key val obj)
-\def=(\key\\val with key (yield val))
+\def=(\\key\\val with key (yield val))
 */
 value type_def(value f)
 	{
@@ -102,7 +102,7 @@ value type_split_obj(value f)
 /*
 (fetch v k x)
 Return the value at key k in index v.  If no value, store the value of x in
-the index so you get the same value next time.  Equivalent to:
+the index so you get the same value next time.
 
 \fetch=
 	(\v\k\\x

@@ -308,7 +308,7 @@ static void end_const(void)
 	close_random();
 	}
 
-static value read_value(value cx, value name)
+static value extend(value cx, value name)
 	{
 	return A(A(Q(type_extend),cx),A(Q(type_use_file),name));
 	}
@@ -330,9 +330,8 @@ static value local_path(const char *name_s)
 static value script_context(void)
 	{
 	value cx_core = Q(type_cx_core);
-	value cx_lib = read_value(cx_core,local_path("/src/lib/main.fxl"));
-	value cx = A(A(Q(type_chain),hold(cx_core)),cx_lib);
-	return cx;
+	value cx_lib = extend(cx_core,local_path("/src/lib/main.fxl"));
+	return A(A(Q(type_chain),hold(cx_core)),cx_lib);
 	}
 
 /*
@@ -344,7 +343,7 @@ static void eval_script(void)
 	{
 	const char *name_s = main_argc > 1 ? main_argv[1] : "";
 	value cx = script_context();
-	value f = read_value(cx,Qstr0(name_s));
+	value f = extend(cx,Qstr0(name_s));
 	f = eval(f);
 	drop(f);
 	}
