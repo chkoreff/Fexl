@@ -77,8 +77,8 @@ std
 \dir_lib=(path_under dir_base "src/lib")
 \use=(\name use_file; path_under dir_lib name)
 
-\std=
-(
+defc "std";
+def "use_lib" use;
 :: std; \std=(extend std; use "bool.fxl")
 :: std; \std=(extend std; use "math.fxl")
 :: std; \std=(extend std; use "list.fxl")
@@ -93,9 +93,4 @@ std
 :: std; \std=(extend std; use "read.fxl")
 :: std; \std=(extend std; use "read_csv.fxl")
 :: std; \std=(extend std; use "read_ssv.fxl")
-std
-)
-
-defc "std";
-def "use_lib" use;
 std
