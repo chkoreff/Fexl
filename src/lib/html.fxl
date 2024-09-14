@@ -157,4 +157,4 @@ def "put_quote_data" put_quote_data;
 def "uri_escape" uri_escape;
 def "uri_unescape" uri_unescape;
 def "make_url" make_url;
-std
+void

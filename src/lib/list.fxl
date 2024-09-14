@@ -515,4 +515,4 @@ def "random_double" random_double;
 def "eq_data" eq_data;
 def "remember" remember;
 def "cache" cache;
-std
+void

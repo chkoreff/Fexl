@@ -92,4 +92,4 @@ def "read_csv_file" read_csv_file;
 def "read_tsv_string" read_tsv_string;
 def "read_tsv_chars" read_tsv_chars;
 def "read_tsv_file" read_tsv_file;
-std
+void

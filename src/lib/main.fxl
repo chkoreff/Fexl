@@ -21,7 +21,7 @@
 	)
 
 # Define some extra functions.
-\std=
+\\cx_extra=
 (
 # (if x y) = y if x is true, otherwise I.
 \if=(\\x\\y x y I)
@@ -70,7 +70,7 @@ def "QU" QU;
 
 def "do_benchmark" do_benchmark;
 def "show_benchmark" show_benchmark;
-std
+void
 )
 
 # Load libraries into the standard context on demand.
@@ -79,18 +79,19 @@ std
 
 defc "std";
 def "use_lib" use;
-:: std; \std=(extend std; use "bool.fxl")
-:: std; \std=(extend std; use "math.fxl")
-:: std; \std=(extend std; use "list.fxl")
-:: std; \std=(extend std; use "format.fxl")
-:: std; \std=(extend std; use "indent.fxl")
-:: std; \std=(extend std; use "assoc.fxl")
-:: std; \std=(extend std; use "hex.fxl")
-:: std; \std=(extend std; use "html.fxl")
-:: std; \std=(extend std; use "time.fxl")
-:: std; \std=(extend std; use "date.fxl")
-:: std; \std=(extend std; use "run.fxl")
-:: std; \std=(extend std; use "read.fxl")
-:: std; \std=(extend std; use "read_csv.fxl")
-:: std; \std=(extend std; use "read_ssv.fxl")
+\\std=(:: std; cx_extra)
+\\std=(:: std; value std; use "bool.fxl")
+\\std=(:: std; value std; use "math.fxl")
+\\std=(:: std; value std; use "list.fxl")
+\\std=(:: std; value std; use "format.fxl")
+\\std=(:: std; value std; use "indent.fxl")
+\\std=(:: std; value std; use "assoc.fxl")
+\\std=(:: std; value std; use "hex.fxl")
+\\std=(:: std; value std; use "html.fxl")
+\\std=(:: std; value std; use "time.fxl")
+\\std=(:: std; value std; use "date.fxl")
+\\std=(:: std; value std; use "run.fxl")
+\\std=(:: std; value std; use "read.fxl")
+\\std=(:: std; value std; use "read_csv.fxl")
+\\std=(:: std; value std; use "read_ssv.fxl")
 std

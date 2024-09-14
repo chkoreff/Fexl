@@ -86,4 +86,4 @@ def "say_data" say_data;
 def "fsay_data" fsay_data;
 def "trace_data" trace_data;
 def "i_as_str" i_as_str;
-std
+void

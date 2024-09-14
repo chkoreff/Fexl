@@ -6,4 +6,4 @@
 def "and" and;
 def "not" not;
 def "or" or;
-std
+void

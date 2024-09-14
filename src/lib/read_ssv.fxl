@@ -60,4 +60,4 @@
 def "read_ssv_string" read_ssv_string;
 def "read_ssv_chars" read_ssv_chars;
 def "read_ssv_file" read_ssv_file;
-std
+void
