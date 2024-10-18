@@ -22,7 +22,7 @@
 
 # Define some extra functions.
 \\cx_extra=
-(
+(\=
 # (if x y) = y if x is true, otherwise I.
 \if=(\\x\\y x y I)
 
@@ -77,21 +77,43 @@ void
 \dir_lib=(path_under dir_base "src/lib")
 \use=(\name use_file; path_under dir_lib name)
 
+\cx_core=std
+
+# Equivalent to (remember 1). LATER 20241018 also in lib/list.fxl
+\\cache=(\v=var_new fetch v)
+
+\load=
+	(
+	\memo=cache
+	@\\load\name
+	memo name;
+	value
+		(
+		def "load" load;
+		def "cx_core" cx_core;
+		def "cx_extra" cx_extra;
+		cx_core
+		);
+		use name
+	)
+
 defc "std";
-def "use_lib" use;
-\\std=(:: std; cx_extra)
-\\std=(:: std; value std; use "bool.fxl")
-\\std=(:: std; value std; use "math.fxl")
-\\std=(:: std; value std; use "list.fxl")
-\\std=(:: std; value std; use "format.fxl")
-\\std=(:: std; value std; use "indent.fxl")
-\\std=(:: std; value std; use "assoc.fxl")
-\\std=(:: std; value std; use "hex.fxl")
-\\std=(:: std; value std; use "html.fxl")
-\\std=(:: std; value std; use "time.fxl")
-\\std=(:: std; value std; use "date.fxl")
-\\std=(:: std; value std; use "run.fxl")
-\\std=(:: std; value std; use "read.fxl")
-\\std=(:: std; value std; use "read_csv.fxl")
-\\std=(:: std; value std; use "read_ssv.fxl")
-std
+def "use_lib" use; # LATER 20241018 deprecate
+def "load" load;
+:: cx_core;
+:: cx_extra;
+:: (load "bool.fxl");
+:: (load "math.fxl");
+:: (load "list.fxl");
+:: (load "format.fxl");
+:: (load "indent.fxl");
+:: (load "assoc.fxl");
+:: (load "hex.fxl");
+:: (load "html.fxl");
+:: (load "time.fxl");
+:: (load "date.fxl");
+:: (load "run.fxl");
+:: (load "read.fxl");
+:: (load "read_csv.fxl");
+:: (load "read_ssv.fxl");
+void

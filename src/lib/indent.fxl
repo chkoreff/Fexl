@@ -1,3 +1,11 @@
+#
+value
+(
+:: (load "format.fxl");
+:: cx_extra;
+cx_core
+)
+\;
 # Format data in a nested indented format.
 
 # Return true if the item is a scalar.

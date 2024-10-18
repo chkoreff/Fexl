@@ -1,6 +1,14 @@
 # Parse the CSV (comma-separated value) format.
 # NOTE: https://www.ietf.org/rfc/rfc4180.txt
 # "Spaces are considered part of a field and should not be ignored."
+value
+(
+:: (load "read.fxl");
+:: cx_extra;
+cx_core
+)
+\;
+
 \get_plain_item=
 	(\sep
 	collect_to
