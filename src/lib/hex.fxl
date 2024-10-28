@@ -73,4 +73,4 @@ def "hex_digit_to_dec" hex_digit_to_dec;
 def "xor_hex" xor_hex;
 def "oct" oct;
 def "hex" hex;
-void
+std

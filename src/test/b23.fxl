@@ -1,5 +1,4 @@
-# Ensure automatic loading of libraries.  Each of these lines loads the next
-# library file in the standard search order.
+# Ensure loading of all libraries.
 \_
 say + - # core
 use if # extra

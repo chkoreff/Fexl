@@ -329,9 +329,7 @@ static value local_path(const char *name_s)
 // Return the context for resolving scripts.
 static value script_context(void)
 	{
-	value cx_core = Q(type_cx_core);
-	value cx_lib = extend(cx_core,local_path("/src/lib/main.fxl"));
-	return A(A(Q(type_chain),hold(cx_core)),cx_lib);
+	return extend(Q(type_cx_core),local_path("/src/lib/main.fxl"));
 	}
 
 /*

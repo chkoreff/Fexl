@@ -14,7 +14,7 @@ steps 63 bytes 320
 Evaluating the context.
 Evaluating the form.
 I am Fred.
-steps 72 bytes 544
+steps 69 bytes 544
 == test_2
 Evaluating the context.
 Evaluating the form.
@@ -24,7 +24,7 @@ T
 HEY: Fred says a
 Wilma says b
 Goodbye
-steps 130 bytes 1088
+steps 122 bytes 1088
 ~
 \err=
 ~

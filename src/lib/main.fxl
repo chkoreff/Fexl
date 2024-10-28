@@ -21,8 +21,8 @@
 	)
 
 # Define some extra functions.
-\\extra=
-(\=
+\std=
+(
 
 # (if x y) = y if x is true, otherwise I.
 \if=(\\x\\y x y I)
@@ -71,113 +71,28 @@ def "QU" QU;
 
 def "do_benchmark" do_benchmark;
 def "show_benchmark" show_benchmark;
-void
+std
 )
 
 # Load libraries into the standard context on demand.
 \dir_lib=(path_under dir_base "src/lib")
 \use=(\name use_file; path_under dir_lib name)
 
-\\bool=
-	(\=
-	value std;
-	use "bool.fxl"
-	)
-
-\\math=
-	(\=
-	value std;
-	use "math.fxl"
-	)
-
-\\list=
-	(\=
-	value (:: bool; std);
-	use "list.fxl"
-	)
-
-\\format=
-	(\=
-	value (:: list; :: math; :: bool; :: extra; std);
-	use "format.fxl"
-	)
-
-\\indent=
-	(\=
-	value (:: format; :: extra; std);
-	use "indent.fxl"
-	)
-
-\\assoc=
-	(\=
-	value (:: list; std);
-	use "assoc.fxl"
-	)
-
-\\hex=
-	(\=
-	value (:: list; :: math; :: bool; std);
-	use "hex.fxl"
-	)
-
-\\html=
-	(\=
-	value (:: list; :: hex; :: format; :: extra; std);
-	use "html.fxl"
-	)
-
-\\time=
-	(\=
-	value (:: extra; std);
-	use "time.fxl"
-	)
-
-\\date=
-	(\=
-	value (:: list; :: math; std);
-	use "date.fxl"
-	)
-
-\\run=
-	(\=
-	value (:: list; :: bool; :: extra; std);
-	use "run.fxl"
-	)
-
-\\read=
-	(\=
-	value std;
-	use "read.fxl"
-	)
-
-\\read_csv=
-	(\=
-	value (:: read; :: extra; std);
-	use "read_csv.fxl"
-	)
-
-\\read_ssv=
-	(\=
-	value (:: read; :: extra; std);
-	use "read_ssv.fxl"
-	)
+\std=(extend std; use "bool.fxl")
+\std=(extend std; use "math.fxl")
+\std=(extend std; use "list.fxl")
+\std=(extend std; use "format.fxl")
+\std=(extend std; use "indent.fxl")
+\std=(extend std; use "assoc.fxl")
+\std=(extend std; use "hex.fxl")
+\std=(extend std; use "html.fxl")
+\std=(extend std; use "time.fxl")
+\std=(extend std; use "date.fxl")
+\std=(extend std; use "run.fxl")
+\std=(extend std; use "read.fxl")
+\std=(extend std; use "read_csv.fxl")
+\std=(extend std; use "read_ssv.fxl")
 
 defc "std";
 def "use_lib" use; # LATER 20241018 deprecate
-:: std;
-:: extra;
-:: bool;
-:: math;
-:: list;
-:: format;
-:: indent;
-:: assoc;
-:: hex;
-:: html;
-:: time;
-:: date;
-:: run;
-:: read;
-:: read_csv;
-:: read_ssv;
-void
+std

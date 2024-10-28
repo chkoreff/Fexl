@@ -203,4 +203,4 @@ def "trim_spaces" trim_spaces;
 def "trim_beg_spaces" trim_beg_spaces;
 def "trim_end_spaces" trim_end_spaces;
 def "random_digits" random_digits;
-void
+std
