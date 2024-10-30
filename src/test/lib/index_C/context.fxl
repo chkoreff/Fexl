@@ -1,9 +1,12 @@
 # Compile an index into C code.
-\std=(extend std; use "lib/index/index.fxl")
-\std=(extend std; use "lib/render/base.fxl")
-\std=(extend std; use "lib/render/C.fxl")
-
-extend std \;
+extend
+(
+load "lib/render/C.fxl";
+load "lib/render/base.fxl";
+load "lib/index/index.fxl";
+std
+)
+\;
 
 # Process all the rows in an index.
 \do_rows=

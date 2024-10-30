@@ -1,5 +1,5 @@
 #
-extend (extend std; use "test.fxl") \;
+value (load "test.fxl"; std) \;
 
 say "== test Fibonacci"
 

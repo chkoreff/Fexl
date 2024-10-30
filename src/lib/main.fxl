@@ -48,10 +48,12 @@
 
 # Use a file in the directory which contains the user's script.
 \use=(\name use_file; path_under dir_local name)
+\load=(\name\cx extend cx; use name)
 
 def "defc" defc;
 def "if" if;
 def "use" use;
+def "load" load;
 
 def "check" check;
 def "default" default;
@@ -77,22 +79,22 @@ std
 # Load libraries into the standard context on demand.
 \dir_lib=(path_under dir_base "src/lib")
 \use=(\name use_file; path_under dir_lib name)
-
-\std=(extend std; use "bool.fxl")
-\std=(extend std; use "math.fxl")
-\std=(extend std; use "list.fxl")
-\std=(extend std; use "format.fxl")
-\std=(extend std; use "indent.fxl")
-\std=(extend std; use "assoc.fxl")
-\std=(extend std; use "hex.fxl")
-\std=(extend std; use "html.fxl")
-\std=(extend std; use "time.fxl")
-\std=(extend std; use "date.fxl")
-\std=(extend std; use "run.fxl")
-\std=(extend std; use "read.fxl")
-\std=(extend std; use "read_csv.fxl")
-\std=(extend std; use "read_ssv.fxl")
+\load=(\name\cx extend cx; use name)
 
 defc "std";
 def "use_lib" use; # LATER 20241018 deprecate
+load "read_ssv.fxl";
+load "read_csv.fxl";
+load "read.fxl";
+load "run.fxl";
+load "date.fxl";
+load "time.fxl";
+load "html.fxl";
+load "hex.fxl";
+load "assoc.fxl";
+load "indent.fxl";
+load "format.fxl";
+load "list.fxl";
+load "math.fxl";
+load "bool.fxl";
 std

@@ -1,5 +1,5 @@
 #
-extend (extend std; use "test.fxl") \;
+extend (load "test.fxl"; std) \;
 
 \show_result=
 	(

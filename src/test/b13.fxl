@@ -35,7 +35,7 @@ try "x"
 )
 
 say "== test_full"
-test_context (extend std; use "test.fxl")
+test_context (load "test.fxl"; std)
 
 say "== test_restricted"
 test_context

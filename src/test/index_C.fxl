@@ -1,5 +1,5 @@
 #
-value (extend std; use "lib/index_C/context.fxl") \;
+value (load "lib/index_C/context.fxl"; std) \;
 
 \try_pairs=
 	(\pairs

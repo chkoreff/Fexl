@@ -1,10 +1,13 @@
 #
-\std=(extend std; use "lib/render/base.fxl")
-\std=(extend std; use "lib/render/list.fxl")
-\std=(extend std; use "lib/index/render.fxl")
-\std=(extend std; use "lib/index/index.fxl")
-
-extend std \;
+extend
+(
+load "lib/index/index.fxl";
+load "lib/index/render.fxl";
+load "lib/render/list.fxl";
+load "lib/render/base.fxl";
+std
+)
+\;
 
 \render_val=
 	(\val
