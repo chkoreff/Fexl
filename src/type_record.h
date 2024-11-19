@@ -7,8 +7,8 @@ struct item
 struct record
 	{
 	unsigned long count;
-	unsigned long len;
-	struct item item[];
+	unsigned long size;
+	struct item *vec;
 	};
 
 extern value type_record(value f);
