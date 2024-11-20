@@ -222,6 +222,7 @@ static value def_core(void)
 	if (match("set")) return Q(type_set);
 	if (match("setf")) return Q(type_setf);
 	if (match("get")) return Q(type_get);
+	if (match("record_copy")) return Q(type_record_copy);
 	if (match("record_count")) return Q(type_record_count);
 	if (match("record_item")) return Q(type_record_item);
 

@@ -23,7 +23,7 @@ static void clear_record(value f)
 	}
 
 // LATER 20221213 Perhaps use binary search.
-static value find(struct record *rec, string key)
+static value record_find(struct record *rec, string key)
 	{
 	unsigned long pos;
 
@@ -43,16 +43,16 @@ static value find(struct record *rec, string key)
 
 value type_record(value f)
 	{
-	value x = arg(f->R);
-	if (x->T == type_str)
+	value key = arg(f->R);
+	if (key->T == type_str)
 		{
-		value val = find(f->L->v_ptr,x->v_ptr);
+		value val = record_find(f->L->v_ptr,key->v_ptr);
 		if (val == 0) val = Qvoid;
 		f = hold(val);
 		}
 	else
 		f = hold(Qvoid);
-	drop(x);
+	drop(key);
 	return f;
 	}
 
@@ -104,23 +104,23 @@ static void shift_items(struct item *vec, unsigned long n, unsigned long pos)
 		vec[i] = vec[i-1];
 	}
 
-static void set_inline(value x, value y, value z)
+static void record_set_inline(value obj, value key, value val)
 	{
-	struct record *rec = z->v_ptr;
-	string key = x->v_ptr;
+	struct record *rec = obj->v_ptr;
+	string s_key = key->v_ptr;
 	unsigned long pos;
 
 	for (pos = 0; pos < rec->count; pos++)
 		{
 		struct item *item = rec->vec + pos;
-		int cmp = str_cmp(key,item->key->v_ptr);
+		int cmp = str_cmp(s_key,item->key->v_ptr);
 		if (cmp > 0)
 			;
 		else if (cmp == 0)
 			{
-			// Update inline.
+			// Change the value.
 			drop(item->val);
-			item->val = hold(y);
+			item->val = val;
 			return;
 			}
 		else
@@ -136,14 +136,14 @@ static void set_inline(value x, value y, value z)
 
 	{
 	struct item *item = rec->vec + pos;
-	item->key = hold(x);
-	item->val = hold(y);
+	item->key = hold(key);
+	item->val = val;
 	}
 	}
 
-static value copy_record(value z)
+static value record_copy(value obj)
 	{
-	struct record *old_rec = z->v_ptr;
+	struct record *old_rec = obj->v_ptr;
 	unsigned long count = old_rec->count;
 	struct record *new_rec = new_record(count,old_rec->size);
 	struct item *old_vec = old_rec->vec;
@@ -161,15 +161,18 @@ static value copy_record(value z)
 	return Qrecord(new_rec);
 	}
 
-static value set(value x, value y, value z)
+// LATER 20241120 In a new version I am eliminating the automatic copy based on
+// reference count.  Instead all records will be mutable and you can make an
+// explicit copy if you like.
+static value record_set(value obj, value key, value val)
 	{
-	if (z->N <= 2)
-		hold(z);
+	if (obj->N <= 2)
+		hold(obj);
 	else
-		z = copy_record(z);
+		obj = record_copy(obj);
 
-	set_inline(x,y,z);
-	return z;
+	record_set_inline(obj,key,val);
+	return obj;
 	}
 
 // Return an empty record.
@@ -185,36 +188,33 @@ static value op_set(value f, value op(value))
 	if (f->L->L == 0) return keep(f);
 	if (f->L->L->L == 0) return keep(f);
 	{
-	value x = arg(f->L->L->R);
-	if (x->T == type_str)
+	value key = arg(f->L->L->R);
+	if (key->T == type_str)
 		{
-		value z = arg(f->R);
-		if (z->T == type_record)
-			{
-			value y = op(f->L->R);
-			f = set(x,y,z);
-			drop(y);
-			}
+		value obj = arg(f->R);
+		if (obj->T == type_record)
+			f = record_set(obj,key,op(f->L->R));
 		else
 			f = hold(Qvoid);
-		drop(z);
+		drop(obj);
 		}
 	else
 		f = hold(Qvoid);
-	drop(x);
+	drop(key);
 	return f;
 	}
 	}
 
-// (set key val obj) Set key to val in record obj, returning a record like obj
-// but with key mapped to val.  It modifies obj inline if there are no other
-// references to it; otherwise it returns a modified copy of obj.
+// (set key val obj) Set key to val in obj, after evaluating val.
+// This returns a record like obj but with key mapped to val.  It modifies obj
+// inline if there are no other references to it; otherwise it returns a
+// modified copy of obj.
 value type_set(value f)
 	{
 	return op_set(f,arg);
 	}
 
-// Set the value without evaluating it.
+// (setf key val obj) Set key to val in obj, without evaluating val.
 value type_setf(value f)
 	{
 	return op_set(f,hold);
@@ -225,32 +225,43 @@ value type_get(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
-	value x = arg(f->L->R);
-	if (x->T == type_str)
+	value key = arg(f->L->R);
+	if (key->T == type_str)
 		{
-		value y = arg(f->R);
-		if (y->T == type_record)
-			f = maybe(find(y->v_ptr,x->v_ptr));
+		value obj = arg(f->R);
+		if (obj->T == type_record)
+			f = maybe(record_find(obj->v_ptr,key->v_ptr));
 		else
 			f = hold(Qvoid);
-		drop(y);
+		drop(obj);
 		}
 	else
 		f = hold(Qvoid);
-	drop(x);
+	drop(key);
 	return f;
 	}
+	}
+
+value type_record_copy(value f)
+	{
+	value obj = arg(f->R);
+	if (obj->T == type_record)
+		f = record_copy(obj);
+	else
+		f = hold(Qvoid);
+	drop(obj);
+	return f;
 	}
 
 // Return the number of items in the record.
 value type_record_count(value f)
 	{
-	value x = arg(f->R);
-	if (x->T == type_record)
-		f = Qnum((double)((struct record *)x->v_ptr)->count);
+	value obj = arg(f->R);
+	if (obj->T == type_record)
+		f = Qnum((double)((struct record *)obj->v_ptr)->count);
 	else
 		f = hold(Qvoid);
-	drop(x);
+	drop(obj);
 	return f;
 	}
 
@@ -260,14 +271,14 @@ value type_record_item(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
-	value x = arg(f->L->R);
-	if (x->T == type_record)
+	value obj = arg(f->L->R);
+	if (obj->T == type_record)
 		{
-		value y = arg(f->R);
-		if (y->T == type_num)
+		value vpos = arg(f->R);
+		if (vpos->T == type_num)
 			{
-			struct record *rec = x->v_ptr;
-			unsigned long pos = get_ulong(y);
+			struct record *rec = obj->v_ptr;
+			unsigned long pos = get_ulong(vpos);
 			if (pos < rec->count)
 				{
 				struct item *item = rec->vec+pos;
@@ -278,11 +289,11 @@ value type_record_item(value f)
 			}
 		else
 			f = hold(Qvoid);
-		drop(y);
+		drop(vpos);
 		}
 	else
 		f = hold(Qvoid);
-	drop(x);
+	drop(obj);
 	return f;
 	}
 	}
