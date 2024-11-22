@@ -129,14 +129,12 @@ format_num
 
 \str_to_data=
 	(\str
-	value
-	(
-	def "T" T;
-	def "F" F;
-	def "void" void;
-	void
-	);
-	parse str ""
+	restrict;
+	define "T" T
+	define "F" F
+	define "void" void
+
+	evaluate; parse str ""
 	)
 
 # (count_match at_beg match str) Count the number of matching characters at
@@ -186,21 +184,20 @@ format_num
 	r
 	)
 
-def "repeat_str" repeat_str;
-def "format_num" format_num;
-def "format_money" format_money;
-def "fexl_quote" fexl_quote;
-def "uc" uc;
-def "lc" lc;
-def "render_data" render_data;
-def "put_data" put_data;
-def "fput_data" fput_data;
-def "as_str" as_str;
-def "str_to_data" str_to_data;
-def "count_match" count_match;
-def "str_trim" str_trim;
-def "trim_spaces" trim_spaces;
-def "trim_beg_spaces" trim_beg_spaces;
-def "trim_end_spaces" trim_end_spaces;
-def "random_digits" random_digits;
-std
+define "repeat_str" repeat_str
+define "format_num" format_num
+define "format_money" format_money
+define "fexl_quote" fexl_quote
+define "uc" uc
+define "lc" lc
+define "render_data" render_data
+define "put_data" put_data
+define "fput_data" fput_data
+define "as_str" as_str
+define "str_to_data" str_to_data
+define "count_match" count_match
+define "str_trim" str_trim
+define "trim_spaces" trim_spaces
+define "trim_beg_spaces" trim_beg_spaces
+define "trim_end_spaces" trim_end_spaces
+define "random_digits" random_digits

@@ -24,7 +24,7 @@ var_put v_map void
 \\pairs=(var_get v_list)
 \\count=(var_get v_count)
 
-\update_map=
+\update_map= # LATER 20241119 use record
 	(\v\key\val
 	update v
 		(\map

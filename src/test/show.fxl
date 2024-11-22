@@ -1,5 +1,6 @@
 #
-value (load "test.fxl"; std) \;
+use "test.fxl"
+evaluate \;
 
 \name=(argv 2)
 is_undef name (error "Missing test name");

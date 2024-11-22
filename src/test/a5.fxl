@@ -1,10 +1,6 @@
 #
-value
-(
-def "talk" (say "TALK");
-std
-)
-\;
+define "talk" (say "TALK")
+evaluate \;
 say "begin"
 talk
 talk

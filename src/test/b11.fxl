@@ -82,7 +82,7 @@ say (eq str1 str2)
 
 (
 say "= test file_content"
-\fh=(fopen (path_under dir_local "data.txt") "r")
+\fh=(fopen (. dir_local "data.txt") "r")
 \str=(file_content fh)
 \str=(slice str 0 28)
 put str
@@ -90,7 +90,7 @@ nl
 )
 (
 say "= test file_bytes"
-\source=(path_under dir_base "src/test/hello.fxl")
+\source=(. dir_base "src/test/hello.fxl")
 \fh=(fopen source "r")
 \bytes=(file_bytes fh)
 say (as_str bytes)
@@ -437,20 +437,14 @@ try void
 try void
 )
 
-# Test import.
+# Test use with alternative names.
 (
-say "= import"
-# Evaluate with alternative names.
-\cx=(load "test.fxl"; std)
-value
-(
-with "div" (cx "div");
-with "test.show_hex" (cx "show_hex");
-with "test.show_str" (cx "show_str");
-void
-)
-\;
-div
+say "= use"
+guard;
+define "define" (\key define (. "test." key))
+use "test.fxl"
+evaluate \;
+test.div
 test.show_hex ""
 test.show_hex "abcd"
 test.show_hex "123"

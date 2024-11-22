@@ -59,12 +59,12 @@
 \run_fexl_file=(\name run_command [(argv 0)" test/"name".fxl"])
 \run_fexl_text=(run_command [(argv 0)])
 
-def "div" div;
-def "show_list" show_list;
-def "run_test" run_test;
-def "show_str" show_str;
-def "show_hex" show_hex;
-def "block_quote" block_quote;
-def "run_fexl_file" run_fexl_file;
-def "run_fexl_text" run_fexl_text;
-std
+define "div" div
+define "show_list" show_list
+define "run_test" run_test
+define "show_str" show_str
+define "show_hex" show_hex
+define "block_quote" block_quote
+define "run_command" run_command
+define "run_fexl_file" run_fexl_file
+define "run_fexl_text" run_fexl_text

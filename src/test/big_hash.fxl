@@ -1,5 +1,6 @@
 #
-value (load "test.fxl"; std) \;
+use "test.fxl"
+evaluate \;
 
 # Reference: https://www.di-mgt.com.au/sha_testvectors.html
 # Test the extremely-long message.

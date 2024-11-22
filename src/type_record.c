@@ -23,7 +23,7 @@ static void clear_record(value f)
 	}
 
 // LATER 20221213 Perhaps use binary search.
-static value record_find(struct record *rec, string key)
+value record_find(struct record *rec, string key)
 	{
 	unsigned long pos;
 
@@ -104,7 +104,7 @@ static void shift_items(struct item *vec, unsigned long n, unsigned long pos)
 		vec[i] = vec[i-1];
 	}
 
-static void record_set_inline(value obj, value key, value val)
+void record_set(value obj, value key, value val)
 	{
 	struct record *rec = obj->v_ptr;
 	string s_key = key->v_ptr;
@@ -161,20 +161,6 @@ static value record_copy(value obj)
 	return Qrecord(new_rec);
 	}
 
-// LATER 20241120 In a new version I am eliminating the automatic copy based on
-// reference count.  Instead all records will be mutable and you can make an
-// explicit copy if you like.
-static value record_set(value obj, value key, value val)
-	{
-	if (obj->N <= 2)
-		hold(obj);
-	else
-		obj = record_copy(obj);
-
-	record_set_inline(obj,key,val);
-	return obj;
-	}
-
 // Return an empty record.
 value record_empty(void)
 	{
@@ -183,38 +169,44 @@ value record_empty(void)
 	return Qrecord(new_record(count,size));
 	}
 
+value type_empty(value f)
+	{
+	return record_empty();
+	(void)f;
+	}
+
 static value op_set(value f, value op(value))
 	{
 	if (f->L->L == 0) return keep(f);
 	if (f->L->L->L == 0) return keep(f);
 	{
-	value key = arg(f->L->L->R);
-	if (key->T == type_str)
+	value obj = arg(f->L->L->R);
+	if (obj->T == type_record)
 		{
-		value obj = arg(f->R);
-		if (obj->T == type_record)
-			f = record_set(obj,key,op(f->L->R));
+		value key = arg(f->L->R);
+		if (key->T == type_str)
+			{
+			record_set(obj,key,op(f->R));
+			f = hold(QI);
+			}
 		else
 			f = hold(Qvoid);
-		drop(obj);
+		drop(key);
 		}
 	else
 		f = hold(Qvoid);
-	drop(key);
+	drop(obj);
 	return f;
 	}
 	}
 
-// (set key val obj) Set key to val in obj, after evaluating val.
-// This returns a record like obj but with key mapped to val.  It modifies obj
-// inline if there are no other references to it; otherwise it returns a
-// modified copy of obj.
+// (set obj key val) Set key to val in obj, after evaluating val.
 value type_set(value f)
 	{
 	return op_set(f,arg);
 	}
 
-// (setf key val obj) Set key to val in obj, without evaluating val.
+// (setf obj key val) Set key to val in obj, without evaluating val.
 value type_setf(value f)
 	{
 	return op_set(f,hold);

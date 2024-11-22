@@ -1,10 +1,11 @@
 #
-value (load "lib/index_C/context.fxl"; std) \;
+use "lib/index_C/context.fxl"
+evaluate \;
 
 \try_pairs=
 	(\pairs
 	say "function:"
-	compile_pairs pairs
+	put (compile_pairs pairs)
 	nl
 	)
 

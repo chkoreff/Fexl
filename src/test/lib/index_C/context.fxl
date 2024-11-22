@@ -1,12 +1,9 @@
 # Compile an index into C code.
-extend
-(
-load "lib/render/C.fxl";
-load "lib/render/base.fxl";
-load "lib/index/index.fxl";
-std
-)
-\;
+use "lib/render/base.fxl"
+use "lib/index/index.fxl"
+use "lib/render/C.fxl"
+
+evaluate \;
 
 # Process all the rows in an index.
 \do_rows=
@@ -103,7 +100,6 @@ std
 	compile_index index
 	)
 
-def "compile_index" compile_index;
-def "index_put_pairs" index_put_pairs;
-def "compile_pairs" compile_pairs;
-std
+define "compile_index" compile_index
+define "index_put_pairs" index_put_pairs
+define "compile_pairs" compile_pairs

@@ -4,11 +4,18 @@
 #include <basic.h>
 #include <die.h>
 #include <report.h>
+#include <type_record.h>
 #include <type_str.h>
 #include <type_sym.h>
 #include <type_with.h>
 
 static value Qstd;
+
+value type_std(value f)
+	{
+	return hold(Qstd);
+	(void)f;
+	}
 
 value type_quo(value f)
 	{
@@ -162,123 +169,106 @@ value type_is_closed(value f)
 	return f;
 	}
 
-static value cache;
-
-static value find_cache(string name)
+static void set_std(value obj)
 	{
-	value pos = cache;
-	while (pos)
+	drop(Qstd);
+	Qstd = obj;
+	}
+
+void define(const char *s_key, value val)
+	{
+	value key = Qstr0(s_key);
+	record_set(Qstd,key,val);
+	drop(key);
+	}
+
+// (define key val) Define key as val in std.
+value type_define(value f)
+	{
+	if (f->L->L == 0) return keep(f);
+	{
+	value key = arg(f->L->R);
+	if (key->T == type_str)
 		{
-		if (str_eq(name,pos->L->R->v_ptr))
-			return pos->R;
-		pos = pos->next;
+		record_set(Qstd,key,hold(f->R));
+		f = hold(QI);
 		}
-	return 0;
+	else
+		f = hold(Qvoid);
+	drop(key);
+	return f;
+	}
 	}
 
-static void push_cache(value exp, value val)
-	{
-	value top = new_value();
-	top->L = exp;
-	top->R = val;
-	top->next = cache;
-	cache = top;
-	}
-
-static void clear_cache(void)
-	{
-	while (cache)
-		{
-		value next = cache->next;
-		drop(cache->R);
-		recycle(cache);
-		cache = next;
-		}
-	}
-
-static value resolve(value exp, value cx, const char *label)
+static value resolve(value exp)
 	{
 	if (exp->T == type_quo)
 		return hold(exp);
 	else if (exp->T == type_ref)
 		{
-		string name = exp->R->v_ptr;
-		value val = find_cache(name);
+		struct record *rec = Qstd->v_ptr;
+		string key = exp->R->v_ptr;
+		value val = record_find(rec,key);
 		if (val)
-			return (val->T == type_quo) ? hold(val) : hold(exp);
+			return quo(hold(val));
 		else
-			{
-			value key = hold(Qstr(name));
-			value val = eval(A(A(hold(cx),key),hold(Qyield)));
-			value new;
-
-			if (val->L == Qyield)
-				new = quo(hold(val->R));
-			else
-				{
-				undefined_symbol(str_data(exp->R),exp->R->N,label);
-				new = hold(exp);
-				}
-
-			if (key->N == 1)
-				recycle(key);
-			else
-				{
-				// Copy the string only if you held onto the key.
-				key->v_ptr = str_copy(name);
-				drop(key);
-				}
-
-			drop(val);
-			push_cache(exp,new);
-			return hold(new);
-			}
+			return hold(exp);
 		}
 	else
 		{
-		value L = resolve(exp->L,cx,label);
-		value R = resolve(exp->R,cx,label);
+		value L = resolve(exp->L);
+		value R = resolve(exp->R);
 		return join(exp->T,L,R);
 		}
 	}
 
-static value do_resolve(value exp, value cx, const char *label)
+static void report_undef(value exp, const char *label)
 	{
-	value save_cache = cache;
-	cache = 0;
-	exp = resolve(exp,cx,label);
-	clear_cache();
-	cache = save_cache;
-	return exp;
+	if (exp->T == type_quo)
+		;
+	else if (exp->T == type_ref)
+		{
+		string key = exp->R->v_ptr;
+		undefined_symbol(key->data,exp->R->N,label);
+		}
+	else
+		{
+		report_undef(exp->L,label);
+		report_undef(exp->R,label);
+		}
 	}
 
-// (value cx form) Resolve all the symbols in the form and return its value.
-// If there are any undefined symbols, report them all and die.
-// The cx function maps a name to (yield val) if defined, otherwise void.
-value type_value(value f)
-	{
-	if (f->L->L == 0) return keep(f);
+// (resolve form) Resolve any symbols defined in std.
+value type_resolve(value f)
 	{
 	value form = arg(f->R);
 	if (form->T == type_form)
 		{
-		value exp = form->R;
-		if (exp->T == type_quo)
-			f = hold(exp->R);
+		f = resolve(form->R);
+		f = Qform(hold(form->L),f);
+		}
+	else
+		f = hold(Qvoid);
+	drop(form);
+	return f;
+	}
+
+/*
+(evaluate form) Evaluate the form in std.  If there are any undefined symbols,
+report them all and die.
+*/
+value type_evaluate(value f)
+	{
+	value form = arg(f->R);
+	if (form->T == type_form)
+		{
+		f = resolve(form->R);
+		if (f->T == type_quo)
+			f = unquo(f);
 		else
 			{
-			const char *label = str_data(form->L);
-			value cx = (f->L->R = eval(f->L->R));
-			exp = do_resolve(exp,cx,label);
-
-			if (exp->T == type_quo)
-				f = unquo(exp);
-			else
-				{
-				drop(exp);
-				die(0);
-				f = hold(Qvoid); // not reached
-				}
+			report_undef(f,str_data(form->L));
+			die(0);
 			}
 		}
 	else
@@ -286,21 +276,25 @@ value type_value(value f)
 	drop(form);
 	return f;
 	}
-	}
 
-// \extend=(\cx value (def "std" cx; cx))
-value type_extend(value f)
+// (set_std rec) Set the current context to the record.
+value type_set_std(value f)
 	{
-	value cx = eval(f->R);
-	cx = Qassoc(hold(Qstd),yield(hold(cx)),cx);
-	f->R = cx;
-	f->T = type_value;
-	return hold(f);
+	value x = arg(f->R);
+	if (x->T == type_record)
+		{
+		set_std(hold(x));
+		f = hold(QI);
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
 	}
 
 void beg_sym(void)
 	{
-	Qstd = Qstr0("std");
+	Qstd = record_empty();
 	}
 
 void end_sym(void)

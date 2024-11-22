@@ -5,7 +5,6 @@ extern value QY;
 extern value Qvoid;
 extern value Qnull;
 extern value Qonce;
-extern value Qyield;
 extern value type_I(value f);
 extern value type_T(value f);
 extern value type_F(value f);

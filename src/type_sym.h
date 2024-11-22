@@ -1,3 +1,4 @@
+extern value type_std(value f);
 extern value type_quo(value f);
 extern value type_ref(value f);
 extern value quo(value val);
@@ -10,7 +11,10 @@ extern value Qform(value label, value exp);
 extern value type_D(value f);
 extern value type_E(value f);
 extern value type_is_closed(value f);
-extern value type_value(value f);
-extern value type_extend(value f);
+extern void define(const char *s_key, value val);
+extern value type_define(value f);
+extern value type_resolve(value f);
+extern value type_evaluate(value f);
+extern value type_set_std(value f);
 extern void beg_sym(void);
 extern void end_sym(void);
