@@ -188,7 +188,8 @@ static value def_core(void)
 	if (match("rand")) return Q0(type_rand);
 
 	if (match("parse")) return Q(type_parse);
-	if (match("use_file")) return Q(type_use_file);
+	if (match("parse_file")) return Q(type_parse_file);
+	if (match("use_file")) return Q(type_parse_file); // LATER 20241123 deprecated
 
 	if (match("is_closed")) return Q(type_is_closed);
 	if (match("value")) return Q(type_value);
@@ -218,7 +219,7 @@ static value def_core(void)
 	if (match("pack")) return Q(type_pack);
 
 	// record
-	if (match("empty")) return record_empty();
+	if (match("empty")) return Q0(type_empty);
 	if (match("set")) return Q(type_set);
 	if (match("setf")) return Q(type_setf);
 	if (match("get")) return Q(type_get);
@@ -311,7 +312,7 @@ static void end_const(void)
 
 static value extend(value cx, value name)
 	{
-	return A(A(Q(type_extend),cx),A(Q(type_use_file),name));
+	return A(A(Q(type_extend),cx),A(Q(type_parse_file),name));
 	}
 
 // Return a path name relative to the base directory.

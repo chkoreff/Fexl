@@ -47,7 +47,7 @@
 \show_benchmark=(run_benchmark say)
 
 # Use a file in the directory which contains the user's script.
-\use=(\name use_file; path_under dir_local name)
+\use=(\name parse_file; path_under dir_local name)
 \load=(\name\cx extend cx; use name)
 
 def "defc" defc;
@@ -78,7 +78,7 @@ std
 
 # Load libraries into the standard context on demand.
 \dir_lib=(path_under dir_base "src/lib")
-\use=(\name use_file; path_under dir_lib name)
+\use=(\name parse_file; path_under dir_lib name)
 \load=(\name\cx extend cx; use name)
 
 defc "std";

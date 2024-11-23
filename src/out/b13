@@ -11,7 +11,7 @@ name if : T
 name each : T
 name div : T
 name show_list : T
-name use_file : T
+name parse_file : T
 name use : T
 name void : T
 name dirname : T
@@ -35,7 +35,7 @@ name if : F
 name each : F
 name div : F
 name show_list : F
-name use_file : F
+name parse_file : F
 name use : F
 name void : F
 name dirname : F

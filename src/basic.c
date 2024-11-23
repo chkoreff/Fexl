@@ -105,7 +105,7 @@ value type_yield(value f)
 
 value yield(value x)
 	{
-	return V(type_yield,hold(Qyield),x);
+	return V(type_yield,hold(QI),x);
 	}
 
 // Return either no or (yes x).

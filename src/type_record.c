@@ -183,6 +183,12 @@ value record_empty(void)
 	return Qrecord(new_record(count,size));
 	}
 
+value type_empty(value f)
+	{
+	return record_empty();
+	(void)f;
+	}
+
 static value op_set(value f, value op(value))
 	{
 	if (f->L->L == 0) return keep(f);

@@ -39,4 +39,4 @@ a c
 c
 ~
 
-run_fexl_text ~ use_file "missing.fxl" ~
+run_fexl_text ~ parse_file "missing.fxl" ~

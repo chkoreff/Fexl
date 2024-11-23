@@ -30,7 +30,7 @@ value type_parse(value f)
 
 // Parse a named file.  Note that if name designates a directory the fopen will
 // succeed, but it will behave like an empty file.
-static value use_file(value name)
+static value parse_file(value name)
 	{
 	const char *name_s = str_data(name);
 	FILE *fh = name_s[0] ? fopen(name_s,"r") : stdin;
@@ -43,12 +43,12 @@ static value use_file(value name)
 	return parse_fexl(Qfile(fh),name);
 	}
 
-// (use_file name) Parse the named file.
-value type_use_file(value f)
+// (parse_file name) Parse the named file.
+value type_parse_file(value f)
 	{
 	value name = arg(f->R);
 	if (name->T == type_str)
-		f = use_file(name);
+		f = parse_file(name);
 	else
 		f = hold(Qvoid);
 	drop(name);
