@@ -83,6 +83,7 @@ static value def_core(void)
 	if (match("cons")) return Q(type_cons);
 	if (match("null")) return hold(Qnull);
 	if (match("eval")) return Q(type_eval);
+	if (match("once")) return hold(Qonce);
 	if (match("yield")) return hold(Qyield);
 
 	if (match("is_defined")) return Q(type_is_defined);

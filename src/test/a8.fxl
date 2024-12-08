@@ -9,7 +9,7 @@ stream_get (say "get" rand) \\xs
 
 # This is the first three items of the infinite list.  Note again that I use \\
 # to avoid getting the first value right away.
-\\xs=(\= first 3 xs)
+\\xs=(once; first 3 xs)
 
 \\show=
 	(

@@ -2,7 +2,7 @@
 \\test_1=
 (
 say "== test_1" # says PING 1 time
-\\ping=(\= say "PING")
+\\ping=(once; say "PING")
 I
 ping
 ping
@@ -13,7 +13,7 @@ ping
 (
 say "== test_2" # says PING 5 times
 \\ping=(say "PING")
-\\other=(\= ping)
+\\other=(once ping)
 \\talk=(ping other)
 \\talk=(talk talk)
 \\talk=(talk talk)
@@ -32,7 +32,7 @@ talk talk talk
 (
 say "== test_4" # says PING pong PING PING PING
 \\ping=(say "PING")
-\\pong=(\= say "pong")
+\\pong=(once; say "pong")
 \\talk=(ping pong)
 \\talk=(talk talk)
 \\talk=(talk talk)

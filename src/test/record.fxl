@@ -183,7 +183,7 @@
 	ge pos count [];
 	\item=(record_item obj pos)
 	\pos=(+ 1 pos)
-	[item;\= loop pos]
+	[item; once; loop pos]
 	)
 	0
 	)
