@@ -88,7 +88,7 @@ To see the current version number (http://semver.org):
 cat VERSION
 ```
 
-## Test bug in GNU coreutils 8.13.
+## Test sort in GNU coreutils.
 
 ```
 (cd test/ls_bug; ./try)
