@@ -76,7 +76,7 @@ def "show_benchmark" show_benchmark;
 std
 )
 
-# Load libraries into the standard context on demand.
+# Load libraries into the standard context.
 \dir_lib=(path_under dir_base "src/lib")
 \use=(\name parse_file; path_under dir_lib name)
 \load=(\name\cx extend cx; use name)
