@@ -6,7 +6,8 @@
 	)
 
 \\fh_entropy=
-	(\=
+	(once;
+
 	\source="/dev/urandom" # Normally you'd use this.
 	\source="/dev/zero" # Tests all zeroes.
 
@@ -23,7 +24,7 @@
 # Yield the next n bytes from the entropy source.  The list is created only on
 # demand, and is also a _fixed_ list, so I can print it repeatedly and see the
 # same thing each time.
-\get_bytes=(\n yield; \= first n; list_entropy)
+\get_bytes=(\n yield; once; first n; list_entropy)
 
 \\get_random_id=
 	(

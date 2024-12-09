@@ -135,6 +135,7 @@ static void use_core(void)
 	define("cons",Q(type_cons));
 	define("null",hold(Qnull));
 	define("eval",Q(type_eval));
+	define("once",hold(Qonce));
 	define("yield",Q(type_yield));
 
 	define("is_defined",Q(type_is_defined));

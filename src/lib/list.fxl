@@ -3,7 +3,7 @@
 	(\\xs\\ys
 	(@\\loop\\xs
 	xs ys \\x\\xs
-	[x;\=loop xs]
+	[x;once; loop xs]
 	) xs
 	)
 
@@ -27,7 +27,7 @@
 	(\\f @\\loop \\xs
 	xs [] \x\\xs
 	\x=(f x)
-	[x;\=loop xs]
+	[x;once; loop xs]
 	)
 
 # Eager map.
@@ -45,7 +45,7 @@
 	xs [] \x\\xs
 	\y=(fn x)
 	is_good y (cons y) ();
-	\=loop xs
+	once; loop xs
 	)
 
 # (filter f xs) is the list of items x in xs for which (f x) is true.
@@ -53,7 +53,7 @@
 	(\\f @\\loop \\xs
 	xs [] \x\\xs
 	f x (cons x) ();
-	\=loop xs
+	once; loop xs
 	)
 
 # Reverse list xs.
@@ -268,7 +268,7 @@
 \stream_values=
 	(\\get @\\loop
 	\x=get
-	[x;\=loop]
+	[x; once loop]
 	)
 
 # (stream_get get) yields the list of future value of get, terminated by void.
@@ -276,10 +276,10 @@
 \stream_get=
 	(\\get
 	yield;
-	\=
+	once;
 	@\\loop
 	\x=get
-	is_undef x [] [x;\=loop]
+	is_undef x [] [x; once loop]
 	)
 
 # Gather input items into a list.  This is equivalent to stream_values except
@@ -287,7 +287,7 @@
 \get_list=
 	(\\get @\\loop
 	\x=get
-	is_undef x [] [x;\=loop]
+	is_undef x [] [x; once loop]
 	)
 
 # Flatten a piece of data (string, number, boolean, or list) into a string.

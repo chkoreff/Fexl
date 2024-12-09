@@ -5,7 +5,7 @@ evaluate \;
 \try_pairs=
 	(\pairs
 	say "function:"
-	put (compile_pairs pairs)
+	compile_pairs pairs
 	nl
 	)
 

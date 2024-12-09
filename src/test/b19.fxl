@@ -1,4 +1,5 @@
 # Test assoc list.
+
 show_benchmark;
 
 \add_random_keys=
