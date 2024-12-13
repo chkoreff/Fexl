@@ -31,7 +31,7 @@ talk
 div
 # Should say PING six times.
 \\ping=(say "ping")
-\\other=(once ping)
+\\other=(\= ping)
 \\talk=(ping other)
 talk
 talk
@@ -299,7 +299,7 @@ And the world is mine to win. ..."
 div
 \\show=
 	(
-	(once; say "(CALC)")
+	(\=say "(CALC)")
 	\x=(* 5 6)
 	say ["x = " x]
 	)
@@ -312,12 +312,12 @@ show
 say "]"
 
 (
-\\x=(once; put "(CALC)" + 2 (* 7 6))
+\\x=(\=put "(CALC)" + 2 (* 7 6))
 
 \make_square=
 	(\x
 	yield;
-	(once; put ["square " x "="])
+	(\=put ["square " x "="])
 	* x x
 	)
 
@@ -619,9 +619,9 @@ try
 	(\x append x x);
 	[
 	(put "(1)" "a")
-	(once; put "(2)" I;I;"b")
+	(\= put "(2)" I;I;"b")
 	(put "(3)" "c")
-	(once; put "(4)" "d")
+	(\= put "(4)" "d")
 	]
 	)
 )
@@ -746,7 +746,7 @@ test_context
 div
 \\try=
 (
-(once; say "Let's parse.")
+(\=say "Let's parse.")
 eval_file "hello.fxl"
 )
 
@@ -764,7 +764,7 @@ div
 \x say [x " " (* 3 x)]
 ~~
 
-(once; say "Let's parse.")
+(\=say "Let's parse.")
 eval_str source
 )
 
@@ -840,8 +840,8 @@ This also goes to the file.
 	div
 
 	\\open=(fopen tmp_file)
-	\\fh_w=(once; open "w")
-	\\fh_r=(once; open "r")
+	\\fh_w=(\= open "w")
+	\\fh_r=(\= open "r")
 
 	\put=
 		(\x

@@ -178,8 +178,8 @@ Return (a x) if that is defined, otherwise return (b x).
 
 \::=
 	(
-	\\a \\a=(once a)
-	\\b \\b=(once b)
+	\\a \\a=(\= a)
+	\\b \\b=(\= b)
 	\x
 	\v=(a x)
 	is_defined v v (b x)
