@@ -7,7 +7,6 @@
 #include <type_record.h>
 #include <type_str.h>
 #include <type_sym.h>
-#include <type_with.h>
 
 static value Qstd;
 
