@@ -47,17 +47,10 @@ value ref(string name, unsigned long line)
 	return V(type_ref,&clear,x);
 	}
 
-static value unquo(value f)
-	{
-	value x = hold(f->R);
-	drop(f);
-	return x;
-	}
-
 value join(type t, value x, value y)
 	{
 	if (x->T == type_quo && y->T == type_quo)
-		return quo(V(t,unquo(x),unquo(y)));
+		return quo(V(t,tail(x),tail(y)));
 	else
 		return V(t,x,y);
 	}
@@ -108,7 +101,7 @@ value lam(type type, string name, value e)
 	value f = subf(p,e,x);
 	drop(x);
 	if (f->T == type_quo)
-		f = quo(V(type,p,unquo(f)));
+		f = quo(V(type,p,tail(f)));
 	else
 		f = V(type,quo(p),f);
 	str_free(name);
@@ -180,7 +173,7 @@ static void push_cache(value exp, value val)
 	{
 	value top = new_value();
 	top->L = exp;
-	top->R = val;
+	top->R = hold(val);
 	top->next = cache;
 	cache = top;
 	}
@@ -196,6 +189,29 @@ static void clear_cache(void)
 		}
 	}
 
+static value resolve_name(string name, value cx)
+	{
+	value key = hold(Qstr(name));
+	value result = eval(A(A(hold(cx),key),hold(Qyield)));
+
+	if (key->N == 1)
+		recycle(key);
+	else
+		{
+		// Copy the string only if you held onto the key.
+		key->v_ptr = str_copy(name);
+		drop(key);
+		}
+
+	if (result->L == Qyield)
+		return tail(result);
+	else
+		{
+		drop(result);
+		return 0;
+		}
+	}
+
 static value resolve(value exp, value cx, const char *label)
 	{
 	if (exp->T == type_quo)
@@ -204,34 +220,23 @@ static value resolve(value exp, value cx, const char *label)
 		{
 		string name = exp->R->v_ptr;
 		value val = find_cache(name);
+
 		if (val)
 			return (val->T == type_quo) ? hold(val) : hold(exp);
 		else
 			{
-			value key = hold(Qstr(name));
-			value val = eval(A(A(hold(cx),key),hold(Qyield)));
-			value new;
+			value val = resolve_name(name,cx);
 
-			if (val->L == Qyield)
-				new = quo(hold(val->R));
+			if (val)
+				val = quo(val);
 			else
 				{
 				undefined_symbol(str_data(exp->R),exp->R->N,label);
-				new = hold(exp);
+				val = hold(exp);
 				}
 
-			if (key->N == 1)
-				recycle(key);
-			else
-				{
-				// Copy the string only if you held onto the key.
-				key->v_ptr = str_copy(name);
-				drop(key);
-				}
-
-			drop(val);
-			push_cache(exp,new);
-			return hold(new);
+			push_cache(exp,val);
+			return val;
 			}
 		}
 	else
@@ -272,7 +277,7 @@ value type_value(value f)
 			exp = do_resolve(exp,cx,label);
 
 			if (exp->T == type_quo)
-				f = unquo(exp);
+				f = tail(exp);
 			else
 				{
 				drop(exp);

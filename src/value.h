@@ -33,5 +33,6 @@ extern value Q(type T);
 extern value A(value x, value y);
 extern value keep(value f);
 extern unsigned long cur_steps;
+extern value tail(value f);
 extern value eval(value f);
 extern value arg(value f);

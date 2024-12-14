@@ -160,7 +160,7 @@ struct stream
 
 static struct stream beg_stream(input get, void *source)
 	{
-	struct stream s = (struct stream){cur_ch, cur_line, cur_get, cur_source};
+	struct stream s = {cur_ch, cur_line, cur_get, cur_source};
 	cur_get = get;
 	cur_source = source;
 	skip();

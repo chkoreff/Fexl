@@ -70,10 +70,9 @@ static void put_data(value f)
 		limit_show(f->R);
 	else if (f->T == type_ref)
 		{
-		value x = f->R;
-		put_quote(x->v_ptr);
+		put_quote(f->R->v_ptr);
 		put_ch(' ');
-		put_ulong(x->N);
+		put_ulong(f->R->N);
 		}
 	else
 		put("DATA");

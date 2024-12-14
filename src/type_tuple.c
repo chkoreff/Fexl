@@ -15,11 +15,8 @@ value type_tuple(value f)
 		args = eval(args);
 		if (args->T == type_list)
 			{
-			value head = hold(args->L);
-			value tail = hold(args->R);
-			drop(args);
-			args = tail;
-			exp = A(exp,head);
+			exp = A(exp,hold(args->L));
+			args = tail(args);
 			}
 		else if (args->T == type_null)
 			{
