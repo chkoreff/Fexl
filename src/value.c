@@ -128,10 +128,19 @@ value keep(value f)
 
 unsigned long cur_steps;
 
+value tail(value f)
+	{
+	value x = hold(f->R);
+	drop(f);
+	return x;
+	}
+
 static value step(value f)
 	{
 	value g;
-	if (f->N == 1)
+	if (f->L->T)
+		g = f->L;
+	else if (f->N == 1)
 		g = (f->L = eval(f->L));
 	else
 		{
@@ -139,11 +148,7 @@ static value step(value f)
 		if (g == f->L)
 			drop(g);
 		else
-			{
-			value x = hold(f->R);
-			drop(f);
-			f = A(g,x);
-			}
+			f = A(g,tail(f));
 		}
 
 	g = g->T(f);

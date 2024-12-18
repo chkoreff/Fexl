@@ -53,17 +53,10 @@ value ref(string name, unsigned long line)
 	return V(type_ref,&clear,x);
 	}
 
-static value unquo(value f)
-	{
-	value x = hold(f->R);
-	drop(f);
-	return x;
-	}
-
 value join(type t, value x, value y)
 	{
 	if (x->T == type_quo && y->T == type_quo)
-		return quo(V(t,unquo(x),unquo(y)));
+		return quo(V(t,tail(x),tail(y)));
 	else
 		return V(t,x,y);
 	}
@@ -114,7 +107,7 @@ value lam(type type, string name, value e)
 	value f = subf(p,e,x);
 	drop(x);
 	if (f->T == type_quo)
-		f = quo(V(type,p,unquo(f)));
+		f = quo(V(type,p,tail(f)));
 	else
 		f = V(type,quo(p),f);
 	str_free(name);
@@ -263,7 +256,7 @@ value type_evaluate(value f)
 		{
 		f = resolve(form->R);
 		if (f->T == type_quo)
-			f = unquo(f);
+			f = tail(f);
 		else
 			{
 			report_undef(f,str_data(form->L));
