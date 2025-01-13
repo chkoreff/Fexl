@@ -70,8 +70,11 @@ static void put_data(value f)
 	else if (f->T == type_ref)
 		{
 		put_quote(f->R->v_ptr);
+		if (0) // Don't show the line number.
+		{
 		put_ch(' ');
 		put_ulong(f->R->N);
+		}
 		}
 	else
 		put("DATA");
@@ -98,8 +101,11 @@ static void limit_show(value f)
 		put_ch(' ');
 		if (f->L->N)
 			{
+			if (f->T != type_form) // Don't show the file name.
+			{
 			limit_show(f->L);
 			put_ch(' ');
+			}
 			limit_show(f->R);
 			}
 		else
@@ -120,4 +126,15 @@ void show_exp(value f)
 void show(const char *name, value f)
 	{
 	put(name);show_exp(f);nl();
+	}
+
+static value type_show(value f)
+	{
+	show_exp(f->R);nl();
+	return hold(QI);
+	}
+
+void run(void)
+	{
+	define("show",Q(type_show));
 	}

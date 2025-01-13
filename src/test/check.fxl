@@ -45,6 +45,7 @@
 "sat"
 "sort"
 "stats"
+"lib"
 "stream"
 "resolve"
 "record"
