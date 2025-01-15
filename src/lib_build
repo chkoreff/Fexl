@@ -91,6 +91,9 @@ compile()
 		# The next option enforces ISO C90 compatibility.
 		options="$options -Wdeclaration-after-statement"
 
+		# This option saves the .i and .s files along with the .o file.
+		#options="$options -save-temps=obj"
+
 		run gcc -c $options -O3 -I . $file_c -o $file_o
 	fi
 	}
