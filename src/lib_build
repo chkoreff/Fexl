@@ -61,7 +61,6 @@ compile()
 	push $file_o
 
 	local file_c=$name.c
-	mkdir -p $(dirname $file_o)
 
 	# Make sure header cache file obj/$name.dep is up to date.
 	local file_dep=../obj/$name.dep
@@ -110,7 +109,6 @@ link()
 	local file_e=../bin/$name
 	stale $file_e $objects
 	if [ $? -eq 1 ]; then
-		mkdir -p $(dirname $file_e)
 		run gcc -s $objects -o $file_e
 	fi
 	objects=""
@@ -131,3 +129,6 @@ case "$1" in
 		exit 2
 		;;
 esac
+
+mkdir -p ../obj
+mkdir -p ../bin
