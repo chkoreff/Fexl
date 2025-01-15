@@ -68,7 +68,6 @@ compile()
 	push $file_o
 
 	local file_c=$name.c
-	mkdir -p $(dirname $file_o)
 
 	# Make sure header cache file obj/$name.dep is up to date.
 	local file_dep=../obj/$name.dep
@@ -127,7 +126,6 @@ make_lib()
 	local update=$?
 
 	if [ $update -eq 1 ]; then
-		mkdir -p $(dirname $file_so)
 		run gcc -s -shared $objects -o $file_so
 	fi
 	objects=""
@@ -140,7 +138,6 @@ link()
 	local file_e=../bin/$name
 	stale $file_e $objects
 	if [ $? -eq 1 ]; then
-		mkdir -p $(dirname $file_e)
 		run gcc -rdynamic -s $objects -o $file_e
 	fi
 	objects=""
@@ -162,3 +159,7 @@ case "$1" in
 		exit 2
 		;;
 esac
+
+mkdir -p ../obj
+mkdir -p ../lib
+mkdir -p ../bin
