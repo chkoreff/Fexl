@@ -212,33 +212,36 @@ static value resolve_name(string name, value cx)
 		}
 	}
 
+static value resolve_ref(value exp, value cx, const char *label)
+	{
+	string name = exp->R->v_ptr;
+	value val = find_cache(name);
+
+	if (val)
+		return (val->T == type_quo) ? hold(val) : hold(exp);
+	else
+		{
+		value val = resolve_name(name,cx);
+
+		if (val)
+			val = quo(val);
+		else
+			{
+			undefined_symbol(str_data(exp->R),exp->R->N,label);
+			val = hold(exp);
+			}
+
+		push_cache(exp,val);
+		return val;
+		}
+	}
+
 static value resolve(value exp, value cx, const char *label)
 	{
 	if (exp->T == type_quo)
 		return hold(exp);
 	else if (exp->T == type_ref)
-		{
-		string name = exp->R->v_ptr;
-		value val = find_cache(name);
-
-		if (val)
-			return (val->T == type_quo) ? hold(val) : hold(exp);
-		else
-			{
-			value val = resolve_name(name,cx);
-
-			if (val)
-				val = quo(val);
-			else
-				{
-				undefined_symbol(str_data(exp->R),exp->R->N,label);
-				val = hold(exp);
-				}
-
-			push_cache(exp,val);
-			return val;
-			}
-		}
+		return resolve_ref(exp,cx,label);
 	else
 		{
 		value L = resolve(exp->L,cx,label);
