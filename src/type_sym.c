@@ -190,7 +190,6 @@ static void clear_cache(void)
 	}
 
 static value cur_cx;
-static value cur_label;
 
 static value resolve_name(string name)
 	{
@@ -230,7 +229,6 @@ static value resolve_ref(value exp)
 			val = quo(val);
 		else
 			{
-			undefined_symbol(str_data(exp->R),exp->R->N,str_data(cur_label));
 			val = hold(exp);
 			}
 
@@ -253,23 +251,36 @@ static value resolve(value exp)
 		}
 	}
 
-static value do_resolve(value exp, value cx, value label)
+static value do_resolve(value exp, value cx)
 	{
 	value save_cache = cache;
 	value save_cur_cx = cur_cx;
-	value save_cur_label = cur_label;
 
 	cache = 0;
 	cur_cx = cx;
-	cur_label = label;
 
 	exp = resolve(exp);
 	clear_cache();
 
 	cache = save_cache;
 	cur_cx = save_cur_cx;
-	cur_label = save_cur_label;
 	return exp;
+	}
+
+static void report_undef(value exp, const char *label)
+	{
+	if (exp->T == type_quo)
+		;
+	else if (exp->T == type_ref)
+		{
+		string key = exp->R->v_ptr;
+		undefined_symbol(key->data,exp->R->N,label);
+		}
+	else
+		{
+		report_undef(exp->L,label);
+		report_undef(exp->R,label);
+		}
 	}
 
 // (value cx form) Resolve all the symbols in the form and return its value.
@@ -287,14 +298,14 @@ value type_value(value f)
 			f = hold(exp->R);
 		else
 			{
-			value label = form->L;
 			value cx = (f->L->R = eval(f->L->R));
-			exp = do_resolve(exp,cx,label);
+			exp = do_resolve(exp,cx);
 
 			if (exp->T == type_quo)
 				f = tail(exp);
 			else
 				{
+				report_undef(exp,str_data(form->L));
 				drop(exp);
 				die(0);
 				f = hold(Qvoid); // not reached

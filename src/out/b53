@@ -29,6 +29,10 @@ I am Fred.
 Undefined symbol say on line 11
 Undefined symbol fred on line 14
 Undefined symbol wilma on line 14
+Undefined symbol fred on line 15
+Undefined symbol wilma on line 15
+Undefined symbol say on line 16
+Undefined symbol say on line 17
 Undefined symbol std on line 18
 ~
 \status=1
