@@ -197,10 +197,7 @@ static value resolve_ref(value exp)
 	struct record *rec = Qstd->v_ptr;
 	string key = exp->R->v_ptr;
 	value val = record_find(rec,key);
-	if (val)
-		return quo(hold(val));
-	else
-		return hold(exp);
+	return val ? quo(hold(val)) : hold(exp);
 	}
 
 static value resolve(value exp)
