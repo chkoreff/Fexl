@@ -192,20 +192,23 @@ value type_define(value f)
 	}
 	}
 
+static value resolve_ref(value exp)
+	{
+	struct record *rec = Qstd->v_ptr;
+	string key = exp->R->v_ptr;
+	value val = record_find(rec,key);
+	if (val)
+		return quo(hold(val));
+	else
+		return hold(exp);
+	}
+
 static value resolve(value exp)
 	{
 	if (exp->T == type_quo)
 		return hold(exp);
 	else if (exp->T == type_ref)
-		{
-		struct record *rec = Qstd->v_ptr;
-		string key = exp->R->v_ptr;
-		value val = record_find(rec,key);
-		if (val)
-			return quo(hold(val));
-		else
-			return hold(exp);
-		}
+		return resolve_ref(exp);
 	else
 		{
 		value L = resolve(exp->L);
