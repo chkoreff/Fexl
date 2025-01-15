@@ -189,10 +189,13 @@ static void clear_cache(void)
 		}
 	}
 
-static value resolve_name(string name, value cx)
+static value cur_cx;
+static value cur_label;
+
+static value resolve_name(string name)
 	{
 	value key = hold(Qstr(name));
-	value result = eval(A(A(hold(cx),key),hold(Qyield)));
+	value result = eval(A(A(hold(cur_cx),key),hold(Qyield)));
 
 	if (key->N == 1)
 		recycle(key);
@@ -212,7 +215,7 @@ static value resolve_name(string name, value cx)
 		}
 	}
 
-static value resolve_ref(value exp, value cx, const char *label)
+static value resolve_ref(value exp)
 	{
 	string name = exp->R->v_ptr;
 	value val = find_cache(name);
@@ -221,13 +224,13 @@ static value resolve_ref(value exp, value cx, const char *label)
 		return (val->T == type_quo) ? hold(val) : hold(exp);
 	else
 		{
-		value val = resolve_name(name,cx);
+		value val = resolve_name(name);
 
 		if (val)
 			val = quo(val);
 		else
 			{
-			undefined_symbol(str_data(exp->R),exp->R->N,label);
+			undefined_symbol(str_data(exp->R),exp->R->N,str_data(cur_label));
 			val = hold(exp);
 			}
 
@@ -236,27 +239,36 @@ static value resolve_ref(value exp, value cx, const char *label)
 		}
 	}
 
-static value resolve(value exp, value cx, const char *label)
+static value resolve(value exp)
 	{
 	if (exp->T == type_quo)
 		return hold(exp);
 	else if (exp->T == type_ref)
-		return resolve_ref(exp,cx,label);
+		return resolve_ref(exp);
 	else
 		{
-		value L = resolve(exp->L,cx,label);
-		value R = resolve(exp->R,cx,label);
+		value L = resolve(exp->L);
+		value R = resolve(exp->R);
 		return join(exp->T,L,R);
 		}
 	}
 
-static value do_resolve(value exp, value cx, const char *label)
+static value do_resolve(value exp, value cx, value label)
 	{
 	value save_cache = cache;
+	value save_cur_cx = cur_cx;
+	value save_cur_label = cur_label;
+
 	cache = 0;
-	exp = resolve(exp,cx,label);
+	cur_cx = cx;
+	cur_label = label;
+
+	exp = resolve(exp);
 	clear_cache();
+
 	cache = save_cache;
+	cur_cx = save_cur_cx;
+	cur_label = save_cur_label;
 	return exp;
 	}
 
@@ -275,7 +287,7 @@ value type_value(value f)
 			f = hold(exp->R);
 		else
 			{
-			const char *label = str_data(form->L);
+			value label = form->L;
 			value cx = (f->L->R = eval(f->L->R));
 			exp = do_resolve(exp,cx,label);
 
