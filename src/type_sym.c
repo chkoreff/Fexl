@@ -224,14 +224,7 @@ static value resolve_ref(value exp)
 	else
 		{
 		value val = resolve_name(name);
-
-		if (val)
-			val = quo(val);
-		else
-			{
-			val = hold(exp);
-			}
-
+		val = val ? quo(val) : hold(exp);
 		push_cache(exp,val);
 		return val;
 		}
