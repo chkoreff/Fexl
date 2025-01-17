@@ -4,6 +4,7 @@
 #include <basic.h>
 #include <die.h>
 #include <report.h>
+#include <type_record.h>
 #include <type_str.h>
 #include <type_sym.h>
 #include <type_with.h>
@@ -155,109 +156,22 @@ value type_is_closed(value f)
 	return f;
 	}
 
-static value cache;
-
-static value find_cache(string name)
-	{
-	value pos = cache;
-	while (pos)
-		{
-		if (str_eq(name,pos->L->R->v_ptr))
-			return pos->R;
-		pos = pos->next;
-		}
-	return 0;
-	}
-
-static void push_cache(value exp, value val)
-	{
-	value top = new_value();
-	top->L = exp;
-	top->R = hold(val);
-	top->next = cache;
-	cache = top;
-	}
-
-static void clear_cache(void)
-	{
-	while (cache)
-		{
-		value next = cache->next;
-		drop(cache->R);
-		recycle(cache);
-		cache = next;
-		}
-	}
-
-static value cur_cx;
-
-static value resolve_name(string name)
-	{
-	value key = hold(Qstr(name));
-	value result = eval(A(A(hold(cur_cx),key),hold(Qyield)));
-
-	if (key->N == 1)
-		recycle(key);
-	else
-		{
-		// Copy the string only if you held onto the key.
-		key->v_ptr = str_copy(name);
-		drop(key);
-		}
-
-	if (result->L == Qyield)
-		return tail(result);
-	else
-		{
-		drop(result);
-		return 0;
-		}
-	}
-
-static value resolve_ref(value exp)
-	{
-	string name = exp->R->v_ptr;
-	value val = find_cache(name);
-
-	if (val)
-		return (val->T == type_quo) ? hold(val) : hold(exp);
-	else
-		{
-		value val = resolve_name(name);
-		val = val ? quo(val) : hold(exp);
-		push_cache(exp,val);
-		return val;
-		}
-	}
-
-static value resolve(value exp)
+static value resolve(value exp, value obj)
 	{
 	if (exp->T == type_quo)
 		return hold(exp);
 	else if (exp->T == type_ref)
-		return resolve_ref(exp);
+		{
+		string name = exp->R->v_ptr;
+		value val = record_find(obj,name);
+		return val ? quo(hold(val)) : hold(exp);
+		}
 	else
 		{
-		value L = resolve(exp->L);
-		value R = resolve(exp->R);
+		value L = resolve(exp->L,obj);
+		value R = resolve(exp->R,obj);
 		return join(exp->T,L,R);
 		}
-	}
-
-static value do_resolve(value exp, value cx)
-	{
-	value save_cache = cache;
-	value save_cur_cx = cur_cx;
-
-	cache = 0;
-	cur_cx = cx;
-
-	exp = resolve(exp);
-	clear_cache();
-
-	cache = save_cache;
-	cur_cx = save_cur_cx;
-	return exp;
 	}
 
 static void report_undef(value exp, const char *label)
@@ -273,6 +187,33 @@ static void report_undef(value exp, const char *label)
 		{
 		report_undef(exp->L,label);
 		report_undef(exp->R,label);
+		}
+	}
+
+// For each ref key in exp, use cx to get its val, then store key-val in obj.
+static void imprint(value exp, value cx, value obj)
+	{
+	if (exp->T == type_quo)
+		;
+	else if (exp->T == type_ref)
+		{
+		string name = exp->R->v_ptr;
+		if (!record_find(obj,name))
+			{
+			value key = hold(Qstr(str_copy(name)));
+			value val = eval(A(A(hold(cx),key),hold(Qyield)));
+
+			if (val->L == Qyield)
+				record_set(obj,key,hold(val->R));
+
+			drop(key);
+			drop(val);
+			}
+		}
+	else
+		{
+		imprint(exp->L,cx,obj);
+		imprint(exp->R,cx,obj);
 		}
 	}
 
@@ -292,7 +233,10 @@ value type_value(value f)
 		else
 			{
 			value cx = (f->L->R = eval(f->L->R));
-			exp = do_resolve(exp,cx);
+			value obj = record_empty();
+			imprint(exp,cx,obj);
+			exp = resolve(exp,obj);
+			drop(obj);
 
 			if (exp->T == type_quo)
 				f = tail(exp);
