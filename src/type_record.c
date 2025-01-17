@@ -23,7 +23,7 @@ static void clear_record(value f)
 	}
 
 // LATER 20221213 Perhaps use binary search.
-static value record_find(struct record *rec, string key)
+value record_find(struct record *rec, string key)
 	{
 	unsigned long pos;
 
@@ -104,7 +104,7 @@ static void shift_items(struct item *vec, unsigned long n, unsigned long pos)
 		vec[i] = vec[i-1];
 	}
 
-static void record_set_inline(value obj, value key, value val)
+void record_set(value obj, value key, value val)
 	{
 	struct record *rec = obj->v_ptr;
 	string s_key = key->v_ptr;
@@ -161,20 +161,6 @@ static value record_copy(value obj)
 	return Qrecord(new_rec);
 	}
 
-// LATER 20241120 In a new version I am eliminating the automatic copy based on
-// reference count.  Instead all records will be mutable and you can make an
-// explicit copy if you like.
-static value record_set(value obj, value key, value val)
-	{
-	if (obj->N <= 2)
-		hold(obj);
-	else
-		obj = record_copy(obj);
-
-	record_set_inline(obj,key,val);
-	return obj;
-	}
-
 // Return an empty record.
 value record_empty(void)
 	{
@@ -189,6 +175,20 @@ value type_empty(value f)
 	(void)f;
 	}
 
+// LATER 20241120 In a new version I am eliminating the automatic copy based on
+// reference count.  Instead all records will be mutable and you can make an
+// explicit copy if you like.
+static value record_set_copy(value obj, value key, value val)
+	{
+	if (obj->N <= 2)
+		hold(obj);
+	else
+		obj = record_copy(obj);
+
+	record_set(obj,key,val);
+	return obj;
+	}
+
 static value op_set(value f, value op(value))
 	{
 	if (f->L->L == 0) return keep(f);
@@ -199,7 +199,7 @@ static value op_set(value f, value op(value))
 		{
 		value obj = arg(f->R);
 		if (obj->T == type_record)
-			f = record_set(obj,key,op(f->L->R));
+			f = record_set_copy(obj,key,op(f->L->R));
 		else
 			f = hold(Qvoid);
 		drop(obj);
@@ -224,6 +224,43 @@ value type_set(value f)
 value type_setf(value f)
 	{
 	return op_set(f,hold);
+	}
+
+static value op_SET(value f, value op(value))
+	{
+	if (f->L->L == 0) return keep(f);
+	if (f->L->L->L == 0) return keep(f);
+	{
+	value obj = arg(f->L->L->R);
+	if (obj->T == type_record)
+		{
+		value key = arg(f->L->R);
+		if (key->T == type_str)
+			{
+			record_set(obj,key,op(f->R));
+			f = hold(QI);
+			}
+		else
+			f = hold(Qvoid);
+		drop(key);
+		}
+	else
+		f = hold(Qvoid);
+	drop(obj);
+	return f;
+	}
+	}
+
+// (SET obj key val) Set key to val in obj, after evaluating val.
+value type_SET(value f)
+	{
+	return op_SET(f,arg);
+	}
+
+// (SETF obj key val) Set key to val in obj, without evaluating val.
+value type_SETF(value f)
+	{
+	return op_SET(f,hold);
 	}
 
 // Look up key in record and return either no or (yes val).

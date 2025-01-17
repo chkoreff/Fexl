@@ -15,11 +15,9 @@
 \\test_1=
 	(
 	say "= test_1"
-	\obj=
-		(
-		set "b" (put "!" 2);
-		empty
-		)
+
+	\obj=empty
+	SET obj "b" (put "!" 2)
 
 	try_keys obj
 	)
@@ -27,14 +25,11 @@
 \\test_2=
 	(
 	say "= test_2"
-	\obj=
-		(
-		# Modified inline
-		set "b" 222;
-		set "b" 22;
-		set "b" (put "!" 2);
-		empty
-		)
+
+	\obj=empty
+	SET obj "b" (put "!" 2)
+	SET obj "b" 22
+	SET obj "b" 222
 
 	try_keys obj
 	)
@@ -44,8 +39,8 @@
 	say "= test_3"
 
 	\obj=empty
-	\obj=(set "b" (put "!" 2) obj)
-	\obj=(set "b" 22 obj)
+	SET obj "b" (put "!" 2)
+	SET obj "b" 22
 
 	try_keys obj
 	)
@@ -55,12 +50,12 @@
 	say "= test_4"
 
 	\obj=empty
-	\obj=(set "d" 4 obj)
-	\obj=(set "d" 44 obj)
-	\obj=(set "b" 2 obj)
-	\obj=(set "c" 3 obj)
-	\obj=(set "c" 33 obj)
-	\obj=(set "a" 1 obj)
+	SET obj "d" 4
+	SET obj "d" 44
+	SET obj "b" 2
+	SET obj "c" 3
+	SET obj "c" 33
+	SET obj "a" 1
 
 	try_keys obj
 	)
@@ -70,14 +65,14 @@
 	say "= test_5"
 
 	\obj=empty
-	\obj=(set "d" 4 obj)
-	\obj=(set "d" 44 obj)
-	\obj=(set "b" 2 obj)
-	\obj=(set "c" 3 obj)
-	\obj=(set "c" 33 obj)
-	\obj=(set "a" 11 obj)
-	\obj=(set "a" 1 obj)
-	\obj=(set "e" 5 obj)
+	SET obj "d" 4
+	SET obj "d" 44
+	SET obj "b" 2
+	SET obj "c" 3
+	SET obj "c" 33
+	SET obj "a" 11
+	SET obj "a" 1
+	SET obj "e" 5
 
 	try_keys obj
 	)
@@ -86,18 +81,15 @@
 	(
 	say "= test_6"
 
-	\obj=
-	(
-	set "e" 5;
-	set "a" 1;
-	set "a" 11;
-	set "c" 33;
-	set "c" 3;
-	set "b" 2;
-	set "d" 44;
-	set "d" 4;
-	empty
-	)
+	\obj=empty
+	SET obj "d" 4
+	SET obj "d" 44
+	SET obj "b" 2
+	SET obj "c" 3
+	SET obj "c" 33
+	SET obj "a" 11
+	SET obj "a" 1
+	SET obj "e" 5
 
 	try_keys obj
 	)
@@ -108,31 +100,35 @@
 
 	\obj_2810=
 		(
-		set "d" 44;
-		set "d" 4;
-		empty
+		\obj=empty
+		SET obj "d" 4
+		SET obj "d" 44
+		obj
 		)
 
 	\obj_3043=
 		(
-		set "c" 3;
-		set "b" 2;
-		obj_2810
+		\obj=(record_copy obj_2810)
+		SET obj "b" 2
+		SET obj "c" 3
+		obj
 		)
 
 	\obj_7892=
 		(
-		\obj=(set "c" 33 obj_3043)
-		\obj=(set "a" 11 obj)
-		set "e" 5;
-		set "a" 1;
+		\obj=(record_copy obj_3043)
+		SET obj "c" 33
+		SET obj "a" 11
+		SET obj "a" 1
+		SET obj "e" 5
 		obj
 		)
 
 	\obj_8237=
 		(
-		set "e" 5;
-		I obj_2810
+		\obj=(record_copy obj_2810)
+		SET obj "e" 5
+		obj
 		)
 
 	(
@@ -158,15 +154,17 @@
 
 	\f1=
 		(
-		set "a" 1;
-		set "b" 2;
-		empty
+		\obj=empty
+		SET obj "b" 2
+		SET obj "a" 1
+		obj
 		)
 
 	\f2=
 		(
-		set "c" 3;
-		empty
+		\obj=empty
+		SET obj "c" 3
+		obj
 		)
 
 	\f=(:: f1 f2)
@@ -197,14 +195,15 @@
 
 	\obj=
 	(
-	set "e" 5;
-	set "a" 1;
-	set "a" 11;
-	set "c" 33;
-	set "c" 3;
-	set "d" 44;
-	set "d" 4;
-	empty
+	\obj=empty
+	SET obj "d" 4
+	SET obj "d" 44
+	SET obj "c" 3
+	SET obj "c" 33
+	SET obj "a" 11
+	SET obj "a" 1
+	SET obj "e" 5
+	obj
 	)
 
 	try_keys obj
@@ -225,33 +224,36 @@
 \\test_10=
 	(
 	say "= test_10"
-	# Test former leak with inline update.
+	# Test avoid leak with update.
 	(
-	\z1=(set "a" 1 empty)
-	\\z2=(I z1)
-	\z3=(set "a" z2 z2)
+	\obj=empty
+	SET obj "a" 1
+	SET obj "a" obj
+	SET obj "a" void # Clear cycle to avoid leak.
 	)
-	# Test former leak with inline insert.
+	# Test avoid leak with insert.
 	(
-	\z1=(set "a" 1 empty)
-	\\z2=(I z1)
-	\z3=(set "b" z2 z2)
+	\obj=empty
+	SET obj "a" 1
+	SET obj "b" obj
+	SET obj "b" void # Clear cycle to avoid leak.
 	)
 	)
 
 \\test_11=
 	(
 	say "= test_11"
-	# Test setf and get.
+	# Test SETF and get.
 
 	show_benchmark;
 
 	\obj=
 		(
-		set "x" (say "CALC" + 2 3);
-		setf "fred" (say "I am Fred.");
-		setf "wilma" (say "I am Wilma.");
-		empty
+		\obj=empty
+		SETF obj "wilma" (say "I am Wilma.")
+		SETF obj "fred" (say "I am Fred.")
+		SET obj "x" (say "CALC" + 2 3)
+		obj
 		)
 	say ["x = "(obj "x")]
 	obj "fred"
@@ -297,9 +299,10 @@ say "= test_12"
 	\v=var_new
 	var_put v val
 
-	setf "get" (var_get v);
-	set "put" (var_put v);
-	empty
+	\obj=empty
+	SET obj "put" (var_put v)
+	SETF obj "get" (var_get v)
+	obj
 	)
 
 # Return a new tree with a function to create a new value when needed.
@@ -309,20 +312,24 @@ say "= test_12"
 	\v=var_new
 	var_put v empty
 
+	\obj=empty
+
 	# This "auto-vivifies" an entry at the given key.
-	setf "at"
+	SETF obj "at"
 		(\key
 		get key (var_get v)
 			(
 			\val=new_val
-			var_put v (setf key val (var_get v))
+			\obj=(var_get v)
+			SETF obj key val
 			val
 			)
 			()
-		);
+		)
+
 	# LATER 20230702 Implement a "del" function in type_record.c and provide a
 	# "del" method here.
-	empty
+	obj
 	)
 
 # Extend slot with a "mod" routine to apply a function to the value.
@@ -331,8 +338,7 @@ say "= test_12"
 	\obj=(new_slot val)
 	getf "put" obj \\put
 	getf "get" obj \\val
-
-	setf "mod" (\f put (f val));
+	SETF obj "mod" (\f put (f val))
 	obj
 	)
 
@@ -341,8 +347,7 @@ say "= test_12"
 	(\val
 	\obj=(new_slot val)
 	getf "get" obj \\val
-
-	setf "show" (say ["val = "(as_str val)]);
+	SETF obj "show" (say ["val = "(as_str val)])
 	obj
 	)
 

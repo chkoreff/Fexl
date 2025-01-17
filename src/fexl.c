@@ -221,8 +221,14 @@ static value def_core(void)
 
 	// record
 	if (match("empty")) return Q0(type_empty);
+
+	// LATER 20250117 set and setf are deprecated
 	if (match("set")) return Q(type_set);
 	if (match("setf")) return Q(type_setf);
+
+	if (match("SET")) return Q(type_SET);
+	if (match("SETF")) return Q(type_SETF);
+
 	if (match("get")) return Q(type_get);
 	if (match("record_copy")) return Q(type_record_copy);
 	if (match("record_count")) return Q(type_record_count);
