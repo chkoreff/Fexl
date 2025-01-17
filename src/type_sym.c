@@ -192,24 +192,20 @@ value type_define(value f)
 	}
 	}
 
-static value resolve_ref(value exp)
-	{
-	struct record *rec = Qstd->v_ptr;
-	string key = exp->R->v_ptr;
-	value val = record_find(rec,key);
-	return val ? quo(hold(val)) : hold(exp);
-	}
-
-static value resolve(value exp)
+static value resolve(value exp, value obj)
 	{
 	if (exp->T == type_quo)
 		return hold(exp);
 	else if (exp->T == type_ref)
-		return resolve_ref(exp);
+		{
+		string key = exp->R->v_ptr;
+		value val = record_find(obj,key);
+		return val ? quo(hold(val)) : hold(exp);
+		}
 	else
 		{
-		value L = resolve(exp->L);
-		value R = resolve(exp->R);
+		value L = resolve(exp->L,obj);
+		value R = resolve(exp->R,obj);
 		return join(exp->T,L,R);
 		}
 	}
@@ -236,7 +232,7 @@ value type_resolve(value f)
 	value form = arg(f->R);
 	if (form->T == type_form)
 		{
-		f = resolve(form->R);
+		f = resolve(form->R,Qstd);
 		f = Qform(hold(form->L),f);
 		}
 	else
@@ -254,7 +250,7 @@ value type_evaluate(value f)
 	value form = arg(f->R);
 	if (form->T == type_form)
 		{
-		f = resolve(form->R);
+		f = resolve(form->R,Qstd);
 		if (f->T == type_quo)
 			f = tail(f);
 		else

@@ -23,8 +23,9 @@ static void clear_record(value f)
 	}
 
 // LATER 20221213 Perhaps use binary search.
-value record_find(struct record *rec, string key)
+value record_find(value obj, string key)
 	{
+	struct record *rec = obj->v_ptr;
 	unsigned long pos;
 
 	for (pos = 0; pos < rec->count; pos++)
@@ -46,7 +47,7 @@ value type_record(value f)
 	value key = arg(f->R);
 	if (key->T == type_str)
 		{
-		value val = record_find(f->L->v_ptr,key->v_ptr);
+		value val = record_find(f->L,key->v_ptr);
 		if (val == 0) val = Qvoid;
 		f = hold(val);
 		}
@@ -273,7 +274,7 @@ value type_get(value f)
 		{
 		value obj = arg(f->R);
 		if (obj->T == type_record)
-			f = maybe(record_find(obj->v_ptr,key->v_ptr));
+			f = maybe(record_find(obj,key->v_ptr));
 		else
 			f = hold(Qvoid);
 		drop(obj);
