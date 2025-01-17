@@ -285,8 +285,14 @@ static void define_rand(void)
 static void define_record(void)
 	{
 	define("empty",Q0(type_empty));
-	define("set",Q(type_set));
-	define("setf",Q(type_setf));
+
+	// LATER 20250117 set and setf are deprecated
+	define("set",Q(type_SET));
+	define("setf",Q(type_SETF));
+
+	define("SET",Q(type_SET));
+	define("SETF",Q(type_SETF));
+
 	define("get",Q(type_get));
 	define("record_copy",Q(type_record_copy));
 	define("record_count",Q(type_record_count));
