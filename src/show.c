@@ -71,8 +71,11 @@ static void put_data(value f)
 	else if (f->T == type_ref)
 		{
 		put_quote(f->R->v_ptr);
+		if (0) // Don't show the line number.
+		{
 		put_ch(' ');
 		put_ulong(f->R->N);
+		}
 		}
 	else
 		put("DATA");
@@ -99,8 +102,11 @@ static void limit_show(value f)
 		put_ch(' ');
 		if (f->L->N)
 			{
+			if (f->T != type_form) // Don't show the file name.
+			{
 			limit_show(f->L);
 			put_ch(' ');
+			}
 			limit_show(f->R);
 			}
 		else

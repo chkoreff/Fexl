@@ -162,8 +162,8 @@ static value resolve(value exp, value obj)
 		return hold(exp);
 	else if (exp->T == type_ref)
 		{
-		string name = exp->R->v_ptr;
-		value val = record_find(obj,name);
+		string key = exp->R->v_ptr;
+		value val = record_find(obj,key);
 		return val ? quo(hold(val)) : hold(exp);
 		}
 	else
