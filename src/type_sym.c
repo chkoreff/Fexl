@@ -210,6 +210,21 @@ static value resolve(value exp, value obj)
 		}
 	}
 
+// (resolve form) Resolve any symbols defined in std.
+value type_resolve(value f)
+	{
+	value form = arg(f->R);
+	if (form->T == type_form)
+		{
+		f = resolve(form->R,Qstd);
+		f = Qform(hold(form->L),f);
+		}
+	else
+		f = hold(Qvoid);
+	drop(form);
+	return f;
+	}
+
 static void report_undef(value exp, const char *label)
 	{
 	if (exp->T == type_quo)
@@ -224,21 +239,6 @@ static void report_undef(value exp, const char *label)
 		report_undef(exp->L,label);
 		report_undef(exp->R,label);
 		}
-	}
-
-// (resolve form) Resolve any symbols defined in std.
-value type_resolve(value f)
-	{
-	value form = arg(f->R);
-	if (form->T == type_form)
-		{
-		f = resolve(form->R,Qstd);
-		f = Qform(hold(form->L),f);
-		}
-	else
-		f = hold(Qvoid);
-	drop(form);
-	return f;
 	}
 
 /*
