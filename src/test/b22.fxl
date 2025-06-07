@@ -1,5 +1,6 @@
 #
-value (load "test.fxl"; std) \;
+use "test.fxl"
+evaluate \;
 
 say "== test Fibonacci"
 

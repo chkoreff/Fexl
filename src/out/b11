@@ -272,7 +272,7 @@ try ["a" "x" "e"]
 = try void
   compute
   x = ":"
-= import
+= use
 ==
 0:[]
 4:[61626364]
@@ -286,7 +286,7 @@ try ["a" "x" "e"]
 2 [13 17 21]
 3 [14 18 22]
 4 [void void void]
-steps 59753 bytes 26176
+steps 59677 bytes 27776
 ~1
 \err=
 ~

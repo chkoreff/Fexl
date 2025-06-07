@@ -6,5 +6,4 @@
 	say "]"
 	)
 
-def "say_list" say_list;
-std
+define "say_list" say_list

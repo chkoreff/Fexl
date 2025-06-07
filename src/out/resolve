@@ -5,18 +5,15 @@ Evaluating the form.
 result void
 
 Evaluating the form.
-Evaluating the context.
 Hello
 result ok
 
-steps 63 bytes 320
+steps 53 bytes 352
 == test_1
-Evaluating the context.
 Evaluating the form.
 I am Fred.
-steps 69 bytes 448
+steps 28 bytes 384
 == test_2
-Evaluating the context.
 Evaluating the form.
 Hi
 57
@@ -24,7 +21,23 @@ T
 HEY: Fred says a
 Wilma says b
 Goodbye
-steps 122 bytes 864
+steps 75 bytes 832
+== test_3
+
+= evaluate
+: define say
+: define fred
+: define wilma
+Hello.
+I am Fred.
+I am Wilma.
+
+= evaluate
+: define say
+Hello.
+
+= evaluate
+[1 2 3]
 ~
 \err=
 ~

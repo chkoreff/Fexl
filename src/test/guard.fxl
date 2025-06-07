@@ -1,0 +1,53 @@
+#
+show_benchmark;
+
+evaluate (\; say "A" say "B")
+
+define "fred" (say "I am Fred.")
+define "wilma" (say "I am Wilma.")
+define "barney" (say "I am Barney.")
+define "betty" (say "I am Betty.")
+
+(
+evaluate \;
+say "test 1"
+fred wilma
+barney betty
+)
+
+(
+\wrap_prefix=
+	(\key
+	get key std void \\f
+	define key (put "= " f)
+	)
+
+guard;
+
+wrap_prefix "fred"
+wrap_prefix "wilma"
+#wrap_prefix "barney"
+
+evaluate \;
+say "test 2"
+fred wilma
+barney betty
+)
+
+(
+evaluate \;
+say "test 3"
+fred wilma
+barney betty
+)
+
+(
+restrict;
+define "say" say
+evaluate \;
+say "test 4"
+#fred
+)
+
+say "finally"
+define "X" 3

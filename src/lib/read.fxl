@@ -31,8 +31,7 @@
 	read_stream (flatten xs)
 	)
 
-def "skip_match" skip_match;
-def "collect_to" collect_to;
-def "read_chars" read_chars;
-def "read_file" read_file;
-std
+define "skip_match" skip_match
+define "collect_to" collect_to
+define "read_chars" read_chars
+define "read_file" read_file

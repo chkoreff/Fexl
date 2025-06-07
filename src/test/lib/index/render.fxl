@@ -16,5 +16,4 @@
 		)
 	)
 
-def "say_index" say_index;
-std
+define "say_index" say_index

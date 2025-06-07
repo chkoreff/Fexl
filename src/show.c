@@ -38,13 +38,12 @@ static const char *type_name(type t)
 	if (t == type_list) return "list";
 	if (t == type_D) return "D";
 	if (t == type_E) return "E";
-	if (t == type_value) return "value";
+	if (t == type_evaluate) return "evaluate";
 	if (t == type_pair) return "pair";
 	if (t == type_null) return "null";
 	if (t == type_tuple) return "tuple";
 	if (t == type_assoc) return "assoc";
 	if (t == type_with) return "with";
-	if (t == type_def) return "def";
 	if (t == type_chain) return "::";
 
 	return "TYPE";
@@ -127,4 +126,15 @@ void show_exp(value f)
 void show(const char *name, value f)
 	{
 	put(name);show_exp(f);nl();
+	}
+
+static value type_show(value f)
+	{
+	show_exp(f->R);nl();
+	return hold(QI);
+	}
+
+void run(void)
+	{
+	define("show",Q(type_show));
 	}

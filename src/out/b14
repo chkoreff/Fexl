@@ -5,6 +5,7 @@ directory src/lib
 assoc.fxl
 bool.fxl
 date.fxl
+extra.fxl
 format.fxl
 hex.fxl
 html.fxl

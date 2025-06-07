@@ -7,7 +7,7 @@
 
 \try_read_file=
 	(\read\name
-	try_read read (path_under dir_local name)
+	try_read read (. dir_local name)
 	)
 
 \\test_csv=

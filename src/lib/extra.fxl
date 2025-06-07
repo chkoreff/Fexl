@@ -1,0 +1,50 @@
+# (default d x) = x if x is good, otherwise d.
+\default=(\\d\x is_defined x x d)
+# (check x d) = x if x is good, otherwise d.
+\check=(\x is_defined x x)
+
+\parse_local=(\name parse_file; . dir_local name)
+\use=(\name evaluate; parse_local name)
+
+\trace=(fsay stderr)
+\error=(\msg trace msg die)
+
+# (if x y) = y if x is true, otherwise I.
+\if=(\\x\\y x y I)
+
+\NL="
+"
+\TAB="	"
+\CR=(chr 13)
+\LF=NL
+\QU=~ "~
+
+\run_benchmark=
+	(\\show\\f
+	fexl_benchmark f \val\steps\bytes
+	show ["steps "steps" bytes "bytes]
+	val
+	)
+
+\do_benchmark=(run_benchmark trace)
+\show_benchmark=(run_benchmark say)
+
+define "default" default
+define "check" check
+
+define "parse_local" parse_local
+define "use" use
+
+define "trace" trace
+define "error" error
+
+define "if" if
+
+define "NL" NL
+define "TAB" TAB
+define "CR" CR
+define "LF" LF
+define "QU" QU
+
+define "do_benchmark" do_benchmark
+define "show_benchmark" show_benchmark

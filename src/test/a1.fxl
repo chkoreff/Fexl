@@ -1,5 +1,6 @@
 #
-extend (load "test.fxl"; std) \;
+use "test.fxl"
+evaluate \;
 
 \show=
 	(\x
@@ -11,8 +12,7 @@ extend (load "test.fxl"; std) \;
 	say "other"
 	)
 
-\eval_file=(\name value std; use name)
-\eval_str=(\str value std; parse str "")
+\use_str=(\str evaluate; parse str "")
 
 (
 \\ping=(say "ping")
@@ -336,51 +336,49 @@ say s7
 )
 
 div
-eval_file "hello.fxl"
+use "hello.fxl"
 div
-eval_file "utf8.fxl"
+use "utf8.fxl"
 div
-eval_file "beer.fxl"
+use "beer.fxl"
 div
-eval_file "hailstone.fxl"
+use "hailstone.fxl"
 
 div
-eval_str ~END
+use_str ~END
 \x=(+ 33 48)
 say ["x = " x]
 ~END
 
 div
 (
-value
-(
-def "show" show;
-std
-)
-\;
+restrict;
+define "show" show
+define "+" +
+
+evaluate \;
 show "x"
 show (+ 2 3)
 )
 
 div
 (
-value
-(
-def "say" say;
-def "put" put;
-def "nl" nl;
-def "+" +;
-def "round" round;
-def "trunc" trunc;
-def "abs" abs;
-def "sqrt" sqrt;
-def "exp" exp;
-def "log" log;
-def "sin" sin;
-def "fred" (say "I am Fred.");
-void
-)
-\;
+restrict;
+
+define "say" say
+define "put" put
+define "nl" nl
+define "+" +
+define "round" round
+define "trunc" trunc
+define "abs" abs
+define "sqrt" sqrt
+define "exp" exp
+define "log" log
+define "sin" sin
+define "fred" (say "I am Fred.")
+
+evaluate \;
 say "hi"
 fred
 say (+ 42.8 -7.6)
@@ -582,12 +580,12 @@ say (is_void void)
 say (is_void ( (\; f x) 3) )
 # Evaluate a form.
 (
-\x=(value std; \; + 3 4)
+\x=(evaluate \; + 3 4)
 say ["x = "(as_str x)]
 )
 # Evaluate a non-form.
 (
-\x=(value std; + 3 4)
+\x=(evaluate; + 3 4)
 say ["x = "(as_str x)]
 )
 
@@ -683,18 +681,16 @@ talk
 	say "== resolve"
 
 	(
-	\def=(\key\\val with key (say ["symbol "key] yield val))
-	value
-	(
-	def "say" say;
-	def "fred" (say "I am Fred.");
-	def "wilma" (say "I am Wilma.");
-	def "is_void" is_void;
-	def "void" void;
-	def "barney" (say "I am Barney.");
-	void
-	)
-	\;
+	restrict;
+	\define=(\key\\val say ["symbol "key] define key val)
+	define "say" say
+	define "fred" (say "I am Fred.")
+	define "wilma" (say "I am Wilma.")
+	define "is_void" is_void
+	define "void" void
+	define "barney" (say "I am Barney.")
+
+	evaluate \;
 	say "== run"
 	fred
 	wilma
@@ -711,23 +707,21 @@ talk
 	\form=(parse "say (+ 7 8)" "")
 
 	say "Run in standard context."
-	value std form
+	evaluate form
 
 	say "Run in weird context."
-	value
-		(
-		def "say" say;
-		def "+" *;
-		void
-		)
-		form
+	restrict;
+	define "say" say
+	define "+" *
+
+	evaluate form
 
 	say "]"
 	)
 
 \\case_3=
 	(
-	value std (\; yield; say "PING") \\run
+	evaluate (\; yield; say "PING") \\run
 	say "["
 	run
 	run
@@ -747,7 +741,7 @@ div
 \\try=
 (
 (\=say "Let's parse.")
-eval_file "hello.fxl"
+use "hello.fxl"
 )
 
 try
@@ -765,7 +759,7 @@ div
 ~~
 
 (\=say "Let's parse.")
-eval_str source
+use_str source
 )
 
 try 5
@@ -776,7 +770,7 @@ try -1.3
 \\test_file=
 (
 \tmp_name="tmp.txt"
-\tmp_file=(path_under dir_local tmp_name)
+\tmp_file=(. dir_local tmp_name)
 
 \write_file=
 	(\content
@@ -923,7 +917,7 @@ say "Passed var test of 20150907."
 test_var
 
 div
-eval_file "var.fxl"
+use "var.fxl"
 
 # Test evaluation order.
 (
@@ -1088,7 +1082,7 @@ div
 # Here I test the existence of the flock_ and limit_ function calls, though I'm
 # not yet testing their effects.
 
-\fh=(fopen (path_under dir_local "hello.fxl") "r")
+\fh=(fopen (. dir_local "hello.fxl") "r")
 say (is_good fh)
 say (is_good; flock_ex fh)
 say (is_good; flock_sh fh)
@@ -1140,7 +1134,7 @@ try "fsay" (fsay stdout)
 (
 \try=
 	(\f1\f2
-	\base=(path_under dir_base)
+	\base=(. dir_base)
 	say ["is_newer "f1" "f2" = "(is_newer (base f1) (base f2))]
 	)
 
@@ -1161,7 +1155,7 @@ try "missing" "missing"
 (
 \try=
 	(\path
-	\q_path=(path_under dir_base path)
+	\q_path=(. dir_base path)
 	\type=
 		(
 		is_file q_path "f";
@@ -1187,7 +1181,7 @@ say (oct "775")
 say (hex "af01A")
 
 (
-\local=(path_under dir_local)
+\local=(. dir_local)
 \mkdir=(\path mkdir (local path) (oct "755"))
 \rmdir=(\path rmdir (local path))
 
@@ -1320,7 +1314,7 @@ nl
 (
 \form=(\; \x x)
 say (is_closed form)
-\f=(value void form)
+\f=(restrict; evaluate form)
 say (f 2)
 )
 
@@ -1338,6 +1332,37 @@ put "a = " put (as_str a) nl
 put "b = " put (as_str b) nl
 put "c = " put (as_str c) nl
 put "d = " put (as_str d) nl
+)
+
+# Test op_argv.
+(
+load_base_so "test.so"
+evaluate \;
+
+test_argv []
+test_argv ["a" "b"]
+
+# Test old problem with inline list expansion.
+test_argv ["a"; () []]
+# Test evaluate list.
+test_argv (append ["a"] ["b" "c"])
+# Test malformed list tail.
+test_argv ["a"; 3]
+
+# This includes a non-string which clips the list.
+test_argv
+[
+(I "a") "b"
+;
+append ["c" "d"];
+append (map (. "x") ["e" "f"]);
+["g"
+	(I "h")
+	3  # This non-string clips the list.
+	(say "NO" "i")  # Not evaluated
+	"j"
+	]
+]
 )
 
 (
@@ -1440,19 +1465,6 @@ say (is_undef val)
 try "a"
 try "b"
 try "c"
-)
-
-(
-# Demonstrate holding onto a key directly when resolving a form.
-value
-(\key
-eq key "say" (yield say);
-eq key "message" (yield key);
-void
-)
-\;
-say message
-say message
 )
 
 \#

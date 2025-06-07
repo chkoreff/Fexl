@@ -7,9 +7,14 @@
 #include <type_record.h>
 #include <type_str.h>
 #include <type_sym.h>
-#include <type_with.h>
 
 static value Qstd;
+
+value type_std(value f)
+	{
+	return hold(Qstd);
+	(void)f;
+	}
 
 value type_quo(value f)
 	{
@@ -156,6 +161,37 @@ value type_is_closed(value f)
 	return f;
 	}
 
+static void set_std(value obj)
+	{
+	drop(Qstd);
+	Qstd = obj;
+	}
+
+void define(const char *s_key, value val)
+	{
+	value key = Qstr0(s_key);
+	record_set(Qstd,key,val);
+	drop(key);
+	}
+
+// (define key val) Define key as val in std.
+value type_define(value f)
+	{
+	if (f->L->L == 0) return keep(f);
+	{
+	value key = arg(f->L->R);
+	if (key->T == type_str)
+		{
+		record_set(Qstd,key,hold(f->R));
+		f = hold(QI);
+		}
+	else
+		f = hold(Qvoid);
+	drop(key);
+	return f;
+	}
+	}
+
 static value resolve(value exp, value obj)
 	{
 	if (exp->T == type_quo)
@@ -174,6 +210,21 @@ static value resolve(value exp, value obj)
 		}
 	}
 
+// (resolve form) Resolve any symbols defined in std.
+value type_resolve(value f)
+	{
+	value form = arg(f->R);
+	if (form->T == type_form)
+		{
+		f = resolve(form->R,Qstd);
+		f = Qform(hold(form->L),f);
+		}
+	else
+		f = hold(Qvoid);
+	drop(form);
+	return f;
+	}
+
 static void report_undef(value exp, const char *label)
 	{
 	if (exp->T == type_quo)
@@ -190,63 +241,22 @@ static void report_undef(value exp, const char *label)
 		}
 	}
 
-// For each ref key in exp, use cx to get its val, then store key-val in obj.
-static void imprint(value exp, value cx, value obj)
-	{
-	if (exp->T == type_quo)
-		;
-	else if (exp->T == type_ref)
-		{
-		string name = exp->R->v_ptr;
-		if (!record_find(obj,name))
-			{
-			value key = hold(Qstr(str_copy(name)));
-			value val = eval(A(A(hold(cx),key),hold(Qyield)));
-
-			if (val->L == Qyield)
-				record_set(obj,key,hold(val->R));
-
-			drop(key);
-			drop(val);
-			}
-		}
-	else
-		{
-		imprint(exp->L,cx,obj);
-		imprint(exp->R,cx,obj);
-		}
-	}
-
-// (value cx form) Resolve all the symbols in the form and return its value.
-// If there are any undefined symbols, report them all and die.
-// The cx function maps a name to (yield val) if defined, otherwise void.
-value type_value(value f)
-	{
-	if (f->L->L == 0) return keep(f);
+/*
+(evaluate form) Evaluate the form in std.  If there are any undefined symbols,
+report them all and die.
+*/
+value type_evaluate(value f)
 	{
 	value form = arg(f->R);
 	if (form->T == type_form)
 		{
-		value exp = form->R;
-		if (exp->T == type_quo)
-			f = hold(exp->R);
+		f = resolve(form->R,Qstd);
+		if (f->T == type_quo)
+			f = tail(f);
 		else
 			{
-			value cx = (f->L->R = eval(f->L->R));
-			value obj = record_empty();
-			imprint(exp,cx,obj);
-			exp = resolve(exp,obj);
-			drop(obj);
-
-			if (exp->T == type_quo)
-				f = tail(exp);
-			else
-				{
-				report_undef(exp,str_data(form->L));
-				drop(exp);
-				die(0);
-				f = hold(Qvoid); // not reached
-				}
+			report_undef(f,str_data(form->L));
+			die(0);
 			}
 		}
 	else
@@ -254,21 +264,25 @@ value type_value(value f)
 	drop(form);
 	return f;
 	}
-	}
 
-// \extend=(\cx value (def "std" cx; cx))
-value type_extend(value f)
+// (set_std rec) Set the current context to the record.
+value type_set_std(value f)
 	{
-	value cx = eval(f->R);
-	cx = Qassoc(hold(Qstd),yield(hold(cx)),cx);
-	f->R = cx;
-	f->T = type_value;
-	return hold(f);
+	value x = arg(f->R);
+	if (x->T == type_record)
+		{
+		set_std(hold(x));
+		f = hold(QI);
+		}
+	else
+		f = hold(Qvoid);
+	drop(x);
+	return f;
 	}
 
 void beg_sym(void)
 	{
-	Qstd = Qstr0("std");
+	Qstd = record_empty();
 	}
 
 void end_sym(void)

@@ -1,100 +1,49 @@
-# (check x d) = x if x is good, otherwise d.
-\check=(\x is_defined x x)
-# (default d x) = x if x is good, otherwise d.
-\default=(\\d\x is_defined x x d)
+# Load the libraries.
 
-\path_under=(\dir\name . (. dir "/") name)
+\parse_lib=(\name parse_file; . dir_lib name)
+\use_lib=(\name evaluate; parse_lib name)
 
-# Establish paths based on command arguments.
-\dir_base=(dirname; dirname; argv 0)
-\script_name=(default ""; argv 1)
-
-\trace=(fsay stderr)
-\error=(\msg trace msg die)
-
-# Define key to refer to a context.
-\defc= # LATER 20240820 deprecated
-	(\key\cx
-	@\\self
-	def key self;
-	cx
+\guard=
+	(\\body
+	\save=(record_copy std)
+	\x=body
+	set_std save
+	x
 	)
 
-# Define some extra functions.
-\std=
-(
-
-# (if x y) = y if x is true, otherwise I.
-\if=(\\x\\y x y I)
-
-\dir_local=(dirname script_name)
-
-\NL="
-"
-\TAB="	"
-\CR=(chr 13)
-\LF=NL
-\QU=~ "~
-
-\run_benchmark=
-	(\\show\\f
-	fexl_benchmark f \val\steps\bytes
-	show ["steps "steps" bytes "bytes]
-	val
+\restrict=
+	(\\body
+	\save=std
+	set_std empty
+	\x=body
+	set_std save
+	x
 	)
 
-\do_benchmark=(run_benchmark trace)
-\show_benchmark=(run_benchmark say)
+\dir_base_so=(. dir_base "lib/")
 
-# Use a file in the directory which contains the user's script.
-\use=(\name parse_file; path_under dir_local name)
-\load=(\name\cx extend cx; use name)
+\load_base_so=
+	(\name
+	load_so (. dir_base_so name)
+	)
 
-def "defc" defc;
-def "if" if;
-def "use" use;
-def "load" load;
+define "guard" guard
+define "restrict" restrict
+define "dir_base_so" dir_base_so
+define "load_base_so" load_base_so
 
-def "check" check;
-def "default" default;
-
-def "path_under" path_under;
-def "dir_base" dir_base;
-def "dir_local" dir_local;
-
-def "trace" trace;
-def "error" error;
-
-def "TAB" TAB;
-def "NL" NL;
-def "CR" CR;
-def "LF" LF;
-def "QU" QU;
-
-def "do_benchmark" do_benchmark;
-def "show_benchmark" show_benchmark;
-std
-)
-
-# Load libraries into the standard context.
-\dir_lib=(path_under dir_base "src/lib")
-\use=(\name parse_file; path_under dir_lib name)
-\load=(\name\cx extend cx; use name)
-
-defc "std";
-def "use_lib" use; # LATER 20241018 deprecate
-load "read_ssv.fxl";
-load "read_csv.fxl";
-load "read.fxl";
-load "run.fxl";
-load "date.fxl";
-load "time.fxl";
-load "html.fxl";
-load "hex.fxl";
-load "assoc.fxl";
-load "indent.fxl";
-load "format.fxl";
-load "list.fxl";
-load "math.fxl";
-load "bool.fxl";
-std
+use_lib "extra.fxl"
+use_lib "bool.fxl"
+use_lib "math.fxl"
+use_lib "list.fxl"
+use_lib "assoc.fxl"
+use_lib "time.fxl"
+use_lib "date.fxl"
+use_lib "format.fxl"
+use_lib "indent.fxl"
+use_lib "hex.fxl"
+use_lib "html.fxl"
+use_lib "read.fxl"
+use_lib "read_csv.fxl"
+use_lib "read_ssv.fxl"
+use_lib "run.fxl"

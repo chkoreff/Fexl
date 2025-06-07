@@ -9,7 +9,6 @@ value QY;
 value Qvoid;
 value Qnull;
 value Qonce;
-value Qyield;
 
 // (I x) = x
 value type_I(value f)
@@ -220,7 +219,6 @@ void beg_basic(void)
 	Qvoid = Q(type_void);
 	Qnull = Q(type_null);
 	Qonce = Q(type_once);
-	Qyield = Q(type_yield);
 	}
 
 void end_basic(void)
@@ -232,5 +230,4 @@ void end_basic(void)
 	drop(Qvoid);
 	drop(Qnull);
 	drop(Qonce);
-	drop(Qyield);
 	}

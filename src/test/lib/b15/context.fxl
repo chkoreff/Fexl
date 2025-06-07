@@ -1,13 +1,10 @@
 #
-extend
-(
-load "lib/index/index.fxl";
-load "lib/index/render.fxl";
-load "lib/render/list.fxl";
-load "lib/render/base.fxl";
-std
-)
-\;
+use "lib/render/base.fxl"
+use "lib/render/list.fxl"
+use "lib/index/render.fxl"
+use "lib/index/index.fxl"
+
+evaluate \;
 
 \render_val=
 	(\val
@@ -32,6 +29,5 @@ std
 		)
 	)
 
-def "say_pairs" say_pairs;
-def "say_errors" say_errors;
-std
+define "say_pairs" say_pairs
+define "say_errors" say_errors

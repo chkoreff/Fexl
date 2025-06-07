@@ -1,13 +1,11 @@
-# Test the extend function.
+# Test context.
 
 \\test_0=
 (
 \try=
-	(
-	\\cx=(say "Evaluating the context." std)
-	\\form
+	(\\form
 	\\form=(say "Evaluating the form." form)
-	\result=(value cx form)
+	\result=(evaluate form)
 	say ["result "(is_undef result "void" "ok")]
 	nl
 	)
@@ -26,24 +24,17 @@ try (\; say "Hello")
 say "== test_1"
 show_benchmark;
 
-extend
-	(
-	say "Evaluating the context."
-	def "F" F;
-	def "if" if;
-	def "fred" (say "I am Fred.");
-	std
-	)
-	(
-	say "Evaluating the form."
-	\;
-	extend std \;
-	extend std \;
-	extend std \;
+guard;
+define "fred" (say "I am Fred.")
 
-	if F std
-	fred
-	)
+say "Evaluating the form."
+evaluate \;
+evaluate \;
+evaluate \;
+evaluate \;
+
+if F define
+fred
 )
 
 \\test_2=
@@ -51,27 +42,19 @@ extend
 say "== test_2"
 show_benchmark;
 
-# Test fancy extended standard context.
-extend
-(
-# Define std to include a few extra functions.
-say "Evaluating the context."
+# Define a few extra functions.
+guard;
 \speaker=(\name \x put name put " says " say x)
-def "fred" (speaker "Fred");
-def "wilma" (speaker "Wilma");
-def "goodbye" (say "Goodbye");
-std
-);
+define "fred" (speaker "Fred")
+define "wilma" (speaker "Wilma")
+define "goodbye" (say "Goodbye")
 
 say "Evaluating the form."
-\;
-# Now override one of the definitions.  Not extending this time.
-value
-(
-def "fred" (put "HEY: " fred);
-std
-)
-\;
+evaluate \;
+# Now override one of the definitions.
+define "fred" (put "HEY: " fred)
+
+evaluate \;
 
 # Now run this program in the enhanced context.
 say "Hi"
@@ -82,6 +65,53 @@ wilma "b"
 goodbye
 )
 
+\\test_3=
+(
+# Illustrate how dynamic loading could be done with resolve.
+say "== test_3"
+
+\check_resolve=
+	(\\body\form
+	is_closed form form;
+	body
+	resolve form
+	)
+
+\define=(\key say [": define "key] define key)
+
+\evaluate=
+	(\form
+	nl
+	say "= evaluate"
+	restrict;
+
+	evaluate;
+	check_resolve
+		(
+		define "fred" (say "I am Fred.")
+		define "wilma" (say "I am Wilma.")
+		);
+	check_resolve
+		(
+		define "say" say
+		);
+	form
+	)
+
+(
+evaluate \;
+say "Hello."
+fred wilma
+)
+(
+evaluate \;
+say "Hello."
+)
+
+say_data (evaluate \; [1 2 3])
+)
+
 test_0
 test_1
 test_2
+test_3

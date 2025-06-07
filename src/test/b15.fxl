@@ -1,5 +1,6 @@
 #
-value (load "lib/b15/context.fxl"; std) \;
+use "lib/b15/context.fxl"
+evaluate \;
 
 # Sort unique pairs, keeping the latest one.
 \sort_pairs=(combine_keys (\x\y y))

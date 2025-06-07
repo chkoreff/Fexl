@@ -3,10 +3,8 @@
 == test_full
 name say : T
 name is_defined : T
-name std : T
 name + : T
 name @ : T
-name def : T
 name if : T
 name each : T
 name div : T
@@ -27,10 +25,8 @@ name x : F
 == test_restricted
 name say : T
 name is_defined : T
-name std : F
 name + : F
 name @ : F
-name def : F
 name if : F
 name each : F
 name div : F

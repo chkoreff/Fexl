@@ -1,0 +1,67 @@
+\out=
+~
+[I]
+[list [str "a"] [list [str "b"] [null]]]
+[pair [str "a"] [str "b"]]
+[D [A [F] [A [F] [T]]] [D [A [T] [F]] [A [I] [I]]]]
+
+[form [A [ref "a"] [A [ref "b"] [ref "c"]]]]
+[form [quo [I]]]
+[form [quo [list [str "a"] [list [str "b"] [null]]]]]
+[form [A [ref "say"] [quo [list [str "a"] [list [str "b"] [null]]]]]]
+[form [quo [D [A [F] [A [F] [T]]] [D [A [T] [F]] [A [I] [I]]]]]]
+[form [quo [E [A [F] [A [F] [T]]] [D [A [T] [F]] [A [I] [I]]]]]]
+
+[A [say] [str "Hello."]]
+Hello.
+[I]
+[assoc [pair [str "a"] [num 1]] [assoc [pair [str "b"] [num 2]] [void]]]
+[A [A [add] [num 2]] [num 3]]
+[num 5]
+
+[tuple [tuple] [list [num 1] [null]]]
+[pair [num 1] [num 2]]
+[tuple [tuple] [list [num 1] [list [num 2] [num 3]]]]
+[tuple [tuple] [list [num 1] [list [num 2] [list [num 3] [null]]]]]
+[pair [A [A [add] [num 1]] [num 1]] [A [A [mul] [num 2]] [num 2]]]
+[list [pair [str "a"] [num 1]] [list [pair [str "b"] [num 2]] [list [pair [str "c"] [num 3]] [null]]]]
+
+[pair [str "a"] [str "b"]]
+[pair [I] [str "b"]]
+[pair [str "a"] [I]]
+[tuple [tuple] [list [str "a"] [list [I] [say]]]]
+[tuple [tuple] [list [num 1] [list [num 2] [list [num 3] [null]]]]]
+[tuple [tuple] [null]]
+[tuple [tuple] [list [say] [null]]]
+[tuple [tuple] [list [num 1] [list [num 2] [list [say] [null]]]]]
+
+[pair [str "a"] [str "b"]]
+[pair [I] [str "b"]]
+[pair [str "a"] [I]]
+[pair [say] [Y]]
+[tuple [tuple] [list [str "a"] [list [I] [say]]]]
+[pair [str "a"] [I]]
+
+[tuple [tuple] [null]]
+[tuple [tuple] [list [num 1] [null]]]
+[pair [num 1] [num 2]]
+[tuple [tuple] [list [num 1] [list [num 2] [list [num 3] [null]]]]]
+
+[form [pair [ref "a"] [ref "b"]]]
+[form [pair [ref "a"] [quo [num 2]]]]
+[form [pair [quo [num 1]] [ref "b"]]]
+[form [quo [pair [num 1] [num 2]]]]
+
+[form [tuple [quo [tuple]] [list [ref "a"] [list [ref "b"] [list [ref "c"] [quo [null]]]]]]]
+[form [tuple [quo [tuple]] [list [ref "a"] [list [ref "b"] [quo [list [num 3] [null]]]]]]]
+[form [tuple [quo [tuple]] [list [ref "a"] [quo [list [num 2] [list [num 3] [null]]]]]]]
+[form [quo [tuple [tuple] [list [num 1] [list [num 2] [list [num 3] [null]]]]]]]
+
+[form [tuple [quo [tuple]] [list [quo [num 1]] [list [ref "b"] [list [ref "c"] [quo [null]]]]]]]
+[form [tuple [quo [tuple]] [list [quo [num 1]] [list [quo [num 2]] [list [ref "c"] [quo [null]]]]]]]
+[form [quo [tuple [tuple] [list [num 1] [list [num 2] [list [num 3] [null]]]]]]]
+~
+\err=
+~
+~
+\status=0

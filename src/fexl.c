@@ -16,6 +16,7 @@
 #include <type_hex.h>
 #include <type_istr.h>
 #include <type_limit.h>
+#include <type_load.h>
 #include <type_math.h>
 #include <type_num.h>
 #include <type_output.h>
@@ -32,269 +33,27 @@
 #include <type_var.h>
 #include <type_with.h>
 
-static const char *cur_name;
+static value Qdir_base;
+static value Qdir_lib;
 
-static int match(const char *other)
+static value concat(value x, value y)
 	{
-	return strcmp(cur_name,other) == 0;
+	return eval(A(A(Q(type_concat),x),y));
 	}
 
-// Resolve core names.
-static value def_core(void)
+static value Qdirname(value x)
 	{
-	if (match("put")) return hold(Qput);
-	if (match("nl")) return hold(Qnl);
-	if (match("say")) return Q(type_say);
-	if (match("fput")) return hold(Qfput);
-	if (match("fnl")) return hold(Qfnl);
-	if (match("fsay")) return Q(type_fsay);
-	if (match("fflush")) return Q(type_fflush);
-
-	if (match("+")) return Q(type_add);
-	if (match("-")) return Q(type_sub);
-	if (match("*")) return Q(type_mul);
-	if (match("/")) return Q(type_div);
-	if (match("^")) return Q(type_pow);
-	if (match("xor")) return Q(type_xor);
-	if (match("round")) return Q(type_round);
-	if (match("ceil")) return Q(type_ceil);
-	if (match("trunc")) return Q(type_trunc);
-	if (match("abs")) return Q(type_abs);
-	if (match("sqrt")) return Q(type_sqrt);
-	if (match("exp")) return Q(type_exp);
-	if (match("log")) return Q(type_log);
-	if (match("sin")) return Q(type_sin);
-	if (match("cos")) return Q(type_cos);
-	if (match("pi")) return Qnum(num_pi);
-
-	if (match("compare")) return Q(type_compare);
-	if (match("lt")) return Q(type_lt);
-	if (match("le")) return Q(type_le);
-	if (match("eq")) return Q(type_eq);
-	if (match("ne")) return Q(type_ne);
-	if (match("ge")) return Q(type_ge);
-	if (match("gt")) return Q(type_gt);
-
-	if (match("I")) return hold(QI);
-	if (match("T")) return hold(QT);
-	if (match("F")) return hold(QF);
-	if (match("@")) return hold(QY);
-	if (match("void")) return hold(Qvoid);
-	if (match("cons")) return Q(type_cons);
-	if (match("null")) return hold(Qnull);
-	if (match("eval")) return Q(type_eval);
-	if (match("once")) return hold(Qonce);
-	if (match("yield")) return hold(Qyield);
-
-	if (match("is_defined")) return Q(type_is_defined);
-	if (match("is_undef")) return Q(type_is_undef);
-	if (match("is_void")) return Q(type_is_void);
-	if (match("is_good")) return Q(type_is_good);
-	if (match("is_bool")) return Q(type_is_bool);
-	if (match("is_list")) return Q(type_is_list);
-	if (match("::")) return Q(type_chain);
-
-	if (match(".")) return Q(type_concat);
-	if (match("length")) return Q(type_length);
-	if (match("slice")) return Q(type_slice);
-	if (match("search")) return Q(type_search);
-	if (match("str_num")) return Q(type_str_num);
-	if (match("ord")) return Q(type_ord);
-	if (match("chr")) return Q(type_chr);
-	if (match("char_width")) return Q(type_char_width);
-	if (match("dirname")) return Q(type_dirname);
-	if (match("basename")) return Q(type_basename);
-	if (match("length_common")) return Q(type_length_common);
-	if (match("compare_at")) return Q(type_compare_at);
-	if (match("is_str")) return Q(type_is_str);
-	if (match("with")) return Q(type_with);
-	if (match("def")) return Q(type_def);
-	if (match("is_obj")) return Q(type_is_obj);
-	if (match("split_obj")) return Q(type_split_obj);
-	if (match("fetch")) return Q(type_fetch);
-
-	if (match("num_str")) return Q(type_num_str);
-	if (match("is_num")) return Q(type_is_num);
-
-	if (match("is_tuple")) return Q(type_is_tuple);
-	if (match("tuple_to_list")) return Q(type_tuple_to_list);
-	if (match("list_to_tuple")) return Q(type_list_to_tuple);
-
-	if (match("stdin")) return hold(Qstdin);
-	if (match("stdout")) return hold(Qstdout);
-	if (match("stderr")) return hold(Qstderr);
-	if (match("fopen")) return Q(type_fopen);
-	if (match("fclose")) return Q(type_fclose);
-	if (match("fgetc")) return Q(type_fgetc);
-	if (match("fget")) return Q(type_fget);
-	if (match("clearerr")) return Q(type_clearerr);
-	if (match("feof")) return Q(type_feof);
-	if (match("flook")) return Q(type_flook);
-	if (match("remove")) return Q(type_remove);
-	if (match("is_newer")) return Q(type_is_newer);
-	if (match("is_file")) return Q(type_is_file);
-	if (match("is_dir")) return Q(type_is_dir);
-	if (match("flock_ex")) return Q(type_flock_ex);
-	if (match("flock_sh")) return Q(type_flock_sh);
-	if (match("flock_un")) return Q(type_flock_un);
-	if (match("readlink")) return Q(type_readlink);
-	if (match("mkdir")) return Q(type_mkdir);
-	if (match("rmdir")) return Q(type_rmdir);
-	if (match("ftruncate")) return Q(type_ftruncate);
-	if (match("fseek_set")) return Q(type_fseek_set);
-	if (match("fseek_cur")) return Q(type_fseek_cur);
-	if (match("fseek_end")) return Q(type_fseek_end);
-	if (match("ftell")) return Q(type_ftell);
-	if (match("fileno")) return Q(type_fileno);
-	if (match("fread")) return Q(type_fread);
-	if (match("mkfile")) return Q(type_mkfile);
-	if (match("dir_names")) return Q(type_dir_names);
-	if (match("mod_time")) return Q(type_mod_time);
-	if (match("file_size")) return Q(type_file_size);
-	if (match("symlink")) return Q(type_symlink);
-	if (match("rename")) return Q(type_rename);
-
-	// stream
-	if (match("at_eof")) return Q0(type_at_eof);
-	if (match("at_white")) return Q0(type_at_white);
-	if (match("skip_white")) return Q0(type_skip_white);
-	if (match("at_eol")) return Q0(type_at_eol);
-	if (match("at_ch")) return Q(type_at_ch);
-	if (match("look")) return Q0(type_look);
-	if (match("skip")) return Q0(type_skip);
-	if (match("line")) return Q0(type_line);
-	if (match("buf_keep")) return Q(type_buf_keep);
-	if (match("collect_to_ch")) return Q(type_collect_to_ch);
-	if (match("collect_tilde_string")) return Q(type_collect_tilde_string);
-	if (match("read_stream")) return Q(type_read_stream);
-
-	if (match("time")) return Q0(type_time);
-	if (match("localtime")) return Q(type_localtime);
-	if (match("gmtime")) return Q(type_gmtime);
-	if (match("timelocal")) return Q(type_timelocal);
-	if (match("timegm")) return Q(type_timegm);
-	if (match("microtime")) return Q0(type_microtime);
-	if (match("dow")) return Q(type_dow);
-
-	if (match("die")) return Q0(type_die);
-	if (match("argv")) return Q(type_argv);
-	if (match("sleep")) return Q(type_sleep);
-	if (match("usleep")) return Q(type_usleep);
-	if (match("run_process")) return Q(type_run_process);
-	if (match("spawn")) return Q(type_spawn);
-	if (match("exec")) return Q(type_exec);
-	if (match("fexl_benchmark")) return Q(type_fexl_benchmark);
-
-	if (match("seed_rand")) return Q(type_seed_rand);
-	if (match("rand")) return Q0(type_rand);
-
-	if (match("parse")) return Q(type_parse);
-	if (match("parse_file")) return Q(type_parse_file);
-	if (match("use_file")) return Q(type_parse_file); // LATER 20241123 deprecated
-
-	if (match("is_closed")) return Q(type_is_closed);
-	if (match("value")) return Q(type_value);
-	if (match("extend")) return Q(type_extend);
-
-	if (match("buf_new")) return Q0(type_buf_new);
-	if (match("buf_put")) return Q(type_buf_put);
-	if (match("buf_get")) return Q(type_buf_get);
-
-	if (match("readstr")) return Q(type_readstr);
-	if (match("sgetc")) return Q(type_sgetc);
-	if (match("sget")) return Q(type_sget);
-	if (match("slook")) return Q(type_slook);
-
-	if (match("var_new")) return Q0(type_var_new);
-	if (match("var_get")) return Q(type_var_get);
-	if (match("var_getf")) return Q(type_var_getf);
-	if (match("var_put")) return Q(type_var_put);
-	if (match("var_putf")) return Q(type_var_putf);
-	if (match("is_var")) return Q(type_is_var);
-
-	if (match("limit_time")) return Q(type_limit_time);
-	if (match("limit_memory")) return Q(type_limit_memory);
-	if (match("limit_stack")) return Q(type_limit_stack);
-
-	if (match("unpack")) return Q(type_unpack);
-	if (match("pack")) return Q(type_pack);
-
-	// record
-	if (match("empty")) return Q0(type_empty);
-
-	// LATER 20250117 set and setf are deprecated
-	if (match("set")) return Q(type_set);
-	if (match("setf")) return Q(type_setf);
-
-	if (match("SET")) return Q(type_SET);
-	if (match("SETF")) return Q(type_SETF);
-
-	if (match("get")) return Q(type_get);
-	if (match("record_copy")) return Q(type_record_copy);
-	if (match("record_count")) return Q(type_record_count);
-	if (match("record_item")) return Q(type_record_item);
-
-	// crypto functions
-	if (match("random_bytes")) return Q(type_random_bytes);
-	if (match("random_nonce")) return Q0(type_random_nonce);
-	if (match("random_secret_key")) return Q0(type_random_secret_key);
-	if (match("nacl_box_public")) return Q(type_nacl_box_public);
-	if (match("nacl_box_prepare")) return Q(type_nacl_box_prepare);
-	if (match("nacl_box_seal")) return Q(type_nacl_box_seal);
-	if (match("nacl_box_open")) return Q(type_nacl_box_open);
-	if (match("nacl_sign_public")) return Q(type_nacl_sign_public);
-	if (match("nacl_sign_seal")) return Q(type_nacl_sign_seal);
-	if (match("nacl_sign_open")) return Q(type_nacl_sign_open);
-	if (match("sha256")) return Q(type_sha256);
-	if (match("sha512")) return Q(type_sha512);
-	if (match("pack64")) return Q(type_pack64);
-	if (match("unpack64")) return Q(type_unpack64);
-	if (match("hmac_sha512")) return Q(type_hmac_sha512);
-	if (match("hmac_sha256")) return Q(type_hmac_sha256);
-
-	// big numbers
-	if (match("bn_eq0")) return Q(type_bn_eq0);
-	if (match("bn_is_neg")) return Q(type_bn_is_neg);
-	if (match("bn_neg")) return Q(type_bn_neg);
-	if (match("bn_cmp")) return Q(type_bn_cmp);
-	if (match("bn_lt")) return Q(type_bn_lt);
-	if (match("bn_le")) return Q(type_bn_le);
-	if (match("bn_eq")) return Q(type_bn_eq);
-	if (match("bn_ne")) return Q(type_bn_ne);
-	if (match("bn_ge")) return Q(type_bn_ge);
-	if (match("bn_gt")) return Q(type_bn_gt);
-	if (match("bn_from_dec")) return Q(type_bn_from_dec);
-	if (match("bn_to_dec")) return Q(type_bn_to_dec);
-	if (match("bn_add")) return Q(type_bn_add);
-	if (match("bn_sub")) return Q(type_bn_sub);
-	if (match("bn_mul")) return Q(type_bn_mul);
-	if (match("bn_mod")) return Q(type_bn_mod);
-	if (match("bn_div")) return Q(type_bn_div);
-	if (match("is_bn")) return Q(type_is_bn);
-
-	if (match("set_alarm")) return Q(type_set_alarm);
-	if (match("start_server")) return Q(type_start_server);
-	if (match("kill")) return Q(type_kill);
-	if (match("connect")) return Q(type_connect);
-	if (match("receive_keystrokes")) return Q(type_receive_keystrokes);
-
-	return 0;
+	return eval(A(Q(type_dirname),x));
 	}
 
-static value type_cx_core(value f)
+static void use(value name)
 	{
-	value x = arg(f->R);
-	if (x->T == type_str)
-		{
-		value val;
-		cur_name = str_data(x);
-		val = def_core();
-		f = val ? yield(val) : hold(Qvoid);
-		}
-	else
-		f = hold(Qvoid);
-	drop(x);
-	return f;
+	drop(eval(A(Q(type_evaluate),A(Q(type_parse_file),name))));
+	}
+
+static void use_lib(const char *name)
+	{
+	use(concat(hold(Qdir_lib),Qstr0(name)));
 	}
 
 static void beg_const(void)
@@ -305,6 +64,10 @@ static void beg_const(void)
 	beg_tuple();
 	beg_sym();
 	init_signal();
+
+	// The base directory is right above the bin directory.
+	Qdir_base = concat(Qdirname(Qdirname(Qstr0(main_argv[0]))),Qstr0("/"));
+	Qdir_lib = concat(hold(Qdir_base),Qstr0("src/lib/"));
 	}
 
 static void end_const(void)
@@ -315,30 +78,356 @@ static void end_const(void)
 	end_tuple();
 	end_sym();
 	close_random();
+	drop(Qdir_base);
+	drop(Qdir_lib);
 	}
 
-static value extend(value cx, value name)
+static void define_basic(void)
 	{
-	return A(A(Q(type_extend),cx),A(Q(type_parse_file),name));
+	define("I",hold(QI));
+	define("T",hold(QT));
+	define("F",hold(QF));
+	define("@",hold(QY));
+	define("void",hold(Qvoid));
+	define("null",hold(Qnull));
+	define("once",hold(Qonce));
+	define("cons",Q(type_cons));
+	define("eval",Q(type_eval));
+	define("yield",Q(type_yield));
+	define("is_defined",Q(type_is_defined));
+	define("is_undef",Q(type_is_undef));
+	define("is_void",Q(type_is_void));
+	define("is_good",Q(type_is_good));
+	define("is_bool",Q(type_is_bool));
+	define("is_list",Q(type_is_list));
+	define("::",Q(type_chain));
 	}
 
-// Return a path name relative to the base directory.
-static value local_path(const char *name_s)
+// big numbers
+static void define_bn(void)
 	{
-	// Get the name of the currently running executable.
-	value f = Qstr0(main_argv[0]);
-	// Go two directories up, right above the bin directory.
-	f = A(Q(type_dirname),f);
-	f = A(Q(type_dirname),f);
-	// Concatenate the name of the main script.
-	f = A(A(Q(type_concat),f),Qstr0(name_s));
-	return f;
+	define("bn_eq0",Q(type_bn_eq0));
+	define("bn_is_neg",Q(type_bn_is_neg));
+	define("bn_neg",Q(type_bn_neg));
+	define("bn_cmp",Q(type_bn_cmp));
+	define("bn_lt",Q(type_bn_lt));
+	define("bn_le",Q(type_bn_le));
+	define("bn_eq",Q(type_bn_eq));
+	define("bn_ne",Q(type_bn_ne));
+	define("bn_ge",Q(type_bn_ge));
+	define("bn_gt",Q(type_bn_gt));
+	define("bn_from_dec",Q(type_bn_from_dec));
+	define("bn_to_dec",Q(type_bn_to_dec));
+	define("bn_add",Q(type_bn_add));
+	define("bn_sub",Q(type_bn_sub));
+	define("bn_mul",Q(type_bn_mul));
+	define("bn_mod",Q(type_bn_mod));
+	define("bn_div",Q(type_bn_div));
+	define("is_bn",Q(type_is_bn));
 	}
 
-// Return the context for resolving scripts.
-static value script_context(void)
+static void define_buf(void)
 	{
-	return extend(Q(type_cx_core),local_path("/src/lib/main.fxl"));
+	define("buf_new",Q0(type_buf_new));
+	define("buf_put",Q(type_buf_put));
+	define("buf_get",Q(type_buf_get));
+	}
+
+static void define_cmp(void)
+	{
+	define("compare",Q(type_compare));
+	define("lt",Q(type_lt));
+	define("le",Q(type_le));
+	define("eq",Q(type_eq));
+	define("ne",Q(type_ne));
+	define("ge",Q(type_ge));
+	define("gt",Q(type_gt));
+	}
+
+static void define_crypto(void)
+	{
+	define("random_bytes",Q(type_random_bytes));
+	define("random_nonce",Q0(type_random_nonce));
+	define("random_secret_key",Q0(type_random_secret_key));
+	define("nacl_box_public",Q(type_nacl_box_public));
+	define("nacl_box_prepare",Q(type_nacl_box_prepare));
+	define("nacl_box_seal",Q(type_nacl_box_seal));
+	define("nacl_box_open",Q(type_nacl_box_open));
+	define("nacl_sign_public",Q(type_nacl_sign_public));
+	define("nacl_sign_seal",Q(type_nacl_sign_seal));
+	define("nacl_sign_open",Q(type_nacl_sign_open));
+	define("sha256",Q(type_sha256));
+	define("sha512",Q(type_sha512));
+	define("pack64",Q(type_pack64));
+	define("unpack64",Q(type_unpack64));
+	define("hmac_sha512",Q(type_hmac_sha512));
+	define("hmac_sha256",Q(type_hmac_sha256));
+	}
+
+static void define_dir(void)
+	{
+	define("dir_base",hold(Qdir_base));
+	define("dir_lib",hold(Qdir_lib));
+	}
+
+static void define_file(void)
+	{
+	define("stdin",hold(Qstdin));
+	define("stdout",hold(Qstdout));
+	define("stderr",hold(Qstderr));
+	define("fopen",Q(type_fopen));
+	define("fclose",Q(type_fclose));
+	define("fgetc",Q(type_fgetc));
+	define("fget",Q(type_fget));
+	define("clearerr",Q(type_clearerr));
+	define("feof",Q(type_feof));
+	define("flook",Q(type_flook));
+	define("remove",Q(type_remove));
+	define("is_newer",Q(type_is_newer));
+	define("is_file",Q(type_is_file));
+	define("is_dir",Q(type_is_dir));
+	define("flock_ex",Q(type_flock_ex));
+	define("flock_sh",Q(type_flock_sh));
+	define("flock_un",Q(type_flock_un));
+	define("readlink",Q(type_readlink));
+	define("mkdir",Q(type_mkdir));
+	define("rmdir",Q(type_rmdir));
+	define("ftruncate",Q(type_ftruncate));
+	define("fseek_set",Q(type_fseek_set));
+	define("fseek_cur",Q(type_fseek_cur));
+	define("fseek_end",Q(type_fseek_end));
+	define("ftell",Q(type_ftell));
+	define("fileno",Q(type_fileno));
+	define("fread",Q(type_fread));
+	define("mkfile",Q(type_mkfile));
+	define("dir_names",Q(type_dir_names));
+	define("mod_time",Q(type_mod_time));
+	define("file_size",Q(type_file_size));
+	define("symlink",Q(type_symlink));
+	define("rename",Q(type_rename));
+	}
+
+static void define_hex(void)
+	{
+	define("unpack",Q(type_unpack));
+	define("pack",Q(type_pack));
+	}
+
+static void define_istr(void)
+	{
+	define("readstr",Q(type_readstr));
+	define("sgetc",Q(type_sgetc));
+	define("sget",Q(type_sget));
+	define("slook",Q(type_slook));
+	}
+
+static void define_limit(void)
+	{
+	define("limit_time",Q(type_limit_time));
+	define("limit_stack",Q(type_limit_stack));
+	define("limit_memory",Q(type_limit_memory));
+	}
+
+static void define_load(void)
+	{
+	define("load_so",Q(type_load_so));
+	}
+
+static void define_math(void)
+	{
+	define("+",Q(type_add));
+	define("-",Q(type_sub));
+	define("*",Q(type_mul));
+	define("/",Q(type_div));
+	define("^",Q(type_pow));
+	define("xor",Q(type_xor));
+	define("round",Q(type_round));
+	define("ceil",Q(type_ceil));
+	define("trunc",Q(type_trunc));
+	define("abs",Q(type_abs));
+	define("sqrt",Q(type_sqrt));
+	define("exp",Q(type_exp));
+	define("log",Q(type_log));
+	define("sin",Q(type_sin));
+	define("cos",Q(type_cos));
+	define("pi",Qnum(num_pi));
+	}
+
+static void define_num(void)
+	{
+	define("num_str",Q(type_num_str));
+	define("is_num",Q(type_is_num));
+	}
+
+static void define_output(void)
+	{
+	define("put",hold(Qput));
+	define("nl",hold(Qnl));
+	define("say",Q(type_say));
+	define("fput",hold(Qfput));
+	define("fnl",hold(Qfnl));
+	define("fsay",Q(type_fsay));
+	define("fflush",Q(type_fflush));
+	}
+
+static void define_parse(void)
+	{
+	define("parse",Q(type_parse));
+	define("parse_file",Q(type_parse_file));
+	}
+
+static void define_rand(void)
+	{
+	define("seed_rand",Q(type_seed_rand));
+	define("rand",Q0(type_rand));
+	}
+
+static void define_record(void)
+	{
+	define("empty",Q0(type_empty));
+
+	// LATER 20250117 set and setf are deprecated
+	define("set",Q(type_SET));
+	define("setf",Q(type_SETF));
+
+	define("SET",Q(type_SET));
+	define("SETF",Q(type_SETF));
+
+	define("get",Q(type_get));
+	define("record_copy",Q(type_record_copy));
+	define("record_count",Q(type_record_count));
+	define("record_item",Q(type_record_item));
+	}
+
+static void define_run(void)
+	{
+	define("die",Q0(type_die));
+	define("argv",Q(type_argv));
+	define("sleep",Q(type_sleep));
+	define("usleep",Q(type_usleep));
+	define("run_process",Q(type_run_process));
+	define("spawn",Q(type_spawn));
+	define("start_server",Q(type_start_server));
+	define("kill",Q(type_kill));
+	define("connect",Q(type_connect));
+	define("exec",Q(type_exec));
+	define("receive_keystrokes",Q(type_receive_keystrokes));
+	define("fexl_benchmark",Q(type_fexl_benchmark));
+	}
+
+static void define_signal(void)
+	{
+	define("set_alarm",Q(type_set_alarm));
+	}
+
+static void define_str(void)
+	{
+	define(".",Q(type_concat));
+	define("length",Q(type_length));
+	define("slice",Q(type_slice));
+	define("search",Q(type_search));
+	define("str_num",Q(type_str_num));
+	define("ord",Q(type_ord));
+	define("chr",Q(type_chr));
+	define("char_width",Q(type_char_width));
+	define("dirname",Q(type_dirname));
+	define("basename",Q(type_basename));
+	define("length_common",Q(type_length_common));
+	define("compare_at",Q(type_compare_at));
+	define("is_str",Q(type_is_str));
+	}
+
+static void define_stream(void)
+	{
+	define("at_eof",Q0(type_at_eof));
+	define("at_white",Q0(type_at_white));
+	define("skip_white",Q0(type_skip_white));
+	define("at_eol",Q0(type_at_eol));
+	define("at_ch",Q(type_at_ch));
+	define("look",Q0(type_look));
+	define("skip",Q0(type_skip));
+	define("line",Q0(type_line));
+	define("buf_keep",Q(type_buf_keep));
+	define("collect_to_ch",Q(type_collect_to_ch));
+	define("collect_tilde_string",Q(type_collect_tilde_string));
+	define("read_stream",Q(type_read_stream));
+	}
+
+static void define_sym(void)
+	{
+	define("std",Q0(type_std));
+	define("is_closed",Q(type_is_closed));
+	define("define",Q(type_define));
+	define("resolve",Q(type_resolve));
+	define("evaluate",Q(type_evaluate));
+	define("set_std",Q(type_set_std));
+	}
+
+static void define_time(void)
+	{
+	define("time",Q0(type_time));
+	define("localtime",Q(type_localtime));
+	define("gmtime",Q(type_gmtime));
+	define("timelocal",Q(type_timelocal));
+	define("timegm",Q(type_timegm));
+	define("microtime",Q0(type_microtime));
+	define("dow",Q(type_dow));
+	}
+
+static void define_tuple(void)
+	{
+	define("is_tuple",Q(type_is_tuple));
+	define("tuple_to_list",Q(type_tuple_to_list));
+	define("list_to_tuple",Q(type_list_to_tuple));
+	}
+
+static void define_var(void)
+	{
+	define("var_new",Q0(type_var_new));
+	define("var_get",Q(type_var_get));
+	define("var_getf",Q(type_var_getf));
+	define("var_put",Q(type_var_put));
+	define("var_putf",Q(type_var_putf));
+	define("is_var",Q(type_is_var));
+	}
+
+static void define_with(void)
+	{
+	define("with",Q(type_with));
+	define("is_obj",Q(type_is_obj));
+	define("split_obj",Q(type_split_obj));
+	define("fetch",Q(type_fetch));
+	}
+
+// Define all the functions written in C.
+static void use_core(void)
+	{
+	define_basic();
+	define_bn();
+	define_buf();
+	define_cmp();
+	define_crypto();
+	define_dir();
+	define_file();
+	define_hex();
+	define_istr();
+	define_limit();
+	define_load();
+	define_math();
+	define_num();
+	define_output();
+	define_parse();
+	define_rand();
+	define_record();
+	define_run();
+	define_signal();
+	define_str();
+	define_stream();
+	define_sym();
+	define_time();
+	define_tuple();
+	define_var();
+	define_with();
 	}
 
 /*
@@ -349,10 +438,11 @@ behaves like an empty file.
 static void eval_script(void)
 	{
 	const char *name_s = main_argc > 1 ? main_argv[1] : "";
-	value cx = script_context();
-	value f = extend(cx,Qstr0(name_s));
-	f = eval(f);
-	drop(f);
+	value name = Qstr0(name_s);
+	define("dir_local",concat(Qdirname(hold(name)),Qstr0("/")));
+	use_core();
+	use_lib("main.fxl");
+	use(name);
 	}
 
 int main(int argc, const char *argv[])

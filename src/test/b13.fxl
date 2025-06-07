@@ -1,20 +1,16 @@
 #
-\test_context=
-(\cx
-
+\\test_context=
+(
 \try=
 	(\name
-	\val=(cx name)
-	\ok=(is_defined val)
+	\ok=(get name std F \\_ T)
 	say ["name "name" : "ok]
 	)
 
 try "say"
 try "is_defined"
-try "std"
 try "+"
 try "@"
-try "def"
 try "if"
 try "each"
 try "div"
@@ -34,30 +30,32 @@ try "-3.56e-4x"
 try "x"
 )
 
+(
 say "== test_full"
-test_context (load "test.fxl"; std)
-
-say "== test_restricted"
+guard;
+use "test.fxl"
 test_context
-	(
-	def "say" say;
-	def "is_defined" is_defined;
-	void
-	)
+)
+
+(
+say "== test_restricted"
+restrict;
+define "say" say
+define "is_defined" is_defined
+test_context
+)
 
 (
 say "== test_run_restricted"
-value
-(
+restrict;
 # This context defines only 5 available functions.
-def "say" say;
-def "seed_rand" seed_rand;
-def "rand" rand;
-def "fred" (say "I am Fred.");
-def "wilma" (say "I am Wilma.");
-void
-)
-\;
+define "say" say
+define "seed_rand" seed_rand
+define "rand" rand
+define "fred" (say "I am Fred.")
+define "wilma" (say "I am Wilma.")
+
+evaluate \;
 
 seed_rand 0.1964
 fred

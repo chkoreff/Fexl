@@ -1,5 +1,6 @@
 #
-value (load "test.fxl"; std) \;
+use "test.fxl"
+evaluate \;
 
 show_benchmark;
 
@@ -11,16 +12,14 @@ show_benchmark;
 	)
 
 # Test restricted evaluation by defining only the necessary functions.
-value
-(
-def "append" append;
-def "show_list" show_list;
-def "sort" sort;
-def "tower" tower;
-def "unique" unique;
-void
-)
-\;
+restrict;
+define "append" append
+define "show_list" show_list
+define "sort" sort
+define "tower" tower
+define "unique" unique
+
+evaluate \;
 # Here I test the sort.
 
 # A list of 30 random words from diceware.com.

@@ -4,7 +4,7 @@
 \show_base_dir=
 	(\path
 	say ["directory "path]
-	\path=(path_under dir_base path)
+	\path=(. dir_base path)
 	# Exclude hidden files.
 	\names=(sort; filter (\x not; starts_with "." x); dir_names path)
 	say "["
@@ -14,7 +14,7 @@
 
 \demo_seek=
 	(\path
-	\path=(path_under dir_local path)
+	\path=(. dir_local path)
 
 	\fh=
 		(
@@ -79,19 +79,17 @@
 		)
 
 	\form
-	value
-		(
-		def "show_pos" show_pos;
-		def "seek_set" seek_set;
-		def "seek_cur" seek_cur;
-		def "seek_end" seek_end;
-		def "truncate" truncate;
-		def "write" write;
-		def "read" read;
-		def "sleep" sleep;
-		std
-		)
-		form
+	guard;
+	define "show_pos" show_pos
+	define "seek_set" seek_set
+	define "seek_cur" seek_cur
+	define "seek_end" seek_end
+	define "truncate" truncate
+	define "write" write
+	define "read" read
+	define "sleep" sleep
+
+	evaluate form
 
 	\code=(remove path)
 	say [(eq code 0 "Removed" "Could not remove")" "path]
@@ -155,7 +153,7 @@ look
 \\try_file=
 	(
 	say "= file"
-	\source=(path_under dir_base "src/test/data.txt")
+	\source=(. dir_base "src/test/data.txt")
 
 	\fh=(
 		\fh=(fopen source "r")

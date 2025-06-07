@@ -1,6 +1,15 @@
 #!/bin/sh
 . ./lib_build
 
+# Build test.so
+make_PIC test
+make_lib test
+
+# Build show.so
+make_PIC show
+make_lib show
+
+# Build fexl.
 make base64
 make basic
 make bn
@@ -20,7 +29,7 @@ make parse
 make report
 make sha256
 make sha512
-#make show # for dev
+#need show # for dev
 make str
 make stream
 make type_bn
@@ -32,6 +41,7 @@ make type_hex
 make type_input
 make type_istr
 make type_limit
+make type_load
 make type_math
 make type_num
 make type_output
@@ -48,5 +58,6 @@ make type_tuple
 make type_var
 make type_with
 make value
+push -ldl
 push -lm
 link fexl

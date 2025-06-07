@@ -11,7 +11,7 @@
 	\source="/dev/zero" # Tests all zeroes.
 
 	# Testing with fixed file contents.
-	\source=(path_under dir_base "src/test/data.txt")
+	\source=(. dir_base "src/test/data.txt")
 
 	\fh=(fopen source "r")
 	is_undef fh (error ["Could not open "source]);

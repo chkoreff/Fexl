@@ -57,7 +57,6 @@
 \read_ssv_chars=(parse read_chars)
 \read_ssv_file=(parse read_file)
 
-def "read_ssv_string" read_ssv_string;
-def "read_ssv_chars" read_ssv_chars;
-def "read_ssv_file" read_ssv_file;
-std
+define "read_ssv_string" read_ssv_string
+define "read_ssv_chars" read_ssv_chars
+define "read_ssv_file" read_ssv_file

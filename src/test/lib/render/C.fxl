@@ -11,5 +11,4 @@
 		)
 	)
 
-def "scope" scope;
-std
+define "scope" scope
