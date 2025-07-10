@@ -286,10 +286,10 @@ static void define_record(void)
 	{
 	define("empty",Q0(type_empty));
 
-	// LATER 20250117 set and setf are deprecated
 	define("set",Q(type_SET));
 	define("setf",Q(type_SETF));
 
+	// LATER 20250710 The names SET and SETf are deprecated.
 	define("SET",Q(type_SET));
 	define("SETF",Q(type_SETF));
 

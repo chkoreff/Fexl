@@ -176,57 +176,6 @@ value type_empty(value f)
 	(void)f;
 	}
 
-// LATER 20241120 In a new version I am eliminating the automatic copy based on
-// reference count.  Instead all records will be mutable and you can make an
-// explicit copy if you like.
-static value record_set_copy(value obj, value key, value val)
-	{
-	if (obj->N <= 2)
-		hold(obj);
-	else
-		obj = record_copy(obj);
-
-	record_set(obj,key,val);
-	return obj;
-	}
-
-static value op_set(value f, value op(value))
-	{
-	if (f->L->L == 0) return keep(f);
-	if (f->L->L->L == 0) return keep(f);
-	{
-	value key = arg(f->L->L->R);
-	if (key->T == type_str)
-		{
-		value obj = arg(f->R);
-		if (obj->T == type_record)
-			f = record_set_copy(obj,key,op(f->L->R));
-		else
-			f = hold(Qvoid);
-		drop(obj);
-		}
-	else
-		f = hold(Qvoid);
-	drop(key);
-	return f;
-	}
-	}
-
-// (set key val obj) Set key to val in obj, after evaluating val.
-// This returns a record like obj but with key mapped to val.  It modifies obj
-// inline if there are no other references to it; otherwise it returns a
-// modified copy of obj.
-value type_set(value f)
-	{
-	return op_set(f,arg);
-	}
-
-// (setf key val obj) Set key to val in obj, without evaluating val.
-value type_setf(value f)
-	{
-	return op_set(f,hold);
-	}
-
 static value op_SET(value f, value op(value))
 	{
 	if (f->L->L == 0) return keep(f);
