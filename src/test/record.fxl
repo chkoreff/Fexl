@@ -17,7 +17,7 @@
 	say "= test_1"
 
 	\obj=empty
-	SET obj "b" (put "!" 2)
+	set obj "b" (put "!" 2)
 
 	try_keys obj
 	)
@@ -27,9 +27,9 @@
 	say "= test_2"
 
 	\obj=empty
-	SET obj "b" (put "!" 2)
-	SET obj "b" 22
-	SET obj "b" 222
+	set obj "b" (put "!" 2)
+	set obj "b" 22
+	set obj "b" 222
 
 	try_keys obj
 	)
@@ -39,8 +39,8 @@
 	say "= test_3"
 
 	\obj=empty
-	SET obj "b" (put "!" 2)
-	SET obj "b" 22
+	set obj "b" (put "!" 2)
+	set obj "b" 22
 
 	try_keys obj
 	)
@@ -50,12 +50,12 @@
 	say "= test_4"
 
 	\obj=empty
-	SET obj "d" 4
-	SET obj "d" 44
-	SET obj "b" 2
-	SET obj "c" 3
-	SET obj "c" 33
-	SET obj "a" 1
+	set obj "d" 4
+	set obj "d" 44
+	set obj "b" 2
+	set obj "c" 3
+	set obj "c" 33
+	set obj "a" 1
 
 	try_keys obj
 	)
@@ -65,14 +65,14 @@
 	say "= test_5"
 
 	\obj=empty
-	SET obj "d" 4
-	SET obj "d" 44
-	SET obj "b" 2
-	SET obj "c" 3
-	SET obj "c" 33
-	SET obj "a" 11
-	SET obj "a" 1
-	SET obj "e" 5
+	set obj "d" 4
+	set obj "d" 44
+	set obj "b" 2
+	set obj "c" 3
+	set obj "c" 33
+	set obj "a" 11
+	set obj "a" 1
+	set obj "e" 5
 
 	try_keys obj
 	)
@@ -82,14 +82,14 @@
 	say "= test_6"
 
 	\obj=empty
-	SET obj "d" 4
-	SET obj "d" 44
-	SET obj "b" 2
-	SET obj "c" 3
-	SET obj "c" 33
-	SET obj "a" 11
-	SET obj "a" 1
-	SET obj "e" 5
+	set obj "d" 4
+	set obj "d" 44
+	set obj "b" 2
+	set obj "c" 3
+	set obj "c" 33
+	set obj "a" 11
+	set obj "a" 1
+	set obj "e" 5
 
 	try_keys obj
 	)
@@ -101,33 +101,33 @@
 	\obj_2810=
 		(
 		\obj=empty
-		SET obj "d" 4
-		SET obj "d" 44
+		set obj "d" 4
+		set obj "d" 44
 		obj
 		)
 
 	\obj_3043=
 		(
 		\obj=(record_copy obj_2810)
-		SET obj "b" 2
-		SET obj "c" 3
+		set obj "b" 2
+		set obj "c" 3
 		obj
 		)
 
 	\obj_7892=
 		(
 		\obj=(record_copy obj_3043)
-		SET obj "c" 33
-		SET obj "a" 11
-		SET obj "a" 1
-		SET obj "e" 5
+		set obj "c" 33
+		set obj "a" 11
+		set obj "a" 1
+		set obj "e" 5
 		obj
 		)
 
 	\obj_8237=
 		(
 		\obj=(record_copy obj_2810)
-		SET obj "e" 5
+		set obj "e" 5
 		obj
 		)
 
@@ -155,15 +155,15 @@
 	\f1=
 		(
 		\obj=empty
-		SET obj "b" 2
-		SET obj "a" 1
+		set obj "b" 2
+		set obj "a" 1
 		obj
 		)
 
 	\f2=
 		(
 		\obj=empty
-		SET obj "c" 3
+		set obj "c" 3
 		obj
 		)
 
@@ -196,13 +196,13 @@
 	\obj=
 	(
 	\obj=empty
-	SET obj "d" 4
-	SET obj "d" 44
-	SET obj "c" 3
-	SET obj "c" 33
-	SET obj "a" 11
-	SET obj "a" 1
-	SET obj "e" 5
+	set obj "d" 4
+	set obj "d" 44
+	set obj "c" 3
+	set obj "c" 33
+	set obj "a" 11
+	set obj "a" 1
+	set obj "e" 5
 	obj
 	)
 
@@ -227,32 +227,32 @@
 	# Test avoid leak with update.
 	(
 	\obj=empty
-	SET obj "a" 1
-	SET obj "a" obj
-	SET obj "a" void # Clear cycle to avoid leak.
+	set obj "a" 1
+	set obj "a" obj
+	set obj "a" void # Clear cycle to avoid leak.
 	)
 	# Test avoid leak with insert.
 	(
 	\obj=empty
-	SET obj "a" 1
-	SET obj "b" obj
-	SET obj "b" void # Clear cycle to avoid leak.
+	set obj "a" 1
+	set obj "b" obj
+	set obj "b" void # Clear cycle to avoid leak.
 	)
 	)
 
 \\test_11=
 	(
 	say "= test_11"
-	# Test SETF and get.
+	# Test setf and get.
 
 	show_benchmark;
 
 	\obj=
 		(
 		\obj=empty
-		SETF obj "wilma" (say "I am Wilma.")
-		SETF obj "fred" (say "I am Fred.")
-		SET obj "x" (say "CALC" + 2 3)
+		setf obj "wilma" (say "I am Wilma.")
+		setf obj "fred" (say "I am Fred.")
+		set obj "x" (say "CALC" + 2 3)
 		obj
 		)
 	say ["x = "(obj "x")]
@@ -300,8 +300,8 @@ say "= test_12"
 	var_put v val
 
 	\obj=empty
-	SET obj "put" (var_put v)
-	SETF obj "get" (var_get v)
+	set obj "put" (var_put v)
+	setf obj "get" (var_get v)
 	obj
 	)
 
@@ -315,13 +315,13 @@ say "= test_12"
 	\obj=empty
 
 	# This "auto-vivifies" an entry at the given key.
-	SETF obj "at"
+	setf obj "at"
 		(\key
 		get key (var_get v)
 			(
 			\val=new_val
 			\obj=(var_get v)
-			SETF obj key val
+			setf obj key val
 			val
 			)
 			()
@@ -338,7 +338,7 @@ say "= test_12"
 	\obj=(new_slot val)
 	getf "put" obj \\put
 	getf "get" obj \\val
-	SETF obj "mod" (\f put (f val))
+	setf obj "mod" (\f put (f val))
 	obj
 	)
 
@@ -347,7 +347,7 @@ say "= test_12"
 	(\val
 	\obj=(new_slot val)
 	getf "get" obj \\val
-	SETF obj "show" (say ["val = "(as_str val)])
+	setf obj "show" (say ["val = "(as_str val)])
 	obj
 	)
 

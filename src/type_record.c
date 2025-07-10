@@ -176,7 +176,7 @@ value type_empty(value f)
 	(void)f;
 	}
 
-static value op_SET(value f, value op(value))
+static value op_set(value f, value op(value))
 	{
 	if (f->L->L == 0) return keep(f);
 	if (f->L->L->L == 0) return keep(f);
@@ -201,16 +201,16 @@ static value op_SET(value f, value op(value))
 	}
 	}
 
-// (SET obj key val) Set key to val in obj, after evaluating val.
-value type_SET(value f)
+// (set obj key val) Set key to val in obj, after evaluating val.
+value type_set(value f)
 	{
-	return op_SET(f,arg);
+	return op_set(f,arg);
 	}
 
-// (SETF obj key val) Set key to val in obj, without evaluating val.
-value type_SETF(value f)
+// (setf obj key val) Set key to val in obj, without evaluating val.
+value type_setf(value f)
 	{
-	return op_SET(f,hold);
+	return op_set(f,hold);
 	}
 
 // Look up key in record and return either no or (yes val).
