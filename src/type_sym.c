@@ -198,8 +198,7 @@ static value resolve(value exp)
 		return hold(exp);
 	else if (exp->T == type_ref)
 		{
-		string key = exp->R->v_ptr;
-		value val = record_find(Qstd,key);
+		value val = record_find(Qstd,exp->R);
 		return val ? quo(hold(val)) : hold(exp);
 		}
 	else
@@ -225,20 +224,46 @@ value type_resolve(value f)
 	return f;
 	}
 
-static void report_undef(value exp, const char *label)
+static value cache_undef;
+
+static void collect_undef(value exp)
 	{
 	if (exp->T == type_quo)
 		;
 	else if (exp->T == type_ref)
 		{
-		string key = exp->R->v_ptr;
-		undefined_symbol(key->data,exp->R->N,label);
+		value val = record_find(cache_undef,exp->R);
+		if (val == 0)
+			{
+			value key = Qstr(str_copy(exp->R->v_ptr));
+			record_set(cache_undef,key,hold(exp));
+			drop(key);
+			}
 		}
 	else
 		{
-		report_undef(exp->L,label);
-		report_undef(exp->R,label);
+		collect_undef(exp->L);
+		collect_undef(exp->R);
 		}
+	}
+
+static void report_undef(value exp, const char *label)
+	{
+	cache_undef = record_empty();
+	collect_undef(exp);
+	{
+	struct record *rec = cache_undef->v_ptr;
+	unsigned long count = rec->count;
+	unsigned long pos;
+	for (pos = 0; pos < count; pos++)
+		{
+		struct item *item = rec->vec + pos;
+		string key = item->key->v_ptr;
+		value exp = item->val;
+		undefined_symbol(key->data,exp->R->N,label);
+		}
+	}
+	drop(cache_undef);
 	}
 
 /*
@@ -256,6 +281,8 @@ value type_evaluate(value f)
 		else
 			{
 			report_undef(f,str_data(form->L));
+			drop(f);
+			f = hold(Qvoid);
 			die(0);
 			}
 		}

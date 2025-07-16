@@ -26,14 +26,10 @@ I am Fred.
 ~
 \err=
 ~
-Undefined symbol say on line 10
 Undefined symbol fred on line 13
-Undefined symbol wilma on line 13
-Undefined symbol fred on line 14
-Undefined symbol wilma on line 14
-Undefined symbol say on line 15
-Undefined symbol say on line 16
 Undefined symbol lookup on line 17
+Undefined symbol say on line 10
+Undefined symbol wilma on line 13
 ~
 \status=1
 ]
