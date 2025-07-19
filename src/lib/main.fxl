@@ -20,17 +20,8 @@
 	x
 	)
 
-\dir_base_so=(. dir_base "lib/")
-
-\load_base_so=
-	(\name
-	load_so (. dir_base_so name)
-	)
-
 define "guard" guard
 define "restrict" restrict
-define "dir_base_so" dir_base_so
-define "load_base_so" load_base_so
 
 use_lib "extra.fxl"
 use_lib "bool.fxl"

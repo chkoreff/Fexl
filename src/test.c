@@ -4,8 +4,8 @@
 
 #include <basic.h>
 #include <file.h>
+#include <test.h>
 #include <type_str.h>
-#include <type_sym.h>
 
 static value test_argv(const char *const *argv)
 	{
@@ -21,12 +21,7 @@ static value test_argv(const char *const *argv)
 	return hold(QI);
 	}
 
-static value type_test_argv(value f)
+value type_test_argv(value f)
 	{
 	return op_argv(f,test_argv);
-	}
-
-void run(void)
-	{
-	define("test_argv",Q(type_test_argv));
 	}

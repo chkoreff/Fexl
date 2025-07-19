@@ -1,7 +1,4 @@
-# Test dynamic libraries.
-load_base_so "show.so"
-evaluate \;
-
+# Test show forms.
 show ()
 show ["a" "b"]
 show {"a" "b"}

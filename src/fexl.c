@@ -6,8 +6,10 @@
 #include <buf.h>
 #include <crypto.h>
 //#include <memory.h>
+#include <show.h>
 #include <stdio.h>
 #include <string.h> // strcmp
+#include <test.h>
 #include <type_bn.h>
 #include <type_buf.h>
 #include <type_cmp.h>
@@ -16,7 +18,6 @@
 #include <type_hex.h>
 #include <type_istr.h>
 #include <type_limit.h>
-#include <type_load.h>
 #include <type_math.h>
 #include <type_num.h>
 #include <type_output.h>
@@ -228,11 +229,6 @@ static void define_limit(void)
 	define("limit_memory",Q(type_limit_memory));
 	}
 
-static void define_load(void)
-	{
-	define("load_so",Q(type_load_so));
-	}
-
 static void define_math(void)
 	{
 	define("+",Q(type_add));
@@ -406,7 +402,6 @@ static void use_core(void)
 	define_hex();
 	define_istr();
 	define_limit();
-	define_load();
 	define_math();
 	define_num();
 	define_output();
@@ -422,6 +417,8 @@ static void use_core(void)
 	define_tuple();
 	define_var();
 	define_with();
+	define("show",Q(type_show));
+	define("test_argv",Q(type_test_argv));
 	}
 
 /*
