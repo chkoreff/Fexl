@@ -1,4 +1,4 @@
-#include <stddef.h>
+#include <stddef.h> // size_t
 
 #include <buf.h>
 #include <str.h>
@@ -202,33 +202,35 @@ static value parse_seq(const char t_ch, const char *msg)
 	}
 	}
 
+// See through any quo form.
+static value see(const value p)
+	{
+	return (p->T == type_quo) ? p->R : p;
+	}
+
 // If a list is exactly two items then return a pair of those items.
 static value check_pair(const value list)
 	{
-	value p = list;
-	value x1, x2;
+	value p0, p1, p2, x, y;
 
-	if (p->T == type_quo) p = p->R;
-	if (p->T != type_list) return 0;
+	p0 = see(list);
+	if (p0->T != type_list) return 0;
 
-	x1 = p->L;
-	p = p->R;
+	p1 = see(p0->R);
+	if (p1->T != type_list) return 0;
 
-	if (p->T == type_quo) p = p->R;
-	if (p->T != type_list) return 0;
+	p2 = see(p1->R);
+	if (p2->T != type_null) return 0;
 
-	x2 = p->L;
-	p = p->R;
-
-	if (p->T == type_quo) p = p->R;
-	if (p->T != type_null) return 0;
+	x = hold(p0->L);
+	y = hold(p1->L);
 
 	if (list->T == type_quo)
-		return quo(pair(hold(x1),hold(x2)));
+		return quo(pair(x,y));
 	else if (list->R->T == type_quo)
-		return pair(hold(x1),quo(hold(x2)));
+		return pair(x,quo(y));
 	else
-		return join(type_pair,hold(x1),hold(x2));
+		return pair(x,y);
 	}
 
 static value parse_tuple(void)
