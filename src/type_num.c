@@ -8,14 +8,14 @@
 #include <type_num.h>
 #include <type_str.h>
 
-static void clear_num(value f)
-	{
-	(void)f;
-	}
-
 value type_num(value f)
 	{
 	return type_void(f);
+	}
+
+static void clear_num(value f)
+	{
+	(void)f;
 	}
 
 value Qnum(double x)

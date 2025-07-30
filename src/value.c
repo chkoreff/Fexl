@@ -126,14 +126,14 @@ value keep(value f)
 	return hold(f);
 	}
 
-unsigned long cur_steps;
-
 value tail(value f)
 	{
 	value x = hold(f->R);
 	drop(f);
 	return x;
 	}
+
+unsigned long cur_steps;
 
 static value step(value f)
 	{

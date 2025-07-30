@@ -5,7 +5,7 @@ extern value quo(value val);
 extern value ref(string name, unsigned long line);
 extern value join(type t, value x, value y);
 extern value app(value x, value y);
-extern value lam(type type, string name, value exp);
+extern value lam(type type, string name, value e);
 extern value type_form(value f);
 extern value Qform(value label, value exp);
 extern value type_D(value f);

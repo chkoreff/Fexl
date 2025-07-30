@@ -1,4 +1,4 @@
-#include <stddef.h>
+#include <stddef.h> // size_t
 #include <str.h>
 #include <value.h>
 

@@ -54,7 +54,7 @@ value type_put(value f)
 
 value type_nl(value f)
 	{
-	fnl(stdout);
+	nl();
 	return hold(QI);
 	(void)f;
 	}
