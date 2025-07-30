@@ -137,18 +137,19 @@ value tail(value f)
 
 static value step(value f)
 	{
-	value g;
-	if (f->L->T)
-		g = f->L;
-	else if (f->N == 1)
-		g = (f->L = eval(f->L));
-	else
+	value g = f->L;
+	if (g->T == 0)
 		{
-		g = eval(hold(f->L));
-		if (g == f->L)
-			drop(g);
+		if (f->N == 1)
+			g = (f->L = eval(g));
 		else
-			f = A(g,tail(f));
+			{
+			g = eval(hold(g));
+			if (g == f->L)
+				drop(g);
+			else
+				f = A(g,tail(f));
+			}
 		}
 
 	g = g->T(f);
