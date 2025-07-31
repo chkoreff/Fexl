@@ -1,6 +1,7 @@
 #!/bin/sh
 . ./lib_build
 
+## Make the fexl lib.
 make base64
 make basic
 make bn
@@ -9,7 +10,6 @@ make buf_str
 make convert
 make crypto
 make die
-make fexl
 make file
 make file_str
 make format
@@ -50,5 +50,10 @@ make type_tuple
 make type_var
 make type_with
 make value
-push -lm
-link fexl
+make_lib fexl
+
+## Make the fexl bin.
+make fexl
+push_lib fexl
+push -lm # Some newer systems need this for lib math.
+make_bin fexl

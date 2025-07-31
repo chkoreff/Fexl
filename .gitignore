@@ -1,4 +1,5 @@
 *.swp
 /bin
+/lib
 /obj
 /notes

@@ -1,6 +1,6 @@
 #!/bin/sh
 # These are common shell routines used by build scripts, sourced with ".".
-# These build scripts do follow header dependencies.
+# These build scripts check header dependencies.
 
 # stale $target $source1 ... $sourceN
 # Return 1 if $target does not exist or is older than any $source.
@@ -42,6 +42,11 @@ get_headers()
 push()
 	{
 	objects="$objects $1"
+	}
+
+push_lib()
+	{
+	push ../lib/$1.a
 	}
 
 # Compile a source file if it's newer than the object file.
@@ -105,8 +110,20 @@ make()
 	compile $name ""
 	}
 
-# Link the object files if any is newer than the executable file.
-link()
+# Make a static library.
+make_lib()
+	{
+	local name="$1"
+	local file_a=../lib/$name.a
+	stale $file_a $objects
+	if [ $? -eq 1 ]; then
+		run ar rcTD $file_a $objects
+	fi
+	objects=""
+	}
+
+# Make an executable file.
+make_bin()
 	{
 	local name="$1"
 	local file_e=../bin/$name
@@ -119,8 +136,9 @@ link()
 
 erase()
 	{
-	rm -rf ../obj
 	rm -rf ../bin
+	rm -rf ../lib
+	rm -rf ../obj
 	}
 
 case "$1" in
@@ -133,5 +151,6 @@ case "$1" in
 		;;
 esac
 
-mkdir -p ../obj
 mkdir -p ../bin
+mkdir -p ../lib
+mkdir -p ../obj
