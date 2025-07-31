@@ -1,1 +1,2 @@
-extern value parse_fexl(value stream, value label);
+extern value cur_label;
+extern value parse_top(void);

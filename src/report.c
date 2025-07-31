@@ -25,3 +25,14 @@ void undefined_symbol(const char *name, unsigned long line, const char *label)
 	fput(stderr,"Undefined symbol "); fput(stderr,name);
 	put_error_location(line,label);
 	}
+
+static void bad_name(const char *msg, const char *name)
+	{
+	fput(stderr,msg); fput(stderr,name); fnl(stderr);
+	die(0);
+	}
+
+void could_not_open(const char *name)
+	{
+	bad_name("Could not open source file ",name);
+	}

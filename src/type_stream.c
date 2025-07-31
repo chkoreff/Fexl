@@ -2,8 +2,9 @@
 #include <str.h>
 #include <value.h>
 
-#include <basic.h>
 #include <buf.h>
+
+#include <basic.h>
 #include <stream.h>
 #include <type_buf.h>
 #include <type_num.h>
@@ -112,11 +113,4 @@ value type_collect_tilde_string(value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	}
-
-// (read_stream stream read)
-value type_read_stream(value f)
-	{
-	if (f->L->L == 0) return keep(f);
-	return read_stream(arg(f->L->R),hold(f->R));
 	}

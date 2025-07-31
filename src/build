@@ -17,6 +17,7 @@ make limit
 make memory
 make nacl
 make parse
+make parse_file
 make report
 make sha256
 make sha512

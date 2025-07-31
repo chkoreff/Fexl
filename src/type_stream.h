@@ -9,4 +9,3 @@ extern value type_line(value f);
 extern value type_buf_keep(value f);
 extern value type_collect_to_ch(value f);
 extern value type_collect_tilde_string(value f);
-extern value type_read_stream(value f);

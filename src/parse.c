@@ -66,7 +66,7 @@ characters which constitute the actual content of the string, terminated by a
 repeat occurrence of the delimiter.
 */
 
-static value cur_label; // label of current input stream
+value cur_label; // label of current input stream
 
 static void syntax_error(const char *code, unsigned long line)
 	{
@@ -370,23 +370,10 @@ static value parse_exp(void)
 	}
 
 // Parse a top level form.
-static value parse_top(void)
+value parse_top(void)
 	{
 	value exp = parse_form();
 	if (cur_ch != -1)
 		syntax_error("Extraneous input", cur_line);
 	return exp;
-	}
-
-static value type_parse_fexl(value f)
-	{
-	return parse_top();
-	(void)f;
-	}
-
-// Parse a top level form.
-value parse_fexl(value stream, value label)
-	{
-	cur_label = label;
-	return read_stream(stream, Q0(type_parse_fexl));
 	}
