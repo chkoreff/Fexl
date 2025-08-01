@@ -48,3 +48,23 @@ define "QU" QU
 
 define "do_benchmark" do_benchmark
 define "show_benchmark" show_benchmark
+
+\guard=
+	(\\body
+	\save=(record_copy std)
+	\x=body
+	set_std save
+	x
+	)
+
+\restrict=
+	(\\body
+	\save=std
+	set_std empty
+	\x=body
+	set_std save
+	x
+	)
+
+define "guard" guard
+define "restrict" restrict

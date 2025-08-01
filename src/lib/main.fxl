@@ -3,26 +3,6 @@
 \parse_lib=(\name parse_file; . dir_lib name)
 \use_lib=(\name evaluate; parse_lib name)
 
-\guard=
-	(\\body
-	\save=(record_copy std)
-	\x=body
-	set_std save
-	x
-	)
-
-\restrict=
-	(\\body
-	\save=std
-	set_std empty
-	\x=body
-	set_std save
-	x
-	)
-
-define "guard" guard
-define "restrict" restrict
-
 use_lib "extra.fxl"
 use_lib "bool.fxl"
 use_lib "math.fxl"
