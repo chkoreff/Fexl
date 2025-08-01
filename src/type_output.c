@@ -112,19 +112,3 @@ value type_fflush(value f)
 	drop(out);
 	return f;
 	}
-
-void beg_output(void)
-	{
-	Qput = Q(type_put);
-	Qnl = Q0(type_nl);
-	Qfput = Q(type_fput);
-	Qfnl = Q(type_fnl);
-	}
-
-void end_output(void)
-	{
-	drop(Qput);
-	drop(Qnl);
-	drop(Qfput);
-	drop(Qfnl);
-	}

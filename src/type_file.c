@@ -580,17 +580,3 @@ value type_rename(value f)
 	return f;
 	}
 	}
-
-void beg_file(void)
-	{
-	Qstdin = Qfile(stdin);
-	Qstdout = Qfile(stdout);
-	Qstderr = Qfile(stderr);
-	}
-
-void end_file(void)
-	{
-	drop(Qstdin);
-	drop(Qstdout);
-	drop(Qstderr);
-	}

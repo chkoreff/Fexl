@@ -209,25 +209,3 @@ value Q0(type T)
 	{
 	return A(Q(T),hold(QI));
 	}
-
-void beg_basic(void)
-	{
-	QI = Q(type_I);
-	QT = Q(type_T);
-	QF = Q(type_F);
-	QY = Q(type_Y);
-	Qvoid = Q(type_void);
-	Qnull = Q(type_null);
-	Qonce = Q(type_once);
-	}
-
-void end_basic(void)
-	{
-	drop(QI);
-	drop(QT);
-	drop(QF);
-	drop(QY);
-	drop(Qvoid);
-	drop(Qnull);
-	drop(Qonce);
-	}

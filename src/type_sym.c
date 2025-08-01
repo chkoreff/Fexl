@@ -8,7 +8,7 @@
 #include <type_str.h>
 #include <type_sym.h>
 
-static value Qstd;
+value Qstd;
 
 value type_std(value f)
 	{
@@ -279,14 +279,4 @@ value type_set_std(value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
-	}
-
-void beg_sym(void)
-	{
-	Qstd = record_empty();
-	}
-
-void end_sym(void)
-	{
-	drop(Qstd);
 	}

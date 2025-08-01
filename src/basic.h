@@ -31,5 +31,3 @@ extern value type_is_bool(value f);
 extern value type_is_list(value f);
 extern value type_chain(value f);
 extern value Q0(type T);
-extern void beg_basic(void);
-extern void end_basic(void);

@@ -1,3 +1,4 @@
+extern value Qstd;
 extern value type_std(value f);
 extern value type_quo(value f);
 extern value type_ref(value f);
@@ -16,5 +17,3 @@ extern value type_define(value f);
 extern value type_resolve(value f);
 extern value type_evaluate(value f);
 extern value type_set_std(value f);
-extern void beg_sym(void);
-extern void end_sym(void);

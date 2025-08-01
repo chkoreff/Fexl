@@ -59,11 +59,25 @@ static void use_lib(const char *name)
 
 static void beg_const(void)
 	{
-	beg_basic();
-	beg_file();
-	beg_output();
-	beg_tuple();
-	beg_sym();
+	QI = Q(type_I);
+	QT = Q(type_T);
+	QF = Q(type_F);
+	QY = Q(type_Y);
+	Qvoid = Q(type_void);
+	Qnull = Q(type_null);
+	Qonce = Q(type_once);
+
+	Qstdin = Qfile(stdin);
+	Qstdout = Qfile(stdout);
+	Qstderr = Qfile(stderr);
+
+	Qput = Q(type_put);
+	Qnl = Q0(type_nl);
+	Qfput = Q(type_fput);
+	Qfnl = Q(type_fnl);
+
+	Qtuple = Q(type_tuple);
+	Qstd = record_empty();
 	init_signal();
 
 	// The base directory is right above the bin directory.
@@ -73,11 +87,26 @@ static void beg_const(void)
 
 static void end_const(void)
 	{
-	end_basic();
-	end_file();
-	end_output();
-	end_tuple();
-	end_sym();
+	drop(QI);
+	drop(QT);
+	drop(QF);
+	drop(QY);
+	drop(Qvoid);
+	drop(Qnull);
+	drop(Qonce);
+
+	drop(Qstdin);
+	drop(Qstdout);
+	drop(Qstderr);
+
+	drop(Qput);
+	drop(Qnl);
+	drop(Qfput);
+	drop(Qfnl);
+
+	drop(Qtuple);
+	drop(Qstd);
+
 	close_random();
 	drop(Qdir_base);
 	drop(Qdir_lib);

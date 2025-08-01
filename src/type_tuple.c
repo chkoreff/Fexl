@@ -57,13 +57,3 @@ value type_list_to_tuple(value f)
 	{
 	return V(type_tuple,hold(Qtuple),hold(f->R));
 	}
-
-void beg_tuple(void)
-	{
-	Qtuple = Q(type_tuple);
-	}
-
-void end_tuple(void)
-	{
-	drop(Qtuple);
-	}
