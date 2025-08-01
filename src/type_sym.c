@@ -224,46 +224,20 @@ value type_resolve(value f)
 	return f;
 	}
 
-static value cache_undef;
-
-static void collect_undef(value exp)
+static void report_undef(value exp, const char *label)
 	{
 	if (exp->T == type_quo)
 		;
 	else if (exp->T == type_ref)
 		{
-		value val = record_find(cache_undef,exp->R);
-		if (val == 0)
-			{
-			value key = Qstr(str_copy(exp->R->v_ptr));
-			record_set(cache_undef,key,hold(exp));
-			drop(key);
-			}
+		string key = exp->R->v_ptr;
+		undefined_symbol(key->data,exp->R->N,label);
 		}
 	else
 		{
-		collect_undef(exp->L);
-		collect_undef(exp->R);
+		report_undef(exp->L,label);
+		report_undef(exp->R,label);
 		}
-	}
-
-static void report_undef(value exp, const char *label)
-	{
-	cache_undef = record_empty();
-	collect_undef(exp);
-	{
-	struct record *rec = cache_undef->v_ptr;
-	unsigned long count = rec->count;
-	unsigned long pos;
-	for (pos = 0; pos < count; pos++)
-		{
-		struct item *item = rec->vec + pos;
-		string key = item->key->v_ptr;
-		value exp = item->val;
-		undefined_symbol(key->data,exp->R->N,label);
-		}
-	}
-	drop(cache_undef);
 	}
 
 /*
