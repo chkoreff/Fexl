@@ -39,12 +39,17 @@ static value Qdir_lib;
 
 static value concat(value x, value y)
 	{
-	return eval(A(A(Q(type_concat),x),y));
+	value f = Qstr(str_concat(x->v_ptr,y->v_ptr));
+	drop(x);
+	drop(y);
+	return f;
 	}
 
 static value Qdirname(value x)
 	{
-	return eval(A(Q(type_dirname),x));
+	value f = Qstr(dirname(x->v_ptr));
+	drop(x);
+	return f;
 	}
 
 static void use(value name)
