@@ -12,16 +12,15 @@
 
 static value parse_fh(FILE *fh, value name)
 	{
+	value exp;
+	struct state s = beg_stream((input)fgetc,fh);
+	value save_cur_label = cur_label;
 	cur_label = name;
-	cur_get = (input)fgetc;
-	cur_source = fh;
-	skip();
-
-	{
-	value exp = parse_top();
+	exp = parse_top();
 	drop(cur_label);
+	cur_label = save_cur_label;
+	end_stream(s);
 	return exp;
-	}
 	}
 
 static FILE *open_file(const char *name_s)

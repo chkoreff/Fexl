@@ -13,44 +13,12 @@
 #include <type_parse.h>
 #include <type_str.h>
 
-// Holds the current state of a stream.
-struct state
-	{
-	int cur_ch;
-	unsigned long cur_line;
-	input cur_get;
-	void *cur_source;
-	};
-
-static struct state get_state(void)
-	{
-	return (struct state){cur_ch, cur_line, cur_get, cur_source};
-	}
-
-static void put_state(struct state s)
-	{
-	cur_ch = s.cur_ch;
-	cur_line = s.cur_line;
-	cur_get = s.cur_get;
-	cur_source = s.cur_source;
-	}
-
-static value type_parse_fexl(value f)
-	{
-	return parse_top();
-	(void)f;
-	}
-
 // (parse_file name) Parse the named file.
 value type_parse_file(value f)
 	{
 	value name = arg(f->R);
 	if (name->T == type_str)
-		{
-		struct state s = get_state();
 		f = parse_file(hold(name));
-		put_state(s);
-		}
 	else
 		f = hold(Qvoid);
 	drop(name);
@@ -59,10 +27,10 @@ value type_parse_file(value f)
 
 static value read_input(input get, void *source, value read)
 	{
-	cur_get = get;
-	cur_source = source;
-	skip();
-	return eval(read); // Run the read function
+	struct state s = beg_stream(get,source);
+	value exp = eval(read); // Run the read function
+	end_stream(s);
+	return exp;
 	}
 
 // Read the stream, which may be type_file, type_istr, or type_str.
@@ -86,6 +54,12 @@ static value read_stream(value stream, value read)
 		}
 	}
 
+static value type_parse_top(value f)
+	{
+	return parse_top();
+	(void)f;
+	}
+
 // (parse stream label) Parse the stream, using the given label for any syntax
 // error messages, and return the resulting form.
 value type_parse(value f)
@@ -95,12 +69,12 @@ value type_parse(value f)
 	value label = arg(f->R);
 	if (label->T == type_str)
 		{
-		struct state s = get_state();
 		value stream = arg(f->L->R);
+		value save_cur_label = cur_label;
 		cur_label = label;
-		f = read_stream(stream,Q0(type_parse_fexl));
+		f = read_stream(stream,Q0(type_parse_top));
+		cur_label = save_cur_label;
 		drop(stream);
-		put_state(s);
 		}
 	else
 		f = hold(Qvoid);
@@ -114,12 +88,10 @@ value type_read_stream(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
-	struct state s = get_state();
 	value stream = arg(f->L->R);
 	value read = hold(f->R);
 	f = read_stream(stream,read);
 	drop(stream);
-	put_state(s);
 	return f;
 	}
 	}

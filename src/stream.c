@@ -143,3 +143,21 @@ int collect_tilde_string(buffer buf)
 	return ok;
 	}
 	}
+
+struct state beg_stream(input get, void *source)
+	{
+	struct state s = (struct state){cur_ch, cur_line, cur_get, cur_source};
+	cur_get = get;
+	cur_line = 1;
+	cur_source = source;
+	skip();
+	return s;
+	}
+
+void end_stream(struct state s)
+	{
+	cur_ch = s.cur_ch;
+	cur_line = s.cur_line;
+	cur_get = s.cur_get;
+	cur_source = s.cur_source;
+	}
