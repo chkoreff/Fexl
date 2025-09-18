@@ -49,22 +49,18 @@ define "QU" QU
 define "do_benchmark" do_benchmark
 define "show_benchmark" show_benchmark
 
-\guard=
-	(\\body
-	\save=(record_copy std)
-	\x=body
-	set_std save
-	x
-	)
-
-\restrict=
-	(\\body
+\use_context=
+	(\\cx\\body
 	\save=std
-	set_std empty
+	set_std cx
 	\x=body
 	set_std save
 	x
 	)
 
+\guard=(use_context (record_copy std))
+\restrict=(use_context empty)
+
+define "use_context" use_context
 define "guard" guard
 define "restrict" restrict

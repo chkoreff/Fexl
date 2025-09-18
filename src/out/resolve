@@ -12,7 +12,7 @@ steps 53 bytes 352
 == test_1
 Evaluating the form.
 I am Fred.
-steps 28 bytes 384
+steps 31 bytes 384
 == test_2
 Evaluating the form.
 Hi
@@ -21,7 +21,7 @@ T
 HEY: Fred says a
 Wilma says b
 Goodbye
-steps 75 bytes 832
+steps 78 bytes 832
 == test_3
 
 = evaluate
