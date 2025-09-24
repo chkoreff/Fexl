@@ -186,6 +186,18 @@
 	0
 	)
 
+\\walk_record=
+	(\rec\f
+	\n=(record_count rec)
+	(@\\loop\i
+	ge i n ();
+	record_item rec i \k\\v
+	f i k v
+	loop (+ 1 i)
+	)
+	0
+	)
+
 \\test_9=
 	(
 	say "= test_9"
@@ -399,6 +411,66 @@ run_test obj
 )
 )
 
+# Test mixed number and string keys in a record.
+\\test_mixed_keys=
+(
+say "= test_mixed_keys"
+
+\obj=empty
+
+(
+\try=
+	(\v
+	set obj v [v]
+	)
+
+try "c"
+try "a"
+try 10
+try 5
+try "b"
+try 20
+try "d"
+try 0
+try -3
+)
+
+walk_record obj
+	(\i\k\v
+	say (as_str ["set" k v])
+	)
+nl
+
+(
+\try=
+	(\k
+	get k obj
+		(
+		say (as_str ["no" k])
+		)
+		(\v
+		say (as_str ["yes" k v])
+		)
+	)
+
+try "c"
+try "a"
+try 10
+try 5
+try "b"
+try 20
+try "d"
+try 0
+try -3
+
+try 2
+try "e"
+try 3
+try "a"
+try 10
+)
+)
+
 say "BEG"
 test_1
 test_2
@@ -412,3 +484,4 @@ test_9
 test_10
 test_11
 test_12
+test_mixed_keys

@@ -154,6 +154,31 @@ val = 4
 val = 8
 steps 132 bytes 3360
 
+= test_mixed_keys
+["set" -3 [-3]]
+["set" 0 [0]]
+["set" 5 [5]]
+["set" 10 [10]]
+["set" 20 [20]]
+["set" "a" ["a"]]
+["set" "b" ["b"]]
+["set" "c" ["c"]]
+["set" "d" ["d"]]
+
+["yes" "c" ["c"]]
+["yes" "a" ["a"]]
+["yes" 10 [10]]
+["yes" 5 [5]]
+["yes" "b" ["b"]]
+["yes" 20 [20]]
+["yes" "d" ["d"]]
+["yes" 0 [0]]
+["yes" -3 [-3]]
+["no" 2]
+["no" "e"]
+["no" 3]
+["yes" "a" ["a"]]
+["yes" 10 [10]]
 ~
 \err=
 ~

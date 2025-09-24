@@ -6,13 +6,6 @@
 #include <type_num.h>
 #include <type_str.h>
 
-static int num_cmp(double x, double y)
-	{
-	if (x < y) return -1;
-	if (x > y) return 1;
-	return 0;
-	}
-
 static value op_cmp(value f, int op(int))
 	{
 	if (f->L->L == 0) return keep(f);

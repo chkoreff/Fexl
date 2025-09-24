@@ -50,6 +50,7 @@ value ref(string name, unsigned long line)
 	value x = new_value();
 	x->v_ptr = name;
 	x->N = line;
+	x->T = type_str;
 	return V(type_ref,&clear,x);
 	}
 

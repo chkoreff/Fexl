@@ -1,3 +1,4 @@
+extern int num_cmp(double x, double y);
 extern value type_num(value f);
 extern value Qnum(double x);
 extern value Qnum_str0(const char *name);

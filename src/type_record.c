@@ -22,17 +22,34 @@ static void clear_record(value f)
 	free_memory(rec,sizeof(struct record));
 	}
 
+static int key_cmp(value x, value y)
+	{
+	if (x->T == type_str)
+		{
+		if (y->T == type_str)
+			return str_cmp(x->v_ptr,y->v_ptr);
+		else
+			return 1;
+		}
+	else
+		{
+		if (y->T == type_num)
+			return num_cmp(x->v_double,y->v_double);
+		else
+			return -1;
+		}
+	}
+
 // LATER 20221213 Perhaps use binary search.
 value record_find(value obj, value key)
 	{
 	struct record *rec = obj->v_ptr;
-	string s_key = key->v_ptr;
 	unsigned long pos;
 
 	for (pos = 0; pos < rec->count; pos++)
 		{
 		struct item *item = rec->vec + pos;
-		int cmp = str_cmp(s_key,item->key->v_ptr);
+		int cmp = key_cmp(key,item->key);
 		if (cmp > 0)
 			;
 		else if (cmp == 0)
@@ -46,7 +63,7 @@ value record_find(value obj, value key)
 value type_record(value f)
 	{
 	value key = arg(f->R);
-	if (key->T == type_str)
+	if (key->T == type_str || key->T == type_num)
 		{
 		value val = record_find(f->L,key);
 		if (val == 0) val = Qvoid;
@@ -109,13 +126,12 @@ static void shift_items(struct item *vec, unsigned long n, unsigned long pos)
 void record_set(value obj, value key, value val)
 	{
 	struct record *rec = obj->v_ptr;
-	string s_key = key->v_ptr;
 	unsigned long pos;
 
 	for (pos = 0; pos < rec->count; pos++)
 		{
 		struct item *item = rec->vec + pos;
-		int cmp = str_cmp(s_key,item->key->v_ptr);
+		int cmp = key_cmp(key,item->key);
 		if (cmp > 0)
 			;
 		else if (cmp == 0)
@@ -186,7 +202,7 @@ static value op_set(value f, value op(value))
 	if (obj->T == type_record)
 		{
 		value key = arg(f->L->R);
-		if (key->T == type_str)
+		if (key->T == type_str || key->T == type_num)
 			{
 			record_set(obj,key,op(f->R));
 			f = hold(QI);
@@ -220,7 +236,7 @@ value type_get(value f)
 	if (f->L->L == 0) return keep(f);
 	{
 	value key = arg(f->L->R);
-	if (key->T == type_str)
+	if (key->T == type_str || key->T == type_num)
 		{
 		value obj = arg(f->R);
 		if (obj->T == type_record)
