@@ -45,19 +45,21 @@ value record_find(value obj, value key)
 	{
 	struct record *rec = obj->v_ptr;
 	unsigned long pos;
+	struct item *item;
+	int cmp = 1;
 
 	for (pos = 0; pos < rec->count; pos++)
 		{
-		struct item *item = rec->vec + pos;
-		int cmp = key_cmp(key,item->key);
-		if (cmp > 0)
-			;
-		else if (cmp == 0)
-			return item->val;
-		else
+		item = rec->vec + pos;
+		cmp = key_cmp(key,item->key);
+		if (cmp <= 0)
 			break;
 		}
-	return 0;
+
+	if (cmp == 0)
+		return item->val;
+	else
+		return 0;
 	}
 
 value type_record(value f)
@@ -127,22 +129,23 @@ void record_set(value obj, value key, value val)
 	{
 	struct record *rec = obj->v_ptr;
 	unsigned long pos;
+	struct item *item;
+	int cmp = 1;
 
 	for (pos = 0; pos < rec->count; pos++)
 		{
-		struct item *item = rec->vec + pos;
-		int cmp = key_cmp(key,item->key);
-		if (cmp > 0)
-			;
-		else if (cmp == 0)
-			{
-			// Change the value.
-			drop(item->val);
-			item->val = val;
-			return;
-			}
-		else
+		item = rec->vec + pos;
+		cmp = key_cmp(key,item->key);
+		if (cmp <= 0)
 			break;
+		}
+
+	if (cmp == 0)
+		{
+		// Change the value.
+		drop(item->val);
+		item->val = val;
+		return;
 		}
 
 	// Insert new item.
@@ -170,24 +173,24 @@ void record_del(value obj, value key)
 	{
 	struct record *rec = obj->v_ptr;
 	unsigned long pos;
+	struct item *item;
+	int cmp = 1;
 
 	for (pos = 0; pos < rec->count; pos++)
 		{
-		struct item *item = rec->vec + pos;
-		int cmp = key_cmp(key,item->key);
-		if (cmp > 0)
-			;
-		else if (cmp == 0)
-			{
-			drop(item->key);
-			drop(item->val);
+		item = rec->vec + pos;
+		cmp = key_cmp(key,item->key);
+		if (cmp <= 0)
+			break;
+		}
 
-			shift_down(rec->vec,rec->count,pos);
-			rec->count--;
-			return;
-			}
-		else
-			return;
+	if (cmp == 0)
+		{
+		drop(item->key);
+		drop(item->val);
+
+		shift_down(rec->vec,rec->count,pos);
+		rec->count--;
 		}
 	}
 
