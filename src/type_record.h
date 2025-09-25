@@ -18,6 +18,7 @@ extern value record_empty(void);
 extern value type_empty(value f);
 extern value type_set(value f);
 extern value type_setf(value f);
+extern value type_del(value f);
 extern value type_get(value f);
 extern value type_record_copy(value f);
 extern value type_record_count(value f);

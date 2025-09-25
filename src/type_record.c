@@ -116,7 +116,7 @@ static void bump(struct record *old_rec)
 	old_rec->vec = new_vec;
 	}
 
-static void shift_items(struct item *vec, unsigned long n, unsigned long pos)
+static void shift_up(struct item *vec, unsigned long n, unsigned long pos)
 	{
 	unsigned long i;
 	for (i = n; i > pos; i--)
@@ -149,7 +149,7 @@ void record_set(value obj, value key, value val)
 	if (rec->count >= rec->size)
 		bump(rec);
 
-	shift_items(rec->vec,rec->count,pos);
+	shift_up(rec->vec,rec->count,pos);
 	rec->count++;
 
 	{
@@ -157,6 +157,38 @@ void record_set(value obj, value key, value val)
 	item->key = hold(key);
 	item->val = val;
 	}
+	}
+
+static void shift_down(struct item *vec, unsigned long n, unsigned long pos)
+	{
+	unsigned long i;
+	for (i = pos; i < n; i++)
+		vec[i] = vec[i+1];
+	}
+
+void record_del(value obj, value key)
+	{
+	struct record *rec = obj->v_ptr;
+	unsigned long pos;
+
+	for (pos = 0; pos < rec->count; pos++)
+		{
+		struct item *item = rec->vec + pos;
+		int cmp = key_cmp(key,item->key);
+		if (cmp > 0)
+			;
+		else if (cmp == 0)
+			{
+			drop(item->key);
+			drop(item->val);
+
+			shift_down(rec->vec,rec->count,pos);
+			rec->count--;
+			return;
+			}
+		else
+			return;
+		}
 	}
 
 static value record_copy(value obj)
@@ -228,6 +260,32 @@ value type_set(value f)
 value type_setf(value f)
 	{
 	return op_set(f,hold);
+	}
+
+// (del obj key) Delete key from obj.
+value type_del(value f)
+	{
+	//return op_set(f,hold);
+	if (f->L->L == 0) return keep(f);
+	{
+	value obj = arg(f->L->R);
+	if (obj->T == type_record)
+		{
+		value key = arg(f->R);
+		if (key->T == type_str || key->T == type_num)
+			{
+			record_del(obj,key);
+			f = hold(QI);
+			}
+		else
+			f = hold(Qvoid);
+		drop(key);
+		}
+	else
+		f = hold(Qvoid);
+	drop(obj);
+	return f;
+	}
 	}
 
 // Look up key in record and return either no or (yes val).

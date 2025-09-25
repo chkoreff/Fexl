@@ -155,6 +155,7 @@ val = 8
 steps 132 bytes 3360
 
 = test_mixed_keys
+count = 9
 ["set" -3 [-3]]
 ["set" 0 [0]]
 ["set" 5 [5]]
@@ -179,6 +180,40 @@ steps 132 bytes 3360
 ["no" 3]
 ["yes" "a" ["a"]]
 ["yes" 10 [10]]
+
+["del" 15]
+["del" "A"]
+["del" "e"]
+["del" "a"]
+["del" -3]
+["del" "d"]
+["del" "a"]
+
+count = 6
+["set" 0 [0]]
+["set" 5 [5]]
+["set" 10 [10]]
+["set" 20 [20]]
+["set" "b" ["b"]]
+["set" "c" ["c"]]
+
+["del" "b"]
+["del" 10]
+["del" 10]
+["del" 25]
+["del" "a"]
+["del" 20]
+
+count = 3
+["set" 0 [0]]
+["set" 5 [5]]
+["set" "c" ["c"]]
+
+["del" 0]
+["del" 5]
+["del" "c"]
+
+count = 0
 ~
 \err=
 ~

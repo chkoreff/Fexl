@@ -339,8 +339,6 @@ say "= test_12"
 			()
 		)
 
-	# LATER 20230702 Implement a "del" function in type_record.c and provide a
-	# "del" method here.
 	obj
 	)
 
@@ -418,6 +416,16 @@ say "= test_mixed_keys"
 
 \obj=empty
 
+\\show_record=
+	(
+	say ["count = "(record_count obj)]
+	walk_record obj
+		(\i\k\v
+		say (as_str ["set" k v])
+		)
+	)
+
+# Set keys.
 (
 \try=
 	(\v
@@ -435,13 +443,11 @@ try 0
 try -3
 )
 
-walk_record obj
-	(\i\k\v
-	say (as_str ["set" k v])
-	)
-nl
+show_record
 
+# Get keys.
 (
+nl
 \try=
 	(\k
 	get k obj
@@ -468,6 +474,40 @@ try "e"
 try 3
 try "a"
 try 10
+)
+
+# Delete keys.
+(
+\try=
+	(\key
+	say (as_str ["del" key])
+	del obj key
+	)
+nl
+try 15
+try "A"
+try "e"
+try "a"
+try -3
+try "d"
+try "a"
+nl
+show_record
+nl
+try "b"
+try 10
+try 10
+try 25
+try "a"
+try 20
+nl
+show_record
+nl
+try 0
+try 5
+try "c"
+nl
+show_record
 )
 )
 
