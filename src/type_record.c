@@ -47,19 +47,29 @@ struct search
 	int cmp;
 	};
 
-// LATER 20221213 Perhaps use binary search.
 static struct search find_key( struct record *rec, value key)
 	{
-	unsigned long pos;
+	unsigned long lo = 0;
+	unsigned long hi = rec->count;
+	unsigned long pos = hi;
 	struct item *item = 0;
 	int cmp = 1;
 
-	for (pos = 0; pos < rec->count; pos++)
+	while (lo < hi)
 		{
-		item = rec->vec + pos;
+		unsigned long i = lo + ((hi - lo) / 2);
+		item = rec->vec + i;
 		cmp = key_cmp(key,item->key);
-		if (cmp <= 0)
-			break;
+		if (cmp > 0)
+			lo = i + 1;
+		else
+			{
+			pos = i;
+			if (cmp < 0)
+				hi = i;
+			else
+				break;
+			}
 		}
 	return (struct search){pos, item, cmp};
 	}
