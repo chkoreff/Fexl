@@ -40,12 +40,18 @@ static int key_cmp(value x, value y)
 		}
 	}
 
-// LATER 20221213 Perhaps use binary search.
-value record_find(value obj, value key)
+struct search
 	{
-	struct record *rec = obj->v_ptr;
 	unsigned long pos;
 	struct item *item;
+	int cmp;
+	};
+
+// LATER 20221213 Perhaps use binary search.
+static struct search find_key( struct record *rec, value key)
+	{
+	unsigned long pos;
+	struct item *item = 0;
 	int cmp = 1;
 
 	for (pos = 0; pos < rec->count; pos++)
@@ -55,9 +61,14 @@ value record_find(value obj, value key)
 		if (cmp <= 0)
 			break;
 		}
+	return (struct search){pos, item, cmp};
+	}
 
-	if (cmp == 0)
-		return item->val;
+value record_find(value obj, value key)
+	{
+	struct search search = find_key(obj->v_ptr,key);
+	if (search.cmp == 0)
+		return search.item->val;
 	else
 		return 0;
 	}
@@ -128,23 +139,13 @@ static void shift_up(struct item *vec, unsigned long n, unsigned long pos)
 void record_set(value obj, value key, value val)
 	{
 	struct record *rec = obj->v_ptr;
-	unsigned long pos;
-	struct item *item;
-	int cmp = 1;
+	struct search search = find_key(rec,key);
 
-	for (pos = 0; pos < rec->count; pos++)
-		{
-		item = rec->vec + pos;
-		cmp = key_cmp(key,item->key);
-		if (cmp <= 0)
-			break;
-		}
-
-	if (cmp == 0)
+	if (search.cmp == 0)
 		{
 		// Change the value.
-		drop(item->val);
-		item->val = val;
+		drop(search.item->val);
+		search.item->val = val;
 		return;
 		}
 
@@ -152,11 +153,11 @@ void record_set(value obj, value key, value val)
 	if (rec->count >= rec->size)
 		bump(rec);
 
-	shift_up(rec->vec,rec->count,pos);
+	shift_up(rec->vec,rec->count,search.pos);
 	rec->count++;
 
 	{
-	struct item *item = rec->vec + pos;
+	struct item *item = rec->vec + search.pos;
 	item->key = hold(key);
 	item->val = val;
 	}
@@ -172,24 +173,14 @@ static void shift_down(struct item *vec, unsigned long n, unsigned long pos)
 void record_del(value obj, value key)
 	{
 	struct record *rec = obj->v_ptr;
-	unsigned long pos;
-	struct item *item;
-	int cmp = 1;
+	struct search search = find_key(rec,key);
 
-	for (pos = 0; pos < rec->count; pos++)
+	if (search.cmp == 0)
 		{
-		item = rec->vec + pos;
-		cmp = key_cmp(key,item->key);
-		if (cmp <= 0)
-			break;
-		}
+		drop(search.item->key);
+		drop(search.item->val);
 
-	if (cmp == 0)
-		{
-		drop(item->key);
-		drop(item->val);
-
-		shift_down(rec->vec,rec->count,pos);
+		shift_down(rec->vec,rec->count,search.pos);
 		rec->count--;
 		}
 	}
