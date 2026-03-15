@@ -47,7 +47,7 @@ struct search
 	int cmp;
 	};
 
-static struct search find_key( struct record *rec, value key)
+static struct search find_key(struct record *rec, value key)
 	{
 	unsigned long lo = 0;
 	unsigned long hi = rec->count;
