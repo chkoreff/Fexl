@@ -412,7 +412,7 @@ try "a" "x" "e"
 say "== fetch"
 \try=
 	(
-	\v=var_new
+	\v=empty
 	\\v=(I v) # test eval of first arg
 	\k
 	say ["= try "(as_str k)]

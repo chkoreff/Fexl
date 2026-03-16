@@ -23,3 +23,4 @@ extern value type_get(value f);
 extern value type_record_copy(value f);
 extern value type_record_count(value f);
 extern value type_record_item(value f);
+extern value type_fetch(value f);

@@ -369,3 +369,45 @@ value type_record_item(value f)
 	return f;
 	}
 	}
+
+/*
+(fetch v k x)
+Return the value at key k in index v.  If no value, store the value of x in
+the index so you get the same value next time.
+
+\fetch=
+	(\v\k\\x
+	get k v
+		(
+		\x=x
+		setf v k x
+		x
+		)
+		()
+	)
+*/
+value type_fetch(value f)
+	{
+	if (f->L->L == 0) return keep(f);
+	if (f->L->L->L == 0) return keep(f);
+	{
+	value v = arg(f->L->L->R);
+	if (v->T == type_record)
+		{
+		value k = arg(f->L->R);
+		value y = record_find(v,k);
+		if (y)
+			f = hold(y);
+		else
+			{
+			f = arg(f->R);
+			record_set(v,k,hold(f));
+			}
+		drop(k);
+		}
+	else
+		f = hold(Qvoid);
+	drop(v);
+	return f;
+	}
+	}

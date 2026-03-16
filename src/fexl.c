@@ -322,6 +322,7 @@ static void define_record(void)
 	define("record_copy",Q(type_record_copy));
 	define("record_count",Q(type_record_count));
 	define("record_item",Q(type_record_item));
+	define("fetch",Q(type_fetch));
 	}
 
 static void define_run(void)
@@ -421,7 +422,6 @@ static void define_with(void)
 	define("with",Q(type_with));
 	define("is_obj",Q(type_is_obj));
 	define("split_obj",Q(type_split_obj));
-	define("fetch",Q(type_fetch));
 	}
 
 // Define all the functions written in C.

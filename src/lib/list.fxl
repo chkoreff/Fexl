@@ -448,20 +448,20 @@
 # Make a cache which remembers the values of a function with n arguments.
 \remember=
 	(\n
-	\v=var_new
+	\v=empty
 
 	(@\\loop\n
 	le n 1 fetch;
 	\f=(loop (- n 1))
 
 	\v\k
-	\v=(fetch v k var_new)
+	\v=(fetch v k empty)
 	f v
 	) n v
 	)
 
 # Equivalent to (remember 1).
-\\cache=(\v=var_new fetch v)
+\\cache=(\v=empty fetch v)
 
 define "append" append
 define "flatten" flatten

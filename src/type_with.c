@@ -48,7 +48,7 @@ Return a function like obj but with key defined as val.
 
 \with=(\key\\val\obj \x eq x key val; obj x)
 */
-value type_with(value f)
+value type_with(value f) // LATER 20260315 deprecated
 	{
 	if (f->L->L == 0) return keep(f);
 	if (f->L->L->L == 0) return keep(f);
@@ -83,47 +83,6 @@ value type_split_obj(value f)
 	else
 		f = hold(Qvoid);
 	drop(x);
-	return f;
-	}
-	}
-
-/*
-(fetch v k x)
-Return the value at key k in index v.  If no value, store the value of x in
-the index so you get the same value next time.
-
-\fetch=
-	(\v\k\\x
-	\y=(var_get v k)
-	is_defined y y;
-	\x=x
-	var_put v (with k x; var_get v)
-	x
-	)
-*/
-value type_fetch(value f)
-	{
-	if (f->L->L == 0) return keep(f);
-	if (f->L->L->L == 0) return keep(f);
-	{
-	value v = arg(f->L->L->R);
-	if (v->T == type_var)
-		{
-		value k = arg(f->L->R);
-		value y = eval(A(hold(v->R),hold(k)));
-		if (y->T != type_void)
-			f = y;
-		else
-			{
-			drop(y);
-			f = arg(f->R);
-			v->R = Qassoc(hold(k),hold(f),v->R);
-			}
-		drop(k);
-		}
-	else
-		f = hold(Qvoid);
-	drop(v);
 	return f;
 	}
 	}
