@@ -1,0 +1,30 @@
+#
+\define_output=
+	(
+	\put
+	\tab_stop
+
+	\\nl=(put NL)
+	\say=(\\x put x nl)
+
+	\v_tab=var_new
+	var_put v_tab ""
+
+	\\tab=(put (var_get v_tab))
+
+	\indent=
+		(\\body
+		\old_tab=(var_get v_tab)
+		var_put v_tab (. old_tab tab_stop)
+		body
+		var_put v_tab old_tab
+		)
+
+	define "put" put
+	define "nl" nl
+	define "say" say
+	define "tab" tab
+	define "indent" indent
+	)
+
+define "define_output" define_output

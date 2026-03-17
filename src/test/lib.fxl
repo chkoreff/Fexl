@@ -18,9 +18,6 @@ show x
 \x=x
 show x
 
-\x=(with "a" 1; with "b" 2; void)
-show x
-
 \\x=(+ 2 3)
 show x
 

@@ -186,18 +186,6 @@
 	0
 	)
 
-\\walk_record=
-	(\rec\f
-	\n=(record_count rec)
-	(@\\loop\i
-	ge i n ();
-	record_item rec i \k\\v
-	f i k v
-	loop (+ 1 i)
-	)
-	0
-	)
-
 \\test_9=
 	(
 	say "= test_9"
@@ -420,7 +408,7 @@ say "= test_mixed_keys"
 	(
 	say ["count = "(record_count obj)]
 	walk_record obj
-		(\i\k\v
+		(\k\v
 		say (as_str ["set" k v])
 		)
 	)

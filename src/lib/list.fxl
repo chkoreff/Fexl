@@ -250,17 +250,18 @@
 # Get the nth column of a table, numbered from 0.
 \column=(\n map (\row list_at row n))
 
-# Given a list of rows, return a function which maps the key at key_pos to the
+# Given a list of rows, return a record which maps the key at key_pos to the
 # value at val_pos.
 \match_column=
-	(\key_pos\val_pos @\\loop \\rows
-	rows void \row\\rows
-
-	\key=(list_at row key_pos)
-	\val=(list_at row val_pos)
-
-	with key val;
-	loop rows
+	(\key_pos\val_pos\\rows
+	\obj=empty
+	each rows
+		(\row
+		\key=(list_at row key_pos)
+		\val=(list_at row val_pos)
+		setf obj key val
+		)
+	obj
 	)
 
 # (stream_values get) is the infinite list of future values of get.  This is

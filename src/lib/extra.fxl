@@ -64,3 +64,23 @@ define "show_benchmark" show_benchmark
 define "use_context" use_context
 define "guard" guard
 define "restrict" restrict
+
+\is_record= # LATER 20250725 built-in
+	(\obj
+	is_good (record_count obj)
+	)
+
+\walk_record= # LATER 20260316 built-in
+	(\rec\f
+	\n=(record_count rec)
+	(@\\loop\i
+	ge i n ();
+	record_item rec i \k\\v
+	f k v;
+	loop (+ 1 i)
+	)
+	0
+	)
+
+define "is_record" is_record
+define "walk_record" walk_record

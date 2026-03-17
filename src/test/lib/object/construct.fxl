@@ -1,0 +1,42 @@
+## Constructors
+
+# Make a record.
+\R=
+	(\\next
+	next empty
+	)
+
+# Define a key value in a record.
+\D=
+	(\key\val\\next\obj
+	set obj key val
+	next obj
+	)
+
+# Make a proper list.
+\L=(\x\xs cons x xs)
+
+# Make an empty list.
+\N=[]
+
+# Make a tuple.
+\U=list_to_tuple
+
+# Make a big number.
+\B=bn_from_dec
+
+# Make a var.
+\V=
+	(\\x
+	\v=var_new
+	var_put v x
+	v
+	)
+
+define "B" B
+define "D" D
+define "L" L
+define "N" N
+define "R" R
+define "U" U
+define "V" V

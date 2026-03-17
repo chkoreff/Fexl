@@ -1,0 +1,190 @@
+#
+use "lib/object/output.fxl"
+evaluate \;
+
+## Rendering data
+
+# This converts arbitrary data to a format that can be saved to disk.  The
+# format uses only the constructors defined in construct.fxl.  It does not use
+# lambda expressions or the built-in syntax for lists and tuples.
+
+\render_obj_form=
+	(
+	guard;
+	del std "put"
+	del std "say"
+	del std "nl"
+	resolve \;
+
+	\is_scalar=
+		(\x
+		is_record x F;
+		is_list x F;
+		is_tuple x F;
+		is_var x F;
+		T
+		)
+
+	\show_obj=
+		(@\\show_obj\obj
+
+		\\show_val=
+			(\obj
+			is_scalar obj
+				(
+				put " "
+				show_obj obj
+				)
+				(
+				nl
+				indent;
+				tab say "("
+				show_obj obj
+				tab put ")"
+				)
+			)
+
+		\\show_functor=
+			(\name\obj
+			tab put name
+			is_scalar obj
+				(
+				put " "
+				show_obj obj
+				nl
+				)
+				(
+				say ";"
+				show_obj obj
+				)
+			)
+
+		is_num obj (put (num_str obj));
+		is_str obj (put (fexl_quote obj));
+		is_record obj
+			(
+			tab say "R;"
+			walk_record obj
+				(\k\v
+				tab put "D "
+				put (is_str k fexl_quote num_str k)
+				show_val v
+				say ";"
+				)
+			);
+		is_bool obj (put (obj "T" "F"));
+		is_list obj
+			(
+			each obj
+				(\x
+				tab put "L"
+				show_val x
+				say ";"
+				)
+			tab say "N"
+			);
+		is_tuple obj
+			(
+			show_functor "U";
+			tuple_to_list obj
+			);
+		is_var obj
+			(
+			show_functor "V";
+			var_get obj
+			);
+		is_bn obj
+			(
+			put "(B "
+			\x=(bn_to_dec obj)
+			put (fexl_quote x)
+			put ")"
+			);
+		is_undef obj (put "void");
+		put "?"
+		)
+
+	\show_obj=
+		(\obj
+		is_scalar obj
+			(
+			show_obj obj
+			nl
+			)
+			(
+			say "("
+			show_obj obj
+			put ")"
+			nl
+			)
+		)
+
+	show_obj
+	)
+
+\render_obj=
+	(\put\tab_stop
+	restrict;
+	define_output put tab_stop
+	evaluate render_obj_form
+	)
+
+\show_obj=
+	(
+	\tab_stop="  "
+	#\tab_stop=TAB
+	#\tab_stop=""
+
+	#\put=(fput stderr)
+	#\put=(fput stdout)
+
+	render_obj put tab_stop
+	)
+
+# Convert obj to str using standard ASCII TAB stop.
+\obj_str=
+	(
+	#\tab_stop="  "
+	\tab_stop=TAB
+	#\tab_stop=""
+
+	\obj
+
+	\buf=buf_new
+	\put=(buf_put buf)
+
+	render_obj put tab_stop obj
+	buf_get buf
+	)
+
+# Convert str to obj.
+\str_obj=
+	(
+	\cx_construct=
+		(
+		guard;
+		use "lib/object/construct.fxl"
+		evaluate \;
+
+		\obj=empty
+		set obj "?" I
+		set obj "D" D
+		set obj "L" L
+		set obj "N" N
+		set obj "R" R
+		set obj "T" T
+		set obj "F" F
+		set obj "U" U
+		set obj "void" void
+		obj
+		)
+
+	\str
+	use_context cx_construct;
+	evaluate; parse str "str"
+	)
+
+define "render_obj" render_obj
+define "show_obj" show_obj
+define "obj_str" obj_str
+define "str_obj" str_obj

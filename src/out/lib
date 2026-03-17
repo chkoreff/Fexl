@@ -15,7 +15,6 @@
 [A [say] [str "Hello."]]
 Hello.
 [I]
-[assoc [pair [str "a"] [num 1]] [assoc [pair [str "b"] [num 2]] [void]]]
 [A [A [add] [num 2]] [num 3]]
 [num 5]
 

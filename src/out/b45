@@ -4,95 +4,119 @@
 x => 1
 3 => whatever
 y => 2
-!q => qq
-z => z
+q => qq
+z => 
 
 x => 1
 3 => whatever
 y => 2
-!q => qq
-z => z
+q => qq
+z => 
 
 x => 1
 3 => whatever
 y => 2
-!q => qq
-z => z
+q => qq
+z => 
 
 = test_2
-!====
-with "x" 1;
-with "y" 2;
-with 3 "whatever";
-with "q" "qq";
-with "obj"
+====
 (
-with "a" 11;
-with "b" 22;
-with "c" ?;
-void
-);
-with "list"
-[
-2
-"abc"
-void
-(
-with "a" 47;
-with "b" 82;
-void
+R;
+D 3 "whatever";
+D "e"
+	(
+	R;
+	);
+D "flag" T;
+D "list"
+	(
+	L 2;
+	L "abc";
+	L void;
+	L
+		(
+		R;
+		D "a" 47;
+		D "b" 82;
+		);
+	N
+	);
+D "obj"
+	(
+	R;
+	D "a" 11;
+	D "b" 22;
+	D "c" ?;
+	);
+D "q" "qq";
+D "tuple"
+	(
+	U;
+	L "a";
+	L 2;
+	L
+		(
+		L
+			(
+			U;
+			L "c";
+			L 3;
+			N
+			);
+		L
+			(
+			U;
+			L "d";
+			L 4;
+			N
+			);
+		N
+		);
+	L
+		(
+		R;
+		D "flag" F;
+		D "x" 3;
+		);
+	N
+	);
+D "x" 1;
+D "y" 2;
 )
-];
-with "flag" T;
-with "tuple"
-{
-"a"
-2
-[
-{
-"c"
-3
-}
-{
-"d"
-4
-}
-]
-(
-with "x" 3;
-void
-)
-};
-?
 ====
 2
 ====
 "whatever"
 ====
-with "a" 11;
-with "b" 22;
-with "c" ?;
-void
-====
-[
-2
-"abc"
-void
 (
-with "a" 47;
-with "b" 82;
-void
+R;
+D "a" 11;
+D "b" 22;
+D "c" ?;
 )
-]
 ====
-"z"
+(
+L 2;
+L "abc";
+L void;
+L
+	(
+	R;
+	D "a" 47;
+	D "b" 82;
+	);
+N
+)
+====
+void
 ====
 22
 ====
 void
 ====
 void
-steps 2868 bytes 4768
+steps 9413 bytes 15264
 ~
 \err=
 ~
