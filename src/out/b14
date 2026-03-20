@@ -17,6 +17,7 @@ read.fxl
 read_csv.fxl
 read_ssv.fxl
 run.fxl
+show_value.fxl
 time.fxl
 ]
 Created test/vector

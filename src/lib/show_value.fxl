@@ -1,0 +1,169 @@
+#
+\fexl_type_v=(\x fexl_type x)
+\get_type_L=(\\x fexl_look x () () (\t\\x\\y fexl_type x))
+\get_type_R=(\\x fexl_look x () () (\t\\x\\y fexl_type y))
+
+## Get some types.
+\type_quo=(get_type_R (\;))
+\type_ref=(get_type_R (\; a))
+\type_once=(get_type_L (\=))
+\type_nl=(get_type_L nl)
+\type_time=(get_type_L time)
+\type_empty=(get_type_L empty)
+
+\type_file=(fexl_type stdin)
+\type_str=(fexl_type "")
+\type_num=(fexl_type 0)
+\type_record=(fexl_type_v empty)
+\type_var=(fexl_type_v var_new)
+\type_bn=(fexl_type_v (bn_from_dec ""))
+\type_istr=(fexl_type_v (readstr ""))
+\type_buf=(fexl_type_v buf_new)
+
+\type_form=(fexl_type (\;))
+
+## Set the type names.
+
+\table_type_name=empty
+
+(
+\set_name=(set table_type_name)
+\set_type=(\\x set_name (fexl_type x))
+\set_type_v=(\x set_type x)
+
+set_name 0 "A" # always zero
+#set_type (() ()) "A"
+
+set_type "" "str"
+set_type 0 "num"
+set_type [] "null"
+set_type [0] "list"
+set_type {} "tuple"
+set_type T "T"
+set_type F "F"
+set_type void "void"
+set_type_v empty "record"
+set_type_v var_new "var"
+set_type_v (bn_from_dec "0") "bn"
+set_type stdin "file"
+set_type (\;) "form"
+set_type I "I"
+set_type @ "Y"
+set_type yield "yield"
+set_type . "concat"
+set_type say "say"
+set_type put "put"
+set_type + "add"
+set_type * "mul"
+set_type evaluate "evaluate"
+set_type {0 0} "pair"
+set_type :: "chain"
+set_type (\\x) "D"
+set_type (\x) "E"
+
+set_name type_quo "quo"
+set_name type_ref "ref"
+set_name type_once "once"
+set_name type_nl "nl"
+set_name type_time "time"
+set_name type_empty "empty"
+)
+
+\type_name=(\t get t table_type_name "TYPE" ())
+
+## Set handlers for showing data.
+
+\table_handler=empty
+
+(
+\set_handler=(set table_handler)
+
+set_handler type_str
+	(\\loop\\x
+	put (fexl_quote x)
+	)
+set_handler type_num
+	(\\loop\\x
+	put (num_str x)
+	)
+set_handler type_record
+	(\\loop\\x
+	put "["
+	walk_record x
+		(\k\\v
+		put (is_str k fexl_quote num_str k)
+		put " "
+		loop v
+		put " "
+		)
+	put "]"
+	)
+set_handler type_var
+	(\\loop\\x
+	var_getf x \\val
+	loop val
+	)
+set_handler type_bn
+	(\\loop\\x
+	put (fexl_quote (bn_to_dec x))
+	)
+set_handler type_file
+	(\\loop\\x
+	put (fileno x)
+	)
+set_handler type_quo
+	(\\loop\\x
+	fexl_look_quo x \\y
+	loop y
+	)
+set_handler type_ref
+	(\\loop\\x
+	fexl_look_ref x \sym\line
+	put (fexl_quote sym)
+	#put " " put line # Don't show the line number.
+	)
+if F
+(
+set_handler type_istr
+	(\\loop\\x
+	put "ISTR"
+	)
+set_handler type_buf
+	(\\loop\\x
+	put "BUF"
+	)
+)
+)
+
+\show=
+	(@\\loop\\x
+	put "["
+	fexl_look x
+		(\\t
+		put (type_name t)
+		)
+		(\\t
+		put (type_name t)
+		put " "
+		get t table_handler
+			(put "DATA")
+			(\\f f loop x)
+		)
+		(\\t\\x\\y
+		put (type_name t)
+		eq t type_form
+			(
+			#put " " loop x # Don't show the file name.
+			)
+			(
+			put " " loop x
+			)
+		put " " loop y
+		)
+	put "]"
+	)
+
+\show=(\\x show x nl)
+
+define "type_name" type_name
+define "show" show

@@ -1,4 +1,9 @@
 # Test show forms.
+use_lib "show_value.fxl"
+evaluate \;
+show_benchmark;
+
+(
 show ()
 show ["a" "b"]
 show {"a" "b"}
@@ -23,6 +28,7 @@ show x
 
 \x=x
 show x
+)
 
 (
 nl
@@ -77,4 +83,66 @@ nl
 show (\; {1 b c})
 show (\; {1 2 c})
 show (\; {1 2 3})
+nl
+)
+
+(
+\show_v=(\x show x)
+
+show "a"
+show 3
+show empty
+show_v empty
+(
+\obj=empty
+set obj "b" 2
+set obj "a" 1
+setf obj "c" (say "Hi" 3)
+show obj
+)
+show (I 4)
+show []
+show ["a"]
+show {}
+show {"a"}
+show_v var_new
+(
+\v=var_new
+var_putf v (say "Hello.")
+show v
+)
+show T
+show F
+show_v (bn_from_dec "123")
+show void
+show stdin
+show (\;)
+show (\; () 3 [])
+show (\; a)
+show (\; a b)
+show I
+show @
+show yield
+show .
+show say
+show put
+show +
+show *
+show evaluate
+show {1 2}
+show ::
+show (\\x)
+show (\x)
+
+show (\= )
+show (\= I)
+show (\= say "Hi")
+
+show nl
+show time
+show_v (readstr "a")
+show_v buf_new
+
+show_v (T 3)
+show_v ([] 3)
 )

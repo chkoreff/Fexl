@@ -6,7 +6,6 @@
 #include <buf.h>
 #include <crypto.h>
 //#include <memory.h>
-#include <show.h>
 #include <stdio.h>
 #include <string.h> // strcmp
 #include <test.h>
@@ -14,6 +13,7 @@
 #include <type_buf.h>
 #include <type_cmp.h>
 #include <type_crypto.h>
+#include <type_fexl.h>
 #include <type_file.h>
 #include <type_hex.h>
 #include <type_istr.h>
@@ -241,6 +241,14 @@ static void define_file(void)
 	define("rename",Q(type_rename));
 	}
 
+static void define_fexl(void)
+	{
+	define("fexl_type",Q(type_fexl_type));
+	define("fexl_look",Q(type_fexl_look));
+	define("fexl_look_quo",Q(type_fexl_look_quo));
+	define("fexl_look_ref",Q(type_fexl_look_ref));
+	}
+
 static void define_hex(void)
 	{
 	define("unpack",Q(type_unpack));
@@ -425,6 +433,7 @@ static void use_core(void)
 	define_cmp();
 	define_crypto();
 	define_dir();
+	define_fexl();
 	define_file();
 	define_hex();
 	define_istr();
@@ -443,7 +452,6 @@ static void use_core(void)
 	define_time();
 	define_tuple();
 	define_var();
-	define("show",Q(type_show));
 	define("test_argv",Q(type_test_argv));
 	}
 
