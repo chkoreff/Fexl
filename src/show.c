@@ -12,7 +12,6 @@
 #include <type_str.h>
 #include <type_sym.h>
 #include <type_tuple.h>
-#include <type_with.h>
 
 static const char *type_name(type t)
 	{
@@ -42,8 +41,6 @@ static const char *type_name(type t)
 	if (t == type_pair) return "pair";
 	if (t == type_null) return "null";
 	if (t == type_tuple) return "tuple";
-	if (t == type_assoc) return "assoc";
-	if (t == type_with) return "with";
 	if (t == type_chain) return "::";
 
 	return "TYPE";

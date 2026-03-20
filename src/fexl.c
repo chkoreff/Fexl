@@ -32,7 +32,6 @@
 #include <type_time.h>
 #include <type_tuple.h>
 #include <type_var.h>
-#include <type_with.h>
 
 static value Qdir_base;
 static value Qdir_lib;
@@ -417,13 +416,6 @@ static void define_var(void)
 	define("is_var",Q(type_is_var));
 	}
 
-static void define_with(void)
-	{
-	define("with",Q(type_with));
-	define("is_obj",Q(type_is_obj));
-	define("split_obj",Q(type_split_obj));
-	}
-
 // Define all the functions written in C.
 static void use_core(void)
 	{
@@ -451,7 +443,6 @@ static void use_core(void)
 	define_time();
 	define_tuple();
 	define_var();
-	define_with();
 	define("show",Q(type_show));
 	define("test_argv",Q(type_test_argv));
 	}
