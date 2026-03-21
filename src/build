@@ -1,6 +1,14 @@
 #!/bin/sh
 . ./lib_build
 
+# Build test.so
+make_PIC test
+make_so test
+
+# Build show.so
+make_PIC show
+make_so show
+
 ## Make the fexl lib.
 make base64
 make basic
@@ -20,10 +28,9 @@ make parse
 make report
 make sha256
 make sha512
-make show
+push_obj show
 make str
 make stream
-make test
 make type_bn
 make type_buf
 make type_cmp
@@ -34,6 +41,7 @@ make type_hex
 make type_input
 make type_istr
 make type_limit
+make type_load
 make type_math
 make type_num
 make type_output
@@ -54,5 +62,7 @@ make_lib fexl
 ## Make the fexl bin.
 make fexl
 push_lib fexl
+
+push -ldl
 push -lm # Some newer systems need this for lib math.
 make_bin fexl

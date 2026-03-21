@@ -90,6 +90,7 @@ del
 del_key
 die
 dir_base
+dir_base_so
 dir_lib
 dir_local
 dir_names
@@ -202,6 +203,8 @@ list_length
 list_str
 list_sum
 list_to_tuple
+load_base_so
+load_so
 localtime
 log
 long_month_name
@@ -356,7 +359,6 @@ subtract_microtime
 symlink
 tag
 tau
-test_argv
 time
 timegm
 timelocal

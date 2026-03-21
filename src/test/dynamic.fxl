@@ -1,0 +1,9 @@
+#
+load_base_so "test.so"
+load_base_so "show.so" # built-in show
+#use_lib "show_value.fxl" # enhanced show
+evaluate \;
+
+test_argv ["a" "b"]
+show ["a" "b"]
+show empty

@@ -1,0 +1,14 @@
+\out=
+~
+= test_argv
+[
+0 : a
+1 : b
+]
+[list [str "a"] [list [str "b"] [null]]]
+[A [TYPE] [I]]
+~
+\err=
+~
+~
+\status=0

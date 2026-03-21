@@ -125,8 +125,13 @@ void show(const char *name, value f)
 	put(name);show_exp(f);nl();
 	}
 
-value type_show(value f)
+static value type_show(value f)
 	{
 	show_exp(f->R);nl();
 	return hold(QI);
+	}
+
+void run(void)
+	{
+	define("show",Q(type_show));
 	}

@@ -44,6 +44,11 @@ push()
 	objects="$objects $1"
 	}
 
+push_obj()
+	{
+	push ../obj/$1.o
+	}
+
 push_lib()
 	{
 	push ../lib/$1.a
@@ -110,6 +115,28 @@ make()
 	compile $name ""
 	}
 
+make_PIC()
+	{
+	local name="$1"
+	compile $name "-fPIC"
+	}
+
+# Make a shared library.  I use -fPIC (Position Independent Code) so the object
+# can be linked into a shared library.
+make_so()
+	{
+	local name="$1"
+	local file_so=../lib/$name.so
+
+	stale $file_so $objects
+	local update=$?
+
+	if [ $update -eq 1 ]; then
+		run gcc -s -shared $objects -o $file_so
+	fi
+	objects=""
+	}
+
 # Make a static library.
 make_lib()
 	{
@@ -129,7 +156,7 @@ make_bin()
 	local file_e=../bin/$name
 	stale $file_e $objects
 	if [ $? -eq 1 ]; then
-		run gcc -s $objects -o $file_e
+		run gcc -rdynamic -s $objects -o $file_e
 	fi
 	objects=""
 	}
