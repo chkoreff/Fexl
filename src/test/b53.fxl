@@ -16,7 +16,7 @@ define "put" put
 define "nl" nl
 define "fred" (say "I am Fred.")
 define "wilma" (say "I am Wilma.")
-define "lookup" (\key get key std void)
+define "lookup" (\key GET std key void)
 
 evaluate \;
 say "Hello"
@@ -40,7 +40,7 @@ define "put" put
 define "nl" nl
 #define "fred" (say "I am Fred.")
 #define "wilma" (say "I am Wilma.")
-#define "lookup" (\key get key std void)
+#define "lookup" (\key GET std key void)
 
 evaluate \;
 say "Hello"

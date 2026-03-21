@@ -3,7 +3,7 @@
 (
 \try=
 	(\name
-	\ok=(get name std F \\_ T)
+	\ok=(GET std name F \\_ T)
 	say ["name "name" : "ok]
 	)
 

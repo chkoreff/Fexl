@@ -50,6 +50,7 @@
 "resolve"
 "record"
 "index_C"
+"std"
 ]
 
 # Gather any individually specified tests.

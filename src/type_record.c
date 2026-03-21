@@ -292,8 +292,8 @@ value type_del(value f)
 	}
 	}
 
-// Look up key in record and return either no or (yes val).
-value type_get(value f)
+// (get key obj) Look up key in record and return either no or (yes val).
+value type_get(value f) // LATER 20260321 deprecate in favor of GET
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -310,6 +310,28 @@ value type_get(value f)
 	else
 		f = hold(Qvoid);
 	drop(key);
+	return f;
+	}
+	}
+
+// (GET obj key) Look up key in record and return either no or (yes val).
+value type_GET(value f)
+	{
+	if (f->L->L == 0) return keep(f);
+	{
+	value obj = arg(f->L->R);
+	if (obj->T == type_record)
+		{
+		value key = arg(f->R);
+		if (key->T == type_str || key->T == type_num)
+			f = maybe(record_find(obj,key));
+		else
+			f = hold(Qvoid);
+		drop(key);
+		}
+	else
+		f = hold(Qvoid);
+	drop(obj);
 	return f;
 	}
 	}
@@ -377,7 +399,7 @@ the index so you get the same value next time.
 
 \fetch=
 	(\v\k\\x
-	get k v
+	GET v k
 		(
 		\x=x
 		setf v k x

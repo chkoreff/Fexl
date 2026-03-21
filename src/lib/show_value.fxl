@@ -69,7 +69,7 @@ set_name type_time "time"
 set_name type_empty "empty"
 )
 
-\type_name=(\t get t table_type_name "TYPE" ())
+\type_name=(\t GET table_type_name t "TYPE" ())
 
 ## Set handlers for showing data.
 
@@ -135,6 +135,8 @@ set_handler type_buf
 )
 )
 
+\get_handler=(GET table_handler)
+
 \show=
 	(@\\loop\\x
 	put "["
@@ -145,7 +147,7 @@ set_handler type_buf
 		(\\t
 		put (type_name t)
 		put " "
-		get t table_handler
+		get_handler t
 			(put "DATA")
 			(\\f f loop x)
 		)

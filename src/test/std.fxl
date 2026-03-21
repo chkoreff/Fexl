@@ -1,0 +1,5 @@
+# Show all the symbols defined in std.
+walk_record std
+	(\\k\\v
+	say k
+	)
