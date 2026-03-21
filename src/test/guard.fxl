@@ -18,7 +18,7 @@ barney betty
 (
 \wrap_prefix=
 	(\key
-	GET std key void \\f
+	get std key void \\f
 	define key (put "= " f)
 	)
 

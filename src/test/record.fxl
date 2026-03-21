@@ -243,7 +243,7 @@
 \\test_11=
 	(
 	say "= test_11"
-	# Test setf and GET.
+	# Test setf and get.
 
 	show_benchmark;
 
@@ -263,7 +263,7 @@
 	# Look up a key value and run it if found.
 	\try=
 		(\key
-		GET obj key
+		get obj key
 			(say ["NO "key])
 			(\\val
 			say ["YES "key]
@@ -289,7 +289,7 @@ say "= test_12"
 
 \getf= # LATER 20230702 Do in type_record.c
 	(\obj\key
-	GET obj key void
+	get obj key void
 	)
 
 # Return a new slot with initial value.
@@ -317,7 +317,7 @@ say "= test_12"
 	# This "auto-vivifies" an entry at the given key.
 	setf obj "at"
 		(\key
-		GET (var_get v) key
+		get (var_get v) key
 			(
 			\val=new_val
 			\obj=(var_get v)
@@ -438,7 +438,7 @@ show_record
 nl
 \try=
 	(\k
-	GET obj k
+	get obj k
 		(
 		say (as_str ["no" k])
 		)

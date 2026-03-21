@@ -326,7 +326,6 @@ static void define_record(void)
 	define("setf",Q(type_setf));
 	define("del",Q(type_del));
 	define("get",Q(type_get));
-	define("GET",Q(type_GET));
 	define("record_copy",Q(type_record_copy));
 	define("record_count",Q(type_record_count));
 	define("record_item",Q(type_record_item));
