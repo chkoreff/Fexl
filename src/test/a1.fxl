@@ -1336,7 +1336,7 @@ put "d = " put (as_str d) nl
 
 # Test op_argv.
 (
-load_base_so "test.so"
+use_test
 evaluate \;
 
 test_argv []
