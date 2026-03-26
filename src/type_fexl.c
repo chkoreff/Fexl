@@ -22,9 +22,9 @@ value type_fexl_type(value f)
 
 // (fexl_look x case_atom case_data case_tree)
 // Look at the value x and return one of three cases:
-//    (case_atom T)    # if x is an atom of type T
-//    (case_data T)    # if x is data of type T
-//    (case_tree L R)  # if x is tree of type T with left L and right R
+//    (case_atom T)     # if x is an atom of type T
+//    (case_data T)     # if x is data of type T
+//    (case_tree T L R) # if x is tree of type T with left L and right R
 value type_fexl_look(value f)
 	{
 	if (f->L->L == 0) return keep(f);
