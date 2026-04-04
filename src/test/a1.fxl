@@ -1449,16 +1449,14 @@ say (is_undef val)
 )
 
 (
-# Test evaluation of right side in get_key.
-\cx=
-[
-{"a" (say "got a" 1)}
-{"b" (say "got b" 2)}
-]
+# Test setf.
+\obj=empty
+setf obj "a" (say "got a" 1)
+setf obj "b" (say "got b" 2)
 
 \try=
 	(\key
-	\val=(: key cx)
+	\val=(obj key)
 	say [key" = "(as_str val)]
 	)
 

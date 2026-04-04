@@ -1,42 +1,45 @@
-# Test assoc list.
-
+#
 show_benchmark;
 
+(
+# Test storing random key-val pairs in a record.
+\obj=empty
+
 \add_random_keys=
-	(@\\loop\count\seed\obj
-	le count 0 obj;
+	(@\\loop\count\seed
+	le count 0 ();
 	\hash=(sha512 seed)
 	\key=(unpack; slice hash 0 8)
 	\val=(unpack; slice hash 32 8)
-	\obj=(push_key key val obj)
-	loop (- count 1) hash obj
+	set obj key val
+	loop (- count 1) hash
 	)
 
-\\obj=(add_random_keys 8192 "abcd" [])
-\obj=(sort_pairs obj)
+add_random_keys 8192 "abcd"
 
 (
 \key="7d13f23fa2b9a6fd"
-\val=(get_key key obj)
+\val=(obj key)
 say_data {key val}
-\obj=(put_key key "ffff" obj)
-\val=(get_key key obj)
+set obj key "ffff"
+\val=(obj key)
 say_data {key val}
-\obj=(update_key key (. "aaaa") obj)
-\val=(get_key key obj)
+set obj key (. "aaaa"; obj key)
+\val=(obj key)
 say_data {key val}
 )
 
 (
-shift obj \pair\_
+\pair=(record_item obj 0)
 put "first = "
 say_data pair
 )
 
 (
-shift (reverse obj) \pair\_
+\pair=(record_item obj (+ -1; record_count obj))
 put "last  = "
 say_data pair
+)
 )
 
 (
@@ -49,8 +52,8 @@ say ["ys = "(as_str ys)]
 )
 
 (
-say "= merge_keys"
 # Test merge_keys.
+say "= merge_keys"
 \xs=[{"a" 1} {"b" 2} {"d" 4} {"g" 7}]
 \ys=[{"a" -1} {"c" -3} {"d" -4} {"e" -5} {"f" -6}]
 merge_keys (\x\y {x y}) xs ys \L\M\R

@@ -1,47 +1,85 @@
-#
+# Test some record operations.
+\update=
+	(\obj\key\\fn
+	set obj key (fn; obj key)
+	)
+
+\add=
+	(\obj\key\val
+	set obj key (get obj key val (+ val))
+	)
+
+\set_default=
+	(\obj\key\val
+	get obj key
+		(set obj key val)
+		(\_)
+	)
+
+\make_record=
+	(\keys\vals
+	\rec=empty
+	(@\\loop\keys\vals
+	keys () \key\keys
+	vals () \val\vals
+	\key=(trim_spaces key)
+	set rec key val
+	loop keys vals
+	)
+	keys vals
+	rec
+	)
+
+\show=
+	(\obj
+	say "["
+	walk_record obj
+		(\key\val
+		say_data {key val}
+		)
+	say "]"
+	)
+
 show_benchmark;
 
-\x=[]
-\x=(put_key "a" 0 x)
-\x=(put_key "b" 0 x)
-\x=(put_key "c" 0 x)
+\x=empty
 
-\x=(put_key "a" 1 x)
-\x=(put_key "b" 2 x)
-\x=(put_key "c" 3 x)
+set x "a" 0
+set x "b" 0
+set x "c" 0
 
-\x=(push_key "d" 4 x)
-\x=(push_key "e" 5 x)
+set x "a" 1
+set x "b" 2
+set x "c" 3
 
-say_data x
-\x=(del_key "x" x)
-\x=(del_key "d" x)
-\x=(del_key "c" x)
-say_data x
+set x "d" 4
+set x "e" 5
+show x
 
-\x=(update_key "a" (* 10) x)
-\x=(update_key "b" (+ 5) x)
-\x=(add_key "c" 1 x)
-\x=(add_key "c" 20 x)
-say_data x
+del x "x"
+del x "d"
+del x "c"
+show x
 
-\x=
-	(
-	update_values
-		(\key\val
-		eq key "b" (+ 8 val);
-		val
-		)
-		x
+update x "a" (* 10)
+update x "b" (+ 5)
+
+add x "c" 1
+add x "c" 20
+show x
+
+# Test updating record as I walk through it.
+walk_record x
+	(\key\val
+	eq key "b" (set x key (+ 8 val));
 	)
-say_data x
+show x
 
-\x=(put_default "c" 0 x)
-\x=(put_default "d" 4 x)
-say_data x
+set_default x "c" 0
+set_default x "d" 4
+show x
 
-\y=(name_columns ["a" "b" "c"] [1 2 3])
-say_data y
+\y=(make_record ["a" "b" "c"] [1 2 3])
+show y
 
-\x=(sort_pairs x)
-say_data x
+show x
