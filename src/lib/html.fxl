@@ -68,41 +68,40 @@
 
 # https://en.wikipedia.org/wiki/Percent-encoding
 \uri_escape=
-	(str_map \ch
-
-	eq ch " " "+"; # Special rule for space
-
-	\is_reserved=
-		(
-		eq ch "!" T;
-		eq ch "*" T;
-		eq ch "'" T;
-		eq ch "(" T;
-		eq ch ")" T;
-		eq ch ";" T;
-		eq ch ":" T;
-		eq ch "@" T;
-		eq ch "&" T;
-		eq ch "=" T;
-		eq ch "+" T;
-		eq ch "$" T;
-		eq ch "," T;
-		eq ch "/" T;
-		eq ch "?" T;
-		eq ch "#" T;
-		eq ch "[" T;
-		eq ch "]" T;
-		eq ch "%" T;
-		eq ch "\" T; # Need this otherwise browser treats same as slash.
-		eq ch QU T; # Need this for quotes in path names.
-		eq ch NL T;
-		eq ch CR T;
-		F
+	(
+	\table=empty
+	\reserve=
+		(\ch
+		\code=(. "%" (hex_byte (ord ch)))
+		set table ch code
 		)
+	set table " " "+" # Special rule for space
+	reserve "!"
+	reserve "*"
+	reserve "'"
+	reserve "("
+	reserve ")"
+	reserve ";"
+	reserve ":"
+	reserve "@"
+	reserve "&"
+	reserve "="
+	reserve "+"
+	reserve "$"
+	reserve ","
+	reserve "/"
+	reserve "?"
+	reserve "#"
+	reserve "["
+	reserve "]"
+	reserve "%"
+	reserve "\" # Need this otherwise browser treats same as slash.
+	reserve QU # Need this for quotes in path names.
+	reserve NL
+	reserve CR
 
-	is_reserved
-		(. "%" (hex_byte (ord ch)))
-		ch
+	str_map \ch
+	get table ch ch ()
 	)
 
 \uri_unescape=
