@@ -340,7 +340,17 @@
 \str_chars=(get_str_list sget)
 
 # Apply a function to each logical character of a string.
-\str_map=(\f\str list_str; map f; str_chars str)
+\str_map=
+	(\f\str
+	\in=(readstr str)
+	\buf=buf_new
+
+	@\\loop
+	\x=(sget in)
+	is_undef x (buf_get buf);
+	buf_put buf (f x)
+	loop
+	)
 
 # Insert separators between elements of a list.
 \join_list=
