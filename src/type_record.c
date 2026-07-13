@@ -269,7 +269,6 @@ value type_setf(value f)
 // (del obj key) Delete key from obj.
 value type_del(value f)
 	{
-	//return op_set(f,hold);
 	if (f->L->L == 0) return keep(f);
 	{
 	value obj = arg(f->L->R);
