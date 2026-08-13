@@ -31,6 +31,7 @@ at_ch
 at_eof
 at_eol
 at_white
+atan
 basename
 bn_add
 bn_cmp
@@ -355,6 +356,7 @@ stream_values
 subtract_microtime
 symlink
 tag
+tan
 tau
 time
 timegm

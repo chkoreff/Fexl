@@ -13,4 +13,6 @@ extern value type_exp(value f);
 extern value type_log(value f);
 extern value type_sin(value f);
 extern value type_cos(value f);
+extern value type_tan(value f);
+extern value type_atan(value f);
 extern const double num_pi;

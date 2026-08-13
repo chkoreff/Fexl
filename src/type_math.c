@@ -58,5 +58,7 @@ value type_exp(value f) { return op_num(f,exp); }
 value type_log(value f) { return op_num(f,log); }
 value type_sin(value f) { return op_num(f,sin); }
 value type_cos(value f) { return op_num(f,cos); }
+value type_tan(value f) { return op_num(f,tan); }
+value type_atan(value f) { return op_num(f,atan); }
 
 const double num_pi = M_PI;

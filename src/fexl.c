@@ -288,6 +288,8 @@ static void define_math(void)
 	define("log",Q(type_log));
 	define("sin",Q(type_sin));
 	define("cos",Q(type_cos));
+	define("tan",Q(type_tan));
+	define("atan",Q(type_atan));
 	define("pi",Qnum(num_pi));
 	}
 

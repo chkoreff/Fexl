@@ -1,0 +1,49 @@
+#
+\run_tests=
+(\try
+try 0
+#try (/ 64 960)
+try (/ 1 15)
+try (/ pi 8)
+try (/ pi 4)
+try 1.57
+try (/ pi 2)
+try 1.58
+try 1.67
+try 2
+try 3.1
+try 3.141
+try pi
+try (* pi 1.1)
+try (* pi 1.5)
+try (* pi 1.75)
+try (* pi 1.8)
+try (* pi 1.9)
+try (* pi 2)
+try (* pi 2.25)
+)
+
+\try=
+	(\x
+
+	\tan_x=(tan x)
+	\y=(atan tan_x)
+
+	say ["x     = "x]
+	say ["tan   = "tan_x]
+
+	# The difference between x and (atan (tan x)) is a multiple of pi.
+	\check=(/ (- x y) pi)
+	say ["check = "check]
+	nl
+	)
+
+\try_neg=
+	(\x
+	try (neg x)
+	)
+
+say "== positive"
+run_tests try
+say "== negative"
+run_tests try_neg

@@ -52,6 +52,7 @@
 "record"
 "index_C"
 "std"
+"tan"
 ]
 
 # Gather any individually specified tests.
