@@ -85,8 +85,10 @@ static void beg_const(void)
 	Qstd = record_empty();
 	init_signal();
 
-	// The base directory is right above the bin directory.
+	// The base directory is two levels above the bin/fexl program.
 	Qdir_base = concat(Qdirname(Qdirname(Qstr0(main_argv[0]))),Qstr0("/"));
+
+	// The lib directory is src/lib under the base directory.
 	Qdir_lib = concat(hold(Qdir_base),Qstr0("src/lib/"));
 	}
 
@@ -475,6 +477,7 @@ static void eval_script(void)
 	{
 	const char *name_s = main_argc > 1 ? main_argv[1] : "";
 	value name = Qstr0(name_s);
+	// The local directory is one level above the script path.
 	define("dir_local",concat(Qdirname(hold(name)),Qstr0("/")));
 	use_core();
 	use_lib("main.fxl");
