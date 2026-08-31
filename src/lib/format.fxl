@@ -128,12 +128,15 @@ format_num
 	)
 
 \str_to_data=
-	(\str
-	restrict;
-	define "T" T
-	define "F" F
-	define "void" void
+	(
+	\cx=empty
+	\def=(setf cx)
+	def "T" T
+	def "F" F
+	def "void" void
 
+	\str
+	use_context cx;
 	evaluate; parse str ""
 	)
 
