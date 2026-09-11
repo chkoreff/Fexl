@@ -38,9 +38,7 @@
 # Run a shell command and print its stdout, stderr, and exit status.
 \run_command=
 	(\cmd\input
-	\cmd=(to_str cmd)
-	\args=["/bin/sh" "-c" cmd]
-	run_program args input \out\err\status
+	run_program ["/bin/sh" "-c" (to_str cmd)] input \out\err\status
 	say "\out="
 	say (block_quote out)
 	say "\err="
