@@ -15,10 +15,10 @@
 	{ out err status }
 	)
 
-# Run the function (exec argv).
+# Run the function (exec args).
 \run_program=
-	(\argv
-	run_function (exec argv)
+	(\args
+	run_function (exec args)
 	)
 
 # Run a function with the given input, returning the output as a string.  If
@@ -30,10 +30,10 @@
 	out
 	)
 
-# Run (exec argv) as a filter.
+# Run (exec args) as a filter.
 \run_filter=
-	(\argv
-	run_function_filter (exec argv)
+	(\args
+	run_function_filter (exec args)
 	)
 
 # Grab the output of a function, passing in null input.
@@ -46,8 +46,8 @@
 # on the same machine as the server, this can kill the browser too.
 \stop_server=
 	(\ip\port
-	\argv=["/usr/bin/lsof" (to_str ["-i4TCP@"ip":"port]) "-t"]
-	\out=(run_function (exec argv) "" \out\err\status out)
+	\args=["/usr/bin/lsof" (to_str ["-i4TCP@"ip":"port]) "-t"]
+	\out=(run_function (exec args) "" \out\err\status out)
 	\list_pid=(map str_num; filter (ne ""); split NL out)
 
 	each list_pid

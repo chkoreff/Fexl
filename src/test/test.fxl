@@ -35,12 +35,12 @@
 	to_str [term NL x term]
 	)
 
-# Run a command and print its stdout, stderr, and exit status.
+# Run a shell command and print its stdout, stderr, and exit status.
 \run_command=
 	(\cmd\input
 	\cmd=(to_str cmd)
-	\argv=["/bin/sh" "-c" cmd]
-	run_program argv input \out\err\status
+	\args=["/bin/sh" "-c" cmd]
+	run_program args input \out\err\status
 	say "\out="
 	say (block_quote out)
 	say "\err="
@@ -57,7 +57,7 @@
 	)
 
 \run_fexl_file=(\name run_command [(argv 0)" test/"name".fxl"])
-\run_fexl_text=(run_command [(argv 0)])
+\run_fexl_text=(run_command (argv 0))
 
 define "div" div
 define "show_list" show_list

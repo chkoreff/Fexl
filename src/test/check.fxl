@@ -71,13 +71,18 @@
 # Run a shell command with no input.
 \sh=(\cmd run_program ["/bin/sh" "-c" (to_str cmd)] "")
 
+\run_show=
+	(\name\extra
+	sh [(argv 0)" test/show.fxl "name extra]
+	)
+
 \\refresh=
 	(
 	\_=(mkdir "new" (oct "775"))
 	each list
 		(\name
 		say ["refresh "name" "]
-		sh [(argv 0)" test/show.fxl "name" >new/"name]
+		run_show name [" >new/"name]
 		\out\err\status
 		)
 	)
@@ -87,7 +92,7 @@
 	each list
 		(\name
 		put ["test "name" "]
-		sh [(argv 0)" test/show.fxl "name" | diff - out/"name]
+		run_show name [" | diff - out/"name]
 		\out\err\status
 		eq 0 status
 			(say "good")
@@ -95,6 +100,7 @@
 			say "failed"
 			put out
 			put err
+			say ["failed "name]
 			)
 		)
 	)
