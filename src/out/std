@@ -26,6 +26,7 @@ and
 append
 append_all
 argv
+argv_fexl
 as_str
 at_ch
 at_eof

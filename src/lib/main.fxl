@@ -4,6 +4,9 @@
 \use_lib=(\name evaluate; parse_lib name)
 define "use_lib" use_lib
 
+\a0=(argv 0)
+define "argv_fexl" [a0]
+
 use_lib "extra.fxl"
 use_lib "bool.fxl"
 use_lib "math.fxl"
