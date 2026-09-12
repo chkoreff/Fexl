@@ -53,6 +53,7 @@
 "index_C"
 "std"
 "tan"
+"minimal"
 ]
 
 # Gather any individually specified tests.

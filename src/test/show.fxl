@@ -31,5 +31,43 @@ jjja小
 ~
 );
 
+# Run this test with minimal environment.
+eq name "minimal"
+(
+# Quote a string to use as a shell argument.
+\sh_quote=
+	(
+	\contains=(\x\y is_good (search x y 0))
+	\x
+	\x=(to_str x)
+	contains x QU
+		(
+		# Escape all QU with "\".
+		\x=(str_map (\ch eq ch QU (. "\" ch) ch) x)
+		to_str [QU x QU]
+		);
+	contains x " " (to_str [QU x QU]);
+	x
+	)
+
+\args=
+	[
+	"a"
+	"b 2"
+	"c"
+	["d"" ""e"]
+	~ "f"~
+	~ g" "h~
+	[QU QU]
+	]
+
+\args=["../bin/fexl" "test/minimal.fxl"; args]
+
+\cmd=(join_list " "; map sh_quote args)
+
+say cmd
+run_command cmd ""
+);
+
 # Other normal tests run here.
 run_fexl_file name ""

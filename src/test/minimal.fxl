@@ -1,0 +1,18 @@
+#
+use_lib "bool.fxl"
+use_lib "list.fxl"
+evaluate \;
+
+# Using technique for breaking a loop.
+(
+\\break
+each (range 0 10)
+	(\i
+	\\loop
+	\val=(argv i)
+	is_undef val break;
+	say ["argv "i" = "(val)]
+	loop
+	)
+);
+say "END"

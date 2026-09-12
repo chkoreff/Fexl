@@ -1,11 +1,5 @@
-# Load the libraries.
-
-\parse_lib=(\name parse_file; . dir_lib name)
-\use_lib=(\name evaluate; parse_lib name)
-define "use_lib" use_lib
-
-\a0=(argv 0)
-define "argv_fexl" [a0]
+#
+define "argv_fexl" [(argv 0)]
 
 use_lib "extra.fxl"
 use_lib "bool.fxl"

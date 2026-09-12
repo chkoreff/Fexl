@@ -1,0 +1,18 @@
+../bin/fexl test/minimal.fxl a "b 2" c "d e" "\"f\"" "g\" \"h" "\"\""
+\out=
+~
+argv 0 = ../bin/fexl
+argv 1 = test/minimal.fxl
+argv 2 = a
+argv 3 = b 2
+argv 4 = c
+argv 5 = d e
+argv 6 = "f"
+argv 7 = g" "h
+argv 8 = ""
+END
+~
+\err=
+~
+~
+\status=0

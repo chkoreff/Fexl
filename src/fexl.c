@@ -57,9 +57,23 @@ static void use(value name)
 	drop(eval(A(Q(type_evaluate),A(Q(type_parse_file),name))));
 	}
 
-static void use_lib(const char *name)
+static void use_lib(value name)
 	{
-	use(concat(hold(Qdir_lib),Qstr0(name)));
+	use(concat(hold(Qdir_lib),name));
+	}
+
+static value type_use_lib(value f)
+	{
+	value name = arg(f->R);
+	if (name->T == type_str)
+		{
+		use_lib(hold(name));
+		f = hold(QI);
+		}
+	else
+		f = hold(Qvoid);
+	drop(name);
+	return f;
 	}
 
 static void beg_const(void)
@@ -465,6 +479,7 @@ static void use_core(void)
 	define_time();
 	define_tuple();
 	define_var();
+	define("use_lib",Q(type_use_lib));
 	define("use_test",Q0(type_use_test));
 	}
 
@@ -480,7 +495,7 @@ static void eval_script(void)
 	// The local directory is one level above the script path.
 	define("dir_local",concat(Qdirname(hold(name)),Qstr0("/")));
 	use_core();
-	use_lib("main.fxl");
+	use_lib(Qstr0("main.fxl"));
 	use(name);
 	}
 
