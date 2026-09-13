@@ -3,6 +3,11 @@
 # (check x d) = x if x is good, otherwise d.
 \check=(\x is_defined x x)
 
+# The local directory is one level above the script name.
+\script_name=(default ""; argv 1)
+\dir_local=(. (dirname script_name) "/")
+define "dir_local" dir_local
+
 \parse_local=(\name parse_file; . dir_local name)
 \use=(\name evaluate; parse_local name)
 

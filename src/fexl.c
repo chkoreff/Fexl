@@ -492,8 +492,6 @@ static void eval_script(void)
 	{
 	const char *name_s = main_argc > 1 ? main_argv[1] : "";
 	value name = Qstr0(name_s);
-	// The local directory is one level above the script path.
-	define("dir_local",concat(Qdirname(hold(name)),Qstr0("/")));
 	use_core();
 	use_lib(Qstr0("main.fxl"));
 	use(name);
