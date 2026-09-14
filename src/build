@@ -58,3 +58,6 @@ make fexl
 push_lib fexl
 push -lm # Some newer systems need this for lib math.
 make_bin fexl
+
+# This version does not load any libraries.
+ln -fs ../bin/fexl ../bin/fexl0

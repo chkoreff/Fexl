@@ -1,7 +1,7 @@
-../bin/fexl test/minimal.fxl a "b 2" c "d e" "\"f\"" "g\" \"h" "\"\""
+../bin/fexl0 test/minimal.fxl a "b 2" c "d e" "\"f\"" "g\" \"h" "\"\""
 \out=
 ~
-argv 0 = ../bin/fexl
+argv 0 = ../bin/fexl0
 argv 1 = test/minimal.fxl
 argv 2 = a
 argv 3 = b 2

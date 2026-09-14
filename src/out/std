@@ -203,6 +203,7 @@ list_length
 list_str
 list_sum
 list_to_tuple
+load
 localtime
 log
 long_month_name

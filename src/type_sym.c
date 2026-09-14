@@ -308,7 +308,6 @@ void define_sym(void)
 	define("is_closed",Q(type_is_closed));
 	define("define",Q(type_define));
 	define("resolve",Q(type_resolve));
-	define("evaluate",Q(type_evaluate));
 	define("set_std",Q(type_set_std));
 	}
 

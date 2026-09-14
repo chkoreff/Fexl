@@ -1,6 +1,6 @@
 # Test the built-in show function.
-use_test
-#use_lib "show_value.fxl" # Test the enhanced show function.
+load "test"
+#load "show_value" # Test the enhanced show function.
 evaluate \;
 
 test_argv ["a" "b"]

@@ -1,6 +1,27 @@
 #
-use_lib "bool.fxl"
-use_lib "list.fxl"
+#load "core"
+
+load "argv"
+load "basic"
+load "sym"
+
+load "bool"
+
+load "math"
+load "crypto"
+load "buf"
+load "cmp"
+load "file"
+load "istr"
+load "num"
+load "record"
+load "str"
+load "tuple"
+
+load "list"
+
+load "output"
+
 evaluate \;
 
 # Using technique for breaking a loop.

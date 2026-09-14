@@ -28,15 +28,20 @@ static value type_test_argv(value f)
 	return op_argv(f,test_argv);
 	}
 
-static value type_use_test(value f)
+void define_test(void)
 	{
 	define("test_argv",Q(type_test_argv));
 	define("show",Q(type_show));
+	}
+
+static value type_use_test(value f)
+	{
+	define_test();
 	return hold(QI);
 	(void)f;
 	}
 
-void define_test(void)
+void define_use_test(void)
 	{
-	define("use_test",Q0(type_use_test));
+	define("use_test",Q0(type_use_test)); // LATER 20260914 deprecated
 	}

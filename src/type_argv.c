@@ -64,7 +64,7 @@ void use_lib(const char *name)
 	use(concat(hold(Qdir_lib),Qstr0(name)));
 	}
 
-static value type_use_lib(value f)
+value type_use_lib(value f) // LATER 20260914 deprecated
 	{
 	value name = arg(f->R);
 	if (name->T == type_str)
@@ -83,7 +83,6 @@ void define_argv(void)
 	define("argv",Q(type_argv));
 	define("dir_base",hold(Qdir_base));
 	define("dir_lib",hold(Qdir_lib));
-	define("use_lib",Q(type_use_lib));
 	}
 
 void beg_argv(void)

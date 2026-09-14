@@ -1,5 +1,5 @@
 # Test show forms.
-use_lib "show_value.fxl"
+load "show_value"
 evaluate \;
 show_benchmark;
 

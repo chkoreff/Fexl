@@ -61,7 +61,7 @@ eq name "minimal"
 	[QU QU]
 	]
 
-\args=["../bin/fexl" "test/minimal.fxl"; args]
+\args=["../bin/fexl0" "test/minimal.fxl"; args]
 
 \cmd=(join_list " "; map sh_quote args)
 
