@@ -1,13 +1,14 @@
 #include <value.h>
 
 #include <basic.h>
+#include <define.h>
 #include <type_var.h>
 
 // A var is a mutable variable where you can put and get values.  This can help
 // with things like caching, simulating a dynamic entity such as a file system
 // or human user, redefining print to capture output in a memory buffer, etc.
 
-value type_var(value f)
+static value type_var(value f)
 	{
 	return type_void(f);
 	}
@@ -18,7 +19,7 @@ static void clear_var(value f)
 	}
 
 // (var_new) Return a new variable with a void value.
-value type_var_new(value f)
+static value type_var_new(value f)
 	{
 	static struct value clear = {{.N=0}, {.clear=clear_var}};
 	return V(type_var,&clear,hold(Qvoid));
@@ -26,7 +27,7 @@ value type_var_new(value f)
 	}
 
 // (var_get var) Return the current value of var.
-value type_var_get(value f)
+static value type_var_get(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_var)
@@ -38,7 +39,7 @@ value type_var_get(value f)
 	}
 
 // (var_getf var) Yield the current value of var.
-value type_var_getf(value f)
+static value type_var_getf(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_var)
@@ -69,18 +70,28 @@ static value op_put(value f, value op(value))
 	}
 
 // (var_put var x) Put the value of x into var.
-value type_var_put(value f)
+static value type_var_put(value f)
 	{
 	return op_put(f,arg);
 	}
 
 // (var_putf var x) Put x into var.
-value type_var_putf(value f)
+static value type_var_putf(value f)
 	{
 	return op_put(f,hold);
 	}
 
-value type_is_var(value f)
+static value type_is_var(value f)
 	{
 	return op_is_type(f,type_var);
+	}
+
+void define_var(void)
+	{
+	define("var_new",Q0(type_var_new));
+	define("var_get",Q(type_var_get));
+	define("var_getf",Q(type_var_getf));
+	define("var_put",Q(type_var_put));
+	define("var_putf",Q(type_var_putf));
+	define("is_var",Q(type_is_var));
 	}

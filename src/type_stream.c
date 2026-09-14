@@ -5,38 +5,40 @@
 #include <buf.h>
 
 #include <basic.h>
+#include <define.h>
 #include <stream.h>
 #include <type_buf.h>
 #include <type_num.h>
+#include <type_parse.h>
 #include <type_str.h>
 #include <type_stream.h>
 
-value type_at_eof(value f)
+static value type_at_eof(value f)
 	{
 	return boolean(cur_ch == -1);
 	(void)f;
 	}
 
-value type_at_white(value f)
+static value type_at_white(value f)
 	{
 	return boolean(at_white());
 	(void)f;
 	}
 
-value type_skip_white(value f)
+static value type_skip_white(value f)
 	{
 	skip_white();
 	return hold(QI);
 	(void)f;
 	}
 
-value type_at_eol(value f)
+static value type_at_eol(value f)
 	{
 	return boolean(cur_ch == '\n' || cur_ch == '\r');
 	(void)f;
 	}
 
-value type_at_ch(value f)
+static value type_at_ch(value f)
 	{
 	value x = f->R;
 	if (x->T == type_str)
@@ -47,7 +49,7 @@ value type_at_ch(value f)
 	}
 
 // Return the current character.
-value type_look(value f)
+static value type_look(value f)
 	{
 	if (cur_ch < 0)
 		return hold(Qvoid);
@@ -60,7 +62,7 @@ value type_look(value f)
 	}
 
 // Skip to the next character.
-value type_skip(value f)
+static value type_skip(value f)
 	{
 	skip();
 	return hold(QI);
@@ -68,13 +70,13 @@ value type_skip(value f)
 	}
 
 // Return the current line number.
-value type_line(value f)
+static value type_line(value f)
 	{
 	return Qnum(cur_line);
 	(void)f;
 	}
 
-value type_buf_keep(value f)
+static value type_buf_keep(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_buf)
@@ -88,7 +90,7 @@ value type_buf_keep(value f)
 	return f;
 	}
 
-value type_collect_to_ch(value f)
+static value type_collect_to_ch(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -104,7 +106,7 @@ value type_collect_to_ch(value f)
 	}
 	}
 
-value type_collect_tilde_string(value f)
+static value type_collect_tilde_string(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_buf)
@@ -113,4 +115,20 @@ value type_collect_tilde_string(value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
+	}
+
+void define_stream(void)
+	{
+	define("at_eof",Q0(type_at_eof));
+	define("at_white",Q0(type_at_white));
+	define("skip_white",Q0(type_skip_white));
+	define("at_eol",Q0(type_at_eol));
+	define("at_ch",Q(type_at_ch));
+	define("look",Q0(type_look));
+	define("skip",Q0(type_skip));
+	define("line",Q0(type_line));
+	define("buf_keep",Q(type_buf_keep));
+	define("collect_to_ch",Q(type_collect_to_ch));
+	define("collect_tilde_string",Q(type_collect_tilde_string));
+	define("read_stream",Q(type_read_stream));
 	}

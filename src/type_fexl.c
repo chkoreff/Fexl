@@ -2,6 +2,7 @@
 #include <value.h>
 
 #include <basic.h>
+#include <define.h>
 #include <type_fexl.h>
 #include <type_num.h>
 #include <type_str.h>
@@ -15,7 +16,7 @@ static value Qtype(type T)
 
 // (fexl_type x) Return the type of x as a number.  The number is the address
 // of the C function pointer, so it may change between invocations.
-value type_fexl_type(value f)
+static value type_fexl_type(value f)
 	{
 	return Qtype(f->R->T);
 	}
@@ -25,7 +26,7 @@ value type_fexl_type(value f)
 //    (case_atom T)     # if x is an atom of type T
 //    (case_data T)     # if x is data of type T
 //    (case_tree T L R) # if x is tree of type T with left L and right R
-value type_fexl_look(value f)
+static value type_fexl_look(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	if (f->L->L->L == 0) return keep(f);
@@ -45,7 +46,7 @@ value type_fexl_look(value f)
 	}
 
 // (fexl_look_quo x) If x is type_quo, return {y} where y is the right side.
-value type_fexl_look_quo(value f)
+static value type_fexl_look_quo(value f)
 	{
 	if (f->R->T == type_quo)
 		f = yield(hold(f->R->R));
@@ -55,7 +56,7 @@ value type_fexl_look_quo(value f)
 	}
 
 // (fexl_look_ref x) If x is type_ref, return {sym line}.
-value type_fexl_look_ref(value f)
+static value type_fexl_look_ref(value f)
 	{
 	if (f->R->T == type_ref)
 		{
@@ -67,4 +68,12 @@ value type_fexl_look_ref(value f)
 	else
 		f = hold(Qvoid);
 	return f;
+	}
+
+void define_fexl(void)
+	{
+	define("fexl_type",Q(type_fexl_type));
+	define("fexl_look",Q(type_fexl_look));
+	define("fexl_look_quo",Q(type_fexl_look_quo));
+	define("fexl_look_ref",Q(type_fexl_look_ref));
 	}

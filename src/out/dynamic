@@ -7,6 +7,23 @@
 ]
 [list [str "a"] [list [str "b"] [null]]]
 [A [TYPE] [I]]
+[I]
+[concat]
+[add]
+[mul]
+[num 3]
+[say]
+[form [A [ref "a"] [ref "b"]]]
+[Y]
+[A [once] [I]]
+[yield]
+[T]
+[F]
+[D [F] [I]]
+[E [F] [I]]
+[void]
+[evaluate]
+[pair [num 1] [num 2]]
 ~
 \err=
 ~

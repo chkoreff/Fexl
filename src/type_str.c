@@ -3,6 +3,7 @@
 
 #include <basic.h>
 #include <convert.h>
+#include <define.h>
 #include <memory.h>
 #include <type_num.h>
 #include <type_str.h>
@@ -100,13 +101,13 @@ value op_str3(value f, string op(string,string,string))
 	}
 
 // (. x y) is the concatenation of strings x and y.
-value type_concat(value f)
+static value type_concat(value f)
 	{
 	return op_str2(f,str_concat);
 	}
 
 // (length x) is the length of string x
-value type_length(value f)
+static value type_length(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
@@ -119,7 +120,7 @@ value type_length(value f)
 
 // (slice str pos len) calls str_slice, except it returns void if pos or len is
 // negative.
-value type_slice(value f)
+static value type_slice(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	if (f->L->L->L == 0) return keep(f);
@@ -146,7 +147,7 @@ value type_slice(value f)
 	}
 
 // (search haystack needle offset) calls str_search.
-value type_search(value f)
+static value type_search(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	if (f->L->L->L == 0) return keep(f);
@@ -180,7 +181,7 @@ value type_search(value f)
 	}
 
 // Convert string to number if possible.
-value type_str_num(value f)
+static value type_str_num(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
@@ -198,7 +199,7 @@ value type_str_num(value f)
 	}
 
 // (ord x) is the ordinal number of the first ASCII character of string x.
-value type_ord(value f)
+static value type_ord(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
@@ -213,7 +214,7 @@ value type_ord(value f)
 	}
 
 // (chr x) is the ASCII character whose ordinal number is x.
-value type_chr(value f)
+static value type_chr(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
@@ -230,7 +231,7 @@ value type_chr(value f)
 
 // (char_width str pos) Return the width of the UTF-8 character which starts at
 // the given position.
-value type_char_width(value f)
+static value type_char_width(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -262,12 +263,12 @@ value type_char_width(value f)
 	}
 	}
 
-value type_dirname(value f) { return op_str(f,dirname); }
-value type_basename(value f) { return op_str(f,basename); }
+static value type_dirname(value f) { return op_str(f,dirname); }
+static value type_basename(value f) { return op_str(f,basename); }
 
 // (length_common x y) Return the number of initial bytes which x and y have in
 // common.
-value type_length_common(value f)
+static value type_length_common(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -292,7 +293,7 @@ value type_length_common(value f)
 //     \cy=(slice y pos 1)
 //     gt cx cy GT; lt cx cy LT; EQ
 //     )
-value type_compare_at(value f)
+static value type_compare_at(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	if (f->L->L->L == 0) return keep(f);
@@ -329,7 +330,7 @@ value type_compare_at(value f)
 	}
 	}
 
-value type_is_str(value f)
+static value type_is_str(value f)
 	{
 	return op_is_type(f,type_str);
 	}
@@ -393,4 +394,21 @@ value op_argv(value f, value op(const char *const *argv))
 	drop(items);
 
 	return f;
+	}
+
+void define_str(void)
+	{
+	define(".",Q(type_concat));
+	define("length",Q(type_length));
+	define("slice",Q(type_slice));
+	define("search",Q(type_search));
+	define("str_num",Q(type_str_num));
+	define("ord",Q(type_ord));
+	define("chr",Q(type_chr));
+	define("char_width",Q(type_char_width));
+	define("dirname",Q(type_dirname));
+	define("basename",Q(type_basename));
+	define("length_common",Q(type_length_common));
+	define("compare_at",Q(type_compare_at));
+	define("is_str",Q(type_is_str));
 	}

@@ -3,6 +3,7 @@
 
 #include <arpa/inet.h> // inet_addr
 #include <basic.h>
+#include <define.h>
 #include <die.h>
 #include <memory.h>
 #include <netinet/in.h> // IPPROTO_TCP INADDR_ANY (BSD)
@@ -18,33 +19,11 @@
 #include <type_str.h>
 #include <unistd.h> // exec fork sleep
 
-int main_argc;
-const char **main_argv;
-
-value type_die(value f)
+static value type_die(value f)
 	{
 	die(0);
 	return hold(QI);
 	(void)f;
-	}
-
-// (argv i) Return the command line argument at position i (starting at 0), or
-// void if no such position.
-value type_argv(value f)
-	{
-	value x = arg(f->R);
-	if (x->T == type_num)
-		{
-		int i = x->v_double;
-		if (i >= 0 && i < main_argc)
-			f = Qstr(str_new_data0(main_argv[i]));
-		else
-			f = hold(Qvoid);
-		}
-	else
-		f = hold(Qvoid);
-	drop(x);
-	return f;
 	}
 
 static value op_sleep(value f, unsigned int op(unsigned int))
@@ -63,13 +42,13 @@ static value op_sleep(value f, unsigned int op(unsigned int))
 	}
 
 // (sleep n) Sleep for the specified number of seconds.
-value type_sleep(value f)
+static value type_sleep(value f)
 	{
 	return op_sleep(f,sleep);
 	}
 
 // (usleep n) Sleep for the specified number of microseconds.
-value type_usleep(value f)
+static value type_usleep(value f)
 	{
 	return op_sleep(f,(unsigned int (*)(unsigned int))usleep);
 	}
@@ -213,7 +192,7 @@ static value op_process(value f, int catch_stderr)
 // The child's stderr goes to the same destination as the parent's stderr,
 // which is typically what you want when implementing a server with an error
 // log.
-value type_run_process(value f)
+static value type_run_process(value f)
 	{
 	return op_process(f,0);
 	}
@@ -222,7 +201,7 @@ value type_run_process(value f)
 //
 // Interact with the fn_child function as a separate process, with the
 // fn_parent receiving handles to the child's stdin, stdout, and stderr.
-value type_spawn(value f)
+static value type_spawn(value f)
 	{
 	return op_process(f,1);
 	}
@@ -367,7 +346,7 @@ static void server_process(value v_interact, int fd_listen)
 // Also:
 // lsof -i4TCP@127.0.0.1:2186 -t
 
-value type_start_server(value f)
+static value type_start_server(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	if (f->L->L->L == 0) return keep(f);
@@ -435,7 +414,7 @@ value type_start_server(value f)
 	}
 
 // (kill pid sig)
-value type_kill(value f)
+static value type_kill(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -465,7 +444,7 @@ value type_kill(value f)
 
 // (connect ip port) Connect to the ip address and port and return the file
 // handle for the connection.
-value type_connect(value f)
+static value type_connect(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -515,14 +494,14 @@ static value do_exec(const char *const *argv)
 
 // (exec argv) Call execv with the given argument list.  The first argument is
 // the full path of the executable program.  This call does not return.
-value type_exec(value f)
+static value type_exec(value f)
 	{
 	return op_argv(f,do_exec);
 	}
 
 // (receive_keystrokes fn)
 // Run the function while receiving individual keystrokes.
-value type_receive_keystrokes(value f)
+static value type_receive_keystrokes(value f)
 	{
 	struct termios attr;
 	tcflag_t save_c_lflag;
@@ -547,7 +526,7 @@ value type_receive_keystrokes(value f)
 // (fexl_benchmark x next) Evaluate x and return (next val steps bytes), where
 // val is the value of x, steps is the number of reduction steps, and bytes is
 // the number of memory bytes used.
-value type_fexl_benchmark(value f)
+static value type_fexl_benchmark(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	clear_free_list();
@@ -567,4 +546,19 @@ value type_fexl_benchmark(value f)
 	cur_steps += beg_steps;
 	return f;
 	}
+	}
+
+void define_run(void)
+	{
+	define("die",Q0(type_die));
+	define("sleep",Q(type_sleep));
+	define("usleep",Q(type_usleep));
+	define("run_process",Q(type_run_process));
+	define("spawn",Q(type_spawn));
+	define("start_server",Q(type_start_server));
+	define("kill",Q(type_kill));
+	define("connect",Q(type_connect));
+	define("exec",Q(type_exec));
+	define("receive_keystrokes",Q(type_receive_keystrokes));
+	define("fexl_benchmark",Q(type_fexl_benchmark));
 	}

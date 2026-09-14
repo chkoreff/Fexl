@@ -6,6 +6,7 @@
 
 #include <basic.h>
 #include <bn.h>
+#include <define.h>
 #include <type_bn.h>
 #include <type_num.h>
 #include <type_str.h>
@@ -20,7 +21,7 @@ static void clear_bn(value f)
 	bn_free(f->v_ptr);
 	}
 
-value Qbn(struct bn *x)
+static value Qbn(struct bn *x)
 	{
 	static struct value clear = {{.N=0}, {.clear=clear_bn}};
 	return V(type_bn,&clear,(value)x);
@@ -37,17 +38,17 @@ static value op_pred(value f, int op(const struct bn *x))
 	return f;
 	}
 
-value type_bn_eq0(value f)
+static value type_bn_eq0(value f)
 	{
 	return op_pred(f,bn_eq0);
 	}
 
-value type_bn_is_neg(value f)
+static value type_bn_is_neg(value f)
 	{
 	return op_pred(f,bn_is_neg);
 	}
 
-value type_bn_neg(value f)
+static value type_bn_neg(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_bn)
@@ -58,7 +59,7 @@ value type_bn_neg(value f)
 	return f;
 	}
 
-value type_bn_cmp(value f)
+static value type_bn_cmp(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -97,14 +98,14 @@ static int ne(int x) { return x != 0; }
 static int ge(int x) { return x >= 0; }
 static int gt(int x) { return x > 0; }
 
-value type_bn_lt(value f) { return op_cmp(f,lt); }
-value type_bn_le(value f) { return op_cmp(f,le); }
-value type_bn_eq(value f) { return op_cmp(f,eq); }
-value type_bn_ne(value f) { return op_cmp(f,ne); }
-value type_bn_ge(value f) { return op_cmp(f,ge); }
-value type_bn_gt(value f) { return op_cmp(f,gt); }
+static value type_bn_lt(value f) { return op_cmp(f,lt); }
+static value type_bn_le(value f) { return op_cmp(f,le); }
+static value type_bn_eq(value f) { return op_cmp(f,eq); }
+static value type_bn_ne(value f) { return op_cmp(f,ne); }
+static value type_bn_ge(value f) { return op_cmp(f,ge); }
+static value type_bn_gt(value f) { return op_cmp(f,gt); }
 
-value type_bn_from_dec(value f)
+static value type_bn_from_dec(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
@@ -115,7 +116,7 @@ value type_bn_from_dec(value f)
 	return f;
 	}
 
-value type_bn_to_dec(value f)
+static value type_bn_to_dec(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_bn)
@@ -143,12 +144,12 @@ static value op_2(value f,
 	}
 	}
 
-value type_bn_add(value f) { return op_2(f,bn_add); }
-value type_bn_sub(value f) { return op_2(f,bn_sub); }
-value type_bn_mul(value f) { return op_2(f,bn_mul); }
-value type_bn_mod(value f) { return op_2(f,bn_mod); }
+static value type_bn_add(value f) { return op_2(f,bn_add); }
+static value type_bn_sub(value f) { return op_2(f,bn_sub); }
+static value type_bn_mul(value f) { return op_2(f,bn_mul); }
+static value type_bn_mod(value f) { return op_2(f,bn_mod); }
 
-value type_bn_div(value f)
+static value type_bn_div(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -169,7 +170,30 @@ value type_bn_div(value f)
 	}
 	}
 
-value type_is_bn(value f)
+static value type_is_bn(value f)
 	{
 	return op_is_type(f,type_bn);
+	}
+
+// big numbers
+void define_bn(void)
+	{
+	define("bn_eq0",Q(type_bn_eq0));
+	define("bn_is_neg",Q(type_bn_is_neg));
+	define("bn_neg",Q(type_bn_neg));
+	define("bn_cmp",Q(type_bn_cmp));
+	define("bn_lt",Q(type_bn_lt));
+	define("bn_le",Q(type_bn_le));
+	define("bn_eq",Q(type_bn_eq));
+	define("bn_ne",Q(type_bn_ne));
+	define("bn_ge",Q(type_bn_ge));
+	define("bn_gt",Q(type_bn_gt));
+	define("bn_from_dec",Q(type_bn_from_dec));
+	define("bn_to_dec",Q(type_bn_to_dec));
+	define("bn_add",Q(type_bn_add));
+	define("bn_sub",Q(type_bn_sub));
+	define("bn_mul",Q(type_bn_mul));
+	define("bn_mod",Q(type_bn_mod));
+	define("bn_div",Q(type_bn_div));
+	define("is_bn",Q(type_is_bn));
 	}

@@ -2,6 +2,7 @@
 #include <str.h>
 
 #include <basic.h>
+#include <define.h>
 #include <type_hex.h>
 #include <type_str.h>
 
@@ -54,7 +55,7 @@ static string pack(string str_hex)
 	}
 
 // Map raw bytes to their hexadecimal values.
-value type_unpack(value f)
+static value type_unpack(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
@@ -66,7 +67,7 @@ value type_unpack(value f)
 	}
 
 // Map a string specified in hexadecimal into the raw bytes.
-value type_pack(value f)
+static value type_pack(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
@@ -75,4 +76,10 @@ value type_pack(value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
+	}
+
+void define_hex(void)
+	{
+	define("unpack",Q(type_unpack));
+	define("pack",Q(type_pack));
 	}

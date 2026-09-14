@@ -1,8 +1,25 @@
-#
+# Test the built-in show function.
 use_test
-#use_lib "show_value.fxl" # enhanced show
+#use_lib "show_value.fxl" # Test the enhanced show function.
 evaluate \;
 
 test_argv ["a" "b"]
 show ["a" "b"]
 show empty
+show I
+show .
+show +
+show *
+show 3
+show say
+show (\; a b)
+show @
+show (\= I)
+show yield
+show T
+show F
+show (\\x )
+show (\x )
+show void
+show evaluate
+show {1 2}

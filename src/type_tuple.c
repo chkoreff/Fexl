@@ -1,6 +1,7 @@
 #include <value.h>
 
 #include <basic.h>
+#include <define.h>
 #include <type_tuple.h>
 
 value Qtuple;
@@ -32,7 +33,7 @@ value type_tuple(value f)
 		}
 	}
 
-value type_is_tuple(value f)
+static value type_is_tuple(value f)
 	{
 	value x = arg(f->R);
 	f = boolean(x->T == type_tuple || x->T == type_pair);
@@ -40,7 +41,7 @@ value type_is_tuple(value f)
 	return f;
 	}
 
-value type_tuple_to_list(value f)
+static value type_tuple_to_list(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_tuple)
@@ -53,7 +54,24 @@ value type_tuple_to_list(value f)
 	return f;
 	}
 
-value type_list_to_tuple(value f)
+static value type_list_to_tuple(value f)
 	{
 	return V(type_tuple,hold(Qtuple),hold(f->R));
+	}
+
+void define_tuple(void)
+	{
+	define("is_tuple",Q(type_is_tuple));
+	define("tuple_to_list",Q(type_tuple_to_list));
+	define("list_to_tuple",Q(type_list_to_tuple));
+	}
+
+void beg_tuple(void)
+	{
+	Qtuple = Q(type_tuple);
+	}
+
+void end_tuple(void)
+	{
+	drop(Qtuple);
 	}

@@ -2,6 +2,7 @@
 #include <value.h>
 
 #include <basic.h>
+#include <define.h>
 #include <die.h>
 #include <report.h>
 #include <type_record.h>
@@ -10,7 +11,7 @@
 
 value Qstd;
 
-value type_std(value f)
+static value type_std(value f)
 	{
 	return hold(Qstd);
 	(void)f;
@@ -151,7 +152,7 @@ value type_E(value f)
 	}
 
 // Return true if the form has no undefined symbols.
-value type_is_closed(value f)
+static value type_is_closed(value f)
 	{
 	value form = arg(f->R);
 	if (form->T == type_form)
@@ -168,15 +169,8 @@ static void set_std(value obj)
 	Qstd = obj;
 	}
 
-void define(const char *s_key, value val)
-	{
-	value key = Qstr0(s_key);
-	record_set(Qstd,key,val);
-	drop(key);
-	}
-
 // (define key val) Define key as val in std.
-value type_define(value f)
+static value type_define(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -211,7 +205,7 @@ static value resolve(value exp)
 	}
 
 // (resolve form) Resolve any symbols defined in std.
-value type_resolve(value f)
+static value type_resolve(value f)
 	{
 	value form = arg(f->R);
 	if (form->T == type_form)
@@ -294,7 +288,7 @@ value type_evaluate(value f)
 	}
 
 // (set_std rec) Set the current context to the record.
-value type_set_std(value f)
+static value type_set_std(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_record)
@@ -306,4 +300,24 @@ value type_set_std(value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
+	}
+
+void define_sym(void)
+	{
+	define("std",Q0(type_std));
+	define("is_closed",Q(type_is_closed));
+	define("define",Q(type_define));
+	define("resolve",Q(type_resolve));
+	define("evaluate",Q(type_evaluate));
+	define("set_std",Q(type_set_std));
+	}
+
+void beg_sym(void)
+	{
+	Qstd = record_empty();
+	}
+
+void end_sym(void)
+	{
+	drop(Qstd);
 	}

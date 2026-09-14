@@ -7,6 +7,7 @@
 
 #include <basic.h>
 #include <bn.h>
+#include <define.h>
 #include <file.h>
 #include <file_str.h>
 #include <type_bn.h>
@@ -15,10 +16,10 @@
 #include <type_output.h>
 #include <type_str.h>
 
-value Qput;
-value Qnl;
-value Qfput;
-value Qfnl;
+static value Qput;
+static value Qnl;
+static value Qfput;
+static value Qfnl;
 
 static value op_put(FILE *fh, value f)
 	{
@@ -47,24 +48,24 @@ static value op_put(FILE *fh, value f)
 	return f;
 	}
 
-value type_put(value f)
+static value type_put(value f)
 	{
 	return op_put(stdout,f);
 	}
 
-value type_nl(value f)
+static value type_nl(value f)
 	{
 	nl();
 	return hold(QI);
 	(void)f;
 	}
 
-value type_say(value f)
+static value type_say(value f)
 	{
 	return A(A(hold(Qput),hold(f->R)),hold(Qnl));
 	}
 
-value type_fput(value f)
+static value type_fput(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -78,7 +79,7 @@ value type_fput(value f)
 	}
 	}
 
-value type_fnl(value f)
+static value type_fnl(value f)
 	{
 	value out = arg(f->R);
 	if (out->T == type_file)
@@ -92,14 +93,14 @@ value type_fnl(value f)
 	return f;
 	}
 
-value type_fsay(value f)
+static value type_fsay(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	return A(A(A(hold(Qfput),hold(f->L->R)),hold(f->R)),
 		A(hold(Qfnl),hold(f->L->R)));
 	}
 
-value type_fflush(value f)
+static value type_fflush(value f)
 	{
 	value out = arg(f->R);
 	if (out->T == type_file)
@@ -111,4 +112,31 @@ value type_fflush(value f)
 		f = hold(Qvoid);
 	drop(out);
 	return f;
+	}
+
+void define_output(void)
+	{
+	define("put",hold(Qput));
+	define("nl",hold(Qnl));
+	define("say",Q(type_say));
+	define("fput",hold(Qfput));
+	define("fnl",hold(Qfnl));
+	define("fsay",Q(type_fsay));
+	define("fflush",Q(type_fflush));
+	}
+
+void beg_output(void)
+	{
+	Qput = Q(type_put);
+	Qnl = Q0(type_nl);
+	Qfput = Q(type_fput);
+	Qfnl = Q(type_fnl);
+	}
+
+void end_output(void)
+	{
+	drop(Qput);
+	drop(Qnl);
+	drop(Qfput);
+	drop(Qfnl);
 	}

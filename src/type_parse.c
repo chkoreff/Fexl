@@ -5,6 +5,7 @@
 #include <value.h>
 
 #include <basic.h>
+#include <define.h>
 #include <parse.h>
 #include <report.h>
 #include <stream.h>
@@ -60,11 +61,11 @@ static value parse(value stream, value name)
 	return exp;
 	}
 
-static FILE *open_file(const char *name_s)
+static FILE *open_file(const char *name)
 	{
-	FILE *fh = fopen(name_s,"r");
+	FILE *fh = fopen(name,"r");
 	if (!fh)
-		could_not_open(name_s);
+		bad_name("Could not open source file ",name);
 	return fh;
 	}
 
@@ -88,7 +89,7 @@ value type_parse_file(value f)
 
 // (parse stream name) Parse the Fexl stream, using the given name for any
 // syntax error messages, and return the resulting form.
-value type_parse(value f)
+static value type_parse(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -116,4 +117,10 @@ value type_read_stream(value f)
 	drop(stream);
 	return f;
 	}
+	}
+
+void define_parse(void)
+	{
+	define("parse",Q(type_parse));
+	define("parse_file",Q(type_parse_file));
 	}

@@ -1,4 +1,2 @@
 extern value type_buf(value f);
-extern value type_buf_new(value f);
-extern value type_buf_put(value f);
-extern value type_buf_get(value f);
+extern void define_buf(void);

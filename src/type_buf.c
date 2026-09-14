@@ -6,6 +6,7 @@
 
 #include <basic.h>
 #include <buf_str.h>
+#include <define.h>
 #include <memory.h>
 #include <type_buf.h>
 #include <type_str.h>
@@ -23,7 +24,7 @@ static void clear_buf(value f)
 	}
 
 // buf_new returns a new empty character buffer.
-value type_buf_new(value f)
+static value type_buf_new(value f)
 	{
 	static struct value clear = {{.N=0}, {.clear=clear_buf}};
 	buffer buf = new_memory(sizeof(struct buffer));
@@ -33,7 +34,7 @@ value type_buf_new(value f)
 	}
 
 // (buf_put buf str) Appends the string to the buffer.
-value type_buf_put(value f)
+static value type_buf_put(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -54,7 +55,7 @@ value type_buf_put(value f)
 
 // (buf_get buf) Clear the buffer and return str, where str is the current
 // content of the buffer.
-value type_buf_get(value f)
+static value type_buf_get(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_buf)
@@ -63,4 +64,11 @@ value type_buf_get(value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
+	}
+
+void define_buf(void)
+	{
+	define("buf_new",Q0(type_buf_new));
+	define("buf_put",Q(type_buf_put));
+	define("buf_get",Q(type_buf_get));
 	}

@@ -1,6 +1,7 @@
 #include <value.h>
 
 #include <basic.h>
+#include <define.h>
 #include <signal.h> // sigaction etc.
 #include <stdio.h> // perror
 #include <stdlib.h> // exit
@@ -32,18 +33,12 @@ static void set_handler(int signum)
 		}
 	}
 
-void init_signal(void)
-	{
-	set_handler(SIGALRM);
-	set_handler(SIGCHLD);
-	}
-
 // (set_alarm seconds)
 // Set an alarm for the given number of seconds.  This is used primarily by
 // server processes so they don't wait forever for input from the client.  If
 // the alarm goes off it will interrupt the system call (fget, fread, etc.) and
 // the process can exit.
-value type_set_alarm(value f)
+static value type_set_alarm(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
@@ -55,4 +50,19 @@ value type_set_alarm(value f)
 		f = hold(Qvoid);
 	drop(x);
 	return f;
+	}
+
+void define_signal(void)
+	{
+	define("set_alarm",Q(type_set_alarm));
+	}
+
+void beg_signal(void)
+	{
+	set_handler(SIGALRM);
+	set_handler(SIGCHLD);
+	}
+
+void end_signal(void)
+	{
 	}

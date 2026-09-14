@@ -9,6 +9,7 @@ make buf
 make buf_str
 make convert
 make crypto
+make define
 make die
 make file
 make file_str
@@ -24,6 +25,7 @@ make show
 make str
 make stream
 make test
+make type_argv
 make type_bn
 make type_buf
 make type_cmp

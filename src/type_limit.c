@@ -1,6 +1,7 @@
 #include <value.h>
 
 #include <basic.h>
+#include <define.h>
 #include <limit.h>
 #include <type_limit.h>
 #include <type_num.h>
@@ -19,17 +20,24 @@ static value op_limit(value f, void op(unsigned long))
 	return f;
 	}
 
-value type_limit_time(value f)
+static value type_limit_time(value f)
 	{
 	return op_limit(f,limit_time);
 	}
 
-value type_limit_stack(value f)
+static value type_limit_stack(value f)
 	{
 	return op_limit(f,limit_stack);
 	}
 
-value type_limit_memory(value f)
+static value type_limit_memory(value f)
 	{
 	return op_limit(f,limit_memory);
+	}
+
+void define_limit(void)
+	{
+	define("limit_time",Q(type_limit_time));
+	define("limit_stack",Q(type_limit_stack));
+	define("limit_memory",Q(type_limit_memory));
 	}

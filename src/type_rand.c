@@ -1,12 +1,13 @@
 #include <value.h>
 
 #include <basic.h>
+#include <define.h>
 #include <stdlib.h> // srand rand RAND_MAX
 #include <type_num.h>
 #include <type_rand.h>
 
 // Seed rand with an arbitrary number between 0 and 1.
-value type_seed_rand(value f)
+static value type_seed_rand(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
@@ -23,8 +24,14 @@ value type_seed_rand(value f)
 
 // rand returns x, where x is a weakly pseudo-random number with a uniform
 // distribution over 0 <= x <= 1.
-value type_rand(value f)
+static value type_rand(value f)
 	{
 	return Qnum(((double)rand()) / ((double)RAND_MAX));
 	(void)f;
+	}
+
+void define_rand(void)
+	{
+	define("seed_rand",Q(type_seed_rand));
+	define("rand",Q0(type_rand));
 	}

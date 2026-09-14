@@ -1,11 +1,3 @@
-extern value Qput;
-extern value Qnl;
-extern value Qfput;
-extern value Qfnl;
-extern value type_put(value f);
-extern value type_nl(value f);
-extern value type_say(value f);
-extern value type_fput(value f);
-extern value type_fnl(value f);
-extern value type_fsay(value f);
-extern value type_fflush(value f);
+extern void define_output(void);
+extern void beg_output(void);
+extern void end_output(void);

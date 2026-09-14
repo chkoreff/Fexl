@@ -1,1 +1,1 @@
-extern value type_test_argv(value f);
+extern void define_test(void);

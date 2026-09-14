@@ -2,6 +2,7 @@
 #include <value.h>
 
 #include <basic.h>
+#include <define.h>
 #include <memory.h>
 #include <type_num.h>
 #include <type_record.h>
@@ -223,7 +224,7 @@ value record_empty(void)
 	return Qrecord(new_record(count,size));
 	}
 
-value type_empty(value f)
+static value type_empty(value f)
 	{
 	return record_empty();
 	(void)f;
@@ -255,19 +256,19 @@ static value op_set(value f, value op(value))
 	}
 
 // (set obj key val) Set key to val in obj, after evaluating val.
-value type_set(value f)
+static value type_set(value f)
 	{
 	return op_set(f,arg);
 	}
 
 // (setf obj key val) Set key to val in obj, without evaluating val.
-value type_setf(value f)
+static value type_setf(value f)
 	{
 	return op_set(f,hold);
 	}
 
 // (del obj key) Delete key from obj.
-value type_del(value f)
+static value type_del(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -292,7 +293,7 @@ value type_del(value f)
 	}
 
 // (get obj key) Look up key in record and return either no or (yes val).
-value type_get(value f)
+static value type_get(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -313,7 +314,7 @@ value type_get(value f)
 	}
 	}
 
-value type_record_copy(value f)
+static value type_record_copy(value f)
 	{
 	value obj = arg(f->R);
 	if (obj->T == type_record)
@@ -325,7 +326,7 @@ value type_record_copy(value f)
 	}
 
 // Return the number of items in the record.
-value type_record_count(value f)
+static value type_record_count(value f)
 	{
 	value obj = arg(f->R);
 	if (obj->T == type_record)
@@ -338,7 +339,7 @@ value type_record_count(value f)
 
 // (record_item obj pos) Return the {key val} pair in record obj at offset pos,
 // starting at zero.
-value type_record_item(value f)
+static value type_record_item(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -385,7 +386,7 @@ the index so you get the same value next time.
 		()
 	)
 */
-value type_fetch(value f)
+static value type_fetch(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	if (f->L->L->L == 0) return keep(f);
@@ -409,4 +410,17 @@ value type_fetch(value f)
 	drop(v);
 	return f;
 	}
+	}
+
+void define_record(void)
+	{
+	define("empty",Q0(type_empty));
+	define("set",Q(type_set));
+	define("setf",Q(type_setf));
+	define("del",Q(type_del));
+	define("get",Q(type_get));
+	define("record_copy",Q(type_record_copy));
+	define("record_count",Q(type_record_count));
+	define("record_item",Q(type_record_item));
+	define("fetch",Q(type_fetch));
 	}

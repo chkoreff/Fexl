@@ -2,6 +2,7 @@
 #include <value.h>
 
 #include <basic.h>
+#include <define.h>
 #include <type_cmp.h>
 #include <type_num.h>
 #include <type_str.h>
@@ -26,7 +27,7 @@ static value op_cmp(value f, int op(int))
 
 // (compare x y LT EQ GT)
 // Compare the numbers or strings and return LT, EQ, or GT.
-value type_compare(value f)
+static value type_compare(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	if (f->L->L->L == 0) return keep(f);
@@ -75,9 +76,20 @@ static int ne(int x) { return x != 0; }
 static int ge(int x) { return x >= 0; }
 static int gt(int x) { return x > 0; }
 
-value type_lt(value f) { return op_cmp(f,lt); }
-value type_le(value f) { return op_cmp(f,le); }
-value type_eq(value f) { return op_cmp(f,eq); }
-value type_ne(value f) { return op_cmp(f,ne); }
-value type_ge(value f) { return op_cmp(f,ge); }
-value type_gt(value f) { return op_cmp(f,gt); }
+static value type_lt(value f) { return op_cmp(f,lt); }
+static value type_le(value f) { return op_cmp(f,le); }
+static value type_eq(value f) { return op_cmp(f,eq); }
+static value type_ne(value f) { return op_cmp(f,ne); }
+static value type_ge(value f) { return op_cmp(f,ge); }
+static value type_gt(value f) { return op_cmp(f,gt); }
+
+void define_cmp(void)
+	{
+	define("compare",Q(type_compare));
+	define("lt",Q(type_lt));
+	define("le",Q(type_le));
+	define("eq",Q(type_eq));
+	define("ne",Q(type_ne));
+	define("ge",Q(type_ge));
+	define("gt",Q(type_gt));
+	}

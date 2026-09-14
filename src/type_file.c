@@ -3,6 +3,7 @@
 #include <value.h>
 
 #include <basic.h>
+#include <define.h>
 #include <die.h>
 #include <dirent.h> // opendir readdir closedir
 #include <memory.h>
@@ -14,9 +15,9 @@
 #include <type_str.h>
 #include <unistd.h> // readlink
 
-value Qstdin;
-value Qstdout;
-value Qstderr;
+static value Qstdin;
+static value Qstdout;
+static value Qstderr;
 
 value type_file(value f)
 	{
@@ -44,7 +45,7 @@ value Qfile(FILE *fh)
 
 // (fopen path mode) Open a file and return fh, where fh is the open file
 // handle or void on failure.
-value type_fopen(value f)
+static value type_fopen(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -67,7 +68,7 @@ value type_fopen(value f)
 
 // (fclose fh) Close the file handle, and set it to void so it doesn't core
 // dump if you mistakenly try to close it again.
-value type_fclose(value f)
+static value type_fclose(value f)
 	{
 	value out = arg(f->R);
 	if (out->T == type_file)
@@ -85,18 +86,18 @@ value type_fclose(value f)
 	}
 
 // (fgetc fh) returns the next single byte from the file, or void if none.
-value type_fgetc(value f)
+static value type_fgetc(value f)
 	{
 	return op_getc(f,type_file,(input)fgetc);
 	}
 
 // (fget fh) returns the next UTF-8 character from the file, or void if none.
-value type_fget(value f)
+static value type_fget(value f)
 	{
 	return op_get(f,type_file,(input)fgetc);
 	}
 
-value type_clearerr(value f)
+static value type_clearerr(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_file)
@@ -110,7 +111,7 @@ value type_clearerr(value f)
 	return f;
 	}
 
-value type_feof(value f)
+static value type_feof(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_file)
@@ -122,7 +123,7 @@ value type_feof(value f)
 	}
 
 // (flook fh) returns the next byte from the file without consuming it.
-value type_flook(value f)
+static value type_flook(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_file)
@@ -146,7 +147,7 @@ value type_flook(value f)
 
 // (remove path) Remove path from file system; return 0 if successful or -1
 // otherwise.
-value type_remove(value f)
+static value type_remove(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
@@ -190,7 +191,7 @@ static int is_newer(const char *file1, const char *file2)
 	return status_1.st_mtime > status_2.st_mtime;
 	}
 
-value type_is_newer(value f)
+static value type_is_newer(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -229,13 +230,13 @@ static value op_stat_type(value f, mode_t mask)
 	}
 
 // (is_file path) Return true if the path is a regular file.
-value type_is_file(value f)
+static value type_is_file(value f)
 	{
 	return op_stat_type(f,S_IFREG);
 	}
 
 // (is_dir path) Return true if the path is a directory.
-value type_is_dir(value f)
+static value type_is_dir(value f)
 	{
 	return op_stat_type(f,S_IFDIR);
 	}
@@ -261,14 +262,14 @@ static value op_flock(value f, int operation)
 
 // (flock_ex fh) Obtain an exclusive lock on the file handle, blocking as long
 // as necessary.
-value type_flock_ex(value f) { return op_flock(f,LOCK_EX); }
+static value type_flock_ex(value f) { return op_flock(f,LOCK_EX); }
 
 // (flock_sh fh) Obtain a shared lock on the file handle, blocking as long
 // as necessary.
-value type_flock_sh(value f) { return op_flock(f,LOCK_SH); }
+static value type_flock_sh(value f) { return op_flock(f,LOCK_SH); }
 
 // (flock_un fh) Unlock the file handle.
-value type_flock_un(value f) { return op_flock(f,LOCK_UN); }
+static value type_flock_un(value f) { return op_flock(f,LOCK_UN); }
 
 // Call readlink, returning a string.
 static string safe_readlink(const char *path)
@@ -299,7 +300,7 @@ static string safe_readlink(const char *path)
 		}
 	}
 
-value type_readlink(value f)
+static value type_readlink(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
@@ -312,7 +313,7 @@ value type_readlink(value f)
 
 // \code=(mkdir path mode) Attempt to create a directory named path.
 // See mkdir(2) for details.  An example for mode is (oct "775").
-value type_mkdir(value f)
+static value type_mkdir(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -335,7 +336,7 @@ value type_mkdir(value f)
 
 // \code=(rmdir path) Deletes a directory, which must be empty.
 // See rmdir(2) for details.
-value type_rmdir(value f)
+static value type_rmdir(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
@@ -351,7 +352,7 @@ value type_rmdir(value f)
 	}
 
 // \code=(ftruncate fh len) Truncate a file to the given length.
-value type_ftruncate(value f)
+static value type_ftruncate(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -394,12 +395,12 @@ static value op_seek(value f, int whence)
 	}
 
 // \code=(fseek_set fh offset)
-value type_fseek_set(value f) { return op_seek(f,SEEK_SET); }
-value type_fseek_cur(value f) { return op_seek(f,SEEK_CUR); }
-value type_fseek_end(value f) { return op_seek(f,SEEK_END); }
+static value type_fseek_set(value f) { return op_seek(f,SEEK_SET); }
+static value type_fseek_cur(value f) { return op_seek(f,SEEK_CUR); }
+static value type_fseek_end(value f) { return op_seek(f,SEEK_END); }
 
 // \offset=(ftell fh)
-value type_ftell(value f)
+static value type_ftell(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_file)
@@ -411,7 +412,7 @@ value type_ftell(value f)
 	}
 
 // \n=(fileno fh)
-value type_fileno(value f)
+static value type_fileno(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_file)
@@ -424,7 +425,7 @@ value type_fileno(value f)
 
 // \str=(fread fh size) Read at most size bytes from the file, clipping if it
 // reaches end of file.
-value type_fread(value f)
+static value type_fread(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -454,7 +455,7 @@ value type_fread(value f)
 
 // \fh=(mkfile path mode) Atomically create and open a file for reading and
 // writing.  Returns void if the file already existed.
-value type_mkfile(value f)
+static value type_mkfile(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -485,7 +486,7 @@ static value dir_names(DIR *dir)
 
 // \names=(dir_names path) Return the list of names in a directory.  The names
 // are returned in arbitrary order and include the special files "." and "..".
-value type_dir_names(value f)
+static value type_dir_names(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_str)
@@ -534,20 +535,20 @@ static value op_stat(value f, unsigned long op(struct stat *status))
 	}
 
 // Return the modification time of a file in epoch seconds.
-value type_mod_time(value f)
+static value type_mod_time(value f)
 	{
 	return op_stat(f,get_st_mtime);
 	}
 
 // Return the size of a file.
-value type_file_size(value f)
+static value type_file_size(value f)
 	{
 	return op_stat(f,get_st_size);
 	}
 
 // (symlink target linkpath) Create a symbolic link named linkpath which points
 // to target.  Return the numeric result of calling symlink(2).
-value type_symlink(value f)
+static value type_symlink(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -565,7 +566,7 @@ value type_symlink(value f)
 
 // (rename source target) Rename source path as target path.  Return the
 // numeric value of calling rename(2).
-value type_rename(value f)
+static value type_rename(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	{
@@ -579,4 +580,55 @@ value type_rename(value f)
 	drop(y);
 	return f;
 	}
+	}
+
+void define_file(void)
+	{
+	define("stdin",hold(Qstdin));
+	define("stdout",hold(Qstdout));
+	define("stderr",hold(Qstderr));
+	define("fopen",Q(type_fopen));
+	define("fclose",Q(type_fclose));
+	define("fgetc",Q(type_fgetc));
+	define("fget",Q(type_fget));
+	define("clearerr",Q(type_clearerr));
+	define("feof",Q(type_feof));
+	define("flook",Q(type_flook));
+	define("remove",Q(type_remove));
+	define("is_newer",Q(type_is_newer));
+	define("is_file",Q(type_is_file));
+	define("is_dir",Q(type_is_dir));
+	define("flock_ex",Q(type_flock_ex));
+	define("flock_sh",Q(type_flock_sh));
+	define("flock_un",Q(type_flock_un));
+	define("readlink",Q(type_readlink));
+	define("mkdir",Q(type_mkdir));
+	define("rmdir",Q(type_rmdir));
+	define("ftruncate",Q(type_ftruncate));
+	define("fseek_set",Q(type_fseek_set));
+	define("fseek_cur",Q(type_fseek_cur));
+	define("fseek_end",Q(type_fseek_end));
+	define("ftell",Q(type_ftell));
+	define("fileno",Q(type_fileno));
+	define("fread",Q(type_fread));
+	define("mkfile",Q(type_mkfile));
+	define("dir_names",Q(type_dir_names));
+	define("mod_time",Q(type_mod_time));
+	define("file_size",Q(type_file_size));
+	define("symlink",Q(type_symlink));
+	define("rename",Q(type_rename));
+	}
+
+void beg_file(void)
+	{
+	Qstdin = Qfile(stdin);
+	Qstdout = Qfile(stdout);
+	Qstderr = Qfile(stderr);
+	}
+
+void end_file(void)
+	{
+	drop(Qstdin);
+	drop(Qstdout);
+	drop(Qstderr);
 	}

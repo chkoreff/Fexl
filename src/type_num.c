@@ -3,6 +3,7 @@
 #include <value.h>
 
 #include <basic.h>
+#include <define.h>
 #include <convert.h>
 #include <format.h>
 #include <type_num.h>
@@ -51,7 +52,7 @@ unsigned long get_ulong(value x)
 	return n >= 0 ? n : 0;
 	}
 
-value type_num_str(value f)
+static value type_num_str(value f)
 	{
 	value x = arg(f->R);
 	if (x->T == type_num)
@@ -62,7 +63,13 @@ value type_num_str(value f)
 	return f;
 	}
 
-value type_is_num(value f)
+static value type_is_num(value f)
 	{
 	return op_is_type(f,type_num);
+	}
+
+void define_num(void)
+	{
+	define("num_str",Q(type_num_str));
+	define("is_num",Q(type_is_num));
 	}

@@ -8,6 +8,7 @@
 #include <value.h>
 
 #include <basic.h>
+#include <define.h>
 #include <format.h>
 #include <type_num.h>
 #include <type_str.h>
@@ -15,7 +16,7 @@
 
 // Return the current time as the number of seconds since the Epoch,
 // 1970-01-01 00:00:00 +0000 (UTC).
-value type_time(value f)
+static value type_time(value f)
 	{
 	time_t n;
 	time(&n);
@@ -66,25 +67,25 @@ static value op_strptime(value f,
 	}
 
 // Convert epoch to string in local time zone.
-value type_localtime(value f)
+static value type_localtime(value f)
 	{
 	return op_strftime(f,localtime);
 	}
 
 // Convert epoch to string in UTC time zone.
-value type_gmtime(value f)
+static value type_gmtime(value f)
 	{
 	return op_strftime(f,gmtime);
 	}
 
 // Convert string to epoch in local time zone.
-value type_timelocal(value f)
+static value type_timelocal(value f)
 	{
 	return op_strptime(f,timelocal);
 	}
 
 // Convert string to epoch in UTC time zone.
-value type_timegm(value f)
+static value type_timegm(value f)
 	{
 	return op_strptime(f,timegm);
 	}
@@ -98,7 +99,7 @@ static string microtime(void)
 	return str_new_data0(format_uint64_t(n));
 	}
 
-value type_microtime(value f)
+static value type_microtime(value f)
 	{
 	return Qstr(microtime());
 	(void)f;
@@ -115,7 +116,7 @@ static int get_dow(int y, int m, int d)
 
 // Return day of week for y,m,d.
 // 1:Mon 2:Tue 3:Wed 4:Thu 5:Fri 6:Sat 7:Sun
-value type_dow(value f)
+static value type_dow(value f)
 	{
 	if (f->L->L == 0) return keep(f);
 	if (f->L->L->L == 0) return keep(f);
@@ -139,4 +140,15 @@ value type_dow(value f)
 	drop(a3);
 	return f;
 	}
+	}
+
+void define_time(void)
+	{
+	define("time",Q0(type_time));
+	define("localtime",Q(type_localtime));
+	define("gmtime",Q(type_gmtime));
+	define("timelocal",Q(type_timelocal));
+	define("timegm",Q(type_timegm));
+	define("microtime",Q0(type_microtime));
+	define("dow",Q(type_dow));
 	}

@@ -9,9 +9,19 @@
 #include <type_math.h>
 #include <type_num.h>
 #include <type_output.h>
+#include <type_record.h>
 #include <type_str.h>
 #include <type_sym.h>
 #include <type_tuple.h>
+
+static int done;
+static type t_Y;
+static type t_yield;
+static type t_concat;
+static type t_say;
+static type t_add;
+static type t_mul;
+static type t_evaluate;
 
 static const char *type_name(type t)
 	{
@@ -23,25 +33,25 @@ static const char *type_name(type t)
 	if (t == type_quo) return "quo";
 	if (t == type_ref) return "ref";
 
-	if (t == type_T) return "T";
-	if (t == type_F) return "F";
-	if (t == type_I) return "I";
-	if (t == type_Y) return "Y";
-	if (t == type_once) return "once";
-	if (t == type_void) return "void";
-	if (t == type_yield) return "yield";
-	if (t == type_concat) return "concat";
-	if (t == type_say) return "say";
-	if (t == type_add) return "add";
-	if (t == type_mul) return "mul";
 	if (t == type_list) return "list";
 	if (t == type_D) return "D";
 	if (t == type_E) return "E";
-	if (t == type_evaluate) return "evaluate";
+	if (t == type_void) return "void";
 	if (t == type_pair) return "pair";
 	if (t == type_null) return "null";
 	if (t == type_tuple) return "tuple";
-	if (t == type_chain) return "::";
+	if (t == type_T) return "T";
+	if (t == type_F) return "F";
+	if (t == QI->T) return "I";
+	if (t == Qonce->T) return "once";
+
+	if (t == t_Y) return "Y";
+	if (t == t_yield) return "yield";
+	if (t == t_concat) return "concat";
+	if (t == t_say) return "say";
+	if (t == t_add) return "add";
+	if (t == t_mul) return "mul";
+	if (t == t_evaluate) return "evaluate";
 
 	return "TYPE";
 	}
@@ -125,8 +135,33 @@ void show(const char *name, value f)
 	put(name);show_exp(f);nl();
 	}
 
+type get_type(const char *s_key)
+	{
+	type t;
+	value key = Qstr0(s_key);
+	value val = record_find(Qstd,key);
+	if (val)
+		t = val->T;
+	else
+		t = 0;
+	drop(key);
+	return t;
+	}
+
 value type_show(value f)
 	{
+	if (!done)
+	{
+	done = 1;
+	t_Y = get_type("@");
+	t_yield = get_type("yield");
+	t_concat = get_type(".");
+	t_say = get_type("say");
+	t_add = get_type("+");
+	t_mul = get_type("*");
+	t_evaluate = get_type("evaluate");
+	}
+
 	show_exp(f->R);nl();
 	return hold(QI);
 	}
