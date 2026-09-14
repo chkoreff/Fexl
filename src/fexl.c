@@ -85,7 +85,6 @@ static void define_core(void)
 	define_sym();
 	define_time();
 	define_tuple();
-	define_use_test();
 	define_var();
 	}
 
@@ -176,11 +175,7 @@ static void eval_script(void)
 	define("load",Q(type_load));
 	define("evaluate",Q(type_evaluate));
 
-	if (ch != '0')
-		{
-		define("use_lib",Q(type_use_lib)); // LATER 20260914 deprecated
-		load("main");
-		}
+	if (ch != '0') load("main");
 
 	use_file(main_argc > 1 ? main_argv[1] : "");
 	}

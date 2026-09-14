@@ -382,8 +382,6 @@ uri_escape
 uri_unescape
 use
 use_context
-use_lib
-use_test
 usleep
 var_get
 var_getf
