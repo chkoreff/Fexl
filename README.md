@@ -88,12 +88,6 @@ To see the current version number (http://semver.org):
 cat VERSION
 ```
 
-## Test sort in GNU coreutils.
-
-```
-(cd test/ls_bug; ./try)
-```
-
 ## Guide to source code
 
 The `main` routine is in fexl.c.
