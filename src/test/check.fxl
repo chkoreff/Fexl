@@ -72,8 +72,7 @@
 # Run a shell command with no input.
 \sh=(\cmd run_program ["/bin/sh" "-c" (to_str cmd)] "")
 
-\cmd_fexl=(join_list " " argv_fexl)
-\cmd_show=(to_str [cmd_fexl" test/show.fxl "])
+\cmd_show=(to_str [(argv 0)" test/show.fxl "])
 
 \run_show=
 	(\name\extra

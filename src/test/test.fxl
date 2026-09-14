@@ -54,10 +54,8 @@
 	say ["\status="status]
 	)
 
-\cmd_fexl=(join_list " " argv_fexl)
-
-\run_fexl_file=(\name run_command [cmd_fexl" test/"name".fxl"])
-\run_fexl_text=(run_command cmd_fexl)
+\run_fexl_file=(\name run_command [(argv 0)" test/"name".fxl"])
+\run_fexl_text=(run_command (argv 0))
 
 define "div" div
 define "show_list" show_list

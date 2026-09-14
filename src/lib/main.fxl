@@ -1,6 +1,4 @@
 #
-define "argv_fexl" [(argv 0)]
-
 use_lib "extra.fxl"
 use_lib "bool.fxl"
 use_lib "math.fxl"

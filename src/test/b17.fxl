@@ -91,7 +91,7 @@ run_test "test_run_program";
 
 \try=
 	(\code
-	run_program argv_fexl code show_result
+	run_program [(argv 0)] code show_result
 	)
 
 try
