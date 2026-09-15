@@ -5,6 +5,7 @@
 #include <type_argv.h>
 #include <type_num.h>
 #include <type_parse.h>
+#include <type_record.h>
 #include <type_str.h>
 #include <type_sym.h>
 
@@ -65,7 +66,36 @@ void use_file(const char *name)
 
 void use_lib(const char *name)
 	{
-	use(concat(hold(Qdir_lib),Qstr0(name)));
+	value f = eval_file(concat(hold(Qdir_lib),Qstr0(name)));
+	while (1)
+		{
+		if (f->T == type_list)
+			{
+			value head = arg(f->L);
+			value tail = arg(f->R);
+			if (head->T == type_list)
+				{
+				value key = arg(head->L);
+				if (key->T == type_str)
+					{
+					value args = arg(head->R);
+					if (args->T == type_list)
+						record_set(Qstd,key,hold(args->L));
+					drop(args);
+					}
+				drop(key);
+				}
+
+			drop(head);
+			drop(f);
+			f = tail;
+			}
+		else
+			{
+			drop(f);
+			break;
+			}
+		}
 	}
 
 void define_argv(void)

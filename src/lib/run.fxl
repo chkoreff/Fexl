@@ -76,10 +76,12 @@
 	if (eq option "start") start_server
 	)
 
-define "run_function" run_function
-define "run_program" run_program
-define "run_function_filter" run_function_filter
-define "run_filter" run_filter
-define "grab_output" grab_output
-define "stop_server" stop_server
-define "run_server" run_server
+[
+["run_function" run_function]
+["run_program" run_program]
+["run_function_filter" run_function_filter]
+["run_filter" run_filter]
+["grab_output" grab_output]
+["stop_server" stop_server]
+["run_server" run_server]
+]

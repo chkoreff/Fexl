@@ -167,5 +167,7 @@ set_handler type_buf
 
 \show=(\\x show x nl)
 
-define "type_name" type_name
-define "show" show
+[
+["type_name" type_name]
+["show" show]
+]

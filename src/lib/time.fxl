@@ -39,7 +39,9 @@
 	v
 	)
 
-define "split_microtime" split_microtime
-define "subtract_microtime" subtract_microtime
-define "show_microtime" show_microtime
-define "trace_elapsed" trace_elapsed
+[
+["split_microtime" split_microtime]
+["subtract_microtime" subtract_microtime]
+["show_microtime" show_microtime]
+["trace_elapsed" trace_elapsed]
+]

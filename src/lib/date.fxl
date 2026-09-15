@@ -286,31 +286,33 @@
 	ymd_date y m d
 	)
 
-define "long_month_names" long_month_names
-define "short_month_names" short_month_names
-define "long_month_name" long_month_name
-define "short_month_name" short_month_name
-define "date_year" date_year
-define "date_month" date_month
-define "date_ymd" date_ymd
-define "split_date" split_date
-define "date_normal" date_normal
-define "date_quarter" date_quarter
-define "month_ym" month_ym
-define "ym_month" ym_month
-define "ymd_date" ymd_date
-define "month_before" month_before
-define "month_after" month_after
-define "ym_num_days" ym_num_days
-define "fill_day" fill_day
-define "day_after" day_after
-define "date_end_prev_month" date_end_prev_month
-define "date_end_prev_quarter" date_end_prev_quarter
-define "date_end_prev_year" date_end_prev_year
-define "same_quarter" same_quarter
-define "year_num_days" year_num_days
-define "day_in_year" day_in_year
-define "count_days" count_days
-define "day_of_week" day_of_week
-define "add_days" add_days
-define "add_year" add_year
+[
+["long_month_names" long_month_names]
+["short_month_names" short_month_names]
+["long_month_name" long_month_name]
+["short_month_name" short_month_name]
+["date_year" date_year]
+["date_month" date_month]
+["date_ymd" date_ymd]
+["split_date" split_date]
+["date_normal" date_normal]
+["date_quarter" date_quarter]
+["month_ym" month_ym]
+["ym_month" ym_month]
+["ymd_date" ymd_date]
+["month_before" month_before]
+["month_after" month_after]
+["ym_num_days" ym_num_days]
+["fill_day" fill_day]
+["day_after" day_after]
+["date_end_prev_month" date_end_prev_month]
+["date_end_prev_quarter" date_end_prev_quarter]
+["date_end_prev_year" date_end_prev_year]
+["same_quarter" same_quarter]
+["year_num_days" year_num_days]
+["day_in_year" day_in_year]
+["count_days" count_days]
+["day_of_week" day_of_week]
+["add_days" add_days]
+["add_year" add_year]
+]

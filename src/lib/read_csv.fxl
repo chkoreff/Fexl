@@ -83,12 +83,14 @@
 \read_tsv_chars=(read_xsv_chars TAB)
 \read_tsv_file=(read_xsv_file TAB)
 
-define "read_xsv_string" read_xsv_string
-define "read_xsv_chars" read_xsv_chars
-define "read_xsv_file" read_xsv_file
-define "read_csv_string" read_csv_string
-define "read_csv_chars" read_csv_chars
-define "read_csv_file" read_csv_file
-define "read_tsv_string" read_tsv_string
-define "read_tsv_chars" read_tsv_chars
-define "read_tsv_file" read_tsv_file
+[
+["read_xsv_string" read_xsv_string]
+["read_xsv_chars" read_xsv_chars]
+["read_xsv_file" read_xsv_file]
+["read_csv_string" read_csv_string]
+["read_csv_chars" read_csv_chars]
+["read_csv_file" read_csv_file]
+["read_tsv_string" read_tsv_string]
+["read_tsv_chars" read_tsv_chars]
+["read_tsv_file" read_tsv_file]
+]

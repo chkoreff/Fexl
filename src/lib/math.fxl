@@ -20,10 +20,12 @@
 		(bn_gcd b (bn_mod a b))
 	)
 
-define "neg" neg
-define "max" max
-define "min" min
-define "mod" mod
-define "tau" tau
-define "round2" round2
-define "bn_gcd" bn_gcd
+[
+["neg" neg]
+["max" max]
+["min" min]
+["mod" mod]
+["tau" tau]
+["round2" round2]
+["bn_gcd" bn_gcd]
+]

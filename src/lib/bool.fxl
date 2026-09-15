@@ -3,6 +3,8 @@
 \or=(\\x\\y x T y)
 \not=(\\x x F T)
 
-define "and" and
-define "not" not
-define "or" or
+[
+["and" and]
+["not" not]
+["or" or]
+]
