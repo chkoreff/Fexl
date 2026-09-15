@@ -48,9 +48,14 @@ static value Qdirname(value x)
 	return f;
 	}
 
+static value eval_file(value name)
+	{
+	return eval(A(Q(type_evaluate),A(Q(type_parse_file),name)));
+	}
+
 static void use(value name)
 	{
-	drop(eval(A(Q(type_evaluate),A(Q(type_parse_file),name))));
+	drop(eval_file(name));
 	}
 
 void use_file(const char *name)
