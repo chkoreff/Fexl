@@ -2,7 +2,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <define.h>
 #include <report.h>
 #include <stdio.h>
 #include <string.h> // strcmp strlen

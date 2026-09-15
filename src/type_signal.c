@@ -1,7 +1,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <define.h>
 #include <signal.h> // sigaction etc.
 #include <stdio.h> // perror
 #include <stdlib.h> // exit

@@ -1,7 +1,7 @@
 #include <str.h>
 #include <value.h>
 
-#include <define.h>
+#include <basic.h>
 #include <type_record.h>
 #include <type_str.h>
 #include <type_sym.h>

@@ -5,7 +5,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <define.h>
 #include <parse.h>
 #include <report.h>
 #include <stream.h>

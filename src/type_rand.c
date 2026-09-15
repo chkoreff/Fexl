@@ -1,7 +1,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <define.h>
 #include <stdlib.h> // srand rand RAND_MAX
 #include <type_num.h>
 #include <type_rand.h>

@@ -1,7 +1,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <define.h>
 
 value QI;
 value QT;

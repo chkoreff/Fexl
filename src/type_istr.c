@@ -2,7 +2,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <define.h>
 #include <memory.h>
 #include <type_input.h>
 #include <type_istr.h>

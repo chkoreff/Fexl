@@ -6,7 +6,6 @@
 
 #include <basic.h>
 #include <buf_str.h>
-#include <define.h>
 #include <memory.h>
 #include <type_buf.h>
 #include <type_str.h>

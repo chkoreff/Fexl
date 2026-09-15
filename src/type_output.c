@@ -7,7 +7,6 @@
 
 #include <basic.h>
 #include <bn.h>
-#include <define.h>
 #include <file.h>
 #include <file_str.h>
 #include <type_bn.h>

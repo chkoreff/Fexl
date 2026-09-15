@@ -1,7 +1,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <define.h>
 #include <limit.h>
 #include <type_limit.h>
 #include <type_num.h>

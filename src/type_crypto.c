@@ -3,7 +3,6 @@
 
 #include <basic.h>
 #include <crypto.h>
-#include <define.h>
 #include <type_crypto.h>
 #include <type_num.h>
 #include <type_str.h>

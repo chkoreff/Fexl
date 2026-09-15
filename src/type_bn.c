@@ -6,7 +6,6 @@
 
 #include <basic.h>
 #include <bn.h>
-#include <define.h>
 #include <type_bn.h>
 #include <type_num.h>
 #include <type_str.h>

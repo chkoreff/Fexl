@@ -17,6 +17,7 @@ extern value maybe(value x);
 extern value boolean(int x);
 extern value op_is_type(value f, type t);
 extern value Q0(type T);
+extern void define(const char *s_key, value val);
 extern void define_basic(void);
 extern void beg_basic(void);
 extern void end_basic(void);

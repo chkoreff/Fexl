@@ -5,7 +5,6 @@
 #include <buf.h>
 
 #include <basic.h>
-#include <define.h>
 #include <stream.h>
 #include <type_buf.h>
 #include <type_num.h>

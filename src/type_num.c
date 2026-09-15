@@ -3,7 +3,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <define.h>
 #include <convert.h>
 #include <format.h>
 #include <type_num.h>

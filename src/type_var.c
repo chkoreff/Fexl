@@ -1,7 +1,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <define.h>
 #include <type_var.h>
 
 // A var is a mutable variable where you can put and get values.  This can help

@@ -2,7 +2,6 @@
 #include <str.h>
 
 #include <basic.h>
-#include <define.h>
 #include <type_hex.h>
 #include <type_str.h>
 

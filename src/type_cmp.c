@@ -2,7 +2,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <define.h>
 #include <type_cmp.h>
 #include <type_num.h>
 #include <type_str.h>

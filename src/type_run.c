@@ -3,7 +3,6 @@
 
 #include <arpa/inet.h> // inet_addr
 #include <basic.h>
-#include <define.h>
 #include <die.h>
 #include <memory.h>
 #include <netinet/in.h> // IPPROTO_TCP INADDR_ANY (BSD)

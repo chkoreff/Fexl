@@ -2,7 +2,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <define.h>
 #include <die.h>
 #include <report.h>
 #include <type_record.h>

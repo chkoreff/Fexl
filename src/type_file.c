@@ -3,7 +3,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <define.h>
 #include <die.h>
 #include <dirent.h> // opendir readdir closedir
 #include <memory.h>
