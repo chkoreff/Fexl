@@ -1465,5 +1465,11 @@ try "b"
 try "c"
 )
 
+(
+# Force a cycle in std, but no leak will occur.
+\x=std
+define "x" x
+)
+
 \#
 Extra stuff not parsed.

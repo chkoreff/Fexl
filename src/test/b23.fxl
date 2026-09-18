@@ -3,16 +3,16 @@
 say + - # core
 use if # extra
 and or not # bool
-neg max # math
+neg max # math2
 map sort_all # list
 as_str trim_spaces # format
 say_data # indent
 get_key put_key # assoc
-oct hex # hex
+oct hex # hex2
 tag tr # html
-trace_elapsed # time
+trace_elapsed # time2
 split_date day_of_week # date
-grab_output # run
+grab_output # run2
 read_file # read
 read_csv_file # read_csv
 read_ssv_file # read_ssv

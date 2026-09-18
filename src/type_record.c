@@ -7,17 +7,23 @@
 #include <type_record.h>
 #include <type_str.h>
 
-static void clear_record(value f)
+void record_clear(value f)
 	{
 	struct record *rec = f->v_ptr;
 	unsigned long i;
-	// Drop each item in record
 	for (i = 0; i < rec->count; i++)
 		{
 		struct item *item = rec->vec + i;
 		drop(item->key);
 		drop(item->val);
 		}
+	rec->count = 0;
+	}
+
+static void clear_record(value f)
+	{
+	struct record *rec = f->v_ptr;
+	record_clear(f);
 	free_memory(rec->vec, sizeof(struct item[rec->size]));
 	free_memory(rec,sizeof(struct record));
 	}

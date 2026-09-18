@@ -317,5 +317,7 @@ void beg_sym(void)
 
 void end_sym(void)
 	{
+	// Clear Qstd in case the user created a cycle.
+	record_clear(Qstd);
 	drop(Qstd);
 	}

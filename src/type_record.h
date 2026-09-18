@@ -11,6 +11,7 @@ struct record
 	struct item *vec;
 	};
 
+extern void record_clear(value f);
 extern value record_find(value obj, value key);
 extern value type_record(value f);
 extern void record_set(value obj, value key, value val);
