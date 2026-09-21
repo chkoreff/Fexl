@@ -1,0 +1,53 @@
+#
+\make_flintstone=
+	(\\form
+	make_load
+		form
+		(
+		define "announce" (\name say ["I am "name"."])
+		)
+	)
+
+make_flintstone
+	(
+	say "  read 1"
+	\;
+	[
+	["fred" (announce "Fred")]
+	["wilma" (announce "Wilma")]
+	]
+	)
+	\\load_flintstone_1
+
+make_flintstone
+	(
+	say "  read 2"
+	\;
+	[
+	["barney" (announce "Barney")]
+	["betty" (announce "Betty")]
+	]
+	)
+	\\load_flintstone_2
+
+\\load_flintstone=
+	(
+	load_flintstone_1
+	load_flintstone_2
+	)
+
+\\load_flintstone=
+	(
+	say "= load_flintstone"
+	load_flintstone
+	)
+
+load_flintstone
+load_flintstone
+
+evaluate \;
+
+say "Meet the Flintstones."
+
+fred wilma
+barney betty

@@ -64,10 +64,43 @@ void use_file(const char *name)
 	use(Qstr0(name));
 	}
 
-void use_lib(const char *name)
+static value eval_lib(const char *name)
 	{
-	value list = eval_file(concat(hold(Qdir_lib),Qstr0(name)));
-	record_fill(Qstd,list);
+	return eval_file(concat(hold(Qdir_lib),Qstr0(name)));
+	}
+
+static void import_record(value cx)
+	{
+	struct record *rec = cx->v_ptr;
+	unsigned long i;
+	for (i = 0; i < rec->count; i++)
+		{
+		struct item *item = rec->vec + i;
+		record_set(Qstd,item->key,hold(item->val));
+		}
+	}
+
+void load_extend(void)
+	{
+	value list;
+	value cx;
+	value save = Qstd;
+	Qstd = record_copy(Qstd);
+
+	list = eval_lib("extend.fxl");
+	cx = record_empty();
+	record_fill(cx,list);
+
+	drop(Qstd);
+	Qstd = save;
+
+	import_record(cx);
+	drop(cx);
+	}
+
+void load_main(void)
+	{
+	drop(eval_lib("main.fxl"));
 	}
 
 void load_argv(void)

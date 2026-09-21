@@ -61,13 +61,21 @@ eq name "minimal"
 	[QU QU]
 	]
 
-\args=["../bin/fexl0" "test/minimal.fxl"; args]
+\prog=(. (argv 0) "0")
+\args=[prog "test/minimal.fxl"; args]
 
 # Print the shell command that would invoke this test.
 \cmd=(join_list " "; map sh_quote args)
 
 say cmd
 run_exec (map to_str args) ""
+);
+
+# Run this test with minimal environment.
+eq name "b54"
+(
+\prog=(. (argv 0) "0")
+run_exec [prog "test/b54.fxl"] ""
 );
 
 # Other normal tests run here.

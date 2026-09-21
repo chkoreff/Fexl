@@ -199,7 +199,7 @@ void record_del(value obj, value key)
 		}
 	}
 
-static value record_copy(value obj)
+value record_copy(value obj)
 	{
 	struct record *old_rec = obj->v_ptr;
 	unsigned long count = old_rec->count;

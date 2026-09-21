@@ -1,0 +1,4 @@
+# Run this with fexl0 to test load_main.
+load_main
+evaluate \;
+say (quote "<br>")

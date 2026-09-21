@@ -1,0 +1,325 @@
+#
+load_argv
+load_basic
+load_cmp
+load_math
+load_output
+load_parse
+load_record
+load_str
+load_sym
+evaluate \;
+
+\use_context=
+	(\\cx\\body
+	\save=std
+	set_std cx
+	\x=body
+	set_std save
+	x
+	)
+
+\restrict=(use_context empty)
+
+\guard=(use_context (record_copy std))
+
+\walk_record= # LATER 20260316 built-in
+	(\rec\f
+	\n=(record_count rec)
+	(@\\loop\i
+	ge i n ();
+	record_item rec i \k\\v
+	f k v;
+	loop (+ 1 i)
+	)
+	0
+	)
+
+\import_record=
+	(\cx
+	walk_record cx define
+	)
+
+\\make_load=
+	(\\form\\predefine
+	{
+	(
+	import_record
+		(\=
+		\list=
+			(
+			restrict;
+			predefine
+			evaluate form
+			)
+
+		\cx=empty
+		record_fill cx list
+		cx
+		)
+	)
+	}
+	)
+
+\read_lib=
+	(\name
+	parse_file (. dir_lib name)
+	)
+
+\make_lib=
+	(\name
+	make_load (read_lib name)
+	)
+
+\\load_top=
+	(
+	define "evaluate" evaluate
+	)
+
+#[ Level 1
+make_lib "bool.fxl"
+	(
+	load_basic
+	)
+	\\load_bool
+
+make_lib "extra.fxl"
+	(
+	load_argv
+	load_basic
+	load_cmp
+	load_file
+	load_math
+	load_output
+	load_parse
+	load_record
+	load_run
+	load_str
+	load_sym
+	load_top
+	)
+	\\load_extra
+
+# Extend load_extra with some functions defined above.
+\\load_extra=
+	(
+	load_extra
+	define "use_context" use_context
+	define "restrict" restrict
+	define "guard" guard
+	define "walk_record" walk_record
+	define "make_load" make_load
+	)
+
+make_lib "list.fxl"
+	(
+	load_basic
+	load_bool
+	load_buf
+	load_cmp
+	load_crypto
+	load_file
+	load_istr
+	load_math
+	load_num
+	load_record
+	load_str
+	load_tuple
+	)
+	\\load_list
+
+make_lib "math.fxl"
+	(
+	load_basic
+	load_bn
+	load_cmp
+	load_math
+	)
+	\\load_math2
+
+make_lib "read.fxl"
+	(
+	load_basic
+	load_buf
+	load_file
+	load_stream
+	)
+	\\load_read
+#]
+#[ Level 2
+make_lib "assoc.fxl"
+	(
+	load_basic
+	load_cmp
+	load_list
+	load_math
+	)
+	\\load_assoc
+
+make_lib "date.fxl"
+	(
+	load_basic
+	load_bn
+	load_cmp
+	load_list
+	load_math
+	load_math2
+	load_num
+	load_str
+	load_time
+	)
+	\\load_date
+
+make_lib "format.fxl"
+	(
+	load_basic
+	load_bool
+	load_buf
+	load_cmp
+	load_extra
+	load_list
+	load_math
+	load_math2
+	load_num
+	load_output
+	load_parse
+	load_record
+	load_str
+	load_top
+	load_tuple
+	)
+	\\load_format
+
+make_lib "hex.fxl"
+	(
+	load_basic
+	load_bool
+	load_cmp
+	load_list
+	load_math
+	load_math2
+	load_str
+	)
+	\\load_hex2
+
+make_lib "read_csv.fxl"
+	(
+	load_basic
+	load_buf
+	load_extra
+	load_read
+	load_stream
+	)
+	\\load_read_csv
+
+make_lib "read_ssv.fxl"
+	(
+	load_basic
+	load_buf
+	load_cmp
+	load_extra
+	load_read
+	load_stream
+	)
+	\\load_read_ssv
+
+make_lib "run.fxl"
+	(
+	load_basic
+	load_bool
+	load_cmp
+	load_extra
+	load_file
+	load_list
+	load_output
+	load_run
+	load_str
+	)
+	\\load_run2
+
+make_lib "time.fxl"
+	(
+	load_extra
+	load_file
+	load_math
+	load_output
+	load_str
+	load_time
+	)
+	\\load_time2
+#]
+#[ Level 3
+make_lib "html.fxl"
+	(
+	load_basic
+	load_buf
+	load_cmp
+	load_extra
+	load_format
+	load_hex2
+	load_istr
+	load_list
+	load_math
+	load_num
+	load_output
+	load_record
+	load_str
+	load_tuple
+	)
+	\\load_html
+
+make_lib "indent.fxl"
+	(
+	load_basic
+	load_buf
+	load_extra
+	load_file
+	load_format
+	load_num
+	load_output
+	load_str
+	load_tuple
+	)
+	\\load_indent
+
+make_lib "show_value.fxl"
+	(
+	load_basic
+	load_bn
+	load_buf
+	load_cmp
+	load_extra
+	load_fexl
+	load_file
+	load_format
+	load_istr
+	load_math
+	load_num
+	load_output
+	load_record
+	load_str
+	load_time
+	load_top
+	load_var
+	)
+	\\load_show_value
+#]
+
+[
+["load_assoc" load_assoc]
+["load_bool" load_bool]
+["load_date" load_date]
+["load_extra" load_extra]
+["load_format" load_format]
+["load_hex2" load_hex2]
+["load_html" load_html]
+["load_indent" load_indent]
+["load_list" load_list]
+["load_math2" load_math2]
+["load_read" load_read]
+["load_read_csv" load_read_csv]
+["load_read_ssv" load_read_ssv]
+["load_run2" load_run2]
+["load_show_value" load_show_value]
+["load_time2" load_time2]
+]

@@ -1,0 +1,16 @@
+\out=
+~
+= load_flintstone
+  read 1
+  read 2
+= load_flintstone
+Meet the Flintstones.
+I am Fred.
+I am Wilma.
+I am Barney.
+I am Betty.
+~
+\err=
+~
+~
+\status=0

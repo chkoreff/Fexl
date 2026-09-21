@@ -1,27 +1,11 @@
 #
-#load "core"
+load_extend
+evaluate \;
 
-load "argv"
-load "basic"
-load "sym"
-
-load "bool"
-
-load "math"
-load "crypto"
-load "buf"
-load "cmp"
-load "file"
-load "istr"
-load "num"
-load "record"
-load "str"
-load "tuple"
-
-load "list"
-
-load "output"
-
+load_argv
+load_basic
+load_list
+load_output
 evaluate \;
 
 # Using technique for breaking a loop.

@@ -33,33 +33,9 @@
 \do_benchmark=(run_benchmark trace)
 \show_benchmark=(run_benchmark say)
 
-\use_context=
-	(\\cx\\body
-	\save=std
-	set_std cx
-	\x=body
-	set_std save
-	x
-	)
-
-\guard=(use_context (record_copy std))
-\restrict=(use_context empty)
-
 \is_record= # LATER 20250725 built-in
 	(\obj
 	is_good (record_count obj)
-	)
-
-\walk_record= # LATER 20260316 built-in
-	(\rec\f
-	\n=(record_count rec)
-	(@\\loop\i
-	ge i n ();
-	record_item rec i \k\\v
-	f k v;
-	loop (+ 1 i)
-	)
-	0
 	)
 
 [
@@ -78,9 +54,5 @@
 ["QU" QU]
 ["do_benchmark" do_benchmark]
 ["show_benchmark" show_benchmark]
-["use_context" use_context]
-["guard" guard]
-["restrict" restrict]
 ["is_record" is_record]
-["walk_record" walk_record]
 ]

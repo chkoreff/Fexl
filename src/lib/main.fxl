@@ -1,17 +1,43 @@
 #
-load "core"
-load "extra"
-load "bool"
-load "math2"
-load "list"
-load "assoc"
-load "time2"
-load "date"
-load "format"
-load "indent"
-load "hex2"
-load "html"
-load "read"
-load "read_csv"
-load "read_ssv"
-load "run2"
+load_extend
+evaluate \;
+load_argv
+load_assoc
+load_basic
+load_bn
+load_bool
+load_buf
+load_cmp
+load_crypto
+load_date
+load_extra
+load_fexl
+load_file
+load_format
+load_hex
+load_hex2
+load_html
+load_indent
+load_istr
+load_limit
+load_list
+load_math
+load_math2
+load_num
+load_output
+load_parse
+load_rand
+load_read
+load_read_csv
+load_read_ssv
+load_record
+load_run
+load_run2
+load_signal
+load_str
+load_stream
+load_sym
+load_time
+load_time2
+load_tuple
+load_var

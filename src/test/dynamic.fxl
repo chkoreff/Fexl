@@ -1,6 +1,6 @@
 # Test the built-in show function.
-load "test"
-#load "show_value" # Test the enhanced show function.
+load_test
+#load_show_value # Test the enhanced show function.
 evaluate \;
 
 test_argv ["a" "b"]

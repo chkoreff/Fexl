@@ -33,6 +33,7 @@
 "b50"
 "b51"
 "b53"
+"b54"
 "guard"
 "leak"
 "chars"
@@ -54,6 +55,7 @@
 "std"
 "tan"
 "minimal"
+"flintstone"
 ]
 
 # Gather any individually specified tests.

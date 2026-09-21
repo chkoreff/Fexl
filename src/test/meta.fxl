@@ -1,5 +1,5 @@
 # Test show forms.
-load "show_value"
+load_show_value
 evaluate \;
 show_benchmark;
 
