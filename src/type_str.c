@@ -395,7 +395,7 @@ value op_argv(value f, value op(const char *const *argv))
 	return f;
 	}
 
-void define_str(void)
+void load_str(void)
 	{
 	define(".",Q(type_concat));
 	define("length",Q(type_length));

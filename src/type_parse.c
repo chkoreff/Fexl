@@ -118,7 +118,7 @@ value type_read_stream(value f)
 	}
 	}
 
-void define_parse(void)
+void load_parse(void)
 	{
 	define("parse",Q(type_parse));
 	define("parse_file",Q(type_parse_file));

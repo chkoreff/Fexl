@@ -82,7 +82,7 @@ static value type_hmac_sha512(value f)
 static value type_hmac_sha256(value f)
 	{ return op_str2(f,str_hmac_sha256); }
 
-void define_crypto(void)
+void load_crypto(void)
 	{
 	define("random_bytes",Q(type_random_bytes));
 	define("random_nonce",Q0(type_random_nonce));

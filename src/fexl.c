@@ -58,33 +58,33 @@ static void end_const(void)
 	}
 
 // Define all the functions written in C.
-static void define_core(void)
+static void load_core(void)
 	{
-	define_argv();
-	define_basic();
-	define_bn();
-	define_buf();
-	define_cmp();
-	define_crypto();
-	define_fexl();
-	define_file();
-	define_hex();
-	define_istr();
-	define_limit();
-	define_math();
-	define_num();
-	define_output();
-	define_parse();
-	define_rand();
-	define_record();
-	define_run();
-	define_signal();
-	define_str();
-	define_stream();
-	define_sym();
-	define_time();
-	define_tuple();
-	define_var();
+	load_argv();
+	load_basic();
+	load_bn();
+	load_buf();
+	load_cmp();
+	load_crypto();
+	load_fexl();
+	load_file();
+	load_hex();
+	load_istr();
+	load_limit();
+	load_math();
+	load_num();
+	load_output();
+	load_parse();
+	load_rand();
+	load_record();
+	load_run();
+	load_signal();
+	load_str();
+	load_stream();
+	load_sym();
+	load_time();
+	load_tuple();
+	load_var();
 	}
 
 static int eq(const char *x, const char *y)
@@ -95,50 +95,50 @@ static int eq(const char *x, const char *y)
 // Load a named library.
 static void load(const char *name)
 	{
-	if (eq(name,"argv")) return define_argv();
+	if (eq(name,"argv")) return load_argv();
 	if (eq(name,"assoc")) return use_lib("assoc.fxl");
-	if (eq(name,"basic")) return define_basic();
-	if (eq(name,"bn")) return define_bn();
+	if (eq(name,"basic")) return load_basic();
+	if (eq(name,"bn")) return load_bn();
 	if (eq(name,"bool")) return use_lib("bool.fxl");
-	if (eq(name,"buf")) return define_buf();
-	if (eq(name,"cmp")) return define_cmp();
-	if (eq(name,"core")) return define_core();
-	if (eq(name,"crypto")) return define_crypto();
+	if (eq(name,"buf")) return load_buf();
+	if (eq(name,"cmp")) return load_cmp();
+	if (eq(name,"core")) return load_core();
+	if (eq(name,"crypto")) return load_crypto();
 	if (eq(name,"date")) return use_lib("date.fxl");
 	if (eq(name,"extra")) return use_lib("extra.fxl");
-	if (eq(name,"fexl")) return define_fexl();
-	if (eq(name,"file")) return define_file();
+	if (eq(name,"fexl")) return load_fexl();
+	if (eq(name,"file")) return load_file();
 	if (eq(name,"format")) return use_lib("format.fxl");
-	if (eq(name,"hex")) return define_hex();
+	if (eq(name,"hex")) return load_hex();
 	if (eq(name,"hex2")) return use_lib("hex.fxl");
 	if (eq(name,"html")) return use_lib("html.fxl");
 	if (eq(name,"indent")) return use_lib("indent.fxl");
-	if (eq(name,"istr")) return define_istr();
-	if (eq(name,"limit")) return define_limit();
+	if (eq(name,"istr")) return load_istr();
+	if (eq(name,"limit")) return load_limit();
 	if (eq(name,"list")) return use_lib("list.fxl");
 	if (eq(name,"main")) return use_lib("main.fxl");
-	if (eq(name,"math")) return define_math();
+	if (eq(name,"math")) return load_math();
 	if (eq(name,"math2")) return use_lib("math.fxl");
-	if (eq(name,"num")) return define_num();
-	if (eq(name,"output")) return define_output();
-	if (eq(name,"parse")) return define_parse();
-	if (eq(name,"rand")) return define_rand();
+	if (eq(name,"num")) return load_num();
+	if (eq(name,"output")) return load_output();
+	if (eq(name,"parse")) return load_parse();
+	if (eq(name,"rand")) return load_rand();
 	if (eq(name,"read")) return use_lib("read.fxl");
 	if (eq(name,"read_csv")) return use_lib("read_csv.fxl");
 	if (eq(name,"read_ssv")) return use_lib("read_ssv.fxl");
-	if (eq(name,"record")) return define_record();
-	if (eq(name,"run")) return define_run();
+	if (eq(name,"record")) return load_record();
+	if (eq(name,"run")) return load_run();
 	if (eq(name,"run2")) return use_lib("run.fxl");
 	if (eq(name,"show_value")) return use_lib("show_value.fxl");
-	if (eq(name,"signal")) return define_signal();
-	if (eq(name,"str")) return define_str();
-	if (eq(name,"stream")) return define_stream();
-	if (eq(name,"sym")) return define_sym();
-	if (eq(name,"test")) return define_test();
-	if (eq(name,"time")) return define_time();
+	if (eq(name,"signal")) return load_signal();
+	if (eq(name,"str")) return load_str();
+	if (eq(name,"stream")) return load_stream();
+	if (eq(name,"sym")) return load_sym();
+	if (eq(name,"test")) return load_test();
+	if (eq(name,"time")) return load_time();
 	if (eq(name,"time2")) return use_lib("time.fxl");
-	if (eq(name,"tuple")) return define_tuple();
-	if (eq(name,"var")) return define_var();
+	if (eq(name,"tuple")) return load_tuple();
+	if (eq(name,"var")) return load_var();
 	bad_name("Unknown library ",name);
 	}
 

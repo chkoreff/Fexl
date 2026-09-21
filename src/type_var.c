@@ -85,7 +85,7 @@ static value type_is_var(value f)
 	return op_is_type(f,type_var);
 	}
 
-void define_var(void)
+void load_var(void)
 	{
 	define("var_new",Q0(type_var_new));
 	define("var_get",Q(type_var_get));

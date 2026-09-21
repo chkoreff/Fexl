@@ -34,7 +34,7 @@ static value type_limit_memory(value f)
 	return op_limit(f,limit_memory);
 	}
 
-void define_limit(void)
+void load_limit(void)
 	{
 	define("limit_time",Q(type_limit_time));
 	define("limit_stack",Q(type_limit_stack));

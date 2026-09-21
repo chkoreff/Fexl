@@ -1,1 +1,1 @@
-extern void define_time(void);
+extern void load_time(void);

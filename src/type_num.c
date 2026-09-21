@@ -67,7 +67,7 @@ static value type_is_num(value f)
 	return op_is_type(f,type_num);
 	}
 
-void define_num(void)
+void load_num(void)
 	{
 	define("num_str",Q(type_num_str));
 	define("is_num",Q(type_is_num));

@@ -6,4 +6,4 @@ extern value op_str(value f, string op(string));
 extern value op_str2(value f, string op(string,string));
 extern value op_str3(value f, string op(string,string,string));
 extern value op_argv(value f, value op(const char *const *argv));
-extern void define_str(void);
+extern void load_str(void);

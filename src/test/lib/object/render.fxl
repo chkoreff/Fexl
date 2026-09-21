@@ -125,7 +125,7 @@ evaluate \;
 \render_obj=
 	(\put\tab_stop
 	restrict;
-	define_output put tab_stop
+	load_output put tab_stop
 	evaluate render_obj_form
 	)
 

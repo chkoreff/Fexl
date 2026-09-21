@@ -63,7 +63,7 @@ static value type_atan(value f) { return op_num(f,atan); }
 
 static const double num_pi = M_PI;
 
-void define_math(void)
+void load_math(void)
 	{
 	define("+",Q(type_add));
 	define("-",Q(type_sub));

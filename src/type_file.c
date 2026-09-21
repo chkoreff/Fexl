@@ -581,7 +581,7 @@ static value type_rename(value f)
 	}
 	}
 
-void define_file(void)
+void load_file(void)
 	{
 	define("stdin",hold(Qstdin));
 	define("stdout",hold(Qstdout));

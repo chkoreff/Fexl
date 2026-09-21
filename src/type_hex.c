@@ -77,7 +77,7 @@ static value type_pack(value f)
 	return f;
 	}
 
-void define_hex(void)
+void load_hex(void)
 	{
 	define("unpack",Q(type_unpack));
 	define("pack",Q(type_pack));

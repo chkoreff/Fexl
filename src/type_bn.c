@@ -175,7 +175,7 @@ static value type_is_bn(value f)
 	}
 
 // big numbers
-void define_bn(void)
+void load_bn(void)
 	{
 	define("bn_eq0",Q(type_bn_eq0));
 	define("bn_is_neg",Q(type_bn_is_neg));

@@ -417,7 +417,7 @@ static value type_fetch(value f)
 	}
 	}
 
-void define_record(void)
+void load_record(void)
 	{
 	define("empty",Q0(type_empty));
 	define("set",Q(type_set));

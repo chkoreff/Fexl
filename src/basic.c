@@ -210,7 +210,7 @@ value Q0(type T)
 	return A(Q(T),hold(QI));
 	}
 
-void define_basic(void)
+void load_basic(void)
 	{
 	define("I",hold(QI));
 	define("T",hold(QT));

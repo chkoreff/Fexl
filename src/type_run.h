@@ -1,1 +1,1 @@
-extern void define_run(void);
+extern void load_run(void);

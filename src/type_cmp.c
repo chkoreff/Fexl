@@ -82,7 +82,7 @@ static value type_ne(value f) { return op_cmp(f,ne); }
 static value type_ge(value f) { return op_cmp(f,ge); }
 static value type_gt(value f) { return op_cmp(f,gt); }
 
-void define_cmp(void)
+void load_cmp(void)
 	{
 	define("compare",Q(type_compare));
 	define("lt",Q(type_lt));

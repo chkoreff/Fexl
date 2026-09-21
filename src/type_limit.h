@@ -1,1 +1,1 @@
-extern void define_limit(void);
+extern void load_limit(void);

@@ -1,1 +1,1 @@
-extern void define_math(void);
+extern void load_math(void);

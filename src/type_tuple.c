@@ -58,7 +58,7 @@ static value type_list_to_tuple(value f)
 	return V(type_tuple,hold(Qtuple),hold(f->R));
 	}
 
-void define_tuple(void)
+void load_tuple(void)
 	{
 	define("is_tuple",Q(type_is_tuple));
 	define("tuple_to_list",Q(type_tuple_to_list));

@@ -301,7 +301,7 @@ static value type_set_std(value f)
 	return f;
 	}
 
-void define_sym(void)
+void load_sym(void)
 	{
 	define("std",Q0(type_std));
 	define("is_closed",Q(type_is_closed));

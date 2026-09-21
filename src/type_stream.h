@@ -1,1 +1,1 @@
-extern void define_stream(void);
+extern void load_stream(void);

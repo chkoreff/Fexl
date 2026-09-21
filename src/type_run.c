@@ -547,7 +547,7 @@ static value type_fexl_benchmark(value f)
 	}
 	}
 
-void define_run(void)
+void load_run(void)
 	{
 	define("die",Q0(type_die));
 	define("sleep",Q(type_sleep));

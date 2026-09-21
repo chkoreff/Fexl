@@ -96,7 +96,7 @@ void use_lib(const char *name)
 	populate(Qstd,list);
 	}
 
-void define_argv(void)
+void load_argv(void)
 	{
 	define("argv",Q(type_argv));
 	define("dir_base",hold(Qdir_base));

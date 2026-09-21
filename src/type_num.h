@@ -3,4 +3,4 @@ extern value type_num(value f);
 extern value Qnum(double x);
 extern value Qnum_str0(const char *name);
 extern unsigned long get_ulong(value x);
-extern void define_num(void);
+extern void load_num(void);

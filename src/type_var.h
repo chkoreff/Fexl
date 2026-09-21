@@ -1,1 +1,1 @@
-extern void define_var(void);
+extern void load_var(void);

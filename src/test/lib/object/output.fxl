@@ -1,5 +1,5 @@
 #
-\define_output=
+\load_output=
 	(
 	\put
 	\tab_stop
@@ -27,4 +27,4 @@
 	define "indent" indent
 	)
 
-define "define_output" define_output
+define "load_output" load_output

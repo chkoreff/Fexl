@@ -116,7 +116,7 @@ static value type_collect_tilde_string(value f)
 	return f;
 	}
 
-void define_stream(void)
+void load_stream(void)
 	{
 	define("at_eof",Q0(type_at_eof));
 	define("at_white",Q0(type_at_white));

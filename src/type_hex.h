@@ -1,1 +1,1 @@
-extern void define_hex(void);
+extern void load_hex(void);

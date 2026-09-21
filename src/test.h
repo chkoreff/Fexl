@@ -1,1 +1,1 @@
-extern void define_test(void);
+extern void load_test(void);

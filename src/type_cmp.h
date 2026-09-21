@@ -1,1 +1,1 @@
-extern void define_cmp(void);
+extern void load_cmp(void);

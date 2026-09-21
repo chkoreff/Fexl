@@ -1,1 +1,1 @@
-extern void define_rand(void);
+extern void load_rand(void);

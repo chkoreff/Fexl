@@ -51,7 +51,7 @@ static value type_set_alarm(value f)
 	return f;
 	}
 
-void define_signal(void)
+void load_signal(void)
 	{
 	define("set_alarm",Q(type_set_alarm));
 	}
