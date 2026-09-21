@@ -287,6 +287,7 @@ readstr
 receive_keystrokes
 record_copy
 record_count
+record_fill
 record_item
 remember
 remove

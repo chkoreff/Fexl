@@ -442,6 +442,24 @@ void record_fill(value obj, value list)
 	drop(list);
 	}
 
+static value type_record_fill(value f)
+	{
+	if (f->L->L == 0) return keep(f);
+	{
+	value obj = arg(f->L->R);
+	if (obj->T == type_record)
+		{
+		value list = arg(f->R);
+		record_fill(obj,list);
+		f = hold(QI);
+		}
+	else
+		f = hold(Qvoid);
+	drop(obj);
+	return f;
+	}
+	}
+
 void load_record(void)
 	{
 	define("empty",Q0(type_empty));
@@ -454,4 +472,5 @@ void load_record(void)
 	define("record_count",Q(type_record_count));
 	define("record_item",Q(type_record_item));
 	define("fetch",Q(type_fetch));
+	define("record_fill",Q(type_record_fill));
 	}
