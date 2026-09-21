@@ -135,9 +135,9 @@ void show(const char *name, value f)
 	put(name);show_exp(f);nl();
 	}
 
-static type get_type(const char *s_key)
+static type get_type(const char *name)
 	{
-	value key = Qstr0(s_key);
+	value key = Qstr0(name);
 	value val = record_find(Qstd,key);
 	drop(key);
 	return val ? val->T : 0;
