@@ -64,36 +64,10 @@ void use_file(const char *name)
 	use(Qstr0(name));
 	}
 
-static void populate(value obj, value list)
-	{
-	while (list->T == type_list)
-		{
-		value head = arg(list->L);
-		value tail = arg(list->R);
-		if (head->T == type_list)
-			{
-			value key = arg(head->L);
-			if (key->T == type_str)
-				{
-				value args = arg(head->R);
-				if (args->T == type_list)
-					record_set(obj,key,hold(args->L));
-				drop(args);
-				}
-			drop(key);
-			}
-
-		drop(head);
-		drop(list);
-		list = tail;
-		}
-	drop(list);
-	}
-
 void use_lib(const char *name)
 	{
 	value list = eval_file(concat(hold(Qdir_lib),Qstr0(name)));
-	populate(Qstd,list);
+	record_fill(Qstd,list);
 	}
 
 void load_argv(void)

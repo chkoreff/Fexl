@@ -15,4 +15,5 @@ extern value record_find(value obj, value key);
 extern value type_record(value f);
 extern void record_set(value obj, value key, value val);
 extern value record_empty(void);
+extern void record_fill(value obj, value list);
 extern void load_record(void);

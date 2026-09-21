@@ -415,6 +415,33 @@ static value type_fetch(value f)
 	}
 	}
 
+// Fill a record from a list of lists, e.g. [["a" 1] ["b" 2]].
+void record_fill(value obj, value list)
+	{
+	while (list->T == type_list)
+		{
+		value head = arg(list->L);
+		value tail = arg(list->R);
+		if (head->T == type_list)
+			{
+			value key = arg(head->L);
+			if (key->T == type_str)
+				{
+				value args = arg(head->R);
+				if (args->T == type_list)
+					record_set(obj,key,hold(args->L));
+				drop(args);
+				}
+			drop(key);
+			}
+
+		drop(head);
+		drop(list);
+		list = tail;
+		}
+	drop(list);
+	}
+
 void load_record(void)
 	{
 	define("empty",Q0(type_empty));
