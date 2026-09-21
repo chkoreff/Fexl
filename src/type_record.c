@@ -7,9 +7,8 @@
 #include <type_record.h>
 #include <type_str.h>
 
-void record_clear(value f)
+static void drop_items(struct record *rec)
 	{
-	struct record *rec = f->v_ptr;
 	unsigned long i;
 	for (i = 0; i < rec->count; i++)
 		{
@@ -17,13 +16,12 @@ void record_clear(value f)
 		drop(item->key);
 		drop(item->val);
 		}
-	rec->count = 0;
 	}
 
 static void clear_record(value f)
 	{
 	struct record *rec = f->v_ptr;
-	record_clear(f);
+	drop_items(rec);
 	free_memory(rec->vec, sizeof(struct item[rec->size]));
 	free_memory(rec,sizeof(struct record));
 	}
@@ -424,6 +422,7 @@ void load_record(void)
 	define("setf",Q(type_setf));
 	define("del",Q(type_del));
 	define("get",Q(type_get));
+	// LATER 20260919 record_clear
 	define("record_copy",Q(type_record_copy));
 	define("record_count",Q(type_record_count));
 	define("record_item",Q(type_record_item));

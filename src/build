@@ -9,7 +9,6 @@ make buf
 make buf_str
 make convert
 make crypto
-make define
 make die
 make file
 make file_str

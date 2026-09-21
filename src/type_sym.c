@@ -168,6 +168,13 @@ static void set_std(value obj)
 	Qstd = obj;
 	}
 
+void define(const char *name, value val)
+	{
+	value key = Qstr0(name);
+	record_set(Qstd,key,val);
+	drop(key);
+	}
+
 // (define key val) Define key as val in std.
 static value type_define(value f)
 	{
@@ -317,7 +324,5 @@ void beg_sym(void)
 
 void end_sym(void)
 	{
-	// Clear Qstd in case the user created a cycle.
-	record_clear(Qstd);
 	drop(Qstd);
 	}
