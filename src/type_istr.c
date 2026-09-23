@@ -92,10 +92,12 @@ static value type_slook(value f)
 	return f;
 	}
 
-void load_istr(void)
+value type_load_istr(value f)
 	{
 	define("readstr",Q(type_readstr));
 	define("sgetc",Q(type_sgetc));
 	define("sget",Q(type_sget));
 	define("slook",Q(type_slook));
+	return hold(QI);
+	(void)f;
 	}

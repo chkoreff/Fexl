@@ -395,7 +395,7 @@ value op_argv(value f, value op(const char *const *argv))
 	return f;
 	}
 
-void load_str(void)
+value type_load_str(value f)
 	{
 	define(".",Q(type_concat));
 	define("length",Q(type_length));
@@ -410,4 +410,6 @@ void load_str(void)
 	define("length_common",Q(type_length_common));
 	define("compare_at",Q(type_compare_at));
 	define("is_str",Q(type_is_str));
+	return hold(QI);
+	(void)f;
 	}

@@ -29,8 +29,10 @@ static value type_rand(value f)
 	(void)f;
 	}
 
-void load_rand(void)
+value type_load_rand(value f)
 	{
 	define("seed_rand",Q(type_seed_rand));
 	define("rand",Q0(type_rand));
+	return hold(QI);
+	(void)f;
 	}

@@ -80,7 +80,7 @@ static void import_record(value cx)
 		}
 	}
 
-void load_extend(void)
+value type_load_extend(value f)
 	{
 	value list;
 	value cx;
@@ -96,6 +96,8 @@ void load_extend(void)
 
 	import_record(cx);
 	drop(cx);
+	return hold(QI);
+	(void)f;
 	}
 
 void load_main(void)
@@ -103,11 +105,20 @@ void load_main(void)
 	drop(eval_lib("main.fxl"));
 	}
 
-void load_argv(void)
+value type_load_argv(value f)
 	{
 	define("argv",Q(type_argv));
 	define("dir_base",hold(Qdir_base));
 	define("dir_lib",hold(Qdir_lib));
+	return hold(QI);
+	(void)f;
+	}
+
+value type_load_main(value f)
+	{
+	load_main();
+	return hold(QI);
+	(void)f;
 	}
 
 void beg_argv(void)

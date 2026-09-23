@@ -1,1 +1,1 @@
-extern void load_stream(void);
+extern value type_load_stream(value f);

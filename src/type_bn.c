@@ -175,7 +175,7 @@ static value type_is_bn(value f)
 	}
 
 // big numbers
-void load_bn(void)
+value type_load_bn(value f)
 	{
 	define("bn_eq0",Q(type_bn_eq0));
 	define("bn_is_neg",Q(type_bn_is_neg));
@@ -195,4 +195,6 @@ void load_bn(void)
 	define("bn_mod",Q(type_bn_mod));
 	define("bn_div",Q(type_bn_div));
 	define("is_bn",Q(type_is_bn));
+	return hold(QI);
+	(void)f;
 	}

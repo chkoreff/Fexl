@@ -1,2 +1,2 @@
 extern value type_bn(value f);
-extern void load_bn(void);
+extern value type_load_bn(value f);

@@ -113,7 +113,7 @@ static value type_fflush(value f)
 	return f;
 	}
 
-void load_output(void)
+value type_load_output(value f)
 	{
 	define("put",hold(Qput));
 	define("nl",hold(Qnl));
@@ -122,6 +122,8 @@ void load_output(void)
 	define("fnl",hold(Qfnl));
 	define("fsay",Q(type_fsay));
 	define("fflush",Q(type_fflush));
+	return hold(QI);
+	(void)f;
 	}
 
 void beg_output(void)

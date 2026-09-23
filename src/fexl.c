@@ -3,7 +3,6 @@
 #include <value.h>
 
 #include <basic.h>
-#include <load.h>
 #include <report.h>
 #include <string.h> // strlen
 #include <test.h>
@@ -62,34 +61,34 @@ static void end_const(void)
 static void load_core(void)
 	{
 	define("evaluate",Q(type_evaluate));
-	define_lib("load_argv",load_argv);
-	define_lib("load_basic",load_basic);
-	define_lib("load_bn",load_bn);
-	define_lib("load_buf",load_buf);
-	define_lib("load_cmp",load_cmp);
-	define_lib("load_crypto",load_crypto);
-	define_lib("load_extend",load_extend);
-	define_lib("load_fexl",load_fexl);
-	define_lib("load_file",load_file);
-	define_lib("load_hex",load_hex);
-	define_lib("load_istr",load_istr);
-	define_lib("load_limit",load_limit);
-	define_lib("load_main",load_main);
-	define_lib("load_math",load_math);
-	define_lib("load_num",load_num);
-	define_lib("load_output",load_output);
-	define_lib("load_parse",load_parse);
-	define_lib("load_rand",load_rand);
-	define_lib("load_record",load_record);
-	define_lib("load_run",load_run);
-	define_lib("load_signal",load_signal);
-	define_lib("load_str",load_str);
-	define_lib("load_stream",load_stream);
-	define_lib("load_sym",load_sym);
-	define_lib("load_test",load_test);
-	define_lib("load_time",load_time);
-	define_lib("load_tuple",load_tuple);
-	define_lib("load_var",load_var);
+	define("load_argv",Q0(type_load_argv));
+	define("load_basic",Q0(type_load_basic));
+	define("load_bn",Q0(type_load_bn));
+	define("load_buf",Q0(type_load_buf));
+	define("load_cmp",Q0(type_load_cmp));
+	define("load_crypto",Q0(type_load_crypto));
+	define("load_extend",Q0(type_load_extend));
+	define("load_fexl",Q0(type_load_fexl));
+	define("load_file",Q0(type_load_file));
+	define("load_hex",Q0(type_load_hex));
+	define("load_istr",Q0(type_load_istr));
+	define("load_limit",Q0(type_load_limit));
+	define("load_main",Q0(type_load_main));
+	define("load_math",Q0(type_load_math));
+	define("load_num",Q0(type_load_num));
+	define("load_output",Q0(type_load_output));
+	define("load_parse",Q0(type_load_parse));
+	define("load_rand",Q0(type_load_rand));
+	define("load_record",Q0(type_load_record));
+	define("load_run",Q0(type_load_run));
+	define("load_signal",Q0(type_load_signal));
+	define("load_str",Q0(type_load_str));
+	define("load_stream",Q0(type_load_stream));
+	define("load_sym",Q0(type_load_sym));
+	define("load_test",Q0(type_load_test));
+	define("load_time",Q0(type_load_time));
+	define("load_tuple",Q0(type_load_tuple));
+	define("load_var",Q0(type_load_var));
 	}
 
 /*

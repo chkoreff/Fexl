@@ -141,7 +141,7 @@ static value type_dow(value f)
 	}
 	}
 
-void load_time(void)
+value type_load_time(value f)
 	{
 	define("time",Q0(type_time));
 	define("localtime",Q(type_localtime));
@@ -150,4 +150,6 @@ void load_time(void)
 	define("timegm",Q(type_timegm));
 	define("microtime",Q0(type_microtime));
 	define("dow",Q(type_dow));
+	return hold(QI);
+	(void)f;
 	}

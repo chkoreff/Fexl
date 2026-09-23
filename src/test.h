@@ -1,1 +1,1 @@
-extern void load_test(void);
+extern value type_load_test(value f);

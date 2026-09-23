@@ -1,1 +1,1 @@
-extern void load_rand(void);
+extern value type_load_rand(value f);

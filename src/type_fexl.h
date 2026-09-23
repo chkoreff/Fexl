@@ -1,1 +1,1 @@
-extern void load_fexl(void);
+extern value type_load_fexl(value f);

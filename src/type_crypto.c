@@ -82,7 +82,7 @@ static value type_hmac_sha512(value f)
 static value type_hmac_sha256(value f)
 	{ return op_str2(f,str_hmac_sha256); }
 
-void load_crypto(void)
+value type_load_crypto(value f)
 	{
 	define("random_bytes",Q(type_random_bytes));
 	define("random_nonce",Q0(type_random_nonce));
@@ -100,6 +100,8 @@ void load_crypto(void)
 	define("unpack64",Q(type_unpack64));
 	define("hmac_sha512",Q(type_hmac_sha512));
 	define("hmac_sha256",Q(type_hmac_sha256));
+	return hold(QI);
+	(void)f;
 	}
 
 void beg_crypto(void)

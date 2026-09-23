@@ -1,1 +1,1 @@
-extern void load_time(void);
+extern value type_load_time(value f);

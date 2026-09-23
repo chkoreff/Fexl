@@ -1,1 +1,1 @@
-extern void load_math(void);
+extern value type_load_math(value f);

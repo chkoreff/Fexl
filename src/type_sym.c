@@ -308,13 +308,15 @@ static value type_set_std(value f)
 	return f;
 	}
 
-void load_sym(void)
+value type_load_sym(value f)
 	{
 	define("std",Q0(type_std));
 	define("is_closed",Q(type_is_closed));
 	define("define",Q(type_define));
 	define("resolve",Q(type_resolve));
 	define("set_std",Q(type_set_std));
+	return hold(QI);
+	(void)f;
 	}
 
 void beg_sym(void)

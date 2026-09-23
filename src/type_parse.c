@@ -118,8 +118,10 @@ value type_read_stream(value f)
 	}
 	}
 
-void load_parse(void)
+value type_load_parse(value f)
 	{
 	define("parse",Q(type_parse));
 	define("parse_file",Q(type_parse_file));
+	return hold(QI);
+	(void)f;
 	}

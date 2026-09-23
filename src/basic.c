@@ -210,7 +210,7 @@ value Q0(type T)
 	return A(Q(T),hold(QI));
 	}
 
-void load_basic(void)
+value type_load_basic(value f)
 	{
 	define("I",hold(QI));
 	define("T",hold(QT));
@@ -229,6 +229,8 @@ void load_basic(void)
 	define("is_bool",Q(type_is_bool));
 	define("is_list",Q(type_is_list));
 	define("::",Q(type_chain));
+	return hold(QI);
+	(void)f;
 	}
 
 void beg_basic(void)

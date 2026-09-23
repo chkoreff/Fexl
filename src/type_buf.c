@@ -65,9 +65,11 @@ static value type_buf_get(value f)
 	return f;
 	}
 
-void load_buf(void)
+value type_load_buf(value f)
 	{
 	define("buf_new",Q0(type_buf_new));
 	define("buf_put",Q(type_buf_put));
 	define("buf_get",Q(type_buf_get));
+	return hold(QI);
+	(void)f;
 	}

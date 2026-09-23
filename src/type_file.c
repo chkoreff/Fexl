@@ -581,7 +581,7 @@ static value type_rename(value f)
 	}
 	}
 
-void load_file(void)
+value type_load_file(value f)
 	{
 	define("stdin",hold(Qstdin));
 	define("stdout",hold(Qstdout));
@@ -616,6 +616,8 @@ void load_file(void)
 	define("file_size",Q(type_file_size));
 	define("symlink",Q(type_symlink));
 	define("rename",Q(type_rename));
+	return hold(QI);
+	(void)f;
 	}
 
 void beg_file(void)

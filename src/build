@@ -14,7 +14,6 @@ make file
 make file_str
 make format
 make limit
-make load
 make memory
 make nacl
 make parse

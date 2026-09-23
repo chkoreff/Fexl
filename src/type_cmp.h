@@ -1,1 +1,1 @@
-extern void load_cmp(void);
+extern value type_load_cmp(value f);

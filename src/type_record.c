@@ -460,7 +460,7 @@ static value type_record_fill(value f)
 	}
 	}
 
-void load_record(void)
+value type_load_record(value f)
 	{
 	define("empty",Q0(type_empty));
 	define("set",Q(type_set));
@@ -473,4 +473,6 @@ void load_record(void)
 	define("record_item",Q(type_record_item));
 	define("fetch",Q(type_fetch));
 	define("record_fill",Q(type_record_fill));
+	return hold(QI);
+	(void)f;
 	}

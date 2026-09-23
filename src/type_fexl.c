@@ -69,10 +69,12 @@ static value type_fexl_look_ref(value f)
 	return f;
 	}
 
-void load_fexl(void)
+value type_load_fexl(value f)
 	{
 	define("fexl_type",Q(type_fexl_type));
 	define("fexl_look",Q(type_fexl_look));
 	define("fexl_look_quo",Q(type_fexl_look_quo));
 	define("fexl_look_ref",Q(type_fexl_look_ref));
+	return hold(QI);
+	(void)f;
 	}

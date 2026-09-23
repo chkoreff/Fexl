@@ -27,8 +27,10 @@ static value type_test_argv(value f)
 	return op_argv(f,test_argv);
 	}
 
-void load_test(void)
+value type_load_test(value f)
 	{
 	define("test_argv",Q(type_test_argv));
 	define("show",Q(type_show));
+	return hold(QI);
+	(void)f;
 	}

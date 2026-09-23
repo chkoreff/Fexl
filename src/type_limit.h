@@ -1,1 +1,1 @@
-extern void load_limit(void);
+extern value type_load_limit(value f);

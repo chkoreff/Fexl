@@ -547,7 +547,7 @@ static value type_fexl_benchmark(value f)
 	}
 	}
 
-void load_run(void)
+value type_load_run(value f)
 	{
 	define("die",Q0(type_die));
 	define("sleep",Q(type_sleep));
@@ -560,4 +560,6 @@ void load_run(void)
 	define("exec",Q(type_exec));
 	define("receive_keystrokes",Q(type_receive_keystrokes));
 	define("fexl_benchmark",Q(type_fexl_benchmark));
+	return hold(QI);
+	(void)f;
 	}

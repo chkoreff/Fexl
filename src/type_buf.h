@@ -1,2 +1,2 @@
 extern value type_buf(value f);
-extern void load_buf(void);
+extern value type_load_buf(value f);

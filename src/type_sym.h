@@ -11,6 +11,6 @@ extern value Qform(value label, value exp);
 extern value type_D(value f);
 extern value type_E(value f);
 extern value type_evaluate(value f);
-extern void load_sym(void);
+extern value type_load_sym(value f);
 extern void beg_sym(void);
 extern void end_sym(void);
