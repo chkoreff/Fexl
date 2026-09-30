@@ -287,7 +287,7 @@
 
 say "= test_12"
 
-\getf= # LATER 20230702 Do in type_record.c
+\getf=
 	(\obj\key
 	get obj key void
 	)

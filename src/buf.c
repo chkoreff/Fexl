@@ -1,10 +1,10 @@
 #include <stddef.h>
 
 #include <buf.h>
-#include <memory.h>
-#include <stdlib.h> // realloc
-#include <string.h> // memcpy
 #include <die.h>
+#include <memory.h>
+#include <stdlib.h> // realloc free
+#include <string.h> // memcpy
 
 // Grow buffer by delta bytes.
 static void buf_grow(buffer buf, size_t delta)

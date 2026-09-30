@@ -56,7 +56,6 @@ static const char *type_name(type t)
 	return "TYPE";
 	}
 
-// LATER 20231127 Use tilde notation if string has embedded quotes.
 static void put_quote(string x)
 	{
 	put_ch('"');
