@@ -502,13 +502,7 @@ static value type_rmod(value f)
 		{
 		value key = arg(f->L->L->R);
 		if (key->T == type_str || key->T == type_num)
-			{
-			value val = hold(f->L->R);
-			value fn = hold(f->R);
-			f = rmod(obj,key,val,fn);
-			drop(val);
-			drop(fn);
-			}
+			f = rmod(obj,key,f->L->R,f->R);
 		else
 			f = hold(Qvoid);
 		drop(key);
