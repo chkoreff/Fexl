@@ -150,6 +150,16 @@ static void shift_up(struct item *vec, unsigned long n, unsigned long pos)
 		vec[i] = vec[i-1];
 	}
 
+static struct item *insert(struct record *rec, unsigned long pos)
+	{
+	if (rec->count >= rec->size)
+		bump(rec);
+
+	shift_up(rec->vec,rec->count,pos);
+	rec->count++;
+	return rec->vec + pos;
+	}
+
 void record_set(value obj, value key, value val)
 	{
 	struct record *rec = obj->v_ptr;
@@ -159,22 +169,14 @@ void record_set(value obj, value key, value val)
 		{
 		// Change the value.
 		drop(search.item->val);
-		search.item->val = val;
-		return;
 		}
-
-	// Insert new item.
-	if (rec->count >= rec->size)
-		bump(rec);
-
-	shift_up(rec->vec,rec->count,search.pos);
-	rec->count++;
-
-	{
-	struct item *item = rec->vec + search.pos;
-	item->key = hold(key);
-	item->val = val;
-	}
+	else
+		{
+		// Insert new item.
+		search.item = insert(rec,search.pos);
+		search.item->key = hold(key);
+		}
+	search.item->val = val;
 	}
 
 static void shift_down(struct item *vec, unsigned long n, unsigned long pos)
