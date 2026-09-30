@@ -427,7 +427,7 @@ void record_fill(value obj, value list)
 		if (head->T == type_list)
 			{
 			value key = arg(head->L);
-			if (key->T == type_str)
+			if (key->T == type_str || key->T == type_num)
 				{
 				value args = arg(head->R);
 				if (args->T == type_list)

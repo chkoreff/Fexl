@@ -1,0 +1,29 @@
+#
+\\show=
+	(\obj
+	say "["
+	walk_record obj
+		(\key\val
+		say [key" : "val]
+		)
+	say "]"
+	)
+
+\\test_record_fill=
+	(
+	\obj=empty
+
+	record_fill obj
+		[
+		["y" 2]
+		[2 "y"]
+		["x" 1]
+		[1 "x"]
+		]
+
+	show obj
+	)
+
+test_record_fill
+
+say "END"
