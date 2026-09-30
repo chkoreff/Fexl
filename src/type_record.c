@@ -186,7 +186,7 @@ static void shift_down(struct item *vec, unsigned long n, unsigned long pos)
 		vec[i] = vec[i+1];
 	}
 
-void record_del(value obj, value key)
+static void record_del(value obj, value key)
 	{
 	struct record *rec = obj->v_ptr;
 	struct search search = find_key(rec,key);
