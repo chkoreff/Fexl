@@ -462,6 +462,64 @@ static value type_record_fill(value f)
 	}
 	}
 
+static value rmod(value obj, value key, value val, value fn)
+	{
+	struct record *rec = obj->v_ptr;
+	struct search search = find_key(rec,key);
+	unsigned long pos = search.pos;
+
+	if (search.cmp == 0)
+		val = search.item->val;
+	else
+		{
+		struct item *item = insert(rec,pos);
+		item->key = hold(key);
+		item->val = hold(Qvoid);
+		}
+
+	val = eval(A(hold(fn),hold(val)));
+
+	if (pos < rec->count)
+		{
+		struct item *item = rec->vec + pos;
+		hold(val);
+		drop(item->val);
+		item->val = val;
+		}
+	return val;
+	}
+
+// \x=(rmod obj key val fn)
+// Modify the record key by applying fn to its current value, with default val.
+static value type_rmod(value f)
+	{
+	if (f->L->L == 0) return keep(f);
+	if (f->L->L->L == 0) return keep(f);
+	if (f->L->L->L->L == 0) return keep(f);
+	{
+	value obj = arg(f->L->L->L->R);
+	if (obj->T == type_record)
+		{
+		value key = arg(f->L->L->R);
+		if (key->T == type_str || key->T == type_num)
+			{
+			value val = hold(f->L->R);
+			value fn = hold(f->R);
+			f = rmod(obj,key,val,fn);
+			drop(val);
+			drop(fn);
+			}
+		else
+			f = hold(Qvoid);
+		drop(key);
+		}
+	else
+		f = hold(Qvoid);
+	drop(obj);
+	return f;
+	}
+	}
+
 value type_load_record(value f)
 	{
 	define("empty",Q0(type_empty));
@@ -475,6 +533,7 @@ value type_load_record(value f)
 	define("record_item",Q(type_record_item));
 	define("fetch",Q(type_fetch));
 	define("record_fill",Q(type_record_fill));
+	define("rmod",Q(type_rmod));
 	return hold(QI);
 	(void)f;
 	}

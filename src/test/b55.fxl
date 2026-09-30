@@ -9,6 +9,63 @@
 	say "]"
 	)
 
+\\test_rmod=
+	(
+	\try=
+		(\\obj\\key\\val \\fn
+		\x=(rmod obj key val fn)
+		say ["x = "(as_str x)]
+		show obj
+		nl
+		)
+
+	\obj=empty
+
+	try
+		(I obj)
+		(I "a")
+		(say "(1)" 5)
+		(* 100)
+
+	try
+		(I obj)
+		(I "b")
+		(say "(2)" 9999)
+		(\val / val 9)
+
+	try obj "b" 0 (* 2)
+	try obj "c" 3 (* 100)
+
+	# Test weird cases.
+
+	say "Weird cases:"
+
+	# Modify the record while evaluating the update function.
+	(
+	\obj=(record_copy obj)
+	try obj
+		"b" 0
+		(\val
+		del obj "a"
+		del obj "b"
+		* 2 val
+		)
+	)
+
+	# Modify the record while evaluating the default value.
+	(
+	\obj=(record_copy obj)
+	try
+		obj
+		"d"
+		(
+		del obj "a"
+		22
+		)
+		(+ 1000)
+	)
+	)
+
 \\test_record_fill=
 	(
 	\obj=empty
@@ -24,6 +81,7 @@
 	show obj
 	)
 
+test_rmod
 test_record_fill
 
 say "END"

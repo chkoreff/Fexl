@@ -342,6 +342,7 @@ resolve
 restrict
 reverse
 rmdir
+rmod
 round
 round2
 run_filter
