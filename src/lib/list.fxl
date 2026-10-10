@@ -87,8 +87,8 @@
 		compare kx ky
 			(\tail=(loop xt ys) [x;tail])
 			(
-			\vx=(combine vx vy)
 			\tail=(loop xt yt)
+			\vx=(combine vx vy)
 			[{kx vx};tail]
 			)
 			(\tail=(loop xs yt) [y;tail])
@@ -113,8 +113,14 @@
 		loop xs
 		)
 
-	\segments=(map (\x [x]) xs)
-	merge_all_segments segments
+	\make_segments=
+		(@\\loop \\xs
+		xs [] \x\\xs
+		[[x];loop xs]
+		)
+
+	\xs=(make_segments xs)
+	merge_all_segments xs
 	)
 
 # (merge_keys combine xs ys)
