@@ -70,57 +70,50 @@
 # Shift the first item off a list.
 \shift=(\\xs xs {void []} \x\\xs {x xs})
 
+# Collect values from a record with function fn.
+\record_collect=
+	(\obj\fn
+	\count=(record_count obj)
+	(@\\loop \pos
+	ge pos count [];
+	\item=(record_item obj pos)
+	fn item;
+	loop (+ 1 pos)
+	)
+	0
+	)
+
+# Return the lazy list of pairs in a record.
+\record_pairs=
+	(\obj
+	record_collect obj
+		(\\item\\tail
+		[item;tail]
+		)
+	)
+
+# Return just the values.
+\record_values=
+	(\obj
+	record_collect obj
+		(\\item\\tail
+		item \\key\\val
+		[val;tail]
+		)
+	)
+
 # Sort the list of {key val} pairs xs.  Use the combine function to combine
 # values with the same key.
 \combine_keys=
 	(\combine\xs
 
-	# Merge two segments together.  A segment is a list of groups.
-	\merge_segments=
-		(@\\loop\xs\ys
-		xs ys \x\xt
-		ys xs \y\yt
-
-		x \kx\vx
-		y \ky\vy
-
-		compare kx ky
-			(\tail=(loop xt ys) [x;tail])
-			(
-			\tail=(loop xt yt)
-			\vx=(combine vx vy)
-			[{kx vx};tail]
-			)
-			(\tail=(loop xs yt) [y;tail])
+	\obj=empty
+	each xs
+		(\x
+		x \\k\\v
+		\_=(rmod obj k v (\\xs combine xs v))
 		)
-
-	# Merge each adjoining pair of segments in a list of segments.
-	\merge_adjoining_segments=
-		(@\\loop\xs
-		xs [] \x\ys
-		ys xs \y\zs
-		\z=(merge_segments x y)
-		\zs=(loop zs)
-		[z;zs]
-		)
-
-	# Merge all the segments in a list into a single segment.
-	\merge_all_segments=
-		(@\\loop\xs
-		xs [] \x\ys
-		ys x \_\\_
-		\xs=(merge_adjoining_segments xs)
-		loop xs
-		)
-
-	\make_segments=
-		(@\\loop \\xs
-		xs [] \x\\xs
-		[[x];loop xs]
-		)
-
-	\xs=(make_segments xs)
-	merge_all_segments xs
+	record_pairs obj
 	)
 
 # (merge_keys combine xs ys)
@@ -162,8 +155,20 @@
 # listed in ascending order of key.
 \group_items=
 	(\extract\xs
-	\xs=(map (\x \k=(extract x) {k [x]}) xs)
-	combine_keys append xs
+
+	\obj=empty
+	each xs
+		(\x
+		\k=(extract x)
+		\_=(rmod obj k [] (\\xs [x;xs]))
+		)
+
+	record_collect obj
+		(\item\\tail
+		item \\key\\val
+		\val=(reverse val)
+		[{key val};tail]
+		)
 	)
 
 # Get the list of keys from a list of pairs.
@@ -175,22 +180,84 @@
 # Sort all items with a key extraction function.
 \sort_all=
 	(\extract\\xs
-	\xs=(group_items extract xs)
-	append_all; get_values xs
+	\obj=empty
+
+	each xs
+		(\x
+		\k=(extract x)
+		\_=(rmod obj k [] (\\xs [x;xs]))
+		)
+
+	record_collect obj
+		(\item\\tail
+		item \\key\\val
+		\val=(reverse val)
+		append val tail
+		)
 	)
 
 # Sort unique items with a key extraction function.
 \sort_unique=
 	(\extract\\xs
-	\xs=(map (\x \k=(extract x) {k x}) xs)
-	\xs=(combine_keys (\x\_ x) xs) # Keep the first.
-	get_values xs
+	\obj=empty
+
+	each xs
+		(\x
+		\k=(extract x)
+		get obj k (setf obj k T) (\\_)
+		)
+
+	record_collect obj
+		(\\item\\tail
+		item \\key\\val
+		[key;tail]
+		)
 	)
 
 # The sort and unique functions operate on lists whose elements are all either
 # strings or numbers.
-\sort=(sort_all I)
-\unique=(sort_unique I)
+\sort=
+	(
+	\repeat=
+		(\n\val\xs
+		(@\\loop\n
+		le n 0 xs;
+		[val;loop (- n 1)]
+		)
+		n
+		)
+
+	\\xs
+
+	\obj=empty
+	each xs
+		(\\x
+		\_=(rmod obj x 0 (+ 1))
+		)
+
+	record_collect obj
+		(\item\tail
+		item \key\n
+		repeat n key;
+		tail
+		)
+	)
+
+\unique=
+	(\\xs
+
+	\obj=empty
+	each xs
+		(\\x
+		setf obj x T
+		)
+
+	record_collect obj
+		(\item\\tail
+		item \\key\\val
+		[key;tail]
+		)
+	)
 
 # Using function f and starting value z, run the function forward for each
 # element in the list.
@@ -491,6 +558,9 @@
 ["reverse" reverse]
 ["append_all" append_all]
 ["shift" shift]
+["record_collect" record_collect]
+["record_pairs" record_pairs]
+["record_values" record_values]
 ["combine_keys" combine_keys]
 ["merge_keys" merge_keys]
 ["group_items" group_items]

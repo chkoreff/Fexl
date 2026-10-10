@@ -153,6 +153,7 @@ make_lib "assoc.fxl"
 	load_cmp
 	load_list
 	load_math
+	load_record
 	)
 	\\load_assoc
 

@@ -329,10 +329,13 @@ read_xsv_string
 readlink
 readstr
 receive_keystrokes
+record_collect
 record_copy
 record_count
 record_fill
 record_item
+record_pairs
+record_values
 remember
 remove
 rename

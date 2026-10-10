@@ -173,19 +173,6 @@
 	try_keys f
 	)
 
-# Return the lazy list of pairs in a record.
-\record_pairs=
-	(\obj
-	\count=(record_count obj)
-	(@\\loop\pos
-	ge pos count [];
-	\item=(record_item obj pos)
-	\pos=(+ 1 pos)
-	[item;\= loop pos]
-	)
-	0
-	)
-
 \\test_9=
 	(
 	say "= test_9"

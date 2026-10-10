@@ -2,8 +2,17 @@
 use "lib/b15/context.fxl"
 evaluate \;
 
-# Sort unique pairs, keeping the latest one.
-\sort_pairs=(combine_keys (\x\y y))
+# Sort unique pairs, keeping the last one.
+\sort_pairs=
+	(\\xs
+	\obj=empty
+	each xs
+		(\x
+		x \\k\\_
+		setf obj k x
+		)
+	record_values obj
+	)
 
 # Compare values.
 \eq_val=

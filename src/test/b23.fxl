@@ -4,7 +4,7 @@ say + - # core
 use if # extra
 and or not # bool
 neg max # math2
-map sort_all # list
+map sort # list
 as_str trim_spaces # format
 say_data # indent
 get_key put_key # assoc

@@ -66,7 +66,23 @@
 	)
 
 # (sort_pairs list) Sort the list of pairs by key.
-\sort_pairs=(sort_all (\p p \k\_ k))
+\sort_pairs=
+	(\\xs
+
+	\obj=empty
+	each xs
+		(\x
+		x \\k\\_
+		\_=(rmod obj k [] (\\xs [x;xs]))
+		)
+
+	record_collect obj
+		(\item\\tail
+		item \\key\\list
+		append (reverse list);
+		tail
+		)
+	)
 
 \put_default=
 	(\key\dval\list
@@ -85,8 +101,20 @@
 
 \make_assoc=
 	(\extract\xs
-	\xs=(map (\x \k=(extract x) {k x}) xs)
-	combine_keys (\x\_ x) xs # Keep the first.
+
+	\obj=empty
+	each xs
+		(\x
+		\k=(extract x)
+		get obj k
+			(
+			setf obj k x # Keep the first.
+			)
+			(\\_
+			)
+		)
+
+	record_pairs obj
 	)
 
 [
