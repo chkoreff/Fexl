@@ -2,8 +2,6 @@
 use "test.fxl"
 evaluate \;
 
-show_benchmark;
-
 # (tower f n x) is the result of applying f to x n times.
 \tower=
 	(\f @\\loop\n\x
@@ -11,13 +9,17 @@ show_benchmark;
 	loop (- n 1) (f x)
 	)
 
+\double=(\xs append xs xs)
+
 # Test restricted evaluation by defining only the necessary functions.
 restrict;
-define "append" append
+define "double" double
 define "show_list" show_list
 define "sort" sort
 define "tower" tower
 define "unique" unique
+
+show_benchmark;
 
 evaluate \;
 # Here I test the sort.
@@ -72,7 +74,7 @@ evaluate \;
 	)
 
 # (exp_list n xs) Make 2^n copies of list xs.
-\exp_list=(tower (\x append x x))
+\exp_list=(tower double)
 
 \show=show_list
 
