@@ -33,6 +33,7 @@ Note that on most machines, (sizeof(struct value) == 32).
 */
 
 static value free_list = 0;
+static value drop_list = 0;
 
 value new_value(void)
 	{
@@ -50,21 +51,41 @@ void recycle(value f)
 	free_list = f;
 	}
 
-// Discard a value f with reference count 0.  This drops the L and R fields of
-// a tree value, or calls the clear routine of a data value, and recycles it.
-static void discard(value f)
+static void drop_child(value f)
+	{
+	if (--f->N == 0)
+		{
+		f->next = drop_list;
+		drop_list = f;
+		}
+	}
+
+static void vacate(value f)
 	{
 	if (f->L)
 		{
 		if (f->L->N)
 			{
-			drop(f->L);
-			drop(f->R);
+			drop_child(f->L);
+			drop_child(f->R);
 			}
 		else
 			f->L->clear(f);
 		}
 	recycle(f);
+	}
+
+// Discard a value f with reference count 0.  This drops the L and R fields of
+// a tree value, or calls the clear routine of a data value, and recycles it.
+static void discard(value f)
+	{
+	vacate(f);
+	while (drop_list)
+		{
+		value f = drop_list;
+		drop_list = f->next;
+		vacate(f);
+		}
 	}
 
 // Increment the reference count.
