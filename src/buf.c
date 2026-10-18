@@ -3,21 +3,17 @@
 #include <buf.h>
 #include <die.h>
 #include <memory.h>
-#include <stdlib.h> // realloc free
+#include <stdlib.h> // free
 #include <string.h> // memcpy
 
 // Grow buffer by delta bytes.
 static void buf_grow(buffer buf, size_t delta)
 	{
-	size_t size = buf->size + delta;
-	char *data = realloc(buf->data, size);
+	unsigned long o_size = buf->size;
+	unsigned long n_size = o_size + delta;
 
-	if (data == NULL) die("Out of memory");
-	if (buf->data == 0) cur_blocks++;
-	cur_bytes += delta;
-
-	buf->size = size;
-	buf->data = data;
+	buf->data = resize_memory(buf->data, o_size, n_size);
+	buf->size = n_size;
 	}
 
 // Ensure that the buffer has at least the needed capacity.
