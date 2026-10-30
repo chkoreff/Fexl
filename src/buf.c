@@ -3,7 +3,6 @@
 #include <buf.h>
 #include <die.h>
 #include <memory.h>
-#include <stdlib.h> // free
 #include <string.h> // memcpy
 
 // Grow buffer by delta bytes.
@@ -62,9 +61,8 @@ void buf_addn(buffer buf, const char *str, size_t len)
 // Discard buffer contents.
 void buf_discard(buffer buf)
 	{
-	if (buf->data != 0) cur_blocks--;
-	free(buf->data);
-	cur_bytes -= buf->size;
+	if (buf->data)
+		free_memory(buf->data,buf->size);
 
 	buf->len = 0;
 	buf->size = 0;

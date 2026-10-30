@@ -117,6 +117,7 @@ static struct record *new_record(unsigned long count, unsigned long size)
 	return rec;
 	}
 
+// Calculate a size needed to hold at least count elements.
 static unsigned long calc_size(unsigned long count)
 	{
 	unsigned long extra = count >> 1;
@@ -125,9 +126,10 @@ static unsigned long calc_size(unsigned long count)
 	return count + extra;
 	}
 
+// Increase the size to hold at least one more element.
 static void bump(struct record *old_rec)
 	{
-	// LATER 20241119 Use realloc
+	// LATER 20241119 Use resize_memory
 	unsigned long count = old_rec->count;
 	unsigned long size = calc_size(count+1);
 	struct item *new_vec = new_memory(sizeof(struct item[size]));
@@ -143,7 +145,16 @@ static void bump(struct record *old_rec)
 	old_rec->vec = new_vec;
 	}
 
-static void shift_up(struct item *vec, unsigned long n, unsigned long pos)
+// Shift left the items at [pos+1,n] so they are at [pos,n-1].
+static void shift_l(struct item vec[], unsigned long pos, unsigned long n)
+	{
+	unsigned long i;
+	for (i = pos; i < n; i++)
+		vec[i] = vec[i+1];
+	}
+
+// Shift right the items at [pos,n-1] so they are at [pos+1,n].
+static void shift_r(struct item vec[], unsigned long pos, unsigned long n)
 	{
 	unsigned long i;
 	for (i = n; i > pos; i--)
@@ -155,7 +166,7 @@ static struct item *insert(struct record *rec, unsigned long pos)
 	if (rec->count >= rec->size)
 		bump(rec);
 
-	shift_up(rec->vec,rec->count,pos);
+	shift_r(rec->vec, pos, rec->count);
 	rec->count++;
 	return rec->vec + pos;
 	}
@@ -179,13 +190,6 @@ void record_set(value obj, value key, value val)
 	search.item->val = val;
 	}
 
-static void shift_down(struct item *vec, unsigned long n, unsigned long pos)
-	{
-	unsigned long i;
-	for (i = pos; i < n; i++)
-		vec[i] = vec[i+1];
-	}
-
 static void record_del(value obj, value key)
 	{
 	struct record *rec = obj->v_ptr;
@@ -196,7 +200,7 @@ static void record_del(value obj, value key)
 		drop(search.item->key);
 		drop(search.item->val);
 
-		shift_down(rec->vec,rec->count,search.pos);
+		shift_l(rec->vec, search.pos, rec->count);
 		rec->count--;
 		}
 	}
