@@ -17,7 +17,8 @@ static void reset_vector(struct vector *vec)
 	{
 	if (vec->data)
 		{
-		for (unsigned long i = 0; i < vec->len; i++)
+		unsigned long i;
+		for (i = 0; i < vec->len; i++)
 			drop(vec->data[i]);
 
 		free_memory(vec->data, sizeof(value[vec->size]));
