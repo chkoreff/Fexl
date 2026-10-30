@@ -1,0 +1,146 @@
+#
+\loop_range=
+	(\beg\end\f
+	(@\\loop\i
+	gt i end ();
+	f i
+	loop (+ 1 i)
+	)
+	beg
+	)
+
+\walk_vector=
+	(\vec\f
+	\len=(vec_len vec)
+	loop_range 0 (- len 1)
+		(\k
+		vec_get vec k \\v
+		f k v
+		)
+	)
+
+\vec_show=
+	(\vec
+	say "["
+	walk_vector vec
+		(\k\\v
+		say [k" : "(as_str v)]
+		)
+	say "]"
+	)
+
+\vec_push=
+	(\vec\\x
+	\pos=(vec_len vec)
+	vec_ins vec pos x
+	)
+
+\vec=vec_new
+
+\len=(vec_len vec)
+say ["len = "len]
+
+(
+\x=(vec 0)
+say ["x = "(as_str x)]
+)
+
+(
+\x=(vec_get vec 0)
+say ["x = "(as_str x)]
+)
+
+vec_push vec 10
+vec_get vec 0 \\x say ["got "x]
+
+vec_show vec
+
+vec_push vec 11
+vec_push vec 12
+vec_push vec 13
+vec_push vec 14
+
+vec_show vec
+
+vec_put vec 1 21
+vec_show vec
+
+say "== pop"
+
+\\show_pop=
+	(
+	\len=(vec_len vec)
+	le len 0 (say "done");
+	\pos=(- len 1)
+	vec_get vec pos \\x
+	vec_del vec pos
+	say ["pop "x]
+	)
+
+loop_range 1 6
+	(\_
+	show_pop
+	vec_show vec
+	)
+
+say "== clear"
+vec_clear vec
+vec_show vec
+
+loop_range 1 4000 (vec_push vec)
+say ["len = "(vec_len vec)]
+loop_range 1 2
+	(\_
+	show_pop
+	)
+
+say ["is_vec vec = "(is_vec vec)]
+say ["is_vec I = "(is_vec I)]
+
+(
+\vec=vec_new
+vec_push vec 10
+vec_push vec 11
+vec_push vec 12
+
+say "= vector:"
+vec_show vec
+
+\try_ins=
+	(\pos\\val
+	say ["= vec_ins "pos" "val]
+	\result=(vec_ins vec pos val)
+	if (is_undef result) (say "(out of bounds)")
+	vec_show vec
+	)
+
+try_ins 2 22
+try_ins 4 40
+try_ins 6 60
+try_ins 0 8
+)
+
+(
+\vec=vec_new
+vec_push vec 10
+vec_push vec 11
+vec_push vec 12
+
+say "= vector:"
+vec_show vec
+
+\try_del=
+	(\pos
+	say ["= vec_del "pos]
+	\result=(vec_del vec pos)
+	if (is_undef result) (say "(out of bounds)")
+	vec_show vec
+	)
+
+try_del 0
+try_del 2
+try_del 1
+try_del 0
+)
+
+say "END"

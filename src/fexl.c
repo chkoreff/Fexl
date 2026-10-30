@@ -30,6 +30,7 @@
 #include <type_time.h>
 #include <type_tuple.h>
 #include <type_var.h>
+#include <type_vector.h>
 
 //#include <memory.h>
 
@@ -89,6 +90,7 @@ static void load_core(void)
 	define("load_time",Q0(type_load_time));
 	define("load_tuple",Q0(type_load_tuple));
 	define("load_var",Q0(type_load_var));
+	define("load_vector",Q0(type_load_vector));
 	}
 
 /*

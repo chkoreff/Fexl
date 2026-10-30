@@ -41,3 +41,4 @@ load_time
 load_time2
 load_tuple
 load_var
+load_vector

@@ -184,6 +184,7 @@ is_str
 is_tuple
 is_undef
 is_var
+is_vec
 is_void
 join
 join_list
@@ -247,6 +248,7 @@ load_time
 load_time2
 load_tuple
 load_var
+load_vector
 localtime
 log
 long_month_name
@@ -437,6 +439,13 @@ var_getf
 var_new
 var_put
 var_putf
+vec_clear
+vec_del
+vec_get
+vec_ins
+vec_len
+vec_new
+vec_put
 void
 walk_record
 xor

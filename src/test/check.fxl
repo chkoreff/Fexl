@@ -57,6 +57,7 @@
 "tan"
 "minimal"
 "flintstone"
+"vec"
 ]
 
 # Gather any individually specified tests.

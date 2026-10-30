@@ -49,6 +49,7 @@ make type_sym
 make type_time
 make type_tuple
 make type_var
+make type_vector
 make value
 make_lib fexl
 
