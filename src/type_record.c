@@ -127,22 +127,16 @@ static unsigned long calc_size(unsigned long count)
 	}
 
 // Increase the size to hold at least one more element.
-static void bump(struct record *old_rec)
+static void bump(struct record *rec)
 	{
-	// LATER 20241119 Use resize_memory
-	unsigned long count = old_rec->count;
-	unsigned long size = calc_size(count+1);
-	struct item *new_vec = new_memory(sizeof(struct item[size]));
-	struct item *old_vec = old_rec->vec;
-	unsigned long i;
+	unsigned long o_size = rec->size;
+	unsigned long n_size = calc_size(rec->count + 1);
 
-	for (i = 0; i < count; i++)
-		new_vec[i] = old_vec[i];
-
-	free_memory(old_vec, sizeof(struct item[old_rec->size]));
-
-	old_rec->size = size;
-	old_rec->vec = new_vec;
+	rec->vec = resize_memory(rec->vec,
+		sizeof(struct item[o_size]),
+		sizeof(struct item[n_size])
+		);
+	rec->size = n_size;
 	}
 
 // Shift left the items at [pos+1,n] so they are at [pos,n-1].
